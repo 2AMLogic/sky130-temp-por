@@ -9,6 +9,9 @@ __pycache__/
 # (append-only record trail), so they escape the *.log rule.
 !sim/*/corners/**/*.log
 sim/build/
+# design/xschemrc's interactive-netlisting scratch dir (design/netlist.py
+# always overrides with an explicit -o, so this only catches GUI sessions)
+design/netlist/build/
 # synthesis / P&R scratch
 flow/build/
 # local klt install, created by the setup script

@@ -1,0 +1,80 @@
+#### Project-local xschemrc for sky130-temp-por.
+####
+#### Used by `python3 design/netlist.py` (via `xschem --rcfile`) and suitable
+#### for interactive sessions:
+####
+####     export PDK_ROOT=~/.volare PDK=sky130A   # or let the volare default apply
+####     xschem --rcfile design/xschemrc design/bias_core.sch
+####
+#### PDK discovery, in order: PDK_ROOT/PDK env vars, else the volare default
+#### root (~/.volare/sky130A) -- the same fallback design/netlist.py uses and
+#### the same one sky130-bandgap/sim/xschemrc pins, so a machine with the PDK
+#### volare-installed needs no environment setup at all. This is option (b)
+#### from issue #6 ("inline PDK discovery directly in design/xschemrc"): a
+#### shared sim/harness/pdk.py-equivalent module is deferred to
+#### spec/porting-plan.md §4 item 1 (sim-harness port, not yet filed) so this
+#### issue's scope stays schematic entry, not simulation infrastructure.
+####
+#### This sources the PDK's own xschemrc (unlike gf180-temp-por's, which
+#### deliberately does not) because sky130's PDK xschemrc is netlist-batch-
+#### safe: it only sets XSCHEM_LIBRARY_PATH and SKYWATER_MODELS, with no
+#### gf180-style hardcoded variant/interactive-toolbar assumptions to work
+#### around -- confirmed against sky130-bandgap/sim/xschemrc, which relies on
+#### the same source pattern for its own corner runner.
+
+if {![info exists env(PDK_ROOT)] || $env(PDK_ROOT) eq {}} {
+  set env(PDK_ROOT) [file normalize ~/.volare]
+}
+if {![info exists env(PDK)] || $env(PDK) eq {}} {
+  set env(PDK) sky130A
+}
+
+set _sky130_rc $env(PDK_ROOT)/$env(PDK)/libs.tech/xschem/xschemrc
+if {![file exists $_sky130_rc]} {
+  puts stderr "design/xschemrc: no PDK xschemrc at $_sky130_rc"
+  puts stderr "design/xschemrc: install the sky130A PDK (volare) or set PDK_ROOT/PDK"
+} else {
+  source $_sky130_rc
+}
+unset _sky130_rc
+
+#### Where this file lives -- design/ is the project symbol library. Appended
+#### *after* the PDK entries so a project symbol (bias_core.sym) can never
+#### shadow a sky130_fd_pr/* one, and resolves by its bare/repo-relative name.
+set design_dir [file normalize [file dirname [info script]]]
+if {[info exists XSCHEM_LIBRARY_PATH] && $XSCHEM_LIBRARY_PATH ne {}} {
+  append XSCHEM_LIBRARY_PATH ":$design_dir"
+} else {
+  set XSCHEM_LIBRARY_PATH $design_dir
+}
+
+#### Allow a future sim harness's XSCHEM_USER_LIBRARY_PATH (testbench dirs) to
+#### be picked up too, so a testbench cell can instantiate design/ symbols.
+if { [info exists env(XSCHEM_USER_LIBRARY_PATH)] } {
+  append XSCHEM_LIBRARY_PATH :$env(XSCHEM_USER_LIBRARY_PATH)
+}
+
+#### Netlisting behaviour (the load-bearing part of this file) -- mirrors
+#### gf180-temp-por/design/xschemrc exactly, PDK specifics aside.
+set netlist_type spice
+#### Netlist the cell being netlisted as a .subckt rather than as a flat deck.
+#### Every cell in design/ -- including the top level -- is a reusable block
+#### that testbenches instantiate, never a standalone simulation deck.
+set top_is_subckt 1
+#### Keep hierarchy: sub-circuits stay as .subckt definitions + X instances.
+set flat_netlist 0
+#### Device symbols in the PDK carry spiceprefix=X; honour it.
+set spiceprefix 1
+
+#### Start with no schematic loaded when invoked without a filename, and skip
+#### the PDK's own demo schematic.
+set XSCHEM_START_WINDOW {}
+
+#### Do not open the interactive info window during batch runs.
+set show_infowindow 0
+
+#### Keep xschem's generated netlists out of the tracked tree by default;
+#### design/netlist.py overrides this with an explicit `-o`, so this only
+#### affects interactive netlisting from the GUI.
+set netlist_dir [file normalize [file join $design_dir netlist build]]
+file mkdir $netlist_dir
