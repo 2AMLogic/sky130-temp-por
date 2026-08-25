@@ -1,0 +1,961 @@
+{
+  "author": "auditor@loom.local",
+  "cross_point_checks": [
+    {
+      "detail": "sigma(seed 20260826) / sigma(seed 20260825) = 1.039 (0.1002 mV vs 0.0964 mV; tolerance +/-25%)",
+      "name": "seed_sigma_stable[da1]",
+      "pass": true
+    },
+    {
+      "detail": "worst-sample magnitude differs between the two seeds (0.2703 mV vs 0.3194 mV), i.e. the draw really did change",
+      "name": "seed_sample_differs[da1]",
+      "pass": true
+    },
+    {
+      "detail": "sigma(seed 20260826) / sigma(seed 20260825) = 0.970 (0.0959 mV vs 0.0989 mV; tolerance +/-25%)",
+      "name": "seed_sigma_stable[da10]",
+      "pass": true
+    },
+    {
+      "detail": "worst-sample magnitude differs between the two seeds (0.2710 mV vs 0.2778 mV), i.e. the draw really did change",
+      "name": "seed_sample_differs[da10]",
+      "pass": true
+    },
+    {
+      "detail": "sigma(seed 20260826) / sigma(seed 20260825) = 0.941 (0.0727 mV vs 0.0773 mV; tolerance +/-25%)",
+      "name": "seed_sigma_stable[dr1]",
+      "pass": true
+    },
+    {
+      "detail": "worst-sample magnitude differs between the two seeds (54.5970 mV vs 54.6150 mV), i.e. the draw really did change",
+      "name": "seed_sample_differs[dr1]",
+      "pass": true
+    },
+    {
+      "detail": "sigma(seed 20260826) / sigma(seed 20260825) = 1.070 (0.0715 mV vs 0.0668 mV; tolerance +/-25%)",
+      "name": "seed_sigma_stable[dr10]",
+      "pass": true
+    },
+    {
+      "detail": "worst-sample magnitude differs between the two seeds (55.0565 mV vs 55.0771 mV), i.e. the draw really did change",
+      "name": "seed_sample_differs[dr10]",
+      "pass": true
+    }
+  ],
+  "experiment": {
+    "claim": "Issue #17 -- sim-harness port. Confirms sky130's local-mismatch (MC_MM_SWITCH=1) AND global-process-Monte-Carlo (MC_PR_SWITCH=1) mechanisms both produce non-degenerate samples against THIS repo's own PNP topology -- a single `sky130_fd_pr__pnp_05v5_W3p40L3p40` vs. the real 1-vs-8-parallel array bias_core/temp_core actually use, not a re-run of sky130-bandgap's own small/large device-size pair. **This record makes no spec pass/fail claim** -- no ratified spec exists yet (spec/porting-plan.md Sec4 item 4); it reports measured distributions plus the harness checks that make them trustworthy, per issue #17's own acceptance criteria.",
+    "provenance": "schematic",
+    "provenance_source": "sim/pnp-mismatch/testbench/tb_pnp_mismatch.spice",
+    "slug": "pnp-mismatch",
+    "statistical_convention": "N = 300 Monte Carlo samples per local-mismatch point (section tt_mm: MC_MM_SWITCH=1, MC_PR_SWITCH=0); 1 sigma sample standard deviation (N-1), fixed setseed 20260825",
+    "title": "Substrate PNP pair mismatch -- sigma(dVBE) by local + global-process Monte Carlo"
+  },
+  "git": {
+    "branch": "feature/issue-17",
+    "dirty": true,
+    "sha": "a9cac4b"
+  },
+  "links": {
+    "json_record": "sim/pnp-mismatch/records/20260825-220116-a9cac4b.json",
+    "netlist_snapshot": "sim/pnp-mismatch/netlist-snapshots/20260825-220116-a9cac4b.spice",
+    "raw_logs": "sim/pnp-mismatch/corners/20260825-220116-a9cac4b/",
+    "record": "sim/pnp-mismatch/records/20260825-220116-a9cac4b.md",
+    "run_script": "sim/pnp-mismatch/run_pnp_mismatch.py",
+    "testbench": "sim/pnp-mismatch/testbench/tb_pnp_mismatch.spice"
+  },
+  "mismatch_model": {
+    "coefficients": {
+      "W3p40L3p40_bf_scale": 0.45,
+      "W3p40L3p40_is_scale": 0.13,
+      "sw_mm_sky130_fd_pr__pnp_05v5_W0p68L0p68_bf": 0.05537,
+      "sw_mm_sky130_fd_pr__pnp_05v5_W0p68L0p68_is": 0.01662
+    },
+    "global_switch": "MC_PR_SWITCH (globally-scoped .param AGAUSS/GAUSS terms, set 1 only in the mc section)",
+    "local_switch": "MC_MM_SWITCH (per-instance AGAUSS, set by the .lib section: 0 in tt/ss/ff/sf/fs/tt, 1 in *_mm)",
+    "sections": {
+      "control": "tt",
+      "mismatch": "tt_mm",
+      "process_mc": "mc"
+    },
+    "source": "libs.tech/combined/continuous/models_bjt.spice + models_global.spice"
+  },
+  "overall_pass": true,
+  "pairs": [
+    {
+      "bias_a": 1e-06,
+      "devices": "sky130_fd_pr__pnp_05v5_W3p40L3p40 x2",
+      "kind": "identical",
+      "n_a": 1,
+      "n_b": 1,
+      "veb_vectors": null,
+      "vector": "da1"
+    },
+    {
+      "bias_a": 1e-05,
+      "devices": "sky130_fd_pr__pnp_05v5_W3p40L3p40 x2",
+      "kind": "identical",
+      "n_a": 1,
+      "n_b": 1,
+      "veb_vectors": null,
+      "vector": "da10"
+    },
+    {
+      "bias_a": 1e-06,
+      "devices": "sky130_fd_pr__pnp_05v5_W3p40L3p40 1x vs 8x parallel",
+      "kind": "array1v8",
+      "n_a": 1,
+      "n_b": 8,
+      "veb_vectors": [
+        "vr1a",
+        "vr1b"
+      ],
+      "vector": "dr1"
+    },
+    {
+      "bias_a": 1e-05,
+      "devices": "sky130_fd_pr__pnp_05v5_W3p40L3p40 1x vs 8x parallel",
+      "kind": "array1v8",
+      "n_a": 1,
+      "n_b": 8,
+      "veb_vectors": [
+        "vr10a",
+        "vr10b"
+      ],
+      "vector": "dr10"
+    }
+  ],
+  "pdk": {
+    "installed_commit": "c6d73a35f524070e85faff4a6a9eef49553ebc2b",
+    "lib_file": "/home/ubuntu/.volare/sky130A/libs.tech/combined/sky130.lib.spice",
+    "matches_pin": true,
+    "pinned_commit": "c6d73a35f524070e85faff4a6a9eef49553ebc2b",
+    "root": "/home/ubuntu/.volare",
+    "variant": "sky130A"
+  },
+  "points": [
+    {
+      "checks": [
+        {
+          "detail": "parsed 300 samples, expected 300",
+          "name": "sample_count",
+          "pass": true
+        },
+        {
+          "detail": "sigma = 0.1161 mV (must be > 0: a zero here means the mismatch switch never reached the models)",
+          "name": "sigma_nonzero[da1]",
+          "pass": true
+        },
+        {
+          "detail": "sigma/predicted = 1.89 (measured 0.1161 mV vs first-order PDK-coefficient prediction 0.0614 mV; band 0.4-2.5)",
+          "name": "analytic_band[da1]",
+          "pass": true
+        },
+        {
+          "detail": "|mean| = 0.0089 mV vs 4*sigma/sqrt(N) = 0.0268 mV (an identical pair has no systematic offset)",
+          "name": "zero_mean[da1]",
+          "pass": true
+        },
+        {
+          "detail": "sigma = 0.1279 mV (must be > 0: a zero here means the mismatch switch never reached the models)",
+          "name": "sigma_nonzero[da10]",
+          "pass": true
+        },
+        {
+          "detail": "sigma/predicted = 2.08 (measured 0.1279 mV vs first-order PDK-coefficient prediction 0.0614 mV; band 0.4-2.5)",
+          "name": "analytic_band[da10]",
+          "pass": true
+        },
+        {
+          "detail": "|mean| = 0.0096 mV vs 4*sigma/sqrt(N) = 0.0295 mV (an identical pair has no systematic offset)",
+          "name": "zero_mean[da10]",
+          "pass": true
+        },
+        {
+          "detail": "sigma = 0.0943 mV (must be > 0: a zero here means the mismatch switch never reached the models)",
+          "name": "sigma_nonzero[dr1]",
+          "pass": true
+        },
+        {
+          "detail": "sigma/predicted = 2.05 (measured 0.0943 mV vs first-order PDK-coefficient prediction 0.0460 mV; band 0.4-2.5)",
+          "name": "analytic_band[dr1]",
+          "pass": true
+        },
+        {
+          "detail": "sigma/|mean dVBE| = 0.0022 (mismatch spread 0.0943 mV against a 42.256 mV PTAT signal from the 1-vs-8-parallel array's own VT*ln(8) term; must be <= 0.05)",
+          "name": "signal_vs_sigma[dr1]",
+          "pass": true
+        },
+        {
+          "detail": "sigma = 0.0848 mV (must be > 0: a zero here means the mismatch switch never reached the models)",
+          "name": "sigma_nonzero[dr10]",
+          "pass": true
+        },
+        {
+          "detail": "sigma/predicted = 1.84 (measured 0.0848 mV vs first-order PDK-coefficient prediction 0.0460 mV; band 0.4-2.5)",
+          "name": "analytic_band[dr10]",
+          "pass": true
+        },
+        {
+          "detail": "sigma/|mean dVBE| = 0.0020 (mismatch spread 0.0848 mV against a 42.538 mV PTAT signal from the 1-vs-8-parallel array's own VT*ln(8) term; must be <= 0.05)",
+          "name": "signal_vs_sigma[dr10]",
+          "pass": true
+        }
+      ],
+      "corner_id": "tt_mm_-40c_nosupply",
+      "parsed_samples": 300,
+      "pass": true,
+      "purpose": "local-mismatch distribution at the nominal process point",
+      "requested_samples": 300,
+      "role": "mismatch",
+      "section": "tt_mm",
+      "seed": 20260825,
+      "stats": {
+        "da1": {
+          "max": 0.0003941835,
+          "max_abs": 0.0003941835,
+          "mean": -8.893225906333332e-06,
+          "min": -0.000323196,
+          "n": 300,
+          "sigma": 0.00011606996445461878
+        },
+        "da10": {
+          "max": 0.0003950243,
+          "max_abs": 0.0003950243,
+          "mean": -9.5538992076e-06,
+          "min": -0.000352771,
+          "n": 300,
+          "sigma": 0.0001278654387437766
+        },
+        "dr1": {
+          "max": 0.04253313,
+          "max_abs": 0.04253313,
+          "mean": 0.0422559811,
+          "min": 0.04197418,
+          "n": 300,
+          "sigma": 9.430600383319548e-05
+        },
+        "dr10": {
+          "max": 0.04276329,
+          "max_abs": 0.04276329,
+          "mean": 0.0425376008,
+          "min": 0.04227072,
+          "n": 300,
+          "sigma": 8.484369294651594e-05
+        },
+        "vr10a": {
+          "max": 0.8513872,
+          "max_abs": 0.8513872,
+          "mean": 0.8511944746666666,
+          "min": 0.8509003,
+          "n": 300,
+          "sigma": 8.282814596562116e-05
+        },
+        "vr10b": {
+          "max": 0.8087537,
+          "max_abs": 0.8087537,
+          "mean": 0.8086568733333334,
+          "min": 0.8085791,
+          "n": 300,
+          "sigma": 3.0007698380514558e-05
+        },
+        "vr1a": {
+          "max": 0.8044046,
+          "max_abs": 0.8044046,
+          "mean": 0.8041212536666666,
+          "min": 0.8038515,
+          "n": 300,
+          "sigma": 9.000166713369815e-05
+        },
+        "vr1b": {
+          "max": 0.7619587,
+          "max_abs": 0.7619587,
+          "mean": 0.76186527,
+          "min": 0.7617854,
+          "n": 300,
+          "sigma": 3.0557975492833685e-05
+        }
+      },
+      "supply_v": null,
+      "temperature_c": -40.0
+    },
+    {
+      "checks": [
+        {
+          "detail": "parsed 300 samples, expected 300",
+          "name": "sample_count",
+          "pass": true
+        },
+        {
+          "detail": "sigma = 0.0964 mV (must be > 0: a zero here means the mismatch switch never reached the models)",
+          "name": "sigma_nonzero[da1]",
+          "pass": true
+        },
+        {
+          "detail": "sigma/predicted = 1.22 (measured 0.0964 mV vs first-order PDK-coefficient prediction 0.0790 mV; band 0.4-2.5)",
+          "name": "analytic_band[da1]",
+          "pass": true
+        },
+        {
+          "detail": "|mean| = 0.0039 mV vs 4*sigma/sqrt(N) = 0.0223 mV (an identical pair has no systematic offset)",
+          "name": "zero_mean[da1]",
+          "pass": true
+        },
+        {
+          "detail": "sigma = 0.0989 mV (must be > 0: a zero here means the mismatch switch never reached the models)",
+          "name": "sigma_nonzero[da10]",
+          "pass": true
+        },
+        {
+          "detail": "sigma/predicted = 1.25 (measured 0.0989 mV vs first-order PDK-coefficient prediction 0.0790 mV; band 0.4-2.5)",
+          "name": "analytic_band[da10]",
+          "pass": true
+        },
+        {
+          "detail": "|mean| = 0.0054 mV vs 4*sigma/sqrt(N) = 0.0228 mV (an identical pair has no systematic offset)",
+          "name": "zero_mean[da10]",
+          "pass": true
+        },
+        {
+          "detail": "sigma = 0.0773 mV (must be > 0: a zero here means the mismatch switch never reached the models)",
+          "name": "sigma_nonzero[dr1]",
+          "pass": true
+        },
+        {
+          "detail": "sigma/predicted = 1.30 (measured 0.0773 mV vs first-order PDK-coefficient prediction 0.0593 mV; band 0.4-2.5)",
+          "name": "analytic_band[dr1]",
+          "pass": true
+        },
+        {
+          "detail": "sigma/|mean dVBE| = 0.0014 (mismatch spread 0.0773 mV against a 54.424 mV PTAT signal from the 1-vs-8-parallel array's own VT*ln(8) term; must be <= 0.05)",
+          "name": "signal_vs_sigma[dr1]",
+          "pass": true
+        },
+        {
+          "detail": "sigma = 0.0668 mV (must be > 0: a zero here means the mismatch switch never reached the models)",
+          "name": "sigma_nonzero[dr10]",
+          "pass": true
+        },
+        {
+          "detail": "sigma/predicted = 1.13 (measured 0.0668 mV vs first-order PDK-coefficient prediction 0.0593 mV; band 0.4-2.5)",
+          "name": "analytic_band[dr10]",
+          "pass": true
+        },
+        {
+          "detail": "sigma/|mean dVBE| = 0.0012 (mismatch spread 0.0668 mV against a 54.878 mV PTAT signal from the 1-vs-8-parallel array's own VT*ln(8) term; must be <= 0.05)",
+          "name": "signal_vs_sigma[dr10]",
+          "pass": true
+        }
+      ],
+      "corner_id": "tt_mm_27c_nosupply",
+      "parsed_samples": 300,
+      "pass": true,
+      "purpose": "local-mismatch distribution at the nominal process point",
+      "requested_samples": 300,
+      "role": "mismatch",
+      "section": "tt_mm",
+      "seed": 20260825,
+      "stats": {
+        "da1": {
+          "max": 0.0002233581,
+          "max_abs": 0.000270313,
+          "mean": -3.93843385e-06,
+          "min": -0.000270313,
+          "n": 300,
+          "sigma": 9.636691949320336e-05
+        },
+        "da10": {
+          "max": 0.0002623211,
+          "max_abs": 0.000271012,
+          "mean": -5.42505271e-06,
+          "min": -0.000271012,
+          "n": 300,
+          "sigma": 9.88760110726027e-05
+        },
+        "dr1": {
+          "max": 0.054597,
+          "max_abs": 0.054597,
+          "mean": 0.054423645300000004,
+          "min": 0.05421109,
+          "n": 300,
+          "sigma": 7.727855197202515e-05
+        },
+        "dr10": {
+          "max": 0.05505647,
+          "max_abs": 0.05505647,
+          "mean": 0.05487794026666666,
+          "min": 0.05463731,
+          "n": 300,
+          "sigma": 6.683590080726036e-05
+        },
+        "vr10a": {
+          "max": 0.7404478,
+          "max_abs": 0.7404478,
+          "mean": 0.7402948386666667,
+          "min": 0.7400663,
+          "n": 300,
+          "sigma": 6.520445466312523e-05
+        },
+        "vr10b": {
+          "max": 0.685488,
+          "max_abs": 0.685488,
+          "mean": 0.685416899,
+          "min": 0.685351,
+          "n": 300,
+          "sigma": 2.3424474073471216e-05
+        },
+        "vr1a": {
+          "max": 0.6797658,
+          "max_abs": 0.6797658,
+          "mean": 0.679570777,
+          "min": 0.6793947,
+          "n": 300,
+          "sigma": 7.4613563896861e-05
+        },
+        "vr1b": {
+          "max": 0.6252094,
+          "max_abs": 0.6252094,
+          "mean": 0.6251471286666667,
+          "min": 0.6250887,
+          "n": 300,
+          "sigma": 2.4400508072638025e-05
+        }
+      },
+      "supply_v": null,
+      "temperature_c": 27.0
+    },
+    {
+      "checks": [
+        {
+          "detail": "parsed 300 samples, expected 300",
+          "name": "sample_count",
+          "pass": true
+        },
+        {
+          "detail": "sigma = 0.1802 mV (must be > 0: a zero here means the mismatch switch never reached the models)",
+          "name": "sigma_nonzero[da1]",
+          "pass": true
+        },
+        {
+          "detail": "sigma/predicted = 1.72 (measured 0.1802 mV vs first-order PDK-coefficient prediction 0.1048 mV; band 0.4-2.5)",
+          "name": "analytic_band[da1]",
+          "pass": true
+        },
+        {
+          "detail": "|mean| = 0.0066 mV vs 4*sigma/sqrt(N) = 0.0416 mV (an identical pair has no systematic offset)",
+          "name": "zero_mean[da1]",
+          "pass": true
+        },
+        {
+          "detail": "sigma = 0.1848 mV (must be > 0: a zero here means the mismatch switch never reached the models)",
+          "name": "sigma_nonzero[da10]",
+          "pass": true
+        },
+        {
+          "detail": "sigma/predicted = 1.76 (measured 0.1848 mV vs first-order PDK-coefficient prediction 0.1048 mV; band 0.4-2.5)",
+          "name": "analytic_band[da10]",
+          "pass": true
+        },
+        {
+          "detail": "|mean| = 0.0029 mV vs 4*sigma/sqrt(N) = 0.0427 mV (an identical pair has no systematic offset)",
+          "name": "zero_mean[da10]",
+          "pass": true
+        },
+        {
+          "detail": "sigma = 0.1355 mV (must be > 0: a zero here means the mismatch switch never reached the models)",
+          "name": "sigma_nonzero[dr1]",
+          "pass": true
+        },
+        {
+          "detail": "sigma/predicted = 1.72 (measured 0.1355 mV vs first-order PDK-coefficient prediction 0.0786 mV; band 0.4-2.5)",
+          "name": "analytic_band[dr1]",
+          "pass": true
+        },
+        {
+          "detail": "sigma/|mean dVBE| = 0.0019 (mismatch spread 0.1355 mV against a 72.284 mV PTAT signal from the 1-vs-8-parallel array's own VT*ln(8) term; must be <= 0.05)",
+          "name": "signal_vs_sigma[dr1]",
+          "pass": true
+        },
+        {
+          "detail": "sigma = 0.1384 mV (must be > 0: a zero here means the mismatch switch never reached the models)",
+          "name": "sigma_nonzero[dr10]",
+          "pass": true
+        },
+        {
+          "detail": "sigma/predicted = 1.76 (measured 0.1384 mV vs first-order PDK-coefficient prediction 0.0786 mV; band 0.4-2.5)",
+          "name": "analytic_band[dr10]",
+          "pass": true
+        },
+        {
+          "detail": "sigma/|mean dVBE| = 0.0019 (mismatch spread 0.1384 mV against a 73.103 mV PTAT signal from the 1-vs-8-parallel array's own VT*ln(8) term; must be <= 0.05)",
+          "name": "signal_vs_sigma[dr10]",
+          "pass": true
+        }
+      ],
+      "corner_id": "tt_mm_125c_nosupply",
+      "parsed_samples": 300,
+      "pass": true,
+      "purpose": "local-mismatch distribution at the nominal process point",
+      "requested_samples": 300,
+      "role": "mismatch",
+      "section": "tt_mm",
+      "seed": 20260825,
+      "stats": {
+        "da1": {
+          "max": 0.00046412,
+          "max_abs": 0.000580197,
+          "mean": 6.5822613236666675e-06,
+          "min": -0.000580197,
+          "n": 300,
+          "sigma": 0.00018024222298121666
+        },
+        "da10": {
+          "max": 0.0006069412,
+          "max_abs": 0.0006069412,
+          "mean": 2.918545407000001e-06,
+          "min": -0.000466709,
+          "n": 300,
+          "sigma": 0.00018480283381758515
+        },
+        "dr1": {
+          "max": 0.07267997,
+          "max_abs": 0.07267997,
+          "mean": 0.07228360136666667,
+          "min": 0.07195831,
+          "n": 300,
+          "sigma": 0.00013550691902930594
+        },
+        "dr10": {
+          "max": 0.07340258,
+          "max_abs": 0.07340258,
+          "mean": 0.07310272056666667,
+          "min": 0.07262805,
+          "n": 300,
+          "sigma": 0.00013835157069965774
+        },
+        "vr10a": {
+          "max": 0.5658188,
+          "max_abs": 0.5658188,
+          "mean": 0.565482284,
+          "min": 0.5650536,
+          "n": 300,
+          "sigma": 0.0001336752544646457
+        },
+        "vr10b": {
+          "max": 0.4925043,
+          "max_abs": 0.4925043,
+          "mean": 0.4923795653333334,
+          "min": 0.49226,
+          "n": 300,
+          "sigma": 4.579885860718911e-05
+        },
+        "vr1a": {
+          "max": 0.4849735,
+          "max_abs": 0.4849735,
+          "mean": 0.4846080166666667,
+          "min": 0.4842845,
+          "n": 300,
+          "sigma": 0.0001298257702626995
+        },
+        "vr1b": {
+          "max": 0.4124672,
+          "max_abs": 0.4124672,
+          "mean": 0.4123244226666667,
+          "min": 0.4121553,
+          "n": 300,
+          "sigma": 4.680994969937944e-05
+        }
+      },
+      "supply_v": null,
+      "temperature_c": 125.0
+    },
+    {
+      "checks": [
+        {
+          "detail": "parsed 30 samples, expected 30",
+          "name": "sample_count",
+          "pass": true
+        },
+        {
+          "detail": "sigma = 0 V with MC_MM_SWITCH=0, MC_PR_SWITCH=0 (must be <= 1e-09 V -- a floating-point-noise floor, not a real-mismatch tolerance: the array1v8 pair's 8-parallel-device node sum is not always bit-identical run-to-run even with both switches off, but stays ~9 orders of magnitude below any measured real-mismatch sigma above)",
+          "name": "sigma_zero[da1]",
+          "pass": true
+        },
+        {
+          "detail": "sigma = 0 V with MC_MM_SWITCH=0, MC_PR_SWITCH=0 (must be <= 1e-09 V -- a floating-point-noise floor, not a real-mismatch tolerance: the array1v8 pair's 8-parallel-device node sum is not always bit-identical run-to-run even with both switches off, but stays ~9 orders of magnitude below any measured real-mismatch sigma above)",
+          "name": "sigma_zero[da10]",
+          "pass": true
+        },
+        {
+          "detail": "sigma = 7.05752e-18 V with MC_MM_SWITCH=0, MC_PR_SWITCH=0 (must be <= 1e-09 V -- a floating-point-noise floor, not a real-mismatch tolerance: the array1v8 pair's 8-parallel-device node sum is not always bit-identical run-to-run even with both switches off, but stays ~9 orders of magnitude below any measured real-mismatch sigma above)",
+          "name": "sigma_zero[dr1]",
+          "pass": true
+        },
+        {
+          "detail": "sigma = 0 V with MC_MM_SWITCH=0, MC_PR_SWITCH=0 (must be <= 1e-09 V -- a floating-point-noise floor, not a real-mismatch tolerance: the array1v8 pair's 8-parallel-device node sum is not always bit-identical run-to-run even with both switches off, but stays ~9 orders of magnitude below any measured real-mismatch sigma above)",
+          "name": "sigma_zero[dr10]",
+          "pass": true
+        }
+      ],
+      "corner_id": "tt_27c_nosupply_mm-off",
+      "parsed_samples": 30,
+      "pass": true,
+      "purpose": "control: identical deck on the plain `tt` section (MC_MM_SWITCH=0); every sigma must come back exactly 0, which is what proves the spread above is the mismatch switch and not solver noise",
+      "requested_samples": 30,
+      "role": "control",
+      "section": "tt",
+      "seed": 20260825,
+      "stats": {
+        "da1": {
+          "max": 0.0,
+          "max_abs": 0.0,
+          "mean": 0.0,
+          "min": 0.0,
+          "n": 30,
+          "sigma": 0.0
+        },
+        "da10": {
+          "max": 0.0,
+          "max_abs": 0.0,
+          "mean": 0.0,
+          "min": 0.0,
+          "n": 30,
+          "sigma": 0.0
+        },
+        "dr1": {
+          "max": 0.05442279,
+          "max_abs": 0.05442279,
+          "mean": 0.05442278999999999,
+          "min": 0.05442279,
+          "n": 30,
+          "sigma": 7.057516067604627e-18
+        },
+        "dr10": {
+          "max": 0.05487557,
+          "max_abs": 0.05487557,
+          "mean": 0.05487557,
+          "min": 0.05487557,
+          "n": 30,
+          "sigma": 0.0
+        },
+        "vr10a": {
+          "max": 0.7402926,
+          "max_abs": 0.7402926,
+          "mean": 0.7402926,
+          "min": 0.7402926,
+          "n": 30,
+          "sigma": 0.0
+        },
+        "vr10b": {
+          "max": 0.6854171,
+          "max_abs": 0.6854171,
+          "mean": 0.6854171,
+          "min": 0.6854171,
+          "n": 30,
+          "sigma": 0.0
+        },
+        "vr1a": {
+          "max": 0.6795725,
+          "max_abs": 0.6795725,
+          "mean": 0.6795725,
+          "min": 0.6795725,
+          "n": 30,
+          "sigma": 0.0
+        },
+        "vr1b": {
+          "max": 0.6251497,
+          "max_abs": 0.6251497,
+          "mean": 0.6251497,
+          "min": 0.6251497,
+          "n": 30,
+          "sigma": 0.0
+        }
+      },
+      "supply_v": null,
+      "temperature_c": 27.0
+    },
+    {
+      "checks": [
+        {
+          "detail": "parsed 300 samples, expected 300",
+          "name": "sample_count",
+          "pass": true
+        },
+        {
+          "detail": "sigma = 0.1002 mV (must be > 0: a zero here means the mismatch switch never reached the models)",
+          "name": "sigma_nonzero[da1]",
+          "pass": true
+        },
+        {
+          "detail": "sigma/predicted = 1.27 (measured 0.1002 mV vs first-order PDK-coefficient prediction 0.0790 mV; band 0.4-2.5)",
+          "name": "analytic_band[da1]",
+          "pass": true
+        },
+        {
+          "detail": "|mean| = 0.0051 mV vs 4*sigma/sqrt(N) = 0.0231 mV (an identical pair has no systematic offset)",
+          "name": "zero_mean[da1]",
+          "pass": true
+        },
+        {
+          "detail": "sigma = 0.0959 mV (must be > 0: a zero here means the mismatch switch never reached the models)",
+          "name": "sigma_nonzero[da10]",
+          "pass": true
+        },
+        {
+          "detail": "sigma/predicted = 1.21 (measured 0.0959 mV vs first-order PDK-coefficient prediction 0.0790 mV; band 0.4-2.5)",
+          "name": "analytic_band[da10]",
+          "pass": true
+        },
+        {
+          "detail": "|mean| = 0.0017 mV vs 4*sigma/sqrt(N) = 0.0222 mV (an identical pair has no systematic offset)",
+          "name": "zero_mean[da10]",
+          "pass": true
+        },
+        {
+          "detail": "sigma = 0.0727 mV (must be > 0: a zero here means the mismatch switch never reached the models)",
+          "name": "sigma_nonzero[dr1]",
+          "pass": true
+        },
+        {
+          "detail": "sigma/predicted = 1.23 (measured 0.0727 mV vs first-order PDK-coefficient prediction 0.0593 mV; band 0.4-2.5)",
+          "name": "analytic_band[dr1]",
+          "pass": true
+        },
+        {
+          "detail": "sigma/|mean dVBE| = 0.0013 (mismatch spread 0.0727 mV against a 54.428 mV PTAT signal from the 1-vs-8-parallel array's own VT*ln(8) term; must be <= 0.05)",
+          "name": "signal_vs_sigma[dr1]",
+          "pass": true
+        },
+        {
+          "detail": "sigma = 0.0715 mV (must be > 0: a zero here means the mismatch switch never reached the models)",
+          "name": "sigma_nonzero[dr10]",
+          "pass": true
+        },
+        {
+          "detail": "sigma/predicted = 1.21 (measured 0.0715 mV vs first-order PDK-coefficient prediction 0.0593 mV; band 0.4-2.5)",
+          "name": "analytic_band[dr10]",
+          "pass": true
+        },
+        {
+          "detail": "sigma/|mean dVBE| = 0.0013 (mismatch spread 0.0715 mV against a 54.875 mV PTAT signal from the 1-vs-8-parallel array's own VT*ln(8) term; must be <= 0.05)",
+          "name": "signal_vs_sigma[dr10]",
+          "pass": true
+        }
+      ],
+      "corner_id": "tt_mm_27c_nosupply_seed-b",
+      "parsed_samples": 300,
+      "pass": true,
+      "purpose": "seed-stability: same point, different setseed -- the samples must change while sigma must not, i.e. the reported spread is a property of the model, not of one lucky draw",
+      "requested_samples": 300,
+      "role": "seed-check",
+      "section": "tt_mm",
+      "seed": 20260826,
+      "stats": {
+        "da1": {
+          "max": 0.0002983825,
+          "max_abs": 0.000319372,
+          "mean": -5.12806866e-06,
+          "min": -0.000319372,
+          "n": 300,
+          "sigma": 0.00010017293183220033
+        },
+        "da10": {
+          "max": 0.0002777593,
+          "max_abs": 0.0002777593,
+          "mean": 1.6599078629999994e-06,
+          "min": -0.000259537,
+          "n": 300,
+          "sigma": 9.594294740575672e-05
+        },
+        "dr1": {
+          "max": 0.05461501,
+          "max_abs": 0.05461501,
+          "mean": 0.054427680433333334,
+          "min": 0.05421059,
+          "n": 300,
+          "sigma": 7.27051283963471e-05
+        },
+        "dr10": {
+          "max": 0.05507711,
+          "max_abs": 0.05507711,
+          "mean": 0.05487544176666667,
+          "min": 0.0546646,
+          "n": 300,
+          "sigma": 7.15146690091657e-05
+        },
+        "vr10a": {
+          "max": 0.7404729,
+          "max_abs": 0.7404729,
+          "mean": 0.7402904366666667,
+          "min": 0.7400641,
+          "n": 300,
+          "sigma": 6.756083884450578e-05
+        },
+        "vr10b": {
+          "max": 0.6854776,
+          "max_abs": 0.6854776,
+          "mean": 0.6854149946666667,
+          "min": 0.6853516,
+          "n": 300,
+          "sigma": 2.468352946761528e-05
+        },
+        "vr1a": {
+          "max": 0.6797814,
+          "max_abs": 0.6797814,
+          "mean": 0.6795774136666666,
+          "min": 0.6793567,
+          "n": 300,
+          "sigma": 6.897741799943394e-05
+        },
+        "vr1b": {
+          "max": 0.625252,
+          "max_abs": 0.625252,
+          "mean": 0.625149733,
+          "min": 0.6250792,
+          "n": 300,
+          "sigma": 2.5596630689912076e-05
+        }
+      },
+      "supply_v": null,
+      "temperature_c": 27.0
+    },
+    {
+      "checks": [
+        {
+          "detail": "parsed 30 samples, expected 30",
+          "name": "sample_count",
+          "pass": true
+        },
+        {
+          "detail": "sigma(da1) = 0.0711 mV with MC_PR_SWITCH=1 (global, common-mode across co-located devices in the same run -- expected near zero, tolerance 0.5 mV)",
+          "name": "diff_near_zero[da1]",
+          "pass": true
+        },
+        {
+          "detail": "sigma(da10) = 0.0657 mV with MC_PR_SWITCH=1 (global, common-mode across co-located devices in the same run -- expected near zero, tolerance 0.5 mV)",
+          "name": "diff_near_zero[da10]",
+          "pass": true
+        },
+        {
+          "detail": "sigma(dr1) = 0.0486 mV with MC_PR_SWITCH=1 (global, common-mode across co-located devices in the same run -- expected near zero, tolerance 0.5 mV)",
+          "name": "diff_near_zero[dr1]",
+          "pass": true
+        },
+        {
+          "detail": "sigma(dr10) = 0.0502 mV with MC_PR_SWITCH=1 (global, common-mode across co-located devices in the same run -- expected near zero, tolerance 0.5 mV)",
+          "name": "diff_near_zero[dr10]",
+          "pass": true
+        },
+        {
+          "detail": "sigma(vr1a) = 39.319 uV across the MC_PR_SWITCH=1 loop (must be >= 1 uV: a zero here means the global-process switch never reached the models)",
+          "name": "abs_nonzero[vr1a]",
+          "pass": true
+        },
+        {
+          "detail": "sigma(vr1b) = 19.407 uV across the MC_PR_SWITCH=1 loop (must be >= 1 uV: a zero here means the global-process switch never reached the models)",
+          "name": "abs_nonzero[vr1b]",
+          "pass": true
+        },
+        {
+          "detail": "sigma(vr10a) = 44.867 uV across the MC_PR_SWITCH=1 loop (must be >= 1 uV: a zero here means the global-process switch never reached the models)",
+          "name": "abs_nonzero[vr10a]",
+          "pass": true
+        },
+        {
+          "detail": "sigma(vr10b) = 15.764 uV across the MC_PR_SWITCH=1 loop (must be >= 1 uV: a zero here means the global-process switch never reached the models)",
+          "name": "abs_nonzero[vr10b]",
+          "pass": true
+        }
+      ],
+      "corner_id": "mc_27c_nosupply",
+      "parsed_samples": 30,
+      "pass": true,
+      "purpose": "MC_PR_SWITCH=1 (global process Monte Carlo) liveness check -- confirms the switch draws a non-degenerate sample on THIS repo's own PNP netlist, per issue #17's acceptance criteria",
+      "requested_samples": 30,
+      "role": "process-mc",
+      "section": "mc",
+      "seed": 20260825,
+      "stats": {
+        "da1": {
+          "max": 0.0001584722,
+          "max_abs": 0.0001584722,
+          "mean": 5.023775133333333e-06,
+          "min": -0.000102613,
+          "n": 30,
+          "sigma": 7.110985121311563e-05
+        },
+        "da10": {
+          "max": 0.0001174355,
+          "max_abs": 0.000142773,
+          "mean": -2.0614473433333335e-05,
+          "min": -0.000142773,
+          "n": 30,
+          "sigma": 6.567047549717344e-05
+        },
+        "dr1": {
+          "max": 0.05452433,
+          "max_abs": 0.05452433,
+          "mean": 0.054426301333333336,
+          "min": 0.05434934,
+          "n": 30,
+          "sigma": 4.85767605664112e-05
+        },
+        "dr10": {
+          "max": 0.05506083,
+          "max_abs": 0.05506083,
+          "mean": 0.05490339166666667,
+          "min": 0.05481767,
+          "n": 30,
+          "sigma": 5.022622299592885e-05
+        },
+        "vr10a": {
+          "max": 0.7412354,
+          "max_abs": 0.7412354,
+          "mean": 0.7410937466666667,
+          "min": 0.7410193,
+          "n": 30,
+          "sigma": 4.4867027547179004e-05
+        },
+        "vr10b": {
+          "max": 0.6862212,
+          "max_abs": 0.6862212,
+          "mean": 0.6861903533333333,
+          "min": 0.6861662,
+          "n": 30,
+          "sigma": 1.576354881568816e-05
+        },
+        "vr1a": {
+          "max": 0.6804031,
+          "max_abs": 0.6804031,
+          "mean": 0.6803297366666666,
+          "min": 0.6802702,
+          "n": 30,
+          "sigma": 3.931923705132676e-05
+        },
+        "vr1b": {
+          "max": 0.6259332,
+          "max_abs": 0.6259332,
+          "mean": 0.62590342,
+          "min": 0.6258625,
+          "n": 30,
+          "sigma": 1.9407328868058283e-05
+        }
+      },
+      "supply_v": null,
+      "temperature_c": 27.0
+    }
+  ],
+  "record_id": "20260825-220116-a9cac4b",
+  "statistics": {
+    "n_samples": 300,
+    "seed_a": 20260825,
+    "seed_b": 20260826
+  },
+  "supersedes": "",
+  "timestamp": "2026-08-25T22:01:16Z",
+  "tools": {
+    "ngspice": "ngspice-46 : Circuit level simulation program",
+    "platform": "Linux 7.0.0-1010-aws x86_64",
+    "python": "3.12.3",
+    "xschem": "XSCHEM V3.4.7"
+  }
+}
