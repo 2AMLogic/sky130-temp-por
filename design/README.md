@@ -5,13 +5,13 @@ against the sky130 PDK. This directory is the **source of truth for the
 block's electrical interface**: `sim/` testbenches and (later) `layout/` LVS
 both consume the netlists exported from here.
 
-> **Status: tooling and the first cell (`bias_core`) have landed (issue #6).**
-> The remaining four cells and the top-level assembly are tracked as
-> siblings in the same decomposition (#5): `temp_core` (#7),
-> `por_comparator` (#8), `por_output_chain` (#9, including the POR
-> startup-assist leg), and `temp_por_top` (#10, the block-level assembly —
-> only once it lands does the ratified top-level pinout below become a real,
-> checkable `.subckt`). See [Placeholder status](#placeholder-status).
+> **Status: tooling, `bias_core` (issue #6) and `por_comparator` (issue #8)
+> have landed.** The remaining three cells and the top-level assembly are
+> tracked as siblings in the same decomposition (#5): `temp_core` (#7),
+> `por_output_chain` (#9, including the POR startup-assist leg), and
+> `temp_por_top` (#10, the block-level assembly — only once it lands does
+> the ratified top-level pinout below become a real, checkable `.subckt`).
+> See [Placeholder status](#placeholder-status).
 
 This is a port of
 [`2AMLogic/gf180-temp-por`](https://github.com/2AMLogic/gf180-temp-por)'s own
@@ -140,13 +140,16 @@ produce byte-identical netlists on any machine.
 
 ## Using the netlists from a testbench
 
-`design/netlist/` holds one file per cell — currently just
-`bias_core.spice`, a single `.subckt`, so a testbench can target it on its
-own:
+`design/netlist/` holds one file per cell — `bias_core.spice` and
+`por_comparator.spice` so far, each a single `.subckt`, so a testbench can
+target one on its own:
 
 ```spice
 .include design/netlist/bias_core.spice
 xdut VDD VSS IBIAS VREF BIAS_OK bias_core
+
+.include design/netlist/por_comparator.spice
+xcmp VDD VSS IBIAS VREF BIAS_OK POR_RAW por_comparator
 ```
 
 Once `temp_por_top.sch` lands (issue #10), `temp_por_top.spice` will carry
@@ -185,9 +188,9 @@ in:
 
 | Cell               | Landed by | Status | Device mapping / sizing note |
 | ------------------ | --------- | ------ | ----------------------------- |
-| `bias_core`        | #6 (this issue) | **ported** — [`bias_core.md`](bias_core.md) | Topology and wiring ported mechanically from gf180's ratified `bias_core`; every `W`/`L` carried at the same drawn geometry (so ratio-derived quantities are exact), absolute sizing is first-order/placeholder pending sky130 device characterization. DC operating-point smoke test solves at multiple corners — see `bias_core.md`, "Verification done for this issue". |
+| `bias_core`        | #6 | **ported** — [`bias_core.md`](bias_core.md) | Topology and wiring ported mechanically from gf180's ratified `bias_core`; every `W`/`L` carried at the same drawn geometry (so ratio-derived quantities are exact), absolute sizing is first-order/placeholder pending sky130 device characterization. DC operating-point smoke test solves at multiple corners — see `bias_core.md`, "Verification done for this issue". |
 | `temp_core`        | #7 | not started | |
-| `por_comparator`   | #8 | not started | |
+| `por_comparator`   | #8 (this issue) | **ported** | Topology and wiring ported mechanically from gf180's ratified `por_comparator`: resistor-divided VDD tap (`RTOP`/`RBOT`/`RHYS`, all `res_xhigh_po`) compared against `VREF` by an NMOS-input 5T OTA, with `POR_RAW`-gated resistor-network positive feedback (`MHSW`) as the hysteresis mechanism (DR-002). Every `W`/`L` and resistor drawn length carried at the same drawn geometry as gf180 (ratio-derived VPOR-rise/VPOR-fall/V_hys expressions are exact); absolute trip points are first-order/placeholder pending sky130 device characterization and a real `bias_core` `VREF` — no numeric threshold carried from gf180 (CLAUDE.md). Informal DC operating-point check (not committed as a `sim/` artifact) confirms `POR_RAW` tracks `SNS` vs. `VREF` in the expected direction and clamps low when `BIAS_OK` is low. |
 | `por_output_chain` | #9 | not started | also owns the POR startup-assist pull-down (DR-002) |
 | `temp_por_top`     | #10 | not started | block-level assembly; only once this lands does `design/netlist.py --check` have a ratified top-level pinout to assert against |
 
