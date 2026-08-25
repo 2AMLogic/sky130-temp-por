@@ -5,13 +5,13 @@ against the sky130 PDK. This directory is the **source of truth for the
 block's electrical interface**: `sim/` testbenches and (later) `layout/` LVS
 both consume the netlists exported from here.
 
-> **Status: tooling, `bias_core` (issue #6), `temp_core` (issue #7), and
-> `por_comparator` (issue #8) have landed.** The remaining two cells and the
-> top-level assembly are tracked as siblings in the same decomposition (#5):
-> `por_output_chain` (#9, including the POR startup-assist leg), and
-> `temp_por_top` (#10, the block-level assembly — only once it lands does
-> the ratified top-level pinout below become a real, checkable `.subckt`).
-> See [Placeholder status](#placeholder-status).
+> **Status: tooling, `bias_core` (issue #6), `temp_core` (issue #7),
+> `por_comparator` (issue #8), and `por_output_chain` (issue #9, including
+> the POR startup-assist pull-down) have landed.** The top-level assembly is
+> the one remaining sibling in the same decomposition (#5): `temp_por_top`
+> (#10, the block-level assembly — only once it lands does the ratified
+> top-level pinout below become a real, checkable `.subckt`). See
+> [Placeholder status](#placeholder-status).
 
 This is a port of
 [`2AMLogic/gf180-temp-por`](https://github.com/2AMLogic/gf180-temp-por)'s own
@@ -58,10 +58,10 @@ startup-assist pull-down — are deliberately *not* separate cells):
 ```
 temp_por_top                     top level, the ratified pad interface        issue #10
 ├── xbias  bias_core             shared bias / reference core                 issue #6
-├── xtemp  temp_core             PTAT/CTAT sensing core                       issue #7  (this issue)
+├── xtemp  temp_core             PTAT/CTAT sensing core                       issue #7
 ├── xcmp   por_comparator        threshold comparator + hysteresis            issue #8
 └── xpor   por_output_chain      deglitch, pulse, output stage,
-                                  + POR startup-assist pull-down               issue #9
+                                  + POR startup-assist pull-down               issue #9  (this issue)
 ```
 
 Internal nets (driver/consumer contract carried from gf180's DR-010, to be
@@ -141,8 +141,8 @@ produce byte-identical netlists on any machine.
 ## Using the netlists from a testbench
 
 `design/netlist/` holds one file per cell — `bias_core.spice`,
-`temp_core.spice`, and `por_comparator.spice` so far, each a single
-`.subckt`, so a testbench can target one on its own:
+`temp_core.spice`, `por_comparator.spice`, and `por_output_chain.spice` so
+far, each a single `.subckt`, so a testbench can target one on its own:
 
 ```spice
 .include design/netlist/bias_core.spice
@@ -160,6 +160,16 @@ xcmp VDD VSS IBIAS VREF BIAS_OK POR_RAW por_comparator
 .include design/netlist/temp_core.spice
 xbias VDD VSS IBIAS VREF BIAS_OK bias_core
 xdut   VDD VSS IBIAS EN PTAT CTAT temp_core
+```
+
+`por_output_chain` likewise consumes `bias_core`'s `IBIAS` output (and, in a
+full assembly, `por_comparator`'s `POR_RAW`):
+
+```spice
+.include design/netlist/bias_core.spice
+.include design/netlist/por_output_chain.spice
+xbias VDD VSS IBIAS VREF BIAS_OK bias_core
+xdut  VDD VSS IBIAS POR_RAW RESETn por_output_chain
 ```
 
 Once `temp_por_top.sch` lands (issue #10), `temp_por_top.spice` will carry
@@ -199,9 +209,9 @@ in:
 | Cell               | Landed by | Status | Device mapping / sizing note |
 | ------------------ | --------- | ------ | ----------------------------- |
 | `bias_core`        | #6 | **ported** — [`bias_core.md`](bias_core.md) | Topology and wiring ported mechanically from gf180's ratified `bias_core`; every `W`/`L` carried at the same drawn geometry (so ratio-derived quantities are exact), absolute sizing is first-order/placeholder pending sky130 device characterization. DC operating-point smoke test solves at multiple corners — see `bias_core.md`, "Verification done for this issue". |
-| `temp_core`        | #7 (this issue) | **ported** — [`temp_core.md`](temp_core.md) | Topology and wiring ported mechanically from gf180's ratified `temp_core`; every `W`/`L` carried at the same drawn geometry. gf180's 6-bit trim ladder is simplified to a single trim node (`PTAT_TRIM`) per issue #7's scope — see `temp_core.md`, "Trim mechanism". DC operating-point smoke test (alongside `bias_core`) solves at a 3x3 corner/temperature grid — see `temp_core.md`, "Verification done for this issue". |
+| `temp_core`        | #7 | **ported** — [`temp_core.md`](temp_core.md) | Topology and wiring ported mechanically from gf180's ratified `temp_core`; every `W`/`L` carried at the same drawn geometry. gf180's 6-bit trim ladder is simplified to a single trim node (`PTAT_TRIM`) per issue #7's scope — see `temp_core.md`, "Trim mechanism". DC operating-point smoke test (alongside `bias_core`) solves at a 3x3 corner/temperature grid — see `temp_core.md`, "Verification done for this issue". |
 | `por_comparator`   | #8 | **ported** | Topology and wiring ported mechanically from gf180's ratified `por_comparator`: resistor-divided VDD tap (`RTOP`/`RBOT`/`RHYS`, all `res_xhigh_po`) compared against `VREF` by an NMOS-input 5T OTA, with `POR_RAW`-gated resistor-network positive feedback (`MHSW`) as the hysteresis mechanism (DR-002). Every `W`/`L` and resistor drawn length carried at the same drawn geometry as gf180 (ratio-derived VPOR-rise/VPOR-fall/V_hys expressions are exact); absolute trip points are first-order/placeholder pending sky130 device characterization and a real `bias_core` `VREF` — no numeric threshold carried from gf180 (CLAUDE.md). Informal DC operating-point check (not committed as a `sim/` artifact) confirms `POR_RAW` tracks `SNS` vs. `VREF` in the expected direction and clamps low when `BIAS_OK` is low. |
-| `por_output_chain` | #9 | not started | also owns the POR startup-assist pull-down (DR-002) |
+| `por_output_chain` | #9 (this issue) | **ported** — [`por_output_chain.md`](por_output_chain.md) | Topology and wiring ported mechanically from gf180's ratified `por_output_chain`: deglitch filter, current-starved one-shot, nA-limited trip detector, and a release NAND + push-pull output stage whose below-floor leakage-divider default **is** the POR startup-assist pull-down (DR-002) — verified in shape against gf180's own schematic, not a separate leaf cell. Adds one device beyond gf180's own cell: `MASSIST`, a `sky130_fd_pr__nfet_05v0_nvt` near-zero-`Vt` pull-down gated directly from `VDD`/`VSS`, satisfying this issue's own device-mapping table (gf180's own DR-005 scoped a native/zero-`Vt` leg as availability-contingent and its own PDK never confirmed one; sky130's is confirmed) — see `por_output_chain.md`, "Why `MASSIST` exists". CDG/CTIM (deglitch dwell / one-shot pulse-width capacitors) are first-order placeholder timing elements, not committed durations (CLAUDE.md). DC + transient smoke tests (assert/delayed-release/reassert behavior, and a 0→3.3 V below-floor ramp with `POR_RAW` held low) solve cleanly — see `por_output_chain.md`, "Verification done for this issue". |
 | `temp_por_top`     | #10 | not started | block-level assembly; only once this lands does `design/netlist.py --check` have a ratified top-level pinout to assert against |
 
 When a sibling cell lands: follow the same pattern issue #6 established —
