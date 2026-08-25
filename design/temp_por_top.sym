@@ -1,0 +1,28 @@
+v {xschem version=3.4.7 file_version=1.2}
+G {}
+K {type=subcircuit
+format="@name @pinlist @symname"
+template="name=x1"
+}
+V {}
+S {}
+E {}
+P 4 5 -100 -60 100 -60 100 60 -100 60 -100 -60 {}
+B 5 -122.5 -22.5 -117.5 -17.5 {name=VDD dir=inout}
+L 7 -120 -20 -100 -20 {}
+T {VDD} -95 -24 0 0 0.2 0.2 {}
+B 5 -122.5 17.5 -117.5 22.5 {name=VSS dir=inout}
+L 7 -120 20 -100 20 {}
+T {VSS} -95 16 0 0 0.2 0.2 {}
+B 5 117.5 -42.5 122.5 -37.5 {name=PTAT dir=out}
+L 4 100 -40 120 -40 {}
+T {PTAT} 95 -44 0 1 0.2 0.2 {}
+B 5 117.5 -2.5 122.5 2.5 {name=CTAT dir=out}
+L 4 100 0 120 0 {}
+T {CTAT} 95 -4 0 1 0.2 0.2 {}
+B 5 117.5 37.5 122.5 42.5 {name=RESETn dir=out}
+L 4 100 40 120 40 {}
+T {RESETn} 95 36 0 1 0.2 0.2 {}
+T {@symname} -57.5 -16 0 0 0.3 0.3 {}
+T {@name} -100 -72 0 0 0.2 0.2 {}
+T {temp sensor + POR} -70 10 0 0 0.2 0.2 {}
