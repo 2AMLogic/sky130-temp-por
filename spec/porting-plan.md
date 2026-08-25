@@ -433,7 +433,32 @@ are:
    [DR-006](https://github.com/2AMLogic/gf180-temp-por/blob/main/spec/decision-records/DR-006-sim-harness-port.md)'s
    own port from `gf180-bandgap`) — establishes the §3.1 corner grid and
    §3.2 mismatch-Monte-Carlo mechanism as running infrastructure, and is a
-   prerequisite for every characterization issue below.
+   prerequisite for every characterization issue below. **DONE** (issue
+   #17): `sim/bin/{corner-run.py,sim_common.py,pdk-env.sh}`, `sim/pdk.json`,
+   `sim/spiceinit`, `sim/xschemrc` ported from `sky130-bandgap`'s own
+   harness and re-verified against this repo's own installed PDK (exact
+   `open_pdks` commit match, not assumed). The ported default
+   process-corner grid is the precedent's own flat 7-entry list
+   (`tt/ss/ff/sf/fs/ll/hh`, `sim/pdk.json`), **not** the 90-point
+   MOS×resistor cross product this section's own text above describes —
+   that cross product does not exist in the harness being ported (traced at
+   issue #17 curation time: `Corner.process` is a single string field,
+   every `.lib` line takes exactly one corner name) and remains future work
+   for whichever issue builds the full PVT/mismatch testbench matrix (item
+   2 below). `sim/bias-core-smoke/` (schematic-driven, full 45-point
+   tt/ss/ff/sf/fs × 3 temp × 3 supply grid) and `sim/pnp-mismatch/` (bespoke
+   Monte Carlo script; both `MC_MM_SWITCH=1` local mismatch and
+   `MC_PR_SWITCH=1` global process Monte Carlo confirmed non-degenerate
+   against this repo's own PNP topology — the real 1-vs-8-parallel array
+   `bias_core`/`temp_core` use, not sky130-bandgap's small/large
+   device-size pair) are the first two experiments proving the ported
+   harness runs against this repo's own `design/netlist/*.spice`, not just
+   `sky130-bandgap`'s. `sim/bias-core-smoke`'s own committed record also
+   surfaced a genuine `bias_core` finding (spurious high-current DC
+   solution at `tt`/27 °C at both supply extremes) the harness's own
+   full-grid sweep found and a prior spot check could not — filed as
+   [issue #19](https://github.com/2AMLogic/sky130-temp-por/issues/19),
+   downstream circuit-behavior work, not part of this item.
 2. **Device characterization** against the §2.2 device list — PNP
    VBE/mismatch, resistor flavor tempco/tolerance, `g5v0d10v5` MOS
    threshold spread, and (new work, §2.6) native-device characterization for

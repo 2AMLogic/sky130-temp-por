@@ -1,0 +1,68 @@
+{
+  "slug": "bias-core-smoke",
+  "title": "bias_core schematic-entry smoke check: untrimmed nominal operating point",
+  "claim": "Harness bring-up for issue #17 -- NOT a spec claim (spec/target-spec.md does not exist yet, spec/porting-plan.md Sec4 item 4). Substantiates that sim/bin/corner-run.py, ported from sky130-bandgap, actually drives THIS repo's own design/bias_core.sch through xschem/ngspice across the full 45-point PVT matrix, and that the process/voltage/temperature knobs measurably change the result. design/bias_core.md already documents an informal, uncommitted spot check at tt/ff/ss x -40/27/125 degC; this record is the harness's own first COMMITTED sim/ evidence, across the full 5-corner x 3-temp x 3-supply grid, not a spot check.",
+  "provenance": "schematic",
+  "provenance_source": "sim/bias-core-smoke/testbench/tb_bias_core_smoke.sch",
+  "schematic": "testbench/tb_bias_core_smoke.sch",
+  "statistical_convention": "N/A (corner-matrix check, not a distribution claim)",
+  "corners": {
+    "process": ["tt", "ss", "ff", "sf", "fs"],
+    "temperature_c": [-40, 27, 125],
+    "supply_v": [2.97, 3.3, 3.63]
+  },
+  "quick_subset": [
+    ["tt", 27, 3.3],
+    ["ss", -40, 2.97],
+    ["ff", 125, 3.63]
+  ],
+  "deck": {
+    "options": ["wnflag=1"],
+    "params": {},
+    "analyses": ["op"]
+  },
+  "measurements": [
+    {
+      "name": "vref",
+      "expr": "v(vref)",
+      "unit": "V",
+      "min": 1.0,
+      "max": 1.4,
+      "note": "Untrimmed reference output, open circuit. design/bias_core.md's own spot check found 1.2477-1.2574 V across tt/ff/ss x -40/27/125 degC; this window is deliberately a few-hundred-mV harness liveness bound around that, NOT a spec claim -- no spec/target-spec.md exists yet (spec/porting-plan.md Sec4 item 4)."
+    },
+    {
+      "name": "ibias",
+      "expr": "v(ibias)",
+      "unit": "V",
+      "min": 2.0,
+      "max": 3.7,
+      "note": "IBIAS is open-circuit (no load in this testbench), so per design/bias_core.md's own compliance note (V(IBIAS) <= VDD - 0.2V, but open-circuit it rails toward VDD) this should read close to the corner's own vsup. Window covers the full 2.97-3.63 V supply range with margin."
+    },
+    {
+      "name": "bias_ok",
+      "expr": "v(bias_ok)",
+      "unit": "V",
+      "min": 2.0,
+      "max": 3.7,
+      "note": "BIAS_OK active-high settle flag; should read rail-high (near vsup) once the core is up. Failing this across the matrix would mean the startup kick is not reliably clearing the degenerate zero-current state at some corner."
+    },
+    {
+      "name": "isup",
+      "expr": "-i(v1)",
+      "unit": "A",
+      "min": 1e-8,
+      "max": 1e-5,
+      "note": "Total quiescent supply current. design/bias_core.md's own spot check found ~0.94 uA at tt/27C/3.3V; window is a generous harness liveness bound, not the (not-yet-ratified) Iq spec line."
+    }
+  ],
+  "spread_checks": [
+    {
+      "measurement": "vref",
+      "min_spread": 0.005,
+      "note": "Guards against a silently corner-blind harness: if every corner returns the same vref, the .lib/.temp injection is not taking effect. design/bias_core.md's own spot check already found a ~9.7 mV vref spread across process x temperature alone (1.2477-1.2574 V), so this bound is well inside what a working harness should observe."
+    }
+  ],
+  "notes": [
+    "The full 45-point matrix's committed record (sim/bias-core-smoke/records/) shows overall FAIL: 43/45 corners PASS in the documented VREF band, but tt_27c_2.97v and tt_27c_3.63v both land on a different, spurious DC solution (VREF railed near VDD, milliamp-scale static current) -- present at exactly one process/temperature point, at both supply extremes but not the center supply. This is real evidence a working full-PVT-grid harness surfaced (design/bias_core.md's own prior spot check never varied supply, so it could not have found this) -- NOT a harness defect, and left as a genuine committed FAIL record per sim/'s append-only convention rather than edited/loosened to force a PASS. Filed as a follow-up circuit-behavior investigation, out of scope for issue #17 (harness port) per that issue's own 'Explicitly out of scope' section: https://github.com/2AMLogic/sky130-temp-por/issues/19"
+  ]
+}
