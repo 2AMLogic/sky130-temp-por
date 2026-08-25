@@ -5,9 +5,9 @@ against the sky130 PDK. This directory is the **source of truth for the
 block's electrical interface**: `sim/` testbenches and (later) `layout/` LVS
 both consume the netlists exported from here.
 
-> **Status: tooling, `bias_core` (issue #6) and `por_comparator` (issue #8)
-> have landed.** The remaining three cells and the top-level assembly are
-> tracked as siblings in the same decomposition (#5): `temp_core` (#7),
+> **Status: tooling, `bias_core` (issue #6), `temp_core` (issue #7), and
+> `por_comparator` (issue #8) have landed.** The remaining two cells and the
+> top-level assembly are tracked as siblings in the same decomposition (#5):
 > `por_output_chain` (#9, including the POR startup-assist leg), and
 > `temp_por_top` (#10, the block-level assembly — only once it lands does
 > the ratified top-level pinout below become a real, checkable `.subckt`).
@@ -57,8 +57,8 @@ startup-assist pull-down — are deliberately *not* separate cells):
 
 ```
 temp_por_top                     top level, the ratified pad interface        issue #10
-├── xbias  bias_core             shared bias / reference core                 issue #6  (this issue)
-├── xtemp  temp_core             PTAT/CTAT sensing core                       issue #7
+├── xbias  bias_core             shared bias / reference core                 issue #6
+├── xtemp  temp_core             PTAT/CTAT sensing core                       issue #7  (this issue)
 ├── xcmp   por_comparator        threshold comparator + hysteresis            issue #8
 └── xpor   por_output_chain      deglitch, pulse, output stage,
                                   + POR startup-assist pull-down               issue #9
@@ -80,7 +80,7 @@ honoured by each sibling cell as it lands):
 ```bash
 python3 design/netlist.py            # regenerate design/netlist/*.spice
 python3 design/netlist.py --check    # verify committed netlists are current
-python3 design/netlist.py --cell bias_core -v
+python3 design/netlist.py --cell temp_core -v
 ```
 
 Requirements: `xschem` on `PATH` (this repo has been verified against 3.4.7)
@@ -132,7 +132,7 @@ produce byte-identical netlists on any machine.
    and order — **once `temp_por_top.sch` exists**; skipped until then (see
    `design/netlist.py`'s own docstring for why this issue defers that cell).
 3. **Symbol pins match schematic ports**, per cell, in order — checked for
-   every committed cell today, including `bias_core`.
+   every committed cell today, including `bias_core` and `temp_core`.
 4. **Every sub-circuit is instantiated in the top level** with the right
    number of nets — once `temp_por_top.sch` exists.
 
@@ -140,9 +140,9 @@ produce byte-identical netlists on any machine.
 
 ## Using the netlists from a testbench
 
-`design/netlist/` holds one file per cell — `bias_core.spice` and
-`por_comparator.spice` so far, each a single `.subckt`, so a testbench can
-target one on its own:
+`design/netlist/` holds one file per cell — `bias_core.spice`,
+`temp_core.spice`, and `por_comparator.spice` so far, each a single
+`.subckt`, so a testbench can target one on its own:
 
 ```spice
 .include design/netlist/bias_core.spice
@@ -150,6 +150,16 @@ xdut VDD VSS IBIAS VREF BIAS_OK bias_core
 
 .include design/netlist/por_comparator.spice
 xcmp VDD VSS IBIAS VREF BIAS_OK POR_RAW por_comparator
+```
+
+`temp_core` consumes `bias_core`'s `IBIAS` output, so a testbench exercising
+`temp_core` includes both and shares the net:
+
+```spice
+.include design/netlist/bias_core.spice
+.include design/netlist/temp_core.spice
+xbias VDD VSS IBIAS VREF BIAS_OK bias_core
+xdut   VDD VSS IBIAS EN PTAT CTAT temp_core
 ```
 
 Once `temp_por_top.sch` lands (issue #10), `temp_por_top.spice` will carry
@@ -161,7 +171,7 @@ sub-circuit's `.subckt`).
 ## Working in the GUI
 
 ```bash
-xschem --rcfile design/xschemrc design/bias_core.sch
+xschem --rcfile design/xschemrc design/temp_core.sch
 ```
 
 Conventions for the sibling-cell issues that fill the rest of this hierarchy
@@ -189,8 +199,8 @@ in:
 | Cell               | Landed by | Status | Device mapping / sizing note |
 | ------------------ | --------- | ------ | ----------------------------- |
 | `bias_core`        | #6 | **ported** — [`bias_core.md`](bias_core.md) | Topology and wiring ported mechanically from gf180's ratified `bias_core`; every `W`/`L` carried at the same drawn geometry (so ratio-derived quantities are exact), absolute sizing is first-order/placeholder pending sky130 device characterization. DC operating-point smoke test solves at multiple corners — see `bias_core.md`, "Verification done for this issue". |
-| `temp_core`        | #7 | not started | |
-| `por_comparator`   | #8 (this issue) | **ported** | Topology and wiring ported mechanically from gf180's ratified `por_comparator`: resistor-divided VDD tap (`RTOP`/`RBOT`/`RHYS`, all `res_xhigh_po`) compared against `VREF` by an NMOS-input 5T OTA, with `POR_RAW`-gated resistor-network positive feedback (`MHSW`) as the hysteresis mechanism (DR-002). Every `W`/`L` and resistor drawn length carried at the same drawn geometry as gf180 (ratio-derived VPOR-rise/VPOR-fall/V_hys expressions are exact); absolute trip points are first-order/placeholder pending sky130 device characterization and a real `bias_core` `VREF` — no numeric threshold carried from gf180 (CLAUDE.md). Informal DC operating-point check (not committed as a `sim/` artifact) confirms `POR_RAW` tracks `SNS` vs. `VREF` in the expected direction and clamps low when `BIAS_OK` is low. |
+| `temp_core`        | #7 (this issue) | **ported** — [`temp_core.md`](temp_core.md) | Topology and wiring ported mechanically from gf180's ratified `temp_core`; every `W`/`L` carried at the same drawn geometry. gf180's 6-bit trim ladder is simplified to a single trim node (`PTAT_TRIM`) per issue #7's scope — see `temp_core.md`, "Trim mechanism". DC operating-point smoke test (alongside `bias_core`) solves at a 3x3 corner/temperature grid — see `temp_core.md`, "Verification done for this issue". |
+| `por_comparator`   | #8 | **ported** | Topology and wiring ported mechanically from gf180's ratified `por_comparator`: resistor-divided VDD tap (`RTOP`/`RBOT`/`RHYS`, all `res_xhigh_po`) compared against `VREF` by an NMOS-input 5T OTA, with `POR_RAW`-gated resistor-network positive feedback (`MHSW`) as the hysteresis mechanism (DR-002). Every `W`/`L` and resistor drawn length carried at the same drawn geometry as gf180 (ratio-derived VPOR-rise/VPOR-fall/V_hys expressions are exact); absolute trip points are first-order/placeholder pending sky130 device characterization and a real `bias_core` `VREF` — no numeric threshold carried from gf180 (CLAUDE.md). Informal DC operating-point check (not committed as a `sim/` artifact) confirms `POR_RAW` tracks `SNS` vs. `VREF` in the expected direction and clamps low when `BIAS_OK` is low. |
 | `por_output_chain` | #9 | not started | also owns the POR startup-assist pull-down (DR-002) |
 | `temp_por_top`     | #10 | not started | block-level assembly; only once this lands does `design/netlist.py --check` have a ratified top-level pinout to assert against |
 
