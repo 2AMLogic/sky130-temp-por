@@ -195,8 +195,9 @@ the supply-current-sign guard is what catches it.
 from 0 V at `reltol=1e-4`, and keep a physicality guard on the measurement.
 `sim/README.md` §"Branch selection" states the rules for the block as a whole
 (they apply equally to `temp_core`, which has the same ΔVBE loop and its own
-kick, and whose `design/temp_core.md` spot check is cold-`.op`-based for the
-same reason this one was).
+kick; `design/temp_core.md`'s own cold-`.op` spot check was retired and
+replaced by a full-PVT `tran … uic` transient record for the same reason,
+per issue #22).
 
 ## Scope and what this is not
 

@@ -1,0 +1,111 @@
+{
+  "slug": "temp-core-startup",
+  "title": "temp_core cold-start branch selection (EN high through the whole ramp): transient supply ramp from 0 V across the full PVT matrix",
+  "claim": "Issue #22 -- NOT a spec claim (spec/target-spec.md does not exist yet, spec/porting-plan.md Sec4 item 4). Substantiates that temp_core reaches its intended operating branch (PTAT/CTAT tracking their design/temp_core.md-documented shape, positive supply current) from a physical 0 V cold start at every point of the full 45-point PVT matrix, with EN tied high through the entire power-up ramp. This is the temp_core counterpart to sim/bias-core-startup/ (issue #19): design/temp_core.md's previous 'verification done' section recorded only a cold-.op spot check of the same class issue #19 retired for bias_core (ngspice's continuation on a self-biased DeltaVBE cell can land on a non-physical branch, and which points those are changes when only the linear solver changes) -- temp_core has never been run over a full PVT grid at all before this experiment. EN's own axis (asserted for the whole ramp vs. released only after the supply is up) is exercised separately by sim/temp-core-startup-en-delayed/, the DR-002 startup ordering temp_core will actually see.",
+  "provenance": "schematic",
+  "provenance_source": "sim/temp-core-startup/testbench/tb_temp_core_startup.sch",
+  "schematic": "testbench/tb_temp_core_startup.sch",
+  "statistical_convention": "N/A (corner-matrix check, not a distribution claim)",
+  "corners": {
+    "process": ["tt", "ss", "ff", "sf", "fs"],
+    "temperature_c": [-40, 27, 125],
+    "supply_v": [2.97, 3.3, 3.63]
+  },
+  "quick_subset": [
+    ["tt", 27, 2.97],
+    ["tt", 27, 3.63],
+    ["ff", 125, 3.63]
+  ],
+  "deck": {
+    "options": ["wnflag=1", "method=gear", "trtol=50"],
+    "params": {
+      "tramp": "100u",
+      "tstop": "10m"
+    },
+    "analyses": [
+      "tran 10u 10m uic",
+      "let nlast = length(v(ptat))-1"
+    ]
+  },
+  "measurements": [
+    {
+      "name": "ptat",
+      "expr": "v(ptat)[nlast]",
+      "unit": "V",
+      "min": 0.3,
+      "max": 2.6,
+      "note": "Settled PTAT output at t=tstop, open circuit (this cell has no output buffer, design/temp_core.md). Window is a generous harness-liveness band around design/temp_core.md's own untrimmed DC spot-check table (1.099-1.877 V at 3.3 V/tt-ff-ss/-40..125C), NOT a spec claim -- the point of this experiment is WHICH branch is reached, not the exact value. Widened below the spot-check's own low end to tolerate this experiment's wider supply axis (2.97-3.63 V vs. the spot check's fixed 3.3 V)."
+    },
+    {
+      "name": "ptat_settled",
+      "expr": "abs(v(ptat)[nlast] - v(ptat)[nlast-100])",
+      "unit": "V",
+      "min": 0.0,
+      "max": 0.001,
+      "note": "Settling guard, same convention as sim/bias-core-startup/'s own vref_settled: PTAT must move less than 1 mV over the last 100 output steps (1 ms of the 10 ms window), well past the 100 us supply ramp at every corner."
+    },
+    {
+      "name": "ctat",
+      "expr": "v(ctat)[nlast]",
+      "unit": "V",
+      "min": 0.2,
+      "max": 1.1,
+      "note": "Settled CTAT output (XQ1's own VEB, tapped through XRISO) at t=tstop, open circuit. Window brackets design/temp_core.md's own spot-check table (0.466-0.783 V at 3.3 V) with margin for the wider supply axis here."
+    },
+    {
+      "name": "ctat_settled",
+      "expr": "abs(v(ctat)[nlast] - v(ctat)[nlast-100])",
+      "unit": "V",
+      "min": 0.0,
+      "max": 0.001,
+      "note": "Settling guard for CTAT, same convention as ptat_settled."
+    },
+    {
+      "name": "na",
+      "expr": "v(xdut.na)[nlast]",
+      "unit": "V",
+      "min": -1.0,
+      "max": 4.7,
+      "note": "Physicality guard (sim/README.md Branch selection rule 4): XDUT.NA is one of the two error-amplifier/DeltaVBE loop nodes internal to temp_core (the same class of node that read ~1e8 V outside the rails in the bias_core .op artifact, sim/bias-core-op-branch/). The bound is the rails plus about a volt of margin (VSS - 1 V .. VDD + 1 V), using the matrix's own 3.63 V supply ceiling as the fixed upper number so one bound covers every corner -- a false convergence to a degenerate/non-physical branch fails this loudly instead of reading as a plausible number."
+    },
+    {
+      "name": "nb",
+      "expr": "v(xdut.nb)[nlast]",
+      "unit": "V",
+      "min": -1.0,
+      "max": 4.7,
+      "note": "Same rail-bound physicality guard as na, on the loop's other DeltaVBE node."
+    },
+    {
+      "name": "isup",
+      "expr": "-i(v1)[nlast]",
+      "unit": "A",
+      "min": 1e-8,
+      "max": 5e-5,
+      "note": "Total quiescent supply current at t=tstop (bias_core + temp_core together, both drawing from V1). The lower bound rejects the degenerate zero-current state; the sign (via the leading '-') rejects the non-physical .op artifact this experiment's method exists to avoid -- that artifact reports a NEGATIVE supply current, i.e. the circuit sourcing current into its own only energy source. Upper bound is a generous harness bound, roughly double sim/bias-core-startup/'s own isup ceiling to cover temp_core's added draw."
+    },
+    {
+      "name": "bias_ok",
+      "expr": "v(bias_ok)[nlast]",
+      "unit": "V",
+      "min": 2.0,
+      "max": 3.7,
+      "note": "bias_core's own settle flag, read from the XBIAS instance this testbench needs to drive IBIAS. Must read rail-high: if XBIAS itself failed to start (already substantiated across the full PVT matrix by sim/bias-core-startup/, but this is a different testbench instantiating it fresh), temp_core's own result would not be trustworthy evidence about temp_core specifically."
+    }
+  ],
+  "spread_checks": [
+    {
+      "measurement": "ptat",
+      "min_spread": 0.02,
+      "note": "Corner-blindness guard, same convention as sim/bias-core-startup/'s own vref spread check: if every corner returns the same settled PTAT, the .lib/.temp injection is not taking effect. PTAT is PTAT-by-construction (design/temp_core.md), so its spread across a -40..125 C matrix should be well above this floor."
+    }
+  ],
+  "notes": [
+    "Analyses list carries one non-analysis control line (`let nlast = length(v(ptat))-1`), same pattern as sim/bias-core-startup/'s own manifest.",
+    "EN is tied directly to VDD in this testbench (see the schematic's own header): the enable gate is asserted for the entire power-up ramp. That is scenario A of issue #22's two required EN conditions; scenario B (EN released only AFTER the supply is up, the DR-002 ordering temp_core will actually see once temp_por_top drives it from RESETn) is sim/temp-core-startup-en-delayed/, a separate testbench and a separate claim.",
+    "This deck deliberately does NOT carry sim/bias-core-startup/'s own reltol=1e-4 tightening, and separately does NOT hand-pick any other non-default reltol either -- both were tried and rejected, empirically, not assumed. bias_core + temp_core instantiated together (this testbench's DUT) is a much larger, stiffer transient than bias_core alone: at reltol=1e-4, with or without method=gear/trtol=50 below, a single corner took over 100 s of wall time to integrate past 0.6 ms of the required 10 ms window (extrapolates to tens of minutes per corner, hours for the full 45-point matrix) -- computationally intractable for a 45-point matrix. Tightening only partway (reltol=2e-4) looked promising on the 3 corners it was hand-checked against (tt_-40c_3.30v, tt_125c_3.30v, ff_-40c_3.30v -- each converged in ~13 s to the same settled point their same-row neighbours already report), but re-running the FULL 45-point matrix at reltol=2e-4 produced a DIFFERENT and LARGER failing set (6 corners: ss_-40c_3.63v, ff_-40c_3.30v, sf_-40c_3.30v, fs_-40c_3.63v, fs_27c_2.97v, fs_27c_3.63v -- none of which overlaps the first three except ff_-40c_3.30v), each with the same non-physical signature (negative supply current, and/or NA/NB badly mismatched, and/or PTAT/CTAT far outside every other corner's range). That is sim/README.md's own rule 1 ('change the linear solver and the answer can change with it') restated for transient integration control instead of a cold `.op`'s continuation: reltol is not a knob that monotonically converges this circuit onto the intended branch, it just moves WHICH points land on a non-physical one. Chasing a tolerance that happens to produce 45/45 PASS on one particular run is therefore not a meaningful claim -- the corners that fail change with the settings, so what is being tested is the solver's own numerics, not the circuit. This manifest instead keeps ngspice's UNMODIFIED default reltol=1e-3 (the least arbitrary choice available) and relies on the na/nb rail-bound and isup-sign measurements (sim/README.md rule 4) to catch whichever corners the solver's own continuation happens to mis-land on for this exact deck -- which is precisely what they do (see this experiment's own committed record): every FAILing corner reports a negative supply current, the same non-physical signature issue #19 used to prove the analogous bias_core artifact was a solver artifact and not a second stable state. A `sim/temp-core-op-branch/`-style diagnostic (sweeping supply/numerics like sim/bias-core-op-branch/ did for bias_core) would be the natural follow-up to confirm that conclusively for temp_core too, but running it is out of this issue's scope (issue #22 asks for the full-PVT record with physicality guards, not a numerics-variant diagnosis) -- filed as a follow-up issue instead of attempted here.",
+    "method=gear (instead of ngspice's default trapezoidal integration) with trtol=50 (ngspice's default is 7) is the setting that actually makes the combined bias_core+temp_core cold start tractable at any reltol: trapezoidal integration on this circuit's DeltaVBE-loop-plus-startup-kick dynamics forces persistent sub-microsecond internal timesteps well past the 100 us supply ramp (observed directly: hundreds of accepted-timestep checkpoints clustered within a few hundred us of simulated time, consuming minutes of wall time for no settling progress), which is the classic signature of a lightly-damped RC/cap network that trapezoidal resolves overcautiously. Gear's method is more numerically damped for exactly this class of stiff analog startup transient, and a coarser trtol lets it take larger steps once safely past the initial edges. Both were verified empirically (not assumed) to reproduce the same settled operating point as the slower/tighter settings at every spot-checked corner before being adopted for the full matrix.",
+    "Ramp rate is fixed at 'vsup'/'tramp' = ~30 kV/s (100 us 0->3.3 V) for every corner, same single representative ramp as sim/bias-core-startup/ -- not ramp-rate coverage (that is the POR block's own testbenches, spec/porting-plan.md Sec3.3 / root CLAUDE.md).",
+    "`uic` skips the initial operating-point solve entirely and integrates forward from all-zero initial conditions on every node in the circuit (both XBIAS and XDUT), which is what makes this a physical cold start rather than a solver-seeded one."
+  ]
+}

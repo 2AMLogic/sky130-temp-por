@@ -1,0 +1,112 @@
+{
+  "slug": "temp-core-startup-en-delayed",
+  "title": "temp_core cold-start branch selection (EN released after supply is up, DR-002 ordering): transient supply ramp from 0 V across the full PVT matrix",
+  "claim": "Issue #22 -- NOT a spec claim (spec/target-spec.md does not exist yet, spec/porting-plan.md Sec4 item 4). Companion to sim/temp-core-startup/ (scenario A: EN tied high through the whole power-up ramp). This experiment exercises the EN axis temp_core has and bias_core does not (issue #22's own scope): VDD ramps from 0 V exactly as in sim/temp-core-startup/, but EN is held LOW until well after VDD has completed its ramp and settled, then released -- the DR-002 startup ordering temp_core will actually see once temp_por_top exists and drives EN from RESETn (which only deasserts after POR has already released, i.e. supply already up). Substantiates that temp_core's own startup kick still clears the degenerate zero-current branch when enabled LATE, at every point of the full 45-point PVT matrix, not just when EN was asserted for the whole ramp.",
+  "provenance": "schematic",
+  "provenance_source": "sim/temp-core-startup-en-delayed/testbench/tb_temp_core_startup_en_delayed.sch",
+  "schematic": "testbench/tb_temp_core_startup_en_delayed.sch",
+  "statistical_convention": "N/A (corner-matrix check, not a distribution claim)",
+  "corners": {
+    "process": ["tt", "ss", "ff", "sf", "fs"],
+    "temperature_c": [-40, 27, 125],
+    "supply_v": [2.97, 3.3, 3.63]
+  },
+  "quick_subset": [
+    ["tt", 27, 2.97],
+    ["tt", 27, 3.63],
+    ["ff", 125, 3.63]
+  ],
+  "deck": {
+    "options": ["wnflag=1", "method=gear", "trtol=50"],
+    "params": {
+      "tramp": "100u",
+      "ten_start": "300u",
+      "ten_end": "350u",
+      "tstop": "10m"
+    },
+    "analyses": [
+      "tran 10u 10m uic",
+      "let nlast = length(v(ptat))-1"
+    ]
+  },
+  "measurements": [
+    {
+      "name": "ptat",
+      "expr": "v(ptat)[nlast]",
+      "unit": "V",
+      "min": 0.3,
+      "max": 2.6,
+      "note": "Same window as sim/temp-core-startup/'s own ptat measurement (see that manifest for the full derivation) -- settled PTAT at t=tstop, open circuit, generous harness-liveness band around design/temp_core.md's own untrimmed DC spot-check table, NOT a spec claim."
+    },
+    {
+      "name": "ptat_settled",
+      "expr": "abs(v(ptat)[nlast] - v(ptat)[nlast-100])",
+      "unit": "V",
+      "min": 0.0,
+      "max": 0.001,
+      "note": "Settling guard, same convention as sim/temp-core-startup/ and sim/bias-core-startup/: PTAT must move less than 1 mV over the last 100 output steps (1 ms of the 10 ms window), well past both the 100 us supply ramp and the 350 us EN release at every corner."
+    },
+    {
+      "name": "ctat",
+      "expr": "v(ctat)[nlast]",
+      "unit": "V",
+      "min": 0.2,
+      "max": 1.1,
+      "note": "Same window as sim/temp-core-startup/'s own ctat measurement."
+    },
+    {
+      "name": "ctat_settled",
+      "expr": "abs(v(ctat)[nlast] - v(ctat)[nlast-100])",
+      "unit": "V",
+      "min": 0.0,
+      "max": 0.001,
+      "note": "Settling guard for CTAT, same convention as ptat_settled."
+    },
+    {
+      "name": "na",
+      "expr": "v(xdut.na)[nlast]",
+      "unit": "V",
+      "min": -1.0,
+      "max": 4.7,
+      "note": "Physicality guard (sim/README.md Branch selection rule 4), same as sim/temp-core-startup/'s own na measurement: XDUT.NA is one of the two error-amplifier/DeltaVBE loop nodes internal to temp_core. Bound is the rails plus about a volt of margin (VSS - 1 V .. VDD + 1 V, using the matrix's own 3.63 V supply ceiling as the fixed upper number) -- a false convergence to a degenerate/non-physical branch fails this loudly instead of reading as a plausible number."
+    },
+    {
+      "name": "nb",
+      "expr": "v(xdut.nb)[nlast]",
+      "unit": "V",
+      "min": -1.0,
+      "max": 4.7,
+      "note": "Same rail-bound physicality guard as na, on the loop's other DeltaVBE node."
+    },
+    {
+      "name": "isup",
+      "expr": "-i(v1)[nlast]",
+      "unit": "A",
+      "min": 1e-8,
+      "max": 5e-5,
+      "note": "Total quiescent supply current at t=tstop (bias_core + temp_core together, both drawing from V1; EN's own source V2 carries no rail current). Same bound and same rationale as sim/temp-core-startup/'s own isup measurement -- the sign (via the leading '-') rejects the non-physical negative-supply-current artifact this experiment's cold-start method exists to avoid."
+    },
+    {
+      "name": "bias_ok",
+      "expr": "v(bias_ok)[nlast]",
+      "unit": "V",
+      "min": 2.0,
+      "max": 3.7,
+      "note": "bias_core's own settle flag, read from the XBIAS instance this testbench needs to drive IBIAS -- same rationale as sim/temp-core-startup/'s own bias_ok measurement."
+    }
+  ],
+  "spread_checks": [
+    {
+      "measurement": "ptat",
+      "min_spread": 0.02,
+      "note": "Corner-blindness guard, same convention as sim/temp-core-startup/'s own spread check."
+    }
+  ],
+  "notes": [
+    "Analyses list carries one non-analysis control line (`let nlast = length(v(ptat))-1`), same pattern as sim/temp-core-startup/ and sim/bias-core-startup/.",
+    "This is the ONLY difference from sim/temp-core-startup/: V2 (EN's own source) is a PWL held at 0 V from t=0 through 'ten_start' (300 us, well after V1's own 100 us VDD ramp has completed and the supply has been flat for 200 us), then ramps to 'vsup' by 'ten_end' (350 us) and holds to 'tstop'. Everything else -- DUT wiring, V1's own VDD ramp, measurements, deck options -- is identical to sim/temp-core-startup/ by construction, so a difference between the two records' results is attributable to EN's timing and nothing else.",
+    "Same reltol/integration-method rationale as sim/temp-core-startup/: method=gear + trtol=50 (ngspice defaults: trapezoidal, trtol=7) is what makes the combined bias_core+temp_core cold start tractable in wall time (verified empirically per corner, not assumed), and this deck does NOT carry sim/bias-core-startup/'s own reltol=1e-4 tightening for the same measured performance reason -- the na/nb rail-bound and isup-sign measurements are the guard against a false convergence at the default tolerance, not the tolerance itself.",
+    "Ramp rate for VDD is fixed at 'vsup'/'tramp' = ~30 kV/s (100 us 0->3.3 V) for every corner, same single representative ramp as sim/bias-core-startup/ and sim/temp-core-startup/ -- not ramp-rate coverage (that is the POR block's own testbenches, spec/porting-plan.md Sec3.3 / root CLAUDE.md). EN's own release edge ('ten_end' - 'ten_start' = 50 us) is likewise one representative edge rate, not a swept axis.",
+    "`uic` skips the initial operating-point solve entirely and integrates forward from all-zero initial conditions on every node in the circuit (both XBIAS and XDUT), which is what makes this a physical cold start rather than a solver-seeded one -- EN itself also starts at 0 V via V2's own PWL, consistent with a real disabled-at-power-up condition."
+  ]
+}

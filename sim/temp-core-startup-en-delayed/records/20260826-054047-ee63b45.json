@@ -1,0 +1,4671 @@
+{
+  "author": "ci@loom.test",
+  "corners": [
+    {
+      "corner_id": "tt_-40c_2.97v",
+      "elapsed_s": 12.851,
+      "killed_by_signal": null,
+      "killed_by_signal_name": null,
+      "log": "sim/temp-core-startup-en-delayed/corners/20260826-054047-ee63b45/tt_-40c_2.97v.log",
+      "measurements": [
+        {
+          "expr": "v(ptat)[nlast]",
+          "max": 2.6,
+          "min": 0.3,
+          "name": "ptat",
+          "pass": true,
+          "reason": "",
+          "unit": "V",
+          "value": 1.099363
+        },
+        {
+          "expr": "abs(v(ptat)[nlast] - v(ptat)[nlast-100])",
+          "max": 0.001,
+          "min": 0.0,
+          "name": "ptat_settled",
+          "pass": true,
+          "reason": "",
+          "unit": "V",
+          "value": 7.575713e-10
+        },
+        {
+          "expr": "v(ctat)[nlast]",
+          "max": 1.1,
+          "min": 0.2,
+          "name": "ctat",
+          "pass": true,
+          "reason": "",
+          "unit": "V",
+          "value": 0.7824679
+        },
+        {
+          "expr": "abs(v(ctat)[nlast] - v(ctat)[nlast-100])",
+          "max": 0.001,
+          "min": 0.0,
+          "name": "ctat_settled",
+          "pass": true,
+          "reason": "",
+          "unit": "V",
+          "value": 1.848111e-11
+        },
+        {
+          "expr": "v(xdut.na)[nlast]",
+          "max": 4.7,
+          "min": -1.0,
+          "name": "na",
+          "pass": true,
+          "reason": "",
+          "unit": "V",
+          "value": 0.782468
+        },
+        {
+          "expr": "v(xdut.nb)[nlast]",
+          "max": 4.7,
+          "min": -1.0,
+          "name": "nb",
+          "pass": true,
+          "reason": "",
+          "unit": "V",
+          "value": 0.7824655
+        },
+        {
+          "expr": "-i(v1)[nlast]",
+          "max": 5e-05,
+          "min": 1e-08,
+          "name": "isup",
+          "pass": true,
+          "reason": "",
+          "unit": "A",
+          "value": 5.618284e-06
+        },
+        {
+          "expr": "v(bias_ok)[nlast]",
+          "max": 3.7,
+          "min": 2.0,
+          "name": "bias_ok",
+          "pass": true,
+          "reason": "",
+          "unit": "V",
+          "value": 2.97
+        }
+      ],
+      "ngspice_exit": 0,
+      "pass": true,
+      "process": "tt",
+      "supply_v": 2.97,
+      "temperature_c": -40.0,
+      "timed_out": false,
+      "timeout_s": 200
+    },
+    {
+      "corner_id": "tt_-40c_3.30v",
+      "elapsed_s": 12.696,
+      "killed_by_signal": null,
+      "killed_by_signal_name": null,
+      "log": "sim/temp-core-startup-en-delayed/corners/20260826-054047-ee63b45/tt_-40c_3.30v.log",
+      "measurements": [
+        {
+          "expr": "v(ptat)[nlast]",
+          "max": 2.6,
+          "min": 0.3,
+          "name": "ptat",
+          "pass": true,
+          "reason": "",
+          "unit": "V",
+          "value": 1.099417
+        },
+        {
+          "expr": "abs(v(ptat)[nlast] - v(ptat)[nlast-100])",
+          "max": 0.001,
+          "min": 0.0,
+          "name": "ptat_settled",
+          "pass": true,
+          "reason": "",
+          "unit": "V",
+          "value": 1.30207e-11
+        },
+        {
+          "expr": "v(ctat)[nlast]",
+          "max": 1.1,
+          "min": 0.2,
+          "name": "ctat",
+          "pass": true,
+          "reason": "",
+          "unit": "V",
+          "value": 0.7824688
+        },
+        {
+          "expr": "abs(v(ctat)[nlast] - v(ctat)[nlast-100])",
+          "max": 0.001,
+          "min": 0.0,
+          "name": "ctat_settled",
+          "pass": true,
+          "reason": "",
+          "unit": "V",
+          "value": 3.395062e-12
+        },
+        {
+          "expr": "v(xdut.na)[nlast]",
+          "max": 4.7,
+          "min": -1.0,
+          "name": "na",
+          "pass": true,
+          "reason": "",
+          "unit": "V",
+          "value": 0.7824688
+        },
+        {
+          "expr": "v(xdut.nb)[nlast]",
+          "max": 4.7,
+          "min": -1.0,
+          "name": "nb",
+          "pass": true,
+          "reason": "",
+          "unit": "V",
+          "value": 0.7824682
+        },
+        {
+          "expr": "-i(v1)[nlast]",
+          "max": 5e-05,
+          "min": 1e-08,
+          "name": "isup",
+          "pass": true,
+          "reason": "",
+          "unit": "A",
+          "value": 5.719381e-06
+        },
+        {
+          "expr": "v(bias_ok)[nlast]",
+          "max": 3.7,
+          "min": 2.0,
+          "name": "bias_ok",
+          "pass": true,
+          "reason": "",
+          "unit": "V",
+          "value": 3.3
+        }
+      ],
+      "ngspice_exit": 0,
+      "pass": true,
+      "process": "tt",
+      "supply_v": 3.3,
+      "temperature_c": -40.0,
+      "timed_out": false,
+      "timeout_s": 200
+    },
+    {
+      "corner_id": "tt_-40c_3.63v",
+      "elapsed_s": 12.776,
+      "killed_by_signal": null,
+      "killed_by_signal_name": null,
+      "log": "sim/temp-core-startup-en-delayed/corners/20260826-054047-ee63b45/tt_-40c_3.63v.log",
+      "measurements": [
+        {
+          "expr": "v(ptat)[nlast]",
+          "max": 2.6,
+          "min": 0.3,
+          "name": "ptat",
+          "pass": true,
+          "reason": "",
+          "unit": "V",
+          "value": 1.099467
+        },
+        {
+          "expr": "abs(v(ptat)[nlast] - v(ptat)[nlast-100])",
+          "max": 0.001,
+          "min": 0.0,
+          "name": "ptat_settled",
+          "pass": true,
+          "reason": "",
+          "unit": "V",
+          "value": 4.937721e-10
+        },
+        {
+          "expr": "v(ctat)[nlast]",
+          "max": 1.1,
+          "min": 0.2,
+          "name": "ctat",
+          "pass": true,
+          "reason": "",
+          "unit": "V",
+          "value": 0.7824696
+        },
+        {
+          "expr": "abs(v(ctat)[nlast] - v(ctat)[nlast-100])",
+          "max": 0.001,
+          "min": 0.0,
+          "name": "ctat_settled",
+          "pass": true,
+          "reason": "",
+          "unit": "V",
+          "value": 1.196476e-11
+        },
+        {
+          "expr": "v(xdut.na)[nlast]",
+          "max": 4.7,
+          "min": -1.0,
+          "name": "na",
+          "pass": true,
+          "reason": "",
+          "unit": "V",
+          "value": 0.7824697
+        },
+        {
+          "expr": "v(xdut.nb)[nlast]",
+          "max": 4.7,
+          "min": -1.0,
+          "name": "nb",
+          "pass": true,
+          "reason": "",
+          "unit": "V",
+          "value": 0.7824708
+        },
+        {
+          "expr": "-i(v1)[nlast]",
+          "max": 5e-05,
+          "min": 1e-08,
+          "name": "isup",
+          "pass": true,
+          "reason": "",
+          "unit": "A",
+          "value": 5.817998e-06
+        },
+        {
+          "expr": "v(bias_ok)[nlast]",
+          "max": 3.7,
+          "min": 2.0,
+          "name": "bias_ok",
+          "pass": true,
+          "reason": "",
+          "unit": "V",
+          "value": 3.63
+        }
+      ],
+      "ngspice_exit": 0,
+      "pass": true,
+      "process": "tt",
+      "supply_v": 3.63,
+      "temperature_c": -40.0,
+      "timed_out": false,
+      "timeout_s": 200
+    },
+    {
+      "corner_id": "tt_27c_2.97v",
+      "elapsed_s": 12.907,
+      "killed_by_signal": null,
+      "killed_by_signal_name": null,
+      "log": "sim/temp-core-startup-en-delayed/corners/20260826-054047-ee63b45/tt_27c_2.97v.log",
+      "measurements": [
+        {
+          "expr": "v(ptat)[nlast]",
+          "max": 2.6,
+          "min": 0.3,
+          "name": "ptat",
+          "pass": true,
+          "reason": "",
+          "unit": "V",
+          "value": 1.414017
+        },
+        {
+          "expr": "abs(v(ptat)[nlast] - v(ptat)[nlast-100])",
+          "max": 0.001,
+          "min": 0.0,
+          "name": "ptat_settled",
+          "pass": true,
+          "reason": "",
+          "unit": "V",
+          "value": 4.312446e-10
+        },
+        {
+          "expr": "v(ctat)[nlast]",
+          "max": 1.1,
+          "min": 0.2,
+          "name": "ctat",
+          "pass": true,
+          "reason": "",
+          "unit": "V",
+          "value": 0.6582603
+        },
+        {
+          "expr": "abs(v(ctat)[nlast] - v(ctat)[nlast-100])",
+          "max": 0.001,
+          "min": 0.0,
+          "name": "ctat_settled",
+          "pass": true,
+          "reason": "",
+          "unit": "V",
+          "value": 6.907475e-12
+        },
+        {
+          "expr": "v(xdut.na)[nlast]",
+          "max": 4.7,
+          "min": -1.0,
+          "name": "na",
+          "pass": true,
+          "reason": "",
+          "unit": "V",
+          "value": 0.6582604
+        },
+        {
+          "expr": "v(xdut.nb)[nlast]",
+          "max": 4.7,
+          "min": -1.0,
+          "name": "nb",
+          "pass": true,
+          "reason": "",
+          "unit": "V",
+          "value": 0.6582596
+        },
+        {
+          "expr": "-i(v1)[nlast]",
+          "max": 5e-05,
+          "min": 1e-08,
+          "name": "isup",
+          "pass": true,
+          "reason": "",
+          "unit": "A",
+          "value": 7.179948e-06
+        },
+        {
+          "expr": "v(bias_ok)[nlast]",
+          "max": 3.7,
+          "min": 2.0,
+          "name": "bias_ok",
+          "pass": true,
+          "reason": "",
+          "unit": "V",
+          "value": 2.969999
+        }
+      ],
+      "ngspice_exit": 0,
+      "pass": true,
+      "process": "tt",
+      "supply_v": 2.97,
+      "temperature_c": 27.0,
+      "timed_out": false,
+      "timeout_s": 200
+    },
+    {
+      "corner_id": "tt_27c_3.30v",
+      "elapsed_s": 12.779,
+      "killed_by_signal": null,
+      "killed_by_signal_name": null,
+      "log": "sim/temp-core-startup-en-delayed/corners/20260826-054047-ee63b45/tt_27c_3.30v.log",
+      "measurements": [
+        {
+          "expr": "v(ptat)[nlast]",
+          "max": 2.6,
+          "min": 0.3,
+          "name": "ptat",
+          "pass": true,
+          "reason": "",
+          "unit": "V",
+          "value": 1.414096
+        },
+        {
+          "expr": "abs(v(ptat)[nlast] - v(ptat)[nlast-100])",
+          "max": 0.001,
+          "min": 0.0,
+          "name": "ptat_settled",
+          "pass": true,
+          "reason": "",
+          "unit": "V",
+          "value": 2.766465e-10
+        },
+        {
+          "expr": "v(ctat)[nlast]",
+          "max": 1.1,
+          "min": 0.2,
+          "name": "ctat",
+          "pass": true,
+          "reason": "",
+          "unit": "V",
+          "value": 0.6582614
+        },
+        {
+          "expr": "abs(v(ctat)[nlast] - v(ctat)[nlast-100])",
+          "max": 0.001,
+          "min": 0.0,
+          "name": "ctat_settled",
+          "pass": true,
+          "reason": "",
+          "unit": "V",
+          "value": 5.12923e-12
+        },
+        {
+          "expr": "v(xdut.na)[nlast]",
+          "max": 4.7,
+          "min": -1.0,
+          "name": "na",
+          "pass": true,
+          "reason": "",
+          "unit": "V",
+          "value": 0.6582615
+        },
+        {
+          "expr": "v(xdut.nb)[nlast]",
+          "max": 4.7,
+          "min": -1.0,
+          "name": "nb",
+          "pass": true,
+          "reason": "",
+          "unit": "V",
+          "value": 0.6582629
+        },
+        {
+          "expr": "-i(v1)[nlast]",
+          "max": 5e-05,
+          "min": 1e-08,
+          "name": "isup",
+          "pass": true,
+          "reason": "",
+          "unit": "A",
+          "value": 7.287961e-06
+        },
+        {
+          "expr": "v(bias_ok)[nlast]",
+          "max": 3.7,
+          "min": 2.0,
+          "name": "bias_ok",
+          "pass": true,
+          "reason": "",
+          "unit": "V",
+          "value": 3.299999
+        }
+      ],
+      "ngspice_exit": 0,
+      "pass": true,
+      "process": "tt",
+      "supply_v": 3.3,
+      "temperature_c": 27.0,
+      "timed_out": false,
+      "timeout_s": 200
+    },
+    {
+      "corner_id": "tt_27c_3.63v",
+      "elapsed_s": 12.695,
+      "killed_by_signal": null,
+      "killed_by_signal_name": null,
+      "log": "sim/temp-core-startup-en-delayed/corners/20260826-054047-ee63b45/tt_27c_3.63v.log",
+      "measurements": [
+        {
+          "expr": "v(ptat)[nlast]",
+          "max": 2.6,
+          "min": 0.3,
+          "name": "ptat",
+          "pass": false,
+          "reason": "below min 0.3",
+          "unit": "V",
+          "value": -2.02427
+        },
+        {
+          "expr": "abs(v(ptat)[nlast] - v(ptat)[nlast-100])",
+          "max": 0.001,
+          "min": 0.0,
+          "name": "ptat_settled",
+          "pass": true,
+          "reason": "",
+          "unit": "V",
+          "value": 3.816059e-12
+        },
+        {
+          "expr": "v(ctat)[nlast]",
+          "max": 1.1,
+          "min": 0.2,
+          "name": "ctat",
+          "pass": true,
+          "reason": "",
+          "unit": "V",
+          "value": 0.6582624
+        },
+        {
+          "expr": "abs(v(ctat)[nlast] - v(ctat)[nlast-100])",
+          "max": 0.001,
+          "min": 0.0,
+          "name": "ctat_settled",
+          "pass": true,
+          "reason": "",
+          "unit": "V",
+          "value": 6.863399e-13
+        },
+        {
+          "expr": "v(xdut.na)[nlast]",
+          "max": 4.7,
+          "min": -1.0,
+          "name": "na",
+          "pass": true,
+          "reason": "",
+          "unit": "V",
+          "value": 0.6582625
+        },
+        {
+          "expr": "v(xdut.nb)[nlast]",
+          "max": 4.7,
+          "min": -1.0,
+          "name": "nb",
+          "pass": true,
+          "reason": "",
+          "unit": "V",
+          "value": 0.6582661
+        },
+        {
+          "expr": "-i(v1)[nlast]",
+          "max": 5e-05,
+          "min": 1e-08,
+          "name": "isup",
+          "pass": true,
+          "reason": "",
+          "unit": "A",
+          "value": 7.403127e-06
+        },
+        {
+          "expr": "v(bias_ok)[nlast]",
+          "max": 3.7,
+          "min": 2.0,
+          "name": "bias_ok",
+          "pass": true,
+          "reason": "",
+          "unit": "V",
+          "value": 3.629999
+        }
+      ],
+      "ngspice_exit": 0,
+      "pass": false,
+      "process": "tt",
+      "supply_v": 3.63,
+      "temperature_c": 27.0,
+      "timed_out": false,
+      "timeout_s": 200
+    },
+    {
+      "corner_id": "tt_125c_2.97v",
+      "elapsed_s": 12.753,
+      "killed_by_signal": null,
+      "killed_by_signal_name": null,
+      "log": "sim/temp-core-startup-en-delayed/corners/20260826-054047-ee63b45/tt_125c_2.97v.log",
+      "measurements": [
+        {
+          "expr": "v(ptat)[nlast]",
+          "max": 2.6,
+          "min": 0.3,
+          "name": "ptat",
+          "pass": true,
+          "reason": "",
+          "unit": "V",
+          "value": 1.87638
+        },
+        {
+          "expr": "abs(v(ptat)[nlast] - v(ptat)[nlast-100])",
+          "max": 0.001,
+          "min": 0.0,
+          "name": "ptat_settled",
+          "pass": true,
+          "reason": "",
+          "unit": "V",
+          "value": 6.535528e-11
+        },
+        {
+          "expr": "v(ctat)[nlast]",
+          "max": 1.1,
+          "min": 0.2,
+          "name": "ctat",
+          "pass": true,
+          "reason": "",
+          "unit": "V",
+          "value": 0.4661286
+        },
+        {
+          "expr": "abs(v(ctat)[nlast] - v(ctat)[nlast-100])",
+          "max": 0.001,
+          "min": 0.0,
+          "name": "ctat_settled",
+          "pass": true,
+          "reason": "",
+          "unit": "V",
+          "value": 2.985112e-12
+        },
+        {
+          "expr": "v(xdut.na)[nlast]",
+          "max": 4.7,
+          "min": -1.0,
+          "name": "na",
+          "pass": true,
+          "reason": "",
+          "unit": "V",
+          "value": 0.4661331
+        },
+        {
+          "expr": "v(xdut.nb)[nlast]",
+          "max": 4.7,
+          "min": -1.0,
+          "name": "nb",
+          "pass": true,
+          "reason": "",
+          "unit": "V",
+          "value": 0.4661336
+        },
+        {
+          "expr": "-i(v1)[nlast]",
+          "max": 5e-05,
+          "min": 1e-08,
+          "name": "isup",
+          "pass": true,
+          "reason": "",
+          "unit": "A",
+          "value": 9.515463e-06
+        },
+        {
+          "expr": "v(bias_ok)[nlast]",
+          "max": 3.7,
+          "min": 2.0,
+          "name": "bias_ok",
+          "pass": true,
+          "reason": "",
+          "unit": "V",
+          "value": 2.969935
+        }
+      ],
+      "ngspice_exit": 0,
+      "pass": true,
+      "process": "tt",
+      "supply_v": 2.97,
+      "temperature_c": 125.0,
+      "timed_out": false,
+      "timeout_s": 200
+    },
+    {
+      "corner_id": "tt_125c_3.30v",
+      "elapsed_s": 12.88,
+      "killed_by_signal": null,
+      "killed_by_signal_name": null,
+      "log": "sim/temp-core-startup-en-delayed/corners/20260826-054047-ee63b45/tt_125c_3.30v.log",
+      "measurements": [
+        {
+          "expr": "v(ptat)[nlast]",
+          "max": 2.6,
+          "min": 0.3,
+          "name": "ptat",
+          "pass": true,
+          "reason": "",
+          "unit": "V",
+          "value": 1.876581
+        },
+        {
+          "expr": "abs(v(ptat)[nlast] - v(ptat)[nlast-100])",
+          "max": 0.001,
+          "min": 0.0,
+          "name": "ptat_settled",
+          "pass": true,
+          "reason": "",
+          "unit": "V",
+          "value": 2.556619e-10
+        },
+        {
+          "expr": "v(ctat)[nlast]",
+          "max": 1.1,
+          "min": 0.2,
+          "name": "ctat",
+          "pass": true,
+          "reason": "",
+          "unit": "V",
+          "value": 0.4661305
+        },
+        {
+          "expr": "abs(v(ctat)[nlast] - v(ctat)[nlast-100])",
+          "max": 0.001,
+          "min": 0.0,
+          "name": "ctat_settled",
+          "pass": true,
+          "reason": "",
+          "unit": "V",
+          "value": 1.040917e-11
+        },
+        {
+          "expr": "v(xdut.na)[nlast]",
+          "max": 4.7,
+          "min": -1.0,
+          "name": "na",
+          "pass": true,
+          "reason": "",
+          "unit": "V",
+          "value": 0.4661349
+        },
+        {
+          "expr": "v(xdut.nb)[nlast]",
+          "max": 4.7,
+          "min": -1.0,
+          "name": "nb",
+          "pass": true,
+          "reason": "",
+          "unit": "V",
+          "value": 0.4661392
+        },
+        {
+          "expr": "-i(v1)[nlast]",
+          "max": 5e-05,
+          "min": 1e-08,
+          "name": "isup",
+          "pass": true,
+          "reason": "",
+          "unit": "A",
+          "value": 9.635592e-06
+        },
+        {
+          "expr": "v(bias_ok)[nlast]",
+          "max": 3.7,
+          "min": 2.0,
+          "name": "bias_ok",
+          "pass": true,
+          "reason": "",
+          "unit": "V",
+          "value": 3.299936
+        }
+      ],
+      "ngspice_exit": 0,
+      "pass": true,
+      "process": "tt",
+      "supply_v": 3.3,
+      "temperature_c": 125.0,
+      "timed_out": false,
+      "timeout_s": 200
+    },
+    {
+      "corner_id": "tt_125c_3.63v",
+      "elapsed_s": 13.428,
+      "killed_by_signal": null,
+      "killed_by_signal_name": null,
+      "log": "sim/temp-core-startup-en-delayed/corners/20260826-054047-ee63b45/tt_125c_3.63v.log",
+      "measurements": [
+        {
+          "expr": "v(ptat)[nlast]",
+          "max": 2.6,
+          "min": 0.3,
+          "name": "ptat",
+          "pass": false,
+          "reason": "below min 0.3",
+          "unit": "V",
+          "value": 3.798212e-05
+        },
+        {
+          "expr": "abs(v(ptat)[nlast] - v(ptat)[nlast-100])",
+          "max": 0.001,
+          "min": 0.0,
+          "name": "ptat_settled",
+          "pass": true,
+          "reason": "",
+          "unit": "V",
+          "value": 9.473304e-12
+        },
+        {
+          "expr": "v(ctat)[nlast]",
+          "max": 1.1,
+          "min": 0.2,
+          "name": "ctat",
+          "pass": false,
+          "reason": "below min 0.2",
+          "unit": "V",
+          "value": 0.01394175
+        },
+        {
+          "expr": "abs(v(ctat)[nlast] - v(ctat)[nlast-100])",
+          "max": 0.001,
+          "min": 0.0,
+          "name": "ctat_settled",
+          "pass": true,
+          "reason": "",
+          "unit": "V",
+          "value": 1.758536e-09
+        },
+        {
+          "expr": "v(xdut.na)[nlast]",
+          "max": 4.7,
+          "min": -1.0,
+          "name": "na",
+          "pass": true,
+          "reason": "",
+          "unit": "V",
+          "value": 0.01394304
+        },
+        {
+          "expr": "v(xdut.nb)[nlast]",
+          "max": 4.7,
+          "min": -1.0,
+          "name": "nb",
+          "pass": true,
+          "reason": "",
+          "unit": "V",
+          "value": 0.02846532
+        },
+        {
+          "expr": "-i(v1)[nlast]",
+          "max": 5e-05,
+          "min": 1e-08,
+          "name": "isup",
+          "pass": false,
+          "reason": "below min 1e-08",
+          "unit": "A",
+          "value": -0.00222319
+        },
+        {
+          "expr": "v(bias_ok)[nlast]",
+          "max": 3.7,
+          "min": 2.0,
+          "name": "bias_ok",
+          "pass": true,
+          "reason": "",
+          "unit": "V",
+          "value": 3.629936
+        }
+      ],
+      "ngspice_exit": 0,
+      "pass": false,
+      "process": "tt",
+      "supply_v": 3.63,
+      "temperature_c": 125.0,
+      "timed_out": false,
+      "timeout_s": 200
+    },
+    {
+      "corner_id": "ss_-40c_2.97v",
+      "elapsed_s": 12.746,
+      "killed_by_signal": null,
+      "killed_by_signal_name": null,
+      "log": "sim/temp-core-startup-en-delayed/corners/20260826-054047-ee63b45/ss_-40c_2.97v.log",
+      "measurements": [
+        {
+          "expr": "v(ptat)[nlast]",
+          "max": 2.6,
+          "min": 0.3,
+          "name": "ptat",
+          "pass": true,
+          "reason": "",
+          "unit": "V",
+          "value": 1.099574
+        },
+        {
+          "expr": "abs(v(ptat)[nlast] - v(ptat)[nlast-100])",
+          "max": 0.001,
+          "min": 0.0,
+          "name": "ptat_settled",
+          "pass": true,
+          "reason": "",
+          "unit": "V",
+          "value": 3.961775e-10
+        },
+        {
+          "expr": "v(ctat)[nlast]",
+          "max": 1.1,
+          "min": 0.2,
+          "name": "ctat",
+          "pass": true,
+          "reason": "",
+          "unit": "V",
+          "value": 0.7828844
+        },
+        {
+          "expr": "abs(v(ctat)[nlast] - v(ctat)[nlast-100])",
+          "max": 0.001,
+          "min": 0.0,
+          "name": "ctat_settled",
+          "pass": true,
+          "reason": "",
+          "unit": "V",
+          "value": 9.503176e-12
+        },
+        {
+          "expr": "v(xdut.na)[nlast]",
+          "max": 4.7,
+          "min": -1.0,
+          "name": "na",
+          "pass": true,
+          "reason": "",
+          "unit": "V",
+          "value": 0.7828845
+        },
+        {
+          "expr": "v(xdut.nb)[nlast]",
+          "max": 4.7,
+          "min": -1.0,
+          "name": "nb",
+          "pass": true,
+          "reason": "",
+          "unit": "V",
+          "value": 0.7828817
+        },
+        {
+          "expr": "-i(v1)[nlast]",
+          "max": 5e-05,
+          "min": 1e-08,
+          "name": "isup",
+          "pass": true,
+          "reason": "",
+          "unit": "A",
+          "value": 5.607708e-06
+        },
+        {
+          "expr": "v(bias_ok)[nlast]",
+          "max": 3.7,
+          "min": 2.0,
+          "name": "bias_ok",
+          "pass": true,
+          "reason": "",
+          "unit": "V",
+          "value": 2.97
+        }
+      ],
+      "ngspice_exit": 0,
+      "pass": true,
+      "process": "ss",
+      "supply_v": 2.97,
+      "temperature_c": -40.0,
+      "timed_out": false,
+      "timeout_s": 200
+    },
+    {
+      "corner_id": "ss_-40c_3.30v",
+      "elapsed_s": 15.39,
+      "killed_by_signal": null,
+      "killed_by_signal_name": null,
+      "log": "sim/temp-core-startup-en-delayed/corners/20260826-054047-ee63b45/ss_-40c_3.30v.log",
+      "measurements": [
+        {
+          "expr": "v(ptat)[nlast]",
+          "max": 2.6,
+          "min": 0.3,
+          "name": "ptat",
+          "pass": true,
+          "reason": "",
+          "unit": "V",
+          "value": 1.099628
+        },
+        {
+          "expr": "abs(v(ptat)[nlast] - v(ptat)[nlast-100])",
+          "max": 0.001,
+          "min": 0.0,
+          "name": "ptat_settled",
+          "pass": true,
+          "reason": "",
+          "unit": "V",
+          "value": 4.582119e-10
+        },
+        {
+          "expr": "v(ctat)[nlast]",
+          "max": 1.1,
+          "min": 0.2,
+          "name": "ctat",
+          "pass": true,
+          "reason": "",
+          "unit": "V",
+          "value": 0.7828853
+        },
+        {
+          "expr": "abs(v(ctat)[nlast] - v(ctat)[nlast-100])",
+          "max": 0.001,
+          "min": 0.0,
+          "name": "ctat_settled",
+          "pass": true,
+          "reason": "",
+          "unit": "V",
+          "value": 1.416256e-11
+        },
+        {
+          "expr": "v(xdut.na)[nlast]",
+          "max": 4.7,
+          "min": -1.0,
+          "name": "na",
+          "pass": true,
+          "reason": "",
+          "unit": "V",
+          "value": 0.7828854
+        },
+        {
+          "expr": "v(xdut.nb)[nlast]",
+          "max": 4.7,
+          "min": -1.0,
+          "name": "nb",
+          "pass": true,
+          "reason": "",
+          "unit": "V",
+          "value": 0.7828845
+        },
+        {
+          "expr": "-i(v1)[nlast]",
+          "max": 5e-05,
+          "min": 1e-08,
+          "name": "isup",
+          "pass": true,
+          "reason": "",
+          "unit": "A",
+          "value": 5.709307e-06
+        },
+        {
+          "expr": "v(bias_ok)[nlast]",
+          "max": 3.7,
+          "min": 2.0,
+          "name": "bias_ok",
+          "pass": true,
+          "reason": "",
+          "unit": "V",
+          "value": 3.3
+        }
+      ],
+      "ngspice_exit": 0,
+      "pass": true,
+      "process": "ss",
+      "supply_v": 3.3,
+      "temperature_c": -40.0,
+      "timed_out": false,
+      "timeout_s": 200
+    },
+    {
+      "corner_id": "ss_-40c_3.63v",
+      "elapsed_s": 29.593,
+      "killed_by_signal": null,
+      "killed_by_signal_name": null,
+      "log": "sim/temp-core-startup-en-delayed/corners/20260826-054047-ee63b45/ss_-40c_3.63v.log",
+      "measurements": [
+        {
+          "expr": "v(ptat)[nlast]",
+          "max": 2.6,
+          "min": 0.3,
+          "name": "ptat",
+          "pass": true,
+          "reason": "",
+          "unit": "V",
+          "value": 1.099678
+        },
+        {
+          "expr": "abs(v(ptat)[nlast] - v(ptat)[nlast-100])",
+          "max": 0.001,
+          "min": 0.0,
+          "name": "ptat_settled",
+          "pass": true,
+          "reason": "",
+          "unit": "V",
+          "value": 3.530614e-10
+        },
+        {
+          "expr": "v(ctat)[nlast]",
+          "max": 1.1,
+          "min": 0.2,
+          "name": "ctat",
+          "pass": true,
+          "reason": "",
+          "unit": "V",
+          "value": 0.7828862
+        },
+        {
+          "expr": "abs(v(ctat)[nlast] - v(ctat)[nlast-100])",
+          "max": 0.001,
+          "min": 0.0,
+          "name": "ctat_settled",
+          "pass": true,
+          "reason": "",
+          "unit": "V",
+          "value": 9.683143e-12
+        },
+        {
+          "expr": "v(xdut.na)[nlast]",
+          "max": 4.7,
+          "min": -1.0,
+          "name": "na",
+          "pass": true,
+          "reason": "",
+          "unit": "V",
+          "value": 0.7828863
+        },
+        {
+          "expr": "v(xdut.nb)[nlast]",
+          "max": 4.7,
+          "min": -1.0,
+          "name": "nb",
+          "pass": true,
+          "reason": "",
+          "unit": "V",
+          "value": 0.782887
+        },
+        {
+          "expr": "-i(v1)[nlast]",
+          "max": 5e-05,
+          "min": 1e-08,
+          "name": "isup",
+          "pass": true,
+          "reason": "",
+          "unit": "A",
+          "value": 5.808037e-06
+        },
+        {
+          "expr": "v(bias_ok)[nlast]",
+          "max": 3.7,
+          "min": 2.0,
+          "name": "bias_ok",
+          "pass": true,
+          "reason": "",
+          "unit": "V",
+          "value": 3.63
+        }
+      ],
+      "ngspice_exit": 0,
+      "pass": true,
+      "process": "ss",
+      "supply_v": 3.63,
+      "temperature_c": -40.0,
+      "timed_out": false,
+      "timeout_s": 200
+    },
+    {
+      "corner_id": "ss_27c_2.97v",
+      "elapsed_s": 32.956,
+      "killed_by_signal": null,
+      "killed_by_signal_name": null,
+      "log": "sim/temp-core-startup-en-delayed/corners/20260826-054047-ee63b45/ss_27c_2.97v.log",
+      "measurements": [
+        {
+          "expr": "v(ptat)[nlast]",
+          "max": 2.6,
+          "min": 0.3,
+          "name": "ptat",
+          "pass": true,
+          "reason": "",
+          "unit": "V",
+          "value": 1.414197
+        },
+        {
+          "expr": "abs(v(ptat)[nlast] - v(ptat)[nlast-100])",
+          "max": 0.001,
+          "min": 0.0,
+          "name": "ptat_settled",
+          "pass": true,
+          "reason": "",
+          "unit": "V",
+          "value": 5.952527e-11
+        },
+        {
+          "expr": "v(ctat)[nlast]",
+          "max": 1.1,
+          "min": 0.2,
+          "name": "ctat",
+          "pass": true,
+          "reason": "",
+          "unit": "V",
+          "value": 0.6586109
+        },
+        {
+          "expr": "abs(v(ctat)[nlast] - v(ctat)[nlast-100])",
+          "max": 0.001,
+          "min": 0.0,
+          "name": "ctat_settled",
+          "pass": true,
+          "reason": "",
+          "unit": "V",
+          "value": 7.507328e-13
+        },
+        {
+          "expr": "v(xdut.na)[nlast]",
+          "max": 4.7,
+          "min": -1.0,
+          "name": "na",
+          "pass": true,
+          "reason": "",
+          "unit": "V",
+          "value": 0.658611
+        },
+        {
+          "expr": "v(xdut.nb)[nlast]",
+          "max": 4.7,
+          "min": -1.0,
+          "name": "nb",
+          "pass": true,
+          "reason": "",
+          "unit": "V",
+          "value": 0.6586098
+        },
+        {
+          "expr": "-i(v1)[nlast]",
+          "max": 5e-05,
+          "min": 1e-08,
+          "name": "isup",
+          "pass": true,
+          "reason": "",
+          "unit": "A",
+          "value": 7.166817e-06
+        },
+        {
+          "expr": "v(bias_ok)[nlast]",
+          "max": 3.7,
+          "min": 2.0,
+          "name": "bias_ok",
+          "pass": true,
+          "reason": "",
+          "unit": "V",
+          "value": 2.97
+        }
+      ],
+      "ngspice_exit": 0,
+      "pass": true,
+      "process": "ss",
+      "supply_v": 2.97,
+      "temperature_c": 27.0,
+      "timed_out": false,
+      "timeout_s": 200
+    },
+    {
+      "corner_id": "ss_27c_3.30v",
+      "elapsed_s": 23.388,
+      "killed_by_signal": null,
+      "killed_by_signal_name": null,
+      "log": "sim/temp-core-startup-en-delayed/corners/20260826-054047-ee63b45/ss_27c_3.30v.log",
+      "measurements": [
+        {
+          "expr": "v(ptat)[nlast]",
+          "max": 2.6,
+          "min": 0.3,
+          "name": "ptat",
+          "pass": true,
+          "reason": "",
+          "unit": "V",
+          "value": 1.414275
+        },
+        {
+          "expr": "abs(v(ptat)[nlast] - v(ptat)[nlast-100])",
+          "max": 0.001,
+          "min": 0.0,
+          "name": "ptat_settled",
+          "pass": true,
+          "reason": "",
+          "unit": "V",
+          "value": 1.432756e-10
+        },
+        {
+          "expr": "v(ctat)[nlast]",
+          "max": 1.1,
+          "min": 0.2,
+          "name": "ctat",
+          "pass": true,
+          "reason": "",
+          "unit": "V",
+          "value": 0.6586119
+        },
+        {
+          "expr": "abs(v(ctat)[nlast] - v(ctat)[nlast-100])",
+          "max": 0.001,
+          "min": 0.0,
+          "name": "ctat_settled",
+          "pass": true,
+          "reason": "",
+          "unit": "V",
+          "value": 1.492917e-12
+        },
+        {
+          "expr": "v(xdut.na)[nlast]",
+          "max": 4.7,
+          "min": -1.0,
+          "name": "na",
+          "pass": true,
+          "reason": "",
+          "unit": "V",
+          "value": 0.658612
+        },
+        {
+          "expr": "v(xdut.nb)[nlast]",
+          "max": 4.7,
+          "min": -1.0,
+          "name": "nb",
+          "pass": true,
+          "reason": "",
+          "unit": "V",
+          "value": 0.6586131
+        },
+        {
+          "expr": "-i(v1)[nlast]",
+          "max": 5e-05,
+          "min": 1e-08,
+          "name": "isup",
+          "pass": true,
+          "reason": "",
+          "unit": "A",
+          "value": 7.27547e-06
+        },
+        {
+          "expr": "v(bias_ok)[nlast]",
+          "max": 3.7,
+          "min": 2.0,
+          "name": "bias_ok",
+          "pass": true,
+          "reason": "",
+          "unit": "V",
+          "value": 3.3
+        }
+      ],
+      "ngspice_exit": 0,
+      "pass": true,
+      "process": "ss",
+      "supply_v": 3.3,
+      "temperature_c": 27.0,
+      "timed_out": false,
+      "timeout_s": 200
+    },
+    {
+      "corner_id": "ss_27c_3.63v",
+      "elapsed_s": 29.357,
+      "killed_by_signal": null,
+      "killed_by_signal_name": null,
+      "log": "sim/temp-core-startup-en-delayed/corners/20260826-054047-ee63b45/ss_27c_3.63v.log",
+      "measurements": [
+        {
+          "expr": "v(ptat)[nlast]",
+          "max": 2.6,
+          "min": 0.3,
+          "name": "ptat",
+          "pass": true,
+          "reason": "",
+          "unit": "V",
+          "value": 1.414345
+        },
+        {
+          "expr": "abs(v(ptat)[nlast] - v(ptat)[nlast-100])",
+          "max": 0.001,
+          "min": 0.0,
+          "name": "ptat_settled",
+          "pass": true,
+          "reason": "",
+          "unit": "V",
+          "value": 5.789933e-10
+        },
+        {
+          "expr": "v(ctat)[nlast]",
+          "max": 1.1,
+          "min": 0.2,
+          "name": "ctat",
+          "pass": true,
+          "reason": "",
+          "unit": "V",
+          "value": 0.658613
+        },
+        {
+          "expr": "abs(v(ctat)[nlast] - v(ctat)[nlast-100])",
+          "max": 0.001,
+          "min": 0.0,
+          "name": "ctat_settled",
+          "pass": true,
+          "reason": "",
+          "unit": "V",
+          "value": 9.391155e-12
+        },
+        {
+          "expr": "v(xdut.na)[nlast]",
+          "max": 4.7,
+          "min": -1.0,
+          "name": "na",
+          "pass": true,
+          "reason": "",
+          "unit": "V",
+          "value": 0.6586131
+        },
+        {
+          "expr": "v(xdut.nb)[nlast]",
+          "max": 4.7,
+          "min": -1.0,
+          "name": "nb",
+          "pass": true,
+          "reason": "",
+          "unit": "V",
+          "value": 0.6586162
+        },
+        {
+          "expr": "-i(v1)[nlast]",
+          "max": 5e-05,
+          "min": 1e-08,
+          "name": "isup",
+          "pass": true,
+          "reason": "",
+          "unit": "A",
+          "value": 7.381305e-06
+        },
+        {
+          "expr": "v(bias_ok)[nlast]",
+          "max": 3.7,
+          "min": 2.0,
+          "name": "bias_ok",
+          "pass": true,
+          "reason": "",
+          "unit": "V",
+          "value": 3.63
+        }
+      ],
+      "ngspice_exit": 0,
+      "pass": true,
+      "process": "ss",
+      "supply_v": 3.63,
+      "temperature_c": 27.0,
+      "timed_out": false,
+      "timeout_s": 200
+    },
+    {
+      "corner_id": "ss_125c_2.97v",
+      "elapsed_s": 26.599,
+      "killed_by_signal": null,
+      "killed_by_signal_name": null,
+      "log": "sim/temp-core-startup-en-delayed/corners/20260826-054047-ee63b45/ss_125c_2.97v.log",
+      "measurements": [
+        {
+          "expr": "v(ptat)[nlast]",
+          "max": 2.6,
+          "min": 0.3,
+          "name": "ptat",
+          "pass": true,
+          "reason": "",
+          "unit": "V",
+          "value": 1.876653
+        },
+        {
+          "expr": "abs(v(ptat)[nlast] - v(ptat)[nlast-100])",
+          "max": 0.001,
+          "min": 0.0,
+          "name": "ptat_settled",
+          "pass": true,
+          "reason": "",
+          "unit": "V",
+          "value": 1.528004e-10
+        },
+        {
+          "expr": "v(ctat)[nlast]",
+          "max": 1.1,
+          "min": 0.2,
+          "name": "ctat",
+          "pass": true,
+          "reason": "",
+          "unit": "V",
+          "value": 0.4664139
+        },
+        {
+          "expr": "abs(v(ctat)[nlast] - v(ctat)[nlast-100])",
+          "max": 0.001,
+          "min": 0.0,
+          "name": "ctat_settled",
+          "pass": true,
+          "reason": "",
+          "unit": "V",
+          "value": 9.50906e-13
+        },
+        {
+          "expr": "v(xdut.na)[nlast]",
+          "max": 4.7,
+          "min": -1.0,
+          "name": "na",
+          "pass": true,
+          "reason": "",
+          "unit": "V",
+          "value": 0.4664168
+        },
+        {
+          "expr": "v(xdut.nb)[nlast]",
+          "max": 4.7,
+          "min": -1.0,
+          "name": "nb",
+          "pass": true,
+          "reason": "",
+          "unit": "V",
+          "value": 0.466418
+        },
+        {
+          "expr": "-i(v1)[nlast]",
+          "max": 5e-05,
+          "min": 1e-08,
+          "name": "isup",
+          "pass": true,
+          "reason": "",
+          "unit": "A",
+          "value": 9.497938e-06
+        },
+        {
+          "expr": "v(bias_ok)[nlast]",
+          "max": 3.7,
+          "min": 2.0,
+          "name": "bias_ok",
+          "pass": true,
+          "reason": "",
+          "unit": "V",
+          "value": 2.969967
+        }
+      ],
+      "ngspice_exit": 0,
+      "pass": true,
+      "process": "ss",
+      "supply_v": 2.97,
+      "temperature_c": 125.0,
+      "timed_out": false,
+      "timeout_s": 200
+    },
+    {
+      "corner_id": "ss_125c_3.30v",
+      "elapsed_s": 24.722,
+      "killed_by_signal": null,
+      "killed_by_signal_name": null,
+      "log": "sim/temp-core-startup-en-delayed/corners/20260826-054047-ee63b45/ss_125c_3.30v.log",
+      "measurements": [
+        {
+          "expr": "v(ptat)[nlast]",
+          "max": 2.6,
+          "min": 0.3,
+          "name": "ptat",
+          "pass": true,
+          "reason": "",
+          "unit": "V",
+          "value": 1.876849
+        },
+        {
+          "expr": "abs(v(ptat)[nlast] - v(ptat)[nlast-100])",
+          "max": 0.001,
+          "min": 0.0,
+          "name": "ptat_settled",
+          "pass": true,
+          "reason": "",
+          "unit": "V",
+          "value": 3.065022e-10
+        },
+        {
+          "expr": "v(ctat)[nlast]",
+          "max": 1.1,
+          "min": 0.2,
+          "name": "ctat",
+          "pass": true,
+          "reason": "",
+          "unit": "V",
+          "value": 0.4664157
+        },
+        {
+          "expr": "abs(v(ctat)[nlast] - v(ctat)[nlast-100])",
+          "max": 0.001,
+          "min": 0.0,
+          "name": "ctat_settled",
+          "pass": true,
+          "reason": "",
+          "unit": "V",
+          "value": 5.590306e-12
+        },
+        {
+          "expr": "v(xdut.na)[nlast]",
+          "max": 4.7,
+          "min": -1.0,
+          "name": "na",
+          "pass": true,
+          "reason": "",
+          "unit": "V",
+          "value": 0.4664186
+        },
+        {
+          "expr": "v(xdut.nb)[nlast]",
+          "max": 4.7,
+          "min": -1.0,
+          "name": "nb",
+          "pass": true,
+          "reason": "",
+          "unit": "V",
+          "value": 0.4664235
+        },
+        {
+          "expr": "-i(v1)[nlast]",
+          "max": 5e-05,
+          "min": 1e-08,
+          "name": "isup",
+          "pass": true,
+          "reason": "",
+          "unit": "A",
+          "value": 9.618787e-06
+        },
+        {
+          "expr": "v(bias_ok)[nlast]",
+          "max": 3.7,
+          "min": 2.0,
+          "name": "bias_ok",
+          "pass": true,
+          "reason": "",
+          "unit": "V",
+          "value": 3.299968
+        }
+      ],
+      "ngspice_exit": 0,
+      "pass": true,
+      "process": "ss",
+      "supply_v": 3.3,
+      "temperature_c": 125.0,
+      "timed_out": false,
+      "timeout_s": 200
+    },
+    {
+      "corner_id": "ss_125c_3.63v",
+      "elapsed_s": 12.803,
+      "killed_by_signal": null,
+      "killed_by_signal_name": null,
+      "log": "sim/temp-core-startup-en-delayed/corners/20260826-054047-ee63b45/ss_125c_3.63v.log",
+      "measurements": [
+        {
+          "expr": "v(ptat)[nlast]",
+          "max": 2.6,
+          "min": 0.3,
+          "name": "ptat",
+          "pass": true,
+          "reason": "",
+          "unit": "V",
+          "value": 1.877
+        },
+        {
+          "expr": "abs(v(ptat)[nlast] - v(ptat)[nlast-100])",
+          "max": 0.001,
+          "min": 0.0,
+          "name": "ptat_settled",
+          "pass": true,
+          "reason": "",
+          "unit": "V",
+          "value": 3.3091e-10
+        },
+        {
+          "expr": "v(ctat)[nlast]",
+          "max": 1.1,
+          "min": 0.2,
+          "name": "ctat",
+          "pass": true,
+          "reason": "",
+          "unit": "V",
+          "value": 0.4664174
+        },
+        {
+          "expr": "abs(v(ctat)[nlast] - v(ctat)[nlast-100])",
+          "max": 0.001,
+          "min": 0.0,
+          "name": "ctat_settled",
+          "pass": true,
+          "reason": "",
+          "unit": "V",
+          "value": 8.09991e-12
+        },
+        {
+          "expr": "v(xdut.na)[nlast]",
+          "max": 4.7,
+          "min": -1.0,
+          "name": "na",
+          "pass": true,
+          "reason": "",
+          "unit": "V",
+          "value": 0.4664203
+        },
+        {
+          "expr": "v(xdut.nb)[nlast]",
+          "max": 4.7,
+          "min": -1.0,
+          "name": "nb",
+          "pass": true,
+          "reason": "",
+          "unit": "V",
+          "value": 0.4664289
+        },
+        {
+          "expr": "-i(v1)[nlast]",
+          "max": 5e-05,
+          "min": 1e-08,
+          "name": "isup",
+          "pass": true,
+          "reason": "",
+          "unit": "A",
+          "value": 9.737421e-06
+        },
+        {
+          "expr": "v(bias_ok)[nlast]",
+          "max": 3.7,
+          "min": 2.0,
+          "name": "bias_ok",
+          "pass": true,
+          "reason": "",
+          "unit": "V",
+          "value": 3.629969
+        }
+      ],
+      "ngspice_exit": 0,
+      "pass": true,
+      "process": "ss",
+      "supply_v": 3.63,
+      "temperature_c": 125.0,
+      "timed_out": false,
+      "timeout_s": 200
+    },
+    {
+      "corner_id": "ff_-40c_2.97v",
+      "elapsed_s": 25.117,
+      "killed_by_signal": null,
+      "killed_by_signal_name": null,
+      "log": "sim/temp-core-startup-en-delayed/corners/20260826-054047-ee63b45/ff_-40c_2.97v.log",
+      "measurements": [
+        {
+          "expr": "v(ptat)[nlast]",
+          "max": 2.6,
+          "min": 0.3,
+          "name": "ptat",
+          "pass": true,
+          "reason": "",
+          "unit": "V",
+          "value": 1.099145
+        },
+        {
+          "expr": "abs(v(ptat)[nlast] - v(ptat)[nlast-100])",
+          "max": 0.001,
+          "min": 0.0,
+          "name": "ptat_settled",
+          "pass": true,
+          "reason": "",
+          "unit": "V",
+          "value": 6.496748e-10
+        },
+        {
+          "expr": "v(ctat)[nlast]",
+          "max": 1.1,
+          "min": 0.2,
+          "name": "ctat",
+          "pass": true,
+          "reason": "",
+          "unit": "V",
+          "value": 0.7820314
+        },
+        {
+          "expr": "abs(v(ctat)[nlast] - v(ctat)[nlast-100])",
+          "max": 0.001,
+          "min": 0.0,
+          "name": "ctat_settled",
+          "pass": true,
+          "reason": "",
+          "unit": "V",
+          "value": 1.145717e-11
+        },
+        {
+          "expr": "v(xdut.na)[nlast]",
+          "max": 4.7,
+          "min": -1.0,
+          "name": "na",
+          "pass": true,
+          "reason": "",
+          "unit": "V",
+          "value": 0.7820315
+        },
+        {
+          "expr": "v(xdut.nb)[nlast]",
+          "max": 4.7,
+          "min": -1.0,
+          "name": "nb",
+          "pass": true,
+          "reason": "",
+          "unit": "V",
+          "value": 0.7820294
+        },
+        {
+          "expr": "-i(v1)[nlast]",
+          "max": 5e-05,
+          "min": 1e-08,
+          "name": "isup",
+          "pass": true,
+          "reason": "",
+          "unit": "A",
+          "value": 5.646691e-06
+        },
+        {
+          "expr": "v(bias_ok)[nlast]",
+          "max": 3.7,
+          "min": 2.0,
+          "name": "bias_ok",
+          "pass": true,
+          "reason": "",
+          "unit": "V",
+          "value": 2.97
+        }
+      ],
+      "ngspice_exit": 0,
+      "pass": true,
+      "process": "ff",
+      "supply_v": 2.97,
+      "temperature_c": -40.0,
+      "timed_out": false,
+      "timeout_s": 200
+    },
+    {
+      "corner_id": "ff_-40c_3.30v",
+      "elapsed_s": 16.013,
+      "killed_by_signal": null,
+      "killed_by_signal_name": null,
+      "log": "sim/temp-core-startup-en-delayed/corners/20260826-054047-ee63b45/ff_-40c_3.30v.log",
+      "measurements": [
+        {
+          "expr": "v(ptat)[nlast]",
+          "max": 2.6,
+          "min": 0.3,
+          "name": "ptat",
+          "pass": true,
+          "reason": "",
+          "unit": "V",
+          "value": 1.0992
+        },
+        {
+          "expr": "abs(v(ptat)[nlast] - v(ptat)[nlast-100])",
+          "max": 0.001,
+          "min": 0.0,
+          "name": "ptat_settled",
+          "pass": true,
+          "reason": "",
+          "unit": "V",
+          "value": 1.641367e-10
+        },
+        {
+          "expr": "v(ctat)[nlast]",
+          "max": 1.1,
+          "min": 0.2,
+          "name": "ctat",
+          "pass": true,
+          "reason": "",
+          "unit": "V",
+          "value": 0.7820323
+        },
+        {
+          "expr": "abs(v(ctat)[nlast] - v(ctat)[nlast-100])",
+          "max": 0.001,
+          "min": 0.0,
+          "name": "ctat_settled",
+          "pass": true,
+          "reason": "",
+          "unit": "V",
+          "value": 1.057265e-12
+        },
+        {
+          "expr": "v(xdut.na)[nlast]",
+          "max": 4.7,
+          "min": -1.0,
+          "name": "na",
+          "pass": true,
+          "reason": "",
+          "unit": "V",
+          "value": 0.7820324
+        },
+        {
+          "expr": "v(xdut.nb)[nlast]",
+          "max": 4.7,
+          "min": -1.0,
+          "name": "nb",
+          "pass": true,
+          "reason": "",
+          "unit": "V",
+          "value": 0.7820321
+        },
+        {
+          "expr": "-i(v1)[nlast]",
+          "max": 5e-05,
+          "min": 1e-08,
+          "name": "isup",
+          "pass": true,
+          "reason": "",
+          "unit": "A",
+          "value": 5.75644e-06
+        },
+        {
+          "expr": "v(bias_ok)[nlast]",
+          "max": 3.7,
+          "min": 2.0,
+          "name": "bias_ok",
+          "pass": true,
+          "reason": "",
+          "unit": "V",
+          "value": 3.3
+        }
+      ],
+      "ngspice_exit": 0,
+      "pass": true,
+      "process": "ff",
+      "supply_v": 3.3,
+      "temperature_c": -40.0,
+      "timed_out": false,
+      "timeout_s": 200
+    },
+    {
+      "corner_id": "ff_-40c_3.63v",
+      "elapsed_s": 15.561,
+      "killed_by_signal": null,
+      "killed_by_signal_name": null,
+      "log": "sim/temp-core-startup-en-delayed/corners/20260826-054047-ee63b45/ff_-40c_3.63v.log",
+      "measurements": [
+        {
+          "expr": "v(ptat)[nlast]",
+          "max": 2.6,
+          "min": 0.3,
+          "name": "ptat",
+          "pass": true,
+          "reason": "",
+          "unit": "V",
+          "value": 1.09925
+        },
+        {
+          "expr": "abs(v(ptat)[nlast] - v(ptat)[nlast-100])",
+          "max": 0.001,
+          "min": 0.0,
+          "name": "ptat_settled",
+          "pass": true,
+          "reason": "",
+          "unit": "V",
+          "value": 3.790392e-10
+        },
+        {
+          "expr": "v(ctat)[nlast]",
+          "max": 1.1,
+          "min": 0.2,
+          "name": "ctat",
+          "pass": true,
+          "reason": "",
+          "unit": "V",
+          "value": 0.7820332
+        },
+        {
+          "expr": "abs(v(ctat)[nlast] - v(ctat)[nlast-100])",
+          "max": 0.001,
+          "min": 0.0,
+          "name": "ctat_settled",
+          "pass": true,
+          "reason": "",
+          "unit": "V",
+          "value": 1.971645e-12
+        },
+        {
+          "expr": "v(xdut.na)[nlast]",
+          "max": 4.7,
+          "min": -1.0,
+          "name": "na",
+          "pass": true,
+          "reason": "",
+          "unit": "V",
+          "value": 0.7820333
+        },
+        {
+          "expr": "v(xdut.nb)[nlast]",
+          "max": 4.7,
+          "min": -1.0,
+          "name": "nb",
+          "pass": true,
+          "reason": "",
+          "unit": "V",
+          "value": 0.7820347
+        },
+        {
+          "expr": "-i(v1)[nlast]",
+          "max": 5e-05,
+          "min": 1e-08,
+          "name": "isup",
+          "pass": true,
+          "reason": "",
+          "unit": "A",
+          "value": 5.86618e-06
+        },
+        {
+          "expr": "v(bias_ok)[nlast]",
+          "max": 3.7,
+          "min": 2.0,
+          "name": "bias_ok",
+          "pass": true,
+          "reason": "",
+          "unit": "V",
+          "value": 3.63
+        }
+      ],
+      "ngspice_exit": 0,
+      "pass": true,
+      "process": "ff",
+      "supply_v": 3.63,
+      "temperature_c": -40.0,
+      "timed_out": false,
+      "timeout_s": 200
+    },
+    {
+      "corner_id": "ff_27c_2.97v",
+      "elapsed_s": 31.282,
+      "killed_by_signal": null,
+      "killed_by_signal_name": null,
+      "log": "sim/temp-core-startup-en-delayed/corners/20260826-054047-ee63b45/ff_27c_2.97v.log",
+      "measurements": [
+        {
+          "expr": "v(ptat)[nlast]",
+          "max": 2.6,
+          "min": 0.3,
+          "name": "ptat",
+          "pass": true,
+          "reason": "",
+          "unit": "V",
+          "value": 1.413826
+        },
+        {
+          "expr": "abs(v(ptat)[nlast] - v(ptat)[nlast-100])",
+          "max": 0.001,
+          "min": 0.0,
+          "name": "ptat_settled",
+          "pass": true,
+          "reason": "",
+          "unit": "V",
+          "value": 2.455702e-10
+        },
+        {
+          "expr": "v(ctat)[nlast]",
+          "max": 1.1,
+          "min": 0.2,
+          "name": "ctat",
+          "pass": true,
+          "reason": "",
+          "unit": "V",
+          "value": 0.6578904
+        },
+        {
+          "expr": "abs(v(ctat)[nlast] - v(ctat)[nlast-100])",
+          "max": 0.001,
+          "min": 0.0,
+          "name": "ctat_settled",
+          "pass": true,
+          "reason": "",
+          "unit": "V",
+          "value": 5.316858e-12
+        },
+        {
+          "expr": "v(xdut.na)[nlast]",
+          "max": 4.7,
+          "min": -1.0,
+          "name": "na",
+          "pass": true,
+          "reason": "",
+          "unit": "V",
+          "value": 0.6578905
+        },
+        {
+          "expr": "v(xdut.nb)[nlast]",
+          "max": 4.7,
+          "min": -1.0,
+          "name": "nb",
+          "pass": true,
+          "reason": "",
+          "unit": "V",
+          "value": 0.65789
+        },
+        {
+          "expr": "-i(v1)[nlast]",
+          "max": 5e-05,
+          "min": 1e-08,
+          "name": "isup",
+          "pass": true,
+          "reason": "",
+          "unit": "A",
+          "value": 7.213431e-06
+        },
+        {
+          "expr": "v(bias_ok)[nlast]",
+          "max": 3.7,
+          "min": 2.0,
+          "name": "bias_ok",
+          "pass": true,
+          "reason": "",
+          "unit": "V",
+          "value": 2.969999
+        }
+      ],
+      "ngspice_exit": 0,
+      "pass": true,
+      "process": "ff",
+      "supply_v": 2.97,
+      "temperature_c": 27.0,
+      "timed_out": false,
+      "timeout_s": 200
+    },
+    {
+      "corner_id": "ff_27c_3.30v",
+      "elapsed_s": 32.051,
+      "killed_by_signal": null,
+      "killed_by_signal_name": null,
+      "log": "sim/temp-core-startup-en-delayed/corners/20260826-054047-ee63b45/ff_27c_3.30v.log",
+      "measurements": [
+        {
+          "expr": "v(ptat)[nlast]",
+          "max": 2.6,
+          "min": 0.3,
+          "name": "ptat",
+          "pass": true,
+          "reason": "",
+          "unit": "V",
+          "value": 1.413907
+        },
+        {
+          "expr": "abs(v(ptat)[nlast] - v(ptat)[nlast-100])",
+          "max": 0.001,
+          "min": 0.0,
+          "name": "ptat_settled",
+          "pass": true,
+          "reason": "",
+          "unit": "V",
+          "value": 2.240725e-10
+        },
+        {
+          "expr": "v(ctat)[nlast]",
+          "max": 1.1,
+          "min": 0.2,
+          "name": "ctat",
+          "pass": true,
+          "reason": "",
+          "unit": "V",
+          "value": 0.6578914
+        },
+        {
+          "expr": "abs(v(ctat)[nlast] - v(ctat)[nlast-100])",
+          "max": 0.001,
+          "min": 0.0,
+          "name": "ctat_settled",
+          "pass": true,
+          "reason": "",
+          "unit": "V",
+          "value": 8.867351e-12
+        },
+        {
+          "expr": "v(xdut.na)[nlast]",
+          "max": 4.7,
+          "min": -1.0,
+          "name": "na",
+          "pass": true,
+          "reason": "",
+          "unit": "V",
+          "value": 0.6578916
+        },
+        {
+          "expr": "v(xdut.nb)[nlast]",
+          "max": 4.7,
+          "min": -1.0,
+          "name": "nb",
+          "pass": true,
+          "reason": "",
+          "unit": "V",
+          "value": 0.6578933
+        },
+        {
+          "expr": "-i(v1)[nlast]",
+          "max": 5e-05,
+          "min": 1e-08,
+          "name": "isup",
+          "pass": true,
+          "reason": "",
+          "unit": "A",
+          "value": 7.331252e-06
+        },
+        {
+          "expr": "v(bias_ok)[nlast]",
+          "max": 3.7,
+          "min": 2.0,
+          "name": "bias_ok",
+          "pass": true,
+          "reason": "",
+          "unit": "V",
+          "value": 3.299999
+        }
+      ],
+      "ngspice_exit": 0,
+      "pass": true,
+      "process": "ff",
+      "supply_v": 3.3,
+      "temperature_c": 27.0,
+      "timed_out": false,
+      "timeout_s": 200
+    },
+    {
+      "corner_id": "ff_27c_3.63v",
+      "elapsed_s": 32.539,
+      "killed_by_signal": null,
+      "killed_by_signal_name": null,
+      "log": "sim/temp-core-startup-en-delayed/corners/20260826-054047-ee63b45/ff_27c_3.63v.log",
+      "measurements": [
+        {
+          "expr": "v(ptat)[nlast]",
+          "max": 2.6,
+          "min": 0.3,
+          "name": "ptat",
+          "pass": true,
+          "reason": "",
+          "unit": "V",
+          "value": 1.413979
+        },
+        {
+          "expr": "abs(v(ptat)[nlast] - v(ptat)[nlast-100])",
+          "max": 0.001,
+          "min": 0.0,
+          "name": "ptat_settled",
+          "pass": true,
+          "reason": "",
+          "unit": "V",
+          "value": 1.372604e-10
+        },
+        {
+          "expr": "v(ctat)[nlast]",
+          "max": 1.1,
+          "min": 0.2,
+          "name": "ctat",
+          "pass": true,
+          "reason": "",
+          "unit": "V",
+          "value": 0.6578925
+        },
+        {
+          "expr": "abs(v(ctat)[nlast] - v(ctat)[nlast-100])",
+          "max": 0.001,
+          "min": 0.0,
+          "name": "ctat_settled",
+          "pass": true,
+          "reason": "",
+          "unit": "V",
+          "value": 1.194045e-12
+        },
+        {
+          "expr": "v(xdut.na)[nlast]",
+          "max": 4.7,
+          "min": -1.0,
+          "name": "na",
+          "pass": true,
+          "reason": "",
+          "unit": "V",
+          "value": 0.6578926
+        },
+        {
+          "expr": "v(xdut.nb)[nlast]",
+          "max": 4.7,
+          "min": -1.0,
+          "name": "nb",
+          "pass": true,
+          "reason": "",
+          "unit": "V",
+          "value": 0.6578966
+        },
+        {
+          "expr": "-i(v1)[nlast]",
+          "max": 5e-05,
+          "min": 1e-08,
+          "name": "isup",
+          "pass": true,
+          "reason": "",
+          "unit": "A",
+          "value": 7.449548e-06
+        },
+        {
+          "expr": "v(bias_ok)[nlast]",
+          "max": 3.7,
+          "min": 2.0,
+          "name": "bias_ok",
+          "pass": true,
+          "reason": "",
+          "unit": "V",
+          "value": 3.629999
+        }
+      ],
+      "ngspice_exit": 0,
+      "pass": true,
+      "process": "ff",
+      "supply_v": 3.63,
+      "temperature_c": 27.0,
+      "timed_out": false,
+      "timeout_s": 200
+    },
+    {
+      "corner_id": "ff_125c_2.97v",
+      "elapsed_s": 31.975,
+      "killed_by_signal": null,
+      "killed_by_signal_name": null,
+      "log": "sim/temp-core-startup-en-delayed/corners/20260826-054047-ee63b45/ff_125c_2.97v.log",
+      "measurements": [
+        {
+          "expr": "v(ptat)[nlast]",
+          "max": 2.6,
+          "min": 0.3,
+          "name": "ptat",
+          "pass": true,
+          "reason": "",
+          "unit": "V",
+          "value": 1.876019
+        },
+        {
+          "expr": "abs(v(ptat)[nlast] - v(ptat)[nlast-100])",
+          "max": 0.001,
+          "min": 0.0,
+          "name": "ptat_settled",
+          "pass": true,
+          "reason": "",
+          "unit": "V",
+          "value": 3.757905e-11
+        },
+        {
+          "expr": "v(ctat)[nlast]",
+          "max": 1.1,
+          "min": 0.2,
+          "name": "ctat",
+          "pass": true,
+          "reason": "",
+          "unit": "V",
+          "value": 0.4658236
+        },
+        {
+          "expr": "abs(v(ctat)[nlast] - v(ctat)[nlast-100])",
+          "max": 0.001,
+          "min": 0.0,
+          "name": "ctat_settled",
+          "pass": true,
+          "reason": "",
+          "unit": "V",
+          "value": 2.41912e-12
+        },
+        {
+          "expr": "v(xdut.na)[nlast]",
+          "max": 4.7,
+          "min": -1.0,
+          "name": "na",
+          "pass": true,
+          "reason": "",
+          "unit": "V",
+          "value": 0.4658308
+        },
+        {
+          "expr": "v(xdut.nb)[nlast]",
+          "max": 4.7,
+          "min": -1.0,
+          "name": "nb",
+          "pass": true,
+          "reason": "",
+          "unit": "V",
+          "value": 0.4658297
+        },
+        {
+          "expr": "-i(v1)[nlast]",
+          "max": 5e-05,
+          "min": 1e-08,
+          "name": "isup",
+          "pass": true,
+          "reason": "",
+          "unit": "A",
+          "value": 9.557941e-06
+        },
+        {
+          "expr": "v(bias_ok)[nlast]",
+          "max": 3.7,
+          "min": 2.0,
+          "name": "bias_ok",
+          "pass": true,
+          "reason": "",
+          "unit": "V",
+          "value": 2.969864
+        }
+      ],
+      "ngspice_exit": 0,
+      "pass": true,
+      "process": "ff",
+      "supply_v": 2.97,
+      "temperature_c": 125.0,
+      "timed_out": false,
+      "timeout_s": 200
+    },
+    {
+      "corner_id": "ff_125c_3.30v",
+      "elapsed_s": 32.037,
+      "killed_by_signal": null,
+      "killed_by_signal_name": null,
+      "log": "sim/temp-core-startup-en-delayed/corners/20260826-054047-ee63b45/ff_125c_3.30v.log",
+      "measurements": [
+        {
+          "expr": "v(ptat)[nlast]",
+          "max": 2.6,
+          "min": 0.3,
+          "name": "ptat",
+          "pass": true,
+          "reason": "",
+          "unit": "V",
+          "value": 1.876226
+        },
+        {
+          "expr": "abs(v(ptat)[nlast] - v(ptat)[nlast-100])",
+          "max": 0.001,
+          "min": 0.0,
+          "name": "ptat_settled",
+          "pass": true,
+          "reason": "",
+          "unit": "V",
+          "value": 2.443259e-10
+        },
+        {
+          "expr": "v(ctat)[nlast]",
+          "max": 1.1,
+          "min": 0.2,
+          "name": "ctat",
+          "pass": true,
+          "reason": "",
+          "unit": "V",
+          "value": 0.4658255
+        },
+        {
+          "expr": "abs(v(ctat)[nlast] - v(ctat)[nlast-100])",
+          "max": 0.001,
+          "min": 0.0,
+          "name": "ctat_settled",
+          "pass": true,
+          "reason": "",
+          "unit": "V",
+          "value": 7.790046e-12
+        },
+        {
+          "expr": "v(xdut.na)[nlast]",
+          "max": 4.7,
+          "min": -1.0,
+          "name": "na",
+          "pass": true,
+          "reason": "",
+          "unit": "V",
+          "value": 0.4658327
+        },
+        {
+          "expr": "v(xdut.nb)[nlast]",
+          "max": 4.7,
+          "min": -1.0,
+          "name": "nb",
+          "pass": true,
+          "reason": "",
+          "unit": "V",
+          "value": 0.4658355
+        },
+        {
+          "expr": "-i(v1)[nlast]",
+          "max": 5e-05,
+          "min": 1e-08,
+          "name": "isup",
+          "pass": true,
+          "reason": "",
+          "unit": "A",
+          "value": 9.69003e-06
+        },
+        {
+          "expr": "v(bias_ok)[nlast]",
+          "max": 3.7,
+          "min": 2.0,
+          "name": "bias_ok",
+          "pass": true,
+          "reason": "",
+          "unit": "V",
+          "value": 3.299866
+        }
+      ],
+      "ngspice_exit": 0,
+      "pass": true,
+      "process": "ff",
+      "supply_v": 3.3,
+      "temperature_c": 125.0,
+      "timed_out": false,
+      "timeout_s": 200
+    },
+    {
+      "corner_id": "ff_125c_3.63v",
+      "elapsed_s": 31.166,
+      "killed_by_signal": null,
+      "killed_by_signal_name": null,
+      "log": "sim/temp-core-startup-en-delayed/corners/20260826-054047-ee63b45/ff_125c_3.63v.log",
+      "measurements": [
+        {
+          "expr": "v(ptat)[nlast]",
+          "max": 2.6,
+          "min": 0.3,
+          "name": "ptat",
+          "pass": true,
+          "reason": "",
+          "unit": "V",
+          "value": 1.876388
+        },
+        {
+          "expr": "abs(v(ptat)[nlast] - v(ptat)[nlast-100])",
+          "max": 0.001,
+          "min": 0.0,
+          "name": "ptat_settled",
+          "pass": true,
+          "reason": "",
+          "unit": "V",
+          "value": 1.393008e-10
+        },
+        {
+          "expr": "v(ctat)[nlast]",
+          "max": 1.1,
+          "min": 0.2,
+          "name": "ctat",
+          "pass": true,
+          "reason": "",
+          "unit": "V",
+          "value": 0.4658274
+        },
+        {
+          "expr": "abs(v(ctat)[nlast] - v(ctat)[nlast-100])",
+          "max": 0.001,
+          "min": 0.0,
+          "name": "ctat_settled",
+          "pass": true,
+          "reason": "",
+          "unit": "V",
+          "value": 1.561751e-12
+        },
+        {
+          "expr": "v(xdut.na)[nlast]",
+          "max": 4.7,
+          "min": -1.0,
+          "name": "na",
+          "pass": true,
+          "reason": "",
+          "unit": "V",
+          "value": 0.4658346
+        },
+        {
+          "expr": "v(xdut.nb)[nlast]",
+          "max": 4.7,
+          "min": -1.0,
+          "name": "nb",
+          "pass": true,
+          "reason": "",
+          "unit": "V",
+          "value": 0.4658414
+        },
+        {
+          "expr": "-i(v1)[nlast]",
+          "max": 5e-05,
+          "min": 1e-08,
+          "name": "isup",
+          "pass": true,
+          "reason": "",
+          "unit": "A",
+          "value": 9.823957e-06
+        },
+        {
+          "expr": "v(bias_ok)[nlast]",
+          "max": 3.7,
+          "min": 2.0,
+          "name": "bias_ok",
+          "pass": true,
+          "reason": "",
+          "unit": "V",
+          "value": 3.629866
+        }
+      ],
+      "ngspice_exit": 0,
+      "pass": true,
+      "process": "ff",
+      "supply_v": 3.63,
+      "temperature_c": 125.0,
+      "timed_out": false,
+      "timeout_s": 200
+    },
+    {
+      "corner_id": "sf_-40c_2.97v",
+      "elapsed_s": 29.97,
+      "killed_by_signal": null,
+      "killed_by_signal_name": null,
+      "log": "sim/temp-core-startup-en-delayed/corners/20260826-054047-ee63b45/sf_-40c_2.97v.log",
+      "measurements": [
+        {
+          "expr": "v(ptat)[nlast]",
+          "max": 2.6,
+          "min": 0.3,
+          "name": "ptat",
+          "pass": false,
+          "reason": "above max 2.6",
+          "unit": "V",
+          "value": 2.958725
+        },
+        {
+          "expr": "abs(v(ptat)[nlast] - v(ptat)[nlast-100])",
+          "max": 0.001,
+          "min": 0.0,
+          "name": "ptat_settled",
+          "pass": true,
+          "reason": "",
+          "unit": "V",
+          "value": 9.493295e-12
+        },
+        {
+          "expr": "v(ctat)[nlast]",
+          "max": 1.1,
+          "min": 0.2,
+          "name": "ctat",
+          "pass": true,
+          "reason": "",
+          "unit": "V",
+          "value": 0.8782884
+        },
+        {
+          "expr": "abs(v(ctat)[nlast] - v(ctat)[nlast-100])",
+          "max": 0.001,
+          "min": 0.0,
+          "name": "ctat_settled",
+          "pass": true,
+          "reason": "",
+          "unit": "V",
+          "value": 4.478462e-11
+        },
+        {
+          "expr": "v(xdut.na)[nlast]",
+          "max": 4.7,
+          "min": -1.0,
+          "name": "na",
+          "pass": true,
+          "reason": "",
+          "unit": "V",
+          "value": 0.8782885
+        },
+        {
+          "expr": "v(xdut.nb)[nlast]",
+          "max": 4.7,
+          "min": -1.0,
+          "name": "nb",
+          "pass": true,
+          "reason": "",
+          "unit": "V",
+          "value": 2.754031
+        },
+        {
+          "expr": "-i(v1)[nlast]",
+          "max": 5e-05,
+          "min": 1e-08,
+          "name": "isup",
+          "pass": false,
+          "reason": "below min 1e-08",
+          "unit": "A",
+          "value": -0.00299883
+        },
+        {
+          "expr": "v(bias_ok)[nlast]",
+          "max": 3.7,
+          "min": 2.0,
+          "name": "bias_ok",
+          "pass": true,
+          "reason": "",
+          "unit": "V",
+          "value": 2.97
+        }
+      ],
+      "ngspice_exit": 0,
+      "pass": false,
+      "process": "sf",
+      "supply_v": 2.97,
+      "temperature_c": -40.0,
+      "timed_out": false,
+      "timeout_s": 200
+    },
+    {
+      "corner_id": "sf_-40c_3.30v",
+      "elapsed_s": 32.118,
+      "killed_by_signal": null,
+      "killed_by_signal_name": null,
+      "log": "sim/temp-core-startup-en-delayed/corners/20260826-054047-ee63b45/sf_-40c_3.30v.log",
+      "measurements": [
+        {
+          "expr": "v(ptat)[nlast]",
+          "max": 2.6,
+          "min": 0.3,
+          "name": "ptat",
+          "pass": true,
+          "reason": "",
+          "unit": "V",
+          "value": 1.098273
+        },
+        {
+          "expr": "abs(v(ptat)[nlast] - v(ptat)[nlast-100])",
+          "max": 0.001,
+          "min": 0.0,
+          "name": "ptat_settled",
+          "pass": true,
+          "reason": "",
+          "unit": "V",
+          "value": 5.369971e-11
+        },
+        {
+          "expr": "v(ctat)[nlast]",
+          "max": 1.1,
+          "min": 0.2,
+          "name": "ctat",
+          "pass": true,
+          "reason": "",
+          "unit": "V",
+          "value": 0.7802086
+        },
+        {
+          "expr": "abs(v(ctat)[nlast] - v(ctat)[nlast-100])",
+          "max": 0.001,
+          "min": 0.0,
+          "name": "ctat_settled",
+          "pass": true,
+          "reason": "",
+          "unit": "V",
+          "value": 1.518119e-12
+        },
+        {
+          "expr": "v(xdut.na)[nlast]",
+          "max": 4.7,
+          "min": -1.0,
+          "name": "na",
+          "pass": true,
+          "reason": "",
+          "unit": "V",
+          "value": 0.7802087
+        },
+        {
+          "expr": "v(xdut.nb)[nlast]",
+          "max": 4.7,
+          "min": -1.0,
+          "name": "nb",
+          "pass": true,
+          "reason": "",
+          "unit": "V",
+          "value": 0.780207
+        },
+        {
+          "expr": "-i(v1)[nlast]",
+          "max": 5e-05,
+          "min": 1e-08,
+          "name": "isup",
+          "pass": true,
+          "reason": "",
+          "unit": "A",
+          "value": 5.705688e-06
+        },
+        {
+          "expr": "v(bias_ok)[nlast]",
+          "max": 3.7,
+          "min": 2.0,
+          "name": "bias_ok",
+          "pass": true,
+          "reason": "",
+          "unit": "V",
+          "value": 3.3
+        }
+      ],
+      "ngspice_exit": 0,
+      "pass": true,
+      "process": "sf",
+      "supply_v": 3.3,
+      "temperature_c": -40.0,
+      "timed_out": false,
+      "timeout_s": 200
+    },
+    {
+      "corner_id": "sf_-40c_3.63v",
+      "elapsed_s": 33.054,
+      "killed_by_signal": null,
+      "killed_by_signal_name": null,
+      "log": "sim/temp-core-startup-en-delayed/corners/20260826-054047-ee63b45/sf_-40c_3.63v.log",
+      "measurements": [
+        {
+          "expr": "v(ptat)[nlast]",
+          "max": 2.6,
+          "min": 0.3,
+          "name": "ptat",
+          "pass": true,
+          "reason": "",
+          "unit": "V",
+          "value": 1.098322
+        },
+        {
+          "expr": "abs(v(ptat)[nlast] - v(ptat)[nlast-100])",
+          "max": 0.001,
+          "min": 0.0,
+          "name": "ptat_settled",
+          "pass": true,
+          "reason": "",
+          "unit": "V",
+          "value": 9.169909e-11
+        },
+        {
+          "expr": "v(ctat)[nlast]",
+          "max": 1.1,
+          "min": 0.2,
+          "name": "ctat",
+          "pass": true,
+          "reason": "",
+          "unit": "V",
+          "value": 0.7802095
+        },
+        {
+          "expr": "abs(v(ctat)[nlast] - v(ctat)[nlast-100])",
+          "max": 0.001,
+          "min": 0.0,
+          "name": "ctat_settled",
+          "pass": true,
+          "reason": "",
+          "unit": "V",
+          "value": 4.611311e-12
+        },
+        {
+          "expr": "v(xdut.na)[nlast]",
+          "max": 4.7,
+          "min": -1.0,
+          "name": "na",
+          "pass": true,
+          "reason": "",
+          "unit": "V",
+          "value": 0.7802096
+        },
+        {
+          "expr": "v(xdut.nb)[nlast]",
+          "max": 4.7,
+          "min": -1.0,
+          "name": "nb",
+          "pass": true,
+          "reason": "",
+          "unit": "V",
+          "value": 0.7802095
+        },
+        {
+          "expr": "-i(v1)[nlast]",
+          "max": 5e-05,
+          "min": 1e-08,
+          "name": "isup",
+          "pass": true,
+          "reason": "",
+          "unit": "A",
+          "value": 5.804259e-06
+        },
+        {
+          "expr": "v(bias_ok)[nlast]",
+          "max": 3.7,
+          "min": 2.0,
+          "name": "bias_ok",
+          "pass": true,
+          "reason": "",
+          "unit": "V",
+          "value": 3.63
+        }
+      ],
+      "ngspice_exit": 0,
+      "pass": true,
+      "process": "sf",
+      "supply_v": 3.63,
+      "temperature_c": -40.0,
+      "timed_out": false,
+      "timeout_s": 200
+    },
+    {
+      "corner_id": "sf_27c_2.97v",
+      "elapsed_s": 33.44,
+      "killed_by_signal": null,
+      "killed_by_signal_name": null,
+      "log": "sim/temp-core-startup-en-delayed/corners/20260826-054047-ee63b45/sf_27c_2.97v.log",
+      "measurements": [
+        {
+          "expr": "v(ptat)[nlast]",
+          "max": 2.6,
+          "min": 0.3,
+          "name": "ptat",
+          "pass": true,
+          "reason": "",
+          "unit": "V",
+          "value": 1.413004
+        },
+        {
+          "expr": "abs(v(ptat)[nlast] - v(ptat)[nlast-100])",
+          "max": 0.001,
+          "min": 0.0,
+          "name": "ptat_settled",
+          "pass": true,
+          "reason": "",
+          "unit": "V",
+          "value": 2.59659e-11
+        },
+        {
+          "expr": "v(ctat)[nlast]",
+          "max": 1.1,
+          "min": 0.2,
+          "name": "ctat",
+          "pass": true,
+          "reason": "",
+          "unit": "V",
+          "value": 0.6563146
+        },
+        {
+          "expr": "abs(v(ctat)[nlast] - v(ctat)[nlast-100])",
+          "max": 0.001,
+          "min": 0.0,
+          "name": "ctat_settled",
+          "pass": true,
+          "reason": "",
+          "unit": "V",
+          "value": 1.247225e-12
+        },
+        {
+          "expr": "v(xdut.na)[nlast]",
+          "max": 4.7,
+          "min": -1.0,
+          "name": "na",
+          "pass": true,
+          "reason": "",
+          "unit": "V",
+          "value": 0.6563148
+        },
+        {
+          "expr": "v(xdut.nb)[nlast]",
+          "max": 4.7,
+          "min": -1.0,
+          "name": "nb",
+          "pass": true,
+          "reason": "",
+          "unit": "V",
+          "value": 0.6563124
+        },
+        {
+          "expr": "-i(v1)[nlast]",
+          "max": 5e-05,
+          "min": 1e-08,
+          "name": "isup",
+          "pass": true,
+          "reason": "",
+          "unit": "A",
+          "value": 7.165988e-06
+        },
+        {
+          "expr": "v(bias_ok)[nlast]",
+          "max": 3.7,
+          "min": 2.0,
+          "name": "bias_ok",
+          "pass": true,
+          "reason": "",
+          "unit": "V",
+          "value": 2.969997
+        }
+      ],
+      "ngspice_exit": 0,
+      "pass": true,
+      "process": "sf",
+      "supply_v": 2.97,
+      "temperature_c": 27.0,
+      "timed_out": false,
+      "timeout_s": 200
+    },
+    {
+      "corner_id": "sf_27c_3.30v",
+      "elapsed_s": 33.758,
+      "killed_by_signal": null,
+      "killed_by_signal_name": null,
+      "log": "sim/temp-core-startup-en-delayed/corners/20260826-054047-ee63b45/sf_27c_3.30v.log",
+      "measurements": [
+        {
+          "expr": "v(ptat)[nlast]",
+          "max": 2.6,
+          "min": 0.3,
+          "name": "ptat",
+          "pass": true,
+          "reason": "",
+          "unit": "V",
+          "value": 1.413083
+        },
+        {
+          "expr": "abs(v(ptat)[nlast] - v(ptat)[nlast-100])",
+          "max": 0.001,
+          "min": 0.0,
+          "name": "ptat_settled",
+          "pass": true,
+          "reason": "",
+          "unit": "V",
+          "value": 4.932721e-11
+        },
+        {
+          "expr": "v(ctat)[nlast]",
+          "max": 1.1,
+          "min": 0.2,
+          "name": "ctat",
+          "pass": true,
+          "reason": "",
+          "unit": "V",
+          "value": 0.6563156
+        },
+        {
+          "expr": "abs(v(ctat)[nlast] - v(ctat)[nlast-100])",
+          "max": 0.001,
+          "min": 0.0,
+          "name": "ctat_settled",
+          "pass": true,
+          "reason": "",
+          "unit": "V",
+          "value": 2.912892e-12
+        },
+        {
+          "expr": "v(xdut.na)[nlast]",
+          "max": 4.7,
+          "min": -1.0,
+          "name": "na",
+          "pass": true,
+          "reason": "",
+          "unit": "V",
+          "value": 0.6563158
+        },
+        {
+          "expr": "v(xdut.nb)[nlast]",
+          "max": 4.7,
+          "min": -1.0,
+          "name": "nb",
+          "pass": true,
+          "reason": "",
+          "unit": "V",
+          "value": 0.6563157
+        },
+        {
+          "expr": "-i(v1)[nlast]",
+          "max": 5e-05,
+          "min": 1e-08,
+          "name": "isup",
+          "pass": true,
+          "reason": "",
+          "unit": "A",
+          "value": 7.274635e-06
+        },
+        {
+          "expr": "v(bias_ok)[nlast]",
+          "max": 3.7,
+          "min": 2.0,
+          "name": "bias_ok",
+          "pass": true,
+          "reason": "",
+          "unit": "V",
+          "value": 3.299997
+        }
+      ],
+      "ngspice_exit": 0,
+      "pass": true,
+      "process": "sf",
+      "supply_v": 3.3,
+      "temperature_c": 27.0,
+      "timed_out": false,
+      "timeout_s": 200
+    },
+    {
+      "corner_id": "sf_27c_3.63v",
+      "elapsed_s": 12.783,
+      "killed_by_signal": null,
+      "killed_by_signal_name": null,
+      "log": "sim/temp-core-startup-en-delayed/corners/20260826-054047-ee63b45/sf_27c_3.63v.log",
+      "measurements": [
+        {
+          "expr": "v(ptat)[nlast]",
+          "max": 2.6,
+          "min": 0.3,
+          "name": "ptat",
+          "pass": true,
+          "reason": "",
+          "unit": "V",
+          "value": 1.413152
+        },
+        {
+          "expr": "abs(v(ptat)[nlast] - v(ptat)[nlast-100])",
+          "max": 0.001,
+          "min": 0.0,
+          "name": "ptat_settled",
+          "pass": true,
+          "reason": "",
+          "unit": "V",
+          "value": 2.680163e-10
+        },
+        {
+          "expr": "v(ctat)[nlast]",
+          "max": 1.1,
+          "min": 0.2,
+          "name": "ctat",
+          "pass": true,
+          "reason": "",
+          "unit": "V",
+          "value": 0.6563166
+        },
+        {
+          "expr": "abs(v(ctat)[nlast] - v(ctat)[nlast-100])",
+          "max": 0.001,
+          "min": 0.0,
+          "name": "ctat_settled",
+          "pass": true,
+          "reason": "",
+          "unit": "V",
+          "value": 3.965051e-12
+        },
+        {
+          "expr": "v(xdut.na)[nlast]",
+          "max": 4.7,
+          "min": -1.0,
+          "name": "na",
+          "pass": true,
+          "reason": "",
+          "unit": "V",
+          "value": 0.6563168
+        },
+        {
+          "expr": "v(xdut.nb)[nlast]",
+          "max": 4.7,
+          "min": -1.0,
+          "name": "nb",
+          "pass": true,
+          "reason": "",
+          "unit": "V",
+          "value": 0.6563188
+        },
+        {
+          "expr": "-i(v1)[nlast]",
+          "max": 5e-05,
+          "min": 1e-08,
+          "name": "isup",
+          "pass": true,
+          "reason": "",
+          "unit": "A",
+          "value": 7.380517e-06
+        },
+        {
+          "expr": "v(bias_ok)[nlast]",
+          "max": 3.7,
+          "min": 2.0,
+          "name": "bias_ok",
+          "pass": true,
+          "reason": "",
+          "unit": "V",
+          "value": 3.629997
+        }
+      ],
+      "ngspice_exit": 0,
+      "pass": true,
+      "process": "sf",
+      "supply_v": 3.63,
+      "temperature_c": 27.0,
+      "timed_out": false,
+      "timeout_s": 200
+    },
+    {
+      "corner_id": "sf_125c_2.97v",
+      "elapsed_s": 12.603,
+      "killed_by_signal": null,
+      "killed_by_signal_name": null,
+      "log": "sim/temp-core-startup-en-delayed/corners/20260826-054047-ee63b45/sf_125c_2.97v.log",
+      "measurements": [
+        {
+          "expr": "v(ptat)[nlast]",
+          "max": 2.6,
+          "min": 0.3,
+          "name": "ptat",
+          "pass": true,
+          "reason": "",
+          "unit": "V",
+          "value": 1.874839
+        },
+        {
+          "expr": "abs(v(ptat)[nlast] - v(ptat)[nlast-100])",
+          "max": 0.001,
+          "min": 0.0,
+          "name": "ptat_settled",
+          "pass": true,
+          "reason": "",
+          "unit": "V",
+          "value": 1.316849e-10
+        },
+        {
+          "expr": "v(ctat)[nlast]",
+          "max": 1.1,
+          "min": 0.2,
+          "name": "ctat",
+          "pass": true,
+          "reason": "",
+          "unit": "V",
+          "value": 0.4645172
+        },
+        {
+          "expr": "abs(v(ctat)[nlast] - v(ctat)[nlast-100])",
+          "max": 0.001,
+          "min": 0.0,
+          "name": "ctat_settled",
+          "pass": true,
+          "reason": "",
+          "unit": "V",
+          "value": 3.561651e-12
+        },
+        {
+          "expr": "v(xdut.na)[nlast]",
+          "max": 4.7,
+          "min": -1.0,
+          "name": "na",
+          "pass": true,
+          "reason": "",
+          "unit": "V",
+          "value": 0.4645299
+        },
+        {
+          "expr": "v(xdut.nb)[nlast]",
+          "max": 4.7,
+          "min": -1.0,
+          "name": "nb",
+          "pass": true,
+          "reason": "",
+          "unit": "V",
+          "value": 0.4645206
+        },
+        {
+          "expr": "-i(v1)[nlast]",
+          "max": 5e-05,
+          "min": 1e-08,
+          "name": "isup",
+          "pass": true,
+          "reason": "",
+          "unit": "A",
+          "value": 9.50226e-06
+        },
+        {
+          "expr": "v(bias_ok)[nlast]",
+          "max": 3.7,
+          "min": 2.0,
+          "name": "bias_ok",
+          "pass": true,
+          "reason": "",
+          "unit": "V",
+          "value": 2.96969
+        }
+      ],
+      "ngspice_exit": 0,
+      "pass": true,
+      "process": "sf",
+      "supply_v": 2.97,
+      "temperature_c": 125.0,
+      "timed_out": false,
+      "timeout_s": 200
+    },
+    {
+      "corner_id": "sf_125c_3.30v",
+      "elapsed_s": 12.889,
+      "killed_by_signal": null,
+      "killed_by_signal_name": null,
+      "log": "sim/temp-core-startup-en-delayed/corners/20260826-054047-ee63b45/sf_125c_3.30v.log",
+      "measurements": [
+        {
+          "expr": "v(ptat)[nlast]",
+          "max": 2.6,
+          "min": 0.3,
+          "name": "ptat",
+          "pass": true,
+          "reason": "",
+          "unit": "V",
+          "value": 1.875034
+        },
+        {
+          "expr": "abs(v(ptat)[nlast] - v(ptat)[nlast-100])",
+          "max": 0.001,
+          "min": 0.0,
+          "name": "ptat_settled",
+          "pass": true,
+          "reason": "",
+          "unit": "V",
+          "value": 7.278622e-11
+        },
+        {
+          "expr": "v(ctat)[nlast]",
+          "max": 1.1,
+          "min": 0.2,
+          "name": "ctat",
+          "pass": true,
+          "reason": "",
+          "unit": "V",
+          "value": 0.464519
+        },
+        {
+          "expr": "abs(v(ctat)[nlast] - v(ctat)[nlast-100])",
+          "max": 0.001,
+          "min": 0.0,
+          "name": "ctat_settled",
+          "pass": true,
+          "reason": "",
+          "unit": "V",
+          "value": 2.55973e-12
+        },
+        {
+          "expr": "v(xdut.na)[nlast]",
+          "max": 4.7,
+          "min": -1.0,
+          "name": "na",
+          "pass": true,
+          "reason": "",
+          "unit": "V",
+          "value": 0.4645317
+        },
+        {
+          "expr": "v(xdut.nb)[nlast]",
+          "max": 4.7,
+          "min": -1.0,
+          "name": "nb",
+          "pass": true,
+          "reason": "",
+          "unit": "V",
+          "value": 0.4645261
+        },
+        {
+          "expr": "-i(v1)[nlast]",
+          "max": 5e-05,
+          "min": 1e-08,
+          "name": "isup",
+          "pass": true,
+          "reason": "",
+          "unit": "A",
+          "value": 9.623722e-06
+        },
+        {
+          "expr": "v(bias_ok)[nlast]",
+          "max": 3.7,
+          "min": 2.0,
+          "name": "bias_ok",
+          "pass": true,
+          "reason": "",
+          "unit": "V",
+          "value": 3.299697
+        }
+      ],
+      "ngspice_exit": 0,
+      "pass": true,
+      "process": "sf",
+      "supply_v": 3.3,
+      "temperature_c": 125.0,
+      "timed_out": false,
+      "timeout_s": 200
+    },
+    {
+      "corner_id": "sf_125c_3.63v",
+      "elapsed_s": 12.806,
+      "killed_by_signal": null,
+      "killed_by_signal_name": null,
+      "log": "sim/temp-core-startup-en-delayed/corners/20260826-054047-ee63b45/sf_125c_3.63v.log",
+      "measurements": [
+        {
+          "expr": "v(ptat)[nlast]",
+          "max": 2.6,
+          "min": 0.3,
+          "name": "ptat",
+          "pass": true,
+          "reason": "",
+          "unit": "V",
+          "value": 1.875185
+        },
+        {
+          "expr": "abs(v(ptat)[nlast] - v(ptat)[nlast-100])",
+          "max": 0.001,
+          "min": 0.0,
+          "name": "ptat_settled",
+          "pass": true,
+          "reason": "",
+          "unit": "V",
+          "value": 1.65425e-10
+        },
+        {
+          "expr": "v(ctat)[nlast]",
+          "max": 1.1,
+          "min": 0.2,
+          "name": "ctat",
+          "pass": true,
+          "reason": "",
+          "unit": "V",
+          "value": 0.4645207
+        },
+        {
+          "expr": "abs(v(ctat)[nlast] - v(ctat)[nlast-100])",
+          "max": 0.001,
+          "min": 0.0,
+          "name": "ctat_settled",
+          "pass": true,
+          "reason": "",
+          "unit": "V",
+          "value": 3.529232e-12
+        },
+        {
+          "expr": "v(xdut.na)[nlast]",
+          "max": 4.7,
+          "min": -1.0,
+          "name": "na",
+          "pass": true,
+          "reason": "",
+          "unit": "V",
+          "value": 0.4645334
+        },
+        {
+          "expr": "v(xdut.nb)[nlast]",
+          "max": 4.7,
+          "min": -1.0,
+          "name": "nb",
+          "pass": true,
+          "reason": "",
+          "unit": "V",
+          "value": 0.4645314
+        },
+        {
+          "expr": "-i(v1)[nlast]",
+          "max": 5e-05,
+          "min": 1e-08,
+          "name": "isup",
+          "pass": true,
+          "reason": "",
+          "unit": "A",
+          "value": 9.743155e-06
+        },
+        {
+          "expr": "v(bias_ok)[nlast]",
+          "max": 3.7,
+          "min": 2.0,
+          "name": "bias_ok",
+          "pass": true,
+          "reason": "",
+          "unit": "V",
+          "value": 3.629699
+        }
+      ],
+      "ngspice_exit": 0,
+      "pass": true,
+      "process": "sf",
+      "supply_v": 3.63,
+      "temperature_c": 125.0,
+      "timed_out": false,
+      "timeout_s": 200
+    },
+    {
+      "corner_id": "fs_-40c_2.97v",
+      "elapsed_s": 12.615,
+      "killed_by_signal": null,
+      "killed_by_signal_name": null,
+      "log": "sim/temp-core-startup-en-delayed/corners/20260826-054047-ee63b45/fs_-40c_2.97v.log",
+      "measurements": [
+        {
+          "expr": "v(ptat)[nlast]",
+          "max": 2.6,
+          "min": 0.3,
+          "name": "ptat",
+          "pass": true,
+          "reason": "",
+          "unit": "V",
+          "value": 1.099854
+        },
+        {
+          "expr": "abs(v(ptat)[nlast] - v(ptat)[nlast-100])",
+          "max": 0.001,
+          "min": 0.0,
+          "name": "ptat_settled",
+          "pass": true,
+          "reason": "",
+          "unit": "V",
+          "value": 3.2589e-10
+        },
+        {
+          "expr": "v(ctat)[nlast]",
+          "max": 1.1,
+          "min": 0.2,
+          "name": "ctat",
+          "pass": true,
+          "reason": "",
+          "unit": "V",
+          "value": 0.7833406
+        },
+        {
+          "expr": "abs(v(ctat)[nlast] - v(ctat)[nlast-100])",
+          "max": 0.001,
+          "min": 0.0,
+          "name": "ctat_settled",
+          "pass": true,
+          "reason": "",
+          "unit": "V",
+          "value": 6.996959e-12
+        },
+        {
+          "expr": "v(xdut.na)[nlast]",
+          "max": 4.7,
+          "min": -1.0,
+          "name": "na",
+          "pass": true,
+          "reason": "",
+          "unit": "V",
+          "value": 0.7833407
+        },
+        {
+          "expr": "v(xdut.nb)[nlast]",
+          "max": 4.7,
+          "min": -1.0,
+          "name": "nb",
+          "pass": true,
+          "reason": "",
+          "unit": "V",
+          "value": 0.7833394
+        },
+        {
+          "expr": "-i(v1)[nlast]",
+          "max": 5e-05,
+          "min": 1e-08,
+          "name": "isup",
+          "pass": true,
+          "reason": "",
+          "unit": "A",
+          "value": 5.629746e-06
+        },
+        {
+          "expr": "v(bias_ok)[nlast]",
+          "max": 3.7,
+          "min": 2.0,
+          "name": "bias_ok",
+          "pass": true,
+          "reason": "",
+          "unit": "V",
+          "value": 2.97
+        }
+      ],
+      "ngspice_exit": 0,
+      "pass": true,
+      "process": "fs",
+      "supply_v": 2.97,
+      "temperature_c": -40.0,
+      "timed_out": false,
+      "timeout_s": 200
+    },
+    {
+      "corner_id": "fs_-40c_3.30v",
+      "elapsed_s": 12.794,
+      "killed_by_signal": null,
+      "killed_by_signal_name": null,
+      "log": "sim/temp-core-startup-en-delayed/corners/20260826-054047-ee63b45/fs_-40c_3.30v.log",
+      "measurements": [
+        {
+          "expr": "v(ptat)[nlast]",
+          "max": 2.6,
+          "min": 0.3,
+          "name": "ptat",
+          "pass": true,
+          "reason": "",
+          "unit": "V",
+          "value": 1.099909
+        },
+        {
+          "expr": "abs(v(ptat)[nlast] - v(ptat)[nlast-100])",
+          "max": 0.001,
+          "min": 0.0,
+          "name": "ptat_settled",
+          "pass": true,
+          "reason": "",
+          "unit": "V",
+          "value": 1.40175e-10
+        },
+        {
+          "expr": "v(ctat)[nlast]",
+          "max": 1.1,
+          "min": 0.2,
+          "name": "ctat",
+          "pass": true,
+          "reason": "",
+          "unit": "V",
+          "value": 0.7833415
+        },
+        {
+          "expr": "abs(v(ctat)[nlast] - v(ctat)[nlast-100])",
+          "max": 0.001,
+          "min": 0.0,
+          "name": "ctat_settled",
+          "pass": true,
+          "reason": "",
+          "unit": "V",
+          "value": 6.647127e-12
+        },
+        {
+          "expr": "v(xdut.na)[nlast]",
+          "max": 4.7,
+          "min": -1.0,
+          "name": "na",
+          "pass": true,
+          "reason": "",
+          "unit": "V",
+          "value": 0.7833416
+        },
+        {
+          "expr": "v(xdut.nb)[nlast]",
+          "max": 4.7,
+          "min": -1.0,
+          "name": "nb",
+          "pass": true,
+          "reason": "",
+          "unit": "V",
+          "value": 0.7833422
+        },
+        {
+          "expr": "-i(v1)[nlast]",
+          "max": 5e-05,
+          "min": 1e-08,
+          "name": "isup",
+          "pass": true,
+          "reason": "",
+          "unit": "A",
+          "value": 5.730707e-06
+        },
+        {
+          "expr": "v(bias_ok)[nlast]",
+          "max": 3.7,
+          "min": 2.0,
+          "name": "bias_ok",
+          "pass": true,
+          "reason": "",
+          "unit": "V",
+          "value": 3.3
+        }
+      ],
+      "ngspice_exit": 0,
+      "pass": true,
+      "process": "fs",
+      "supply_v": 3.3,
+      "temperature_c": -40.0,
+      "timed_out": false,
+      "timeout_s": 200
+    },
+    {
+      "corner_id": "fs_-40c_3.63v",
+      "elapsed_s": 12.703,
+      "killed_by_signal": null,
+      "killed_by_signal_name": null,
+      "log": "sim/temp-core-startup-en-delayed/corners/20260826-054047-ee63b45/fs_-40c_3.63v.log",
+      "measurements": [
+        {
+          "expr": "v(ptat)[nlast]",
+          "max": 2.6,
+          "min": 0.3,
+          "name": "ptat",
+          "pass": true,
+          "reason": "",
+          "unit": "V",
+          "value": 1.09996
+        },
+        {
+          "expr": "abs(v(ptat)[nlast] - v(ptat)[nlast-100])",
+          "max": 0.001,
+          "min": 0.0,
+          "name": "ptat_settled",
+          "pass": true,
+          "reason": "",
+          "unit": "V",
+          "value": 4.550944e-10
+        },
+        {
+          "expr": "v(ctat)[nlast]",
+          "max": 1.1,
+          "min": 0.2,
+          "name": "ctat",
+          "pass": true,
+          "reason": "",
+          "unit": "V",
+          "value": 0.7833424
+        },
+        {
+          "expr": "abs(v(ctat)[nlast] - v(ctat)[nlast-100])",
+          "max": 0.001,
+          "min": 0.0,
+          "name": "ctat_settled",
+          "pass": true,
+          "reason": "",
+          "unit": "V",
+          "value": 4.267031e-12
+        },
+        {
+          "expr": "v(xdut.na)[nlast]",
+          "max": 4.7,
+          "min": -1.0,
+          "name": "na",
+          "pass": true,
+          "reason": "",
+          "unit": "V",
+          "value": 0.7833425
+        },
+        {
+          "expr": "v(xdut.nb)[nlast]",
+          "max": 4.7,
+          "min": -1.0,
+          "name": "nb",
+          "pass": true,
+          "reason": "",
+          "unit": "V",
+          "value": 0.7833449
+        },
+        {
+          "expr": "-i(v1)[nlast]",
+          "max": 5e-05,
+          "min": 1e-08,
+          "name": "isup",
+          "pass": true,
+          "reason": "",
+          "unit": "A",
+          "value": 5.829597e-06
+        },
+        {
+          "expr": "v(bias_ok)[nlast]",
+          "max": 3.7,
+          "min": 2.0,
+          "name": "bias_ok",
+          "pass": true,
+          "reason": "",
+          "unit": "V",
+          "value": 3.63
+        }
+      ],
+      "ngspice_exit": 0,
+      "pass": true,
+      "process": "fs",
+      "supply_v": 3.63,
+      "temperature_c": -40.0,
+      "timed_out": false,
+      "timeout_s": 200
+    },
+    {
+      "corner_id": "fs_27c_2.97v",
+      "elapsed_s": 13.023,
+      "killed_by_signal": null,
+      "killed_by_signal_name": null,
+      "log": "sim/temp-core-startup-en-delayed/corners/20260826-054047-ee63b45/fs_27c_2.97v.log",
+      "measurements": [
+        {
+          "expr": "v(ptat)[nlast]",
+          "max": 2.6,
+          "min": 0.3,
+          "name": "ptat",
+          "pass": true,
+          "reason": "",
+          "unit": "V",
+          "value": 1.414441
+        },
+        {
+          "expr": "abs(v(ptat)[nlast] - v(ptat)[nlast-100])",
+          "max": 0.001,
+          "min": 0.0,
+          "name": "ptat_settled",
+          "pass": true,
+          "reason": "",
+          "unit": "V",
+          "value": 3.057501e-10
+        },
+        {
+          "expr": "v(ctat)[nlast]",
+          "max": 1.1,
+          "min": 0.2,
+          "name": "ctat",
+          "pass": true,
+          "reason": "",
+          "unit": "V",
+          "value": 0.6589922
+        },
+        {
+          "expr": "abs(v(ctat)[nlast] - v(ctat)[nlast-100])",
+          "max": 0.001,
+          "min": 0.0,
+          "name": "ctat_settled",
+          "pass": true,
+          "reason": "",
+          "unit": "V",
+          "value": 6.925127e-12
+        },
+        {
+          "expr": "v(xdut.na)[nlast]",
+          "max": 4.7,
+          "min": -1.0,
+          "name": "na",
+          "pass": true,
+          "reason": "",
+          "unit": "V",
+          "value": 0.6589923
+        },
+        {
+          "expr": "v(xdut.nb)[nlast]",
+          "max": 4.7,
+          "min": -1.0,
+          "name": "nb",
+          "pass": true,
+          "reason": "",
+          "unit": "V",
+          "value": 0.658993
+        },
+        {
+          "expr": "-i(v1)[nlast]",
+          "max": 5e-05,
+          "min": 1e-08,
+          "name": "isup",
+          "pass": true,
+          "reason": "",
+          "unit": "A",
+          "value": 7.192469e-06
+        },
+        {
+          "expr": "v(bias_ok)[nlast]",
+          "max": 3.7,
+          "min": 2.0,
+          "name": "bias_ok",
+          "pass": true,
+          "reason": "",
+          "unit": "V",
+          "value": 2.97
+        }
+      ],
+      "ngspice_exit": 0,
+      "pass": true,
+      "process": "fs",
+      "supply_v": 2.97,
+      "temperature_c": 27.0,
+      "timed_out": false,
+      "timeout_s": 200
+    },
+    {
+      "corner_id": "fs_27c_3.30v",
+      "elapsed_s": 12.799,
+      "killed_by_signal": null,
+      "killed_by_signal_name": null,
+      "log": "sim/temp-core-startup-en-delayed/corners/20260826-054047-ee63b45/fs_27c_3.30v.log",
+      "measurements": [
+        {
+          "expr": "v(ptat)[nlast]",
+          "max": 2.6,
+          "min": 0.3,
+          "name": "ptat",
+          "pass": true,
+          "reason": "",
+          "unit": "V",
+          "value": 1.414522
+        },
+        {
+          "expr": "abs(v(ptat)[nlast] - v(ptat)[nlast-100])",
+          "max": 0.001,
+          "min": 0.0,
+          "name": "ptat_settled",
+          "pass": true,
+          "reason": "",
+          "unit": "V",
+          "value": 2.185425e-10
+        },
+        {
+          "expr": "v(ctat)[nlast]",
+          "max": 1.1,
+          "min": 0.2,
+          "name": "ctat",
+          "pass": true,
+          "reason": "",
+          "unit": "V",
+          "value": 0.6589933
+        },
+        {
+          "expr": "abs(v(ctat)[nlast] - v(ctat)[nlast-100])",
+          "max": 0.001,
+          "min": 0.0,
+          "name": "ctat_settled",
+          "pass": true,
+          "reason": "",
+          "unit": "V",
+          "value": 3.439915e-12
+        },
+        {
+          "expr": "v(xdut.na)[nlast]",
+          "max": 4.7,
+          "min": -1.0,
+          "name": "na",
+          "pass": true,
+          "reason": "",
+          "unit": "V",
+          "value": 0.6589934
+        },
+        {
+          "expr": "v(xdut.nb)[nlast]",
+          "max": 4.7,
+          "min": -1.0,
+          "name": "nb",
+          "pass": true,
+          "reason": "",
+          "unit": "V",
+          "value": 0.6589964
+        },
+        {
+          "expr": "-i(v1)[nlast]",
+          "max": 5e-05,
+          "min": 1e-08,
+          "name": "isup",
+          "pass": true,
+          "reason": "",
+          "unit": "A",
+          "value": 7.300113e-06
+        },
+        {
+          "expr": "v(bias_ok)[nlast]",
+          "max": 3.7,
+          "min": 2.0,
+          "name": "bias_ok",
+          "pass": true,
+          "reason": "",
+          "unit": "V",
+          "value": 3.3
+        }
+      ],
+      "ngspice_exit": 0,
+      "pass": true,
+      "process": "fs",
+      "supply_v": 3.3,
+      "temperature_c": 27.0,
+      "timed_out": false,
+      "timeout_s": 200
+    },
+    {
+      "corner_id": "fs_27c_3.63v",
+      "elapsed_s": 12.676,
+      "killed_by_signal": null,
+      "killed_by_signal_name": null,
+      "log": "sim/temp-core-startup-en-delayed/corners/20260826-054047-ee63b45/fs_27c_3.63v.log",
+      "measurements": [
+        {
+          "expr": "v(ptat)[nlast]",
+          "max": 2.6,
+          "min": 0.3,
+          "name": "ptat",
+          "pass": true,
+          "reason": "",
+          "unit": "V",
+          "value": 1.414596
+        },
+        {
+          "expr": "abs(v(ptat)[nlast] - v(ptat)[nlast-100])",
+          "max": 0.001,
+          "min": 0.0,
+          "name": "ptat_settled",
+          "pass": true,
+          "reason": "",
+          "unit": "V",
+          "value": 5.637824e-11
+        },
+        {
+          "expr": "v(ctat)[nlast]",
+          "max": 1.1,
+          "min": 0.2,
+          "name": "ctat",
+          "pass": true,
+          "reason": "",
+          "unit": "V",
+          "value": 0.6589944
+        },
+        {
+          "expr": "abs(v(ctat)[nlast] - v(ctat)[nlast-100])",
+          "max": 0.001,
+          "min": 0.0,
+          "name": "ctat_settled",
+          "pass": true,
+          "reason": "",
+          "unit": "V",
+          "value": 2.620792e-12
+        },
+        {
+          "expr": "v(xdut.na)[nlast]",
+          "max": 4.7,
+          "min": -1.0,
+          "name": "na",
+          "pass": true,
+          "reason": "",
+          "unit": "V",
+          "value": 0.6589945
+        },
+        {
+          "expr": "v(xdut.nb)[nlast]",
+          "max": 4.7,
+          "min": -1.0,
+          "name": "nb",
+          "pass": true,
+          "reason": "",
+          "unit": "V",
+          "value": 0.6589998
+        },
+        {
+          "expr": "-i(v1)[nlast]",
+          "max": 5e-05,
+          "min": 1e-08,
+          "name": "isup",
+          "pass": true,
+          "reason": "",
+          "unit": "A",
+          "value": 7.405944e-06
+        },
+        {
+          "expr": "v(bias_ok)[nlast]",
+          "max": 3.7,
+          "min": 2.0,
+          "name": "bias_ok",
+          "pass": true,
+          "reason": "",
+          "unit": "V",
+          "value": 3.63
+        }
+      ],
+      "ngspice_exit": 0,
+      "pass": true,
+      "process": "fs",
+      "supply_v": 3.63,
+      "temperature_c": 27.0,
+      "timed_out": false,
+      "timeout_s": 200
+    },
+    {
+      "corner_id": "fs_125c_2.97v",
+      "elapsed_s": 12.546,
+      "killed_by_signal": null,
+      "killed_by_signal_name": null,
+      "log": "sim/temp-core-startup-en-delayed/corners/20260826-054047-ee63b45/fs_125c_2.97v.log",
+      "measurements": [
+        {
+          "expr": "v(ptat)[nlast]",
+          "max": 2.6,
+          "min": 0.3,
+          "name": "ptat",
+          "pass": true,
+          "reason": "",
+          "unit": "V",
+          "value": 1.877002
+        },
+        {
+          "expr": "abs(v(ptat)[nlast] - v(ptat)[nlast-100])",
+          "max": 0.001,
+          "min": 0.0,
+          "name": "ptat_settled",
+          "pass": true,
+          "reason": "",
+          "unit": "V",
+          "value": 1.939959e-10
+        },
+        {
+          "expr": "v(ctat)[nlast]",
+          "max": 1.1,
+          "min": 0.2,
+          "name": "ctat",
+          "pass": true,
+          "reason": "",
+          "unit": "V",
+          "value": 0.4667226
+        },
+        {
+          "expr": "abs(v(ctat)[nlast] - v(ctat)[nlast-100])",
+          "max": 0.001,
+          "min": 0.0,
+          "name": "ctat_settled",
+          "pass": true,
+          "reason": "",
+          "unit": "V",
+          "value": 5.305367e-12
+        },
+        {
+          "expr": "v(xdut.na)[nlast]",
+          "max": 4.7,
+          "min": -1.0,
+          "name": "na",
+          "pass": true,
+          "reason": "",
+          "unit": "V",
+          "value": 0.4667245
+        },
+        {
+          "expr": "v(xdut.nb)[nlast]",
+          "max": 4.7,
+          "min": -1.0,
+          "name": "nb",
+          "pass": true,
+          "reason": "",
+          "unit": "V",
+          "value": 0.4667312
+        },
+        {
+          "expr": "-i(v1)[nlast]",
+          "max": 5e-05,
+          "min": 1e-08,
+          "name": "isup",
+          "pass": true,
+          "reason": "",
+          "unit": "A",
+          "value": 9.528735e-06
+        },
+        {
+          "expr": "v(bias_ok)[nlast]",
+          "max": 3.7,
+          "min": 2.0,
+          "name": "bias_ok",
+          "pass": true,
+          "reason": "",
+          "unit": "V",
+          "value": 2.969985
+        }
+      ],
+      "ngspice_exit": 0,
+      "pass": true,
+      "process": "fs",
+      "supply_v": 2.97,
+      "temperature_c": 125.0,
+      "timed_out": false,
+      "timeout_s": 200
+    },
+    {
+      "corner_id": "fs_125c_3.30v",
+      "elapsed_s": 12.871,
+      "killed_by_signal": null,
+      "killed_by_signal_name": null,
+      "log": "sim/temp-core-startup-en-delayed/corners/20260826-054047-ee63b45/fs_125c_3.30v.log",
+      "measurements": [
+        {
+          "expr": "v(ptat)[nlast]",
+          "max": 2.6,
+          "min": 0.3,
+          "name": "ptat",
+          "pass": true,
+          "reason": "",
+          "unit": "V",
+          "value": 1.877218
+        },
+        {
+          "expr": "abs(v(ptat)[nlast] - v(ptat)[nlast-100])",
+          "max": 0.001,
+          "min": 0.0,
+          "name": "ptat_settled",
+          "pass": true,
+          "reason": "",
+          "unit": "V",
+          "value": 3.397789e-10
+        },
+        {
+          "expr": "v(ctat)[nlast]",
+          "max": 1.1,
+          "min": 0.2,
+          "name": "ctat",
+          "pass": true,
+          "reason": "",
+          "unit": "V",
+          "value": 0.4667247
+        },
+        {
+          "expr": "abs(v(ctat)[nlast] - v(ctat)[nlast-100])",
+          "max": 0.001,
+          "min": 0.0,
+          "name": "ctat_settled",
+          "pass": true,
+          "reason": "",
+          "unit": "V",
+          "value": 5.459688e-12
+        },
+        {
+          "expr": "v(xdut.na)[nlast]",
+          "max": 4.7,
+          "min": -1.0,
+          "name": "na",
+          "pass": true,
+          "reason": "",
+          "unit": "V",
+          "value": 0.4667266
+        },
+        {
+          "expr": "v(xdut.nb)[nlast]",
+          "max": 4.7,
+          "min": -1.0,
+          "name": "nb",
+          "pass": true,
+          "reason": "",
+          "unit": "V",
+          "value": 0.4667377
+        },
+        {
+          "expr": "-i(v1)[nlast]",
+          "max": 5e-05,
+          "min": 1e-08,
+          "name": "isup",
+          "pass": true,
+          "reason": "",
+          "unit": "A",
+          "value": 9.648197e-06
+        },
+        {
+          "expr": "v(bias_ok)[nlast]",
+          "max": 3.7,
+          "min": 2.0,
+          "name": "bias_ok",
+          "pass": true,
+          "reason": "",
+          "unit": "V",
+          "value": 3.299985
+        }
+      ],
+      "ngspice_exit": 0,
+      "pass": true,
+      "process": "fs",
+      "supply_v": 3.3,
+      "temperature_c": 125.0,
+      "timed_out": false,
+      "timeout_s": 200
+    },
+    {
+      "corner_id": "fs_125c_3.63v",
+      "elapsed_s": 13.117,
+      "killed_by_signal": null,
+      "killed_by_signal_name": null,
+      "log": "sim/temp-core-startup-en-delayed/corners/20260826-054047-ee63b45/fs_125c_3.63v.log",
+      "measurements": [
+        {
+          "expr": "v(ptat)[nlast]",
+          "max": 2.6,
+          "min": 0.3,
+          "name": "ptat",
+          "pass": true,
+          "reason": "",
+          "unit": "V",
+          "value": 1.87739
+        },
+        {
+          "expr": "abs(v(ptat)[nlast] - v(ptat)[nlast-100])",
+          "max": 0.001,
+          "min": 0.0,
+          "name": "ptat_settled",
+          "pass": true,
+          "reason": "",
+          "unit": "V",
+          "value": 9.078915e-11
+        },
+        {
+          "expr": "v(ctat)[nlast]",
+          "max": 1.1,
+          "min": 0.2,
+          "name": "ctat",
+          "pass": true,
+          "reason": "",
+          "unit": "V",
+          "value": 0.4667268
+        },
+        {
+          "expr": "abs(v(ctat)[nlast] - v(ctat)[nlast-100])",
+          "max": 0.001,
+          "min": 0.0,
+          "name": "ctat_settled",
+          "pass": true,
+          "reason": "",
+          "unit": "V",
+          "value": 1.09257e-12
+        },
+        {
+          "expr": "v(xdut.na)[nlast]",
+          "max": 4.7,
+          "min": -1.0,
+          "name": "na",
+          "pass": true,
+          "reason": "",
+          "unit": "V",
+          "value": 0.4667287
+        },
+        {
+          "expr": "v(xdut.nb)[nlast]",
+          "max": 4.7,
+          "min": -1.0,
+          "name": "nb",
+          "pass": true,
+          "reason": "",
+          "unit": "V",
+          "value": 0.4667441
+        },
+        {
+          "expr": "-i(v1)[nlast]",
+          "max": 5e-05,
+          "min": 1e-08,
+          "name": "isup",
+          "pass": true,
+          "reason": "",
+          "unit": "A",
+          "value": 9.766866e-06
+        },
+        {
+          "expr": "v(bias_ok)[nlast]",
+          "max": 3.7,
+          "min": 2.0,
+          "name": "bias_ok",
+          "pass": true,
+          "reason": "",
+          "unit": "V",
+          "value": 3.629985
+        }
+      ],
+      "ngspice_exit": 0,
+      "pass": true,
+      "process": "fs",
+      "supply_v": 3.63,
+      "temperature_c": 125.0,
+      "timed_out": false,
+      "timeout_s": 200
+    }
+  ],
+  "experiment": {
+    "claim": "Issue #22 -- NOT a spec claim (spec/target-spec.md does not exist yet, spec/porting-plan.md Sec4 item 4). Companion to sim/temp-core-startup/ (scenario A: EN tied high through the whole power-up ramp). This experiment exercises the EN axis temp_core has and bias_core does not (issue #22's own scope): VDD ramps from 0 V exactly as in sim/temp-core-startup/, but EN is held LOW until well after VDD has completed its ramp and settled, then released -- the DR-002 startup ordering temp_core will actually see once temp_por_top exists and drives EN from RESETn (which only deasserts after POR has already released, i.e. supply already up). Substantiates that temp_core's own startup kick still clears the degenerate zero-current branch when enabled LATE, at every point of the full 45-point PVT matrix, not just when EN was asserted for the whole ramp.",
+    "provenance": "schematic",
+    "provenance_source": "sim/temp-core-startup-en-delayed/testbench/tb_temp_core_startup_en_delayed.sch",
+    "slug": "temp-core-startup-en-delayed",
+    "statistical_convention": "N/A (corner-matrix check, not a distribution claim)",
+    "title": "temp_core cold-start branch selection (EN released after supply is up, DR-002 ordering): transient supply ramp from 0 V across the full PVT matrix"
+  },
+  "git": {
+    "branch": "feature/issue-22",
+    "dirty": true,
+    "sha": "ee63b45"
+  },
+  "links": {
+    "corners_dir": "sim/temp-core-startup-en-delayed/corners/20260826-054047-ee63b45/",
+    "json": "sim/temp-core-startup-en-delayed/records/20260826-054047-ee63b45.json",
+    "manifest": "sim/temp-core-startup-en-delayed/experiment.json",
+    "netlist_snapshot": "sim/temp-core-startup-en-delayed/netlist-snapshots/20260826-054047-ee63b45.spice",
+    "record": "sim/temp-core-startup-en-delayed/records/20260826-054047-ee63b45.md",
+    "testbench": "sim/temp-core-startup-en-delayed/testbench/tb_temp_core_startup_en_delayed.sch"
+  },
+  "matrix": {
+    "is_subset": false,
+    "n_points": 45,
+    "point_ids": [
+      "tt_-40c_2.97v",
+      "tt_-40c_3.30v",
+      "tt_-40c_3.63v",
+      "tt_27c_2.97v",
+      "tt_27c_3.30v",
+      "tt_27c_3.63v",
+      "tt_125c_2.97v",
+      "tt_125c_3.30v",
+      "tt_125c_3.63v",
+      "ss_-40c_2.97v",
+      "ss_-40c_3.30v",
+      "ss_-40c_3.63v",
+      "ss_27c_2.97v",
+      "ss_27c_3.30v",
+      "ss_27c_3.63v",
+      "ss_125c_2.97v",
+      "ss_125c_3.30v",
+      "ss_125c_3.63v",
+      "ff_-40c_2.97v",
+      "ff_-40c_3.30v",
+      "ff_-40c_3.63v",
+      "ff_27c_2.97v",
+      "ff_27c_3.30v",
+      "ff_27c_3.63v",
+      "ff_125c_2.97v",
+      "ff_125c_3.30v",
+      "ff_125c_3.63v",
+      "sf_-40c_2.97v",
+      "sf_-40c_3.30v",
+      "sf_-40c_3.63v",
+      "sf_27c_2.97v",
+      "sf_27c_3.30v",
+      "sf_27c_3.63v",
+      "sf_125c_2.97v",
+      "sf_125c_3.30v",
+      "sf_125c_3.63v",
+      "fs_-40c_2.97v",
+      "fs_-40c_3.30v",
+      "fs_-40c_3.63v",
+      "fs_27c_2.97v",
+      "fs_27c_3.30v",
+      "fs_27c_3.63v",
+      "fs_125c_2.97v",
+      "fs_125c_3.30v",
+      "fs_125c_3.63v"
+    ],
+    "points": [
+      [
+        "tt",
+        -40.0,
+        2.97
+      ],
+      [
+        "tt",
+        -40.0,
+        3.3
+      ],
+      [
+        "tt",
+        -40.0,
+        3.63
+      ],
+      [
+        "tt",
+        27.0,
+        2.97
+      ],
+      [
+        "tt",
+        27.0,
+        3.3
+      ],
+      [
+        "tt",
+        27.0,
+        3.63
+      ],
+      [
+        "tt",
+        125.0,
+        2.97
+      ],
+      [
+        "tt",
+        125.0,
+        3.3
+      ],
+      [
+        "tt",
+        125.0,
+        3.63
+      ],
+      [
+        "ss",
+        -40.0,
+        2.97
+      ],
+      [
+        "ss",
+        -40.0,
+        3.3
+      ],
+      [
+        "ss",
+        -40.0,
+        3.63
+      ],
+      [
+        "ss",
+        27.0,
+        2.97
+      ],
+      [
+        "ss",
+        27.0,
+        3.3
+      ],
+      [
+        "ss",
+        27.0,
+        3.63
+      ],
+      [
+        "ss",
+        125.0,
+        2.97
+      ],
+      [
+        "ss",
+        125.0,
+        3.3
+      ],
+      [
+        "ss",
+        125.0,
+        3.63
+      ],
+      [
+        "ff",
+        -40.0,
+        2.97
+      ],
+      [
+        "ff",
+        -40.0,
+        3.3
+      ],
+      [
+        "ff",
+        -40.0,
+        3.63
+      ],
+      [
+        "ff",
+        27.0,
+        2.97
+      ],
+      [
+        "ff",
+        27.0,
+        3.3
+      ],
+      [
+        "ff",
+        27.0,
+        3.63
+      ],
+      [
+        "ff",
+        125.0,
+        2.97
+      ],
+      [
+        "ff",
+        125.0,
+        3.3
+      ],
+      [
+        "ff",
+        125.0,
+        3.63
+      ],
+      [
+        "sf",
+        -40.0,
+        2.97
+      ],
+      [
+        "sf",
+        -40.0,
+        3.3
+      ],
+      [
+        "sf",
+        -40.0,
+        3.63
+      ],
+      [
+        "sf",
+        27.0,
+        2.97
+      ],
+      [
+        "sf",
+        27.0,
+        3.3
+      ],
+      [
+        "sf",
+        27.0,
+        3.63
+      ],
+      [
+        "sf",
+        125.0,
+        2.97
+      ],
+      [
+        "sf",
+        125.0,
+        3.3
+      ],
+      [
+        "sf",
+        125.0,
+        3.63
+      ],
+      [
+        "fs",
+        -40.0,
+        2.97
+      ],
+      [
+        "fs",
+        -40.0,
+        3.3
+      ],
+      [
+        "fs",
+        -40.0,
+        3.63
+      ],
+      [
+        "fs",
+        27.0,
+        2.97
+      ],
+      [
+        "fs",
+        27.0,
+        3.3
+      ],
+      [
+        "fs",
+        27.0,
+        3.63
+      ],
+      [
+        "fs",
+        125.0,
+        2.97
+      ],
+      [
+        "fs",
+        125.0,
+        3.3
+      ],
+      [
+        "fs",
+        125.0,
+        3.63
+      ]
+    ],
+    "process": [
+      "tt",
+      "ss",
+      "ff",
+      "sf",
+      "fs"
+    ],
+    "subset_reason": "",
+    "supply_v": [
+      2.97,
+      3.3,
+      3.63
+    ],
+    "temperature_c": [
+      -40.0,
+      27.0,
+      125.0
+    ]
+  },
+  "overall_pass": false,
+  "pdk": {
+    "installed_commit": "c6d73a35f524070e85faff4a6a9eef49553ebc2b",
+    "lib_file": "/home/ubuntu/.volare/sky130A/libs.tech/combined/sky130.lib.spice",
+    "matches_pin": true,
+    "pinned_commit": "c6d73a35f524070e85faff4a6a9eef49553ebc2b",
+    "root": "/home/ubuntu/.volare",
+    "variant": "sky130A"
+  },
+  "record_id": "20260826-054047-ee63b45",
+  "spread_checks": [
+    {
+      "measurement": "ptat",
+      "min_spread": 0.02,
+      "n": 45,
+      "note": "Corner-blindness guard, same convention as sim/temp-core-startup/'s own spread check.",
+      "observed_spread": 4.982995,
+      "pass": true,
+      "reason": ""
+    }
+  ],
+  "supersedes": "",
+  "timestamp": "2026-08-26T05:40:47Z",
+  "tools": {
+    "ngspice": "ngspice-46 : Circuit level simulation program",
+    "platform": "Linux 7.0.0-1010-aws x86_64",
+    "python": "3.12.3",
+    "xschem": "XSCHEM V3.4.7"
+  }
+}

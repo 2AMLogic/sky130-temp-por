@@ -168,9 +168,11 @@ circuit finding gets a follow-up issue instead (see that experiment's own
 | `sim/bias-core-smoke/` | `sim/bin/corner-run.py` + `experiment.json` | Harness bring-up for issue #17: the ported runner drives THIS repo's own `design/bias_core.sch` through xschem/ngspice across the full 45-point PVT matrix (5 process × 3 temp × 3 supply). Not a spec claim (no `spec/target-spec.md` yet). |
 | `sim/bias-core-startup/` | `sim/bin/corner-run.py` + `experiment.json` | Issue #19: `bias_core` reaches its intended branch (`VREF` ≈ 1.25 V, ~1 µA quiescent, `BIAS_OK` asserted) from a **physical 0 V cold start** — a `tran … uic` supply ramp instead of a cold `.op` — at every point of the full 45-point PVT matrix. This is the branch-selection claim `bias-core-smoke`'s `.op` cannot make (see below). Not a spec claim. |
 | `sim/bias-core-op-branch/` | bespoke `run_op_branch.py` | Issue #19: diagnoses the two `.op` FAILs in `bias-core-smoke`'s first record. Sweeps the supply in 10 mV steps at `tt`/27 °C under four *numerical* variants of the same circuit (KLU vs. sparse solver, gmin vs. source stepping, `.nodeset` seed) and checks each off-branch point for **physicality** (supply-current sign, internal-node magnitude). Verdict: solver artifact, not a second stable state. |
+| `sim/temp-core-startup/` | `sim/bin/corner-run.py` + `experiment.json` | Issue #22: `temp_core` (co-instantiated with `bias_core`, sharing `IBIAS` per DR-010) reaches its intended branch (`PTAT`/`CTAT` tracking `design/temp_core.md`'s own spot-check shape, positive supply current, loop nodes `NA`/`NB` inside the rails) from a **physical 0 V cold start**, `EN` tied high through the whole ramp, at the full 45-point PVT matrix. Replaces `design/temp_core.md`'s own retired cold-`.op` spot check, same class of fix as `bias-core-startup`. 42/45 PASS; 3 FAILs show the same non-physical (solver-artifact) signature `bias-core-op-branch` diagnosed for `bias_core` — see the record and `design/temp_core.md`. Not a spec claim. |
+| `sim/temp-core-startup-en-delayed/` | `sim/bin/corner-run.py` + `experiment.json` | Issue #22: same testbench and method as `temp-core-startup`, but `EN` is held low until well after the supply has ramped and settled, then released — the DR-002 startup ordering `temp_core` will actually see once `temp_por_top` drives it from `RESETn`. 42/45 PASS (a different 3-corner FAILing set, same non-physical signature). Not a spec claim. |
 | `sim/pnp-mismatch/` | bespoke `run_pnp_mismatch.py` | Confirms both `MC_MM_SWITCH=1` (local mismatch) and `MC_PR_SWITCH=1` (global process Monte Carlo) produce non-degenerate samples against this repo's own PNP topology — a single `sky130_fd_pr__pnp_05v5_W3p40L3p40` vs. the real 1-vs-8-parallel array `bias_core`/`temp_core` actually use (not sky130-bandgap's small/large device-size pair, which this design does not have). |
 
-Both are the first, concrete increment of `spec/porting-plan.md` §4 item 1
+These are the first, concrete increment of `spec/porting-plan.md` §4 item 1
 (sim-harness port) — infrastructure and harness-liveness evidence, not the
 full PVT + mismatch-MC + ramp-rate + brownout testbench matrix `spec/porting-plan.md`
 §3 describes, which is later, multi-issue scope across all four leaf cells and
@@ -283,12 +285,13 @@ it.
 
 ## Branch selection: how to characterize a self-biased cell here
 
-Every cell in this block with a ΔVBE loop (`bias_core` today, `temp_core` next)
-has, by construction, at least two mathematical solutions to its DC network
+Every cell in this block with a ΔVBE loop (`bias_core`, `temp_core`) has, by
+construction, at least two mathematical solutions to its DC network
 equations: the intended one and the degenerate zero-current one its on-die kick
 circuit exists to break out of. Issue #19 established the house rules for
-simulating that class of cell — all four are conclusions from
-`sim/bias-core-op-branch/`'s own measurements, not received wisdom:
+simulating that class of cell — the first four are conclusions from
+`sim/bias-core-op-branch/`'s own measurements, not received wisdom; the sixth
+is what issue #22 found extending the method to `temp_core`:
 
 1. **A cold `.op` cannot make a branch claim.** It has no initial state, so the
    branch it lands on is chosen by ngspice's convergence-aid continuation (gmin
@@ -320,3 +323,24 @@ simulating that class of cell — all four are conclusions from
    ΔVBE nodes can excursion to 10⁸ V is simply not safely converged at the
    default relative tolerance — so that option is part of the experiment's
    deck, and rule 4's guard is what caught the need for it.
+6. **Tightening `reltol` is not guaranteed to be monotonic on a larger,
+   stiffer circuit — the guards, not the tolerance, are the actual defense.**
+   `sim/temp-core-startup/` co-instantiates `temp_core` with `bias_core`
+   (`temp_core` needs `bias_core`'s active `IBIAS` drive, DR-010), a
+   larger and stiffer cold-start transient than `bias_core` alone.
+   `reltol=1e-4` there is computationally intractable (a single corner did
+   not finish a 10 ms window in over 100 s); a partial tightening
+   (`reltol=2e-4`) fixed the three corners it was hand-checked against but,
+   run across the *whole* 45-point matrix, moved the failure to a different,
+   larger, non-overlapping set of six corners — rule 1's "change the solver,
+   the answer changes" restated for transient integration control instead of
+   a cold `.op`'s continuation. `sim/temp-core-startup/`'s own manifest
+   therefore keeps ngspice's unmodified default `reltol=1e-3` (paired with
+   `method=gear`/`trtol=50`, needed purely for wall-clock tractability, not
+   for branch selection) and leans entirely on rule 4's guards to catch
+   whichever corners the solver's own continuation mis-lands on for that
+   exact deck — which they do, every time, by the same non-physical
+   signature (negative supply current, or a node railed outside the rails)
+   as `bias_core`'s own artifact. See `design/temp_core.md` and
+   `sim/temp-core-startup/experiment.json`'s own `notes` for the full
+   investigation.
