@@ -17,7 +17,7 @@
     ["ff", 125, 3.63]
   ],
   "deck": {
-    "options": ["wnflag=1"],
+    "options": ["wnflag=1", "reltol=1e-4"],
     "params": {
       "tramp": "100u",
       "tstop": "10m"
@@ -78,7 +78,9 @@
   ],
   "notes": [
     "Analyses list carries one non-analysis control line (`let nlast = length(v(vref))-1`). corner-run.py splices `deck.analyses` verbatim into the .control block ahead of the `let meas_* = <expr>` lines, so this is the supported way to define a helper vector the measurement expressions index against; nutmeg has no `last()` accessor.",
-    "Ramp rate is fixed at 'vsup'/'tramp' = ~30 kV/s (100 us 0->3.3 V) for every corner. That is one point on the supply-ramp-rate axis, not coverage of it -- root CLAUDE.md's ramp-rate matrix requirement belongs to the POR block's own testbenches (spec/porting-plan.md Sec3), not to this bias-core branch-selection check. sim/bias-core-op-branch/ additionally re-runs the failing `.op` supply points at a second, 1000x slower ramp, to confirm the branch reached does not depend on ramp rate at the points that matter here.",
+    "Ramp rate is fixed at 'vsup'/'tramp' = ~30 kV/s (100 us 0->3.3 V) for every corner. That is one point on the supply-ramp-rate axis, not coverage of it -- root CLAUDE.md's ramp-rate matrix requirement belongs to the POR block's own testbenches (spec/porting-plan.md Sec3), not to this bias-core branch-selection check. What this experiment claims is therefore branch selection at a representative ramp, not dv/dt immunity: a dedicated ramp-rate sweep on this cell (and on temp_por_top) is separate, later scope and is NOT claimed here.",
+    "The PWL ramp is a fixed *duration* ('tramp' = 100 us) rather than a fixed dVDD/dt, so the ramp rate varies ~20% across the supply axis (29.7 kV/s at 2.97 V vs 36.3 kV/s at 3.63 V). That is the supply-vs-ramp-rate confound spec/porting-plan.md Sec3.3 warns about (carried from gf180's DR-021), and it is acceptable HERE only because this experiment's claim is binary branch selection at a representative ramp, not a rate-sensitive threshold. The POR block's own ramp-rate testbenches must derive the ramp from a constant dVDD/dt instead -- do not copy this schematic's supply source into them.",
+    "`.option reltol=1e-4` (ngspice's default is 1e-3) is load-bearing, and was added only after being measured to be: the FIRST run of this experiment, record 20260825-235846-f4f73a5 -- committed, superseded, not deleted -- used the default and came back 43/45, with sf_125c_3.63v ending at VREF=0.171 V / BIAS_OK=0 V and fs_-40c_3.30v ending at VREF=3.298 V, BOTH reporting a NEGATIVE settled supply current (-5.57 mA and -3.17 mA). A negative supply current is the same impossible-state signature sim/bias-core-op-branch/ diagnoses in the cold `.op`: the transient's own per-timestep Newton solve had false-converged, silently, with no warning in the log. Re-running exactly those two decks with nothing changed but reltol=1e-4 puts both on the intended branch (VREF 1.2555 V / 1.2497 V, supply +1.18 uA / +0.77 uA). The tolerance is therefore part of the claim, not incidental: a `bias_core`-class deck with a ~1 uA operating current and 1e8-magnitude excursions available to its DeltaVBE nodes is not safely converged at reltol=1e-3.",
     "`uic` is what makes this a cold start: it skips the initial operating-point solve entirely and integrates forward from all-zero initial conditions. Without `uic`, ngspice would compute a `.op` at t=0 first, reintroducing exactly the solver-chosen initial guess this experiment exists to avoid."
   ]
 }
