@@ -113,41 +113,74 @@ correctly rather than merely textually plausible:
 - `python3 design/netlist.py --check` passes: both committed netlists
   (`bias_core`, `temp_core`) reproduce byte-for-byte and the
   symbol-pins-match-schematic-ports invariant holds for each.
-- **A DC operating-point smoke test**, `temp_core` instantiated alongside
-  `bias_core` (`Xbias VDD VSS IBIAS VREF BIAS_OK bias_core`, `Xdut VDD VSS
-  IBIAS EN PTAT CTAT temp_core`, `IBIAS` shared between them exactly as the
-  interface contract requires), `VDD` = 3.3 V, `EN` = `VDD` (enabled),
-  `PTAT`/`CTAT` unloaded — solves at every point of a `tt`/`ff`/`ss` ×
-  −40/27/125 °C spot-check (9 points; ngspice needed its `gmin`-stepping
-  fallback at several points and hit one singular-matrix warning at
-  `ss`/125 °C that still converged — expected for a ΔVBE loop with a
-  degenerate zero-current startup solution, the same class of behavior
-  `bias_core.md` documents). No solver failures (only the one
-  singular-matrix warning, at a point that still solved). Untrimmed
-  (`PTAT_TRIM` floating) results:
 
-  | Corner | Temp (°C) | `V(PTAT)` | `V(CTAT)` | `V(BIAS_OK)` | `V(IBIAS)` shared node |
-  | --- | ---: | ---: | ---: | ---: | ---: |
-  | tt | −40 | 1.099 V | 0.782 V | 3.300 V | 0.913 V |
-  | tt | 27  | 1.414 V | 0.658 V | 3.300 V | 0.849 V |
-  | tt | 125 | 1.877 V | 0.466 V | 3.300 V | 0.760 V |
-  | ff | −40 | 1.099 V | 0.782 V | 3.300 V | 0.886 V |
-  | ff | 27  | 1.414 V | 0.658 V | 3.300 V | 0.821 V |
-  | ff | 125 | 1.876 V | 0.466 V | 3.300 V | 0.732 V |
-  | ss | −40 | 1.100 V | 0.783 V | 3.300 V | 0.940 V |
-  | ss | 27  | 1.414 V | 0.659 V | 3.300 V | 0.877 V |
-  | ss | 125 | 1.877 V | 0.466 V | 3.300 V | 0.789 V |
+### Branch selection: full-PVT transient evidence (issue #22), not a cold `.op` spot check
 
-  `V(PTAT)` rises and `V(CTAT)` falls monotonically with temperature at
-  every corner checked (consistent with PTAT/CTAT by construction);
-  `V(PTAT)`'s slope (≈4.7 mV/°C at `tt`) is within a few percent of the
-  first-order prediction from the carried device ratios
-  (`(R2+R2TRIM)/R1 * d(kT/q*ln8)/dT` ≈ 4.66 mV/°C), and `V(BIAS_OK)` reads
-  asserted (rail-high) at every point. **These numbers are a
-  solvability/sanity check, not a characterized target** — no PVT-grid
-  record exists for this cell, and none is claimed; the close match to the
-  first-order prediction is evidence the topology is wired correctly, not a
-  claim about sky130 accuracy.
+This section previously reported a 9-point cold-`.op` spot check (`tt`/`ff`/`ss`
+× −40/27/125 °C, `EN` = `VDD`, `IBIAS` shared with a co-instantiated
+`bias_core`) as evidence the ΔVBE loop reaches its intended branch. Issue #22
+retired that method for `temp_core`, for exactly the reason
+[issue #19](https://github.com/2AMLogic/sky130-temp-por/issues/19) retired it
+for `bias_core`: a cold `.op` has no initial state, so which branch ngspice
+reports is chosen by its own convergence-aid continuation rather than by the
+circuit (see `sim/README.md` §"Branch selection" for the full house
+methodology). The 9-point table is gone from this document; it is not a
+retraction of the numbers (they were plausible and self-consistent), only of
+the *claim* that a cold `.op` can establish which branch they came from.
+
+The replacement is a physical `tran … uic` supply ramp from 0 V, run over the
+full 45-point PVT matrix, in two scenarios (the `EN` axis `bias_core` does not
+have):
+
+- **`sim/temp-core-startup/`** — `EN` tied to `VDD`, asserted for the entire
+  power-up ramp. Record
+  [`20260826-053032-ee63b45`](../sim/temp-core-startup/records/20260826-053032-ee63b45.md):
+  **42/45 PASS**. `PTAT` rises and `CTAT` falls monotonically with
+  temperature at every passing corner, matching the previous spot check's
+  values closely (e.g. `tt`/27 °C: `PTAT` = 1.414 V, `CTAT` = 0.658 V here vs.
+  1.414 V / 0.658 V in the retired table) — the topology-correctness
+  conclusion the old table supported still holds, now on firmer evidence.
+  Three corners FAIL — `tt_-40c_3.30v`, `tt_125c_3.30v`, `ff_-40c_3.30v`, all
+  at exactly the matrix's nominal 3.30 V supply point — with the same
+  non-physical signature issue #19 used to prove the analogous `bias_core`
+  artifact was a solver artifact rather than a second stable state: a
+  negative settled supply current on one, and `PTAT` railed far outside
+  every other corner's range (as far as +5 V, or negative) on the others,
+  caught by this experiment's own `isup`-sign and `PTAT`-range guards. See
+  that record's own manifest (`sim/temp-core-startup/experiment.json`
+  `notes`) for the numerical-settings investigation behind that conclusion:
+  re-running those three corners at a tighter tolerance recovers the intended
+  branch, but re-running the *whole* matrix at that tighter tolerance moves
+  the failure to a different, non-overlapping set of six corners — the same
+  "change the solver, the failing set changes" signature `sim/bias-core-op-branch/`
+  measured for `bias_core`, not a fixed defect at 3.30 V specifically.
+- **`sim/temp-core-startup-en-delayed/`** — `VDD` ramps identically, but `EN`
+  is held low until well after the supply has settled, then released — the
+  DR-002 startup ordering `temp_core` will actually see once `temp_por_top`
+  drives it from `RESETn`. Record
+  [`20260826-054047-ee63b45`](../sim/temp-core-startup-en-delayed/records/20260826-054047-ee63b45.md):
+  **42/45 PASS**, 3 different FAILing corners
+  (`tt_27c_3.63v`, `tt_125c_3.63v`, `sf_-40c_2.97v`), same non-physical
+  signature (negative supply current and/or a railed `PTAT`/`CTAT`), caught
+  by the same guards. `temp_core`'s own startup kick clears the degenerate
+  zero-current branch on a late `EN` release at the large majority of PVT
+  points, not just when enabled for the whole ramp.
+
+**Neither record is a claim that `temp_core` has a startup defect**, and
+neither is edited or re-run to force a pass — per `sim/README.md`'s
+append-only rule, a FAIL a full PVT sweep actually found is committed
+evidence, not a blocker. Both FAILing sets show the textbook non-physical
+signature (impossible supply-current sign, or a loop node/output railed
+outside anything a passive network biased between `VSS` and `VDD` can
+produce) that issue #19 established discriminates a solver artifact from a
+real second equilibrium for this class of self-biased ΔVBE cell, and the set
+of affected corners is not stable across reasonable changes to the
+transient's own numerical settings — the same "solver-dependent, not
+circuit" pattern `sim/bias-core-op-branch/` measured directly for `bias_core`.
+Confirming that conclusively for `temp_core` too (a `bias-core-op-branch`-style
+numerics sweep) is a natural follow-up but is out of issue #22's own scope,
+which asks for the full-PVT record with physicality guards, not a
+numerics-variant diagnosis.
 
 ## Scope and what this is not
 
