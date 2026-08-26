@@ -91,6 +91,113 @@ textually plausible:
   not a characterized target** — no PVT-grid record exists for this cell,
   and none is claimed.
 
+## Startup and branch selection (issue #19)
+
+The first **full** PVT record for this cell
+(`sim/bias-core-smoke/records/20260825-214036-a9cac4b.md`, a cold `.op` at
+each of 45 points) came back `overall: FAIL` on two points — `tt_27c_2.97v`
+and `tt_27c_3.63v` — with `VREF` railed near `VDD` and a *negative* milliamp
+supply current. [Issue
+#19](https://github.com/2AMLogic/sky130-temp-por/issues/19) investigated
+whether that was a second stable state this cell's startup kick fails to
+break out of. **It is not.** The two experiments that answer it are
+`sim/bias-core-op-branch/` (the diagnosis) and `sim/bias-core-startup/` (the
+replacement characterization); the summary below is theirs, not a new claim.
+
+### What the reported "solution" actually is
+
+At `tt`/27 °C/2.97 V the cold `.op` reports, on the same deck, node voltages
+that no version of this circuit can produce:
+
+| Node | Cold `.op` at 2.97 V (off-branch) | Cold `.op` at 3.30 V (intended branch) |
+| --- | --- | --- |
+| `VREF` | 2.9655 V (≈ `VDD`) | 1.2562 V |
+| supply current | **−5.387 mA** (V1 *sinking* current) | +0.936 µA |
+| `PG` (mirror gate) | 0.1061 V — every mirror PFET hard on | 2.2643 V |
+| `NB` | **−6.96 × 10⁸ V** | 0.6302 V |
+| `EC` (8× PNP emitter node) | **−6.96 × 10⁸ V** | 0.5756 V |
+| `NBTOP` | +4.583 V — *above* the 2.97 V rail | 0.6330 V |
+| `BIAS_OK` | 2.9700 V (**asserted**) | 3.2999 V (asserted) |
+
+Two of those are impossible rather than merely surprising:
+
+- **The supply sinks 5.4 mA.** `V1` is the only energy source and every other
+  element in the cell is passive (MOS, PNP, poly resistors, MIM caps), so any
+  real DC solution must *dissipate* power.
+- **`NB`/`EC` sit 7 × 10⁸ V below ground**, on a 2.97 V rail, with no charge
+  pump, inductor or second supply anywhere in the cell.
+
+That is a *false convergence*, not an equilibrium: the ΔVBE sensing nodes are
+driven so far into the PNP model's reverse region that the branch
+conductances underflow, ngspice's per-node convergence test is satisfied by a
+residual that has nothing to do with a solution, and the mirror gate `PG`
+collapses toward ground, which is what pulls `VREF`, `IBIAS` and `NBTOP` up
+to the rail and puts milliamps through the mirror legs. Note that `BIAS_OK`
+reads **asserted** in this state — the settle flag cannot be used to
+distinguish branches.
+
+### Why it is the solver's path, not the circuit
+
+Holding the circuit, the deck and the corner fixed and changing *only the
+numerics* moves the result. Over a 10 mV supply sweep from 2.97 V to 3.63 V
+at `tt`/27 °C (67 points per variant):
+
+- **KLU** (`sim/spiceinit`'s own setting, i.e. what produced the smoke
+  record) lands off-branch at 4 of 67 supply points: 2.97, 3.31, 3.35 and
+  3.63 V.
+- **The built-in sparse solver**, with nothing else changed, lands
+  off-branch at 3 *entirely different* points: 3.25, 3.48 and 3.59 V. The
+  two sets are disjoint — every one of KLU's four flagged points is fine
+  under sparse, and vice versa.
+- The off-branch points are **isolated single-step islands** (3.31 V
+  off-branch with 3.30 V and 3.32 V both fine), not the contiguous region
+  bounded by a bifurcation that a real second equilibrium would produce.
+- Disabling gmin stepping (source stepping instead) recovers the intended
+  branch at both flagged corners. A designer `.nodeset` seed recovers only
+  one of the two (2.97 V yes, 3.63 V no) — worth knowing before trusting a
+  seeded `.op`.
+- The failure is **not** 27 °C-specific either: sweeping temperature at
+  2.97 V, 27 °C and 30 °C land off-branch while 22/24/25/26/28/29/32 °C do
+  not. Scatter on this axis too.
+
+A linear solver cannot add or remove an equilibrium of a circuit; it can only
+change the arithmetic path taken to one. So the branch a cold `.op` reports
+here is a property of the continuation, not of `bias_core`. On the intended
+branch, meanwhile, `VREF` moves a total of 0.2 mV across the whole
+2.97–3.63 V range — one smooth, well-behaved solution, with no second
+physical solution anywhere on the axis.
+
+### What the cell actually does from 0 V
+
+`sim/bias-core-startup/` replaces the cold `.op` with a physical power-up — a
+supply ramp from 0 V integrated forward (`tran … uic`), which starts from the
+same all-zero state silicon does — across the same full 45-point PVT matrix.
+Record `20260826-005156-f4f73a5` is **45/45 PASS**: the on-die kick chain
+(`XKS0`–`XKS4` → `XKPD`/`XKICK`) breaks the degenerate zero-current state at
+every point, `VREF` settles between 1.2456 V and 1.2582 V, `BIAS_OK` asserts
+rail-high, and the settled supply current stays between 0.76 µA and 1.20 µA
+(positive at every corner). As everywhere else in this document, those are
+solvability/branch-selection numbers, **not** a characterized or ratified
+target.
+
+One caveat worth carrying forward, because it was measured rather than
+assumed: the *first* run of that experiment
+(record `20260825-235846-f4f73a5`, kept and superseded rather than deleted)
+used ngspice's default `reltol=1e-3` and came back 43/45 — two corners ended
+their ramp reporting a **negative** settled supply current, with no warning
+in the log. The same two decks with nothing changed but `.option reltol=1e-4`
+land on the intended branch. So a transient is not automatically immune to
+the same silent false convergence; the tolerance is part of the claim, and
+the supply-current-sign guard is what catches it.
+
+**Practical consequence for anyone simulating this cell**: do not read a bare
+`.op` as evidence about which branch `bias_core` selects — ramp the supply
+from 0 V at `reltol=1e-4`, and keep a physicality guard on the measurement.
+`sim/README.md` §"Branch selection" states the rules for the block as a whole
+(they apply equally to `temp_core`, which has the same ΔVBE loop and its own
+kick, and whose `design/temp_core.md` spot check is cold-`.op`-based for the
+same reason this one was).
+
 ## Scope and what this is not
 
 Per issue #6's non-goals: **not** layout, DRC/LVS, PVT corner verification,
