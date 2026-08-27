@@ -1,13 +1,13 @@
 # Comp-table format
 
-The exact table schema `SKILL.md`'s research procedure fills in, and the
-schema the comp library's own entries use, so a market-key review and a
-comp-library entry are always literally the same table shape — one can be
-pasted into the other with no reformatting.
+The exact table schema `SKILL.md`'s research procedure fills in.
 
-In the installed canary variant, that library is the `comps/` directory
+In the installed canary variant, the comp library is the `comps/` directory
 bundled alongside this file (a generated, public-sources-only excerpt of the
-upstream one).
+upstream one). Library entries hold richer per-part data than the review
+table below — vendor/part/parametric columns keyed to what's easiest to
+source per-part, not to this file's per-spec-row schema — so a review cites
+the library rather than pasting a library row directly into the table.
 
 ## The table
 
