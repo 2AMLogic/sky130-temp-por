@@ -135,6 +135,37 @@ future issue — not resolved here. This port's own scope is the mechanical
 topology substitution CLAUDE.md calls for, not first characterization of a
 device class gf180 never used.
 
+**2026-09-09, characterized (issue #27)**: `sim/native-device-characterization/`
+(record `20260909-232337-c7b9b94`, overall PASS, full 45-point PVT matrix)
+measures exactly this trade-off. Threshold voltage, `MASSIST`-condition
+static current, off-state leakage and assist-onset voltage were characterized
+for both flavors across `tt/ss/ff/sf/fs` × −40/27/125 °C × 2.97/3.30/3.63 V,
+at `MASSIST`'s own drawn bin (`nfet_05v0_nvt` `L=25/W=1`), the next-longest
+`nfet_05v0_nvt` bin (`L=8/W=1`), and `nfet_03v3_nvt`'s longest-channel bin
+(`L=0.8/W=0.42`, the fairest competing case that flavor's menu offers).
+
+- **Flavor/bin choice stands.** `L=25/W=1` is confirmed the lowest-
+  static-current bin of either flavor's menu at every corner — `nfet_03v3_nvt`
+  is short-channel throughout (`L` ≤ 0.8 µm) and its best available bin costs
+  roughly 8× `nfet_05v0_nvt`'s `L=25` current everywhere in the matrix, so no
+  bin of the alternative flavor would improve on the device drawn here.
+- **The static-current cost does not clear the README's DRAFT
+  `Iq (block total) < 20 µA` row** at every corner, and clears neither that
+  row nor its `< 5 µA` stretch figure at the worst corner. `MASSIST` alone —
+  one leg, not the block total — measures 9.44–31.94 µA across the matrix
+  (17.75 µA at the nominal `tt`/27 °C/3.3 V corner, 31.94 µA at the worst
+  corner `ff`/−40 °C/3.63 V). This is reported as a finding, not resolved
+  here: `spec/porting-plan.md` §2.7 separately notes the DRAFT row itself is
+  likely mislabeled (gf180's own ratified `por-iq`, the state `MASSIST`
+  actually lives in, is a `< 3.0 µA` figure `MASSIST` alone misses by 6×–10×
+  at every corner) — a corrected ceiling is `spec/target-spec.md` work (§4
+  item 4). Either way, a keeper that is always on by construction and costs
+  tens of µA is a sizing/topology question, not resolved by this
+  characterization and not this issue's scope to resolve (see
+  `sim/native-device-characterization/README.md` for the full data and
+  discussion, and this issue's own "Out of scope" list for how a resizing
+  would be pursued: a decision record, not a schematic edit here).
+
 ## Sizing
 
 **Every drawn `W`/`L` for the devices gf180's own `por_output_chain` already

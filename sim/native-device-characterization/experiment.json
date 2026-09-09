@@ -1,0 +1,207 @@
+{
+  "slug": "native-device-characterization",
+  "title": "sky130 native-device characterization: nfet_05v0_nvt vs nfet_03v3_nvt threshold voltage, MASSIST-condition static current, off-state leakage and assist-onset voltage over the full PVT matrix",
+  "claim": "Issue #27 -- NOT a spec claim (spec/target-spec.md does not exist yet, spec/porting-plan.md Sec4 item 4). First characterization of the near-zero-Vt (native) NMOS device class this port introduced, which no sibling repo has data for and which spec/porting-plan.md Sec2.2/Sec2.6 explicitly defers to a characterization issue. Substantiates, per device flavor and per PDK bin geometry, at every point of the full 45-point PVT matrix: (a) constant-current threshold voltage and its process/temperature spread; (b) the drain current of a device wired exactly as design/por_output_chain.sch's MASSIST -- gate AND drain at VDD, source/bulk at VSS -- which is the always-on static current MASSIST costs in the released state and which design/por_output_chain.md records as uncharacterized and unbudgeted; (c) off-state (VGS=0) leakage at the same drain bias, for reference; (d) the supply voltage at which that MASSIST connection first sinks a stated assist current, i.e. the measurement behind por_output_chain.md's 'begins conducting from the very first millivolt of VDD' claim. The DUTs are bare PDK devices, not this design's cells: what is characterized here is the DEVICE menu, so the numbers feed the future por-iq spec row and the Sec2.6 flavor decision without making any claim about por_output_chain as a block. This experiment does NOT change the schematic and does NOT re-decide the flavor or the bin -- if the numbers say either should change, spec/decision-records/ owns that, per the issue's own out-of-scope list.",
+  "provenance": "schematic",
+  "provenance_source": "sim/native-device-characterization/testbench/tb_native_device_char.sch",
+  "schematic": "testbench/tb_native_device_char.sch",
+  "statistical_convention": "N/A (deterministic corner-matrix characterization, not a distribution claim -- see notes: this experiment deliberately makes no statistical/yield claim, so it does NOT substitute for the Monte Carlo evidence sim/README.md keeps on a separate axis)",
+  "corners": {
+    "process": ["tt", "ss", "ff", "sf", "fs"],
+    "temperature_c": [-40, 27, 125],
+    "supply_v": [2.97, 3.3, 3.63]
+  },
+  "quick_subset": [
+    ["tt", 27, 3.3],
+    ["ff", 125, 3.63],
+    ["fs", -40, 2.97]
+  ],
+  "deck": {
+    "options": [
+      "wnflag=1",
+      "reltol=1e-5",
+      "abstol=1e-16",
+      "gmin=1e-15"
+    ],
+    "analyses": [
+      "dc vg -1.0 2.0 0.001",
+      "dc vsw 0 3.63 0.001"
+    ]
+  },
+  "measurements": [
+    {
+      "name": "vth_n05l25",
+      "expr": "-1.0 + (mean(dc1.i(vvt_n05l25) lt 4e-9) * length(dc1.i(vvt_n05l25)) - 0.5) * 0.001",
+      "unit": "V",
+      "min": -1.0,
+      "max": 1.0,
+      "note": "nfet_05v0_nvt at the W=1 / L=25 bin -- the geometry MASSIST is drawn at. Constant-current Vth: the VGS at which the drain current crosses 100 nA * (W/L) = 4 nA, at a fixed VDS = 100 mV (linear region). Extracted from the FIRST dc analysis (plot dc1: `dc vg -1.0 2.0 0.001`) by counting the sweep points still below the criterion and converting that count back to a gate voltage; resolution is the 1 mV sweep step, and the reported value is the mid-point of the bracketing pair (hence the -0.5 step offset). The min/max bounds are also the sweep-range guard: a device that never crosses the criterion inside -1.0..+2.0 V reports 1.9995 V and a device already above it at the first point reports -1.0005 V, both outside these bounds, so a Vth outside the swept window FAILS loudly instead of being silently clipped."
+    },
+    {
+      "name": "ion_n05l25",
+      "expr": "i(von_n05l25)[0]",
+      "unit": "A",
+      "min": 1e-9,
+      "max": 1e-2,
+      "note": "THE headline number of this experiment: the static current a device wired exactly like MASSIST (gate AND drain at 'vsup', source and bulk at VSS) sinks continuously, at this corner's supply. Read through the device's own 0 V ammeter source, so it is that device's drain current and not a rail total. Network A carries no swept source, so this current is constant through both dc analyses and is read at the first point of the second one; `ia_flat_n05l25` guards that constancy. The lower bound rejects a zero/negative result (a passive device cannot source current into the rail biasing it) and the upper bound rejects a shorted/non-converged point."
+    },
+    {
+      "name": "ioff_n05l25",
+      "expr": "i(voff_n05l25)[0]",
+      "unit": "A",
+      "min": 1e-16,
+      "max": 1e-3,
+      "note": "Off-state/subthreshold reference: the same geometry with its gate at VSS and its drain still at 'vsup'. Not MASSIST's operating point (MASSIST's gate is tied to VDD by construction and has no off state) -- it is the reference point that says how much of ion is gate drive and how much is the device class's floor. See the manifest notes on `gmin`: at ngspice's default gmin this number is dominated by the simulator's own convergence conductance, not by the device."
+    },
+    {
+      "name": "vmin1n_n05l25",
+      "expr": "(mean(i(vswd_n05l25) lt 1e-9) * length(i(vswd_n05l25)) - 0.5) * 0.001",
+      "unit": "V",
+      "min": 0.0,
+      "max": 3.62,
+      "note": "Assist onset at the 1 nA level: the rail voltage at which a MASSIST-connected device (gate tied to the swept rail) first sinks 1 nA. From the SECOND dc analysis (`dc vsw 0 3.63 0.001`), same count-and-convert extraction and same 1 mV resolution as the Vth measurement. This is the quantitative form of design/por_output_chain.md's 'begins conducting from the very first millivolt of VDD'. Bounds are the sweep-range guard: an onset the sweep never reaches reports 3.6295 V (above max) and an impossible onset at or below 0 V reports -0.0005 V (below min)."
+    },
+    {
+      "name": "vmin100n_n05l25",
+      "expr": "(mean(i(vswd_n05l25) lt 1e-7) * length(i(vswd_n05l25)) - 0.5) * 0.001",
+      "unit": "V",
+      "min": 0.0,
+      "max": 3.62,
+      "note": "Assist onset at the 100 nA level -- the same sweep read at a current that is actually useful as a pull-down against the release-NAND leakage divider, rather than at the 1 nA noise-floor level. Two thresholds are reported because 'conducts' is not a single number: the answer to 'from what VDD does the assist leg do anything' and 'from what VDD does it do something useful' differ by a few hundred millivolts."
+    },
+    {
+      "name": "vth_n05l8",
+      "expr": "-1.0 + (mean(dc1.i(vvt_n05l8) lt 1.25e-8) * length(dc1.i(vvt_n05l8)) - 0.5) * 0.001",
+      "unit": "V",
+      "min": -1.0,
+      "max": 1.0,
+      "note": "nfet_05v0_nvt at the W=1 / L=8 bin -- the next-longest-channel bin the 05v0_nvt menu offers after L=25. Included so the record shows how much of the L=25 result is the device class and how much is the geometry, which is what a future re-sizing decision record would need. Criterion 100 nA * (W/L) = 12.5 nA, same VDS = 100 mV, same extraction as vth_n05l25."
+    },
+    {
+      "name": "ion_n05l8",
+      "expr": "i(von_n05l8)[0]",
+      "unit": "A",
+      "min": 1e-9,
+      "max": 1e-2,
+      "note": "MASSIST-condition static current at the W=1 / L=8 bin. Expected to be worse than L=25 (shorter channel, more current) -- recorded so the record itself shows that L=25 is already the least-current bin of that flavor, i.e. that the drawn geometry is not leaving an easy win on the table."
+    },
+    {
+      "name": "ioff_n05l8",
+      "expr": "i(voff_n05l8)[0]",
+      "unit": "A",
+      "min": 1e-16,
+      "max": 1e-3,
+      "note": "Off-state leakage reference for the W=1 / L=8 bin."
+    },
+    {
+      "name": "vmin1n_n05l8",
+      "expr": "(mean(i(vswd_n05l8) lt 1e-9) * length(i(vswd_n05l8)) - 0.5) * 0.001",
+      "unit": "V",
+      "min": 0.0,
+      "max": 3.62,
+      "note": "1 nA assist onset for the W=1 / L=8 bin."
+    },
+    {
+      "name": "vmin100n_n05l8",
+      "expr": "(mean(i(vswd_n05l8) lt 1e-7) * length(i(vswd_n05l8)) - 0.5) * 0.001",
+      "unit": "V",
+      "min": 0.0,
+      "max": 3.62,
+      "note": "100 nA assist onset for the W=1 / L=8 bin."
+    },
+    {
+      "name": "vth_n03l08",
+      "expr": "-1.0 + (mean(dc1.i(vvt_n03l08) lt 5.25e-8) * length(dc1.i(vvt_n03l08)) - 0.5) * 0.001",
+      "unit": "V",
+      "min": -1.0,
+      "max": 1.0,
+      "note": "nfet_03v3_nvt at the W=0.42 / L=0.8 bin -- the longest-channel (and smallest W/L, therefore weakest) geometry that flavor's entire fixed menu offers. This is the fair best case for the alternative flavor in spec/porting-plan.md Sec2.6's choice, not an arbitrary pick: the 03v3_nvt menu is short-channel throughout (L <= 0.8). Criterion 100 nA * (W/L) = 52.5 nA, same VDS = 100 mV."
+    },
+    {
+      "name": "ion_n03l08",
+      "expr": "i(von_n03l08)[0]",
+      "unit": "A",
+      "min": 1e-9,
+      "max": 1e-2,
+      "note": "MASSIST-condition static current for the alternative flavor at its weakest available bin. This is the number that decides Sec2.6 on static-current grounds: the two flavors are compared at the geometry each one can actually be drawn at, not at a hypothetical matched W/L neither menu offers."
+    },
+    {
+      "name": "ioff_n03l08",
+      "expr": "i(voff_n03l08)[0]",
+      "unit": "A",
+      "min": 1e-16,
+      "max": 1e-3,
+      "note": "Off-state leakage reference for the alternative flavor's weakest bin."
+    },
+    {
+      "name": "vmin1n_n03l08",
+      "expr": "(mean(i(vswd_n03l08) lt 1e-9) * length(i(vswd_n03l08)) - 0.5) * 0.001",
+      "unit": "V",
+      "min": 0.0,
+      "max": 3.62,
+      "note": "1 nA assist onset for the alternative flavor's weakest bin -- the one axis on which it is expected to beat 05v0_nvt, since it conducts more at every voltage."
+    },
+    {
+      "name": "vmin100n_n03l08",
+      "expr": "(mean(i(vswd_n03l08) lt 1e-7) * length(i(vswd_n03l08)) - 0.5) * 0.001",
+      "unit": "V",
+      "min": 0.0,
+      "max": 3.62,
+      "note": "100 nA assist onset for the alternative flavor's weakest bin."
+    },
+    {
+      "name": "isup_a",
+      "expr": "-i(va)[0]",
+      "unit": "A",
+      "min": 1e-9,
+      "max": 1e-2,
+      "note": "PHYSICALITY GUARD (sim/README.md Sec'Branch selection' rule 4, the supply-current-sign guard): total current delivered by the fixed 'vsup' rail into network A. It must be POSITIVE -- a network of grounded-source NMOS devices cannot source power into its own only energy source -- so a non-converged or false-converged point that reports the rail sinking current fails the run loudly instead of contributing a plausible-looking number to the summary table. The upper bound rejects a shorted point."
+    },
+    {
+      "name": "isup_b",
+      "expr": "-i(vsw)[length(i(vsw))-1]",
+      "unit": "A",
+      "min": 1e-9,
+      "max": 1e-2,
+      "note": "Same sign guard for network B, evaluated at the top of the 0 -> 3.63 V sweep, where all three DUTs are conducting hard. Guards the END of the sweep the way izero_b guards the start."
+    },
+    {
+      "name": "izero_b",
+      "expr": "abs(i(vsw)[0])",
+      "unit": "A",
+      "min": 0.0,
+      "max": 1e-15,
+      "note": "PHYSICALITY GUARD at the LOW end of the assist-onset sweep, which is the numerically delicate end and the one this experiment's whole minimum-VDD claim rests on: at exactly 0 V rail, with every gate, drain and source at 0 V, the current must be zero to within the solver's own floor. A convergence failure or a stray leakage path at the bottom of the sweep would put a nonzero current here and drag every vmin* extraction down with it, so it fails the corner rather than silently reporting an onset voltage of 0.0005 V."
+    },
+    {
+      "name": "ia_flat_n05l25",
+      "expr": "abs(maximum(i(von_n05l25)) - minimum(i(von_n05l25))) / abs(i(von_n05l25)[0])",
+      "unit": "1",
+      "min": 0.0,
+      "max": 1e-3,
+      "note": "STRUCTURAL GUARD for the one-deck-serves-all-measurements design: network A (fixed 'vsup' rail) shares only ground with network B (swept rail), so the MASSIST-condition current must not move at all while network B's rail sweeps 0 -> 3.63 V. Reported as a relative spread so the bound is tolerance-scaled; it measures 0 exactly in practice. If these sub-networks ever became accidentally coupled -- a net-label typo in the testbench is all it would take -- ion_* would silently become a function of the OTHER network's sweep and the whole record would be wrong in a way no bound on ion_* itself could catch. This is the control point sim/README.md requires: a check that must fail if the deck is not actually measuring what it claims."
+    }
+  ],
+  "spread_checks": [
+    {
+      "measurement": "vth_n05l25",
+      "min_spread": 0.05,
+      "note": "Corner-blindness guard, same house convention as sim/bias-core-smoke/'s vref spread check: native-device Vth is strongly process- and temperature-dependent, so if every corner returns the same threshold the .lib corner / .temp injection is not reaching the models and the whole matrix is one point repeated 45 times."
+    },
+    {
+      "measurement": "ion_n05l25",
+      "min_spread": 1e-6,
+      "note": "Second corner-blindness guard on the headline measurement itself. ion_n05l25 must additionally vary along the SUPPLY axis (VGS = VDS = 'vsup'), which vth_n05l25 by construction does not -- so this check covers the .param vsup injection, which the vth spread check cannot."
+    }
+  ],
+  "notes": [
+    "WHAT THE SUPPLY AXIS DOES TO EACH MEASUREMENT. Only ion_* and ioff_* are functions of 'vsup' (both are read at VDS = 'vsup'). vth_* is measured at a fixed 100 mV drain bias from an independent source and vmin* is measured on a rail swept over a fixed 0 -> 3.63 V range, so both are device properties independent of the corner's supply and MUST repeat identically across the three supply points of a given process/temperature pair. That is deliberate and is itself a consistency check readable straight off the record: the 45-point matrix carries 45 independent static-current results and 15 distinct threshold / onset results, each replicated three times. A vth_* or vmin* that moved with the supply axis would mean the sub-networks are not independent -- the same failure ia_flat_n05l25 guards against from the other direction.",
+    "WHY THE MIN-VDD SWEEP RUNS TO 3.63 V EVEN AT 2.97 V CORNERS. Sweeping network B over a fixed range rather than up to the corner's own 'vsup' keeps the onset curve identical across the supply axis, which is what makes the replication check above meaningful. It also keeps the sweep limits literal numbers rather than expressions over an injected .param, which the .control-block `dc` command cannot portably evaluate.",
+    "`.option gmin=1e-15` IS LOAD-BEARING FOR THE LEAKAGE NUMBERS, and was measured to be, not assumed. ngspice's default gmin is 1e-12 S, a conductance it places across every junction to help convergence; at a 3 V drain bias that is ~3e-12 A of purely numerical current in series with the measurement. Measured at ss/-40C/2.97V on this exact deck, ioff_n05l25 reads 5.05e-12 A at the default gmin and 2.09e-12 A at gmin=1e-15 -- i.e. MORE THAN HALF of the off-state leakage reported at the default setting is the simulator's own convergence aid rather than the device. Since off-state leakage is precisely one of the quantities spec/porting-plan.md Sec2.6 asks about, running this at the default would have produced a plausible, quotable, wrong number. `abstol=1e-16` (default 1e-12 A) is required for the same reason: the currents of interest here run down to single picoamps, which is at or below ngspice's default absolute current tolerance. `reltol=1e-5` (default 1e-3) tightens the DC solve generally; unlike sim/bias-core-startup/, where the tolerance was load-bearing for BRANCH SELECTION on a self-biased cell, here it only sharpens the extraction -- the DUTs are single grounded-source devices with a unique operating point and no degenerate branch, so sim/README.md Sec'Branch selection' rules 1-3 (cold `.op` cannot make a branch claim; ramp from 0 V instead) do not apply to this experiment, while rule 4 (guard every operating point with a physicality check) very much does and is implemented by isup_a / isup_b / izero_b / ia_flat_n05l25 above.",
+    "WHY A `dc` SWEEP IS SOUND HERE WHEN sim/bias-core-startup/ NEEDED A TRANSIENT RAMP. The distinction sim/README.md draws is about circuits whose DC network equations admit more than one solution -- the DeltaVBE cells, which need a physical power-up trajectory to say which branch the silicon reaches. A single NMOS with its source and bulk grounded and its terminals driven by ideal sources has exactly one solution at every bias point, so the DC sweep is not choosing between branches and there is no branch claim to get wrong. The guards are kept anyway, because a false convergence is still possible and is exactly what would corrupt a picoamp-scale leakage or a millivolt-scale onset extraction.",
+    "VTH EXTRACTION METHOD, STATED SO IT CAN BE ARGUED WITH. Constant-current extraction at VDS = 100 mV (linear region) with the criterion I_D = 100 nA * (W/L), evaluated per geometry. This is a definition, not a physical constant: a different criterion current, a saturation-region VDS, or a maximum-transconductance extrapolation would all give a somewhat different number for the same device, and the near-zero-Vt devices characterized here sit close enough to zero that the choice is visible in the result. The number to compare across corners and across flavors is therefore this experiment's own, consistently extracted; do not mix it with a Vth quoted from another method or another source. Source and bulk are both grounded, so all thresholds here are zero-body-effect thresholds -- which is the right condition for MASSIST, whose source and bulk are both on VSS.",
+    "WHAT THIS EXPERIMENT DOES NOT SUBSTANTIATE. It is a deterministic corner-matrix characterization of the device menu. It makes no statistical claim: there is no Monte Carlo sampling here, so it says nothing about device-to-device mismatch, about the sigma of any of these quantities, or about yield -- sim/README.md keeps that on a separate axis (sim/pnp-mismatch/'s bespoke MC_MM_SWITCH/MC_PR_SWITCH script), and the *_mm and mc library sections this manifest does not use are what such a claim would need. It also characterizes DEVICES, not por_output_chain: the static current recorded here is the cost of MASSIST's own leg in isolation, which is a lower bound on, and not a measurement of, the block's total quiescent current.",
+    "MEASUREMENT EXTRACTION IS BY VECTOR ARITHMETIC, NOT `meas`. Each threshold/onset expression counts the sweep points still below its criterion (`mean(<boolean vector>) * length(...)`) and converts that count back to a voltage. ngspice's own `meas dc ... when` would interpolate more finely, but it aborts the whole .control block when the crossing does not exist, which would lose every other measurement at that corner instead of failing just the one; counting always produces a number, and an out-of-range count lands outside the min/max bounds above and fails the corner explicitly with a readable value. Cross-plot references (`dc1.i(...)`) are how the Vth measurements reach the first analysis's vectors after the second analysis has become the current plot.",
+    "The three DUT geometries are PDK menu entries read out of the pinned PDK's own corner files (sky130_fd_pr__nfet_05v0_nvt__tt.corner.spice lists 11 bins, sky130_fd_pr__nfet_03v3_nvt__tt.corner.spice lists 9), not free sizing choices -- these devices are binned, fixed-(L,W) library cells and ngspice's bin lookup rejects any other pair outright. The full menus are reproduced in this experiment's README."
+  ]
+}
