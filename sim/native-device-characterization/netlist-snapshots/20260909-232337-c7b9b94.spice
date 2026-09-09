@@ -1,0 +1,60 @@
+** sch_path: sim/native-device-characterization/testbench/tb_native_device_char.sch
+**.subckt tb_native_device_char
+VA VDDA 0 'vsup'
+.save i(va)
+VSW VSWN 0 0
+.save i(vsw)
+VDC VDCN 0 0.1
+.save i(vdc)
+VG VGN 0 0
+.save i(vg)
+VON_N05L25 VDDA DON_N05L25 0
+.save i(von_n05l25)
+XMON_N05L25 DON_N05L25 VDDA 0 0 sky130_fd_pr__nfet_05v0_nvt L=25 W=1 nf=1 ad=0.29 as=0.29 pd=2.58 ps=2.58 nrd=0.29 nrs=0.29 sa=0
++ sb=0 sd=0 mult=1 m=1
+VOFF_N05L25 VDDA DOFF_N05L25 0
+.save i(voff_n05l25)
+XMOFF_N05L25 DOFF_N05L25 0 0 0 sky130_fd_pr__nfet_05v0_nvt L=25 W=1 nf=1 ad=0.29 as=0.29 pd=2.58 ps=2.58 nrd=0.29 nrs=0.29 sa=0
++ sb=0 sd=0 mult=1 m=1
+VSWD_N05L25 VSWN DSWD_N05L25 0
+.save i(vswd_n05l25)
+XMSWD_N05L25 DSWD_N05L25 VSWN 0 0 sky130_fd_pr__nfet_05v0_nvt L=25 W=1 nf=1 ad=0.29 as=0.29 pd=2.58 ps=2.58 nrd=0.29 nrs=0.29 sa=0
++ sb=0 sd=0 mult=1 m=1
+VVT_N05L25 VDCN DVT_N05L25 0
+.save i(vvt_n05l25)
+XMVT_N05L25 DVT_N05L25 VGN 0 0 sky130_fd_pr__nfet_05v0_nvt L=25 W=1 nf=1 ad=0.29 as=0.29 pd=2.58 ps=2.58 nrd=0.29 nrs=0.29 sa=0
++ sb=0 sd=0 mult=1 m=1
+VON_N05L8 VDDA DON_N05L8 0
+.save i(von_n05l8)
+XMON_N05L8 DON_N05L8 VDDA 0 0 sky130_fd_pr__nfet_05v0_nvt L=8 W=1 nf=1 ad=0.29 as=0.29 pd=2.58 ps=2.58 nrd=0.29 nrs=0.29 sa=0 sb=0
++ sd=0 mult=1 m=1
+VOFF_N05L8 VDDA DOFF_N05L8 0
+.save i(voff_n05l8)
+XMOFF_N05L8 DOFF_N05L8 0 0 0 sky130_fd_pr__nfet_05v0_nvt L=8 W=1 nf=1 ad=0.29 as=0.29 pd=2.58 ps=2.58 nrd=0.29 nrs=0.29 sa=0 sb=0
++ sd=0 mult=1 m=1
+VSWD_N05L8 VSWN DSWD_N05L8 0
+.save i(vswd_n05l8)
+XMSWD_N05L8 DSWD_N05L8 VSWN 0 0 sky130_fd_pr__nfet_05v0_nvt L=8 W=1 nf=1 ad=0.29 as=0.29 pd=2.58 ps=2.58 nrd=0.29 nrs=0.29 sa=0
++ sb=0 sd=0 mult=1 m=1
+VVT_N05L8 VDCN DVT_N05L8 0
+.save i(vvt_n05l8)
+XMVT_N05L8 DVT_N05L8 VGN 0 0 sky130_fd_pr__nfet_05v0_nvt L=8 W=1 nf=1 ad=0.29 as=0.29 pd=2.58 ps=2.58 nrd=0.29 nrs=0.29 sa=0 sb=0
++ sd=0 mult=1 m=1
+VON_N03L08 VDDA DON_N03L08 0
+.save i(von_n03l08)
+XMON_N03L08 DON_N03L08 VDDA 0 0 sky130_fd_pr__nfet_03v3_nvt L=0.8 W=0.42 nf=1 ad=0.1218 as=0.1218 pd=1.42 ps=1.42
++ nrd=0.69047619047619 nrs=0.69047619047619 sa=0 sb=0 sd=0 mult=1 m=1
+VOFF_N03L08 VDDA DOFF_N03L08 0
+.save i(voff_n03l08)
+XMOFF_N03L08 DOFF_N03L08 0 0 0 sky130_fd_pr__nfet_03v3_nvt L=0.8 W=0.42 nf=1 ad=0.1218 as=0.1218 pd=1.42 ps=1.42
++ nrd=0.69047619047619 nrs=0.69047619047619 sa=0 sb=0 sd=0 mult=1 m=1
+VSWD_N03L08 VSWN DSWD_N03L08 0
+.save i(vswd_n03l08)
+XMSWD_N03L08 DSWD_N03L08 VSWN 0 0 sky130_fd_pr__nfet_03v3_nvt L=0.8 W=0.42 nf=1 ad=0.1218 as=0.1218 pd=1.42 ps=1.42
++ nrd=0.69047619047619 nrs=0.69047619047619 sa=0 sb=0 sd=0 mult=1 m=1
+VVT_N03L08 VDCN DVT_N03L08 0
+.save i(vvt_n03l08)
+XMVT_N03L08 DVT_N03L08 VGN 0 0 sky130_fd_pr__nfet_03v3_nvt L=0.8 W=0.42 nf=1 ad=0.1218 as=0.1218 pd=1.42 ps=1.42
++ nrd=0.69047619047619 nrs=0.69047619047619 sa=0 sb=0 sd=0 mult=1 m=1
+**.ends
+.end
