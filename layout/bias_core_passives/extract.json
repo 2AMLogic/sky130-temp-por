@@ -1,0 +1,377 @@
+{
+  "schema_version": 3,
+  "file": "bias_core_passives.gds",
+  "deck": "sky130",
+  "top": "bias_core_passives",
+  "dbu_um": 0.001,
+  "netlist_path": "bias_core_passives.spice",
+  "netlist_sha256": "a26fc2746a88fb924ef14712c936416f8b5227ff9dd742b9f90b8337d718b5af",
+  "status": "extracted",
+  "device_count": 6,
+  "net_count": 11,
+  "pin_count": 11,
+  "device_counts": {
+    "res_xhigh_po": 4,
+    "sky130_fd_pr__model__cap_mim": 2
+  },
+  "dummy_devices_dropped": 0,
+  "ignored_layers": [],
+  "device_recognition_only_layers": [
+    {
+      "layer": 66,
+      "datatype": 13,
+      "shapes": 4
+    },
+    {
+      "layer": 79,
+      "datatype": 20,
+      "shapes": 4
+    },
+    {
+      "layer": 89,
+      "datatype": 44,
+      "shapes": 2
+    },
+    {
+      "layer": 94,
+      "datatype": 20,
+      "shapes": 4
+    }
+  ],
+  "device_classes": [
+    "nfet",
+    "pfet",
+    "pnp",
+    "sky130_fd_pr__model__cap_mim",
+    "sky130_fd_pr__model__cap_mim_m4",
+    "resistor"
+  ],
+  "devices": [
+    {
+      "name": "$1",
+      "class": "sky130_fd_pr__model__cap_mim",
+      "nets": {
+        "a": "nz",
+        "b": "pg"
+      },
+      "params": {
+        "c_f": 8.152e-13,
+        "area_um2": 400.0,
+        "perimeter_um": 80.0
+      },
+      "instance_path": [
+        {
+          "cell": "cc__cap_cc",
+          "array_index": null
+        },
+        {
+          "cell": "cap_array",
+          "array_index": null
+        }
+      ]
+    },
+    {
+      "name": "$2",
+      "class": "sky130_fd_pr__model__cap_mim",
+      "nets": {
+        "a": "vdd",
+        "b": "nokx"
+      },
+      "params": {
+        "c_f": 7.656e-14,
+        "area_um2": 36.0,
+        "perimeter_um": 24.0
+      },
+      "instance_path": [
+        {
+          "cell": "cok__cap_cok",
+          "array_index": null
+        },
+        {
+          "cell": "cap_array$1",
+          "array_index": null
+        }
+      ]
+    },
+    {
+      "name": "$3",
+      "class": "res_xhigh_po",
+      "nets": {
+        "a": "nbtop",
+        "b": "nb",
+        "w": "vsubs"
+      },
+      "params": {
+        "r_ohm": 17500.0,
+        "l_um": 17.5,
+        "w_um": 2.0,
+        "area_um2": 35.0,
+        "perimeter_um": 39.0
+      },
+      "instance_path": [
+        {
+          "cell": "rt__res_rt",
+          "array_index": null
+        },
+        {
+          "cell": "res_array",
+          "array_index": null
+        }
+      ]
+    },
+    {
+      "name": "$4",
+      "class": "res_xhigh_po",
+      "nets": {
+        "a": "nb",
+        "b": "ec",
+        "w": "vsubs"
+      },
+      "params": {
+        "r_ohm": 350000.0,
+        "l_um": 350.0,
+        "w_um": 2.0,
+        "area_um2": 700.0,
+        "perimeter_um": 704.0
+      },
+      "instance_path": [
+        {
+          "cell": "r1__res_r1",
+          "array_index": null
+        },
+        {
+          "cell": "res_array$1",
+          "array_index": null
+        }
+      ]
+    },
+    {
+      "name": "$5",
+      "class": "res_xhigh_po",
+      "nets": {
+        "a": "n2",
+        "b": "nz",
+        "w": "vsubs"
+      },
+      "params": {
+        "r_ohm": 1016000.0,
+        "l_um": 1016.0,
+        "w_um": 2.0,
+        "area_um2": 2032.0,
+        "perimeter_um": 2036.0
+      },
+      "instance_path": [
+        {
+          "cell": "rz__res_rz",
+          "array_index": null
+        },
+        {
+          "cell": "res_array$2",
+          "array_index": null
+        }
+      ]
+    },
+    {
+      "name": "$6",
+      "class": "res_xhigh_po",
+      "nets": {
+        "a": "vref",
+        "b": "er",
+        "w": "vsubs"
+      },
+      "params": {
+        "r_ohm": 4104000.0,
+        "l_um": 4104.0,
+        "w_um": 2.0,
+        "area_um2": 8208.0,
+        "perimeter_um": 8212.0
+      },
+      "instance_path": [
+        {
+          "cell": "r2__res_r2",
+          "array_index": null
+        },
+        {
+          "cell": "res_array$3",
+          "array_index": null
+        }
+      ]
+    }
+  ],
+  "nets": [
+    {
+      "name": "ec",
+      "pin": true,
+      "device_count": 1,
+      "net_id": 3,
+      "pin_index": 0,
+      "label_positions_um": [
+        {
+          "text": "ec",
+          "x_um": 371.97,
+          "y_um": 1.0
+        }
+      ]
+    },
+    {
+      "name": "er",
+      "pin": true,
+      "device_count": 1,
+      "net_id": 7,
+      "pin_index": 1,
+      "label_positions_um": [
+        {
+          "text": "er",
+          "x_um": 5523.65,
+          "y_um": 1.0
+        }
+      ]
+    },
+    {
+      "name": "n2",
+      "pin": true,
+      "device_count": 1,
+      "net_id": 4,
+      "pin_index": 2,
+      "label_positions_um": [
+        {
+          "text": "n2",
+          "x_um": 375.39,
+          "y_um": 1.0
+        }
+      ]
+    },
+    {
+      "name": "nb",
+      "pin": true,
+      "device_count": 2,
+      "net_id": 2,
+      "pin_index": 3,
+      "label_positions_um": [
+        {
+          "text": "nb",
+          "x_um": 19.84,
+          "y_um": 1.0
+        }
+      ]
+    },
+    {
+      "name": "nbtop",
+      "pin": true,
+      "device_count": 1,
+      "net_id": 1,
+      "pin_index": 4,
+      "label_positions_um": [
+        {
+          "text": "nbtop",
+          "x_um": 0.21,
+          "y_um": 1.0
+        }
+      ]
+    },
+    {
+      "name": "nokx",
+      "pin": true,
+      "device_count": 1,
+      "net_id": 10,
+      "pin_index": 5,
+      "label_positions_um": [
+        {
+          "text": "nokx",
+          "x_um": 5530.36,
+          "y_um": 7.71
+        }
+      ]
+    },
+    {
+      "name": "nz",
+      "pin": true,
+      "device_count": 2,
+      "net_id": 5,
+      "pin_index": 6,
+      "label_positions_um": [
+        {
+          "text": "nz",
+          "x_um": 1393.415,
+          "y_um": 5.75
+        }
+      ]
+    },
+    {
+      "name": "pg",
+      "pin": true,
+      "device_count": 1,
+      "net_id": 9,
+      "pin_index": 7,
+      "label_positions_um": [
+        {
+          "text": "pg",
+          "x_um": 1405.52,
+          "y_um": 21.71
+        }
+      ]
+    },
+    {
+      "name": "vdd",
+      "pin": true,
+      "device_count": 1,
+      "net_id": 8,
+      "pin_index": 8,
+      "label_positions_um": [
+        {
+          "text": "vdd",
+          "x_um": 5526.86,
+          "y_um": 3.5
+        }
+      ]
+    },
+    {
+      "name": "vref",
+      "pin": true,
+      "device_count": 1,
+      "net_id": 6,
+      "pin_index": 9,
+      "label_positions_um": [
+        {
+          "text": "vref",
+          "x_um": 1419.23,
+          "y_um": 1.0
+        }
+      ]
+    },
+    {
+      "name": "vsubs",
+      "pin": true,
+      "device_count": 4,
+      "net_id": 11,
+      "pin_index": 10,
+      "label_positions_um": []
+    }
+  ],
+  "warnings": [],
+  "black_box_regions": [],
+  "abstracted_cells": [],
+  "unmodelled_poly": [],
+  "merged_net_labels": [],
+  "voltage_domain_warnings": [],
+  "unbiased_pmos_body_nets": [],
+  "single_terminal_nets": [],
+  "dead_metal": [],
+  "matched_device_groups": [],
+  "pdk": null,
+  "provenance": {
+    "klt_version": "0.4.0",
+    "klayout_version": "0.30.10",
+    "pdk": null,
+    "deck": {
+      "name": "sky130",
+      "content_hash": "sha256:a903acb18b47d47e73460b10e9c80edd3466193ffc9da0c01c2103f7fdfcf36f",
+      "released": true
+    },
+    "input": {
+      "content_hash": "sha256:2ff6a987f30ecbdbe41f168507a9ad98e508ba76e6bd3b568b779dd5bc665bb4"
+    }
+  },
+  "parasitics": null,
+  "spef_path": null
+}

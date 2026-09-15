@@ -55,6 +55,28 @@ right, and the only gap is the collector-ring-to-`VSS` strap
 [`2AMLogic/klayout-tools#1894`](https://github.com/2AMLogic/klayout-tools/issues/1894)
 blocks.
 
+## `bias_core_passives`: the bias/ratio resistors and Miller caps (issue #37, part of #34)
+
+[`layout/bias_core_passives/`](bias_core_passives/README.md) lays out
+`design/netlist/bias_core.spice`'s `XRT`/`XR1`/`XR2`/`XRZ`/`XCC`/`XCOK`
+device group — the bias/ratio resistor network (4x
+`sky130_fd_pr__res_xhigh_po`, each its own distinct length) and Miller
+compensation caps (2x `sky130_fd_pr__cap_mim_m3_1`) — as a third standalone
+proof cell, using one single-instance `klt gen res_array`/`cap_array` call
+per device (no matched array: none of these 6 devices are meant to match
+each other).
+
+**`klt drc`: clean, 0 violations.** **`klt extract`: 6 devices, 11 nets.**
+**`klt lvs` against `design/netlist/bias_core.spice`'s own device cards:
+mismatch** (0/6 devices, 0/11 nets) — **not** the `bias_core_pnp8_leg`/
+`bias_core_xq1_xqr` collector-strap gap (confirmed: this device group's own
+`VSS`↔`vsubs` naming makes no difference to the result). Two different,
+newly-found `klt lvs`/`klt extract` gaps block it instead — see that cell's
+own README "Verification" section for the full diagnosis,
+[`2AMLogic/klayout-tools#1907`](https://github.com/2AMLogic/klayout-tools/issues/1907)
+and
+[`2AMLogic/klayout-tools#1908`](https://github.com/2AMLogic/klayout-tools/issues/1908).
+
 ## Known klt gaps hit building this recipe
 
 Filed generically at
@@ -96,12 +118,12 @@ cell's own floorplan.
 ## What's next
 
 Per issue #36, this fleet prefers landing DRC-clean/LVS-blocked increments
-(isolated to the known collector-strap gap) over waiting on the upstream
-fix — `bias_core_pnp8_leg` and `bias_core_xq1_xqr` both ship that way. The
-remaining `bias_core` device groups (the PFET/NFET mirror/error-amp stack,
-the bias/ratio resistors, the Miller caps, the startup kick chain, the
-settle-flag output stage) and the full-cell assembly are follow-on
-increments tracked as sibling sub-issues of
+(isolated to a known, upstream-filed gap) over waiting on the upstream fix —
+`bias_core_pnp8_leg`, `bias_core_xq1_xqr`, and `bias_core_passives` all ship
+that way. The remaining `bias_core` device groups (the PFET/NFET
+mirror/error-amp stack, the startup kick chain, the settle-flag output
+stage) and the full-cell assembly are follow-on increments tracked as
+sibling sub-issues of
 [#34](https://github.com/2AMLogic/sky130-temp-por/issues/34); `temp_core`,
 `por_comparator`, `por_output_chain`, and `temp_por_top` are tracked from
 [#4](https://github.com/2AMLogic/sky130-temp-por/issues/4).

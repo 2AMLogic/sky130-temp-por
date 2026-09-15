@@ -1,0 +1,121 @@
+{
+  "pdk": {
+    "variant": "sky130A"
+  },
+  "blocks": [
+    {
+      "id": "rt",
+      "generator_report": "gen/rt.gen.json"
+    },
+    {
+      "id": "r1",
+      "generator_report": "gen/r1.gen.json"
+    },
+    {
+      "id": "rz",
+      "generator_report": "gen/rz.gen.json"
+    },
+    {
+      "id": "cc",
+      "generator_report": "gen/cc.gen.json"
+    },
+    {
+      "id": "r2",
+      "generator_report": "gen/r2.gen.json"
+    },
+    {
+      "id": "cok",
+      "generator_report": "gen/cok.gen.json"
+    }
+  ],
+  "placement": {
+    "strategy": "row",
+    "order": [
+      "rt",
+      "r1",
+      "rz",
+      "cc",
+      "r2",
+      "cok"
+    ],
+    "spacing_um": 3.0
+  },
+  "routing": {
+    "layer_role": "metal",
+    "width_um": 0.17
+  },
+  "connectivity": [
+    {
+      "net": "nb",
+      "pins": [
+        {
+          "block": "rt",
+          "port": "R0_B"
+        },
+        {
+          "block": "r1",
+          "port": "R0_A"
+        }
+      ]
+    },
+    {
+      "net": "nz",
+      "pins": [
+        {
+          "block": "rz",
+          "port": "R0_B"
+        },
+        {
+          "block": "cc",
+          "port": "C0_BOT"
+        }
+      ]
+    }
+  ],
+  "pins": [
+    {
+      "net": "nbtop",
+      "block": "rt",
+      "port": "R0_A"
+    },
+    {
+      "net": "ec",
+      "block": "r1",
+      "port": "R0_B"
+    },
+    {
+      "net": "n2",
+      "block": "rz",
+      "port": "R0_A"
+    },
+    {
+      "net": "pg",
+      "block": "cc",
+      "port": "C0_TOP"
+    },
+    {
+      "net": "vref",
+      "block": "r2",
+      "port": "R0_A"
+    },
+    {
+      "net": "er",
+      "block": "r2",
+      "port": "R0_B"
+    },
+    {
+      "net": "vdd",
+      "block": "cok",
+      "port": "C0_BOT"
+    },
+    {
+      "net": "nokx",
+      "block": "cok",
+      "port": "C0_TOP"
+    }
+  ],
+  "options": {
+    "cell_name": "bias_core_passives",
+    "output": "bias_core_passives.gds"
+  }
+}
