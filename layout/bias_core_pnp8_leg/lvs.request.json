@@ -1,0 +1,10 @@
+{
+  "layout": {
+    "netlist": "bias_core_pnp8_leg.spice"
+  },
+  "reference": {
+    "netlist": "bias_core_pnp8_leg.ref.spice",
+    "form": "subckt-call",
+    "deck": "sky130"
+  }
+}

@@ -1,0 +1,117 @@
+{
+  "cell": "bias_core_pnp8_leg",
+  "_comment": [
+    "Cell descriptor for layout/bin/compose-cell.py -- see layout/README.md",
+    "for the recipe this follows (ported from 2AMLogic/sky130-trng) and",
+    "issue #30 for why this is a standalone proof cell rather than the full",
+    "design/bias_core.sch composition.",
+    "",
+    "This is design/netlist/bias_core.spice's XQ8A..XQ8H group: 8 unit",
+    "sky130_fd_pr__pnp_05v5_W3p40L3p40 devices, each called 'VSS VSS EC'",
+    "(collector=VSS, base=VSS, emitter=EC) -- design/bias_core.md's sizing",
+    "section calls this the '8:1 PNP emitter-count ratio' leg (the matching",
+    "1x reference unit, XQ1, and the VREF-leg unit, XQR, are each a separate",
+    "single-instance device elsewhere in bias_core and are NOT part of this",
+    "proof cell).",
+    "",
+    "klt gen bjt_array (rows=2, cols=4, ratio=8, common_centroid, a shared",
+    "collector guard ring) draws the whole matched-common-centroid array in",
+    "ONE call -- no manual multi-block placement is needed the way",
+    "sky130-trng's ro_stage/ro_nand2 gates need it, since bjt_array already",
+    "IS the composed common-centroid unit.",
+    "",
+    "KNOWN GAP, reported upstream generically as 2AMLogic/klayout-tools#TODO",
+    "(see layout/README.md 'Known klt gaps hit building this recipe' for the",
+    "full writeup): the collector guard ring (bjt_array's COLL_N/S/E/W",
+    "ports, drawn on the diffusion role, not li1) is deliberately left OUT",
+    "of this cell.json's own connectivity[] and is NOT part of the 'vss'",
+    "net below. `klt gen-compose` reports a routed:true leg and a clean",
+    "`klt drc` for a COLL_* pin wired into a connectivity[] net at every",
+    "layer_role tried, but never actually draws the licon/mcon contact onto",
+    "the diffusion port -- `klt extract` always recovers the collector as a",
+    "separate, unstrapped 'vsubs' node (confirmed common across all 8 units,",
+    "i.e. the guard ring's own diffusion is correctly extracted as ONE",
+    "shared physical node -- it is only the strap to VSS that is missing).",
+    "Worse, attempting it *alongside* a second same-block net (this cell's",
+    "own 'ec') was observed to corrupt that second net's own extraction --",
+    "'ec' and 'vss' merged into one shorted node -- even though `klt drc`",
+    "still reported clean and every leg still reported routed:true. Dropping",
+    "COLL_* from connectivity[] avoids both failure modes and leaves 'vss'",
+    "(8 base pins) / 'ec' (8 emitter pins) DRC-clean, correctly separate,",
+    "and individually LVS-matchable against the design's own device cards",
+    "-- only the collector-to-VSS strap this proof cell's own LVS run",
+    "against the *unmodified* design/netlist/bias_core.spice reference",
+    "still (honestly) reports as a mismatch. Revisit once the upstream gap",
+    "is fixed.",
+    "",
+    "Routing: base 'metal' role (li1) with 'cross_block_layer_role: metal2'",
+    "(met1) for the two same-block self-nets ('vss' bussing 8 base pins,",
+    "'ec' bussing 8 emitter pins, each crossing the other's intervening",
+    "pads) -- this is docs/cli/gen-compose.md's own 'Cross-block bus",
+    "routing (routing.cross_block_layer_role, #1168)' worked example,",
+    "reproduced almost verbatim against this same 8-unit bjt_array shape."
+  ],
+  "pdk": {
+    "variant": "sky130A",
+    "deck": "sky130"
+  },
+  "blocks": [
+    {
+      "id": "array",
+      "generator": "bjt_array",
+      "cell_name": "pnp8",
+      "orientation": "none",
+      "params": {
+        "emitter_um": 3.4,
+        "rows": 2,
+        "cols": 4,
+        "dummy": 0,
+        "topology": "common_centroid",
+        "ratio": 8,
+        "add_collector_ring": true
+      }
+    }
+  ],
+  "placement": {
+    "strategy": "explicit",
+    "order": ["array"],
+    "origins_um": { "array": { "x": 0.0, "y": 0.0 } }
+  },
+  "routing": {
+    "layer_role": "metal",
+    "width_um": 0.17,
+    "cross_block_layer_role": "metal2"
+  },
+  "connectivity": [
+    {
+      "net": "vss",
+      "pins": [
+        { "block": "array", "port": "Q0_B" },
+        { "block": "array", "port": "Q1_B" },
+        { "block": "array", "port": "Q2_B" },
+        { "block": "array", "port": "Q3_B" },
+        { "block": "array", "port": "Q4_B" },
+        { "block": "array", "port": "Q5_B" },
+        { "block": "array", "port": "Q6_B" },
+        { "block": "array", "port": "Q7_B" }
+      ]
+    },
+    {
+      "net": "ec",
+      "pins": [
+        { "block": "array", "port": "Q0_E" },
+        { "block": "array", "port": "Q1_E" },
+        { "block": "array", "port": "Q2_E" },
+        { "block": "array", "port": "Q3_E" },
+        { "block": "array", "port": "Q4_E" },
+        { "block": "array", "port": "Q5_E" },
+        { "block": "array", "port": "Q6_E" },
+        { "block": "array", "port": "Q7_E" }
+      ]
+    }
+  ],
+  "lvs": {
+    "reference": "layout/bias_core_pnp8_leg/reference.spice",
+    "subckt": "bias_core_pnp8_leg"
+  }
+}
