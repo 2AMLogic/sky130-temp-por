@@ -13,8 +13,8 @@ pin.
 see that script's own module docstring for the full contract). Their
 docstrings still cite `sky130-trng`'s own issue numbers (`#22`, `#27`, `#49`,
 `#1492`, ...) — those refer to *that* repo's history, not this one; nothing
-in this repo's own numbering corresponds to them. Only `layout/bias_core_pnp8_leg/`
-is new to this repo.
+in this repo's own numbering corresponds to them. `layout/bias_core_pnp8_leg/`
+and `layout/bias_core_xq1_xqr/` are new to this repo.
 
 ## `bias_core_pnp8_leg`: the first real sub-block
 
@@ -36,6 +36,24 @@ collector-ring-to-`VSS` strap the schematic's own device cards require
 That gap traces to a real `klt gen-compose` limitation, not a cell.json bug —
 see "Known klt gaps hit building this recipe" below,
 [`2AMLogic/klayout-tools#1894`](https://github.com/2AMLogic/klayout-tools/issues/1894).
+
+## `bias_core_xq1_xqr`: the matching 1x reference PNPs (issue #36, part of #34)
+
+[`layout/bias_core_xq1_xqr/`](bias_core_xq1_xqr/README.md) lays out
+`design/netlist/bias_core.spice`'s `XQ1` and `XQR` devices — the matching 1x
+reference unit for `bias_core_pnp8_leg`'s 8:1 group, and the separate
+`VREF`-leg unit, respectively — as a second standalone proof cell, using one
+shared-ring `klt gen bjt_array` call (`rows=1 cols=2 ratio=1`) rather than
+two independently-ringed blocks (bussing a net between two closed guard
+rings does not route — see that cell's own README "Routing" section).
+
+**`klt drc`: clean, 0 violations.** **`klt extract`: 2 devices, 4 nets.**
+**`klt lvs` against `design/netlist/bias_core.spice`'s own device cards:
+mismatch** (0/2 devices, 0/3 nets) — the same single, well-isolated cause as
+`bias_core_pnp8_leg`: base and each device's own emitter extract exactly
+right, and the only gap is the collector-ring-to-`VSS` strap
+[`2AMLogic/klayout-tools#1894`](https://github.com/2AMLogic/klayout-tools/issues/1894)
+blocks.
 
 ## Known klt gaps hit building this recipe
 
@@ -70,14 +88,20 @@ emitter bus, `routing.cross_block_layer_role` configured per
    then extract correctly separate, per-device, matching the schematic
    exactly.
 
-Revisit `layout/bias_core_pnp8_leg/`'s collector strap once that issue is
-resolved upstream, at which point a real base+collector+emitter LVS match
-should be possible without changing this cell's own floorplan.
+Revisit `layout/bias_core_pnp8_leg/`'s and `layout/bias_core_xq1_xqr/`'s
+collector strap once that issue is resolved upstream, at which point a real
+base+collector+emitter LVS match should be possible without changing either
+cell's own floorplan.
 
 ## What's next
 
-`temp_core`, `por_comparator`, `por_output_chain`, `temp_por_top`, and the
-rest of `bias_core` itself (the PFET/NFET mirror stack, the kick chain, the
-Miller caps, the bias resistors) are follow-on increments once the
-collector-strap gap above is closed or worked around — tracked from
+Per issue #36, this fleet prefers landing DRC-clean/LVS-blocked increments
+(isolated to the known collector-strap gap) over waiting on the upstream
+fix — `bias_core_pnp8_leg` and `bias_core_xq1_xqr` both ship that way. The
+remaining `bias_core` device groups (the PFET/NFET mirror/error-amp stack,
+the bias/ratio resistors, the Miller caps, the startup kick chain, the
+settle-flag output stage) and the full-cell assembly are follow-on
+increments tracked as sibling sub-issues of
+[#34](https://github.com/2AMLogic/sky130-temp-por/issues/34); `temp_core`,
+`por_comparator`, `por_output_chain`, and `temp_por_top` are tracked from
 [#4](https://github.com/2AMLogic/sky130-temp-por/issues/4).

@@ -1,0 +1,22 @@
+* bias_core_xq1_xqr -- LVS reference for layout/bias_core_xq1_xqr/cell.json
+*
+* NOT an xschem export. Hand-extracted, verbatim (device cards unmodified
+* except for the wrapping .subckt/.ends and the three shared port names),
+* from design/netlist/bias_core.spice's own XQ1 and XQR device cards -- the
+* matching 1x reference unit for the "8:1 PNP emitter-count ratio" leg
+* (layout/bias_core_pnp8_leg/) and the VREF-leg unit, respectively. Every
+* device card below must stay byte-for-byte identical to the corresponding
+* line in design/netlist/bias_core.spice; if design/bias_core.sch's XQ1/XQR
+* devices ever change, this file needs the same change or
+* layout/bin/compose-cell.py's LVS step (comparing against this file) stops
+* meaning anything.
+*
+* In the full bias_core netlist each of these calls is literally "VSS VSS
+* NA"/"VSS VSS ER" (collector=VSS, base=VSS, emitter=NA/ER) -- i.e.
+* collector and base both land on bias_core's own VSS rail and never need a
+* distinct net of their own here, so this reference exposes only three
+* ports (the two distinct emitter nets plus the one shared VSS).
+.subckt bias_core_xq1_xqr NA ER VSS
+XQ1 VSS VSS NA sky130_fd_pr__pnp_05v5_W3p40L3p40 m=1 mult=1
+XQR VSS VSS ER sky130_fd_pr__pnp_05v5_W3p40L3p40 m=1 mult=1
+.ends
