@@ -1,36 +1,27 @@
 #!/usr/bin/env python3
-"""Shared ``klt``-invocation plumbing for this repo's build/verify scripts.
+"""Shared ``klt``-invocation plumbing for this repo's layout build scripts.
 
-Used by ``layout/bin/compose-cell.py`` (the per-cell
-gen/compose/DRC/extract/LVS chain), ``layout/bin/pex-netlist.py`` (the
-post-layout parasitic-netlist library build), and
-``sim/digital-synthesis/harness/synthesize-and-verify.py`` (the
-synthesize/equiv/gate-cosim chain behind the ``level: gate`` evidence
-record). All three drive the same tool the same way -- shell out to ``klt
-... --format json``, treat a missing/unparsable JSON response as fatal,
-treat an ``error`` object in an otherwise well-formed response as fatal,
-and (for the two that write artifacts) serialize their JSON with one fixed
-spelling -- so the contract lives here once instead of in a copy per
-script.
+One caller today: ``layout/bin/compose-cell.py``, the per-cell
+gen/compose/DRC/extract/LVS chain. The contract kept here is about *the
+tool*, not about that one chain -- shell out to ``klt ... --format json``,
+treat a missing or unparsable JSON response as fatal, treat an ``error``
+object in an otherwise well-formed response as fatal (but *not* every
+non-zero exit -- see :func:`run_klt`), and serialize every committed
+artifact with one fixed JSON spelling (see :func:`write_json`). Keeping it
+in its own module rather than inline in ``compose-cell.py`` is what lets a
+second ``klt``-driving script inherit the contract by import instead of
+restating it; there is no such second script yet, and no extraction history
+behind this file -- it was written here, as-is.
 
-Extracted per issue #49, following ``design/_pdk_search.py``'s precedent
-(issue #25): before the extraction, ``pex-netlist.py``'s own ``run_klt``
-docstring said "Same contract as ``layout/bin/compose-cell.py``'s helper of
-the same name", which is a duplication note, not a shared contract. Now it
-is one. The digital-synthesis harness adopted it per issue #133, which
-retired a fourth-copy reimplementation that had quietly diverged (it never
-checked for the ``error`` object, and it treated *every* non-zero exit as
-fatal -- see :func:`run_klt`'s note on ``klt equiv``'s 3/4).
-
-Import it the way ``design/netlist.py`` imports ``_pdk_search`` -- these are
-scripts, not an installed package, so the importer puts this file's own
-directory on ``sys.path`` and imports it by bare module name. It lives under
-``layout/bin/`` because that is where it was extracted from; an importer
-outside that tree spells the same insert with an explicit path::
+These are scripts, not an installed package, so an importer puts this
+file's own directory on ``sys.path`` and imports it by bare module name.
+``compose-cell.py``, a sibling in ``layout/bin/``, spells that::
 
     sys.path.insert(0, str(Path(__file__).resolve().parent))   # layout/bin/*
-    sys.path.insert(0, str(REPO_ROOT / "layout" / "bin"))      # elsewhere
     from _klt_common import BuildError, run_klt, write_json  # noqa: E402
+
+An importer from outside ``layout/bin/`` would insert the same directory by
+an explicit repo-relative path (``REPO_ROOT / "layout" / "bin"``) instead.
 """
 
 from __future__ import annotations
