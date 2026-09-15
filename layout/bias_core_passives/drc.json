@@ -1,0 +1,107 @@
+{
+  "schema_version": 1,
+  "file": "bias_core_passives.gds",
+  "deck": "sky130",
+  "dbu_um": 0.001,
+  "status": "clean",
+  "violation_count": 0,
+  "rule_counts": {},
+  "metrics": {
+    "drc__error__count": 0
+  },
+  "violations": [],
+  "coverage": {
+    "deck_layers": [
+      "64/20",
+      "65/20",
+      "66/20",
+      "66/44",
+      "67/20",
+      "67/44",
+      "68/20",
+      "68/44",
+      "69/20",
+      "69/44",
+      "70/20",
+      "70/44",
+      "71/20",
+      "71/44",
+      "72/20",
+      "89/44",
+      "97/44"
+    ],
+    "layers_checked": [
+      "66/20",
+      "66/44",
+      "67/20",
+      "67/44",
+      "68/20",
+      "68/44",
+      "69/20",
+      "69/44",
+      "70/20",
+      "70/44",
+      "71/20",
+      "89/44"
+    ],
+    "layers_in_stream_without_rules": [
+      "66/13",
+      "67/5",
+      "70/5",
+      "71/5",
+      "79/20",
+      "94/20"
+    ],
+    "rules_skipped": [
+      "capm2.enclosing.via4.1",
+      "capm2.separation.via4.1",
+      "capm2.space.1",
+      "capm2.width.1",
+      "diff.enclosing.licon.1",
+      "diff.width.1",
+      "met4.enclosing.capm2.1",
+      "met4.enclosing.via4.1",
+      "met5.enclosing.via4.1",
+      "met5.space.1",
+      "met5.width.1",
+      "nwell.space.1",
+      "nwell.width.1",
+      "via4.space.1",
+      "via4.width.1"
+    ],
+    "voltage_domain_warnings": [],
+    "deck_scope": [
+      "cap2m",
+      "capm",
+      "ct",
+      "difftap",
+      "li",
+      "licon",
+      "m1",
+      "m2",
+      "m3",
+      "m4",
+      "m5",
+      "nwell",
+      "poly",
+      "via",
+      "via2",
+      "via3",
+      "via4"
+    ]
+  },
+  "provenance": {
+    "klt_version": "0.4.0",
+    "klayout_version": "0.30.10",
+    "pdk": null,
+    "deck": {
+      "name": "sky130",
+      "content_hash": "sha256:a903acb18b47d47e73460b10e9c80edd3466193ffc9da0c01c2103f7fdfcf36f",
+      "released": true
+    },
+    "input": {
+      "content_hash": "sha256:2ff6a987f30ecbdbe41f168507a9ad98e508ba76e6bd3b568b779dd5bc665bb4"
+    },
+    "klayout_version_mismatch": false
+  }
+}

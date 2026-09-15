@@ -1,0 +1,34 @@
+* bias_core_passives -- LVS reference for layout/bias_core_passives/cell.json
+*
+* NOT an xschem export. Hand-extracted, verbatim (device cards unmodified
+* except for the wrapping .subckt/.ends and the eleven top-level port
+* names), from design/netlist/bias_core.spice's own XRT/XR1/XR2/XRZ/XCC/
+* XCOK device cards -- the bias/ratio resistor network and Miller
+* compensation caps design/bias_core.md describes. Every device card below
+* must stay byte-for-byte identical to the corresponding line in
+* design/netlist/bias_core.spice; if design/bias_core.sch's device group
+* ever changes, this file needs the same change or
+* layout/bin/compose-cell.py's LVS step (comparing against this file) stops
+* meaning anything.
+*
+* All four resistors' third node is VSS in the full bias_core netlist (the
+* precision-resistor bulk tie); this sub-block's own layout has no drawn
+* representation of that tie (`klt gen res_array` never exposes it as a
+* port -- see layout/bias_core_passives/cell.json's own comment), but that
+* turns out NOT to be why the LVS run below reports a mismatch: renaming
+* VSS to 'vsubs' throughout this file (matching the layout's own global
+* substrate-net name byte-for-byte) does not change the mismatch at all.
+* The real, confirmed root cause is two independent `klayout-tools` gaps in
+* how `klt lvs`'s subckt-call conversion and `klt extract`'s netlist writer
+* round-trip a resistor/capacitor through SPICE text -- see
+* layout/bias_core_passives/README.md's "Verification" section for the full
+* diagnosis. VSS is declared as a port here regardless, matching the design
+* netlist's own device cards -- this reference is not the source of the gap.
+.subckt bias_core_passives NBTOP NB EC VREF ER NZ N2 PG VDD NOKX VSS
+XRT NBTOP NB VSS sky130_fd_pr__res_xhigh_po W=2 L=17.5 mult=1 m=1
+XR1 NB EC VSS sky130_fd_pr__res_xhigh_po W=2 L=350.0 mult=1 m=1
+XR2 VREF ER VSS sky130_fd_pr__res_xhigh_po W=2 L=4104.0 mult=1 m=1
+XCC PG NZ sky130_fd_pr__cap_mim_m3_1 W=20 L=20 MF=1 m=1
+XRZ NZ N2 VSS sky130_fd_pr__res_xhigh_po W=2 L=1016.0 mult=1 m=1
+XCOK VDD NOKX sky130_fd_pr__cap_mim_m3_1 W=6 L=6 MF=1 m=1
+.ends
