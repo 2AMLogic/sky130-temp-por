@@ -1,0 +1,350 @@
+{
+  "schema_version": 1,
+  "generator": "gen-compose",
+  "cell_name": "bias_core_pnp8_leg",
+  "gds_path": "bias_core_pnp8_leg.gds",
+  "pdk": {
+    "name": "sky130A",
+    "variant": "sky130A",
+    "version": "open_pdks c6d73a35f524070e85faff4a6a9eef49553ebc2b"
+  },
+  "dbu_um": 0.001,
+  "bbox_um": {
+    "x0": -0.97,
+    "y0": -0.97,
+    "x1": 19.05,
+    "y1": 8.17
+  },
+  "ports": [],
+  "blocks": [
+    {
+      "id": "array",
+      "source": "generator_report",
+      "generator": "bjt_array",
+      "cell_name": "pnp8",
+      "offset_um": {
+        "x": 0.0,
+        "y": 0.0
+      },
+      "bbox_um": {
+        "x0": -0.97,
+        "y0": -0.97,
+        "x1": 19.05,
+        "y1": 8.17
+      },
+      "orientation": "none"
+    }
+  ],
+  "nets": [
+    {
+      "net": "vss",
+      "pins": [
+        {
+          "block": "array",
+          "port": "Q0_B"
+        },
+        {
+          "block": "array",
+          "port": "Q1_B"
+        },
+        {
+          "block": "array",
+          "port": "Q2_B"
+        },
+        {
+          "block": "array",
+          "port": "Q3_B"
+        },
+        {
+          "block": "array",
+          "port": "Q4_B"
+        },
+        {
+          "block": "array",
+          "port": "Q5_B"
+        },
+        {
+          "block": "array",
+          "port": "Q6_B"
+        },
+        {
+          "block": "array",
+          "port": "Q7_B"
+        }
+      ],
+      "routed": true,
+      "route_length_um": 30.08,
+      "status": "routed",
+      "legs": [
+        {
+          "pins": [
+            {
+              "block": "array",
+              "port": "Q0_B"
+            },
+            {
+              "block": "array",
+              "port": "Q3_B"
+            }
+          ],
+          "routed": true,
+          "route_length_um": 3.8,
+          "reason": null
+        },
+        {
+          "pins": [
+            {
+              "block": "array",
+              "port": "Q1_B"
+            },
+            {
+              "block": "array",
+              "port": "Q2_B"
+            }
+          ],
+          "routed": true,
+          "route_length_um": 3.8,
+          "reason": null
+        },
+        {
+          "pins": [
+            {
+              "block": "array",
+              "port": "Q4_B"
+            },
+            {
+              "block": "array",
+              "port": "Q7_B"
+            }
+          ],
+          "routed": true,
+          "route_length_um": 3.8,
+          "reason": null
+        },
+        {
+          "pins": [
+            {
+              "block": "array",
+              "port": "Q5_B"
+            },
+            {
+              "block": "array",
+              "port": "Q6_B"
+            }
+          ],
+          "routed": true,
+          "route_length_um": 3.8,
+          "reason": null
+        },
+        {
+          "pins": [
+            {
+              "block": "array",
+              "port": "Q1_B"
+            },
+            {
+              "block": "array",
+              "port": "Q5_B"
+            }
+          ],
+          "routed": true,
+          "route_length_um": 4.959999999999997,
+          "reason": null
+        },
+        {
+          "pins": [
+            {
+              "block": "array",
+              "port": "Q0_B"
+            },
+            {
+              "block": "array",
+              "port": "Q4_B"
+            }
+          ],
+          "routed": true,
+          "route_length_um": 4.959999999999999,
+          "reason": null
+        },
+        {
+          "pins": [
+            {
+              "block": "array",
+              "port": "Q0_B"
+            },
+            {
+              "block": "array",
+              "port": "Q2_B"
+            }
+          ],
+          "routed": true,
+          "route_length_um": 4.960000000000001,
+          "reason": null
+        }
+      ]
+    },
+    {
+      "net": "ec",
+      "pins": [
+        {
+          "block": "array",
+          "port": "Q0_E"
+        },
+        {
+          "block": "array",
+          "port": "Q1_E"
+        },
+        {
+          "block": "array",
+          "port": "Q2_E"
+        },
+        {
+          "block": "array",
+          "port": "Q3_E"
+        },
+        {
+          "block": "array",
+          "port": "Q4_E"
+        },
+        {
+          "block": "array",
+          "port": "Q5_E"
+        },
+        {
+          "block": "array",
+          "port": "Q6_E"
+        },
+        {
+          "block": "array",
+          "port": "Q7_E"
+        }
+      ],
+      "routed": true,
+      "route_length_um": 33.54,
+      "status": "routed",
+      "legs": [
+        {
+          "pins": [
+            {
+              "block": "array",
+              "port": "Q0_E"
+            },
+            {
+              "block": "array",
+              "port": "Q3_E"
+            }
+          ],
+          "routed": true,
+          "route_length_um": 3.8,
+          "reason": null
+        },
+        {
+          "pins": [
+            {
+              "block": "array",
+              "port": "Q1_E"
+            },
+            {
+              "block": "array",
+              "port": "Q2_E"
+            }
+          ],
+          "routed": true,
+          "route_length_um": 3.8,
+          "reason": null
+        },
+        {
+          "pins": [
+            {
+              "block": "array",
+              "port": "Q4_E"
+            },
+            {
+              "block": "array",
+              "port": "Q7_E"
+            }
+          ],
+          "routed": true,
+          "route_length_um": 3.8,
+          "reason": null
+        },
+        {
+          "pins": [
+            {
+              "block": "array",
+              "port": "Q5_E"
+            },
+            {
+              "block": "array",
+              "port": "Q6_E"
+            }
+          ],
+          "routed": true,
+          "route_length_um": 3.8,
+          "reason": null
+        },
+        {
+          "pins": [
+            {
+              "block": "array",
+              "port": "Q1_E"
+            },
+            {
+              "block": "array",
+              "port": "Q3_E"
+            }
+          ],
+          "routed": true,
+          "route_length_um": 4.959999999999999,
+          "reason": null
+        },
+        {
+          "pins": [
+            {
+              "block": "array",
+              "port": "Q3_E"
+            },
+            {
+              "block": "array",
+              "port": "Q7_E"
+            }
+          ],
+          "routed": true,
+          "route_length_um": 4.96,
+          "reason": null
+        },
+        {
+          "pins": [
+            {
+              "block": "array",
+              "port": "Q1_E"
+            },
+            {
+              "block": "array",
+              "port": "Q6_E"
+            }
+          ],
+          "routed": true,
+          "route_length_um": 8.42,
+          "reason": null
+        }
+      ]
+    }
+  ],
+  "pins": [],
+  "unrouted_nets": [],
+  "drc_hints": {
+    "min_spacing_um": null,
+    "matched_groups": [
+      {
+        "matched_group_id": "bjt_array:2x4:common_centroid:ratio8",
+        "blocks": [
+          "array"
+        ],
+        "placement_symmetric": null
+      }
+    ],
+    "notes": []
+  },
+  "warnings": []
+}
