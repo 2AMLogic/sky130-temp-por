@@ -1,0 +1,133 @@
+{
+  "schema_version": 1,
+  "generator": "gen-compose",
+  "cell_name": "bias_core_xq1_xqr",
+  "gds_path": "bias_core_xq1_xqr.gds",
+  "pdk": {
+    "name": "sky130A",
+    "variant": "sky130A",
+    "version": "open_pdks f6eeac7dad085ffcc829ccfd721f7b4ce39edcf7"
+  },
+  "dbu_um": 0.001,
+  "bbox_um": {
+    "x0": -0.97,
+    "y0": -0.97,
+    "x1": 9.81,
+    "y1": 4.37
+  },
+  "ports": [
+    {
+      "name": "na",
+      "net": "na",
+      "layer": {
+        "layer": 67,
+        "datatype": 20,
+        "name": null
+      },
+      "x_um": 1.7,
+      "y_um": 1.7,
+      "width_um": 0.22,
+      "direction_deg": 90,
+      "block": "array",
+      "port": "Q0_E"
+    },
+    {
+      "name": "er",
+      "net": "er",
+      "layer": {
+        "layer": 67,
+        "datatype": 20,
+        "name": null
+      },
+      "x_um": 6.32,
+      "y_um": 1.7,
+      "width_um": 0.22,
+      "direction_deg": 90,
+      "block": "array",
+      "port": "Q1_E"
+    }
+  ],
+  "blocks": [
+    {
+      "id": "array",
+      "source": "generator_report",
+      "generator": "bjt_array",
+      "cell_name": "xq1_xqr",
+      "offset_um": {
+        "x": 0.0,
+        "y": 0.0
+      },
+      "bbox_um": {
+        "x0": -0.97,
+        "y0": -0.97,
+        "x1": 9.81,
+        "y1": 4.37
+      },
+      "orientation": "none"
+    }
+  ],
+  "nets": [
+    {
+      "net": "vss",
+      "pins": [
+        {
+          "block": "array",
+          "port": "Q0_B"
+        },
+        {
+          "block": "array",
+          "port": "Q1_B"
+        }
+      ],
+      "routed": true,
+      "route_length_um": 4.959999999999999,
+      "status": "routed",
+      "legs": [
+        {
+          "pins": [
+            {
+              "block": "array",
+              "port": "Q0_B"
+            },
+            {
+              "block": "array",
+              "port": "Q1_B"
+            }
+          ],
+          "routed": true,
+          "route_length_um": 4.959999999999999,
+          "reason": null
+        }
+      ]
+    }
+  ],
+  "pins": [
+    {
+      "net": "na",
+      "block": "array",
+      "port": "Q0_E",
+      "labelled": true
+    },
+    {
+      "net": "er",
+      "block": "array",
+      "port": "Q1_E",
+      "labelled": true
+    }
+  ],
+  "unrouted_nets": [],
+  "drc_hints": {
+    "min_spacing_um": null,
+    "matched_groups": [
+      {
+        "matched_group_id": "bjt_array:1x2:common_centroid:ratio1",
+        "blocks": [
+          "array"
+        ],
+        "placement_symmetric": null
+      }
+    ],
+    "notes": []
+  },
+  "warnings": []
+}

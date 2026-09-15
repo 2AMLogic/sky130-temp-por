@@ -1,0 +1,132 @@
+{
+  "schema_version": 1,
+  "generator": "bjt_array",
+  "cell_name": "xq1_xqr",
+  "gds_path": "gen/array.gds",
+  "pdk": {
+    "name": "sky130A",
+    "variant": "sky130A",
+    "version": "open_pdks f6eeac7dad085ffcc829ccfd721f7b4ce39edcf7"
+  },
+  "dbu_um": 0.001,
+  "bbox_um": {
+    "x0": -0.97,
+    "y0": -0.97,
+    "x1": 9.81,
+    "y1": 4.37
+  },
+  "device_count": 2,
+  "ports": [
+    {
+      "name": "Q0_E",
+      "net": null,
+      "layer": {
+        "layer": 67,
+        "datatype": 20,
+        "name": null
+      },
+      "x_um": 1.7,
+      "y_um": 1.7,
+      "width_um": 0.22,
+      "direction_deg": 90
+    },
+    {
+      "name": "Q0_B",
+      "net": null,
+      "layer": {
+        "layer": 67,
+        "datatype": 20,
+        "name": null
+      },
+      "x_um": 4.01,
+      "y_um": 1.7,
+      "width_um": 0.22,
+      "direction_deg": 90
+    },
+    {
+      "name": "Q1_E",
+      "net": null,
+      "layer": {
+        "layer": 67,
+        "datatype": 20,
+        "name": null
+      },
+      "x_um": 6.32,
+      "y_um": 1.7,
+      "width_um": 0.22,
+      "direction_deg": 90
+    },
+    {
+      "name": "Q1_B",
+      "net": null,
+      "layer": {
+        "layer": 67,
+        "datatype": 20,
+        "name": null
+      },
+      "x_um": 8.629999999999999,
+      "y_um": 1.7,
+      "width_um": 0.22,
+      "direction_deg": 90
+    },
+    {
+      "name": "COLL_N",
+      "net": null,
+      "layer": {
+        "layer": 65,
+        "datatype": 20,
+        "name": null
+      },
+      "x_um": 4.420000000000001,
+      "y_um": 4.16,
+      "width_um": 0.42000000000000004,
+      "direction_deg": 90
+    },
+    {
+      "name": "COLL_S",
+      "net": null,
+      "layer": {
+        "layer": 65,
+        "datatype": 20,
+        "name": null
+      },
+      "x_um": 4.420000000000001,
+      "y_um": -0.76,
+      "width_um": 0.42000000000000004,
+      "direction_deg": 270
+    },
+    {
+      "name": "COLL_E",
+      "net": null,
+      "layer": {
+        "layer": 65,
+        "datatype": 20,
+        "name": null
+      },
+      "x_um": 9.6,
+      "y_um": 1.6999999999999997,
+      "width_um": 0.42000000000000004,
+      "direction_deg": 0
+    },
+    {
+      "name": "COLL_W",
+      "net": null,
+      "layer": {
+        "layer": 65,
+        "datatype": 20,
+        "name": null
+      },
+      "x_um": -0.76,
+      "y_um": 1.6999999999999997,
+      "width_um": 0.42000000000000004,
+      "direction_deg": 180
+    }
+  ],
+  "drc_hints": {
+    "min_spacing_um": 0.4,
+    "matched_group_id": "bjt_array:1x2:common_centroid:ratio1",
+    "snapped_to_grid": false,
+    "notes": []
+  },
+  "warnings": []
+}
