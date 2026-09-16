@@ -1,0 +1,201 @@
+{
+  "schema_version": 1,
+  "generator": "gen-compose",
+  "cell_name": "bias_core_startup_downstream_check",
+  "gds_path": "downstream-check.gds",
+  "pdk": {
+    "name": "sky130A",
+    "variant": "sky130A",
+    "version": "open_pdks c6d73a35f524070e85faff4a6a9eef49553ebc2b"
+  },
+  "dbu_um": 0.001,
+  "bbox_um": {
+    "x0": -80.0,
+    "y0": 0.0,
+    "x1": 54.040000000000006,
+    "y1": 13.17
+  },
+  "ports": [],
+  "blocks": [
+    {
+      "id": "sub",
+      "source": "cell",
+      "generator": null,
+      "cell_name": "bias_core_startup",
+      "offset_um": {
+        "x": 0.0,
+        "y": 0.0
+      },
+      "bbox_um": {
+        "x0": -40.0,
+        "y0": 0.0,
+        "x1": 54.040000000000006,
+        "y1": 13.17
+      },
+      "orientation": "none"
+    },
+    {
+      "id": "dummy_vdd",
+      "source": "cell",
+      "generator": null,
+      "cell_name": "promo_stub",
+      "offset_um": {
+        "x": -80.0,
+        "y": 13.0
+      },
+      "bbox_um": {
+        "x0": -80.0,
+        "y0": 13.0,
+        "x1": -78.5,
+        "y1": 13.17
+      },
+      "orientation": "none"
+    },
+    {
+      "id": "dummy_nkg",
+      "source": "cell",
+      "generator": null,
+      "cell_name": "promo_stub",
+      "offset_um": {
+        "x": -80.0,
+        "y": 10.0
+      },
+      "bbox_um": {
+        "x0": -80.0,
+        "y0": 10.0,
+        "x1": -78.5,
+        "y1": 10.17
+      },
+      "orientation": "none"
+    },
+    {
+      "id": "dummy_vss",
+      "source": "cell",
+      "generator": null,
+      "cell_name": "promo_stub",
+      "offset_um": {
+        "x": -74.78999999999999,
+        "y": 4.335
+      },
+      "bbox_um": {
+        "x0": -74.78999999999999,
+        "y0": 4.335,
+        "x1": -73.28999999999999,
+        "y1": 4.505
+      },
+      "orientation": "none"
+    }
+  ],
+  "nets": [
+    {
+      "net": "vdd",
+      "pins": [
+        {
+          "block": "sub",
+          "port": "vdd"
+        },
+        {
+          "block": "dummy_vdd",
+          "port": "PAD"
+        }
+      ],
+      "routed": true,
+      "route_length_um": 40.0,
+      "status": "routed",
+      "legs": [
+        {
+          "pins": [
+            {
+              "block": "sub",
+              "port": "vdd"
+            },
+            {
+              "block": "dummy_vdd",
+              "port": "PAD"
+            }
+          ],
+          "routed": true,
+          "route_length_um": 40.0,
+          "reason": null,
+          "channel_track": 0
+        }
+      ]
+    },
+    {
+      "net": "nkg",
+      "pins": [
+        {
+          "block": "sub",
+          "port": "nkg"
+        },
+        {
+          "block": "dummy_nkg",
+          "port": "PAD"
+        }
+      ],
+      "routed": true,
+      "route_length_um": 40.0,
+      "status": "routed",
+      "legs": [
+        {
+          "pins": [
+            {
+              "block": "sub",
+              "port": "nkg"
+            },
+            {
+              "block": "dummy_nkg",
+              "port": "PAD"
+            }
+          ],
+          "routed": true,
+          "route_length_um": 40.0,
+          "reason": null,
+          "channel_track": 0
+        }
+      ]
+    },
+    {
+      "net": "vss",
+      "pins": [
+        {
+          "block": "sub",
+          "port": "vss"
+        },
+        {
+          "block": "dummy_vss",
+          "port": "PAD"
+        }
+      ],
+      "routed": true,
+      "route_length_um": 39.99999999999999,
+      "status": "routed",
+      "legs": [
+        {
+          "pins": [
+            {
+              "block": "sub",
+              "port": "vss"
+            },
+            {
+              "block": "dummy_vss",
+              "port": "PAD"
+            }
+          ],
+          "routed": true,
+          "route_length_um": 39.99999999999999,
+          "reason": null,
+          "channel_track": 0
+        }
+      ]
+    }
+  ],
+  "pins": [],
+  "unrouted_nets": [],
+  "drc_hints": {
+    "min_spacing_um": null,
+    "matched_groups": [],
+    "notes": []
+  },
+  "warnings": []
+}

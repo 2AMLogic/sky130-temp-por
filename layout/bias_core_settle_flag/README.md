@@ -195,6 +195,50 @@ more into it than it carries:
    `L`/`W` and topology, not the parasitic-area parameters, so they differ
    without affecting the verdict.
 
+## Full-cell assembly pins (issue #56)
+
+This cell's own isolated LVS reference only needed `na`/`nbtop`/`nkg`
+exposed. Full-cell `bias_core` assembly (#40) needs every boundary net
+reachable from outside, and #40's own assembly attempt found
+`vdd`/`vss`/`pb`/`nokx`/`bias_ok` had no external pad at all, plus `nkg`'s
+*existing* pad sat too deep inside this cell's own interior for `klt
+gen-compose`'s router to escape without a same-block self-collision (issue
+#1527) — see #56 for the full writeup.
+
+`pins[]` now also promotes `vdd`/`vss`/`pb`/`nokx`/`bias_ok`, and `nkg`'s
+promotion moved off `mokc.U0_G` directly onto a west-edge stub — same
+declare-only metal-stub mechanism `bias_core_mirror_amp/README.md`
+documents, placed at this cell's own genuinely obstruction-free far-west
+edge (past `nwt_mpok`'s guard ring):
+
+| Net | Tap mechanism | Promoted pad |
+|---|---|---|
+| `vdd` | new leg extending the existing `vdd` bus (`y=26.5`) west from `nwt_mpok.TAP_N` | `stub_vdd.PAD`, `x=-4.0, y=26.585` |
+| `vss` | new leg extending the existing `vss` bus (`y=-6.0`) west from `mol1.U0_S` | `stub_vss.PAD`, `x=-4.0, y=-5.915` |
+| `pb` | new leg branching west from `mpok.U0_G`, reusing `pb`'s own native `y=11.5` channel lane | `stub_pb.PAD`, `x=-4.0, y=11.585` |
+| `nokx` | new leg branching west from `mo1n.U0_G` (`nokx`'s own existing junction point) at `y=8.0` on `metal3` (its default `metal` role is occupied by `nokl`'s own vertical riser at `x=14.5` across this whole row) | `stub_nokx.PAD`, `x=-4.0, y=8.085` |
+| `nkg` | **re-tapped, not just added to**: converted from a bare declare-only `mokc.U0_G` pin into a routed 2-pin net, new leg west from `mokc.U0_G` at `y=7.0` on `metal3` (same `nokl`-riser conflict `nokx` has, one row below it) | `stub_nkg.PAD`, `x=-4.0, y=7.085` (was `mokc.U0_G` directly, `x=23.92, y=2.61`) |
+| `bias_ok` | new leg branching from `mo1p.U0_D`'s own existing launch point, over the roof at `y=28.0` (above the `vdd` bus's own `y=26.5`), down a dedicated west column | `stub_bias_ok.PAD`, `x=-6.415, y=19.5` |
+
+Every new leg is an *additional* branch off an already-connected pin except
+`nkg`'s (which moves, per the acceptance criteria's own explicit re-verify
+ask) — every other net's existing routing (`na`/`nbtop`/`tok`/`nokl`/`noko`)
+is byte-for-byte unchanged. `klt drc`/`klt extract`/`klt lvs` all stay
+exactly as they were: 10/10 devices, 11/11 nets, `match` — diffed against
+the pre-#56 committed evidence (the `nkg` move changes only which
+coordinate one `pins[]`/label entry names, not the device or net count).
+
+**Verified against a downstream target, not just eyeballed** — same
+`layout/bin/check-promotion.py` harness `bias_core_mirror_amp/README.md`
+describes, re-run here against all six promoted pins (including the
+re-tapped `nkg`): `unrouted_nets: []`, downstream-composed stream `klt
+drc`-clean. Evidence: `downstream-check.request.json`/`.response.json`/
+`.drc.json`/`.gds` next to this file.
+
+```
+python3 layout/bin/check-promotion.py layout/bias_core_settle_flag/cell.json
+```
+
 ## The one thing this layout does not yet say
 
 `klt gen` **cannot draw sky130's `hvi` (75/20) thick-oxide marker**, so every

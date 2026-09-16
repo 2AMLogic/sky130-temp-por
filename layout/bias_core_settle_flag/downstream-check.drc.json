@@ -1,6 +1,6 @@
 {
   "schema_version": 1,
-  "file": "bias_core_startup.gds",
+  "file": "downstream-check.gds",
   "deck": "sky130",
   "dbu_um": 0.001,
   "status": "clean",
@@ -44,7 +44,8 @@
     "layers_in_stream_without_rules": [
       "65/44",
       "67/5",
-      "68/5"
+      "68/5",
+      "69/5"
     ],
     "rules_skipped": [
       "capm.enclosing.via3.1",
@@ -107,7 +108,7 @@
       "released": true
     },
     "input": {
-      "content_hash": "sha256:cea0cf568032e9fdae5f4cd8e87a14516342e9a337129427671f69a69bf2eb17"
+      "content_hash": "sha256:356105d857ed6dcc7914d4df7f3b6de3f513ae490aede2cfed5031c94eb0bdbc"
     },
     "klayout_version_mismatch": false
   }
