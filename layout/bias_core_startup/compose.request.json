@@ -1,0 +1,470 @@
+{
+  "pdk": {
+    "variant": "sky130A"
+  },
+  "blocks": [
+    {
+      "id": "kpd",
+      "generator_report": "gen/kpd.gen.json"
+    },
+    {
+      "id": "ks4",
+      "generator_report": "gen/ks4.gen.json"
+    },
+    {
+      "id": "ks3",
+      "generator_report": "gen/ks3.gen.json"
+    },
+    {
+      "id": "ks2",
+      "generator_report": "gen/ks2.gen.json"
+    },
+    {
+      "id": "ks1",
+      "generator_report": "gen/ks1.gen.json"
+    },
+    {
+      "id": "ks0",
+      "generator_report": "gen/ks0.gen.json"
+    },
+    {
+      "id": "kick",
+      "generator_report": "gen/kick.gen.json",
+      "orientation": "mirror_x"
+    },
+    {
+      "id": "kan",
+      "generator_report": "gen/kan.gen.json",
+      "orientation": "mirror_x"
+    },
+    {
+      "id": "ka",
+      "generator_report": "gen/ka.gen.json"
+    },
+    {
+      "id": "nwell_tap",
+      "generator_report": "gen/nwell_tap.gen.json"
+    },
+    {
+      "id": "psub_tap",
+      "generator_report": "gen/psub_tap.gen.json"
+    }
+  ],
+  "placement": {
+    "strategy": "explicit",
+    "order": [
+      "kpd",
+      "ks4",
+      "ks3",
+      "ks2",
+      "ks1",
+      "ks0",
+      "kick",
+      "kan",
+      "ka",
+      "nwell_tap",
+      "psub_tap"
+    ],
+    "origins_um": {
+      "kpd": {
+        "x": 0.0,
+        "y": 0.0
+      },
+      "ks4": {
+        "x": 5.84,
+        "y": 3.5
+      },
+      "ks3": {
+        "x": 15.68,
+        "y": 3.5
+      },
+      "ks2": {
+        "x": 25.52,
+        "y": 3.5
+      },
+      "ks1": {
+        "x": 35.36,
+        "y": 3.5
+      },
+      "ks0": {
+        "x": 45.2,
+        "y": 3.5
+      },
+      "kick": {
+        "x": -1.0,
+        "y": 3.5
+      },
+      "kan": {
+        "x": -14.16,
+        "y": 3.0
+      },
+      "ka": {
+        "x": -27.0,
+        "y": 3.5
+      },
+      "nwell_tap": {
+        "x": -29.04,
+        "y": 3.08
+      },
+      "psub_tap": {
+        "x": -35.0,
+        "y": 3.5
+      }
+    }
+  },
+  "routing": {
+    "layer_role": "metal",
+    "width_um": 0.17
+  },
+  "connectivity": [
+    {
+      "net": "vdd",
+      "pins": [
+        {
+          "block": "ks0",
+          "port": "U0_D"
+        },
+        {
+          "block": "ks0",
+          "port": "U0_G"
+        },
+        {
+          "block": "ka",
+          "port": "U0_S"
+        },
+        {
+          "block": "nwell_tap",
+          "port": "TAP_E"
+        },
+        {
+          "block": "nwell_tap",
+          "port": "TAP_N"
+        }
+      ],
+      "legs": [
+        {
+          "from_pin": {
+            "block": "ks0",
+            "port": "U0_D"
+          },
+          "to_pin": {
+            "block": "ks0",
+            "port": "U0_G"
+          }
+        },
+        {
+          "from_pin": {
+            "block": "ka",
+            "port": "U0_S"
+          },
+          "to_pin": {
+            "block": "nwell_tap",
+            "port": "TAP_E"
+          }
+        },
+        {
+          "from_pin": {
+            "block": "nwell_tap",
+            "port": "TAP_N"
+          },
+          "to_pin": {
+            "block": "ks0",
+            "port": "U0_G"
+          },
+          "waypoints_um": [
+            [
+              -28.12,
+              13.0
+            ],
+            [
+              49.62,
+              13.0
+            ]
+          ]
+        }
+      ]
+    },
+    {
+      "net": "ks1",
+      "pins": [
+        {
+          "block": "ks0",
+          "port": "U0_S"
+        },
+        {
+          "block": "ks1",
+          "port": "U0_D"
+        },
+        {
+          "block": "ks1",
+          "port": "U0_G"
+        }
+      ]
+    },
+    {
+      "net": "ks2",
+      "pins": [
+        {
+          "block": "ks1",
+          "port": "U0_S"
+        },
+        {
+          "block": "ks2",
+          "port": "U0_D"
+        },
+        {
+          "block": "ks2",
+          "port": "U0_G"
+        }
+      ]
+    },
+    {
+      "net": "ks3",
+      "pins": [
+        {
+          "block": "ks2",
+          "port": "U0_S"
+        },
+        {
+          "block": "ks3",
+          "port": "U0_D"
+        },
+        {
+          "block": "ks3",
+          "port": "U0_G"
+        }
+      ]
+    },
+    {
+      "net": "ks4",
+      "pins": [
+        {
+          "block": "ks3",
+          "port": "U0_S"
+        },
+        {
+          "block": "ks4",
+          "port": "U0_D"
+        },
+        {
+          "block": "ks4",
+          "port": "U0_G"
+        }
+      ]
+    },
+    {
+      "net": "nkg",
+      "pins": [
+        {
+          "block": "ks4",
+          "port": "U0_S"
+        },
+        {
+          "block": "kpd",
+          "port": "U0_D"
+        },
+        {
+          "block": "kick",
+          "port": "U0_G"
+        }
+      ],
+      "legs": [
+        {
+          "from_pin": {
+            "block": "ks4",
+            "port": "U0_S"
+          },
+          "to_pin": {
+            "block": "kpd",
+            "port": "U0_D"
+          }
+        },
+        {
+          "from_pin": {
+            "block": "kick",
+            "port": "U0_G"
+          },
+          "to_pin": {
+            "block": "kpd",
+            "port": "U0_D"
+          },
+          "waypoints_um": [
+            [
+              -3.42,
+              10.0
+            ],
+            [
+              5.3,
+              10.0
+            ],
+            [
+              5.3,
+              4.0
+            ]
+          ]
+        }
+      ]
+    },
+    {
+      "net": "vss",
+      "pins": [
+        {
+          "block": "kpd",
+          "port": "U0_S"
+        },
+        {
+          "block": "kan",
+          "port": "U0_S"
+        },
+        {
+          "block": "kick",
+          "port": "U0_S"
+        },
+        {
+          "block": "psub_tap",
+          "port": "TAP_S"
+        }
+      ],
+      "legs": [
+        {
+          "from_pin": {
+            "block": "kick",
+            "port": "U0_S"
+          },
+          "to_pin": {
+            "block": "kpd",
+            "port": "U0_S"
+          }
+        },
+        {
+          "from_pin": {
+            "block": "kan",
+            "port": "U0_S"
+          },
+          "to_pin": {
+            "block": "kpd",
+            "port": "U0_S"
+          },
+          "waypoints_um": [
+            [
+              -14.0,
+              6.5
+            ],
+            [
+              -0.42,
+              6.5
+            ],
+            [
+              -0.42,
+              4.0
+            ]
+          ]
+        },
+        {
+          "from_pin": {
+            "block": "psub_tap",
+            "port": "TAP_S"
+          },
+          "to_pin": {
+            "block": "kpd",
+            "port": "U0_S"
+          },
+          "waypoints_um": [
+            [
+              -34.08,
+              -1.0
+            ],
+            [
+              -0.42,
+              -1.0
+            ],
+            [
+              -0.42,
+              4.0
+            ]
+          ]
+        }
+      ]
+    },
+    {
+      "net": "nkm",
+      "layer_role": "metal2",
+      "pins": [
+        {
+          "block": "kpd",
+          "port": "U0_G"
+        },
+        {
+          "block": "kan",
+          "port": "U0_D"
+        },
+        {
+          "block": "kan",
+          "port": "U0_G"
+        },
+        {
+          "block": "ka",
+          "port": "U0_D"
+        }
+      ],
+      "legs": [
+        {
+          "from_pin": {
+            "block": "kpd",
+            "port": "U0_G"
+          },
+          "to_pin": {
+            "block": "kan",
+            "port": "U0_G"
+          },
+          "waypoints_um": [
+            [
+              2.42,
+              9.5
+            ],
+            [
+              -16.58,
+              9.5
+            ]
+          ]
+        },
+        {
+          "from_pin": {
+            "block": "kan",
+            "port": "U0_D"
+          },
+          "to_pin": {
+            "block": "kan",
+            "port": "U0_G"
+          }
+        },
+        {
+          "from_pin": {
+            "block": "kan",
+            "port": "U0_D"
+          },
+          "to_pin": {
+            "block": "ka",
+            "port": "U0_D"
+          }
+        }
+      ]
+    }
+  ],
+  "pins": [
+    {
+      "block": "ka",
+      "port": "U0_G",
+      "net": "pb"
+    },
+    {
+      "block": "kick",
+      "port": "U0_D",
+      "net": "pg"
+    }
+  ],
+  "options": {
+    "cell_name": "bias_core_startup",
+    "output": "bias_core_startup.gds"
+  }
+}

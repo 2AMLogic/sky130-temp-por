@@ -1,0 +1,33 @@
+* extracted by klt extract --deck sky130
+
+* cell bias_core_startup
+* pin ks1
+* pin ks2
+* pin ks3
+* pin ks4
+* pin nkg
+* pin nkm
+* pin pb
+* pin pg
+* pin vdd
+* pin vss
+.SUBCKT bias_core_startup ks1 ks2 ks3 ks4 nkg nkm pb pg vdd vss
+* device instance $1 r0 *1 -3.42,4 nfet
+M$1 vss nkg pg vss nfet L=4U W=1U AS=0.42P AD=0.42P PS=2.84U PD=2.84U
+* device instance $2 r0 *1 10.26,4 nfet
+M$2 ks4 ks4 nkg vss nfet L=8U W=1U AS=0.42P AD=0.42P PS=2.84U PD=2.84U
+* device instance $3 r0 *1 20.1,4 nfet
+M$3 ks3 ks3 ks4 vss nfet L=8U W=1U AS=0.42P AD=0.42P PS=2.84U PD=2.84U
+* device instance $4 r0 *1 29.94,4 nfet
+M$4 ks2 ks2 ks3 vss nfet L=8U W=1U AS=0.42P AD=0.42P PS=2.84U PD=2.84U
+* device instance $5 r0 *1 39.78,4 nfet
+M$5 ks1 ks1 ks2 vss nfet L=8U W=1U AS=0.42P AD=0.42P PS=2.84U PD=2.84U
+* device instance $6 r0 *1 49.62,4 nfet
+M$6 vdd vdd ks1 vss nfet L=8U W=1U AS=0.42P AD=0.42P PS=2.84U PD=2.84U
+* device instance $7 r0 *1 -16.58,4 nfet
+M$7 vss nkm nkm vss nfet L=4U W=2U AS=0.84P AD=0.84P PS=4.84U PD=4.84U
+* device instance $8 r0 *1 2.42,4 nfet
+M$8 nkg nkm vss vss nfet L=4U W=8U AS=3.36P AD=3.36P PS=16.84U PD=16.84U
+* device instance $9 r0 *1 -24.58,4 pfet
+M$9 nkm pb vdd vdd pfet L=4U W=1U AS=0.42P AD=0.42P PS=2.84U PD=2.84U
+.ENDS bias_core_startup

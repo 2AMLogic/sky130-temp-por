@@ -107,6 +107,38 @@ present. Filed as
 [`2AMLogic/klayout-tools#1912`](https://github.com/2AMLogic/klayout-tools/issues/1912);
 see that cell's own README for what the match does and does not assert.
 
+## `bias_core_startup`: the startup kick chain (issue #38, part of #34)
+
+[`layout/bias_core_startup/`](bias_core_startup/README.md) lays out
+`design/netlist/bias_core.spice`'s `XKS0..XKS4`/`XKA`/`XKAN`/`XKPD`/`XKICK`
+device group — a 5-stage diode-connected NFET stack (`XKS0..XKS4`, chained
+`VDD -> KS1 -> KS2 -> KS3 -> KS4 -> NKG`) plus the kick node's own
+PFET/NFET pull-down network (`XKA`/`XKAN`/`XKPD`) and the NFET that injects
+the kick pulse onto `PG` (`XKICK`) — as a fifth standalone proof cell, all 9
+devices `sky130_fd_pr__nfet_g5v0d10v5`/`sky130_fd_pr__pfet_g5v0d10v5`: one
+long single-row floorplan with per-net `connectivity[].layer_role`
+(`bias_core_settle_flag`'s own technique) moving one bundle net (`nkm`) to a
+second metal plane so it clears another net's own li1 detour.
+
+**`klt drc`: clean, 0 violations.** **`klt extract`: 9 devices, 10 nets.**
+**`klt lvs` against `design/netlist/bias_core.spice`'s own device cards:
+`match` — 9/9 devices, 10/10 nets, 10/10 pins, 0 mismatches.** The second
+sub-block in this repo (after `bias_core_settle_flag`) to reach a full LVS
+match — none of these 9 devices are the `sky130_fd_pr__pnp_05v5_W3p40L3p40`
+device `2AMLogic/klayout-tools#1894` blocks, so this group was free to go
+the whole way, and it carries the same `hvi`-marker disclosure
+`bias_core_settle_flag` does
+([`2AMLogic/klayout-tools#1912`](https://github.com/2AMLogic/klayout-tools/issues/1912)).
+An earlier draft hit a new, distinct `gen-compose` gap — promoting several
+of an earlier stage's `pins[]` ports through a bundle net at a different
+`routing.layer_role` via a `"stages"`/`blocks[].from_stage` two-pass
+composition reproducibly failed via-drop with spurious same-layer spacing
+violations, where the identical ports routed directly in a single pass with
+a per-net `layer_role` did not — filed as
+[`2AMLogic/klayout-tools#1917`](https://github.com/2AMLogic/klayout-tools/issues/1917);
+see that cell's own README for the full repro. Not blocking: the single-pass
+technique is what landed.
+
 ## Known klt gaps hit building this recipe
 
 Filed generically at
@@ -156,7 +188,8 @@ cell in this repo) and both filed the same way:
    flavours onto one device class, a 5V design drawn in the 1.8V domain
    passes the whole chain clean —
    [`2AMLogic/klayout-tools#1912`](https://github.com/2AMLogic/klayout-tools/issues/1912).
-   This is the one open caveat on this repo's only LVS-matching cell.
+   This is an open caveat on both of this repo's LVS-matching cells
+   (`bias_core_settle_flag` and `bias_core_startup`).
 4. **A via-ladder's intermediate landing pad can silently short an unrelated
    net.** `gen-compose`'s route-vs-route check deliberately excludes a
    multi-hop ladder's intermediate pads (they are not on the leg's own
@@ -167,16 +200,29 @@ cell in this repo) and both filed the same way:
    [`2AMLogic/klayout-tools#1913`](https://github.com/2AMLogic/klayout-tools/issues/1913).
    `bias_core_settle_flag` hits this for real when its supply rail is left to
    the automatic spanning tree; its own README records the measurement.
+5. **Promoting an earlier stage's `pins[]` ports through a bundle net at a
+   different `routing.layer_role`, via a `"stages"`/`blocks[].from_stage`
+   two-pass composition, reproducibly fails via-drop** with spurious
+   same-layer spacing violations against the promoting stage's own
+   flattened geometry — every pairwise candidate leg among the promoted
+   ports fails, at coordinates resolving to the ports' own reported
+   positions. The *identical* target ports, routed directly in a single
+   `gen-compose` pass with a per-net `connectivity[].layer_role` override
+   instead of `from_stage`, route and DRC clean on the same underlying
+   device geometry —
+   [`2AMLogic/klayout-tools#1917`](https://github.com/2AMLogic/klayout-tools/issues/1917).
+   `bias_core_startup` hit this building an early draft; its own README
+   records the repro and the working single-pass alternative.
 
 ## What's next
 
 Per issue #36, this fleet prefers landing DRC-clean/LVS-blocked increments
 (isolated to a known, upstream-filed gap) over waiting on the upstream fix —
 `bias_core_pnp8_leg`, `bias_core_xq1_xqr`, and `bias_core_passives` all ship
-that way; `bias_core_settle_flag` is the first that does not have to, and
-lands DRC- and LVS-clean. The remaining `bias_core` device groups (the
-PFET/NFET mirror/error-amp stack, the startup kick chain) and the full-cell
-assembly are follow-on increments tracked as sibling sub-issues of
+that way; `bias_core_settle_flag` and `bias_core_startup` land DRC- and
+LVS-clean outright. The remaining `bias_core` device group (the PFET/NFET
+mirror/error-amp stack) and the full-cell assembly are follow-on increments
+tracked as sibling sub-issues of
 [#34](https://github.com/2AMLogic/sky130-temp-por/issues/34); `temp_core`,
 `por_comparator`, `por_output_chain`, and `temp_por_top` are tracked from
 [#4](https://github.com/2AMLogic/sky130-temp-por/issues/4).
