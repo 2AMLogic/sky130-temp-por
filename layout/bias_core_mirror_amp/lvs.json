@@ -1,0 +1,123 @@
+{
+  "schema_version": 1,
+  "engine": "klayout",
+  "layout": "bias_core_mirror_amp.spice",
+  "reference": "bias_core_mirror_amp.ref.spice",
+  "top": "BIAS_CORE_MIRROR_AMP",
+  "reference_top": "BIAS_CORE_MIRROR_AMP",
+  "parameter_tolerance": null,
+  "options": {
+    "combine_devices": false,
+    "combine_devices_per_circuit": null,
+    "flatten_layout": false,
+    "flatten_reference": false,
+    "netgen_setup": null,
+    "parameter_tolerance": null
+  },
+  "status": "match",
+  "mismatch_count": 0,
+  "error_count": 0,
+  "category_counts": {},
+  "category_error_counts": {},
+  "counts": {
+    "nets": {
+      "layout": 13,
+      "reference": 13,
+      "matched": 13
+    },
+    "devices": {
+      "layout": 15,
+      "reference": 15,
+      "matched": 15
+    },
+    "pins": {
+      "layout": 13,
+      "reference": 13,
+      "matched": 13
+    }
+  },
+  "device_classes": null,
+  "environment": {
+    "engine": "klayout",
+    "engine_version": "0.30.10",
+    "layout_sha256": "14abdb6a9d5c81894215d6c1e6f341193e33c13a037d0b0d83854fb83813a2ac",
+    "reference_sha256": "aa7ba275888471c3043751d889e00dc001cad30ddcbd28161c3a12a8710b6613",
+    "extracted_netlist": null
+  },
+  "provenance": {
+    "klt_version": "0.5.0",
+    "klayout_version": "0.30.10",
+    "pdk": null,
+    "deck": null,
+    "input": null,
+    "klayout_version_mismatch": false
+  },
+  "mismatches": [],
+  "net_correspondence": [
+    {
+      "layout": "IBIAS",
+      "reference": "IBIAS",
+      "pin": true
+    },
+    {
+      "layout": "N1",
+      "reference": "N1",
+      "pin": true
+    },
+    {
+      "layout": "N2",
+      "reference": "N2",
+      "pin": true
+    },
+    {
+      "layout": "NA",
+      "reference": "NA",
+      "pin": true
+    },
+    {
+      "layout": "NB",
+      "reference": "NB",
+      "pin": true
+    },
+    {
+      "layout": "NBG",
+      "reference": "NBG",
+      "pin": true
+    },
+    {
+      "layout": "NBTOP",
+      "reference": "NBTOP",
+      "pin": true
+    },
+    {
+      "layout": "NT",
+      "reference": "NT",
+      "pin": true
+    },
+    {
+      "layout": "PB",
+      "reference": "PB",
+      "pin": true
+    },
+    {
+      "layout": "PG",
+      "reference": "PG",
+      "pin": true
+    },
+    {
+      "layout": "VDD",
+      "reference": "VDD",
+      "pin": true
+    },
+    {
+      "layout": "VREF",
+      "reference": "VREF",
+      "pin": true
+    },
+    {
+      "layout": "VSS",
+      "reference": "VSS",
+      "pin": true
+    }
+  ]
+}

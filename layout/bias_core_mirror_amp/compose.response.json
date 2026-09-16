@@ -1,0 +1,1588 @@
+{
+  "schema_version": 1,
+  "generator": "gen-compose",
+  "cell_name": "bias_core_mirror_amp",
+  "gds_path": "bias_core_mirror_amp.gds",
+  "pdk": {
+    "name": "sky130A",
+    "variant": "sky130A",
+    "version": "open_pdks c6d73a35f524070e85faff4a6a9eef49553ebc2b"
+  },
+  "dbu_um": 0.001,
+  "bbox_um": {
+    "x0": -2.19,
+    "y0": 0.0,
+    "x1": 87.84,
+    "y1": 63.12
+  },
+  "ports": [
+    {
+      "name": "nbtop",
+      "net": "nbtop",
+      "layer": {
+        "layer": 67,
+        "datatype": 20,
+        "name": null
+      },
+      "x_um": 4.63,
+      "y_um": 26.97,
+      "width_um": 8.0,
+      "direction_deg": 0,
+      "block": "mp2",
+      "port": "U0_D"
+    },
+    {
+      "name": "vref",
+      "net": "vref",
+      "layer": {
+        "layer": 67,
+        "datatype": 20,
+        "name": null
+      },
+      "x_um": 13.629999999999999,
+      "y_um": 26.97,
+      "width_um": 8.0,
+      "direction_deg": 0,
+      "block": "mp3",
+      "port": "U0_D"
+    },
+    {
+      "name": "ibias",
+      "net": "ibias",
+      "layer": {
+        "layer": 67,
+        "datatype": 20,
+        "name": null
+      },
+      "x_um": 58.63,
+      "y_um": 42.97,
+      "width_um": 40.0,
+      "direction_deg": 0,
+      "block": "mpib",
+      "port": "U0_D"
+    },
+    {
+      "name": "nb",
+      "net": "nb",
+      "layer": {
+        "layer": 67,
+        "datatype": 20,
+        "name": null
+      },
+      "x_um": 83.42,
+      "y_um": 22.36,
+      "width_um": 0.42000000000000004,
+      "direction_deg": 270,
+      "block": "mi2",
+      "port": "U0_G"
+    }
+  ],
+  "blocks": [
+    {
+      "id": "mp2",
+      "source": "generator_report",
+      "generator": "mos_array",
+      "cell_name": "mp2_pfet",
+      "offset_um": {
+        "x": 0.0,
+        "y": 30.97
+      },
+      "bbox_um": {
+        "x0": -0.15,
+        "y0": 22.0,
+        "x1": 4.99,
+        "y1": 31.119999999999997
+      },
+      "orientation": "mirror_y"
+    },
+    {
+      "id": "mp3",
+      "source": "generator_report",
+      "generator": "mos_array",
+      "cell_name": "mp3_pfet",
+      "offset_um": {
+        "x": 9.0,
+        "y": 30.97
+      },
+      "bbox_um": {
+        "x0": 8.85,
+        "y0": 22.0,
+        "x1": 13.99,
+        "y1": 31.119999999999997
+      },
+      "orientation": "mirror_y"
+    },
+    {
+      "id": "mp1",
+      "source": "generator_report",
+      "generator": "mos_array",
+      "cell_name": "mp1_pfet",
+      "offset_um": {
+        "x": 18.0,
+        "y": 30.97
+      },
+      "bbox_um": {
+        "x0": 17.85,
+        "y0": 22.0,
+        "x1": 22.990000000000002,
+        "y1": 31.119999999999997
+      },
+      "orientation": "mirror_y"
+    },
+    {
+      "id": "mpbn",
+      "source": "generator_report",
+      "generator": "mos_array",
+      "cell_name": "mpbn_pfet",
+      "offset_um": {
+        "x": 27.0,
+        "y": 24.97
+      },
+      "bbox_um": {
+        "x0": 26.85,
+        "y0": 22.0,
+        "x1": 31.990000000000002,
+        "y1": 25.119999999999997
+      },
+      "orientation": "mirror_y"
+    },
+    {
+      "id": "ms2p",
+      "source": "generator_report",
+      "generator": "mos_array",
+      "cell_name": "ms2p_pfet",
+      "offset_um": {
+        "x": 36.0,
+        "y": 24.97
+      },
+      "bbox_um": {
+        "x0": 35.85,
+        "y0": 22.0,
+        "x1": 40.99,
+        "y1": 25.119999999999997
+      },
+      "orientation": "mirror_y"
+    },
+    {
+      "id": "mbp",
+      "source": "generator_report",
+      "generator": "mos_array",
+      "cell_name": "mbp_pfet",
+      "offset_um": {
+        "x": 45.0,
+        "y": 24.97
+      },
+      "bbox_um": {
+        "x0": 44.85,
+        "y0": 22.0,
+        "x1": 49.99,
+        "y1": 25.119999999999997
+      },
+      "orientation": "mirror_y"
+    },
+    {
+      "id": "mpib",
+      "source": "generator_report",
+      "generator": "mos_array",
+      "cell_name": "mpib_pfet",
+      "offset_um": {
+        "x": 54.0,
+        "y": 62.97
+      },
+      "bbox_um": {
+        "x0": 53.85,
+        "y0": 22.0,
+        "x1": 58.99,
+        "y1": 63.12
+      },
+      "orientation": "mirror_y"
+    },
+    {
+      "id": "mpt",
+      "source": "generator_report",
+      "generator": "mos_array",
+      "cell_name": "mpt_pfet",
+      "offset_um": {
+        "x": 63.0,
+        "y": 24.97
+      },
+      "bbox_um": {
+        "x0": 62.85,
+        "y0": 22.0,
+        "x1": 67.99,
+        "y1": 25.119999999999997
+      },
+      "orientation": "mirror_y"
+    },
+    {
+      "id": "mi1",
+      "source": "generator_report",
+      "generator": "mos_array",
+      "cell_name": "mi1_pfet",
+      "offset_um": {
+        "x": 72.0,
+        "y": 38.97
+      },
+      "bbox_um": {
+        "x0": 71.85,
+        "y0": 22.0,
+        "x1": 76.99,
+        "y1": 39.12
+      },
+      "orientation": "mirror_y"
+    },
+    {
+      "id": "mi2",
+      "source": "generator_report",
+      "generator": "mos_array",
+      "cell_name": "mi2_pfet",
+      "offset_um": {
+        "x": 81.0,
+        "y": 38.97
+      },
+      "bbox_um": {
+        "x0": 80.85,
+        "y0": 22.0,
+        "x1": 85.99,
+        "y1": 39.12
+      },
+      "orientation": "mirror_y"
+    },
+    {
+      "id": "mbn",
+      "source": "generator_report",
+      "generator": "mos_array",
+      "cell_name": "mbn_nfet",
+      "offset_um": {
+        "x": 24.0,
+        "y": 0.0
+      },
+      "bbox_um": {
+        "x0": 24.0,
+        "y0": 0.0,
+        "x1": 28.84,
+        "y1": 2.82
+      },
+      "orientation": "none"
+    },
+    {
+      "id": "mbn2",
+      "source": "generator_report",
+      "generator": "mos_array",
+      "cell_name": "mbn2_nfet",
+      "offset_um": {
+        "x": 31.0,
+        "y": 0.0
+      },
+      "bbox_um": {
+        "x0": 31.0,
+        "y0": 0.0,
+        "x1": 35.84,
+        "y1": 2.82
+      },
+      "orientation": "none"
+    },
+    {
+      "id": "ms2n",
+      "source": "generator_report",
+      "generator": "mos_array",
+      "cell_name": "ms2n_nfet",
+      "offset_um": {
+        "x": 38.0,
+        "y": 0.0
+      },
+      "bbox_um": {
+        "x0": 38.0,
+        "y0": 0.0,
+        "x1": 46.84,
+        "y1": 8.82
+      },
+      "orientation": "none"
+    },
+    {
+      "id": "ml1",
+      "source": "generator_report",
+      "generator": "mos_array",
+      "cell_name": "ml1_nfet",
+      "offset_um": {
+        "x": 68.0,
+        "y": 0.0
+      },
+      "bbox_um": {
+        "x0": 68.0,
+        "y0": 0.0,
+        "x1": 76.84,
+        "y1": 4.82
+      },
+      "orientation": "none"
+    },
+    {
+      "id": "ml2",
+      "source": "generator_report",
+      "generator": "mos_array",
+      "cell_name": "ml2_nfet",
+      "offset_um": {
+        "x": 79.0,
+        "y": 0.0
+      },
+      "bbox_um": {
+        "x0": 79.0,
+        "y0": 0.0,
+        "x1": 87.84,
+        "y1": 4.82
+      },
+      "orientation": "none"
+    },
+    {
+      "id": "nwt_mp2",
+      "source": "generator_report",
+      "generator": "guard_ring",
+      "cell_name": "nwt_mp2",
+      "offset_um": {
+        "x": -2.04,
+        "y": 22.2
+      },
+      "bbox_um": {
+        "x0": -2.19,
+        "y0": 22.05,
+        "x1": -0.050000000000000044,
+        "y1": 24.189999999999998
+      },
+      "orientation": "none"
+    },
+    {
+      "id": "nwt_mp3",
+      "source": "generator_report",
+      "generator": "guard_ring",
+      "cell_name": "nwt_mp3",
+      "offset_um": {
+        "x": 6.96,
+        "y": 22.2
+      },
+      "bbox_um": {
+        "x0": 6.81,
+        "y0": 22.05,
+        "x1": 8.95,
+        "y1": 24.189999999999998
+      },
+      "orientation": "none"
+    },
+    {
+      "id": "nwt_mp1",
+      "source": "generator_report",
+      "generator": "guard_ring",
+      "cell_name": "nwt_mp1",
+      "offset_um": {
+        "x": 15.96,
+        "y": 22.2
+      },
+      "bbox_um": {
+        "x0": 15.81,
+        "y0": 22.05,
+        "x1": 17.95,
+        "y1": 24.189999999999998
+      },
+      "orientation": "none"
+    },
+    {
+      "id": "nwt_mpbn",
+      "source": "generator_report",
+      "generator": "guard_ring",
+      "cell_name": "nwt_mpbn",
+      "offset_um": {
+        "x": 24.96,
+        "y": 22.2
+      },
+      "bbox_um": {
+        "x0": 24.810000000000002,
+        "y0": 22.05,
+        "x1": 26.95,
+        "y1": 24.189999999999998
+      },
+      "orientation": "none"
+    },
+    {
+      "id": "nwt_ms2p",
+      "source": "generator_report",
+      "generator": "guard_ring",
+      "cell_name": "nwt_ms2p",
+      "offset_um": {
+        "x": 33.96,
+        "y": 22.2
+      },
+      "bbox_um": {
+        "x0": 33.81,
+        "y0": 22.05,
+        "x1": 35.95,
+        "y1": 24.189999999999998
+      },
+      "orientation": "none"
+    },
+    {
+      "id": "nwt_mbp",
+      "source": "generator_report",
+      "generator": "guard_ring",
+      "cell_name": "nwt_mbp",
+      "offset_um": {
+        "x": 42.96,
+        "y": 22.2
+      },
+      "bbox_um": {
+        "x0": 42.81,
+        "y0": 22.05,
+        "x1": 44.95,
+        "y1": 24.189999999999998
+      },
+      "orientation": "none"
+    },
+    {
+      "id": "nwt_mpib",
+      "source": "generator_report",
+      "generator": "guard_ring",
+      "cell_name": "nwt_mpib",
+      "offset_um": {
+        "x": 51.96,
+        "y": 22.2
+      },
+      "bbox_um": {
+        "x0": 51.81,
+        "y0": 22.05,
+        "x1": 53.95,
+        "y1": 24.189999999999998
+      },
+      "orientation": "none"
+    },
+    {
+      "id": "nwt_mpt",
+      "source": "generator_report",
+      "generator": "guard_ring",
+      "cell_name": "nwt_mpt",
+      "offset_um": {
+        "x": 60.96,
+        "y": 22.2
+      },
+      "bbox_um": {
+        "x0": 60.81,
+        "y0": 22.05,
+        "x1": 62.95,
+        "y1": 24.189999999999998
+      },
+      "orientation": "none"
+    },
+    {
+      "id": "nwt_mi1",
+      "source": "generator_report",
+      "generator": "guard_ring",
+      "cell_name": "nwt_mi1",
+      "offset_um": {
+        "x": 69.96,
+        "y": 22.2
+      },
+      "bbox_um": {
+        "x0": 69.80999999999999,
+        "y0": 22.05,
+        "x1": 71.94999999999999,
+        "y1": 24.189999999999998
+      },
+      "orientation": "none"
+    },
+    {
+      "id": "nwt_mi2",
+      "source": "generator_report",
+      "generator": "guard_ring",
+      "cell_name": "nwt_mi2",
+      "offset_um": {
+        "x": 78.96,
+        "y": 22.2
+      },
+      "bbox_um": {
+        "x0": 78.80999999999999,
+        "y0": 22.05,
+        "x1": 80.94999999999999,
+        "y1": 24.189999999999998
+      },
+      "orientation": "none"
+    },
+    {
+      "id": "pst",
+      "source": "generator_report",
+      "generator": "guard_ring",
+      "cell_name": "pst",
+      "offset_um": {
+        "x": 55.0,
+        "y": 0.0
+      },
+      "bbox_um": {
+        "x0": 55.0,
+        "y0": 0.0,
+        "x1": 56.84,
+        "y1": 1.84
+      },
+      "orientation": "none"
+    }
+  ],
+  "nets": [
+    {
+      "net": "vdd",
+      "pins": [
+        {
+          "block": "nwt_mp2",
+          "port": "TAP_N"
+        },
+        {
+          "block": "mp2",
+          "port": "U0_S"
+        },
+        {
+          "block": "nwt_mp3",
+          "port": "TAP_N"
+        },
+        {
+          "block": "mp3",
+          "port": "U0_S"
+        },
+        {
+          "block": "nwt_mp1",
+          "port": "TAP_N"
+        },
+        {
+          "block": "mp1",
+          "port": "U0_S"
+        },
+        {
+          "block": "nwt_mpbn",
+          "port": "TAP_N"
+        },
+        {
+          "block": "mpbn",
+          "port": "U0_S"
+        },
+        {
+          "block": "nwt_ms2p",
+          "port": "TAP_N"
+        },
+        {
+          "block": "ms2p",
+          "port": "U0_S"
+        },
+        {
+          "block": "nwt_mbp",
+          "port": "TAP_N"
+        },
+        {
+          "block": "mbp",
+          "port": "U0_S"
+        },
+        {
+          "block": "nwt_mpib",
+          "port": "TAP_N"
+        },
+        {
+          "block": "mpib",
+          "port": "U0_S"
+        },
+        {
+          "block": "nwt_mpt",
+          "port": "TAP_N"
+        },
+        {
+          "block": "mpt",
+          "port": "U0_S"
+        },
+        {
+          "block": "nwt_mi1",
+          "port": "TAP_N"
+        },
+        {
+          "block": "nwt_mi2",
+          "port": "TAP_N"
+        }
+      ],
+      "routed": true,
+      "route_length_um": 1422.5400000000002,
+      "status": "routed",
+      "legs": [
+        {
+          "pins": [
+            {
+              "block": "nwt_mp2",
+              "port": "TAP_N"
+            },
+            {
+              "block": "mp2",
+              "port": "U0_S"
+            }
+          ],
+          "routed": true,
+          "route_length_um": 80.53,
+          "reason": null,
+          "channel_track": 0
+        },
+        {
+          "pins": [
+            {
+              "block": "mp2",
+              "port": "U0_S"
+            },
+            {
+              "block": "nwt_mp3",
+              "port": "TAP_N"
+            }
+          ],
+          "routed": true,
+          "route_length_um": 86.87,
+          "reason": null,
+          "channel_track": 0
+        },
+        {
+          "pins": [
+            {
+              "block": "nwt_mp3",
+              "port": "TAP_N"
+            },
+            {
+              "block": "mp3",
+              "port": "U0_S"
+            }
+          ],
+          "routed": true,
+          "route_length_um": 80.53000000000002,
+          "reason": null,
+          "channel_track": 0
+        },
+        {
+          "pins": [
+            {
+              "block": "mp3",
+              "port": "U0_S"
+            },
+            {
+              "block": "nwt_mp1",
+              "port": "TAP_N"
+            }
+          ],
+          "routed": true,
+          "route_length_um": 86.87,
+          "reason": null,
+          "channel_track": 0
+        },
+        {
+          "pins": [
+            {
+              "block": "nwt_mp1",
+              "port": "TAP_N"
+            },
+            {
+              "block": "mp1",
+              "port": "U0_S"
+            }
+          ],
+          "routed": true,
+          "route_length_um": 80.53,
+          "reason": null,
+          "channel_track": 0
+        },
+        {
+          "pins": [
+            {
+              "block": "mp1",
+              "port": "U0_S"
+            },
+            {
+              "block": "nwt_mpbn",
+              "port": "TAP_N"
+            }
+          ],
+          "routed": true,
+          "route_length_um": 86.87,
+          "reason": null,
+          "channel_track": 0
+        },
+        {
+          "pins": [
+            {
+              "block": "nwt_mpbn",
+              "port": "TAP_N"
+            },
+            {
+              "block": "mpbn",
+              "port": "U0_S"
+            }
+          ],
+          "routed": true,
+          "route_length_um": 83.53,
+          "reason": null,
+          "channel_track": 0
+        },
+        {
+          "pins": [
+            {
+              "block": "mpbn",
+              "port": "U0_S"
+            },
+            {
+              "block": "nwt_ms2p",
+              "port": "TAP_N"
+            }
+          ],
+          "routed": true,
+          "route_length_um": 89.87,
+          "reason": null,
+          "channel_track": 0
+        },
+        {
+          "pins": [
+            {
+              "block": "nwt_ms2p",
+              "port": "TAP_N"
+            },
+            {
+              "block": "ms2p",
+              "port": "U0_S"
+            }
+          ],
+          "routed": true,
+          "route_length_um": 83.53,
+          "reason": null,
+          "channel_track": 0
+        },
+        {
+          "pins": [
+            {
+              "block": "ms2p",
+              "port": "U0_S"
+            },
+            {
+              "block": "nwt_mbp",
+              "port": "TAP_N"
+            }
+          ],
+          "routed": true,
+          "route_length_um": 89.87,
+          "reason": null,
+          "channel_track": 0
+        },
+        {
+          "pins": [
+            {
+              "block": "nwt_mbp",
+              "port": "TAP_N"
+            },
+            {
+              "block": "mbp",
+              "port": "U0_S"
+            }
+          ],
+          "routed": true,
+          "route_length_um": 83.53,
+          "reason": null,
+          "channel_track": 0
+        },
+        {
+          "pins": [
+            {
+              "block": "mbp",
+              "port": "U0_S"
+            },
+            {
+              "block": "nwt_mpib",
+              "port": "TAP_N"
+            }
+          ],
+          "routed": true,
+          "route_length_um": 89.87,
+          "reason": null,
+          "channel_track": 0
+        },
+        {
+          "pins": [
+            {
+              "block": "nwt_mpib",
+              "port": "TAP_N"
+            },
+            {
+              "block": "mpib",
+              "port": "U0_S"
+            }
+          ],
+          "routed": true,
+          "route_length_um": 64.53,
+          "reason": null,
+          "channel_track": 0
+        },
+        {
+          "pins": [
+            {
+              "block": "mpib",
+              "port": "U0_S"
+            },
+            {
+              "block": "nwt_mpt",
+              "port": "TAP_N"
+            }
+          ],
+          "routed": true,
+          "route_length_um": 70.87,
+          "reason": null,
+          "channel_track": 0
+        },
+        {
+          "pins": [
+            {
+              "block": "nwt_mpt",
+              "port": "TAP_N"
+            },
+            {
+              "block": "mpt",
+              "port": "U0_S"
+            }
+          ],
+          "routed": true,
+          "route_length_um": 83.53,
+          "reason": null,
+          "channel_track": 0
+        },
+        {
+          "pins": [
+            {
+              "block": "mpt",
+              "port": "U0_S"
+            },
+            {
+              "block": "nwt_mi1",
+              "port": "TAP_N"
+            }
+          ],
+          "routed": true,
+          "route_length_um": 89.87,
+          "reason": null,
+          "channel_track": 0
+        },
+        {
+          "pins": [
+            {
+              "block": "nwt_mi1",
+              "port": "TAP_N"
+            },
+            {
+              "block": "nwt_mi2",
+              "port": "TAP_N"
+            }
+          ],
+          "routed": true,
+          "route_length_um": 91.34,
+          "reason": null,
+          "channel_track": 0
+        }
+      ]
+    },
+    {
+      "net": "vss",
+      "pins": [
+        {
+          "block": "mbn",
+          "port": "U0_S"
+        },
+        {
+          "block": "mbn2",
+          "port": "U0_S"
+        },
+        {
+          "block": "ms2n",
+          "port": "U0_S"
+        },
+        {
+          "block": "pst",
+          "port": "TAP_S"
+        },
+        {
+          "block": "ml1",
+          "port": "U0_S"
+        },
+        {
+          "block": "ml2",
+          "port": "U0_S"
+        }
+      ],
+      "routed": true,
+      "route_length_um": 132.42,
+      "status": "routed",
+      "legs": [
+        {
+          "pins": [
+            {
+              "block": "mbn",
+              "port": "U0_S"
+            },
+            {
+              "block": "mbn2",
+              "port": "U0_S"
+            }
+          ],
+          "routed": true,
+          "route_length_um": 21.0,
+          "reason": null,
+          "channel_track": 0
+        },
+        {
+          "pins": [
+            {
+              "block": "mbn2",
+              "port": "U0_S"
+            },
+            {
+              "block": "ms2n",
+              "port": "U0_S"
+            }
+          ],
+          "routed": true,
+          "route_length_um": 24.0,
+          "reason": null,
+          "channel_track": 0
+        },
+        {
+          "pins": [
+            {
+              "block": "ms2n",
+              "port": "U0_S"
+            },
+            {
+              "block": "pst",
+              "port": "TAP_S"
+            }
+          ],
+          "routed": true,
+          "route_length_um": 33.92,
+          "reason": null,
+          "channel_track": 0
+        },
+        {
+          "pins": [
+            {
+              "block": "pst",
+              "port": "TAP_S"
+            },
+            {
+              "block": "ml1",
+              "port": "U0_S"
+            }
+          ],
+          "routed": true,
+          "route_length_um": 26.499999999999993,
+          "reason": null,
+          "channel_track": 0
+        },
+        {
+          "pins": [
+            {
+              "block": "ml1",
+              "port": "U0_S"
+            },
+            {
+              "block": "ml2",
+              "port": "U0_S"
+            }
+          ],
+          "routed": true,
+          "route_length_um": 27.0,
+          "reason": null,
+          "channel_track": 0
+        }
+      ]
+    },
+    {
+      "net": "pg",
+      "pins": [
+        {
+          "block": "mp2",
+          "port": "U0_G"
+        },
+        {
+          "block": "mp3",
+          "port": "U0_G"
+        },
+        {
+          "block": "mp1",
+          "port": "U0_G"
+        },
+        {
+          "block": "mpbn",
+          "port": "U0_G"
+        },
+        {
+          "block": "ms2p",
+          "port": "U0_D"
+        },
+        {
+          "block": "ms2n",
+          "port": "U0_D"
+        }
+      ],
+      "routed": true,
+      "route_length_um": 147.34999999999997,
+      "status": "routed",
+      "legs": [
+        {
+          "pins": [
+            {
+              "block": "mp2",
+              "port": "U0_G"
+            },
+            {
+              "block": "mp3",
+              "port": "U0_G"
+            }
+          ],
+          "routed": true,
+          "route_length_um": 25.72,
+          "reason": null,
+          "channel_track": 0
+        },
+        {
+          "pins": [
+            {
+              "block": "mp3",
+              "port": "U0_G"
+            },
+            {
+              "block": "mp1",
+              "port": "U0_G"
+            }
+          ],
+          "routed": true,
+          "route_length_um": 25.72,
+          "reason": null,
+          "channel_track": 0
+        },
+        {
+          "pins": [
+            {
+              "block": "mp1",
+              "port": "U0_G"
+            },
+            {
+              "block": "mpbn",
+              "port": "U0_G"
+            }
+          ],
+          "routed": true,
+          "route_length_um": 25.72,
+          "reason": null,
+          "channel_track": 0
+        },
+        {
+          "pins": [
+            {
+              "block": "mpbn",
+              "port": "U0_G"
+            },
+            {
+              "block": "ms2p",
+              "port": "U0_D"
+            }
+          ],
+          "routed": true,
+          "route_length_um": 32.07999999999999,
+          "reason": null,
+          "channel_track": 0
+        },
+        {
+          "pins": [
+            {
+              "block": "mpbn",
+              "port": "U0_G"
+            },
+            {
+              "block": "ms2n",
+              "port": "U0_D"
+            }
+          ],
+          "routed": true,
+          "route_length_um": 38.11,
+          "reason": null,
+          "channel_track": 0
+        }
+      ]
+    },
+    {
+      "net": "pb",
+      "pins": [
+        {
+          "block": "mbn2",
+          "port": "U0_D"
+        },
+        {
+          "block": "ms2p",
+          "port": "U0_G"
+        },
+        {
+          "block": "mbp",
+          "port": "U0_G"
+        },
+        {
+          "block": "mbp",
+          "port": "U0_D"
+        },
+        {
+          "block": "mpib",
+          "port": "U0_G"
+        },
+        {
+          "block": "mpt",
+          "port": "U0_G"
+        }
+      ],
+      "routed": true,
+      "route_length_um": 92.38999999999999,
+      "status": "routed",
+      "legs": [
+        {
+          "pins": [
+            {
+              "block": "mbn2",
+              "port": "U0_D"
+            },
+            {
+              "block": "ms2p",
+              "port": "U0_G"
+            }
+          ],
+          "routed": true,
+          "route_length_um": 24.15,
+          "reason": null,
+          "channel_track": 0
+        },
+        {
+          "pins": [
+            {
+              "block": "ms2p",
+              "port": "U0_G"
+            },
+            {
+              "block": "mbp",
+              "port": "U0_G"
+            }
+          ],
+          "routed": true,
+          "route_length_um": 17.72,
+          "reason": null,
+          "channel_track": 0
+        },
+        {
+          "pins": [
+            {
+              "block": "mbp",
+              "port": "U0_G"
+            },
+            {
+              "block": "mbp",
+              "port": "U0_D"
+            }
+          ],
+          "routed": true,
+          "route_length_um": 15.079999999999991,
+          "reason": null,
+          "channel_track": 0
+        },
+        {
+          "pins": [
+            {
+              "block": "mbp",
+              "port": "U0_G"
+            },
+            {
+              "block": "mpib",
+              "port": "U0_G"
+            }
+          ],
+          "routed": true,
+          "route_length_um": 17.72,
+          "reason": null,
+          "channel_track": 0
+        },
+        {
+          "pins": [
+            {
+              "block": "mpib",
+              "port": "U0_G"
+            },
+            {
+              "block": "mpt",
+              "port": "U0_G"
+            }
+          ],
+          "routed": true,
+          "route_length_um": 17.72,
+          "reason": null,
+          "channel_track": 0
+        }
+      ]
+    },
+    {
+      "net": "nbg",
+      "pins": [
+        {
+          "block": "mpbn",
+          "port": "U0_D"
+        },
+        {
+          "block": "mbn2",
+          "port": "U0_G"
+        },
+        {
+          "block": "mbn",
+          "port": "U0_G"
+        },
+        {
+          "block": "mbn",
+          "port": "U0_D"
+        }
+      ],
+      "routed": true,
+      "route_length_um": 50.07000000000001,
+      "status": "routed",
+      "legs": [
+        {
+          "pins": [
+            {
+              "block": "mpbn",
+              "port": "U0_D"
+            },
+            {
+              "block": "mbn2",
+              "port": "U0_G"
+            }
+          ],
+          "routed": true,
+          "route_length_um": 23.150000000000002,
+          "reason": null,
+          "channel_track": 0
+        },
+        {
+          "pins": [
+            {
+              "block": "mbn2",
+              "port": "U0_G"
+            },
+            {
+              "block": "mbn",
+              "port": "U0_G"
+            }
+          ],
+          "routed": true,
+          "route_length_um": 13.780000000000001,
+          "reason": null,
+          "channel_track": 0
+        },
+        {
+          "pins": [
+            {
+              "block": "mbn",
+              "port": "U0_G"
+            },
+            {
+              "block": "mbn",
+              "port": "U0_D"
+            }
+          ],
+          "routed": true,
+          "route_length_um": 13.139999999999997,
+          "reason": null,
+          "channel_track": 0
+        }
+      ]
+    },
+    {
+      "net": "na",
+      "pins": [
+        {
+          "block": "mp1",
+          "port": "U0_D"
+        },
+        {
+          "block": "mi1",
+          "port": "U0_G"
+        }
+      ],
+      "routed": true,
+      "route_length_um": 134.46,
+      "status": "routed",
+      "legs": [
+        {
+          "pins": [
+            {
+              "block": "mp1",
+              "port": "U0_D"
+            },
+            {
+              "block": "mi1",
+              "port": "U0_G"
+            }
+          ],
+          "routed": true,
+          "route_length_um": 134.46,
+          "reason": null,
+          "channel_track": 0
+        }
+      ]
+    },
+    {
+      "net": "nt",
+      "pins": [
+        {
+          "block": "mpt",
+          "port": "U0_D"
+        },
+        {
+          "block": "mi1",
+          "port": "U0_S"
+        },
+        {
+          "block": "mi2",
+          "port": "U0_S"
+        }
+      ],
+      "routed": true,
+      "route_length_um": 41.05999999999999,
+      "status": "routed",
+      "legs": [
+        {
+          "pins": [
+            {
+              "block": "mpt",
+              "port": "U0_D"
+            },
+            {
+              "block": "mi1",
+              "port": "U0_S"
+            }
+          ],
+          "routed": true,
+          "route_length_um": 11.579999999999998,
+          "reason": null,
+          "channel_track": 0
+        },
+        {
+          "pins": [
+            {
+              "block": "mi1",
+              "port": "U0_S"
+            },
+            {
+              "block": "mi2",
+              "port": "U0_S"
+            }
+          ],
+          "routed": true,
+          "route_length_um": 29.47999999999999,
+          "reason": null,
+          "channel_track": 0
+        }
+      ]
+    },
+    {
+      "net": "n1",
+      "pins": [
+        {
+          "block": "mi1",
+          "port": "U0_D"
+        },
+        {
+          "block": "ml1",
+          "port": "U0_D"
+        },
+        {
+          "block": "ml1",
+          "port": "U0_G"
+        },
+        {
+          "block": "ml2",
+          "port": "U0_G"
+        }
+      ],
+      "routed": true,
+      "route_length_um": 81.43000000000004,
+      "status": "routed",
+      "legs": [
+        {
+          "pins": [
+            {
+              "block": "mi1",
+              "port": "U0_D"
+            },
+            {
+              "block": "ml1",
+              "port": "U0_D"
+            }
+          ],
+          "routed": true,
+          "route_length_um": 31.51000000000002,
+          "reason": null,
+          "channel_track": 0
+        },
+        {
+          "pins": [
+            {
+              "block": "ml1",
+              "port": "U0_D"
+            },
+            {
+              "block": "ml1",
+              "port": "U0_G"
+            }
+          ],
+          "routed": true,
+          "route_length_um": 24.140000000000015,
+          "reason": null,
+          "channel_track": 0
+        },
+        {
+          "pins": [
+            {
+              "block": "ml1",
+              "port": "U0_G"
+            },
+            {
+              "block": "ml2",
+              "port": "U0_G"
+            }
+          ],
+          "routed": true,
+          "route_length_um": 25.78,
+          "reason": null,
+          "channel_track": 0
+        }
+      ]
+    },
+    {
+      "net": "n2",
+      "pins": [
+        {
+          "block": "mi2",
+          "port": "U0_D"
+        },
+        {
+          "block": "ml2",
+          "port": "U0_D"
+        },
+        {
+          "block": "ms2n",
+          "port": "U0_G"
+        }
+      ],
+      "routed": true,
+      "route_length_um": 94.65000000000003,
+      "status": "routed",
+      "legs": [
+        {
+          "pins": [
+            {
+              "block": "mi2",
+              "port": "U0_D"
+            },
+            {
+              "block": "ml2",
+              "port": "U0_D"
+            }
+          ],
+          "routed": true,
+          "route_length_um": 33.51000000000002,
+          "reason": null,
+          "channel_track": 0
+        },
+        {
+          "pins": [
+            {
+              "block": "ml2",
+              "port": "U0_D"
+            },
+            {
+              "block": "ms2n",
+              "port": "U0_G"
+            }
+          ],
+          "routed": true,
+          "route_length_um": 61.140000000000015,
+          "reason": null,
+          "channel_track": 0
+        }
+      ]
+    }
+  ],
+  "pins": [
+    {
+      "net": "nbtop",
+      "block": "mp2",
+      "port": "U0_D",
+      "labelled": true
+    },
+    {
+      "net": "vref",
+      "block": "mp3",
+      "port": "U0_D",
+      "labelled": true
+    },
+    {
+      "net": "ibias",
+      "block": "mpib",
+      "port": "U0_D",
+      "labelled": true
+    },
+    {
+      "net": "nb",
+      "block": "mi2",
+      "port": "U0_G",
+      "labelled": true
+    }
+  ],
+  "unrouted_nets": [],
+  "drc_hints": {
+    "min_spacing_um": null,
+    "matched_groups": [
+      {
+        "matched_group_id": "mos_array:1x1:common_centroid",
+        "blocks": [
+          "mp2",
+          "mp3",
+          "mp1",
+          "mpbn",
+          "ms2p",
+          "mbp",
+          "mpib",
+          "mpt",
+          "mi1",
+          "mi2",
+          "mbn",
+          "mbn2",
+          "ms2n",
+          "ml1",
+          "ml2"
+        ],
+        "placement_symmetric": null
+      }
+    ],
+    "notes": []
+  },
+  "warnings": [
+    "block 'nwt_mp2' is placed 0.00um from block 'mp2' (strategy: explicit), closer than mp2's own declared drc_hints.min_spacing_um of 0.40um",
+    "block 'nwt_mp3' is placed 0.00um from block 'mp3' (strategy: explicit), closer than mp3's own declared drc_hints.min_spacing_um of 0.40um",
+    "block 'nwt_mp1' is placed 0.00um from block 'mp1' (strategy: explicit), closer than mp1's own declared drc_hints.min_spacing_um of 0.40um",
+    "block 'nwt_mpbn' is placed 0.00um from block 'mpbn' (strategy: explicit), closer than mpbn's own declared drc_hints.min_spacing_um of 0.40um",
+    "block 'nwt_ms2p' is placed 0.00um from block 'ms2p' (strategy: explicit), closer than ms2p's own declared drc_hints.min_spacing_um of 0.40um",
+    "block 'nwt_mbp' is placed 0.00um from block 'mbp' (strategy: explicit), closer than mbp's own declared drc_hints.min_spacing_um of 0.40um",
+    "block 'nwt_mpib' is placed 0.00um from block 'mpib' (strategy: explicit), closer than mpib's own declared drc_hints.min_spacing_um of 0.40um",
+    "block 'nwt_mpt' is placed 0.00um from block 'mpt' (strategy: explicit), closer than mpt's own declared drc_hints.min_spacing_um of 0.40um",
+    "block 'nwt_mi1' is placed 0.00um from block 'mi1' (strategy: explicit), closer than mi1's own declared drc_hints.min_spacing_um of 0.40um",
+    "block 'nwt_mi2' is placed 0.00um from block 'mi2' (strategy: explicit), closer than mi2's own declared drc_hints.min_spacing_um of 0.40um",
+    "block 'mp2' is placed 0.00um from block 'nwt_mp2' (strategy: explicit), closer than nwt_mp2's own declared drc_hints.min_spacing_um of 0.40um",
+    "block 'mp3' is placed 0.00um from block 'nwt_mp3' (strategy: explicit), closer than nwt_mp3's own declared drc_hints.min_spacing_um of 0.40um",
+    "block 'mp1' is placed 0.00um from block 'nwt_mp1' (strategy: explicit), closer than nwt_mp1's own declared drc_hints.min_spacing_um of 0.40um",
+    "block 'mpbn' is placed 0.00um from block 'nwt_mpbn' (strategy: explicit), closer than nwt_mpbn's own declared drc_hints.min_spacing_um of 0.40um",
+    "block 'ms2p' is placed 0.00um from block 'nwt_ms2p' (strategy: explicit), closer than nwt_ms2p's own declared drc_hints.min_spacing_um of 0.40um",
+    "block 'mbp' is placed 0.00um from block 'nwt_mbp' (strategy: explicit), closer than nwt_mbp's own declared drc_hints.min_spacing_um of 0.40um",
+    "block 'mpib' is placed 0.00um from block 'nwt_mpib' (strategy: explicit), closer than nwt_mpib's own declared drc_hints.min_spacing_um of 0.40um",
+    "block 'mpt' is placed 0.00um from block 'nwt_mpt' (strategy: explicit), closer than nwt_mpt's own declared drc_hints.min_spacing_um of 0.40um",
+    "block 'mi1' is placed 0.00um from block 'nwt_mi1' (strategy: explicit), closer than nwt_mi1's own declared drc_hints.min_spacing_um of 0.40um",
+    "block 'mi2' is placed 0.00um from block 'nwt_mi2' (strategy: explicit), closer than nwt_mi2's own declared drc_hints.min_spacing_um of 0.40um"
+  ]
+}

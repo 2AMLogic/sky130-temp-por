@@ -1,0 +1,1795 @@
+{
+  "cell": "bias_core_mirror_amp",
+  "_comment": [
+    "Cell descriptor for layout/bin/compose-cell.py -- see layout/README.md for",
+    "the recipe this follows and layout/bias_core_mirror_amp/README.md for this",
+    "cell's own floorplan/routing reasoning and results. Issue #35 (part of #34,",
+    "itself a follow-on from #30/#4); the compose-cell recipe is the one",
+    "layout/bias_core_pnp8_leg/ (issue #30/PR #33) established, and the",
+    "multi-plane two-row CMOS shape is layout/bias_core_settle_flag/'s (#39/PR",
+    "#46) and layout/bias_core_startup/'s (#38/PR #48).",
+    "",
+    "This is design/netlist/bias_core.spice's XMP1/XMP2/XMP3/XMPBN/XMBN/XMBN2/",
+    "XMBP/XMPIB/XMPT/XMI1/XMI2/XML1/XML2/XMS2N/XMS2P device group -- the PFET",
+    "current-mirror legs, the PFET/NFET bias-mirror pair, the bias-current",
+    "output devices, and the PFET-input error amp with its NFET mirror load.",
+    "15 devices, 10x sky130_fd_pr__pfet_g5v0d10v5 + 5x",
+    "sky130_fd_pr__nfet_g5v0d10v5, each its own single-instance `klt gen",
+    "mos_array` call (rows=1 cols=1 dummy=0 gate_contact=true) -- no matched",
+    "array: XMI1/XMI2 and XML1/XML2 ARE matched pairs electrically, but klt's",
+    "mos_array common-centroid interdigitation draws one array as one block",
+    "with shared S/D, which cannot express this group's distinct per-terminal",
+    "nets (XML1 is diode-connected, XML2 is not), so each device is drawn",
+    "separately and matching is left to the identical drawn geometry.",
+    "",
+    "None of these 15 devices is the sky130_fd_pr__pnp_05v5_W3p40L3p40 device",
+    "2AMLogic/klayout-tools#1894 blocks, so (unlike bias_core_pnp8_leg/",
+    "bias_core_xq1_xqr) this group was free to reach a full klt lvs match.",
+    "",
+    "KNOWN GAP, disclosed here because a clean LVS match below cannot see it:",
+    "`klt gen` cannot draw sky130's hvi (75/20) thick-oxide marker, so these",
+    "are the 5V devices' W/L drawn in the 1.8V domain's geometry. See",
+    "README.md's 'The one thing this layout does not yet say' section and",
+    "2AMLogic/klayout-tools#1912.",
+    "",
+    "FLOORPLAN (placement.strategy 'explicit'): the two-row CMOS shape",
+    "bias_core_settle_flag established. NMOS row along y=0 (orientation",
+    "'none', gates facing north); PMOS row with its bottom edge at y=22.0",
+    "(orientation 'mirror_y', so every PMOS gate faces south and lands on the",
+    "same y=22.36 gate row -- each PMOS origin is set from its own device",
+    "height, Y = 22.0 + w + 0.97); a 13um signal channel between them. PMOS",
+    "column pitch is 9.0um, which leaves 1.82um between one device's own nwell",
+    "island and the next one's tap -- clear of sky130's 1.27um nwell.space.1.",
+    "Every PFET gets its own guard_ring nwell tap island 2.04um to its west,",
+    "placed so the two nwells OVERLAP by 0.10um (one electrical node) while",
+    "their li1 stays 0.20um apart, clear of the 0.17um li1 spacing floor --",
+    "the same 0.10um-overlap convention bias_core_settle_flag/README.md works",
+    "through. XMI1/XMI2's sources are NT, not VDD, but their BODIES are VDD,",
+    "so they get tap islands too (strapped into the vdd bus like the rest).",
+    "One psub tap island (add_well=false) straps the substrate to vss -- one",
+    "is enough: an NMOS body is a globally synthesized net regardless of any",
+    "drawn contact (see bias_core_startup/README.md's own empirical check).",
+    "",
+    "ROUTING (three planes, assigned per net -- and for 'n2' per LEG -- via",
+    "connectivity[].layer_role / connectivity[].legs[].layer_role,",
+    "klayout-tools#1655, so no two nets sharing a plane ever cross):",
+    "  metal  (li1)  nbg / nt / n1 -- three local nets in disjoint x ranges;",
+    "  metal2 (met1) vdd (one bus at y=65.0, ABOVE every PMOS top, with a",
+    "                riser down each tap/source column), vss (one bus at",
+    "                y=-6.0 below the NMOS row), pb (one channel lane at",
+    "                y=18.0), and n2's ml2.D->ms2n.G leg (channel lane at",
+    "                y=12.0) -- four disjoint y bands;",
+    "  metal3 (met2) pg (channel lane at y=14.0), na (an 'attic' run at",
+    "                y=66.0 over the whole PMOS row -- pg's own lane already",
+    "                owns the channel between mp1 and mi1), and n2's",
+    "                mi2.D->ml2.D leg (a column at x=88.9, east of every",
+    "                block).",
+    "n2's two legs live on two different planes and stitch at their shared",
+    "ml2.U0_D pin through the existing via-drop: routing the whole net on one",
+    "plane is not possible here (ms2n's gate sits directly under pg's own",
+    "channel lane, and the mi2 end sits east of everything), which is exactly",
+    "the non-planar case per-leg layer_role exists for.",
+    "",
+    "Every leg is steered explicitly through connectivity[].legs[]",
+    "(klayout-tools#1529) rather than left to the nearest-first spanning tree;",
+    "compose.response.json records routed: true for every net AND every named",
+    "leg.",
+    "",
+    "nbtop / vref / ibias / nb touch exactly one port in this device group, so",
+    "each is a pins[] declare-only top-level pin (a label on the pad's own",
+    "already-drawn li1, no metal routed) rather than a connectivity[] net."
+  ],
+  "pdk": {
+    "variant": "sky130A",
+    "deck": "sky130"
+  },
+  "blocks": [
+    {
+      "id": "mp2",
+      "generator": "mos_array",
+      "cell_name": "mp2_pfet",
+      "orientation": "mirror_y",
+      "params": {
+        "w_um": 8.0,
+        "l_um": 4.0,
+        "rows": 1,
+        "cols": 1,
+        "dummy": 0,
+        "flavor": "pfet",
+        "gate_contact": true
+      }
+    },
+    {
+      "id": "mp3",
+      "generator": "mos_array",
+      "cell_name": "mp3_pfet",
+      "orientation": "mirror_y",
+      "params": {
+        "w_um": 8.0,
+        "l_um": 4.0,
+        "rows": 1,
+        "cols": 1,
+        "dummy": 0,
+        "flavor": "pfet",
+        "gate_contact": true
+      }
+    },
+    {
+      "id": "mp1",
+      "generator": "mos_array",
+      "cell_name": "mp1_pfet",
+      "orientation": "mirror_y",
+      "params": {
+        "w_um": 8.0,
+        "l_um": 4.0,
+        "rows": 1,
+        "cols": 1,
+        "dummy": 0,
+        "flavor": "pfet",
+        "gate_contact": true
+      }
+    },
+    {
+      "id": "mpbn",
+      "generator": "mos_array",
+      "cell_name": "mpbn_pfet",
+      "orientation": "mirror_y",
+      "params": {
+        "w_um": 2.0,
+        "l_um": 4.0,
+        "rows": 1,
+        "cols": 1,
+        "dummy": 0,
+        "flavor": "pfet",
+        "gate_contact": true
+      }
+    },
+    {
+      "id": "ms2p",
+      "generator": "mos_array",
+      "cell_name": "ms2p_pfet",
+      "orientation": "mirror_y",
+      "params": {
+        "w_um": 2.0,
+        "l_um": 4.0,
+        "rows": 1,
+        "cols": 1,
+        "dummy": 0,
+        "flavor": "pfet",
+        "gate_contact": true
+      }
+    },
+    {
+      "id": "mbp",
+      "generator": "mos_array",
+      "cell_name": "mbp_pfet",
+      "orientation": "mirror_y",
+      "params": {
+        "w_um": 2.0,
+        "l_um": 4.0,
+        "rows": 1,
+        "cols": 1,
+        "dummy": 0,
+        "flavor": "pfet",
+        "gate_contact": true
+      }
+    },
+    {
+      "id": "mpib",
+      "generator": "mos_array",
+      "cell_name": "mpib_pfet",
+      "orientation": "mirror_y",
+      "params": {
+        "w_um": 40.0,
+        "l_um": 4.0,
+        "rows": 1,
+        "cols": 1,
+        "dummy": 0,
+        "flavor": "pfet",
+        "gate_contact": true
+      }
+    },
+    {
+      "id": "mpt",
+      "generator": "mos_array",
+      "cell_name": "mpt_pfet",
+      "orientation": "mirror_y",
+      "params": {
+        "w_um": 2.0,
+        "l_um": 4.0,
+        "rows": 1,
+        "cols": 1,
+        "dummy": 0,
+        "flavor": "pfet",
+        "gate_contact": true
+      }
+    },
+    {
+      "id": "mi1",
+      "generator": "mos_array",
+      "cell_name": "mi1_pfet",
+      "orientation": "mirror_y",
+      "params": {
+        "w_um": 16.0,
+        "l_um": 4.0,
+        "rows": 1,
+        "cols": 1,
+        "dummy": 0,
+        "flavor": "pfet",
+        "gate_contact": true
+      }
+    },
+    {
+      "id": "mi2",
+      "generator": "mos_array",
+      "cell_name": "mi2_pfet",
+      "orientation": "mirror_y",
+      "params": {
+        "w_um": 16.0,
+        "l_um": 4.0,
+        "rows": 1,
+        "cols": 1,
+        "dummy": 0,
+        "flavor": "pfet",
+        "gate_contact": true
+      }
+    },
+    {
+      "id": "mbn",
+      "generator": "mos_array",
+      "cell_name": "mbn_nfet",
+      "orientation": "none",
+      "params": {
+        "w_um": 2.0,
+        "l_um": 4.0,
+        "rows": 1,
+        "cols": 1,
+        "dummy": 0,
+        "flavor": "nfet",
+        "gate_contact": true
+      }
+    },
+    {
+      "id": "mbn2",
+      "generator": "mos_array",
+      "cell_name": "mbn2_nfet",
+      "orientation": "none",
+      "params": {
+        "w_um": 2.0,
+        "l_um": 4.0,
+        "rows": 1,
+        "cols": 1,
+        "dummy": 0,
+        "flavor": "nfet",
+        "gate_contact": true
+      }
+    },
+    {
+      "id": "ms2n",
+      "generator": "mos_array",
+      "cell_name": "ms2n_nfet",
+      "orientation": "none",
+      "params": {
+        "w_um": 8.0,
+        "l_um": 8.0,
+        "rows": 1,
+        "cols": 1,
+        "dummy": 0,
+        "flavor": "nfet",
+        "gate_contact": true
+      }
+    },
+    {
+      "id": "ml1",
+      "generator": "mos_array",
+      "cell_name": "ml1_nfet",
+      "orientation": "none",
+      "params": {
+        "w_um": 4.0,
+        "l_um": 8.0,
+        "rows": 1,
+        "cols": 1,
+        "dummy": 0,
+        "flavor": "nfet",
+        "gate_contact": true
+      }
+    },
+    {
+      "id": "ml2",
+      "generator": "mos_array",
+      "cell_name": "ml2_nfet",
+      "orientation": "none",
+      "params": {
+        "w_um": 4.0,
+        "l_um": 8.0,
+        "rows": 1,
+        "cols": 1,
+        "dummy": 0,
+        "flavor": "nfet",
+        "gate_contact": true
+      }
+    },
+    {
+      "id": "nwt_mp2",
+      "generator": "guard_ring",
+      "cell_name": "nwt_mp2",
+      "orientation": "none",
+      "params": {
+        "inner_width_um": 1.0,
+        "inner_height_um": 1.0,
+        "ring_width_um": 0.42,
+        "contacts_per_side": 2,
+        "add_well": true
+      }
+    },
+    {
+      "id": "nwt_mp3",
+      "generator": "guard_ring",
+      "cell_name": "nwt_mp3",
+      "orientation": "none",
+      "params": {
+        "inner_width_um": 1.0,
+        "inner_height_um": 1.0,
+        "ring_width_um": 0.42,
+        "contacts_per_side": 2,
+        "add_well": true
+      }
+    },
+    {
+      "id": "nwt_mp1",
+      "generator": "guard_ring",
+      "cell_name": "nwt_mp1",
+      "orientation": "none",
+      "params": {
+        "inner_width_um": 1.0,
+        "inner_height_um": 1.0,
+        "ring_width_um": 0.42,
+        "contacts_per_side": 2,
+        "add_well": true
+      }
+    },
+    {
+      "id": "nwt_mpbn",
+      "generator": "guard_ring",
+      "cell_name": "nwt_mpbn",
+      "orientation": "none",
+      "params": {
+        "inner_width_um": 1.0,
+        "inner_height_um": 1.0,
+        "ring_width_um": 0.42,
+        "contacts_per_side": 2,
+        "add_well": true
+      }
+    },
+    {
+      "id": "nwt_ms2p",
+      "generator": "guard_ring",
+      "cell_name": "nwt_ms2p",
+      "orientation": "none",
+      "params": {
+        "inner_width_um": 1.0,
+        "inner_height_um": 1.0,
+        "ring_width_um": 0.42,
+        "contacts_per_side": 2,
+        "add_well": true
+      }
+    },
+    {
+      "id": "nwt_mbp",
+      "generator": "guard_ring",
+      "cell_name": "nwt_mbp",
+      "orientation": "none",
+      "params": {
+        "inner_width_um": 1.0,
+        "inner_height_um": 1.0,
+        "ring_width_um": 0.42,
+        "contacts_per_side": 2,
+        "add_well": true
+      }
+    },
+    {
+      "id": "nwt_mpib",
+      "generator": "guard_ring",
+      "cell_name": "nwt_mpib",
+      "orientation": "none",
+      "params": {
+        "inner_width_um": 1.0,
+        "inner_height_um": 1.0,
+        "ring_width_um": 0.42,
+        "contacts_per_side": 2,
+        "add_well": true
+      }
+    },
+    {
+      "id": "nwt_mpt",
+      "generator": "guard_ring",
+      "cell_name": "nwt_mpt",
+      "orientation": "none",
+      "params": {
+        "inner_width_um": 1.0,
+        "inner_height_um": 1.0,
+        "ring_width_um": 0.42,
+        "contacts_per_side": 2,
+        "add_well": true
+      }
+    },
+    {
+      "id": "nwt_mi1",
+      "generator": "guard_ring",
+      "cell_name": "nwt_mi1",
+      "orientation": "none",
+      "params": {
+        "inner_width_um": 1.0,
+        "inner_height_um": 1.0,
+        "ring_width_um": 0.42,
+        "contacts_per_side": 2,
+        "add_well": true
+      }
+    },
+    {
+      "id": "nwt_mi2",
+      "generator": "guard_ring",
+      "cell_name": "nwt_mi2",
+      "orientation": "none",
+      "params": {
+        "inner_width_um": 1.0,
+        "inner_height_um": 1.0,
+        "ring_width_um": 0.42,
+        "contacts_per_side": 2,
+        "add_well": true
+      }
+    },
+    {
+      "id": "pst",
+      "generator": "guard_ring",
+      "cell_name": "pst",
+      "orientation": "none",
+      "params": {
+        "inner_width_um": 1.0,
+        "inner_height_um": 1.0,
+        "ring_width_um": 0.42,
+        "contacts_per_side": 2,
+        "add_well": false
+      }
+    }
+  ],
+  "placement": {
+    "strategy": "explicit",
+    "order": [
+      "mp2",
+      "mp3",
+      "mp1",
+      "mpbn",
+      "ms2p",
+      "mbp",
+      "mpib",
+      "mpt",
+      "mi1",
+      "mi2",
+      "mbn",
+      "mbn2",
+      "ms2n",
+      "ml1",
+      "ml2",
+      "nwt_mp2",
+      "nwt_mp3",
+      "nwt_mp1",
+      "nwt_mpbn",
+      "nwt_ms2p",
+      "nwt_mbp",
+      "nwt_mpib",
+      "nwt_mpt",
+      "nwt_mi1",
+      "nwt_mi2",
+      "pst"
+    ],
+    "origins_um": {
+      "mp2": {
+        "x": 0.0,
+        "y": 30.97
+      },
+      "mp3": {
+        "x": 9.0,
+        "y": 30.97
+      },
+      "mp1": {
+        "x": 18.0,
+        "y": 30.97
+      },
+      "mpbn": {
+        "x": 27.0,
+        "y": 24.97
+      },
+      "ms2p": {
+        "x": 36.0,
+        "y": 24.97
+      },
+      "mbp": {
+        "x": 45.0,
+        "y": 24.97
+      },
+      "mpib": {
+        "x": 54.0,
+        "y": 62.97
+      },
+      "mpt": {
+        "x": 63.0,
+        "y": 24.97
+      },
+      "mi1": {
+        "x": 72.0,
+        "y": 38.97
+      },
+      "mi2": {
+        "x": 81.0,
+        "y": 38.97
+      },
+      "mbn": {
+        "x": 24.0,
+        "y": 0.0
+      },
+      "mbn2": {
+        "x": 31.0,
+        "y": 0.0
+      },
+      "ms2n": {
+        "x": 38.0,
+        "y": 0.0
+      },
+      "ml1": {
+        "x": 68.0,
+        "y": 0.0
+      },
+      "ml2": {
+        "x": 79.0,
+        "y": 0.0
+      },
+      "nwt_mp2": {
+        "x": -2.04,
+        "y": 22.2
+      },
+      "nwt_mp3": {
+        "x": 6.96,
+        "y": 22.2
+      },
+      "nwt_mp1": {
+        "x": 15.96,
+        "y": 22.2
+      },
+      "nwt_mpbn": {
+        "x": 24.96,
+        "y": 22.2
+      },
+      "nwt_ms2p": {
+        "x": 33.96,
+        "y": 22.2
+      },
+      "nwt_mbp": {
+        "x": 42.96,
+        "y": 22.2
+      },
+      "nwt_mpib": {
+        "x": 51.96,
+        "y": 22.2
+      },
+      "nwt_mpt": {
+        "x": 60.96,
+        "y": 22.2
+      },
+      "nwt_mi1": {
+        "x": 69.96,
+        "y": 22.2
+      },
+      "nwt_mi2": {
+        "x": 78.96,
+        "y": 22.2
+      },
+      "pst": {
+        "x": 55.0,
+        "y": 0.0
+      }
+    }
+  },
+  "routing": {
+    "layer_role": "metal",
+    "width_um": 0.17
+  },
+  "connectivity": [
+    {
+      "net": "vdd",
+      "layer_role": "metal2",
+      "pins": [
+        {
+          "block": "nwt_mp2",
+          "port": "TAP_N"
+        },
+        {
+          "block": "mp2",
+          "port": "U0_S"
+        },
+        {
+          "block": "nwt_mp3",
+          "port": "TAP_N"
+        },
+        {
+          "block": "mp3",
+          "port": "U0_S"
+        },
+        {
+          "block": "nwt_mp1",
+          "port": "TAP_N"
+        },
+        {
+          "block": "mp1",
+          "port": "U0_S"
+        },
+        {
+          "block": "nwt_mpbn",
+          "port": "TAP_N"
+        },
+        {
+          "block": "mpbn",
+          "port": "U0_S"
+        },
+        {
+          "block": "nwt_ms2p",
+          "port": "TAP_N"
+        },
+        {
+          "block": "ms2p",
+          "port": "U0_S"
+        },
+        {
+          "block": "nwt_mbp",
+          "port": "TAP_N"
+        },
+        {
+          "block": "mbp",
+          "port": "U0_S"
+        },
+        {
+          "block": "nwt_mpib",
+          "port": "TAP_N"
+        },
+        {
+          "block": "mpib",
+          "port": "U0_S"
+        },
+        {
+          "block": "nwt_mpt",
+          "port": "TAP_N"
+        },
+        {
+          "block": "mpt",
+          "port": "U0_S"
+        },
+        {
+          "block": "nwt_mi1",
+          "port": "TAP_N"
+        },
+        {
+          "block": "nwt_mi2",
+          "port": "TAP_N"
+        }
+      ],
+      "legs": [
+        {
+          "from_pin": {
+            "block": "nwt_mp2",
+            "port": "TAP_N"
+          },
+          "to_pin": {
+            "block": "mp2",
+            "port": "U0_S"
+          },
+          "waypoints_um": [
+            [
+              -1.12,
+              65.0
+            ],
+            [
+              0.21,
+              65.0
+            ]
+          ]
+        },
+        {
+          "from_pin": {
+            "block": "mp2",
+            "port": "U0_S"
+          },
+          "to_pin": {
+            "block": "nwt_mp3",
+            "port": "TAP_N"
+          },
+          "waypoints_um": [
+            [
+              0.21,
+              65.0
+            ],
+            [
+              7.88,
+              65.0
+            ]
+          ]
+        },
+        {
+          "from_pin": {
+            "block": "nwt_mp3",
+            "port": "TAP_N"
+          },
+          "to_pin": {
+            "block": "mp3",
+            "port": "U0_S"
+          },
+          "waypoints_um": [
+            [
+              7.88,
+              65.0
+            ],
+            [
+              9.21,
+              65.0
+            ]
+          ]
+        },
+        {
+          "from_pin": {
+            "block": "mp3",
+            "port": "U0_S"
+          },
+          "to_pin": {
+            "block": "nwt_mp1",
+            "port": "TAP_N"
+          },
+          "waypoints_um": [
+            [
+              9.21,
+              65.0
+            ],
+            [
+              16.88,
+              65.0
+            ]
+          ]
+        },
+        {
+          "from_pin": {
+            "block": "nwt_mp1",
+            "port": "TAP_N"
+          },
+          "to_pin": {
+            "block": "mp1",
+            "port": "U0_S"
+          },
+          "waypoints_um": [
+            [
+              16.88,
+              65.0
+            ],
+            [
+              18.21,
+              65.0
+            ]
+          ]
+        },
+        {
+          "from_pin": {
+            "block": "mp1",
+            "port": "U0_S"
+          },
+          "to_pin": {
+            "block": "nwt_mpbn",
+            "port": "TAP_N"
+          },
+          "waypoints_um": [
+            [
+              18.21,
+              65.0
+            ],
+            [
+              25.88,
+              65.0
+            ]
+          ]
+        },
+        {
+          "from_pin": {
+            "block": "nwt_mpbn",
+            "port": "TAP_N"
+          },
+          "to_pin": {
+            "block": "mpbn",
+            "port": "U0_S"
+          },
+          "waypoints_um": [
+            [
+              25.88,
+              65.0
+            ],
+            [
+              27.21,
+              65.0
+            ]
+          ]
+        },
+        {
+          "from_pin": {
+            "block": "mpbn",
+            "port": "U0_S"
+          },
+          "to_pin": {
+            "block": "nwt_ms2p",
+            "port": "TAP_N"
+          },
+          "waypoints_um": [
+            [
+              27.21,
+              65.0
+            ],
+            [
+              34.88,
+              65.0
+            ]
+          ]
+        },
+        {
+          "from_pin": {
+            "block": "nwt_ms2p",
+            "port": "TAP_N"
+          },
+          "to_pin": {
+            "block": "ms2p",
+            "port": "U0_S"
+          },
+          "waypoints_um": [
+            [
+              34.88,
+              65.0
+            ],
+            [
+              36.21,
+              65.0
+            ]
+          ]
+        },
+        {
+          "from_pin": {
+            "block": "ms2p",
+            "port": "U0_S"
+          },
+          "to_pin": {
+            "block": "nwt_mbp",
+            "port": "TAP_N"
+          },
+          "waypoints_um": [
+            [
+              36.21,
+              65.0
+            ],
+            [
+              43.88,
+              65.0
+            ]
+          ]
+        },
+        {
+          "from_pin": {
+            "block": "nwt_mbp",
+            "port": "TAP_N"
+          },
+          "to_pin": {
+            "block": "mbp",
+            "port": "U0_S"
+          },
+          "waypoints_um": [
+            [
+              43.88,
+              65.0
+            ],
+            [
+              45.21,
+              65.0
+            ]
+          ]
+        },
+        {
+          "from_pin": {
+            "block": "mbp",
+            "port": "U0_S"
+          },
+          "to_pin": {
+            "block": "nwt_mpib",
+            "port": "TAP_N"
+          },
+          "waypoints_um": [
+            [
+              45.21,
+              65.0
+            ],
+            [
+              52.88,
+              65.0
+            ]
+          ]
+        },
+        {
+          "from_pin": {
+            "block": "nwt_mpib",
+            "port": "TAP_N"
+          },
+          "to_pin": {
+            "block": "mpib",
+            "port": "U0_S"
+          },
+          "waypoints_um": [
+            [
+              52.88,
+              65.0
+            ],
+            [
+              54.21,
+              65.0
+            ]
+          ]
+        },
+        {
+          "from_pin": {
+            "block": "mpib",
+            "port": "U0_S"
+          },
+          "to_pin": {
+            "block": "nwt_mpt",
+            "port": "TAP_N"
+          },
+          "waypoints_um": [
+            [
+              54.21,
+              65.0
+            ],
+            [
+              61.88,
+              65.0
+            ]
+          ]
+        },
+        {
+          "from_pin": {
+            "block": "nwt_mpt",
+            "port": "TAP_N"
+          },
+          "to_pin": {
+            "block": "mpt",
+            "port": "U0_S"
+          },
+          "waypoints_um": [
+            [
+              61.88,
+              65.0
+            ],
+            [
+              63.21,
+              65.0
+            ]
+          ]
+        },
+        {
+          "from_pin": {
+            "block": "mpt",
+            "port": "U0_S"
+          },
+          "to_pin": {
+            "block": "nwt_mi1",
+            "port": "TAP_N"
+          },
+          "waypoints_um": [
+            [
+              63.21,
+              65.0
+            ],
+            [
+              70.88,
+              65.0
+            ]
+          ]
+        },
+        {
+          "from_pin": {
+            "block": "nwt_mi1",
+            "port": "TAP_N"
+          },
+          "to_pin": {
+            "block": "nwt_mi2",
+            "port": "TAP_N"
+          },
+          "waypoints_um": [
+            [
+              70.88,
+              65.0
+            ],
+            [
+              79.88,
+              65.0
+            ]
+          ]
+        }
+      ]
+    },
+    {
+      "net": "vss",
+      "layer_role": "metal2",
+      "pins": [
+        {
+          "block": "mbn",
+          "port": "U0_S"
+        },
+        {
+          "block": "mbn2",
+          "port": "U0_S"
+        },
+        {
+          "block": "ms2n",
+          "port": "U0_S"
+        },
+        {
+          "block": "pst",
+          "port": "TAP_S"
+        },
+        {
+          "block": "ml1",
+          "port": "U0_S"
+        },
+        {
+          "block": "ml2",
+          "port": "U0_S"
+        }
+      ],
+      "legs": [
+        {
+          "from_pin": {
+            "block": "mbn",
+            "port": "U0_S"
+          },
+          "to_pin": {
+            "block": "mbn2",
+            "port": "U0_S"
+          },
+          "waypoints_um": [
+            [
+              24.21,
+              -6.0
+            ],
+            [
+              31.21,
+              -6.0
+            ]
+          ]
+        },
+        {
+          "from_pin": {
+            "block": "mbn2",
+            "port": "U0_S"
+          },
+          "to_pin": {
+            "block": "ms2n",
+            "port": "U0_S"
+          },
+          "waypoints_um": [
+            [
+              31.21,
+              -6.0
+            ],
+            [
+              38.21,
+              -6.0
+            ]
+          ]
+        },
+        {
+          "from_pin": {
+            "block": "ms2n",
+            "port": "U0_S"
+          },
+          "to_pin": {
+            "block": "pst",
+            "port": "TAP_S"
+          },
+          "waypoints_um": [
+            [
+              38.21,
+              -6.0
+            ],
+            [
+              55.92,
+              -6.0
+            ]
+          ]
+        },
+        {
+          "from_pin": {
+            "block": "pst",
+            "port": "TAP_S"
+          },
+          "to_pin": {
+            "block": "ml1",
+            "port": "U0_S"
+          },
+          "waypoints_um": [
+            [
+              55.92,
+              -6.0
+            ],
+            [
+              68.21,
+              -6.0
+            ]
+          ]
+        },
+        {
+          "from_pin": {
+            "block": "ml1",
+            "port": "U0_S"
+          },
+          "to_pin": {
+            "block": "ml2",
+            "port": "U0_S"
+          },
+          "waypoints_um": [
+            [
+              68.21,
+              -6.0
+            ],
+            [
+              79.21,
+              -6.0
+            ]
+          ]
+        }
+      ]
+    },
+    {
+      "net": "pg",
+      "layer_role": "metal3",
+      "pins": [
+        {
+          "block": "mp2",
+          "port": "U0_G"
+        },
+        {
+          "block": "mp3",
+          "port": "U0_G"
+        },
+        {
+          "block": "mp1",
+          "port": "U0_G"
+        },
+        {
+          "block": "mpbn",
+          "port": "U0_G"
+        },
+        {
+          "block": "ms2p",
+          "port": "U0_D"
+        },
+        {
+          "block": "ms2n",
+          "port": "U0_D"
+        }
+      ],
+      "legs": [
+        {
+          "from_pin": {
+            "block": "mp2",
+            "port": "U0_G"
+          },
+          "to_pin": {
+            "block": "mp3",
+            "port": "U0_G"
+          },
+          "waypoints_um": [
+            [
+              2.42,
+              14.0
+            ],
+            [
+              11.42,
+              14.0
+            ]
+          ]
+        },
+        {
+          "from_pin": {
+            "block": "mp3",
+            "port": "U0_G"
+          },
+          "to_pin": {
+            "block": "mp1",
+            "port": "U0_G"
+          },
+          "waypoints_um": [
+            [
+              11.42,
+              14.0
+            ],
+            [
+              20.42,
+              14.0
+            ]
+          ]
+        },
+        {
+          "from_pin": {
+            "block": "mp1",
+            "port": "U0_G"
+          },
+          "to_pin": {
+            "block": "mpbn",
+            "port": "U0_G"
+          },
+          "waypoints_um": [
+            [
+              20.42,
+              14.0
+            ],
+            [
+              29.42,
+              14.0
+            ]
+          ]
+        },
+        {
+          "from_pin": {
+            "block": "mpbn",
+            "port": "U0_G"
+          },
+          "to_pin": {
+            "block": "ms2p",
+            "port": "U0_D"
+          },
+          "waypoints_um": [
+            [
+              29.42,
+              14.0
+            ],
+            [
+              41.9,
+              14.0
+            ],
+            [
+              41.9,
+              23.97
+            ]
+          ]
+        },
+        {
+          "from_pin": {
+            "block": "mpbn",
+            "port": "U0_G"
+          },
+          "to_pin": {
+            "block": "ms2n",
+            "port": "U0_D"
+          },
+          "waypoints_um": [
+            [
+              29.42,
+              14.0
+            ],
+            [
+              47.9,
+              14.0
+            ],
+            [
+              47.9,
+              4.0
+            ]
+          ]
+        }
+      ]
+    },
+    {
+      "net": "pb",
+      "layer_role": "metal2",
+      "pins": [
+        {
+          "block": "mbn2",
+          "port": "U0_D"
+        },
+        {
+          "block": "ms2p",
+          "port": "U0_G"
+        },
+        {
+          "block": "mbp",
+          "port": "U0_G"
+        },
+        {
+          "block": "mbp",
+          "port": "U0_D"
+        },
+        {
+          "block": "mpib",
+          "port": "U0_G"
+        },
+        {
+          "block": "mpt",
+          "port": "U0_G"
+        }
+      ],
+      "legs": [
+        {
+          "from_pin": {
+            "block": "mbn2",
+            "port": "U0_D"
+          },
+          "to_pin": {
+            "block": "ms2p",
+            "port": "U0_G"
+          },
+          "waypoints_um": [
+            [
+              36.9,
+              1.0
+            ],
+            [
+              36.9,
+              18.0
+            ],
+            [
+              38.42,
+              18.0
+            ]
+          ]
+        },
+        {
+          "from_pin": {
+            "block": "ms2p",
+            "port": "U0_G"
+          },
+          "to_pin": {
+            "block": "mbp",
+            "port": "U0_G"
+          },
+          "waypoints_um": [
+            [
+              38.42,
+              18.0
+            ],
+            [
+              47.42,
+              18.0
+            ]
+          ]
+        },
+        {
+          "from_pin": {
+            "block": "mbp",
+            "port": "U0_G"
+          },
+          "to_pin": {
+            "block": "mbp",
+            "port": "U0_D"
+          },
+          "waypoints_um": [
+            [
+              47.42,
+              18.0
+            ],
+            [
+              50.9,
+              18.0
+            ],
+            [
+              50.9,
+              23.97
+            ]
+          ]
+        },
+        {
+          "from_pin": {
+            "block": "mbp",
+            "port": "U0_G"
+          },
+          "to_pin": {
+            "block": "mpib",
+            "port": "U0_G"
+          },
+          "waypoints_um": [
+            [
+              47.42,
+              18.0
+            ],
+            [
+              56.42,
+              18.0
+            ]
+          ]
+        },
+        {
+          "from_pin": {
+            "block": "mpib",
+            "port": "U0_G"
+          },
+          "to_pin": {
+            "block": "mpt",
+            "port": "U0_G"
+          },
+          "waypoints_um": [
+            [
+              56.42,
+              18.0
+            ],
+            [
+              65.42,
+              18.0
+            ]
+          ]
+        }
+      ]
+    },
+    {
+      "net": "nbg",
+      "pins": [
+        {
+          "block": "mpbn",
+          "port": "U0_D"
+        },
+        {
+          "block": "mbn2",
+          "port": "U0_G"
+        },
+        {
+          "block": "mbn",
+          "port": "U0_G"
+        },
+        {
+          "block": "mbn",
+          "port": "U0_D"
+        }
+      ],
+      "legs": [
+        {
+          "from_pin": {
+            "block": "mpbn",
+            "port": "U0_D"
+          },
+          "to_pin": {
+            "block": "mbn2",
+            "port": "U0_G"
+          },
+          "waypoints_um": [
+            [
+              32.9,
+              23.97
+            ],
+            [
+              32.9,
+              6.0
+            ],
+            [
+              33.42,
+              6.0
+            ]
+          ]
+        },
+        {
+          "from_pin": {
+            "block": "mbn2",
+            "port": "U0_G"
+          },
+          "to_pin": {
+            "block": "mbn",
+            "port": "U0_G"
+          },
+          "waypoints_um": [
+            [
+              33.42,
+              6.0
+            ],
+            [
+              26.42,
+              6.0
+            ]
+          ]
+        },
+        {
+          "from_pin": {
+            "block": "mbn",
+            "port": "U0_G"
+          },
+          "to_pin": {
+            "block": "mbn",
+            "port": "U0_D"
+          },
+          "waypoints_um": [
+            [
+              26.42,
+              6.0
+            ],
+            [
+              29.9,
+              6.0
+            ],
+            [
+              29.9,
+              1.0
+            ]
+          ]
+        }
+      ]
+    },
+    {
+      "net": "na",
+      "layer_role": "metal3",
+      "pins": [
+        {
+          "block": "mp1",
+          "port": "U0_D"
+        },
+        {
+          "block": "mi1",
+          "port": "U0_G"
+        }
+      ],
+      "waypoints_um": [
+        [
+          23.5,
+          26.97
+        ],
+        [
+          23.5,
+          66.0
+        ],
+        [
+          74.42,
+          66.0
+        ]
+      ]
+    },
+    {
+      "net": "nt",
+      "pins": [
+        {
+          "block": "mpt",
+          "port": "U0_D"
+        },
+        {
+          "block": "mi1",
+          "port": "U0_S"
+        },
+        {
+          "block": "mi2",
+          "port": "U0_S"
+        }
+      ],
+      "legs": [
+        {
+          "from_pin": {
+            "block": "mpt",
+            "port": "U0_D"
+          },
+          "to_pin": {
+            "block": "mi1",
+            "port": "U0_S"
+          },
+          "waypoints_um": [
+            [
+              68.9,
+              23.97
+            ],
+            [
+              68.9,
+              30.97
+            ]
+          ]
+        },
+        {
+          "from_pin": {
+            "block": "mi1",
+            "port": "U0_S"
+          },
+          "to_pin": {
+            "block": "mi2",
+            "port": "U0_S"
+          },
+          "waypoints_um": [
+            [
+              71.0,
+              30.97
+            ],
+            [
+              71.0,
+              40.0
+            ],
+            [
+              80.5,
+              40.0
+            ],
+            [
+              80.5,
+              30.97
+            ]
+          ]
+        }
+      ]
+    },
+    {
+      "net": "n1",
+      "pins": [
+        {
+          "block": "mi1",
+          "port": "U0_D"
+        },
+        {
+          "block": "ml1",
+          "port": "U0_D"
+        },
+        {
+          "block": "ml1",
+          "port": "U0_G"
+        },
+        {
+          "block": "ml2",
+          "port": "U0_G"
+        }
+      ],
+      "legs": [
+        {
+          "from_pin": {
+            "block": "mi1",
+            "port": "U0_D"
+          },
+          "to_pin": {
+            "block": "ml1",
+            "port": "U0_D"
+          },
+          "waypoints_um": [
+            [
+              77.9,
+              30.97
+            ],
+            [
+              77.9,
+              2.0
+            ]
+          ]
+        },
+        {
+          "from_pin": {
+            "block": "ml1",
+            "port": "U0_D"
+          },
+          "to_pin": {
+            "block": "ml1",
+            "port": "U0_G"
+          },
+          "waypoints_um": [
+            [
+              77.9,
+              2.0
+            ],
+            [
+              77.9,
+              12.0
+            ],
+            [
+              72.42,
+              12.0
+            ]
+          ]
+        },
+        {
+          "from_pin": {
+            "block": "ml1",
+            "port": "U0_G"
+          },
+          "to_pin": {
+            "block": "ml2",
+            "port": "U0_G"
+          },
+          "waypoints_um": [
+            [
+              72.42,
+              12.0
+            ],
+            [
+              83.42,
+              12.0
+            ]
+          ]
+        }
+      ]
+    },
+    {
+      "net": "n2",
+      "pins": [
+        {
+          "block": "mi2",
+          "port": "U0_D"
+        },
+        {
+          "block": "ml2",
+          "port": "U0_D"
+        },
+        {
+          "block": "ms2n",
+          "port": "U0_G"
+        }
+      ],
+      "legs": [
+        {
+          "from_pin": {
+            "block": "mi2",
+            "port": "U0_D"
+          },
+          "to_pin": {
+            "block": "ml2",
+            "port": "U0_D"
+          },
+          "waypoints_um": [
+            [
+              88.9,
+              30.97
+            ],
+            [
+              88.9,
+              2.0
+            ]
+          ],
+          "layer_role": "metal3"
+        },
+        {
+          "from_pin": {
+            "block": "ml2",
+            "port": "U0_D"
+          },
+          "to_pin": {
+            "block": "ms2n",
+            "port": "U0_G"
+          },
+          "waypoints_um": [
+            [
+              88.9,
+              2.0
+            ],
+            [
+              88.9,
+              12.0
+            ],
+            [
+              42.42,
+              12.0
+            ]
+          ],
+          "layer_role": "metal2"
+        }
+      ]
+    }
+  ],
+  "pins": [
+    {
+      "net": "nbtop",
+      "block": "mp2",
+      "port": "U0_D"
+    },
+    {
+      "net": "vref",
+      "block": "mp3",
+      "port": "U0_D"
+    },
+    {
+      "net": "ibias",
+      "block": "mpib",
+      "port": "U0_D"
+    },
+    {
+      "net": "nb",
+      "block": "mi2",
+      "port": "U0_G"
+    }
+  ],
+  "lvs": {
+    "reference": "layout/bias_core_mirror_amp/reference.spice",
+    "subckt": "bias_core_mirror_amp"
+  }
+}

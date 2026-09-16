@@ -1,0 +1,58 @@
+* bias_core_mirror_amp -- LVS reference for layout/bias_core_mirror_amp/cell.json
+*
+* NOT an xschem export. Hand-extracted, verbatim (device cards unmodified
+* except for the wrapping .subckt/.ends and the thirteen top-level port
+* names), from design/netlist/bias_core.spice's own XMP1/XMP2/XMP3/XMPBN/
+* XMBN/XMBN2/XMBP/XMPIB/XMPT/XMI1/XMI2/XML1/XML2/XMS2N/XMS2P device cards --
+* the PFET/NFET current-mirror + error-amp stack (issue #35, part of #34,
+* itself a follow-on from #30/#4). Every device card below is byte-for-byte
+* identical to the corresponding line in design/netlist/bias_core.spice
+* (continuation lines included); if design/bias_core.sch's device group ever
+* changes, this file needs the same change or layout/bin/compose-cell.py's
+* LVS step (comparing against this file) stops meaning anything.
+*
+* Port list: the thirteen nodes this device group's own 15 devices touch.
+* VDD/VSS are the rails. PG is the shared current-mirror gate node, driven
+* here by XMS2N/XMS2P and also kicked by the startup chain's XKICK (#38).
+* NA is XMP1's own drain and XMI1's gate; NBTOP is XMP2's drain and the
+* bias/ratio divider's own input (#37); VREF is bias_core's reference-voltage
+* output; NBG is the NFET bias-mirror gate; PB is the PFET bias-mirror gate,
+* also read by the startup chain's XKA and the settle-flag stage's XMPOK/
+* XMOK2P (#38/#39); NT is the diff pair's own tail node; N1/N2 are the
+* error amp's own load nodes (N2 is also XRZ's input, #37); IBIAS is
+* bias_core's bias-current output; NB is the bias/ratio divider's own output
+* (XRT/XR1, #37) and XMI2's gate. Curator-verified boundary net list (issue
+* #35 comment): PG, NBG, NA, NBTOP, VREF, PB, NT, N1, N2, NB, IBIAS, VDD,
+* VSS -- 13 nets, matching the reference's own port list below.
+.subckt bias_core_mirror_amp VDD VSS PG NA NBTOP VREF NBG PB NT N1 N2 IBIAS NB
+XMP1 NA PG VDD VDD sky130_fd_pr__pfet_g5v0d10v5 L=4 W=8 nf=1 ad=2.32 as=2.32 pd=16.58 ps=16.58 nrd=0.03625 nrs=0.03625 sa=0 sb=0
++ sd=0 mult=1 m=1
+XMP2 NBTOP PG VDD VDD sky130_fd_pr__pfet_g5v0d10v5 L=4 W=8 nf=1 ad=2.32 as=2.32 pd=16.58 ps=16.58 nrd=0.03625 nrs=0.03625 sa=0
++ sb=0 sd=0 mult=1 m=1
+XMP3 VREF PG VDD VDD sky130_fd_pr__pfet_g5v0d10v5 L=4 W=8 nf=1 ad=2.32 as=2.32 pd=16.58 ps=16.58 nrd=0.03625 nrs=0.03625 sa=0 sb=0
++ sd=0 mult=1 m=1
+XMPBN NBG PG VDD VDD sky130_fd_pr__pfet_g5v0d10v5 L=4 W=2 nf=1 ad=0.58 as=0.58 pd=4.58 ps=4.58 nrd=0.145 nrs=0.145 sa=0 sb=0 sd=0
++ mult=1 m=1
+XMBN NBG NBG VSS VSS sky130_fd_pr__nfet_g5v0d10v5 L=4 W=2 nf=1 ad=0.58 as=0.58 pd=4.58 ps=4.58 nrd=0.145 nrs=0.145 sa=0 sb=0 sd=0
++ mult=1 m=1
+XMBN2 PB NBG VSS VSS sky130_fd_pr__nfet_g5v0d10v5 L=4 W=2 nf=1 ad=0.58 as=0.58 pd=4.58 ps=4.58 nrd=0.145 nrs=0.145 sa=0 sb=0 sd=0
++ mult=1 m=1
+XMBP PB PB VDD VDD sky130_fd_pr__pfet_g5v0d10v5 L=4 W=2 nf=1 ad=0.58 as=0.58 pd=4.58 ps=4.58 nrd=0.145 nrs=0.145 sa=0 sb=0 sd=0
++ mult=1 m=1
+XMPIB IBIAS PB VDD VDD sky130_fd_pr__pfet_g5v0d10v5 L=4 W=40 nf=1 ad=11.6 as=11.6 pd=80.58 ps=80.58 nrd=0.00725 nrs=0.00725 sa=0
++ sb=0 sd=0 mult=1 m=1
+XMPT NT PB VDD VDD sky130_fd_pr__pfet_g5v0d10v5 L=4 W=2 nf=1 ad=0.58 as=0.58 pd=4.58 ps=4.58 nrd=0.145 nrs=0.145 sa=0 sb=0 sd=0
++ mult=1 m=1
+XMI1 N1 NA NT VDD sky130_fd_pr__pfet_g5v0d10v5 L=4 W=16 nf=1 ad=4.64 as=4.64 pd=32.58 ps=32.58 nrd=0.018125 nrs=0.018125 sa=0 sb=0
++ sd=0 mult=1 m=1
+XMI2 N2 NB NT VDD sky130_fd_pr__pfet_g5v0d10v5 L=4 W=16 nf=1 ad=4.64 as=4.64 pd=32.58 ps=32.58 nrd=0.018125 nrs=0.018125 sa=0 sb=0
++ sd=0 mult=1 m=1
+XML1 N1 N1 VSS VSS sky130_fd_pr__nfet_g5v0d10v5 L=8 W=4 nf=1 ad=1.16 as=1.16 pd=8.58 ps=8.58 nrd=0.0725 nrs=0.0725 sa=0 sb=0 sd=0
++ mult=1 m=1
+XML2 N2 N1 VSS VSS sky130_fd_pr__nfet_g5v0d10v5 L=8 W=4 nf=1 ad=1.16 as=1.16 pd=8.58 ps=8.58 nrd=0.0725 nrs=0.0725 sa=0 sb=0 sd=0
++ mult=1 m=1
+XMS2N PG N2 VSS VSS sky130_fd_pr__nfet_g5v0d10v5 L=8 W=8 nf=1 ad=2.32 as=2.32 pd=16.58 ps=16.58 nrd=0.03625 nrs=0.03625 sa=0 sb=0
++ sd=0 mult=1 m=1
+XMS2P PG PB VDD VDD sky130_fd_pr__pfet_g5v0d10v5 L=4 W=2 nf=1 ad=0.58 as=0.58 pd=4.58 ps=4.58 nrd=0.145 nrs=0.145 sa=0 sb=0 sd=0
++ mult=1 m=1
+.ends bias_core_mirror_amp
