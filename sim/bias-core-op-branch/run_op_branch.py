@@ -69,7 +69,6 @@ import argparse
 import concurrent.futures as cf
 import json
 import re
-import shutil
 import subprocess
 import sys
 from dataclasses import dataclass, field
