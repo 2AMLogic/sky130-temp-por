@@ -6,9 +6,16 @@ open PDK — designed by AI agents driving
 [klayout-tools](https://github.com/2AMLogic/klayout-tools) and the
 open-source xschem + ngspice flow.
 
-**Status: just opened.** Nothing is designed yet. sky130 is fully supported
-by the toolchain, so there is no tooling prerequisite — work starts with the
-porting plan (issue #1).
+**Status: schematic complete and netlisted; verification and layout
+in progress.** `design/` has a full, netlist-checked schematic hierarchy
+(five cells plus the assembled `temp_por_top`); `sim/` has testbench
+harnesses with recorded PVT-corner results; `layout/` has an active
+multi-cell composition pass on the `bias_core` sub-blocks. `spec/` is not
+yet ratified — three decision records (`proposed`) plus a two-key
+ratification process are in progress (`spec/README.md`,
+`spec/decision-records/`, `ratification/`). See "Target specification"
+below for the maturity-ladder detail. sky130 is fully supported by the
+toolchain, so there is no tooling prerequisite.
 
 **Built agent-native.** Every specification, decision record, testbench, and
 line of documentation here is produced by AI agents working from a ratified
@@ -59,12 +66,18 @@ being the expected cases — change it and record why in a decision record.
 
 Maturity ladder: spec ratified → schematic simulated across PVT →
 layout DRC/LVS-clean → post-layout re-verification → shuttle seat →
-measured silicon. **Current position: pre-spec.**
+measured silicon. **Current position: schematic complete and netlisted,
+with per-cell PVT sim results recorded in `sim/`; spec ratification and
+layout are both advancing in parallel rather than in strict ladder order —
+`spec/decision-records/` has three records (`proposed`, not yet ratified,
+with a two-key `ratification/` process under way) and `layout/` has an
+active multi-cell composition pass (five `bias_core_*` sub-blocks) — so no
+single ladder rung is complete yet.**
 
 ## Repo layout
 
 ```
-spec/          ratified spec + decision records
+spec/          decision records + ratification process (target spec not yet ratified)
 design/        schematics / netlists (xschem)
 sim/           testbenches + PVT corner results (ngspice)
 layout/        GDS + DRC/LVS reports (klayout-tools driven)
