@@ -44,15 +44,13 @@ def run_klt(
 ) -> dict:
     """Run ``klt`` with ``--format json``, from *cwd*, and parse its response.
 
-    The ``layout/bin/`` callers always invoke from the artifact's own output
-    directory with *relative* paths, so that every committed response records
-    repo-relative provenance and no absolute home path leaks into the
+    By convention a ``layout/bin/`` caller invokes from the artifact's own
+    output directory with *relative* paths, so that every committed response
+    records repo-relative provenance and no absolute home path leaks into the
     evidence (the leak ``klt env-provenance --scan`` exists to catch). *cwd*
-    defaults to the caller's own working directory for the callers that
-    cannot do that -- ``klt synthesize``/``klt equiv`` resolve every path in
-    their responses to an absolute path regardless of how the request was
-    invoked, so the digital-synthesis harness gets the same hygiene by
-    sanitizing the response on the way into its record instead.
+    is optional rather than required so that a caller with no such artifact
+    directory to invoke from -- a one-off query whose response is never
+    committed -- can simply run in its own working directory.
 
     *klt* is the binary to invoke, for callers that expose a ``--klt``/``$KLT``
     override; it defaults to whatever ``klt`` is on ``$PATH``.
@@ -98,8 +96,8 @@ def write_json(path: Path, payload: dict) -> None:
     response's own field order survives into the committed file and stays
     diffable against the tool's output), one trailing newline. Parent
     directories are created if missing, so a caller writing into a
-    not-yet-existing output tree (``layout/pex/raw/`` on a fresh build) does
-    not have to pre-create it.
+    not-yet-existing output tree (``layout/<cell>/`` for a cell being composed
+    for the first time) does not have to pre-create it.
     """
     path.parent.mkdir(parents=True, exist_ok=True)
     path.write_text(json.dumps(payload, indent=2, sort_keys=False) + "\n")
