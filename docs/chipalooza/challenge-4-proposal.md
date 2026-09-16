@@ -30,24 +30,44 @@ before any submission — this document is **not** a claim that Challenge
 to design against today.
 
 **Honesty note, stated once here rather than repeated on every row.** This
-repository is at **schematic-only maturity**: `design/` carries a complete,
-netlist-checked schematic hierarchy (issues #6–#10), but `sim/` and
-`layout/` are both **empty** — placeholder `README.md` files only, no
-testbenches, no PVT sweeps, no GDS, no DRC/LVS reports. Per this issue's own
-acceptance criteria and CLAUDE.md's "no claim without a testbench," every
-row in §4's spec table is re-derived **only from what `sim/` actually
-contains today**, which is nothing. This is not a defect this document
-introduces or a spec being relaxed to pass — it is an honest snapshot of
-where the block actually is on the maturity ladder
-(`README.md` § "Target specification": *"Current position: pre-spec"*,
-now updated by `design/README.md` to *"schematic complete, verification and
-layout remain"*). Where a cell's own design document (`design/*.md`)
-records an **informal, uncommitted, spot-corner solvability check** (e.g. a
-DC operating point that converges, or a handful of PVT points spot-checked
-by hand), this document cites it explicitly and labels it exactly as its
-source does — a sanity check that the topology is wired correctly, **not**
-simulation evidence for any spec row, and never conflated with a "met"
-verdict.
+document was originally authored 2026-08-25, when this repository was at
+**schematic-only maturity**: `design/` carried a complete, netlist-checked
+schematic hierarchy (issues #6–#10), while `sim/` and `layout/` were both
+**empty** — placeholder `README.md` files only, no testbenches, no PVT
+sweeps, no GDS, no DRC/LVS reports. **That is no longer true.** `sim/` now
+holds three testbench drivers (`sim/bias-core-op-branch/run_op_branch.py`,
+`sim/bin/corner-run.py`-driven suites under `sim/bias-core-smoke/` and
+`sim/bias-core-startup/`, `sim/temp-core-startup/` +
+`sim/temp-core-startup-en-delayed/`, `sim/pnp-mismatch/run_pnp_mismatch.py`,
+`sim/native-device-characterization/`) plus dated, append-only PVT-corner
+result records under each suite's `records/` directory (e.g.
+`sim/temp-core-startup/records/20260826-053032-ee63b45.md`). `layout/` now
+holds an active multi-cell composition pass — six `bias_core_*` sub-block
+directories (`bias_core_mirror_amp`, `bias_core_passives`,
+`bias_core_pnp8_leg`, `bias_core_settle_flag`, `bias_core_startup`,
+`bias_core_xq1_xqr`), each with `cell.json`/`drc.json`/`extract.json`/
+`lvs.json` artifacts — proving out the `klt gen` → `gen-compose` → `drc` →
+`extract` → `lvs` recipe on real device groups (`layout/README.md`). Every
+other reference below to `sim/`/`layout/` as "empty" or "not yet existing"
+describes that original 2026-08-25 authoring snapshot, not the current
+repository state — see this note for the current one.
+
+**What has *not* yet happened: a row-by-row refresh of §4's
+Measured/Status verdicts against that new evidence.** The specific
+"Measured: none" / "Unmet — no simulation evidence yet" cells in §4 below
+still reflect the original 2026-08-25 snapshot. Re-deriving each row
+correctly — matching the right append-only result record to the right spec
+row, honoring `sim/`'s own PVT-matrix discipline — is real verification
+work, tracked separately rather than guessed at here; amending individual
+"unmet" verdicts to "met" without that dedicated pass would itself be an
+unverified claim, which CLAUDE.md's "no claim without a testbench" rules
+out just as firmly as the original "empty" framing this note corrects. Where
+a cell's own design document (`design/*.md`) records an **informal,
+uncommitted, spot-corner solvability check** (e.g. a DC operating point that
+converges, or a handful of PVT points spot-checked by hand), this document
+cites it explicitly and labels it exactly as its source does — a sanity
+check that the topology is wired correctly, **not** simulation evidence for
+any spec row, and never conflated with a "met" verdict.
 
 ---
 
@@ -232,13 +252,17 @@ interface; none of those additions has been implemented yet.
 
 ## 4. Target specification at the challenge rails
 
-**What this table is, and is not.** Every "Measured (`sim/`)" cell below
-is derived **only** from what `sim/` actually contains, per this issue's
-own acceptance criteria. `sim/` is empty — a placeholder `README.md` only
-(`sim/README.md`: *"Empty until the first work lands here"*) — so every
-"Measured" cell reads **"none"**, and every row's status is
+**What this table is, and is not.** This table was drafted 2026-08-25,
+when `sim/` was still empty (see the "Honesty note" above for the current
+`sim/` contents, which the row-by-row verdicts below have not yet been
+refreshed against). Every "Measured (`sim/`)" cell below is derived **only**
+from what `sim/` actually contained at that authoring time — nothing — so
+every "Measured" cell reads **"none"**, and every row's status is
 **"Unmet — no simulation evidence yet"**, honestly, not as a defect this
-document introduces. The "Target (draft)" column carries values from this
+document introduces. Re-deriving these verdicts against the `sim/` evidence
+that has since landed is tracked separately (see the Honesty note); this
+table is not amended in place without that dedicated review pass. The
+"Target (draft)" column carries values from this
 repo's own `README.md` draft target-spec table and `spec/porting-plan.md`
 §2.8's reconciliation of it — **these are explicitly unratified drafts**,
 not a ratified `spec/target-spec.md` (this repo does not have one yet,
@@ -286,7 +310,7 @@ solvability sanity check, never a "met" claim.
 
 | Parameter | Target (draft, unratified) | Measured (`layout/`) | Status | Evidence |
 |---|---|---|---|---|
-| Total assembled footprint (`temp_por_top`, post-layout, DRC-clean, LVS-matched) | not yet drafted in this repo | none | Unmet — no layout exists. `layout/README.md`: *"Empty until the first work lands here"* | — |
+| Total assembled footprint (`temp_por_top`, post-layout, DRC-clean, LVS-matched) | not yet drafted in this repo | none | Unmet — no top-level assembled layout exists yet. `layout/` holds an active sub-block composition pass (six `bias_core_*` cells, see the Honesty note above) but not yet a `temp_por_top` assembly to measure a footprint from | — |
 
 ## 5. Test-plan outline (measurement on the packaged part)
 
@@ -364,9 +388,10 @@ repo eventually runs, not characterized in isolation.
 This repository is Apache License 2.0 (`LICENSE`), matching the challenge's
 stated preference for a standard open license (per the published briefs'
 common structure). All modifiable sources — schematics (`design/*.sch`),
-exported netlists (`design/netlist/`), the (currently empty) testbench and
-simulation harness location (`sim/`), the (currently empty) layout and
-DRC/LVS report location (`layout/`), and the decision-record history behind
+exported netlists (`design/netlist/`), the testbench and simulation harness
+location (`sim/`), the layout and DRC/LVS report location (`layout/`; see
+the Honesty note above for both directories' current, non-empty contents),
+and the decision-record history behind
 every ratified value (`spec/decision-records/`) — are public in this
 repository under that same license. No separate licensing action would be
 needed for a future submission.
@@ -382,8 +407,10 @@ needed for a future submission.
   default (`~/.volare/sky130A`) — no PDK path is ever baked into a
   schematic or netlist.
 - **Layout / DRC / LVS**: [klayout-tools](https://github.com/2AMLogic/klayout-tools)
-  (`klt`), a headless, scriptable KLayout-based flow, once `layout/` has
-  content to check — nothing exists there yet (§4.4).
+  (`klt`), a headless, scriptable KLayout-based flow. `layout/` now holds an
+  active sub-block composition pass (see the Honesty note above); a
+  `temp_por_top`-level assembly to check against §4.4's footprint row does
+  not exist yet.
 - No proprietary EDA tool is used anywhere in this design's flow, or is
   expected to be needed for any future step.
 
@@ -432,5 +459,7 @@ hierarchy, cell status, ratified pinout), [`design/*.md`](../../design/)
 re-derivation and testbench-matrix plan this design still owes),
 [`spec/decision-records/`](../../spec/decision-records/) (every
 architecture/device-flavor decision's history), [`sim/`](../../sim/) and
-[`layout/`](../../layout/) (both empty as of this document — see
-`sim/README.md`/`layout/README.md`).*
+[`layout/`](../../layout/) (both empty at this document's 2026-08-25
+authoring time, now holding testbenches/results and an in-progress
+composition pass respectively — see the Honesty note above,
+`sim/README.md`, and `layout/README.md`).*
