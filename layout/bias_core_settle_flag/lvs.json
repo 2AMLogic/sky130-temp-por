@@ -1,0 +1,113 @@
+{
+  "schema_version": 1,
+  "engine": "klayout",
+  "layout": "bias_core_settle_flag.spice",
+  "reference": "bias_core_settle_flag.ref.spice",
+  "top": "BIAS_CORE_SETTLE_FLAG",
+  "reference_top": "BIAS_CORE_SETTLE_FLAG",
+  "parameter_tolerance": null,
+  "options": {
+    "combine_devices": false,
+    "combine_devices_per_circuit": null,
+    "flatten_layout": false,
+    "flatten_reference": false,
+    "netgen_setup": null,
+    "parameter_tolerance": null
+  },
+  "status": "match",
+  "mismatch_count": 0,
+  "error_count": 0,
+  "category_counts": {},
+  "category_error_counts": {},
+  "counts": {
+    "nets": {
+      "layout": 11,
+      "reference": 11,
+      "matched": 11
+    },
+    "devices": {
+      "layout": 10,
+      "reference": 10,
+      "matched": 10
+    },
+    "pins": {
+      "layout": 11,
+      "reference": 11,
+      "matched": 11
+    }
+  },
+  "device_classes": null,
+  "environment": {
+    "engine": "klayout",
+    "engine_version": "0.30.10",
+    "layout_sha256": "d0902a825183af8d4d43ddf0b3061e1f863c14256359792dd6af064fa5068dfd",
+    "reference_sha256": "f3bce35d97eb9dccc354ca1d9469690da8ce2fc77da3f1756a1a3984cab14493",
+    "extracted_netlist": null
+  },
+  "provenance": {
+    "klt_version": "0.4.0",
+    "klayout_version": "0.30.10",
+    "pdk": null,
+    "deck": null,
+    "input": null,
+    "klayout_version_mismatch": false
+  },
+  "mismatches": [],
+  "net_correspondence": [
+    {
+      "layout": "BIAS_OK",
+      "reference": "BIAS_OK",
+      "pin": true
+    },
+    {
+      "layout": "NA",
+      "reference": "NA",
+      "pin": true
+    },
+    {
+      "layout": "NBTOP",
+      "reference": "NBTOP",
+      "pin": true
+    },
+    {
+      "layout": "NKG",
+      "reference": "NKG",
+      "pin": true
+    },
+    {
+      "layout": "NOKL",
+      "reference": "NOKL",
+      "pin": true
+    },
+    {
+      "layout": "NOKO",
+      "reference": "NOKO",
+      "pin": true
+    },
+    {
+      "layout": "NOKX",
+      "reference": "NOKX",
+      "pin": true
+    },
+    {
+      "layout": "PB",
+      "reference": "PB",
+      "pin": true
+    },
+    {
+      "layout": "TOK",
+      "reference": "TOK",
+      "pin": true
+    },
+    {
+      "layout": "VDD",
+      "reference": "VDD",
+      "pin": true
+    },
+    {
+      "layout": "VSS",
+      "reference": "VSS",
+      "pin": true
+    }
+  ]
+}

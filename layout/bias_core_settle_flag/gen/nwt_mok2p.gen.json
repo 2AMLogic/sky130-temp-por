@@ -1,0 +1,84 @@
+{
+  "schema_version": 1,
+  "generator": "guard_ring",
+  "cell_name": "nwt_mok2p",
+  "gds_path": "gen/nwt_mok2p.gds",
+  "pdk": {
+    "name": "sky130A",
+    "variant": "sky130A",
+    "version": "open_pdks c6d73a35f524070e85faff4a6a9eef49553ebc2b"
+  },
+  "dbu_um": 0.001,
+  "bbox_um": {
+    "x0": -0.15,
+    "y0": -0.15,
+    "x1": 1.99,
+    "y1": 1.99
+  },
+  "device_count": 8,
+  "ports": [
+    {
+      "name": "TAP_N",
+      "net": null,
+      "layer": {
+        "layer": 67,
+        "datatype": 20,
+        "name": null
+      },
+      "x_um": 0.9199999999999999,
+      "y_um": 1.63,
+      "width_um": 0.42,
+      "direction_deg": 90
+    },
+    {
+      "name": "TAP_S",
+      "net": null,
+      "layer": {
+        "layer": 67,
+        "datatype": 20,
+        "name": null
+      },
+      "x_um": 0.9199999999999999,
+      "y_um": 0.21,
+      "width_um": 0.42,
+      "direction_deg": 270
+    },
+    {
+      "name": "TAP_E",
+      "net": null,
+      "layer": {
+        "layer": 67,
+        "datatype": 20,
+        "name": null
+      },
+      "x_um": 1.63,
+      "y_um": 0.9199999999999999,
+      "width_um": 0.42,
+      "direction_deg": 0
+    },
+    {
+      "name": "TAP_W",
+      "net": null,
+      "layer": {
+        "layer": 67,
+        "datatype": 20,
+        "name": null
+      },
+      "x_um": 0.21,
+      "y_um": 0.9199999999999999,
+      "width_um": 0.42,
+      "direction_deg": 180
+    }
+  ],
+  "navigable_regions": [],
+  "drc_hints": {
+    "min_spacing_um": 0.4,
+    "matched_group_id": null,
+    "snapped_to_grid": false,
+    "notes": [
+      "the resolved contact count (2) leaves less than 0.3um between adjacent contacts along inner_width_um -- may violate the target PDK's minimum contact spacing rule",
+      "the resolved contact count (2) leaves less than 0.3um between adjacent contacts along inner_height_um -- may violate the target PDK's minimum contact spacing rule"
+    ]
+  },
+  "warnings": []
+}
