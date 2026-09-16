@@ -8,9 +8,8 @@
 Every ``design/*.sch`` cell is netlisted **as a ``.subckt``** (never as a flat
 deck) into ``design/netlist/<cell>.spice``:
 
-* once ``temp_por_top.sch`` exists (issue #10), ``temp_por_top.spice`` will
-  carry the whole hierarchy -- the top cell plus every sub-circuit definition
-  it instantiates.
+* ``temp_por_top.spice`` carries the whole hierarchy -- the top cell plus
+  every sub-circuit definition it instantiates.
 * each sub-circuit also gets its own single-``.subckt`` file, so a testbench
   can target one half of the block without dragging in the rest.
 
@@ -27,9 +26,11 @@ inline here rather than factored into shared modules, so this issue's scope
 stays schematic entry rather than simulation/layout infrastructure:
 
 * **PDK discovery** is inlined below (:func:`find_pdk`) instead of delegated
-  to a ``sim/harness/pdk.py``-equivalent module -- ``sim/`` is still an empty
-  stub in this repo (see ``spec/porting-plan.md`` Sec4 item 1, sim-harness
-  port, not yet filed). The resolution order mirrors ``design/xschemrc`` and
+  to a shared ``sim/``-side module -- this file netlists standalone, ahead of
+  and independent from any testbench harness run, so it keeps its own copy
+  rather than importing one from ``sim/bin`` (which now hosts
+  ``corner-run.py`` and ``sim_common.py`` for the PVT-corner/mismatch
+  harness itself). The resolution order mirrors ``design/xschemrc`` and
   ``sky130-bandgap/sim/harness``'s own PDK_ROOT/PDK-with-volare-fallback
   convention, so both stay in sync by construction.
 * **The ratified-port-list assertion** uses a small inlined SPICE
@@ -42,12 +43,11 @@ stays schematic entry rather than simulation/layout infrastructure:
   this copy should be deleted in favour of importing it, exactly as gf180's
   own module docstring intends.
 
-Until ``temp_por_top.sch`` exists (issue #10), there is no ratified top-level
-cell to assert the pinout against, so the top-level and cross-cell
-invariants in :func:`check_invariants` are skipped -- everything else
-(the reproducibility/staleness check, and the per-cell
-symbol-pins-match-schematic-ports check) still runs for whatever cells are
-committed.
+``temp_por_top.sch`` is always present in this repo, so the top-level and
+cross-cell invariants in :func:`check_invariants` run unconditionally on
+every ``--check``/default run -- alongside the reproducibility/staleness
+check and the per-cell symbol-pins-match-schematic-ports check, which run
+for every committed cell.
 """
 
 from __future__ import annotations
