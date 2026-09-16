@@ -1,0 +1,48 @@
+* extracted by klt extract --deck sky130
+
+* cell bias_core_mirror_amp
+* pin ibias
+* pin n1
+* pin n2
+* pin na
+* pin nb
+* pin nbg
+* pin nbtop
+* pin nt
+* pin pb
+* pin pg
+* pin vdd
+* pin vref
+* pin vss
+.SUBCKT bias_core_mirror_amp ibias n1 n2 na nb nbg nbtop nt pb pg vdd vref vss
+* device instance $1 r0 *1 26.42,1 nfet
+M$1 nbg nbg vss vss nfet L=4U W=2U AS=0.84P AD=0.84P PS=4.84U PD=4.84U
+* device instance $2 r0 *1 33.42,1 nfet
+M$2 pb nbg vss vss nfet L=4U W=2U AS=0.84P AD=0.84P PS=4.84U PD=4.84U
+* device instance $3 r0 *1 72.42,2 nfet
+M$3 n1 n1 vss vss nfet L=8U W=4U AS=1.68P AD=1.68P PS=8.84U PD=8.84U
+* device instance $4 r0 *1 83.42,2 nfet
+M$4 n2 n1 vss vss nfet L=8U W=4U AS=1.68P AD=1.68P PS=8.84U PD=8.84U
+* device instance $5 r0 *1 42.42,4 nfet
+M$5 pg n2 vss vss nfet L=8U W=8U AS=3.36P AD=3.36P PS=16.84U PD=16.84U
+* device instance $6 r0 *1 29.42,23.97 pfet
+M$6 nbg pg vdd vdd pfet L=4U W=2U AS=0.84P AD=0.84P PS=4.84U PD=4.84U
+* device instance $7 r0 *1 38.42,23.97 pfet
+M$7 pg pb vdd vdd pfet L=4U W=2U AS=0.84P AD=0.84P PS=4.84U PD=4.84U
+* device instance $8 r0 *1 47.42,23.97 pfet
+M$8 pb pb vdd vdd pfet L=4U W=2U AS=0.84P AD=0.84P PS=4.84U PD=4.84U
+* device instance $9 r0 *1 65.42,23.97 pfet
+M$9 nt pb vdd vdd pfet L=4U W=2U AS=0.84P AD=0.84P PS=4.84U PD=4.84U
+* device instance $10 r0 *1 2.42,26.97 pfet
+M$10 nbtop pg vdd vdd pfet L=4U W=8U AS=3.36P AD=3.36P PS=16.84U PD=16.84U
+* device instance $11 r0 *1 11.42,26.97 pfet
+M$11 vref pg vdd vdd pfet L=4U W=8U AS=3.36P AD=3.36P PS=16.84U PD=16.84U
+* device instance $12 r0 *1 20.42,26.97 pfet
+M$12 na pg vdd vdd pfet L=4U W=8U AS=3.36P AD=3.36P PS=16.84U PD=16.84U
+* device instance $13 r0 *1 74.42,30.97 pfet
+M$13 n1 na nt vdd pfet L=4U W=16U AS=6.72P AD=6.72P PS=32.84U PD=32.84U
+* device instance $14 r0 *1 83.42,30.97 pfet
+M$14 n2 nb nt vdd pfet L=4U W=16U AS=6.72P AD=6.72P PS=32.84U PD=32.84U
+* device instance $15 r0 *1 56.42,42.97 pfet
+M$15 ibias pb vdd vdd pfet L=4U W=40U AS=16.8P AD=16.8P PS=80.84U PD=80.84U
+.ENDS bias_core_mirror_amp

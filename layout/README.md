@@ -139,6 +139,32 @@ a per-net `layer_role` did not — filed as
 see that cell's own README for the full repro. Not blocking: the single-pass
 technique is what landed.
 
+## `bias_core_mirror_amp`: the current-mirror + error-amp stack (issue #35, part of #34)
+
+[`layout/bias_core_mirror_amp/`](bias_core_mirror_amp/README.md) lays out
+`design/netlist/bias_core.spice`'s `XMP1`/`XMP2`/`XMP3`/`XMPBN`/`XMBN`/
+`XMBN2`/`XMBP`/`XMPIB`/`XMPT`/`XMI1`/`XMI2`/`XML1`/`XML2`/`XMS2N`/`XMS2P`
+device group — the four PFET mirror legs off `PG`, the NFET/PFET bias-mirror
+pair that sets `NBG`/`PB`, the `PB`-gated bias-current outputs (`IBIAS`,
+`NT`), and the PFET-input error amp with its NFET mirror load and the
+`XMS2N`/`XMS2P` pair that closes the loop back onto `PG` — as a sixth
+standalone proof cell, 15 devices (10x `sky130_fd_pr__pfet_g5v0d10v5` + 5x
+`sky130_fd_pr__nfet_g5v0d10v5`). Same two-row CMOS shape as
+`bias_core_settle_flag`, scaled up: a 10-wide PMOS row on a 9.0um column
+pitch with a per-device `guard_ring` nwell tap island abutted at the same
+0.10um nwell overlap, a 5-wide NMOS row, and nine routed nets split across
+three metal planes by `connectivity[].layer_role` — plus, for `n2`, two
+planes within one net by `connectivity[].legs[].layer_role`, the first use
+of the per-*leg* form in this repo.
+
+**`klt drc`: clean, 0 violations.** **`klt extract`: 15 devices, 13 nets.**
+**`klt lvs` against `design/netlist/bias_core.spice`'s own device cards:
+`match` — 15/15 devices, 13/13 nets, 13/13 pins, 0 mismatches.** The third
+sub-block in this repo to reach a full LVS match, and the largest; it
+carries the same `hvi`-marker disclosure the other two do
+([`2AMLogic/klayout-tools#1912`](https://github.com/2AMLogic/klayout-tools/issues/1912)).
+No new tool gap was hit building it.
+
 ## Known klt gaps hit building this recipe
 
 Filed generically at
@@ -219,10 +245,10 @@ cell in this repo) and both filed the same way:
 Per issue #36, this fleet prefers landing DRC-clean/LVS-blocked increments
 (isolated to a known, upstream-filed gap) over waiting on the upstream fix —
 `bias_core_pnp8_leg`, `bias_core_xq1_xqr`, and `bias_core_passives` all ship
-that way; `bias_core_settle_flag` and `bias_core_startup` land DRC- and
-LVS-clean outright. The remaining `bias_core` device group (the PFET/NFET
-mirror/error-amp stack) and the full-cell assembly are follow-on increments
-tracked as sibling sub-issues of
+that way; `bias_core_settle_flag`, `bias_core_startup`, and
+`bias_core_mirror_amp` land DRC- and LVS-clean outright. Every `bias_core`
+device group now has its own proof cell; the full-cell assembly is the
+remaining follow-on increment, tracked as a sibling sub-issue of
 [#34](https://github.com/2AMLogic/sky130-temp-por/issues/34); `temp_core`,
 `por_comparator`, `por_output_chain`, and `temp_por_top` are tracked from
 [#4](https://github.com/2AMLogic/sky130-temp-por/issues/4).
