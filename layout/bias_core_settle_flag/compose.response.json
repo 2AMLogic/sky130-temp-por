@@ -1,0 +1,1045 @@
+{
+  "schema_version": 1,
+  "generator": "gen-compose",
+  "cell_name": "bias_core_settle_flag",
+  "gds_path": "bias_core_settle_flag.gds",
+  "pdk": {
+    "name": "sky130A",
+    "variant": "sky130A",
+    "version": "open_pdks c6d73a35f524070e85faff4a6a9eef49553ebc2b"
+  },
+  "dbu_um": 0.001,
+  "bbox_um": {
+    "x0": -2.19,
+    "y0": -3.5,
+    "x1": 40.99,
+    "y1": 25.16
+  },
+  "ports": [
+    {
+      "name": "na",
+      "net": "na",
+      "layer": {
+        "layer": 67,
+        "datatype": 20,
+        "name": null
+      },
+      "x_um": 20.58,
+      "y_um": 14.359999999999998,
+      "width_um": 0.42000000000000004,
+      "direction_deg": 270,
+      "block": "moka",
+      "port": "U0_G"
+    },
+    {
+      "name": "nbtop",
+      "net": "nbtop",
+      "layer": {
+        "layer": 67,
+        "datatype": 20,
+        "name": null
+      },
+      "x_um": 11.42,
+      "y_um": 14.359999999999998,
+      "width_um": 0.42000000000000004,
+      "direction_deg": 270,
+      "block": "mokb",
+      "port": "U0_G"
+    },
+    {
+      "name": "nkg",
+      "net": "nkg",
+      "layer": {
+        "layer": 67,
+        "datatype": 20,
+        "name": null
+      },
+      "x_um": 23.92,
+      "y_um": 2.61,
+      "width_um": 0.42000000000000004,
+      "direction_deg": 90,
+      "block": "mokc",
+      "port": "U0_G"
+    }
+  ],
+  "blocks": [
+    {
+      "id": "mpok",
+      "source": "generator_report",
+      "generator": "mos_array",
+      "cell_name": "mpok_pfet",
+      "offset_um": {
+        "x": 0.0,
+        "y": 15.97
+      },
+      "bbox_um": {
+        "x0": -0.15,
+        "y0": 14.0,
+        "x1": 4.99,
+        "y1": 16.12
+      },
+      "orientation": "mirror_y"
+    },
+    {
+      "id": "mokb",
+      "source": "generator_report",
+      "generator": "mos_array",
+      "cell_name": "mokb_pfet",
+      "offset_um": {
+        "x": 9.0,
+        "y": 22.97
+      },
+      "bbox_um": {
+        "x0": 8.85,
+        "y0": 13.999999999999998,
+        "x1": 13.99,
+        "y1": 23.119999999999997
+      },
+      "orientation": "mirror_y"
+    },
+    {
+      "id": "moka",
+      "source": "generator_report",
+      "generator": "mos_array",
+      "cell_name": "moka_pfet",
+      "offset_um": {
+        "x": 23.0,
+        "y": 22.97
+      },
+      "bbox_um": {
+        "x0": 18.009999999999998,
+        "y0": 13.999999999999998,
+        "x1": 23.15,
+        "y1": 23.119999999999997
+      },
+      "orientation": "rotate_180"
+    },
+    {
+      "id": "mok2p",
+      "source": "generator_report",
+      "generator": "mos_array",
+      "cell_name": "mok2p_pfet",
+      "offset_um": {
+        "x": 27.0,
+        "y": 15.97
+      },
+      "bbox_um": {
+        "x0": 26.85,
+        "y0": 14.0,
+        "x1": 31.990000000000002,
+        "y1": 16.12
+      },
+      "orientation": "mirror_y"
+    },
+    {
+      "id": "mo1p",
+      "source": "generator_report",
+      "generator": "mos_array",
+      "cell_name": "mo1p_pfet",
+      "offset_um": {
+        "x": 36.0,
+        "y": 15.97
+      },
+      "bbox_um": {
+        "x0": 35.85,
+        "y0": 14.0,
+        "x1": 40.99,
+        "y1": 16.12
+      },
+      "orientation": "mirror_y"
+    },
+    {
+      "id": "mol1",
+      "source": "generator_report",
+      "generator": "mos_array",
+      "cell_name": "mol1_nfet",
+      "offset_um": {
+        "x": 8.0,
+        "y": 0.0
+      },
+      "bbox_um": {
+        "x0": 8.0,
+        "y0": 0.0,
+        "x1": 12.84,
+        "y1": 2.82
+      },
+      "orientation": "none"
+    },
+    {
+      "id": "mol2",
+      "source": "generator_report",
+      "generator": "mos_array",
+      "cell_name": "mol2_nfet",
+      "offset_um": {
+        "x": 15.5,
+        "y": 0.0
+      },
+      "bbox_um": {
+        "x0": 15.5,
+        "y0": 0.0,
+        "x1": 20.34,
+        "y1": 2.82
+      },
+      "orientation": "none"
+    },
+    {
+      "id": "mokc",
+      "source": "generator_report",
+      "generator": "mos_array",
+      "cell_name": "mokc_nfet",
+      "offset_um": {
+        "x": 23.0,
+        "y": 0.0
+      },
+      "bbox_um": {
+        "x0": 23.0,
+        "y0": 0.0,
+        "x1": 24.84,
+        "y1": 2.82
+      },
+      "orientation": "none"
+    },
+    {
+      "id": "mok2",
+      "source": "generator_report",
+      "generator": "mos_array",
+      "cell_name": "mok2_nfet",
+      "offset_um": {
+        "x": 28.0,
+        "y": 0.0
+      },
+      "bbox_um": {
+        "x0": 28.0,
+        "y0": 0.0,
+        "x1": 32.84,
+        "y1": 2.82
+      },
+      "orientation": "none"
+    },
+    {
+      "id": "mo1n",
+      "source": "generator_report",
+      "generator": "mos_array",
+      "cell_name": "mo1n_nfet",
+      "offset_um": {
+        "x": 36.0,
+        "y": 0.0
+      },
+      "bbox_um": {
+        "x0": 36.0,
+        "y0": 0.0,
+        "x1": 37.34,
+        "y1": 4.82
+      },
+      "orientation": "none"
+    },
+    {
+      "id": "nwt_mpok",
+      "source": "generator_report",
+      "generator": "guard_ring",
+      "cell_name": "nwt_mpok",
+      "offset_um": {
+        "x": -2.04,
+        "y": 14.2
+      },
+      "bbox_um": {
+        "x0": -2.19,
+        "y0": 14.049999999999999,
+        "x1": -0.050000000000000044,
+        "y1": 16.189999999999998
+      },
+      "orientation": "none"
+    },
+    {
+      "id": "nwt_mokb",
+      "source": "generator_report",
+      "generator": "guard_ring",
+      "cell_name": "nwt_mokb",
+      "offset_um": {
+        "x": 6.96,
+        "y": 14.2
+      },
+      "bbox_um": {
+        "x0": 6.81,
+        "y0": 14.049999999999999,
+        "x1": 8.95,
+        "y1": 16.189999999999998
+      },
+      "orientation": "none"
+    },
+    {
+      "id": "nwt_moka",
+      "source": "generator_report",
+      "generator": "guard_ring",
+      "cell_name": "nwt_moka",
+      "offset_um": {
+        "x": 19.01,
+        "y": 23.17
+      },
+      "bbox_um": {
+        "x0": 18.860000000000003,
+        "y0": 23.020000000000003,
+        "x1": 21.0,
+        "y1": 25.16
+      },
+      "orientation": "none"
+    },
+    {
+      "id": "nwt_mok2p",
+      "source": "generator_report",
+      "generator": "guard_ring",
+      "cell_name": "nwt_mok2p",
+      "offset_um": {
+        "x": 24.96,
+        "y": 14.2
+      },
+      "bbox_um": {
+        "x0": 24.810000000000002,
+        "y0": 14.049999999999999,
+        "x1": 26.95,
+        "y1": 16.189999999999998
+      },
+      "orientation": "none"
+    },
+    {
+      "id": "nwt_mo1p",
+      "source": "generator_report",
+      "generator": "guard_ring",
+      "cell_name": "nwt_mo1p",
+      "offset_um": {
+        "x": 33.96,
+        "y": 14.2
+      },
+      "bbox_um": {
+        "x0": 33.81,
+        "y0": 14.049999999999999,
+        "x1": 35.95,
+        "y1": 16.189999999999998
+      },
+      "orientation": "none"
+    },
+    {
+      "id": "pst1",
+      "source": "generator_report",
+      "generator": "guard_ring",
+      "cell_name": "pst1",
+      "offset_um": {
+        "x": 10.0,
+        "y": -3.5
+      },
+      "bbox_um": {
+        "x0": 10.0,
+        "y0": -3.5,
+        "x1": 11.84,
+        "y1": -1.66
+      },
+      "orientation": "none"
+    },
+    {
+      "id": "pst2",
+      "source": "generator_report",
+      "generator": "guard_ring",
+      "cell_name": "pst2",
+      "offset_um": {
+        "x": 30.0,
+        "y": -3.5
+      },
+      "bbox_um": {
+        "x0": 30.0,
+        "y0": -3.5,
+        "x1": 31.84,
+        "y1": -1.66
+      },
+      "orientation": "none"
+    }
+  ],
+  "nets": [
+    {
+      "net": "vdd",
+      "pins": [
+        {
+          "block": "nwt_mpok",
+          "port": "TAP_N"
+        },
+        {
+          "block": "mpok",
+          "port": "U0_S"
+        },
+        {
+          "block": "nwt_mokb",
+          "port": "TAP_N"
+        },
+        {
+          "block": "nwt_moka",
+          "port": "TAP_N"
+        },
+        {
+          "block": "nwt_mok2p",
+          "port": "TAP_N"
+        },
+        {
+          "block": "mok2p",
+          "port": "U0_S"
+        },
+        {
+          "block": "nwt_mo1p",
+          "port": "TAP_N"
+        },
+        {
+          "block": "mo1p",
+          "port": "U0_S"
+        }
+      ],
+      "routed": true,
+      "route_length_um": 170.57000000000002,
+      "status": "routed",
+      "legs": [
+        {
+          "pins": [
+            {
+              "block": "nwt_mpok",
+              "port": "TAP_N"
+            },
+            {
+              "block": "mpok",
+              "port": "U0_S"
+            }
+          ],
+          "routed": true,
+          "route_length_um": 23.03,
+          "reason": null,
+          "channel_track": 0
+        },
+        {
+          "pins": [
+            {
+              "block": "mpok",
+              "port": "U0_S"
+            },
+            {
+              "block": "nwt_mokb",
+              "port": "TAP_N"
+            }
+          ],
+          "routed": true,
+          "route_length_um": 29.37,
+          "reason": null,
+          "channel_track": 0
+        },
+        {
+          "pins": [
+            {
+              "block": "nwt_mokb",
+              "port": "TAP_N"
+            },
+            {
+              "block": "nwt_moka",
+              "port": "TAP_N"
+            }
+          ],
+          "routed": true,
+          "route_length_um": 24.42,
+          "reason": null,
+          "channel_track": 0
+        },
+        {
+          "pins": [
+            {
+              "block": "nwt_moka",
+              "port": "TAP_N"
+            },
+            {
+              "block": "nwt_mok2p",
+              "port": "TAP_N"
+            }
+          ],
+          "routed": true,
+          "route_length_um": 18.320000000000004,
+          "reason": null,
+          "channel_track": 0
+        },
+        {
+          "pins": [
+            {
+              "block": "nwt_mok2p",
+              "port": "TAP_N"
+            },
+            {
+              "block": "mok2p",
+              "port": "U0_S"
+            }
+          ],
+          "routed": true,
+          "route_length_um": 23.03000000000001,
+          "reason": null,
+          "channel_track": 0
+        },
+        {
+          "pins": [
+            {
+              "block": "mok2p",
+              "port": "U0_S"
+            },
+            {
+              "block": "nwt_mo1p",
+              "port": "TAP_N"
+            }
+          ],
+          "routed": true,
+          "route_length_um": 29.370000000000005,
+          "reason": null,
+          "channel_track": 0
+        },
+        {
+          "pins": [
+            {
+              "block": "nwt_mo1p",
+              "port": "TAP_N"
+            },
+            {
+              "block": "mo1p",
+              "port": "U0_S"
+            }
+          ],
+          "routed": true,
+          "route_length_um": 23.03,
+          "reason": null,
+          "channel_track": 0
+        }
+      ]
+    },
+    {
+      "net": "vss",
+      "pins": [
+        {
+          "block": "mol1",
+          "port": "U0_S"
+        },
+        {
+          "block": "pst1",
+          "port": "TAP_S"
+        },
+        {
+          "block": "mol2",
+          "port": "U0_S"
+        },
+        {
+          "block": "mokc",
+          "port": "U0_S"
+        },
+        {
+          "block": "mok2",
+          "port": "U0_S"
+        },
+        {
+          "block": "pst2",
+          "port": "TAP_S"
+        },
+        {
+          "block": "mo1n",
+          "port": "U0_S"
+        }
+      ],
+      "routed": true,
+      "route_length_um": 95.84,
+      "status": "routed",
+      "legs": [
+        {
+          "pins": [
+            {
+              "block": "mol1",
+              "port": "U0_S"
+            },
+            {
+              "block": "pst1",
+              "port": "TAP_S"
+            }
+          ],
+          "routed": true,
+          "route_length_um": 12.419999999999998,
+          "reason": null,
+          "channel_track": 0
+        },
+        {
+          "pins": [
+            {
+              "block": "pst1",
+              "port": "TAP_S"
+            },
+            {
+              "block": "mol2",
+              "port": "U0_S"
+            }
+          ],
+          "routed": true,
+          "route_length_um": 14.500000000000002,
+          "reason": null,
+          "channel_track": 0
+        },
+        {
+          "pins": [
+            {
+              "block": "mol2",
+              "port": "U0_S"
+            },
+            {
+              "block": "mokc",
+              "port": "U0_S"
+            }
+          ],
+          "routed": true,
+          "route_length_um": 21.5,
+          "reason": null,
+          "channel_track": 0
+        },
+        {
+          "pins": [
+            {
+              "block": "mokc",
+              "port": "U0_S"
+            },
+            {
+              "block": "mok2",
+              "port": "U0_S"
+            }
+          ],
+          "routed": true,
+          "route_length_um": 19.0,
+          "reason": null,
+          "channel_track": 0
+        },
+        {
+          "pins": [
+            {
+              "block": "mok2",
+              "port": "U0_S"
+            },
+            {
+              "block": "pst2",
+              "port": "TAP_S"
+            }
+          ],
+          "routed": true,
+          "route_length_um": 12.420000000000002,
+          "reason": null,
+          "channel_track": 0
+        },
+        {
+          "pins": [
+            {
+              "block": "pst2",
+              "port": "TAP_S"
+            },
+            {
+              "block": "mo1n",
+              "port": "U0_S"
+            }
+          ],
+          "routed": true,
+          "route_length_um": 16.0,
+          "reason": null,
+          "channel_track": 0
+        }
+      ]
+    },
+    {
+      "net": "tok",
+      "pins": [
+        {
+          "block": "mpok",
+          "port": "U0_D"
+        },
+        {
+          "block": "mokb",
+          "port": "U0_S"
+        },
+        {
+          "block": "moka",
+          "port": "U0_S"
+        }
+      ],
+      "routed": true,
+      "route_length_um": 41.56,
+      "status": "routed",
+      "legs": [
+        {
+          "pins": [
+            {
+              "block": "mpok",
+              "port": "U0_D"
+            },
+            {
+              "block": "mokb",
+              "port": "U0_S"
+            }
+          ],
+          "routed": true,
+          "route_length_um": 8.079999999999998,
+          "reason": null,
+          "channel_track": 0
+        },
+        {
+          "pins": [
+            {
+              "block": "mokb",
+              "port": "U0_S"
+            },
+            {
+              "block": "moka",
+              "port": "U0_S"
+            }
+          ],
+          "routed": true,
+          "route_length_um": 33.480000000000004,
+          "reason": null,
+          "channel_track": 0
+        }
+      ]
+    },
+    {
+      "net": "pb",
+      "pins": [
+        {
+          "block": "mpok",
+          "port": "U0_G"
+        },
+        {
+          "block": "mok2p",
+          "port": "U0_G"
+        }
+      ],
+      "routed": true,
+      "route_length_um": 32.72,
+      "status": "routed",
+      "legs": [
+        {
+          "pins": [
+            {
+              "block": "mpok",
+              "port": "U0_G"
+            },
+            {
+              "block": "mok2p",
+              "port": "U0_G"
+            }
+          ],
+          "routed": true,
+          "route_length_um": 32.72,
+          "reason": null,
+          "channel_track": 0
+        }
+      ]
+    },
+    {
+      "net": "nokl",
+      "pins": [
+        {
+          "block": "mokb",
+          "port": "U0_D"
+        },
+        {
+          "block": "mol1",
+          "port": "U0_D"
+        },
+        {
+          "block": "mol1",
+          "port": "U0_G"
+        },
+        {
+          "block": "mol2",
+          "port": "U0_G"
+        }
+      ],
+      "routed": true,
+      "route_length_um": 39.27000000000001,
+      "status": "routed",
+      "legs": [
+        {
+          "pins": [
+            {
+              "block": "mokb",
+              "port": "U0_D"
+            },
+            {
+              "block": "mol2",
+              "port": "U0_G"
+            }
+          ],
+          "routed": true,
+          "route_length_um": 20.650000000000002,
+          "reason": null,
+          "channel_track": 0
+        },
+        {
+          "pins": [
+            {
+              "block": "mol2",
+              "port": "U0_G"
+            },
+            {
+              "block": "mol1",
+              "port": "U0_G"
+            }
+          ],
+          "routed": true,
+          "route_length_um": 10.280000000000003,
+          "reason": null,
+          "channel_track": 0
+        },
+        {
+          "pins": [
+            {
+              "block": "mol1",
+              "port": "U0_G"
+            },
+            {
+              "block": "mol1",
+              "port": "U0_D"
+            }
+          ],
+          "routed": true,
+          "route_length_um": 8.340000000000002,
+          "reason": null,
+          "channel_track": 0
+        }
+      ]
+    },
+    {
+      "net": "noko",
+      "pins": [
+        {
+          "block": "moka",
+          "port": "U0_D"
+        },
+        {
+          "block": "mol2",
+          "port": "U0_D"
+        },
+        {
+          "block": "mokc",
+          "port": "U0_D"
+        },
+        {
+          "block": "mok2",
+          "port": "U0_G"
+        }
+      ],
+      "routed": true,
+      "route_length_um": 56.03,
+      "status": "routed",
+      "legs": [
+        {
+          "pins": [
+            {
+              "block": "moka",
+              "port": "U0_D"
+            },
+            {
+              "block": "mol2",
+              "port": "U0_D"
+            }
+          ],
+          "routed": true,
+          "route_length_um": 23.809999999999995,
+          "reason": null,
+          "channel_track": 0
+        },
+        {
+          "pins": [
+            {
+              "block": "mol2",
+              "port": "U0_D"
+            },
+            {
+              "block": "mokc",
+              "port": "U0_D"
+            }
+          ],
+          "routed": true,
+          "route_length_um": 18.04,
+          "reason": null,
+          "channel_track": 0
+        },
+        {
+          "pins": [
+            {
+              "block": "mokc",
+              "port": "U0_D"
+            },
+            {
+              "block": "mok2",
+              "port": "U0_G"
+            }
+          ],
+          "routed": true,
+          "route_length_um": 14.180000000000003,
+          "reason": null,
+          "channel_track": 0
+        }
+      ]
+    },
+    {
+      "net": "nokx",
+      "pins": [
+        {
+          "block": "mok2p",
+          "port": "U0_D"
+        },
+        {
+          "block": "mok2",
+          "port": "U0_D"
+        },
+        {
+          "block": "mo1p",
+          "port": "U0_G"
+        },
+        {
+          "block": "mo1n",
+          "port": "U0_G"
+        }
+      ],
+      "routed": true,
+      "route_length_um": 43.14,
+      "status": "routed",
+      "legs": [
+        {
+          "pins": [
+            {
+              "block": "mok2p",
+              "port": "U0_D"
+            },
+            {
+              "block": "mok2",
+              "port": "U0_D"
+            }
+          ],
+          "routed": true,
+          "route_length_um": 17.21,
+          "reason": null,
+          "channel_track": 0
+        },
+        {
+          "pins": [
+            {
+              "block": "mok2",
+              "port": "U0_D"
+            },
+            {
+              "block": "mo1n",
+              "port": "U0_G"
+            }
+          ],
+          "routed": true,
+          "route_length_um": 14.43,
+          "reason": null,
+          "channel_track": 0
+        },
+        {
+          "pins": [
+            {
+              "block": "mo1n",
+              "port": "U0_G"
+            },
+            {
+              "block": "mo1p",
+              "port": "U0_G"
+            }
+          ],
+          "routed": true,
+          "route_length_um": 11.5,
+          "reason": null,
+          "channel_track": 0
+        }
+      ]
+    },
+    {
+      "net": "bias_ok",
+      "pins": [
+        {
+          "block": "mo1p",
+          "port": "U0_D"
+        },
+        {
+          "block": "mo1n",
+          "port": "U0_D"
+        }
+      ],
+      "routed": true,
+      "route_length_um": 19.709999999999994,
+      "status": "routed",
+      "legs": [
+        {
+          "pins": [
+            {
+              "block": "mo1p",
+              "port": "U0_D"
+            },
+            {
+              "block": "mo1n",
+              "port": "U0_D"
+            }
+          ],
+          "routed": true,
+          "route_length_um": 19.709999999999994,
+          "reason": null,
+          "channel_track": 0
+        }
+      ]
+    }
+  ],
+  "pins": [
+    {
+      "net": "na",
+      "block": "moka",
+      "port": "U0_G",
+      "labelled": true
+    },
+    {
+      "net": "nbtop",
+      "block": "mokb",
+      "port": "U0_G",
+      "labelled": true
+    },
+    {
+      "net": "nkg",
+      "block": "mokc",
+      "port": "U0_G",
+      "labelled": true
+    }
+  ],
+  "unrouted_nets": [],
+  "drc_hints": {
+    "min_spacing_um": null,
+    "matched_groups": [
+      {
+        "matched_group_id": "mos_array:1x1:common_centroid",
+        "blocks": [
+          "mpok",
+          "mokb",
+          "moka",
+          "mok2p",
+          "mo1p",
+          "mol1",
+          "mol2",
+          "mokc",
+          "mok2",
+          "mo1n"
+        ],
+        "placement_symmetric": null
+      }
+    ],
+    "notes": []
+  },
+  "warnings": [
+    "block 'nwt_mpok' is placed 0.00um from block 'mpok' (strategy: explicit), closer than mpok's own declared drc_hints.min_spacing_um of 0.40um",
+    "block 'nwt_mokb' is placed 0.00um from block 'mokb' (strategy: explicit), closer than mokb's own declared drc_hints.min_spacing_um of 0.40um",
+    "block 'nwt_moka' is placed 0.00um from block 'moka' (strategy: explicit), closer than moka's own declared drc_hints.min_spacing_um of 0.40um",
+    "block 'nwt_mok2p' is placed 0.00um from block 'mok2p' (strategy: explicit), closer than mok2p's own declared drc_hints.min_spacing_um of 0.40um",
+    "block 'nwt_mo1p' is placed 0.00um from block 'mo1p' (strategy: explicit), closer than mo1p's own declared drc_hints.min_spacing_um of 0.40um",
+    "block 'mpok' is placed 0.00um from block 'nwt_mpok' (strategy: explicit), closer than nwt_mpok's own declared drc_hints.min_spacing_um of 0.40um",
+    "block 'mokb' is placed 0.00um from block 'nwt_mokb' (strategy: explicit), closer than nwt_mokb's own declared drc_hints.min_spacing_um of 0.40um",
+    "block 'moka' is placed 0.00um from block 'nwt_moka' (strategy: explicit), closer than nwt_moka's own declared drc_hints.min_spacing_um of 0.40um",
+    "block 'mok2p' is placed 0.00um from block 'nwt_mok2p' (strategy: explicit), closer than nwt_mok2p's own declared drc_hints.min_spacing_um of 0.40um",
+    "block 'mo1p' is placed 0.00um from block 'nwt_mo1p' (strategy: explicit), closer than nwt_mo1p's own declared drc_hints.min_spacing_um of 0.40um"
+  ]
+}

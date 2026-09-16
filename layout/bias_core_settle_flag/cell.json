@@ -1,0 +1,1159 @@
+{
+  "cell": "bias_core_settle_flag",
+  "_comment": [
+    "Cell descriptor for layout/bin/compose-cell.py -- see layout/README.md",
+    "for the recipe this follows and layout/bias_core_settle_flag/README.md",
+    "for this cell's own floorplan/routing reasoning and results. Issue #39",
+    "(part of #34, itself a follow-on from #30/#4); the compose-cell recipe",
+    "is the one layout/bias_core_pnp8_leg/ (issue #30/PR #33) established.",
+    "",
+    "This is design/netlist/bias_core.spice's XMPOK/XMOKA/XMOKB/XMOL1/XMOL2/",
+    "XMOKC/XMOK2/XMOK2P/XMO1P/XMO1N device group -- the settle-flag",
+    "comparator/driver chain that produces bias_core's own BIAS_OK output.",
+    "10 devices, 5x sky130_fd_pr__pfet_g5v0d10v5 + 5x",
+    "sky130_fd_pr__nfet_g5v0d10v5, each its own single-instance `klt gen",
+    "mos_array` call (rows=1 cols=1 dummy=0 gate_contact=true) -- no matched",
+    "array: no two of these ten devices share a W/L, and none of them are",
+    "meant to match each other.",
+    "",
+    "KNOWN GAP, disclosed here because a clean LVS match below cannot see",
+    "it: `klt gen` cannot draw sky130's hvi (75/20) thick-oxide marker, so",
+    "these are the 5V devices' W/L drawn in the 1.8V domain's geometry. See",
+    "README.md's 'The one thing this layout does not yet say' section and",
+    "2AMLogic/klayout-tools#1912.",
+    "",
+    "FLOORPLAN (placement.strategy 'explicit'): the standard two-row CMOS",
+    "shape -- NMOS row along y=0 (orientation 'none', gates facing north),",
+    "PMOS row with its bottom edge at y=14.0 (orientation 'mirror_y', or",
+    "'rotate_180' for moka whose source must face east, so every PMOS gate",
+    "faces south), and the signal channel between them. Every PMOS gate",
+    "lands on the same y=14.36 gate row because each PMOS origin is set from",
+    "its own device height (Y = 14.0 + w + 0.82 + 0.15). Bodies are tied by",
+    "abutment, not by enclosure (a device nested inside a ring is unroutable",
+    "-- 2AMLogic/klayout-tools#1493): each PMOS gets its own `guard_ring`",
+    "nwell tap island placed so the two nwells OVERLAP by 0.10um (one",
+    "electrical node) while their li1 stays 0.20um apart, clear of sky130's",
+    "0.17um li1 spacing floor. Distinct nwell islands are kept >= 1.27um",
+    "apart (nwell.space.1). moka's tap island sits NORTH of it rather than",
+    "west, because a west island would sit exactly where noko's own li1 drop",
+    "out of moka's west-facing drain has to run. Two psub tap islands",
+    "(add_well=false) tie the substrate to vss.",
+    "",
+    "ROUTING (three planes, assigned per net via connectivity[].layer_role,",
+    "klayout-tools#1655, so no two nets sharing a plane ever cross):",
+    "  metal  (li1)  nokl / noko / nokx / bias_ok -- the four local nets,",
+    "                each confined to its own column of the channel, in",
+    "                disjoint x ranges, so they cannot meet;",
+    "  metal2 (met1) vdd (one lane above the PMOS row, y=26.5) and vss (one",
+    "                lane below the NMOS row, y=-6.0) -- disjoint by",
+    "                construction;",
+    "  metal3 (met2) tok (stays above the PMOS row, y>=15.47) and pb (stays",
+    "                below it, y<=14.36) -- also disjoint.",
+    "Every leg is steered explicitly through connectivity[].legs[]",
+    "(klayout-tools#1529) rather than left to the nearest-first spanning",
+    "tree, so a rail leg cannot wander across another net's via landing pad;",
+    "compose.response.json records routed: true for every named leg.",
+    "",
+    "na / nbtop / nkg touch exactly one port in this device group, so each",
+    "is a pins[] declare-only top-level pin (a label on the gate pad's own",
+    "already-drawn li1, no metal routed) rather than a connectivity[] net."
+  ],
+  "pdk": {
+    "variant": "sky130A",
+    "deck": "sky130"
+  },
+  "blocks": [
+    {
+      "id": "mpok",
+      "generator": "mos_array",
+      "cell_name": "mpok_pfet",
+      "orientation": "mirror_y",
+      "params": {
+        "w_um": 1.0,
+        "l_um": 4.0,
+        "rows": 1,
+        "cols": 1,
+        "dummy": 0,
+        "flavor": "pfet",
+        "gate_contact": true
+      }
+    },
+    {
+      "id": "mokb",
+      "generator": "mos_array",
+      "cell_name": "mokb_pfet",
+      "orientation": "mirror_y",
+      "params": {
+        "w_um": 8.0,
+        "l_um": 4.0,
+        "rows": 1,
+        "cols": 1,
+        "dummy": 0,
+        "flavor": "pfet",
+        "gate_contact": true
+      }
+    },
+    {
+      "id": "moka",
+      "generator": "mos_array",
+      "cell_name": "moka_pfet",
+      "orientation": "rotate_180",
+      "params": {
+        "w_um": 8.0,
+        "l_um": 4.0,
+        "rows": 1,
+        "cols": 1,
+        "dummy": 0,
+        "flavor": "pfet",
+        "gate_contact": true
+      }
+    },
+    {
+      "id": "mok2p",
+      "generator": "mos_array",
+      "cell_name": "mok2p_pfet",
+      "orientation": "mirror_y",
+      "params": {
+        "w_um": 1.0,
+        "l_um": 4.0,
+        "rows": 1,
+        "cols": 1,
+        "dummy": 0,
+        "flavor": "pfet",
+        "gate_contact": true
+      }
+    },
+    {
+      "id": "mo1p",
+      "generator": "mos_array",
+      "cell_name": "mo1p_pfet",
+      "orientation": "mirror_y",
+      "params": {
+        "w_um": 1.0,
+        "l_um": 4.0,
+        "rows": 1,
+        "cols": 1,
+        "dummy": 0,
+        "flavor": "pfet",
+        "gate_contact": true
+      }
+    },
+    {
+      "id": "mol1",
+      "generator": "mos_array",
+      "cell_name": "mol1_nfet",
+      "orientation": "none",
+      "params": {
+        "w_um": 2.0,
+        "l_um": 4.0,
+        "rows": 1,
+        "cols": 1,
+        "dummy": 0,
+        "flavor": "nfet",
+        "gate_contact": true
+      }
+    },
+    {
+      "id": "mol2",
+      "generator": "mos_array",
+      "cell_name": "mol2_nfet",
+      "orientation": "none",
+      "params": {
+        "w_um": 2.0,
+        "l_um": 4.0,
+        "rows": 1,
+        "cols": 1,
+        "dummy": 0,
+        "flavor": "nfet",
+        "gate_contact": true
+      }
+    },
+    {
+      "id": "mokc",
+      "generator": "mos_array",
+      "cell_name": "mokc_nfet",
+      "orientation": "none",
+      "params": {
+        "w_um": 2.0,
+        "l_um": 1.0,
+        "rows": 1,
+        "cols": 1,
+        "dummy": 0,
+        "flavor": "nfet",
+        "gate_contact": true
+      }
+    },
+    {
+      "id": "mok2",
+      "generator": "mos_array",
+      "cell_name": "mok2_nfet",
+      "orientation": "none",
+      "params": {
+        "w_um": 2.0,
+        "l_um": 4.0,
+        "rows": 1,
+        "cols": 1,
+        "dummy": 0,
+        "flavor": "nfet",
+        "gate_contact": true
+      }
+    },
+    {
+      "id": "mo1n",
+      "generator": "mos_array",
+      "cell_name": "mo1n_nfet",
+      "orientation": "none",
+      "params": {
+        "w_um": 4.0,
+        "l_um": 0.5,
+        "rows": 1,
+        "cols": 1,
+        "dummy": 0,
+        "flavor": "nfet",
+        "gate_contact": true
+      }
+    },
+    {
+      "id": "nwt_mpok",
+      "generator": "guard_ring",
+      "cell_name": "nwt_mpok",
+      "orientation": "none",
+      "params": {
+        "inner_width_um": 1.0,
+        "inner_height_um": 1.0,
+        "ring_width_um": 0.42,
+        "contacts_per_side": 2,
+        "add_well": true
+      }
+    },
+    {
+      "id": "nwt_mokb",
+      "generator": "guard_ring",
+      "cell_name": "nwt_mokb",
+      "orientation": "none",
+      "params": {
+        "inner_width_um": 1.0,
+        "inner_height_um": 1.0,
+        "ring_width_um": 0.42,
+        "contacts_per_side": 2,
+        "add_well": true
+      }
+    },
+    {
+      "id": "nwt_moka",
+      "generator": "guard_ring",
+      "cell_name": "nwt_moka",
+      "orientation": "none",
+      "params": {
+        "inner_width_um": 1.0,
+        "inner_height_um": 1.0,
+        "ring_width_um": 0.42,
+        "contacts_per_side": 2,
+        "add_well": true
+      }
+    },
+    {
+      "id": "nwt_mok2p",
+      "generator": "guard_ring",
+      "cell_name": "nwt_mok2p",
+      "orientation": "none",
+      "params": {
+        "inner_width_um": 1.0,
+        "inner_height_um": 1.0,
+        "ring_width_um": 0.42,
+        "contacts_per_side": 2,
+        "add_well": true
+      }
+    },
+    {
+      "id": "nwt_mo1p",
+      "generator": "guard_ring",
+      "cell_name": "nwt_mo1p",
+      "orientation": "none",
+      "params": {
+        "inner_width_um": 1.0,
+        "inner_height_um": 1.0,
+        "ring_width_um": 0.42,
+        "contacts_per_side": 2,
+        "add_well": true
+      }
+    },
+    {
+      "id": "pst1",
+      "generator": "guard_ring",
+      "cell_name": "pst1",
+      "orientation": "none",
+      "params": {
+        "inner_width_um": 1.0,
+        "inner_height_um": 1.0,
+        "ring_width_um": 0.42,
+        "contacts_per_side": 2,
+        "add_well": false
+      }
+    },
+    {
+      "id": "pst2",
+      "generator": "guard_ring",
+      "cell_name": "pst2",
+      "orientation": "none",
+      "params": {
+        "inner_width_um": 1.0,
+        "inner_height_um": 1.0,
+        "ring_width_um": 0.42,
+        "contacts_per_side": 2,
+        "add_well": false
+      }
+    }
+  ],
+  "placement": {
+    "strategy": "explicit",
+    "order": [
+      "mpok",
+      "mokb",
+      "moka",
+      "mok2p",
+      "mo1p",
+      "mol1",
+      "mol2",
+      "mokc",
+      "mok2",
+      "mo1n",
+      "nwt_mpok",
+      "nwt_mokb",
+      "nwt_moka",
+      "nwt_mok2p",
+      "nwt_mo1p",
+      "pst1",
+      "pst2"
+    ],
+    "origins_um": {
+      "mpok": {
+        "x": 0.0,
+        "y": 15.97
+      },
+      "mokb": {
+        "x": 9.0,
+        "y": 22.97
+      },
+      "moka": {
+        "x": 23.0,
+        "y": 22.97
+      },
+      "mok2p": {
+        "x": 27.0,
+        "y": 15.97
+      },
+      "mo1p": {
+        "x": 36.0,
+        "y": 15.97
+      },
+      "mol1": {
+        "x": 8.0,
+        "y": 0.0
+      },
+      "mol2": {
+        "x": 15.5,
+        "y": 0.0
+      },
+      "mokc": {
+        "x": 23.0,
+        "y": 0.0
+      },
+      "mok2": {
+        "x": 28.0,
+        "y": 0.0
+      },
+      "mo1n": {
+        "x": 36.0,
+        "y": 0.0
+      },
+      "nwt_mpok": {
+        "x": -2.04,
+        "y": 14.2
+      },
+      "nwt_mokb": {
+        "x": 6.96,
+        "y": 14.2
+      },
+      "nwt_moka": {
+        "x": 19.01,
+        "y": 23.17
+      },
+      "nwt_mok2p": {
+        "x": 24.96,
+        "y": 14.2
+      },
+      "nwt_mo1p": {
+        "x": 33.96,
+        "y": 14.2
+      },
+      "pst1": {
+        "x": 10.0,
+        "y": -3.5
+      },
+      "pst2": {
+        "x": 30.0,
+        "y": -3.5
+      }
+    }
+  },
+  "routing": {
+    "layer_role": "metal",
+    "width_um": 0.17
+  },
+  "connectivity": [
+    {
+      "net": "vdd",
+      "layer_role": "metal2",
+      "pins": [
+        {
+          "block": "nwt_mpok",
+          "port": "TAP_N"
+        },
+        {
+          "block": "mpok",
+          "port": "U0_S"
+        },
+        {
+          "block": "nwt_mokb",
+          "port": "TAP_N"
+        },
+        {
+          "block": "nwt_moka",
+          "port": "TAP_N"
+        },
+        {
+          "block": "nwt_mok2p",
+          "port": "TAP_N"
+        },
+        {
+          "block": "mok2p",
+          "port": "U0_S"
+        },
+        {
+          "block": "nwt_mo1p",
+          "port": "TAP_N"
+        },
+        {
+          "block": "mo1p",
+          "port": "U0_S"
+        }
+      ],
+      "legs": [
+        {
+          "from_pin": {
+            "block": "nwt_mpok",
+            "port": "TAP_N"
+          },
+          "to_pin": {
+            "block": "mpok",
+            "port": "U0_S"
+          },
+          "waypoints_um": [
+            [
+              -1.12,
+              26.5
+            ],
+            [
+              0.21,
+              26.5
+            ]
+          ]
+        },
+        {
+          "from_pin": {
+            "block": "mpok",
+            "port": "U0_S"
+          },
+          "to_pin": {
+            "block": "nwt_mokb",
+            "port": "TAP_N"
+          },
+          "waypoints_um": [
+            [
+              0.21,
+              26.5
+            ],
+            [
+              7.88,
+              26.5
+            ]
+          ]
+        },
+        {
+          "from_pin": {
+            "block": "nwt_mokb",
+            "port": "TAP_N"
+          },
+          "to_pin": {
+            "block": "nwt_moka",
+            "port": "TAP_N"
+          },
+          "waypoints_um": [
+            [
+              7.88,
+              26.5
+            ],
+            [
+              19.93,
+              26.5
+            ]
+          ]
+        },
+        {
+          "from_pin": {
+            "block": "nwt_moka",
+            "port": "TAP_N"
+          },
+          "to_pin": {
+            "block": "nwt_mok2p",
+            "port": "TAP_N"
+          },
+          "waypoints_um": [
+            [
+              19.93,
+              26.5
+            ],
+            [
+              25.88,
+              26.5
+            ]
+          ]
+        },
+        {
+          "from_pin": {
+            "block": "nwt_mok2p",
+            "port": "TAP_N"
+          },
+          "to_pin": {
+            "block": "mok2p",
+            "port": "U0_S"
+          },
+          "waypoints_um": [
+            [
+              25.88,
+              26.5
+            ],
+            [
+              27.21,
+              26.5
+            ]
+          ]
+        },
+        {
+          "from_pin": {
+            "block": "mok2p",
+            "port": "U0_S"
+          },
+          "to_pin": {
+            "block": "nwt_mo1p",
+            "port": "TAP_N"
+          },
+          "waypoints_um": [
+            [
+              27.21,
+              26.5
+            ],
+            [
+              34.88,
+              26.5
+            ]
+          ]
+        },
+        {
+          "from_pin": {
+            "block": "nwt_mo1p",
+            "port": "TAP_N"
+          },
+          "to_pin": {
+            "block": "mo1p",
+            "port": "U0_S"
+          },
+          "waypoints_um": [
+            [
+              34.88,
+              26.5
+            ],
+            [
+              36.21,
+              26.5
+            ]
+          ]
+        }
+      ]
+    },
+    {
+      "net": "vss",
+      "layer_role": "metal2",
+      "pins": [
+        {
+          "block": "mol1",
+          "port": "U0_S"
+        },
+        {
+          "block": "pst1",
+          "port": "TAP_S"
+        },
+        {
+          "block": "mol2",
+          "port": "U0_S"
+        },
+        {
+          "block": "mokc",
+          "port": "U0_S"
+        },
+        {
+          "block": "mok2",
+          "port": "U0_S"
+        },
+        {
+          "block": "pst2",
+          "port": "TAP_S"
+        },
+        {
+          "block": "mo1n",
+          "port": "U0_S"
+        }
+      ],
+      "legs": [
+        {
+          "from_pin": {
+            "block": "mol1",
+            "port": "U0_S"
+          },
+          "to_pin": {
+            "block": "pst1",
+            "port": "TAP_S"
+          },
+          "waypoints_um": [
+            [
+              8.21,
+              -6.0
+            ],
+            [
+              10.92,
+              -6.0
+            ]
+          ]
+        },
+        {
+          "from_pin": {
+            "block": "pst1",
+            "port": "TAP_S"
+          },
+          "to_pin": {
+            "block": "mol2",
+            "port": "U0_S"
+          },
+          "waypoints_um": [
+            [
+              10.92,
+              -6.0
+            ],
+            [
+              15.71,
+              -6.0
+            ]
+          ]
+        },
+        {
+          "from_pin": {
+            "block": "mol2",
+            "port": "U0_S"
+          },
+          "to_pin": {
+            "block": "mokc",
+            "port": "U0_S"
+          },
+          "waypoints_um": [
+            [
+              15.71,
+              -6.0
+            ],
+            [
+              23.21,
+              -6.0
+            ]
+          ]
+        },
+        {
+          "from_pin": {
+            "block": "mokc",
+            "port": "U0_S"
+          },
+          "to_pin": {
+            "block": "mok2",
+            "port": "U0_S"
+          },
+          "waypoints_um": [
+            [
+              23.21,
+              -6.0
+            ],
+            [
+              28.21,
+              -6.0
+            ]
+          ]
+        },
+        {
+          "from_pin": {
+            "block": "mok2",
+            "port": "U0_S"
+          },
+          "to_pin": {
+            "block": "pst2",
+            "port": "TAP_S"
+          },
+          "waypoints_um": [
+            [
+              28.21,
+              -6.0
+            ],
+            [
+              30.92,
+              -6.0
+            ]
+          ]
+        },
+        {
+          "from_pin": {
+            "block": "pst2",
+            "port": "TAP_S"
+          },
+          "to_pin": {
+            "block": "mo1n",
+            "port": "U0_S"
+          },
+          "waypoints_um": [
+            [
+              30.92,
+              -6.0
+            ],
+            [
+              36.21,
+              -6.0
+            ]
+          ]
+        }
+      ]
+    },
+    {
+      "net": "tok",
+      "layer_role": "metal3",
+      "pins": [
+        {
+          "block": "mpok",
+          "port": "U0_D"
+        },
+        {
+          "block": "mokb",
+          "port": "U0_S"
+        },
+        {
+          "block": "moka",
+          "port": "U0_S"
+        }
+      ],
+      "legs": [
+        {
+          "from_pin": {
+            "block": "mpok",
+            "port": "U0_D"
+          },
+          "to_pin": {
+            "block": "mokb",
+            "port": "U0_S"
+          },
+          "waypoints_um": [
+            [
+              5.9,
+              15.47
+            ],
+            [
+              5.9,
+              18.97
+            ]
+          ]
+        },
+        {
+          "from_pin": {
+            "block": "mokb",
+            "port": "U0_S"
+          },
+          "to_pin": {
+            "block": "moka",
+            "port": "U0_S"
+          },
+          "waypoints_um": [
+            [
+              6.0,
+              18.97
+            ],
+            [
+              6.0,
+              24.5
+            ],
+            [
+              24.0,
+              24.5
+            ],
+            [
+              24.0,
+              18.97
+            ]
+          ]
+        }
+      ]
+    },
+    {
+      "net": "pb",
+      "layer_role": "metal3",
+      "pins": [
+        {
+          "block": "mpok",
+          "port": "U0_G"
+        },
+        {
+          "block": "mok2p",
+          "port": "U0_G"
+        }
+      ],
+      "waypoints_um": [
+        [
+          2.42,
+          11.5
+        ],
+        [
+          29.42,
+          11.5
+        ]
+      ]
+    },
+    {
+      "net": "nokl",
+      "pins": [
+        {
+          "block": "mokb",
+          "port": "U0_D"
+        },
+        {
+          "block": "mol1",
+          "port": "U0_D"
+        },
+        {
+          "block": "mol1",
+          "port": "U0_G"
+        },
+        {
+          "block": "mol2",
+          "port": "U0_G"
+        }
+      ],
+      "legs": [
+        {
+          "from_pin": {
+            "block": "mokb",
+            "port": "U0_D"
+          },
+          "to_pin": {
+            "block": "mol2",
+            "port": "U0_G"
+          },
+          "waypoints_um": [
+            [
+              14.5,
+              18.97
+            ],
+            [
+              14.5,
+              4.0
+            ],
+            [
+              17.92,
+              4.0
+            ]
+          ]
+        },
+        {
+          "from_pin": {
+            "block": "mol2",
+            "port": "U0_G"
+          },
+          "to_pin": {
+            "block": "mol1",
+            "port": "U0_G"
+          },
+          "waypoints_um": [
+            [
+              17.92,
+              4.0
+            ],
+            [
+              10.42,
+              4.0
+            ]
+          ]
+        },
+        {
+          "from_pin": {
+            "block": "mol1",
+            "port": "U0_G"
+          },
+          "to_pin": {
+            "block": "mol1",
+            "port": "U0_D"
+          },
+          "waypoints_um": [
+            [
+              10.42,
+              4.0
+            ],
+            [
+              13.5,
+              4.0
+            ],
+            [
+              13.5,
+              1.0
+            ]
+          ]
+        }
+      ]
+    },
+    {
+      "net": "noko",
+      "pins": [
+        {
+          "block": "moka",
+          "port": "U0_D"
+        },
+        {
+          "block": "mol2",
+          "port": "U0_D"
+        },
+        {
+          "block": "mokc",
+          "port": "U0_D"
+        },
+        {
+          "block": "mok2",
+          "port": "U0_G"
+        }
+      ],
+      "legs": [
+        {
+          "from_pin": {
+            "block": "moka",
+            "port": "U0_D"
+          },
+          "to_pin": {
+            "block": "mol2",
+            "port": "U0_D"
+          },
+          "waypoints_um": [
+            [
+              17.6,
+              18.97
+            ],
+            [
+              17.6,
+              6.0
+            ],
+            [
+              21.4,
+              6.0
+            ],
+            [
+              21.4,
+              1.0
+            ]
+          ]
+        },
+        {
+          "from_pin": {
+            "block": "mol2",
+            "port": "U0_D"
+          },
+          "to_pin": {
+            "block": "mokc",
+            "port": "U0_D"
+          },
+          "waypoints_um": [
+            [
+              21.4,
+              1.0
+            ],
+            [
+              21.4,
+              6.0
+            ],
+            [
+              26.4,
+              6.0
+            ],
+            [
+              26.4,
+              1.0
+            ]
+          ]
+        },
+        {
+          "from_pin": {
+            "block": "mokc",
+            "port": "U0_D"
+          },
+          "to_pin": {
+            "block": "mok2",
+            "port": "U0_G"
+          },
+          "waypoints_um": [
+            [
+              26.4,
+              1.0
+            ],
+            [
+              26.4,
+              6.0
+            ],
+            [
+              30.42,
+              6.0
+            ]
+          ]
+        }
+      ]
+    },
+    {
+      "net": "nokx",
+      "pins": [
+        {
+          "block": "mok2p",
+          "port": "U0_D"
+        },
+        {
+          "block": "mok2",
+          "port": "U0_D"
+        },
+        {
+          "block": "mo1p",
+          "port": "U0_G"
+        },
+        {
+          "block": "mo1n",
+          "port": "U0_G"
+        }
+      ],
+      "legs": [
+        {
+          "from_pin": {
+            "block": "mok2p",
+            "port": "U0_D"
+          },
+          "to_pin": {
+            "block": "mok2",
+            "port": "U0_D"
+          },
+          "waypoints_um": [
+            [
+              33.5,
+              15.47
+            ],
+            [
+              33.5,
+              1.0
+            ]
+          ]
+        },
+        {
+          "from_pin": {
+            "block": "mok2",
+            "port": "U0_D"
+          },
+          "to_pin": {
+            "block": "mo1n",
+            "port": "U0_G"
+          },
+          "waypoints_um": [
+            [
+              33.5,
+              1.0
+            ],
+            [
+              33.5,
+              8.0
+            ],
+            [
+              36.67,
+              8.0
+            ]
+          ]
+        },
+        {
+          "from_pin": {
+            "block": "mo1n",
+            "port": "U0_G"
+          },
+          "to_pin": {
+            "block": "mo1p",
+            "port": "U0_G"
+          },
+          "waypoints_um": [
+            [
+              36.67,
+              8.0
+            ],
+            [
+              38.42,
+              8.0
+            ]
+          ]
+        }
+      ]
+    },
+    {
+      "net": "bias_ok",
+      "pins": [
+        {
+          "block": "mo1p",
+          "port": "U0_D"
+        },
+        {
+          "block": "mo1n",
+          "port": "U0_D"
+        }
+      ],
+      "waypoints_um": [
+        [
+          42.0,
+          15.47
+        ],
+        [
+          42.0,
+          2.0
+        ]
+      ]
+    }
+  ],
+  "pins": [
+    {
+      "net": "na",
+      "block": "moka",
+      "port": "U0_G"
+    },
+    {
+      "net": "nbtop",
+      "block": "mokb",
+      "port": "U0_G"
+    },
+    {
+      "net": "nkg",
+      "block": "mokc",
+      "port": "U0_G"
+    }
+  ],
+  "lvs": {
+    "reference": "layout/bias_core_settle_flag/reference.spice",
+    "subckt": "bias_core_settle_flag"
+  }
+}

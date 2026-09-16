@@ -77,6 +77,36 @@ own README "Verification" section for the full diagnosis,
 and
 [`2AMLogic/klayout-tools#1908`](https://github.com/2AMLogic/klayout-tools/issues/1908).
 
+## `bias_core_settle_flag`: the settle-flag output stage (issue #39, part of #34)
+
+[`layout/bias_core_settle_flag/`](bias_core_settle_flag/README.md) lays out
+`design/netlist/bias_core.spice`'s `XMPOK`/`XMOKA`/`XMOKB`/`XMOL1`/`XMOL2`/
+`XMOKC`/`XMOK2`/`XMOK2P`/`XMO1P`/`XMO1N` device group — the settle-flag
+comparator/driver chain that produces `bias_core`'s own `BIAS_OK` output, 10
+devices (5x `sky130_fd_pr__pfet_g5v0d10v5` + 5x
+`sky130_fd_pr__nfet_g5v0d10v5`, no two of them the same size) — as a fourth
+standalone proof cell: a two-row CMOS floorplan (NMOS row, signal channel,
+PMOS row) with per-device `guard_ring` body-tie islands abutted at a 0.10um
+nwell overlap, and all eight routed nets split across three metal planes by
+`connectivity[].layer_role` so the whole cell composes in a single
+`klt gen-compose` pass.
+
+**`klt drc`: clean, 0 violations.** **`klt extract`: 10 devices, 11 nets, 11
+pins.** **`klt lvs` against `design/netlist/bias_core.spice`'s own device
+cards: `match` — 10/10 devices, 11/11 nets, 11/11 pins, 0 mismatches.** This
+is **the first sub-block in this repo to reach a full LVS match**: none of
+the three gaps blocking the sibling cells touches a MOS device, so this group
+was free to go the whole way.
+
+It carries one disclosure of its own, which no step of the chain can see:
+`klt gen` cannot draw sky130's `hvi` (75/20) thick-oxide marker, so these 5V
+`g5v0d10v5` devices are drawn in the 1.8V domain's geometry, `klt drc` reads
+no `hvi` rule, and `klt lvs` deliberately maps both flavours onto one device
+class — so the match above is exactly as clean as it would be with the marker
+present. Filed as
+[`2AMLogic/klayout-tools#1912`](https://github.com/2AMLogic/klayout-tools/issues/1912);
+see that cell's own README for what the match does and does not assert.
+
 ## Known klt gaps hit building this recipe
 
 Filed generically at
@@ -115,15 +145,38 @@ collector strap once that issue is resolved upstream, at which point a real
 base+collector+emitter LVS match should be possible without changing either
 cell's own floorplan.
 
+Two more, both found building `layout/bias_core_settle_flag/` (the first MOS
+cell in this repo) and both filed the same way:
+
+3. **`klt gen` can draw no thick-oxide/medium-voltage marker on the sky130
+   family**, for any `voltage_flavor` value, even though the curated sky130
+   *extraction* deck declares the matching `MOSFlavour(marker=(75, 20),
+   flavour="hvi")` and `pdk_models` binds it to the real `g5v0d10v5`
+   subcircuits. Since no `klt drc` rule reads `hvi`, and `klt lvs` maps both
+   flavours onto one device class, a 5V design drawn in the 1.8V domain
+   passes the whole chain clean —
+   [`2AMLogic/klayout-tools#1912`](https://github.com/2AMLogic/klayout-tools/issues/1912).
+   This is the one open caveat on this repo's only LVS-matching cell.
+4. **A via-ladder's intermediate landing pad can silently short an unrelated
+   net.** `gen-compose`'s route-vs-route check deliberately excludes a
+   multi-hop ladder's intermediate pads (they are not on the leg's own
+   plane) and names `klt drc` as the backstop — but the failure is a *merge*,
+   which no rule deck can see. Reproduced in three blocks with `klt drc`
+   completely clean and `klt extract` reporting the two nets as one `a|b`
+   node —
+   [`2AMLogic/klayout-tools#1913`](https://github.com/2AMLogic/klayout-tools/issues/1913).
+   `bias_core_settle_flag` hits this for real when its supply rail is left to
+   the automatic spanning tree; its own README records the measurement.
+
 ## What's next
 
 Per issue #36, this fleet prefers landing DRC-clean/LVS-blocked increments
 (isolated to a known, upstream-filed gap) over waiting on the upstream fix —
 `bias_core_pnp8_leg`, `bias_core_xq1_xqr`, and `bias_core_passives` all ship
-that way. The remaining `bias_core` device groups (the PFET/NFET
-mirror/error-amp stack, the startup kick chain, the settle-flag output
-stage) and the full-cell assembly are follow-on increments tracked as
-sibling sub-issues of
+that way; `bias_core_settle_flag` is the first that does not have to, and
+lands DRC- and LVS-clean. The remaining `bias_core` device groups (the
+PFET/NFET mirror/error-amp stack, the startup kick chain) and the full-cell
+assembly are follow-on increments tracked as sibling sub-issues of
 [#34](https://github.com/2AMLogic/sky130-temp-por/issues/34); `temp_core`,
 `por_comparator`, `por_output_chain`, and `temp_por_top` are tracked from
 [#4](https://github.com/2AMLogic/sky130-temp-por/issues/4).

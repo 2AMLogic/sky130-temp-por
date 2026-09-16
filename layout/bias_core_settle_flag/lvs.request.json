@@ -1,0 +1,10 @@
+{
+  "layout": {
+    "netlist": "bias_core_settle_flag.spice"
+  },
+  "reference": {
+    "netlist": "bias_core_settle_flag.ref.spice",
+    "form": "subckt-call",
+    "deck": "sky130"
+  }
+}
