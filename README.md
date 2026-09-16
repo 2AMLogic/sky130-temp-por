@@ -8,7 +8,7 @@ open-source xschem + ngspice flow.
 
 **Status: schematic complete and netlisted; verification and layout
 in progress.** `design/` has a full, netlist-checked schematic hierarchy
-(five cells plus the assembled `temp_por_top`); `sim/` has testbench
+(four leaf cells plus the assembled `temp_por_top`); `sim/` has testbench
 harnesses with recorded PVT-corner results; `layout/` has an active
 multi-cell composition pass on the `bias_core` sub-blocks. `spec/` is not
 yet ratified — three decision records (`proposed`) plus a two-key
@@ -71,7 +71,7 @@ with per-cell PVT sim results recorded in `sim/`; spec ratification and
 layout are both advancing in parallel rather than in strict ladder order —
 `spec/decision-records/` has three records (`proposed`, not yet ratified,
 with a two-key `ratification/` process under way) and `layout/` has an
-active multi-cell composition pass (five `bias_core_*` sub-blocks) — so no
+active multi-cell composition pass (six `bias_core_*` sub-blocks) — so no
 single ladder rung is complete yet.**
 
 ## Repo layout

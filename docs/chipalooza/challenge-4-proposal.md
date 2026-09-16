@@ -42,7 +42,7 @@ holds three testbench drivers (`sim/bias-core-op-branch/run_op_branch.py`,
 `sim/native-device-characterization/`) plus dated, append-only PVT-corner
 result records under each suite's `records/` directory (e.g.
 `sim/temp-core-startup/records/20260826-053032-ee63b45.md`). `layout/` now
-holds an active multi-cell composition pass — five `bias_core_*` sub-block
+holds an active multi-cell composition pass — six `bias_core_*` sub-block
 directories (`bias_core_mirror_amp`, `bias_core_passives`,
 `bias_core_pnp8_leg`, `bias_core_settle_flag`, `bias_core_startup`,
 `bias_core_xq1_xqr`), each with `cell.json`/`drc.json`/`extract.json`/
@@ -310,7 +310,7 @@ solvability sanity check, never a "met" claim.
 
 | Parameter | Target (draft, unratified) | Measured (`layout/`) | Status | Evidence |
 |---|---|---|---|---|
-| Total assembled footprint (`temp_por_top`, post-layout, DRC-clean, LVS-matched) | not yet drafted in this repo | none | Unmet — no top-level assembled layout exists yet. `layout/` holds an active sub-block composition pass (five `bias_core_*` cells, see the Honesty note above) but not yet a `temp_por_top` assembly to measure a footprint from | — |
+| Total assembled footprint (`temp_por_top`, post-layout, DRC-clean, LVS-matched) | not yet drafted in this repo | none | Unmet — no top-level assembled layout exists yet. `layout/` holds an active sub-block composition pass (six `bias_core_*` cells, see the Honesty note above) but not yet a `temp_por_top` assembly to measure a footprint from | — |
 
 ## 5. Test-plan outline (measurement on the packaged part)
 
