@@ -26,13 +26,12 @@ repo's own netlist, rather than carrying gf180/bandgap-shaped code that
 nothing here calls.
 
 Kept below (all repo/circuit-generic, actually used by
-`sim/pnp-mismatch/run_pnp_mismatch.py` and/or `corner-run.py` itself):
+`sim/pnp-mismatch/run_pnp_mismatch.py`, `sim/bias-core-op-branch/run_op_branch.py`,
+and/or `corner-run.py` itself):
 
     load_corner_run()    the importlib shim that loads corner-run.py (its
                           filename has a dash, so it can't be `import`ed
                           normally)
-    run_ngspice()          runs one ngspice deck in a scratch dir, capturing
-                          stdout+stderr and timeout status
     parse_measurements()   extracts `.meas`-style `let`/`print` results from
                           an ngspice log via `corner-run.py`'s `MEAS_RE`
     parse_samples()        parses the repeated `op`+`print` blocks of a
@@ -57,10 +56,6 @@ Kept below (all repo/circuit-generic, actually used by
                           `parse_args()` needs
     build_mismatch_points() the N-point mismatch-sweep-plus-controls list
                           builder `pnp-mismatch/run_pnp_mismatch.py` uses
-    mc_control_block()      the Monte Carlo `.control` dowhile-loop skeleton
-                          (`setseed`/`set width`/`set height`/`let nruns`/
-                          `dowhile run < nruns` ... `print`/`let run = run +
-                          1`/`end`/`quit`/`.endc`/`.end`)
     mean()/stdev()/mv()     small numeric/formatting helpers
     seed_stability_checks() the paired same-point/different-seed sigma-drift
                           and worst-sample-changed check pair
@@ -72,8 +67,6 @@ import argparse
 import importlib.util
 import math
 import re
-import shutil
-import subprocess
 import sys
 from dataclasses import dataclass
 from pathlib import Path
@@ -208,38 +201,6 @@ def build_mismatch_points(
     return points
 
 
-def mc_control_block(point: MismatchPoint, loop_body: list[str], prints: str) -> str:
-    """The Monte Carlo `.control` dowhile-loop skeleton: `setseed`/`set
-    width`/`set height`/`let nruns`/`dowhile run < nruns` around a
-    caller-supplied `loop_body`, then `print {prints}`/`let run = run +
-    1`/`end`/`quit`/`.endc`/`.end`.
-
-    `loop_body` is inserted verbatim between `dowhile run < nruns` and
-    `print {prints}` -- it covers everything from the per-experiment `reset`
-    line through the per-experiment `let <name> = ...` measurement lines.
-    Callers own their own two-space loop-body indentation.
-    """
-    return "\n".join(
-        [
-            ".control",
-            f"setseed {point.seed}",
-            "set width = 512",
-            "set height = 100000",
-            f"let nruns = {point.samples}",
-            "let run = 0",
-            "dowhile run < nruns",
-            *loop_body,
-            f"  print {prints}",
-            "  let run = run + 1",
-            "end",
-            "quit",
-            ".endc",
-            ".end",
-            "",
-        ]
-    )
-
-
 def load_corner_run() -> ModuleType:
     """Import sim/bin/corner-run.py (the dash makes it non-importable normally).
 
@@ -273,32 +234,6 @@ def _cr() -> ModuleType:
     if _cr_module is None:
         _cr_module = load_corner_run()
     return _cr_module
-
-
-def run_ngspice(run_dir: Path, name: str, deck: str, timeout: int) -> tuple[str, int, bool]:
-    """Run one ngspice deck in `run_dir`, returning (log, returncode, timed_out)."""
-    run_dir.mkdir(parents=True, exist_ok=True)
-    deck_path = run_dir / f"{name}.spice"
-    deck_path.write_text(deck)
-    shutil.copyfile(SPICEINIT_FILE, run_dir / ".spiceinit")
-    try:
-        proc = subprocess.run(
-            ["ngspice", "-b", deck_path.name],
-            cwd=run_dir,
-            capture_output=True,
-            text=True,
-            stdin=subprocess.DEVNULL,
-            timeout=timeout,
-        )
-        return proc.stdout + proc.stderr, proc.returncode, False
-    except subprocess.TimeoutExpired as exc:
-        out = exc.stdout or ""
-        err = exc.stderr or ""
-        if isinstance(out, bytes):
-            out = out.decode(errors="replace")
-        if isinstance(err, bytes):
-            err = err.decode(errors="replace")
-        return out + err, -1, True
 
 
 def parse_measurements(log: str) -> dict[str, float]:
