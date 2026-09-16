@@ -237,7 +237,7 @@ import tempfile
 from pathlib import Path
 
 sys.path.insert(0, str(Path(__file__).resolve().parent))
-from _klt_common import BuildError, run_klt, write_json  # noqa: E402
+from _klt_common import BuildError, check_klt_pin, run_klt, write_json  # noqa: E402
 
 REPO_ROOT = Path(__file__).resolve().parents[2]
 
@@ -882,6 +882,8 @@ def main(argv: list[str] | None = None) -> int:
         "evidence instead of overwriting it",
     )
     args = parser.parse_args(argv)
+
+    check_klt_pin(REPO_ROOT / "layout" / "pdk.json", env=os.environ.copy())
 
     spec_path = args.spec.resolve()
     spec = json.loads(spec_path.read_text())
