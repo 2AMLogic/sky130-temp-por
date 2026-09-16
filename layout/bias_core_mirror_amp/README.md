@@ -216,6 +216,64 @@ derived version string. The **released** `klayout-tools` v0.5.0 on PyPI is
 (#1655), so it cannot rebuild this cell — or any of the existing ones.
 Filed as a repo-hygiene follow-up, not a tool gap.
 
+## Full-cell assembly pins (issue #56)
+
+This cell's own isolated LVS reference only needed `nbtop`/`vref`/`ibias`/
+`nb` exposed — the four nets that touch exactly one port in this device
+group. Full-cell `bias_core` assembly (#40) needs every net that crosses
+this group's own boundary reachable from outside, and the #40 Builder's own
+assembly attempt found the other six (`na`/`pg`/`pb`/`vdd`/`vss`/`n2`) had
+no external pad at all, plus `nbtop`/`vref`'s *existing* pads sat too deep
+inside this cell's own interior for `klt gen-compose`'s router to escape
+without a same-block self-collision (issue #1527) — see #56 for the full
+writeup.
+
+`pins[]` now also promotes `na`/`pg`/`pb`/`vdd`/`vss`/`n2`, each via a small
+declare-only metal stub (`klt draw`, no PDK awareness needed since it draws
+plain, DRC-legal-width `li1`) placed in the one genuinely obstruction-free
+column this floorplan has — the far west edge, past `nwt_mp2`'s own guard
+ring, which nothing else in this cell ever reaches:
+
+| Net | Tap mechanism | Promoted pad |
+|---|---|---|
+| `vdd` | new leg extending the existing `vdd` bus (already at `y=65.0`) west from `nwt_mp2.TAP_N` | `stub_vdd.PAD`, `x=-4.0, y=65.085` |
+| `vss` | new leg extending the existing `vss` bus (already at `y=-6.0`) west from `mbn.U0_S` | `stub_vss.PAD`, `x=-4.0, y=-5.915` |
+| `pg` | new leg branching west from `mp2.U0_G`, reusing `pg`'s own native `y=14.0` channel lane | `stub_pg.PAD`, `x=-4.0, y=14.085` |
+| `pb` | new leg branching west from `mbn2.U0_D`, reusing `pb`'s own native `y=18.0` channel lane | `stub_pb.PAD`, `x=-4.0, y=18.085` |
+| `n2` | new leg branching west from `ms2n.U0_G` on `metal3` (avoids `pb`'s own `metal2` riser at `x=36.9`) | `stub_n2.PAD`, `x=-4.0, y=12.085` |
+| `na` | new leg branching from `mp1.U0_D`'s own existing attic launch point, over the roof at `y=68.0` (one plane above the existing `na` route's own `y=66.0`, so the two never share a lane), down a dedicated west column | `stub_na.PAD`, `x=-6.415, y=9.0` |
+
+Every new leg is an *additional* branch off an already-connected pin (the
+existing routing for `nbtop`/`vref`/`ibias`/`nb`/`na`/`pg`/`pb`/`vdd`/`vss`/
+`n2` is byte-for-byte unchanged) — a declare-only `pins[]` entry draws no
+new geometry beyond the small stub itself, so `klt drc`/`klt extract`/`klt
+lvs` all stay exactly as they were: 15/15 devices, 13/13 nets, `match`. The
+`ports[]`/`pins[]` diff in `compose.response.json`/`extract.json` is purely
+additive (six new label positions, same device/net counts, same LVS
+verdict) — diffed against the pre-#56 committed evidence, not assumed.
+
+**Verified against a downstream target, not just eyeballed.**
+`layout/bin/check-promotion.py` (new, issue #56) places this cell's own
+composed GDS as a `blocks[].cell` reference (bbox read from the stream, the
+same shape a real `layout/bias_core/` assembly would use) plus one dummy pad
+per newly-promoted pin, in the direction that pin's own port already faces,
+and routes a 2-pin net from each to its dummy — `unrouted_nets: []` for all
+six, and the resulting downstream-composed stream is itself `klt drc`-clean.
+Evidence: `downstream-check.request.json`/`.response.json`/`.drc.json`/
+`.gds` next to this file. Re-run with:
+
+```
+python3 layout/bin/check-promotion.py layout/bias_core_mirror_amp/cell.json
+```
+
+`nbtop`/`vref`/`ibias`/`nb` are unchanged by this issue — `ibias`/`nb`
+already composed cleanly in #40's own assembly attempt, but `nbtop`/`vref`
+were two of the nets that hit the same-block self-collision there. #56's
+own Acceptance Criteria did not ask for a `nbtop`/`vref` re-tap on this
+cell (only `bias_core_settle_flag`'s `nkg` was called out for
+re-verification), so that gap is left open here — worth a follow-up if #40
+still can't reach them once this PR's six new pins are in place.
+
 ## The one thing this layout does not yet say
 
 Same disclosure as `bias_core_settle_flag` and `bias_core_startup`: `klt

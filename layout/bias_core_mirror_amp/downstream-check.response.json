@@ -1,0 +1,354 @@
+{
+  "schema_version": 1,
+  "generator": "gen-compose",
+  "cell_name": "bias_core_mirror_amp_downstream_check",
+  "gds_path": "downstream-check.gds",
+  "pdk": {
+    "name": "sky130A",
+    "variant": "sky130A",
+    "version": "open_pdks c6d73a35f524070e85faff4a6a9eef49553ebc2b"
+  },
+  "dbu_um": 0.001,
+  "bbox_um": {
+    "x0": -44.0,
+    "y0": -31.085,
+    "x1": 87.84,
+    "y1": 65.17
+  },
+  "ports": [],
+  "blocks": [
+    {
+      "id": "sub",
+      "source": "cell",
+      "generator": null,
+      "cell_name": "bias_core_mirror_amp",
+      "offset_um": {
+        "x": 0.0,
+        "y": 0.0
+      },
+      "bbox_um": {
+        "x0": -6.5,
+        "y0": -6.0,
+        "x1": 87.84,
+        "y1": 65.17
+      },
+      "orientation": "none"
+    },
+    {
+      "id": "dummy_vdd",
+      "source": "cell",
+      "generator": null,
+      "cell_name": "promo_stub",
+      "offset_um": {
+        "x": -44.0,
+        "y": 65.0
+      },
+      "bbox_um": {
+        "x0": -44.0,
+        "y0": 65.0,
+        "x1": -42.5,
+        "y1": 65.17
+      },
+      "orientation": "none"
+    },
+    {
+      "id": "dummy_vss",
+      "source": "cell",
+      "generator": null,
+      "cell_name": "promo_stub",
+      "offset_um": {
+        "x": -44.0,
+        "y": -6.0
+      },
+      "bbox_um": {
+        "x0": -44.0,
+        "y0": -6.0,
+        "x1": -42.5,
+        "y1": -5.83
+      },
+      "orientation": "none"
+    },
+    {
+      "id": "dummy_pg",
+      "source": "cell",
+      "generator": null,
+      "cell_name": "promo_stub",
+      "offset_um": {
+        "x": -44.0,
+        "y": 14.0
+      },
+      "bbox_um": {
+        "x0": -44.0,
+        "y0": 14.0,
+        "x1": -42.5,
+        "y1": 14.17
+      },
+      "orientation": "none"
+    },
+    {
+      "id": "dummy_pb",
+      "source": "cell",
+      "generator": null,
+      "cell_name": "promo_stub",
+      "offset_um": {
+        "x": -44.0,
+        "y": 18.0
+      },
+      "bbox_um": {
+        "x0": -44.0,
+        "y0": 18.0,
+        "x1": -42.5,
+        "y1": 18.17
+      },
+      "orientation": "none"
+    },
+    {
+      "id": "dummy_n2",
+      "source": "cell",
+      "generator": null,
+      "cell_name": "promo_stub",
+      "offset_um": {
+        "x": -44.0,
+        "y": 12.0
+      },
+      "bbox_um": {
+        "x0": -44.0,
+        "y0": 12.0,
+        "x1": -42.5,
+        "y1": 12.17
+      },
+      "orientation": "none"
+    },
+    {
+      "id": "dummy_na",
+      "source": "cell",
+      "generator": null,
+      "cell_name": "promo_stub",
+      "offset_um": {
+        "x": -6.415,
+        "y": -31.085
+      },
+      "bbox_um": {
+        "x0": -6.415,
+        "y0": -31.085,
+        "x1": -4.915,
+        "y1": -30.915
+      },
+      "orientation": "none"
+    }
+  ],
+  "nets": [
+    {
+      "net": "vdd",
+      "pins": [
+        {
+          "block": "sub",
+          "port": "vdd"
+        },
+        {
+          "block": "dummy_vdd",
+          "port": "PAD"
+        }
+      ],
+      "routed": true,
+      "route_length_um": 40.0,
+      "status": "routed",
+      "legs": [
+        {
+          "pins": [
+            {
+              "block": "sub",
+              "port": "vdd"
+            },
+            {
+              "block": "dummy_vdd",
+              "port": "PAD"
+            }
+          ],
+          "routed": true,
+          "route_length_um": 40.0,
+          "reason": null,
+          "channel_track": 0
+        }
+      ]
+    },
+    {
+      "net": "vss",
+      "pins": [
+        {
+          "block": "sub",
+          "port": "vss"
+        },
+        {
+          "block": "dummy_vss",
+          "port": "PAD"
+        }
+      ],
+      "routed": true,
+      "route_length_um": 40.0,
+      "status": "routed",
+      "legs": [
+        {
+          "pins": [
+            {
+              "block": "sub",
+              "port": "vss"
+            },
+            {
+              "block": "dummy_vss",
+              "port": "PAD"
+            }
+          ],
+          "routed": true,
+          "route_length_um": 40.0,
+          "reason": null,
+          "channel_track": 0
+        }
+      ]
+    },
+    {
+      "net": "pg",
+      "pins": [
+        {
+          "block": "sub",
+          "port": "pg"
+        },
+        {
+          "block": "dummy_pg",
+          "port": "PAD"
+        }
+      ],
+      "routed": true,
+      "route_length_um": 40.0,
+      "status": "routed",
+      "legs": [
+        {
+          "pins": [
+            {
+              "block": "sub",
+              "port": "pg"
+            },
+            {
+              "block": "dummy_pg",
+              "port": "PAD"
+            }
+          ],
+          "routed": true,
+          "route_length_um": 40.0,
+          "reason": null,
+          "channel_track": 0
+        }
+      ]
+    },
+    {
+      "net": "pb",
+      "pins": [
+        {
+          "block": "sub",
+          "port": "pb"
+        },
+        {
+          "block": "dummy_pb",
+          "port": "PAD"
+        }
+      ],
+      "routed": true,
+      "route_length_um": 40.0,
+      "status": "routed",
+      "legs": [
+        {
+          "pins": [
+            {
+              "block": "sub",
+              "port": "pb"
+            },
+            {
+              "block": "dummy_pb",
+              "port": "PAD"
+            }
+          ],
+          "routed": true,
+          "route_length_um": 40.0,
+          "reason": null,
+          "channel_track": 0
+        }
+      ]
+    },
+    {
+      "net": "n2",
+      "pins": [
+        {
+          "block": "sub",
+          "port": "n2"
+        },
+        {
+          "block": "dummy_n2",
+          "port": "PAD"
+        }
+      ],
+      "routed": true,
+      "route_length_um": 40.0,
+      "status": "routed",
+      "legs": [
+        {
+          "pins": [
+            {
+              "block": "sub",
+              "port": "n2"
+            },
+            {
+              "block": "dummy_n2",
+              "port": "PAD"
+            }
+          ],
+          "routed": true,
+          "route_length_um": 40.0,
+          "reason": null,
+          "channel_track": 0
+        }
+      ]
+    },
+    {
+      "net": "na",
+      "pins": [
+        {
+          "block": "sub",
+          "port": "na"
+        },
+        {
+          "block": "dummy_na",
+          "port": "PAD"
+        }
+      ],
+      "routed": true,
+      "route_length_um": 40.0,
+      "status": "routed",
+      "legs": [
+        {
+          "pins": [
+            {
+              "block": "sub",
+              "port": "na"
+            },
+            {
+              "block": "dummy_na",
+              "port": "PAD"
+            }
+          ],
+          "routed": true,
+          "route_length_um": 40.0,
+          "reason": null,
+          "channel_track": 0
+        }
+      ]
+    }
+  ],
+  "pins": [],
+  "unrouted_nets": [],
+  "drc_hints": {
+    "min_spacing_um": null,
+    "matched_groups": [],
+    "notes": []
+  },
+  "warnings": []
+}

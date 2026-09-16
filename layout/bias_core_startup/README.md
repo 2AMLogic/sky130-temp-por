@@ -168,6 +168,56 @@ As with `bias_core_settle_flag`, two things this match does not assert:
    `klt lvs` compares `L`/`W` and topology, not the parasitic-area
    parameters.
 
+## Full-cell assembly pins (issue #56)
+
+#56 asked the four sub-blocks other than `bias_core_mirror_amp`/
+`bias_core_settle_flag` to be audited for the same gap: every net that
+crosses `design/netlist/bias_core.spice`'s own device-group boundary needs
+a top-level `pins[]` pad, not just the subset this cell's own isolated LVS
+reference required. This cell's own boundary nets are `vdd`, `vss`, `pb`,
+`pg`, and `nkg` (the last because `XKS4`'s own `nkg` node also reaches
+`bias_core_settle_flag`'s `XMOKC` gate — everything else, `ks1`-`ks4`/
+`nkm`, stays entirely inside this device group). Only `pb`/`pg` were
+promoted before this issue; `vdd`/`vss`/`nkg` had no external pad.
+
+`pins[]` now also promotes `vdd`/`vss`/`nkg`, using the same declare-only
+metal-stub mechanism `bias_core_mirror_amp/README.md` documents, placed at
+this cell's own genuinely obstruction-free far-west edge (past `psub_tap`,
+already this cell's westmost block):
+
+| Net | Tap mechanism | Promoted pad |
+|---|---|---|
+| `vss` | **no new geometry at all** — `psub_tap` (a `guard_ring` with `add_well: false`) reports four tap ports (`TAP_N/S/E/W`); only `TAP_S` was wired into the `vss` bus, so `TAP_W` — a different, previously-unused port on the *same already-drawn* vss-tied ring — is promoted directly | `psub_tap.TAP_W`, `x=-34.79, y=4.42` |
+| `vdd` | new leg extending the existing `vdd` bus (`y=13.0`) west from `nwell_tap.TAP_N` | `stub_vdd.PAD`, `x=-40.0, y=13.085` |
+| `nkg` | new leg branching from `kick.U0_G`'s own existing launch point (`y=10.0`, matching the pre-existing `kick.U0_G -> kpd.U0_D` leg's own first waypoint) further west on `metal3` — `vdd`'s own `nwell_tap.TAP_N -> ks0.U0_G` leg runs almost the whole cell's width at `y=13.0` on the default `metal` role, so a same-plane westward run at any `y` between `nwell_tap`'s own riser (`y≈4.7`-`13`) would have crossed it; `metal3` sidesteps that riser instead of routing around it | `stub_nkg.PAD`, `x=-40.0, y=10.085` |
+
+`vss`'s promotion is the cheapest kind — a label on already-drawn metal, no
+stub block, no new route, so it cannot regress DRC/extract/LVS by
+construction. `vdd`/`nkg`'s new legs are additional branches off an
+already-connected pin; the existing `vdd`/`nkg`/`ks1`-`ks4`/`nkm`/`pb`/`pg`
+routing is otherwise byte-for-byte unchanged. `klt drc`/`klt extract`/`klt
+lvs` all stay exactly as they were: 9/9 devices, 10/10 nets, `match` —
+diffed against the pre-#56 committed evidence (the diff is limited to three
+new label positions and coverage metadata reflecting the new `metal2`/
+`metal3` usage; `violation_count`/`status`/device and net counts are
+identical).
+
+**Verified against a downstream target, not just eyeballed** — same
+`layout/bin/check-promotion.py` harness `bias_core_mirror_amp/README.md`
+describes. Since `vss`'s promoted pin is a spare port on an existing block
+rather than a `stub_*` block, it is not covered by the script's own default
+selection (every `pins[]` entry whose block name starts with `stub_`) —
+run with `--net` naming all three explicitly:
+
+```
+python3 layout/bin/check-promotion.py layout/bias_core_startup/cell.json \
+  --net vdd --net vss --net nkg
+```
+
+`unrouted_nets: []` for all three, and the downstream-composed stream is
+itself `klt drc`-clean. Evidence: `downstream-check.request.json`/
+`.response.json`/`.drc.json`/`.gds` next to this file.
+
 ## The one thing this layout does not yet say
 
 Same disclosure as `bias_core_settle_flag`: `klt gen` **cannot draw sky130's

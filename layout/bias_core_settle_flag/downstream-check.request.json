@@ -1,0 +1,361 @@
+{
+  "pdk": {
+    "variant": "sky130A"
+  },
+  "blocks": [
+    {
+      "id": "sub",
+      "cell": {
+        "gds_path": "bias_core_settle_flag.gds",
+        "cell_name": "bias_core_settle_flag",
+        "ports": [
+          {
+            "name": "na",
+            "x_um": 20.58,
+            "y_um": 14.359999999999998,
+            "layer": {
+              "layer": 67,
+              "datatype": 20
+            },
+            "width_um": 0.42000000000000004,
+            "direction_deg": 270
+          },
+          {
+            "name": "nbtop",
+            "x_um": 11.42,
+            "y_um": 14.359999999999998,
+            "layer": {
+              "layer": 67,
+              "datatype": 20
+            },
+            "width_um": 0.42000000000000004,
+            "direction_deg": 270
+          },
+          {
+            "name": "vdd",
+            "x_um": -4.0,
+            "y_um": 26.585,
+            "layer": {
+              "layer": 67,
+              "datatype": 20
+            },
+            "width_um": 0.17,
+            "direction_deg": 180
+          },
+          {
+            "name": "vss",
+            "x_um": -4.0,
+            "y_um": -5.915,
+            "layer": {
+              "layer": 67,
+              "datatype": 20
+            },
+            "width_um": 0.17,
+            "direction_deg": 180
+          },
+          {
+            "name": "pb",
+            "x_um": -4.0,
+            "y_um": 11.585,
+            "layer": {
+              "layer": 67,
+              "datatype": 20
+            },
+            "width_um": 0.17,
+            "direction_deg": 180
+          },
+          {
+            "name": "nokx",
+            "x_um": -4.0,
+            "y_um": 8.085,
+            "layer": {
+              "layer": 67,
+              "datatype": 20
+            },
+            "width_um": 0.17,
+            "direction_deg": 180
+          },
+          {
+            "name": "nkg",
+            "x_um": -4.0,
+            "y_um": 7.085,
+            "layer": {
+              "layer": 67,
+              "datatype": 20
+            },
+            "width_um": 0.17,
+            "direction_deg": 180
+          },
+          {
+            "name": "bias_ok",
+            "x_um": -6.415,
+            "y_um": 19.5,
+            "layer": {
+              "layer": 67,
+              "datatype": 20
+            },
+            "width_um": 0.17,
+            "direction_deg": 270
+          }
+        ],
+        "bbox_um": {
+          "x0": -6.5,
+          "y0": -6.0,
+          "x1": 40.99,
+          "y1": 26.67
+        }
+      }
+    },
+    {
+      "id": "dummy_vdd",
+      "cell": {
+        "gds_path": "promo_stub.gds",
+        "cell_name": "promo_stub",
+        "ports": [
+          {
+            "name": "PAD",
+            "x_um": 0.0,
+            "y_um": 0.085,
+            "layer": {
+              "layer": 67,
+              "datatype": 20
+            },
+            "width_um": 0.17,
+            "direction_deg": 0
+          }
+        ]
+      }
+    },
+    {
+      "id": "dummy_vss",
+      "cell": {
+        "gds_path": "promo_stub.gds",
+        "cell_name": "promo_stub",
+        "ports": [
+          {
+            "name": "PAD",
+            "x_um": 0.0,
+            "y_um": 0.085,
+            "layer": {
+              "layer": 67,
+              "datatype": 20
+            },
+            "width_um": 0.17,
+            "direction_deg": 0
+          }
+        ]
+      }
+    },
+    {
+      "id": "dummy_pb",
+      "cell": {
+        "gds_path": "promo_stub.gds",
+        "cell_name": "promo_stub",
+        "ports": [
+          {
+            "name": "PAD",
+            "x_um": 0.0,
+            "y_um": 0.085,
+            "layer": {
+              "layer": 67,
+              "datatype": 20
+            },
+            "width_um": 0.17,
+            "direction_deg": 0
+          }
+        ]
+      }
+    },
+    {
+      "id": "dummy_nokx",
+      "cell": {
+        "gds_path": "promo_stub.gds",
+        "cell_name": "promo_stub",
+        "ports": [
+          {
+            "name": "PAD",
+            "x_um": 0.0,
+            "y_um": 0.085,
+            "layer": {
+              "layer": 67,
+              "datatype": 20
+            },
+            "width_um": 0.17,
+            "direction_deg": 0
+          }
+        ]
+      }
+    },
+    {
+      "id": "dummy_nkg",
+      "cell": {
+        "gds_path": "promo_stub.gds",
+        "cell_name": "promo_stub",
+        "ports": [
+          {
+            "name": "PAD",
+            "x_um": 0.0,
+            "y_um": 0.085,
+            "layer": {
+              "layer": 67,
+              "datatype": 20
+            },
+            "width_um": 0.17,
+            "direction_deg": 0
+          }
+        ]
+      }
+    },
+    {
+      "id": "dummy_bias_ok",
+      "cell": {
+        "gds_path": "promo_stub.gds",
+        "cell_name": "promo_stub",
+        "ports": [
+          {
+            "name": "PAD",
+            "x_um": 0.0,
+            "y_um": 0.085,
+            "layer": {
+              "layer": 67,
+              "datatype": 20
+            },
+            "width_um": 0.17,
+            "direction_deg": 90
+          }
+        ]
+      }
+    }
+  ],
+  "placement": {
+    "strategy": "explicit",
+    "order": [
+      "sub",
+      "dummy_vdd",
+      "dummy_vss",
+      "dummy_pb",
+      "dummy_nokx",
+      "dummy_nkg",
+      "dummy_bias_ok"
+    ],
+    "origins_um": {
+      "sub": {
+        "x": 0.0,
+        "y": 0.0
+      },
+      "dummy_vdd": {
+        "x": -44.0,
+        "y": 26.5
+      },
+      "dummy_vss": {
+        "x": -44.0,
+        "y": -6.0
+      },
+      "dummy_pb": {
+        "x": -44.0,
+        "y": 11.5
+      },
+      "dummy_nokx": {
+        "x": -44.0,
+        "y": 8.0
+      },
+      "dummy_nkg": {
+        "x": -44.0,
+        "y": 7.0
+      },
+      "dummy_bias_ok": {
+        "x": -6.415,
+        "y": -20.585
+      }
+    }
+  },
+  "connectivity": [
+    {
+      "net": "vdd",
+      "pins": [
+        {
+          "block": "sub",
+          "port": "vdd"
+        },
+        {
+          "block": "dummy_vdd",
+          "port": "PAD"
+        }
+      ]
+    },
+    {
+      "net": "vss",
+      "pins": [
+        {
+          "block": "sub",
+          "port": "vss"
+        },
+        {
+          "block": "dummy_vss",
+          "port": "PAD"
+        }
+      ]
+    },
+    {
+      "net": "pb",
+      "pins": [
+        {
+          "block": "sub",
+          "port": "pb"
+        },
+        {
+          "block": "dummy_pb",
+          "port": "PAD"
+        }
+      ]
+    },
+    {
+      "net": "nokx",
+      "pins": [
+        {
+          "block": "sub",
+          "port": "nokx"
+        },
+        {
+          "block": "dummy_nokx",
+          "port": "PAD"
+        }
+      ]
+    },
+    {
+      "net": "nkg",
+      "pins": [
+        {
+          "block": "sub",
+          "port": "nkg"
+        },
+        {
+          "block": "dummy_nkg",
+          "port": "PAD"
+        }
+      ]
+    },
+    {
+      "net": "bias_ok",
+      "pins": [
+        {
+          "block": "sub",
+          "port": "bias_ok"
+        },
+        {
+          "block": "dummy_bias_ok",
+          "port": "PAD"
+        }
+      ]
+    }
+  ],
+  "routing": {
+    "layer_role": "metal",
+    "width_um": 0.17,
+    "cross_block_layer_role": "metal2"
+  },
+  "options": {
+    "cell_name": "bias_core_settle_flag_downstream_check",
+    "output": "downstream-check.gds"
+  }
+}

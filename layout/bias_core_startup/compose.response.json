@@ -10,10 +10,10 @@
   },
   "dbu_um": 0.001,
   "bbox_um": {
-    "x0": -35.0,
+    "x0": -40.0,
     "y0": 0.0,
     "x1": 54.040000000000006,
-    "y1": 8.82
+    "y1": 13.17
   },
   "ports": [
     {
@@ -45,6 +45,49 @@
       "direction_deg": 180,
       "block": "kick",
       "port": "U0_D"
+    },
+    {
+      "name": "vdd",
+      "net": "vdd",
+      "layer": {
+        "layer": 67,
+        "datatype": 20
+      },
+      "x_um": -40.0,
+      "y_um": 13.085,
+      "width_um": 0.17,
+      "direction_deg": 180,
+      "block": "stub_vdd",
+      "port": "PAD"
+    },
+    {
+      "name": "nkg",
+      "net": "nkg",
+      "layer": {
+        "layer": 67,
+        "datatype": 20
+      },
+      "x_um": -40.0,
+      "y_um": 10.085,
+      "width_um": 0.17,
+      "direction_deg": 180,
+      "block": "stub_nkg",
+      "port": "PAD"
+    },
+    {
+      "name": "vss",
+      "net": "vss",
+      "layer": {
+        "layer": 67,
+        "datatype": 20,
+        "name": null
+      },
+      "x_um": -34.79,
+      "y_um": 4.42,
+      "width_um": 0.42,
+      "direction_deg": 180,
+      "block": "psub_tap",
+      "port": "TAP_W"
     }
   ],
   "blocks": [
@@ -234,6 +277,40 @@
         "y1": 5.34
       },
       "orientation": "none"
+    },
+    {
+      "id": "stub_vdd",
+      "source": "cell",
+      "generator": null,
+      "cell_name": "promo_stub",
+      "offset_um": {
+        "x": -40.0,
+        "y": 13.0
+      },
+      "bbox_um": {
+        "x0": -40.0,
+        "y0": 13.0,
+        "x1": -38.5,
+        "y1": 13.17
+      },
+      "orientation": "none"
+    },
+    {
+      "id": "stub_nkg",
+      "source": "cell",
+      "generator": null,
+      "cell_name": "promo_stub",
+      "offset_um": {
+        "x": -40.0,
+        "y": 10.0
+      },
+      "bbox_um": {
+        "x0": -40.0,
+        "y0": 10.0,
+        "x1": -38.5,
+        "y1": 10.17
+      },
+      "orientation": "none"
     }
   ],
   "nets": [
@@ -259,10 +336,14 @@
         {
           "block": "nwell_tap",
           "port": "TAP_N"
+        },
+        {
+          "block": "stub_vdd",
+          "port": "CONN"
         }
       ],
       "routed": true,
-      "route_length_um": 101.28000000000002,
+      "route_length_um": 120.03500000000001,
       "status": "routed",
       "legs": [
         {
@@ -310,6 +391,22 @@
           ],
           "routed": true,
           "route_length_um": 93.92000000000002,
+          "reason": null,
+          "channel_track": 0
+        },
+        {
+          "pins": [
+            {
+              "block": "nwell_tap",
+              "port": "TAP_N"
+            },
+            {
+              "block": "stub_vdd",
+              "port": "CONN"
+            }
+          ],
+          "routed": true,
+          "route_length_um": 18.755000000000003,
           "reason": null,
           "channel_track": 0
         },
@@ -561,10 +658,14 @@
         {
           "block": "kick",
           "port": "U0_G"
+        },
+        {
+          "block": "stub_nkg",
+          "port": "CONN"
         }
       ],
       "routed": true,
-      "route_length_um": 21.700000000000003,
+      "route_length_um": 61.755,
       "status": "routed",
       "legs": [
         {
@@ -596,6 +697,22 @@
           ],
           "routed": true,
           "route_length_um": 20.28,
+          "reason": null,
+          "channel_track": 0
+        },
+        {
+          "pins": [
+            {
+              "block": "kick",
+              "port": "U0_G"
+            },
+            {
+              "block": "stub_nkg",
+              "port": "CONN"
+            }
+          ],
+          "routed": true,
+          "route_length_um": 40.055,
           "reason": null,
           "channel_track": 0
         }
@@ -776,6 +893,24 @@
       "net": "pg",
       "block": "kick",
       "port": "U0_D",
+      "labelled": true
+    },
+    {
+      "net": "vdd",
+      "block": "stub_vdd",
+      "port": "PAD",
+      "labelled": true
+    },
+    {
+      "net": "nkg",
+      "block": "stub_nkg",
+      "port": "PAD",
+      "labelled": true
+    },
+    {
+      "net": "vss",
+      "block": "psub_tap",
+      "port": "TAP_W",
       "labelled": true
     }
   ],

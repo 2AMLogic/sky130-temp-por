@@ -48,6 +48,68 @@
     {
       "id": "psub_tap",
       "generator_report": "gen/psub_tap.gen.json"
+    },
+    {
+      "id": "stub_vdd",
+      "cell": {
+        "gds_path": "promo_stub.gds",
+        "cell_name": "promo_stub",
+        "ports": [
+          {
+            "name": "CONN",
+            "x_um": 1.5,
+            "y_um": 0.085,
+            "layer": {
+              "layer": 67,
+              "datatype": 20
+            },
+            "width_um": 0.17,
+            "direction_deg": 0
+          },
+          {
+            "name": "PAD",
+            "x_um": 0.0,
+            "y_um": 0.085,
+            "layer": {
+              "layer": 67,
+              "datatype": 20
+            },
+            "width_um": 0.17,
+            "direction_deg": 180
+          }
+        ]
+      }
+    },
+    {
+      "id": "stub_nkg",
+      "cell": {
+        "gds_path": "promo_stub.gds",
+        "cell_name": "promo_stub",
+        "ports": [
+          {
+            "name": "CONN",
+            "x_um": 1.5,
+            "y_um": 0.085,
+            "layer": {
+              "layer": 67,
+              "datatype": 20
+            },
+            "width_um": 0.17,
+            "direction_deg": 0
+          },
+          {
+            "name": "PAD",
+            "x_um": 0.0,
+            "y_um": 0.085,
+            "layer": {
+              "layer": 67,
+              "datatype": 20
+            },
+            "width_um": 0.17,
+            "direction_deg": 180
+          }
+        ]
+      }
     }
   ],
   "placement": {
@@ -63,7 +125,9 @@
       "kan",
       "ka",
       "nwell_tap",
-      "psub_tap"
+      "psub_tap",
+      "stub_vdd",
+      "stub_nkg"
     ],
     "origins_um": {
       "kpd": {
@@ -109,6 +173,14 @@
       "psub_tap": {
         "x": -35.0,
         "y": 3.5
+      },
+      "stub_vdd": {
+        "x": -40.0,
+        "y": 13.0
+      },
+      "stub_nkg": {
+        "x": -40.0,
+        "y": 10.0
       }
     }
   },
@@ -139,6 +211,10 @@
         {
           "block": "nwell_tap",
           "port": "TAP_N"
+        },
+        {
+          "block": "stub_vdd",
+          "port": "CONN"
         }
       ],
       "legs": [
@@ -178,6 +254,26 @@
             ],
             [
               49.62,
+              13.0
+            ]
+          ]
+        },
+        {
+          "from_pin": {
+            "block": "nwell_tap",
+            "port": "TAP_N"
+          },
+          "to_pin": {
+            "block": "stub_vdd",
+            "port": "CONN"
+          },
+          "waypoints_um": [
+            [
+              -28.12,
+              13.0
+            ],
+            [
+              -38.5,
               13.0
             ]
           ]
@@ -266,6 +362,10 @@
         {
           "block": "kick",
           "port": "U0_G"
+        },
+        {
+          "block": "stub_nkg",
+          "port": "CONN"
         }
       ],
       "legs": [
@@ -302,6 +402,27 @@
               4.0
             ]
           ]
+        },
+        {
+          "from_pin": {
+            "block": "kick",
+            "port": "U0_G"
+          },
+          "to_pin": {
+            "block": "stub_nkg",
+            "port": "CONN"
+          },
+          "waypoints_um": [
+            [
+              -3.42,
+              10.0
+            ],
+            [
+              -38.5,
+              10.0
+            ]
+          ],
+          "layer_role": "metal3"
         }
       ]
     },
@@ -461,6 +582,21 @@
       "block": "kick",
       "port": "U0_D",
       "net": "pg"
+    },
+    {
+      "net": "vdd",
+      "block": "stub_vdd",
+      "port": "PAD"
+    },
+    {
+      "net": "nkg",
+      "block": "stub_nkg",
+      "port": "PAD"
+    },
+    {
+      "net": "vss",
+      "block": "psub_tap",
+      "port": "TAP_W"
     }
   ],
   "options": {

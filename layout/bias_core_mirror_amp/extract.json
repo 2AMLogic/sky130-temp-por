@@ -452,7 +452,7 @@
       "name": "ibias",
       "pin": true,
       "device_count": 1,
-      "net_id": 13,
+      "net_id": 12,
       "pin_index": 0,
       "label_positions_um": [
         {
@@ -466,7 +466,7 @@
       "name": "n1",
       "pin": true,
       "device_count": 4,
-      "net_id": 6,
+      "net_id": 5,
       "pin_index": 1,
       "label_positions_um": [
         {
@@ -485,6 +485,11 @@
       "label_positions_um": [
         {
           "text": "n2",
+          "x_um": -4.0,
+          "y_um": 12.085
+        },
+        {
+          "text": "n2",
           "x_um": 88.9,
           "y_um": 17.485
         }
@@ -494,9 +499,14 @@
       "name": "na",
       "pin": true,
       "device_count": 2,
-      "net_id": 12,
+      "net_id": 11,
       "pin_index": 3,
       "label_positions_um": [
+        {
+          "text": "na",
+          "x_um": -6.415,
+          "y_um": 9.0
+        },
         {
           "text": "na",
           "x_um": 50.83,
@@ -522,7 +532,7 @@
       "name": "nbg",
       "pin": true,
       "device_count": 4,
-      "net_id": 2,
+      "net_id": 3,
       "pin_index": 5,
       "label_positions_um": [
         {
@@ -536,7 +546,7 @@
       "name": "nbtop",
       "pin": true,
       "device_count": 1,
-      "net_id": 10,
+      "net_id": 9,
       "pin_index": 6,
       "label_positions_um": [
         {
@@ -550,7 +560,7 @@
       "name": "nt",
       "pin": true,
       "device_count": 3,
-      "net_id": 9,
+      "net_id": 13,
       "pin_index": 7,
       "label_positions_um": [
         {
@@ -564,9 +574,14 @@
       "name": "pb",
       "pin": true,
       "device_count": 6,
-      "net_id": 3,
+      "net_id": 2,
       "pin_index": 8,
       "label_positions_um": [
+        {
+          "text": "pb",
+          "x_um": -4.0,
+          "y_um": 18.085
+        },
         {
           "text": "pb",
           "x_um": 36.9,
@@ -578,9 +593,14 @@
       "name": "pg",
       "pin": true,
       "device_count": 6,
-      "net_id": 5,
+      "net_id": 6,
       "pin_index": 9,
       "label_positions_um": [
+        {
+          "text": "pg",
+          "x_um": -4.0,
+          "y_um": 14.085
+        },
         {
           "text": "pg",
           "x_um": 6.92,
@@ -597,6 +617,11 @@
       "label_positions_um": [
         {
           "text": "vdd",
+          "x_um": -4.0,
+          "y_um": 65.085
+        },
+        {
+          "text": "vdd",
           "x_um": -1.12,
           "y_um": 64.095
         }
@@ -606,7 +631,7 @@
       "name": "vref",
       "pin": true,
       "device_count": 1,
-      "net_id": 11,
+      "net_id": 10,
       "pin_index": 11,
       "label_positions_um": [
         {
@@ -623,6 +648,11 @@
       "net_id": 14,
       "pin_index": 12,
       "label_positions_um": [
+        {
+          "text": "vss",
+          "x_um": -4.0,
+          "y_um": -5.915
+        },
         {
           "text": "vss",
           "x_um": 27.71,
@@ -643,7 +673,7 @@
   "matched_device_groups": [],
   "pdk": null,
   "provenance": {
-    "klt_version": "0.5.0",
+    "klt_version": "0.4.0",
     "klayout_version": "0.30.10",
     "pdk": null,
     "deck": {
@@ -652,7 +682,7 @@
       "released": true
     },
     "input": {
-      "content_hash": "sha256:5ed5def9fc29ba6d2040f38b27423fa58cbc65d3dce61bd4204a61db8541f478"
+      "content_hash": "sha256:6b70630e989b2d695a72416eddc4322e1f01342fe5a7c3e1d1d1b1e48898841b"
     }
   },
   "parasitics": null,

@@ -10,10 +10,10 @@
   },
   "dbu_um": 0.001,
   "bbox_um": {
-    "x0": -2.19,
-    "y0": 0.0,
+    "x0": -6.5,
+    "y0": -6.0,
     "x1": 87.84,
-    "y1": 63.12
+    "y1": 65.17
   },
   "ports": [
     {
@@ -75,6 +75,90 @@
       "direction_deg": 270,
       "block": "mi2",
       "port": "U0_G"
+    },
+    {
+      "name": "vdd",
+      "net": "vdd",
+      "layer": {
+        "layer": 67,
+        "datatype": 20
+      },
+      "x_um": -4.0,
+      "y_um": 65.085,
+      "width_um": 0.17,
+      "direction_deg": 180,
+      "block": "stub_vdd",
+      "port": "PAD"
+    },
+    {
+      "name": "vss",
+      "net": "vss",
+      "layer": {
+        "layer": 67,
+        "datatype": 20
+      },
+      "x_um": -4.0,
+      "y_um": -5.915,
+      "width_um": 0.17,
+      "direction_deg": 180,
+      "block": "stub_vss",
+      "port": "PAD"
+    },
+    {
+      "name": "pg",
+      "net": "pg",
+      "layer": {
+        "layer": 67,
+        "datatype": 20
+      },
+      "x_um": -4.0,
+      "y_um": 14.085,
+      "width_um": 0.17,
+      "direction_deg": 180,
+      "block": "stub_pg",
+      "port": "PAD"
+    },
+    {
+      "name": "pb",
+      "net": "pb",
+      "layer": {
+        "layer": 67,
+        "datatype": 20
+      },
+      "x_um": -4.0,
+      "y_um": 18.085,
+      "width_um": 0.17,
+      "direction_deg": 180,
+      "block": "stub_pb",
+      "port": "PAD"
+    },
+    {
+      "name": "n2",
+      "net": "n2",
+      "layer": {
+        "layer": 67,
+        "datatype": 20
+      },
+      "x_um": -4.0,
+      "y_um": 12.085,
+      "width_um": 0.17,
+      "direction_deg": 180,
+      "block": "stub_n2",
+      "port": "PAD"
+    },
+    {
+      "name": "na",
+      "net": "na",
+      "layer": {
+        "layer": 67,
+        "datatype": 20
+      },
+      "x_um": -6.415,
+      "y_um": 9.0,
+      "width_um": 0.17,
+      "direction_deg": 270,
+      "block": "stub_na",
+      "port": "PAD"
     }
   ],
   "blocks": [
@@ -519,6 +603,108 @@
         "y1": 1.84
       },
       "orientation": "none"
+    },
+    {
+      "id": "stub_vdd",
+      "source": "cell",
+      "generator": null,
+      "cell_name": "promo_stub",
+      "offset_um": {
+        "x": -4.0,
+        "y": 65.0
+      },
+      "bbox_um": {
+        "x0": -4.0,
+        "y0": 65.0,
+        "x1": -2.5,
+        "y1": 65.17
+      },
+      "orientation": "none"
+    },
+    {
+      "id": "stub_vss",
+      "source": "cell",
+      "generator": null,
+      "cell_name": "promo_stub",
+      "offset_um": {
+        "x": -4.0,
+        "y": -6.0
+      },
+      "bbox_um": {
+        "x0": -4.0,
+        "y0": -6.0,
+        "x1": -2.5,
+        "y1": -5.83
+      },
+      "orientation": "none"
+    },
+    {
+      "id": "stub_pg",
+      "source": "cell",
+      "generator": null,
+      "cell_name": "promo_stub",
+      "offset_um": {
+        "x": -4.0,
+        "y": 14.0
+      },
+      "bbox_um": {
+        "x0": -4.0,
+        "y0": 14.0,
+        "x1": -2.5,
+        "y1": 14.17
+      },
+      "orientation": "none"
+    },
+    {
+      "id": "stub_pb",
+      "source": "cell",
+      "generator": null,
+      "cell_name": "promo_stub",
+      "offset_um": {
+        "x": -4.0,
+        "y": 18.0
+      },
+      "bbox_um": {
+        "x0": -4.0,
+        "y0": 18.0,
+        "x1": -2.5,
+        "y1": 18.17
+      },
+      "orientation": "none"
+    },
+    {
+      "id": "stub_n2",
+      "source": "cell",
+      "generator": null,
+      "cell_name": "promo_stub",
+      "offset_um": {
+        "x": -4.0,
+        "y": 12.0
+      },
+      "bbox_um": {
+        "x0": -4.0,
+        "y0": 12.0,
+        "x1": -2.5,
+        "y1": 12.17
+      },
+      "orientation": "none"
+    },
+    {
+      "id": "stub_na",
+      "source": "cell",
+      "generator": null,
+      "cell_name": "promo_stub_v",
+      "offset_um": {
+        "x": -6.5,
+        "y": 9.0
+      },
+      "bbox_um": {
+        "x0": -6.5,
+        "y0": 9.0,
+        "x1": -6.33,
+        "y1": 10.5
+      },
+      "orientation": "none"
     }
   ],
   "nets": [
@@ -596,10 +782,14 @@
         {
           "block": "nwt_mi2",
           "port": "TAP_N"
+        },
+        {
+          "block": "stub_vdd",
+          "port": "CONN"
         }
       ],
       "routed": true,
-      "route_length_um": 1422.5400000000002,
+      "route_length_um": 1465.1750000000002,
       "status": "routed",
       "legs": [
         {
@@ -873,6 +1063,22 @@
           "route_length_um": 91.34,
           "reason": null,
           "channel_track": 0
+        },
+        {
+          "pins": [
+            {
+              "block": "nwt_mp2",
+              "port": "TAP_N"
+            },
+            {
+              "block": "stub_vdd",
+              "port": "CONN"
+            }
+          ],
+          "routed": true,
+          "route_length_um": 42.635,
+          "reason": null,
+          "channel_track": 0
         }
       ]
     },
@@ -902,10 +1108,14 @@
         {
           "block": "ml2",
           "port": "U0_S"
+        },
+        {
+          "block": "stub_vss",
+          "port": "CONN"
         }
       ],
       "routed": true,
-      "route_length_um": 132.42,
+      "route_length_um": 166.21499999999997,
       "status": "routed",
       "legs": [
         {
@@ -987,6 +1197,22 @@
           "route_length_um": 27.0,
           "reason": null,
           "channel_track": 0
+        },
+        {
+          "pins": [
+            {
+              "block": "mbn",
+              "port": "U0_S"
+            },
+            {
+              "block": "stub_vss",
+              "port": "CONN"
+            }
+          ],
+          "routed": true,
+          "route_length_um": 33.795,
+          "reason": null,
+          "channel_track": 0
         }
       ]
     },
@@ -1016,10 +1242,14 @@
         {
           "block": "ms2n",
           "port": "U0_D"
+        },
+        {
+          "block": "stub_pg",
+          "port": "CONN"
         }
       ],
       "routed": true,
-      "route_length_um": 147.34999999999997,
+      "route_length_um": 160.71499999999997,
       "status": "routed",
       "legs": [
         {
@@ -1101,6 +1331,22 @@
           "route_length_um": 38.11,
           "reason": null,
           "channel_track": 0
+        },
+        {
+          "pins": [
+            {
+              "block": "mp2",
+              "port": "U0_G"
+            },
+            {
+              "block": "stub_pg",
+              "port": "CONN"
+            }
+          ],
+          "routed": true,
+          "route_length_um": 13.365,
+          "reason": null,
+          "channel_track": 0
         }
       ]
     },
@@ -1130,10 +1376,14 @@
         {
           "block": "mpt",
           "port": "U0_G"
+        },
+        {
+          "block": "stub_pb",
+          "port": "CONN"
         }
       ],
       "routed": true,
-      "route_length_um": 92.38999999999999,
+      "route_length_um": 150.14499999999998,
       "status": "routed",
       "legs": [
         {
@@ -1213,6 +1463,22 @@
           ],
           "routed": true,
           "route_length_um": 17.72,
+          "reason": null,
+          "channel_track": 0
+        },
+        {
+          "pins": [
+            {
+              "block": "mbn2",
+              "port": "U0_D"
+            },
+            {
+              "block": "stub_pb",
+              "port": "CONN"
+            }
+          ],
+          "routed": true,
+          "route_length_um": 57.754999999999995,
           "reason": null,
           "channel_track": 0
         }
@@ -1302,10 +1568,14 @@
         {
           "block": "mi1",
           "port": "U0_G"
+        },
+        {
+          "block": "stub_na",
+          "port": "CONN"
         }
       ],
       "routed": true,
-      "route_length_um": 134.46,
+      "route_length_um": 263.775,
       "status": "routed",
       "legs": [
         {
@@ -1321,6 +1591,22 @@
           ],
           "routed": true,
           "route_length_um": 134.46,
+          "reason": null,
+          "channel_track": 0
+        },
+        {
+          "pins": [
+            {
+              "block": "mp1",
+              "port": "U0_D"
+            },
+            {
+              "block": "stub_na",
+              "port": "CONN"
+            }
+          ],
+          "routed": true,
+          "route_length_um": 129.315,
           "reason": null,
           "channel_track": 0
         }
@@ -1468,10 +1754,14 @@
         {
           "block": "ms2n",
           "port": "U0_G"
+        },
+        {
+          "block": "stub_n2",
+          "port": "CONN"
         }
       ],
       "routed": true,
-      "route_length_um": 94.65000000000003,
+      "route_length_um": 143.04500000000004,
       "status": "routed",
       "legs": [
         {
@@ -1505,6 +1795,22 @@
           "route_length_um": 61.140000000000015,
           "reason": null,
           "channel_track": 0
+        },
+        {
+          "pins": [
+            {
+              "block": "ms2n",
+              "port": "U0_G"
+            },
+            {
+              "block": "stub_n2",
+              "port": "CONN"
+            }
+          ],
+          "routed": true,
+          "route_length_um": 48.395,
+          "reason": null,
+          "channel_track": 0
         }
       ]
     }
@@ -1532,6 +1838,42 @@
       "net": "nb",
       "block": "mi2",
       "port": "U0_G",
+      "labelled": true
+    },
+    {
+      "net": "vdd",
+      "block": "stub_vdd",
+      "port": "PAD",
+      "labelled": true
+    },
+    {
+      "net": "vss",
+      "block": "stub_vss",
+      "port": "PAD",
+      "labelled": true
+    },
+    {
+      "net": "pg",
+      "block": "stub_pg",
+      "port": "PAD",
+      "labelled": true
+    },
+    {
+      "net": "pb",
+      "block": "stub_pb",
+      "port": "PAD",
+      "labelled": true
+    },
+    {
+      "net": "n2",
+      "block": "stub_n2",
+      "port": "PAD",
+      "labelled": true
+    },
+    {
+      "net": "na",
+      "block": "stub_na",
+      "port": "PAD",
       "labelled": true
     }
   ],

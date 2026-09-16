@@ -232,6 +232,27 @@ collector strap once that issue is resolved upstream, at which point a real
 base+collector+emitter LVS match should be possible without changing either
 cell's own floorplan.
 
+**Update (issue #56):** the installed `klt` build now actively *detects* a
+closed guard/collector ring and refuses any leg targeting one of the
+array's own non-tap ports (`Q*_B`/`Q*_E`) once that block also carries an
+unopened `TAP_*`/`COLL_*` ring — "a route to its non-tap port would cross
+the ring's own metal loop and merge this net with the ring's tap net"
+(citing this same issue #1527 that #56's own `na`/`pg`/`pb`/`vdd`/`vss`/`n2`
+promotions on `bias_core_mirror_amp`/`bias_core_settle_flag` hit and
+resolved with a west-edge metal stub). That fix does not transfer here: the
+rejection fires on the very *first* leg leaving the block, before any
+question of tap-point placement, because `bjt_array`'s ring has no
+`GAP_*` opening (`params.ring_gap_side` unset in both cells) — a
+defensive improvement (this is exactly the silent-short failure mode
+finding 2 above describes, now caught instead of silently drawn), but it
+means `bias_core_pnp8_leg`'s `ec`/`vss` and `bias_core_xq1_xqr`'s `vss` —
+all of which the design's own device cards route outside this device
+group — still have no `pins[]` promotion, and #56 could not add one
+without either the upstream collector-strap fix or a `ring_gap_side`
+floorplan change to one (or both) of these cells. Filed as a scoped
+repo-level follow-up rather than reopening #56 or a new upstream issue
+(the upstream gap is already #1894).
+
 Two more, both found building `layout/bias_core_settle_flag/` (the first MOS
 cell in this repo) and both filed the same way:
 

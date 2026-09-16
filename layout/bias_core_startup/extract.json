@@ -345,6 +345,11 @@
       "label_positions_um": [
         {
           "text": "nkg",
+          "x_um": -40.0,
+          "y_um": 10.085
+        },
+        {
+          "text": "nkg",
           "x_um": 5.34,
           "y_um": 4.0
         }
@@ -401,6 +406,11 @@
       "label_positions_um": [
         {
           "text": "vdd",
+          "x_um": -40.0,
+          "y_um": 13.085
+        },
+        {
+          "text": "vdd",
           "x_um": 51.17,
           "y_um": 4.0
         }
@@ -413,6 +423,11 @@
       "net_id": 11,
       "pin_index": 9,
       "label_positions_um": [
+        {
+          "text": "vss",
+          "x_um": -34.79,
+          "y_um": 4.42
+        },
         {
           "text": "vss",
           "x_um": -0.5,
@@ -442,7 +457,7 @@
       "released": true
     },
     "input": {
-      "content_hash": "sha256:04e76e8a9df5419b747fde30155ebfc3bf3baae68f349c7987ce6be3591c4130"
+      "content_hash": "sha256:cea0cf568032e9fdae5f4cd8e87a14516342e9a337129427671f69a69bf2eb17"
     }
   },
   "parasitics": null,

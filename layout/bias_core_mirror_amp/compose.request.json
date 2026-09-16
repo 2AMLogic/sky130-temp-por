@@ -116,6 +116,192 @@
     {
       "id": "pst",
       "generator_report": "gen/pst.gen.json"
+    },
+    {
+      "id": "stub_vdd",
+      "cell": {
+        "gds_path": "promo_stub.gds",
+        "cell_name": "promo_stub",
+        "ports": [
+          {
+            "name": "CONN",
+            "x_um": 1.5,
+            "y_um": 0.085,
+            "layer": {
+              "layer": 67,
+              "datatype": 20
+            },
+            "width_um": 0.17,
+            "direction_deg": 0
+          },
+          {
+            "name": "PAD",
+            "x_um": 0.0,
+            "y_um": 0.085,
+            "layer": {
+              "layer": 67,
+              "datatype": 20
+            },
+            "width_um": 0.17,
+            "direction_deg": 180
+          }
+        ]
+      }
+    },
+    {
+      "id": "stub_vss",
+      "cell": {
+        "gds_path": "promo_stub.gds",
+        "cell_name": "promo_stub",
+        "ports": [
+          {
+            "name": "CONN",
+            "x_um": 1.5,
+            "y_um": 0.085,
+            "layer": {
+              "layer": 67,
+              "datatype": 20
+            },
+            "width_um": 0.17,
+            "direction_deg": 0
+          },
+          {
+            "name": "PAD",
+            "x_um": 0.0,
+            "y_um": 0.085,
+            "layer": {
+              "layer": 67,
+              "datatype": 20
+            },
+            "width_um": 0.17,
+            "direction_deg": 180
+          }
+        ]
+      }
+    },
+    {
+      "id": "stub_pg",
+      "cell": {
+        "gds_path": "promo_stub.gds",
+        "cell_name": "promo_stub",
+        "ports": [
+          {
+            "name": "CONN",
+            "x_um": 1.5,
+            "y_um": 0.085,
+            "layer": {
+              "layer": 67,
+              "datatype": 20
+            },
+            "width_um": 0.17,
+            "direction_deg": 0
+          },
+          {
+            "name": "PAD",
+            "x_um": 0.0,
+            "y_um": 0.085,
+            "layer": {
+              "layer": 67,
+              "datatype": 20
+            },
+            "width_um": 0.17,
+            "direction_deg": 180
+          }
+        ]
+      }
+    },
+    {
+      "id": "stub_pb",
+      "cell": {
+        "gds_path": "promo_stub.gds",
+        "cell_name": "promo_stub",
+        "ports": [
+          {
+            "name": "CONN",
+            "x_um": 1.5,
+            "y_um": 0.085,
+            "layer": {
+              "layer": 67,
+              "datatype": 20
+            },
+            "width_um": 0.17,
+            "direction_deg": 0
+          },
+          {
+            "name": "PAD",
+            "x_um": 0.0,
+            "y_um": 0.085,
+            "layer": {
+              "layer": 67,
+              "datatype": 20
+            },
+            "width_um": 0.17,
+            "direction_deg": 180
+          }
+        ]
+      }
+    },
+    {
+      "id": "stub_n2",
+      "cell": {
+        "gds_path": "promo_stub.gds",
+        "cell_name": "promo_stub",
+        "ports": [
+          {
+            "name": "CONN",
+            "x_um": 1.5,
+            "y_um": 0.085,
+            "layer": {
+              "layer": 67,
+              "datatype": 20
+            },
+            "width_um": 0.17,
+            "direction_deg": 0
+          },
+          {
+            "name": "PAD",
+            "x_um": 0.0,
+            "y_um": 0.085,
+            "layer": {
+              "layer": 67,
+              "datatype": 20
+            },
+            "width_um": 0.17,
+            "direction_deg": 180
+          }
+        ]
+      }
+    },
+    {
+      "id": "stub_na",
+      "cell": {
+        "gds_path": "promo_stub_v.gds",
+        "cell_name": "promo_stub_v",
+        "ports": [
+          {
+            "name": "CONN",
+            "x_um": 0.085,
+            "y_um": 1.5,
+            "layer": {
+              "layer": 67,
+              "datatype": 20
+            },
+            "width_um": 0.17,
+            "direction_deg": 90
+          },
+          {
+            "name": "PAD",
+            "x_um": 0.085,
+            "y_um": 0.0,
+            "layer": {
+              "layer": 67,
+              "datatype": 20
+            },
+            "width_um": 0.17,
+            "direction_deg": 270
+          }
+        ]
+      }
     }
   ],
   "placement": {
@@ -146,7 +332,13 @@
       "nwt_mpt",
       "nwt_mi1",
       "nwt_mi2",
-      "pst"
+      "pst",
+      "stub_vdd",
+      "stub_vss",
+      "stub_pg",
+      "stub_pb",
+      "stub_n2",
+      "stub_na"
     ],
     "origins_um": {
       "mp2": {
@@ -252,6 +444,30 @@
       "pst": {
         "x": 55.0,
         "y": 0.0
+      },
+      "stub_vdd": {
+        "x": -4.0,
+        "y": 65.0
+      },
+      "stub_vss": {
+        "x": -4.0,
+        "y": -6.0
+      },
+      "stub_pg": {
+        "x": -4.0,
+        "y": 14.0
+      },
+      "stub_pb": {
+        "x": -4.0,
+        "y": 18.0
+      },
+      "stub_n2": {
+        "x": -4.0,
+        "y": 12.0
+      },
+      "stub_na": {
+        "x": -6.5,
+        "y": 9.0
       }
     }
   },
@@ -335,6 +551,10 @@
         {
           "block": "nwt_mi2",
           "port": "TAP_N"
+        },
+        {
+          "block": "stub_vdd",
+          "port": "CONN"
         }
       ],
       "legs": [
@@ -677,6 +897,26 @@
               65.0
             ]
           ]
+        },
+        {
+          "from_pin": {
+            "block": "nwt_mp2",
+            "port": "TAP_N"
+          },
+          "to_pin": {
+            "block": "stub_vdd",
+            "port": "CONN"
+          },
+          "waypoints_um": [
+            [
+              -1.12,
+              65.0
+            ],
+            [
+              -2.5,
+              65.0
+            ]
+          ]
         }
       ]
     },
@@ -707,6 +947,10 @@
         {
           "block": "ml2",
           "port": "U0_S"
+        },
+        {
+          "block": "stub_vss",
+          "port": "CONN"
         }
       ],
       "legs": [
@@ -809,6 +1053,26 @@
               -6.0
             ]
           ]
+        },
+        {
+          "from_pin": {
+            "block": "mbn",
+            "port": "U0_S"
+          },
+          "to_pin": {
+            "block": "stub_vss",
+            "port": "CONN"
+          },
+          "waypoints_um": [
+            [
+              24.21,
+              -6.0
+            ],
+            [
+              -2.5,
+              -6.0
+            ]
+          ]
         }
       ]
     },
@@ -839,6 +1103,10 @@
         {
           "block": "ms2n",
           "port": "U0_D"
+        },
+        {
+          "block": "stub_pg",
+          "port": "CONN"
         }
       ],
       "legs": [
@@ -949,6 +1217,26 @@
               4.0
             ]
           ]
+        },
+        {
+          "from_pin": {
+            "block": "mp2",
+            "port": "U0_G"
+          },
+          "to_pin": {
+            "block": "stub_pg",
+            "port": "CONN"
+          },
+          "waypoints_um": [
+            [
+              2.42,
+              14.0
+            ],
+            [
+              -2.5,
+              14.0
+            ]
+          ]
         }
       ]
     },
@@ -979,6 +1267,10 @@
         {
           "block": "mpt",
           "port": "U0_G"
+        },
+        {
+          "block": "stub_pb",
+          "port": "CONN"
         }
       ],
       "legs": [
@@ -1089,6 +1381,30 @@
               18.0
             ]
           ]
+        },
+        {
+          "from_pin": {
+            "block": "mbn2",
+            "port": "U0_D"
+          },
+          "to_pin": {
+            "block": "stub_pb",
+            "port": "CONN"
+          },
+          "waypoints_um": [
+            [
+              36.9,
+              1.0
+            ],
+            [
+              36.9,
+              18.0
+            ],
+            [
+              -2.5,
+              18.0
+            ]
+          ]
         }
       ]
     },
@@ -1194,21 +1510,65 @@
         {
           "block": "mi1",
           "port": "U0_G"
+        },
+        {
+          "block": "stub_na",
+          "port": "CONN"
         }
       ],
-      "waypoints_um": [
-        [
-          23.5,
-          26.97
-        ],
-        [
-          23.5,
-          66.0
-        ],
-        [
-          74.42,
-          66.0
-        ]
+      "legs": [
+        {
+          "from_pin": {
+            "block": "mp1",
+            "port": "U0_D"
+          },
+          "to_pin": {
+            "block": "mi1",
+            "port": "U0_G"
+          },
+          "waypoints_um": [
+            [
+              23.5,
+              26.97
+            ],
+            [
+              23.5,
+              66.0
+            ],
+            [
+              74.42,
+              66.0
+            ]
+          ]
+        },
+        {
+          "from_pin": {
+            "block": "mp1",
+            "port": "U0_D"
+          },
+          "to_pin": {
+            "block": "stub_na",
+            "port": "CONN"
+          },
+          "waypoints_um": [
+            [
+              23.5,
+              26.97
+            ],
+            [
+              23.5,
+              68.0
+            ],
+            [
+              -6.42,
+              68.0
+            ],
+            [
+              -6.415,
+              10.5
+            ]
+          ]
+        }
       ]
     },
     {
@@ -1379,6 +1739,10 @@
         {
           "block": "ms2n",
           "port": "U0_G"
+        },
+        {
+          "block": "stub_n2",
+          "port": "CONN"
         }
       ],
       "legs": [
@@ -1427,6 +1791,27 @@
             ]
           ],
           "layer_role": "metal2"
+        },
+        {
+          "from_pin": {
+            "block": "ms2n",
+            "port": "U0_G"
+          },
+          "to_pin": {
+            "block": "stub_n2",
+            "port": "CONN"
+          },
+          "waypoints_um": [
+            [
+              42.42,
+              12.0
+            ],
+            [
+              -2.5,
+              12.0
+            ]
+          ],
+          "layer_role": "metal3"
         }
       ]
     }
@@ -1451,6 +1836,36 @@
       "net": "nb",
       "block": "mi2",
       "port": "U0_G"
+    },
+    {
+      "net": "vdd",
+      "block": "stub_vdd",
+      "port": "PAD"
+    },
+    {
+      "net": "vss",
+      "block": "stub_vss",
+      "port": "PAD"
+    },
+    {
+      "net": "pg",
+      "block": "stub_pg",
+      "port": "PAD"
+    },
+    {
+      "net": "pb",
+      "block": "stub_pb",
+      "port": "PAD"
+    },
+    {
+      "net": "n2",
+      "block": "stub_n2",
+      "port": "PAD"
+    },
+    {
+      "net": "na",
+      "block": "stub_na",
+      "port": "PAD"
     }
   ],
   "options": {

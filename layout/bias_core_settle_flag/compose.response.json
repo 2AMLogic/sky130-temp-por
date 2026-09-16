@@ -10,10 +10,10 @@
   },
   "dbu_um": 0.001,
   "bbox_um": {
-    "x0": -2.19,
-    "y0": -3.5,
+    "x0": -6.5,
+    "y0": -6.0,
     "x1": 40.99,
-    "y1": 25.16
+    "y1": 26.67
   },
   "ports": [
     {
@@ -47,19 +47,88 @@
       "port": "U0_G"
     },
     {
+      "name": "vdd",
+      "net": "vdd",
+      "layer": {
+        "layer": 67,
+        "datatype": 20
+      },
+      "x_um": -4.0,
+      "y_um": 26.585,
+      "width_um": 0.17,
+      "direction_deg": 180,
+      "block": "stub_vdd",
+      "port": "PAD"
+    },
+    {
+      "name": "vss",
+      "net": "vss",
+      "layer": {
+        "layer": 67,
+        "datatype": 20
+      },
+      "x_um": -4.0,
+      "y_um": -5.915,
+      "width_um": 0.17,
+      "direction_deg": 180,
+      "block": "stub_vss",
+      "port": "PAD"
+    },
+    {
+      "name": "pb",
+      "net": "pb",
+      "layer": {
+        "layer": 67,
+        "datatype": 20
+      },
+      "x_um": -4.0,
+      "y_um": 11.585,
+      "width_um": 0.17,
+      "direction_deg": 180,
+      "block": "stub_pb",
+      "port": "PAD"
+    },
+    {
+      "name": "nokx",
+      "net": "nokx",
+      "layer": {
+        "layer": 67,
+        "datatype": 20
+      },
+      "x_um": -4.0,
+      "y_um": 8.085,
+      "width_um": 0.17,
+      "direction_deg": 180,
+      "block": "stub_nokx",
+      "port": "PAD"
+    },
+    {
       "name": "nkg",
       "net": "nkg",
       "layer": {
         "layer": 67,
-        "datatype": 20,
-        "name": null
+        "datatype": 20
       },
-      "x_um": 23.92,
-      "y_um": 2.61,
-      "width_um": 0.42000000000000004,
-      "direction_deg": 90,
-      "block": "mokc",
-      "port": "U0_G"
+      "x_um": -4.0,
+      "y_um": 7.085,
+      "width_um": 0.17,
+      "direction_deg": 180,
+      "block": "stub_nkg",
+      "port": "PAD"
+    },
+    {
+      "name": "bias_ok",
+      "net": "bias_ok",
+      "layer": {
+        "layer": 67,
+        "datatype": 20
+      },
+      "x_um": -6.415,
+      "y_um": 19.5,
+      "width_um": 0.17,
+      "direction_deg": 270,
+      "block": "stub_bias_ok",
+      "port": "PAD"
     }
   ],
   "blocks": [
@@ -351,6 +420,108 @@
         "y1": -1.66
       },
       "orientation": "none"
+    },
+    {
+      "id": "stub_vdd",
+      "source": "cell",
+      "generator": null,
+      "cell_name": "promo_stub",
+      "offset_um": {
+        "x": -4.0,
+        "y": 26.5
+      },
+      "bbox_um": {
+        "x0": -4.0,
+        "y0": 26.5,
+        "x1": -2.5,
+        "y1": 26.67
+      },
+      "orientation": "none"
+    },
+    {
+      "id": "stub_vss",
+      "source": "cell",
+      "generator": null,
+      "cell_name": "promo_stub",
+      "offset_um": {
+        "x": -4.0,
+        "y": -6.0
+      },
+      "bbox_um": {
+        "x0": -4.0,
+        "y0": -6.0,
+        "x1": -2.5,
+        "y1": -5.83
+      },
+      "orientation": "none"
+    },
+    {
+      "id": "stub_pb",
+      "source": "cell",
+      "generator": null,
+      "cell_name": "promo_stub",
+      "offset_um": {
+        "x": -4.0,
+        "y": 11.5
+      },
+      "bbox_um": {
+        "x0": -4.0,
+        "y0": 11.5,
+        "x1": -2.5,
+        "y1": 11.67
+      },
+      "orientation": "none"
+    },
+    {
+      "id": "stub_nokx",
+      "source": "cell",
+      "generator": null,
+      "cell_name": "promo_stub",
+      "offset_um": {
+        "x": -4.0,
+        "y": 8.0
+      },
+      "bbox_um": {
+        "x0": -4.0,
+        "y0": 8.0,
+        "x1": -2.5,
+        "y1": 8.17
+      },
+      "orientation": "none"
+    },
+    {
+      "id": "stub_nkg",
+      "source": "cell",
+      "generator": null,
+      "cell_name": "promo_stub",
+      "offset_um": {
+        "x": -4.0,
+        "y": 7.0
+      },
+      "bbox_um": {
+        "x0": -4.0,
+        "y0": 7.0,
+        "x1": -2.5,
+        "y1": 7.17
+      },
+      "orientation": "none"
+    },
+    {
+      "id": "stub_bias_ok",
+      "source": "cell",
+      "generator": null,
+      "cell_name": "promo_stub_v",
+      "offset_um": {
+        "x": -6.5,
+        "y": 19.5
+      },
+      "bbox_um": {
+        "x0": -6.5,
+        "y0": 19.5,
+        "x1": -6.33,
+        "y1": 21.0
+      },
+      "orientation": "none"
     }
   ],
   "nets": [
@@ -388,10 +559,14 @@
         {
           "block": "mo1p",
           "port": "U0_S"
+        },
+        {
+          "block": "stub_vdd",
+          "port": "CONN"
         }
       ],
       "routed": true,
-      "route_length_um": 170.57000000000002,
+      "route_length_um": 182.705,
       "status": "routed",
       "legs": [
         {
@@ -505,6 +680,22 @@
           "route_length_um": 23.03,
           "reason": null,
           "channel_track": 0
+        },
+        {
+          "pins": [
+            {
+              "block": "nwt_mpok",
+              "port": "TAP_N"
+            },
+            {
+              "block": "stub_vdd",
+              "port": "CONN"
+            }
+          ],
+          "routed": true,
+          "route_length_um": 12.135000000000003,
+          "reason": null,
+          "channel_track": 0
         }
       ]
     },
@@ -538,10 +729,14 @@
         {
           "block": "mo1n",
           "port": "U0_S"
+        },
+        {
+          "block": "stub_vss",
+          "port": "CONN"
         }
       ],
       "routed": true,
-      "route_length_um": 95.84,
+      "route_length_um": 113.635,
       "status": "routed",
       "legs": [
         {
@@ -639,6 +834,22 @@
           "route_length_um": 16.0,
           "reason": null,
           "channel_track": 0
+        },
+        {
+          "pins": [
+            {
+              "block": "mol1",
+              "port": "U0_S"
+            },
+            {
+              "block": "stub_vss",
+              "port": "CONN"
+            }
+          ],
+          "routed": true,
+          "route_length_um": 17.795,
+          "reason": null,
+          "channel_track": 0
         }
       ]
     },
@@ -706,10 +917,14 @@
         {
           "block": "mok2p",
           "port": "U0_G"
+        },
+        {
+          "block": "stub_pb",
+          "port": "CONN"
         }
       ],
       "routed": true,
-      "route_length_um": 32.72,
+      "route_length_um": 40.585,
       "status": "routed",
       "legs": [
         {
@@ -725,6 +940,22 @@
           ],
           "routed": true,
           "route_length_um": 32.72,
+          "reason": null,
+          "channel_track": 0
+        },
+        {
+          "pins": [
+            {
+              "block": "mpok",
+              "port": "U0_G"
+            },
+            {
+              "block": "stub_pb",
+              "port": "CONN"
+            }
+          ],
+          "routed": true,
+          "route_length_um": 7.865000000000002,
           "reason": null,
           "channel_track": 0
         }
@@ -896,10 +1127,14 @@
         {
           "block": "mo1n",
           "port": "U0_G"
+        },
+        {
+          "block": "stub_nokx",
+          "port": "CONN"
         }
       ],
       "routed": true,
-      "route_length_um": 43.14,
+      "route_length_um": 85.785,
       "status": "routed",
       "legs": [
         {
@@ -949,6 +1184,22 @@
           "route_length_um": 11.5,
           "reason": null,
           "channel_track": 0
+        },
+        {
+          "pins": [
+            {
+              "block": "mo1n",
+              "port": "U0_G"
+            },
+            {
+              "block": "stub_nokx",
+              "port": "CONN"
+            }
+          ],
+          "routed": true,
+          "route_length_um": 42.645,
+          "reason": null,
+          "channel_track": 0
         }
       ]
     },
@@ -962,10 +1213,14 @@
         {
           "block": "mo1n",
           "port": "U0_D"
+        },
+        {
+          "block": "stub_bias_ok",
+          "port": "CONN"
         }
       ],
       "routed": true,
-      "route_length_um": 19.709999999999994,
+      "route_length_um": 89.02499999999999,
       "status": "routed",
       "legs": [
         {
@@ -981,6 +1236,56 @@
           ],
           "routed": true,
           "route_length_um": 19.709999999999994,
+          "reason": null,
+          "channel_track": 0
+        },
+        {
+          "pins": [
+            {
+              "block": "mo1p",
+              "port": "U0_D"
+            },
+            {
+              "block": "stub_bias_ok",
+              "port": "CONN"
+            }
+          ],
+          "routed": true,
+          "route_length_um": 69.315,
+          "reason": null,
+          "channel_track": 0
+        }
+      ]
+    },
+    {
+      "net": "nkg",
+      "pins": [
+        {
+          "block": "mokc",
+          "port": "U0_G"
+        },
+        {
+          "block": "stub_nkg",
+          "port": "CONN"
+        }
+      ],
+      "routed": true,
+      "route_length_um": 30.895000000000003,
+      "status": "routed",
+      "legs": [
+        {
+          "pins": [
+            {
+              "block": "mokc",
+              "port": "U0_G"
+            },
+            {
+              "block": "stub_nkg",
+              "port": "CONN"
+            }
+          ],
+          "routed": true,
+          "route_length_um": 30.895000000000003,
           "reason": null,
           "channel_track": 0
         }
@@ -1001,9 +1306,39 @@
       "labelled": true
     },
     {
+      "net": "vdd",
+      "block": "stub_vdd",
+      "port": "PAD",
+      "labelled": true
+    },
+    {
+      "net": "vss",
+      "block": "stub_vss",
+      "port": "PAD",
+      "labelled": true
+    },
+    {
+      "net": "pb",
+      "block": "stub_pb",
+      "port": "PAD",
+      "labelled": true
+    },
+    {
+      "net": "nokx",
+      "block": "stub_nokx",
+      "port": "PAD",
+      "labelled": true
+    },
+    {
       "net": "nkg",
-      "block": "mokc",
-      "port": "U0_G",
+      "block": "stub_nkg",
+      "port": "PAD",
+      "labelled": true
+    },
+    {
+      "net": "bias_ok",
+      "block": "stub_bias_ok",
+      "port": "PAD",
       "labelled": true
     }
   ],
