@@ -1,0 +1,108 @@
+{
+  "schema_version": 1,
+  "engine": "klayout",
+  "layout": "bias_core_startup.spice",
+  "reference": "bias_core_startup.ref.spice",
+  "top": "BIAS_CORE_STARTUP",
+  "reference_top": "BIAS_CORE_STARTUP",
+  "parameter_tolerance": null,
+  "options": {
+    "combine_devices": false,
+    "combine_devices_per_circuit": null,
+    "flatten_layout": false,
+    "flatten_reference": false,
+    "netgen_setup": null,
+    "parameter_tolerance": null
+  },
+  "status": "match",
+  "mismatch_count": 0,
+  "error_count": 0,
+  "category_counts": {},
+  "category_error_counts": {},
+  "counts": {
+    "nets": {
+      "layout": 10,
+      "reference": 10,
+      "matched": 10
+    },
+    "devices": {
+      "layout": 9,
+      "reference": 9,
+      "matched": 9
+    },
+    "pins": {
+      "layout": 10,
+      "reference": 10,
+      "matched": 10
+    }
+  },
+  "device_classes": null,
+  "environment": {
+    "engine": "klayout",
+    "engine_version": "0.30.10",
+    "layout_sha256": "b6aabed6a503be536d2bd7d3f88974ccb84b373d04195af16f853c53df00b1f7",
+    "reference_sha256": "62d41eca71588d859a6436d5689fecfdf0c574db9d0601d842d0ebfad7cf76ff",
+    "extracted_netlist": null
+  },
+  "provenance": {
+    "klt_version": "0.4.0",
+    "klayout_version": "0.30.10",
+    "pdk": null,
+    "deck": null,
+    "input": null,
+    "klayout_version_mismatch": false
+  },
+  "mismatches": [],
+  "net_correspondence": [
+    {
+      "layout": "KS1",
+      "reference": "KS1",
+      "pin": true
+    },
+    {
+      "layout": "KS2",
+      "reference": "KS2",
+      "pin": true
+    },
+    {
+      "layout": "KS3",
+      "reference": "KS3",
+      "pin": true
+    },
+    {
+      "layout": "KS4",
+      "reference": "KS4",
+      "pin": true
+    },
+    {
+      "layout": "NKG",
+      "reference": "NKG",
+      "pin": true
+    },
+    {
+      "layout": "NKM",
+      "reference": "NKM",
+      "pin": true
+    },
+    {
+      "layout": "PB",
+      "reference": "PB",
+      "pin": true
+    },
+    {
+      "layout": "PG",
+      "reference": "PG",
+      "pin": true
+    },
+    {
+      "layout": "VDD",
+      "reference": "VDD",
+      "pin": true
+    },
+    {
+      "layout": "VSS",
+      "reference": "VSS",
+      "pin": true
+    }
+  ]
+}

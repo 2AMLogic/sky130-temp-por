@@ -1,0 +1,808 @@
+{
+  "schema_version": 1,
+  "generator": "gen-compose",
+  "cell_name": "bias_core_startup",
+  "gds_path": "bias_core_startup.gds",
+  "pdk": {
+    "name": "sky130A",
+    "variant": "sky130A",
+    "version": "open_pdks c6d73a35f524070e85faff4a6a9eef49553ebc2b"
+  },
+  "dbu_um": 0.001,
+  "bbox_um": {
+    "x0": -35.0,
+    "y0": 0.0,
+    "x1": 54.040000000000006,
+    "y1": 8.82
+  },
+  "ports": [
+    {
+      "name": "pb",
+      "net": "pb",
+      "layer": {
+        "layer": 67,
+        "datatype": 20,
+        "name": null
+      },
+      "x_um": -24.58,
+      "y_um": 5.109999999999999,
+      "width_um": 0.42000000000000004,
+      "direction_deg": 90,
+      "block": "ka",
+      "port": "U0_G"
+    },
+    {
+      "name": "pg",
+      "net": "pg",
+      "layer": {
+        "layer": 67,
+        "datatype": 20,
+        "name": null
+      },
+      "x_um": -5.63,
+      "y_um": 4.0,
+      "width_um": 1.0,
+      "direction_deg": 180,
+      "block": "kick",
+      "port": "U0_D"
+    }
+  ],
+  "blocks": [
+    {
+      "id": "kpd",
+      "source": "generator_report",
+      "generator": "mos_array",
+      "cell_name": "kpd",
+      "offset_um": {
+        "x": 0.0,
+        "y": 0.0
+      },
+      "bbox_um": {
+        "x0": 0.0,
+        "y0": 0.0,
+        "x1": 4.84,
+        "y1": 8.82
+      },
+      "orientation": "none"
+    },
+    {
+      "id": "ks4",
+      "source": "generator_report",
+      "generator": "mos_array",
+      "cell_name": "ks4",
+      "offset_um": {
+        "x": 5.84,
+        "y": 3.5
+      },
+      "bbox_um": {
+        "x0": 5.84,
+        "y0": 3.5,
+        "x1": 14.68,
+        "y1": 5.32
+      },
+      "orientation": "none"
+    },
+    {
+      "id": "ks3",
+      "source": "generator_report",
+      "generator": "mos_array",
+      "cell_name": "ks3",
+      "offset_um": {
+        "x": 15.68,
+        "y": 3.5
+      },
+      "bbox_um": {
+        "x0": 15.68,
+        "y0": 3.5,
+        "x1": 24.52,
+        "y1": 5.32
+      },
+      "orientation": "none"
+    },
+    {
+      "id": "ks2",
+      "source": "generator_report",
+      "generator": "mos_array",
+      "cell_name": "ks2",
+      "offset_um": {
+        "x": 25.52,
+        "y": 3.5
+      },
+      "bbox_um": {
+        "x0": 25.52,
+        "y0": 3.5,
+        "x1": 34.36,
+        "y1": 5.32
+      },
+      "orientation": "none"
+    },
+    {
+      "id": "ks1",
+      "source": "generator_report",
+      "generator": "mos_array",
+      "cell_name": "ks1",
+      "offset_um": {
+        "x": 35.36,
+        "y": 3.5
+      },
+      "bbox_um": {
+        "x0": 35.36,
+        "y0": 3.5,
+        "x1": 44.2,
+        "y1": 5.32
+      },
+      "orientation": "none"
+    },
+    {
+      "id": "ks0",
+      "source": "generator_report",
+      "generator": "mos_array",
+      "cell_name": "ks0",
+      "offset_um": {
+        "x": 45.2,
+        "y": 3.5
+      },
+      "bbox_um": {
+        "x0": 45.2,
+        "y0": 3.5,
+        "x1": 54.040000000000006,
+        "y1": 5.32
+      },
+      "orientation": "none"
+    },
+    {
+      "id": "kick",
+      "source": "generator_report",
+      "generator": "mos_array",
+      "cell_name": "kick",
+      "offset_um": {
+        "x": -1.0,
+        "y": 3.5
+      },
+      "bbox_um": {
+        "x0": -5.84,
+        "y0": 3.5,
+        "x1": -1.0,
+        "y1": 5.32
+      },
+      "orientation": "mirror_x"
+    },
+    {
+      "id": "kan",
+      "source": "generator_report",
+      "generator": "mos_array",
+      "cell_name": "kan",
+      "offset_um": {
+        "x": -14.16,
+        "y": 3.0
+      },
+      "bbox_um": {
+        "x0": -19.0,
+        "y0": 3.0,
+        "x1": -14.16,
+        "y1": 5.82
+      },
+      "orientation": "mirror_x"
+    },
+    {
+      "id": "ka",
+      "source": "generator_report",
+      "generator": "mos_array",
+      "cell_name": "ka",
+      "offset_um": {
+        "x": -27.0,
+        "y": 3.5
+      },
+      "bbox_um": {
+        "x0": -27.15,
+        "y0": 3.35,
+        "x1": -22.009999999999998,
+        "y1": 5.47
+      },
+      "orientation": "none"
+    },
+    {
+      "id": "nwell_tap",
+      "source": "generator_report",
+      "generator": "guard_ring",
+      "cell_name": "nwell_tap",
+      "offset_um": {
+        "x": -29.04,
+        "y": 3.08
+      },
+      "bbox_um": {
+        "x0": -29.189999999999998,
+        "y0": 2.93,
+        "x1": -27.05,
+        "y1": 5.07
+      },
+      "orientation": "none"
+    },
+    {
+      "id": "psub_tap",
+      "source": "generator_report",
+      "generator": "guard_ring",
+      "cell_name": "psub_tap",
+      "offset_um": {
+        "x": -35.0,
+        "y": 3.5
+      },
+      "bbox_um": {
+        "x0": -35.0,
+        "y0": 3.5,
+        "x1": -33.16,
+        "y1": 5.34
+      },
+      "orientation": "none"
+    }
+  ],
+  "nets": [
+    {
+      "net": "vdd",
+      "pins": [
+        {
+          "block": "ks0",
+          "port": "U0_D"
+        },
+        {
+          "block": "ks0",
+          "port": "U0_G"
+        },
+        {
+          "block": "ka",
+          "port": "U0_S"
+        },
+        {
+          "block": "nwell_tap",
+          "port": "TAP_E"
+        },
+        {
+          "block": "nwell_tap",
+          "port": "TAP_N"
+        }
+      ],
+      "routed": true,
+      "route_length_um": 101.28000000000002,
+      "status": "routed",
+      "legs": [
+        {
+          "pins": [
+            {
+              "block": "ks0",
+              "port": "U0_D"
+            },
+            {
+              "block": "ks0",
+              "port": "U0_G"
+            }
+          ],
+          "routed": true,
+          "route_length_um": 5.319999999999993,
+          "reason": null,
+          "channel_track": 0
+        },
+        {
+          "pins": [
+            {
+              "block": "ka",
+              "port": "U0_S"
+            },
+            {
+              "block": "nwell_tap",
+              "port": "TAP_E"
+            }
+          ],
+          "routed": true,
+          "route_length_um": 0.620000000000001,
+          "reason": null,
+          "channel_track": 0
+        },
+        {
+          "pins": [
+            {
+              "block": "nwell_tap",
+              "port": "TAP_N"
+            },
+            {
+              "block": "ks0",
+              "port": "U0_G"
+            }
+          ],
+          "routed": true,
+          "route_length_um": 93.92000000000002,
+          "reason": null,
+          "channel_track": 0
+        },
+        {
+          "pins": [
+            {
+              "block": "nwell_tap",
+              "port": "TAP_E"
+            },
+            {
+              "block": "nwell_tap",
+              "port": "TAP_N"
+            }
+          ],
+          "routed": true,
+          "route_length_um": 1.4199999999999973,
+          "reason": null,
+          "channel_track": 0
+        }
+      ]
+    },
+    {
+      "net": "ks1",
+      "pins": [
+        {
+          "block": "ks0",
+          "port": "U0_S"
+        },
+        {
+          "block": "ks1",
+          "port": "U0_D"
+        },
+        {
+          "block": "ks1",
+          "port": "U0_G"
+        }
+      ],
+      "routed": true,
+      "route_length_um": 6.740000000000002,
+      "status": "routed",
+      "legs": [
+        {
+          "pins": [
+            {
+              "block": "ks0",
+              "port": "U0_S"
+            },
+            {
+              "block": "ks1",
+              "port": "U0_D"
+            }
+          ],
+          "routed": true,
+          "route_length_um": 1.4200000000000088,
+          "reason": null,
+          "channel_track": 0
+        },
+        {
+          "pins": [
+            {
+              "block": "ks1",
+              "port": "U0_D"
+            },
+            {
+              "block": "ks1",
+              "port": "U0_G"
+            }
+          ],
+          "routed": true,
+          "route_length_um": 5.319999999999993,
+          "reason": null,
+          "channel_track": 0
+        }
+      ]
+    },
+    {
+      "net": "ks2",
+      "pins": [
+        {
+          "block": "ks1",
+          "port": "U0_S"
+        },
+        {
+          "block": "ks2",
+          "port": "U0_D"
+        },
+        {
+          "block": "ks2",
+          "port": "U0_G"
+        }
+      ],
+      "routed": true,
+      "route_length_um": 6.740000000000002,
+      "status": "routed",
+      "legs": [
+        {
+          "pins": [
+            {
+              "block": "ks1",
+              "port": "U0_S"
+            },
+            {
+              "block": "ks2",
+              "port": "U0_D"
+            }
+          ],
+          "routed": true,
+          "route_length_um": 1.4200000000000017,
+          "reason": null,
+          "channel_track": 0
+        },
+        {
+          "pins": [
+            {
+              "block": "ks2",
+              "port": "U0_D"
+            },
+            {
+              "block": "ks2",
+              "port": "U0_G"
+            }
+          ],
+          "routed": true,
+          "route_length_um": 5.32,
+          "reason": null,
+          "channel_track": 0
+        }
+      ]
+    },
+    {
+      "net": "ks3",
+      "pins": [
+        {
+          "block": "ks2",
+          "port": "U0_S"
+        },
+        {
+          "block": "ks3",
+          "port": "U0_D"
+        },
+        {
+          "block": "ks3",
+          "port": "U0_G"
+        }
+      ],
+      "routed": true,
+      "route_length_um": 6.739999999999998,
+      "status": "routed",
+      "legs": [
+        {
+          "pins": [
+            {
+              "block": "ks2",
+              "port": "U0_S"
+            },
+            {
+              "block": "ks3",
+              "port": "U0_D"
+            }
+          ],
+          "routed": true,
+          "route_length_um": 1.4200000000000017,
+          "reason": null,
+          "channel_track": 0
+        },
+        {
+          "pins": [
+            {
+              "block": "ks3",
+              "port": "U0_D"
+            },
+            {
+              "block": "ks3",
+              "port": "U0_G"
+            }
+          ],
+          "routed": true,
+          "route_length_um": 5.319999999999997,
+          "reason": null,
+          "channel_track": 0
+        }
+      ]
+    },
+    {
+      "net": "ks4",
+      "pins": [
+        {
+          "block": "ks3",
+          "port": "U0_S"
+        },
+        {
+          "block": "ks4",
+          "port": "U0_D"
+        },
+        {
+          "block": "ks4",
+          "port": "U0_G"
+        }
+      ],
+      "routed": true,
+      "route_length_um": 6.74,
+      "status": "routed",
+      "legs": [
+        {
+          "pins": [
+            {
+              "block": "ks3",
+              "port": "U0_S"
+            },
+            {
+              "block": "ks4",
+              "port": "U0_D"
+            }
+          ],
+          "routed": true,
+          "route_length_um": 1.4200000000000017,
+          "reason": null,
+          "channel_track": 0
+        },
+        {
+          "pins": [
+            {
+              "block": "ks4",
+              "port": "U0_D"
+            },
+            {
+              "block": "ks4",
+              "port": "U0_G"
+            }
+          ],
+          "routed": true,
+          "route_length_um": 5.3199999999999985,
+          "reason": null,
+          "channel_track": 0
+        }
+      ]
+    },
+    {
+      "net": "nkg",
+      "pins": [
+        {
+          "block": "ks4",
+          "port": "U0_S"
+        },
+        {
+          "block": "kpd",
+          "port": "U0_D"
+        },
+        {
+          "block": "kick",
+          "port": "U0_G"
+        }
+      ],
+      "routed": true,
+      "route_length_um": 21.700000000000003,
+      "status": "routed",
+      "legs": [
+        {
+          "pins": [
+            {
+              "block": "ks4",
+              "port": "U0_S"
+            },
+            {
+              "block": "kpd",
+              "port": "U0_D"
+            }
+          ],
+          "routed": true,
+          "route_length_um": 1.42,
+          "reason": null,
+          "channel_track": 0
+        },
+        {
+          "pins": [
+            {
+              "block": "kick",
+              "port": "U0_G"
+            },
+            {
+              "block": "kpd",
+              "port": "U0_D"
+            }
+          ],
+          "routed": true,
+          "route_length_um": 20.28,
+          "reason": null,
+          "channel_track": 0
+        }
+      ]
+    },
+    {
+      "net": "vss",
+      "pins": [
+        {
+          "block": "kpd",
+          "port": "U0_S"
+        },
+        {
+          "block": "kan",
+          "port": "U0_S"
+        },
+        {
+          "block": "kick",
+          "port": "U0_S"
+        },
+        {
+          "block": "psub_tap",
+          "port": "TAP_S"
+        }
+      ],
+      "routed": true,
+      "route_length_um": 61.68000000000001,
+      "status": "routed",
+      "legs": [
+        {
+          "pins": [
+            {
+              "block": "kick",
+              "port": "U0_S"
+            },
+            {
+              "block": "kpd",
+              "port": "U0_S"
+            }
+          ],
+          "routed": true,
+          "route_length_um": 1.42,
+          "reason": null,
+          "channel_track": 0
+        },
+        {
+          "pins": [
+            {
+              "block": "kan",
+              "port": "U0_S"
+            },
+            {
+              "block": "kpd",
+              "port": "U0_S"
+            }
+          ],
+          "routed": false,
+          "route_length_um": null,
+          "reason": "crosses already-routed net 'nkg'"
+        },
+        {
+          "pins": [
+            {
+              "block": "psub_tap",
+              "port": "TAP_S"
+            },
+            {
+              "block": "kpd",
+              "port": "U0_S"
+            }
+          ],
+          "routed": true,
+          "route_length_um": 44.0,
+          "reason": null,
+          "channel_track": 0
+        },
+        {
+          "pins": [
+            {
+              "block": "kpd",
+              "port": "U0_S"
+            },
+            {
+              "block": "kan",
+              "port": "U0_S"
+            }
+          ],
+          "routed": true,
+          "route_length_um": 16.26,
+          "reason": null,
+          "channel_track": 0
+        }
+      ]
+    },
+    {
+      "net": "nkm",
+      "pins": [
+        {
+          "block": "kpd",
+          "port": "U0_G"
+        },
+        {
+          "block": "kan",
+          "port": "U0_D"
+        },
+        {
+          "block": "kan",
+          "port": "U0_G"
+        },
+        {
+          "block": "ka",
+          "port": "U0_D"
+        }
+      ],
+      "routed": true,
+      "route_length_um": 31.180000000000003,
+      "status": "routed",
+      "legs": [
+        {
+          "pins": [
+            {
+              "block": "kpd",
+              "port": "U0_G"
+            },
+            {
+              "block": "kan",
+              "port": "U0_G"
+            }
+          ],
+          "routed": true,
+          "route_length_um": 23.78,
+          "reason": null,
+          "channel_track": 0
+        },
+        {
+          "pins": [
+            {
+              "block": "kan",
+              "port": "U0_D"
+            },
+            {
+              "block": "kan",
+              "port": "U0_G"
+            }
+          ],
+          "routed": true,
+          "route_length_um": 3.8200000000000003,
+          "reason": null,
+          "channel_track": 0
+        },
+        {
+          "pins": [
+            {
+              "block": "kan",
+              "port": "U0_D"
+            },
+            {
+              "block": "ka",
+              "port": "U0_D"
+            }
+          ],
+          "routed": true,
+          "route_length_um": 3.580000000000002,
+          "reason": null,
+          "channel_track": 0
+        }
+      ]
+    }
+  ],
+  "pins": [
+    {
+      "net": "pb",
+      "block": "ka",
+      "port": "U0_G",
+      "labelled": true
+    },
+    {
+      "net": "pg",
+      "block": "kick",
+      "port": "U0_D",
+      "labelled": true
+    }
+  ],
+  "unrouted_nets": [],
+  "drc_hints": {
+    "min_spacing_um": null,
+    "matched_groups": [
+      {
+        "matched_group_id": "mos_array:1x1:common_centroid",
+        "blocks": [
+          "kpd",
+          "ks4",
+          "ks3",
+          "ks2",
+          "ks1",
+          "ks0",
+          "kick",
+          "kan",
+          "ka"
+        ],
+        "placement_symmetric": null
+      }
+    ],
+    "notes": []
+  },
+  "warnings": [
+    "block 'nwell_tap' is placed 0.00um from block 'ka' (strategy: explicit), closer than ka's own declared drc_hints.min_spacing_um of 0.40um",
+    "block 'ka' is placed 0.00um from block 'nwell_tap' (strategy: explicit), closer than nwell_tap's own declared drc_hints.min_spacing_um of 0.40um"
+  ]
+}

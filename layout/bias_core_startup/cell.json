@@ -1,0 +1,208 @@
+{
+  "cell": "bias_core_startup",
+  "_comment": [
+    "Cell descriptor for layout/bin/compose-cell.py -- see layout/README.md",
+    "for the recipe this follows (ported from 2AMLogic/sky130-trng) and",
+    "issue #38 (part of #34, itself a follow-on from #30/#36/#37) for why",
+    "this is a standalone proof cell rather than the full design/bias_core.sch",
+    "composition.",
+    "",
+    "This is design/netlist/bias_core.spice's XKS0..XKS4 / XKA / XKAN / XKPD",
+    "/ XKICK group -- design/bias_core.md's startup kick chain: a 5-stage",
+    "diode-connected NFET stack (XKS0..XKS4, L=8 W=1 each, chained VDD ->",
+    "KS1 -> KS2 -> KS3 -> KS4 -> NKG) plus a PFET (XKA) and two more NFETs",
+    "(XKAN, XKPD) that mirror/pull down the kick node, and a final NFET",
+    "(XKICK) that injects the kick pulse onto PG. 9 devices total, all",
+    "sky130_fd_pr__nfet_g5v0d10v5 / sky130_fd_pr__pfet_g5v0d10v5 -- none of",
+    "them are the sky130_fd_pr__pnp_05v5_W3p40L3p40 device affected by",
+    "2AMLogic/klayout-tools#1894, so (unlike bias_core_pnp8_leg/",
+    "bias_core_xq1_xqr) this group is not expected to hit that gap.",
+    "",
+    "Each device is one klt gen mos_array call (rows=1 cols=1, dummy=0,",
+    "gate_contact=true so every gate lands on a routable metal pad -- every",
+    "gate here ties to a real net, not a bare pins[] label) -- nine",
+    "1x1 blocks placed explicitly and wired by hand, following",
+    "bias_core_settle_flag's own multi-block recipe (distinct devices with",
+    "distinct per-terminal nets) rather than bias_core_pnp8_leg's single",
+    "matched-array generator call (these nine devices do not match each",
+    "other the way an 8:1 ratio leg's unit devices do).",
+    "",
+    "Floorplan: XKS0..XKS4 sit in one row (kpd, ks4, ks3, ks2, ks1, ks0 left",
+    "to right), placed so each stage's U0_S (west-facing) meets the next",
+    "stage's U0_D/U0_G (east-facing) directly across a small gap --",
+    "mos_array's S is always drawn on the block's own west edge and D on",
+    "its east edge, so the chain's VDD -> KS1 -> KS2 -> KS3 -> KS4 -> NKG",
+    "direction runs right to left (XKS0 rightmost, XKS4 leftmost) for every",
+    "adjacent pair to land on opposite-facing ports. XKICK and XKAN are",
+    "mirrored (orientation: mirror_x, which negates local x and swaps",
+    "U0_S/U0_D's east/west facing -- gen.md's own _ORIENTATION_DIRECTION_MAP",
+    "-- note klt's own offset_um semantics: for a mirror_x block, origins_um",
+    "places the block's PRE-mirror local x=0 corner, i.e. the block's",
+    "resulting bbox_x1, not bbox_x0 -- the block extends further NEGATIVE",
+    "x from there) so their own U0_S faces the chain/tap it needs to reach",
+    "directly rather than needing a reach-around.",
+    "",
+    "KNOWN GAP hit building this recipe, reported generically per this",
+    "repo's friction protocol: a two-stage 'stages'/blocks[].from_stage",
+    "composition (layout/ro_stage/cell.json's own technique, used by",
+    "bias_core_pnp8_leg's predecessor drafts) that re-places an EARLIER",
+    "stage's flattened composed cell as one opaque block and then routes a",
+    "bundle net onto several of that block's own promoted pins[] ports at a",
+    "higher routing.layer_role reproducibly fails klt gen-compose's",
+    "automatic via-drop with a same-layer li1.space.1-style spacing report",
+    "against 'block core's own drawn geometry' for EVERY pairwise leg among",
+    "the promoted ports -- even though the identical ports, routed directly",
+    "(not through a from_stage promotion) in a single gen-compose pass with",
+    "a per-net connectivity[].layer_role override (this cell's own 'nkm'",
+    "net, below -- the same per-net-layer_role technique",
+    "bias_core_settle_flag's README documents, klayout-tools#1655), land",
+    "clean. This cell.json therefore uses the single-pass per-net",
+    "layer_role technique instead of 'stages' -- see 'nkm' below -- and the",
+    "from_stage failure is filed as",
+    "2AMLogic/klayout-tools#1917 with a reduced repro (see that issue for",
+    "the exact reproduction cell.json and response fields).",
+    "",
+    "XKA's PFET well is tied to VDD by NWELL-MERGING nwell_tap with XKA",
+    "(placed so their bboxes overlap by ~0.10 um -- see",
+    "bias_core_settle_flag/README.md's own '0.10 um nwell overlap' worked",
+    "example and gf180-temp-por precedent: an NMOS body/substrate tie is a",
+    "globally synthesized net regardless of any drawn contact (klt",
+    "extract's sky130 deck: 'an NMOS body's terminal always falls back to",
+    "the curated deck's synthesized substrate_net global'), confirmed",
+    "empirically against this repo's own klt build (two mos_array nfets 100",
+    "um apart, no shared geometry: both extract body='vsubs', the SAME",
+    "net) -- so psub_tap only needs ONE routed strap into the real 'vss'",
+    "bus anywhere, not one per NFET. A PFET's well is NOT globally",
+    "synthesized this way (klt extract: 'unlike a PMOS body...'), so XKA's",
+    "own well tie is real, physical nwell-merging, not routing alone."
+  ],
+  "pdk": {
+    "variant": "sky130A",
+    "deck": "sky130"
+  },
+  "blocks": [
+    {"id": "kpd", "generator": "mos_array", "cell_name": "kpd", "orientation": "none",
+     "params": {"w_um": 8, "l_um": 4, "rows": 1, "cols": 1, "dummy": 0, "flavor": "nfet", "gate_contact": true}},
+    {"id": "ks4", "generator": "mos_array", "cell_name": "ks4", "orientation": "none",
+     "params": {"w_um": 1, "l_um": 8, "rows": 1, "cols": 1, "dummy": 0, "flavor": "nfet", "gate_contact": true}},
+    {"id": "ks3", "generator": "mos_array", "cell_name": "ks3", "orientation": "none",
+     "params": {"w_um": 1, "l_um": 8, "rows": 1, "cols": 1, "dummy": 0, "flavor": "nfet", "gate_contact": true}},
+    {"id": "ks2", "generator": "mos_array", "cell_name": "ks2", "orientation": "none",
+     "params": {"w_um": 1, "l_um": 8, "rows": 1, "cols": 1, "dummy": 0, "flavor": "nfet", "gate_contact": true}},
+    {"id": "ks1", "generator": "mos_array", "cell_name": "ks1", "orientation": "none",
+     "params": {"w_um": 1, "l_um": 8, "rows": 1, "cols": 1, "dummy": 0, "flavor": "nfet", "gate_contact": true}},
+    {"id": "ks0", "generator": "mos_array", "cell_name": "ks0", "orientation": "none",
+     "params": {"w_um": 1, "l_um": 8, "rows": 1, "cols": 1, "dummy": 0, "flavor": "nfet", "gate_contact": true}},
+    {"id": "kick", "generator": "mos_array", "cell_name": "kick", "orientation": "mirror_x",
+     "params": {"w_um": 1, "l_um": 4, "rows": 1, "cols": 1, "dummy": 0, "flavor": "nfet", "gate_contact": true}},
+    {"id": "kan", "generator": "mos_array", "cell_name": "kan", "orientation": "mirror_x",
+     "params": {"w_um": 2, "l_um": 4, "rows": 1, "cols": 1, "dummy": 0, "flavor": "nfet", "gate_contact": true}},
+    {"id": "ka", "generator": "mos_array", "cell_name": "ka", "orientation": "none",
+     "params": {"w_um": 1, "l_um": 4, "rows": 1, "cols": 1, "dummy": 0, "flavor": "pfet", "gate_contact": true}},
+    {"id": "nwell_tap", "generator": "guard_ring", "cell_name": "nwell_tap", "orientation": "none",
+     "params": {"inner_width_um": 1.0, "inner_height_um": 1.0, "ring_width_um": 0.42, "contacts_per_side": 2, "add_well": true}},
+    {"id": "psub_tap", "generator": "guard_ring", "cell_name": "psub_tap", "orientation": "none",
+     "params": {"inner_width_um": 1.0, "inner_height_um": 1.0, "ring_width_um": 0.42, "contacts_per_side": 2, "add_well": false}}
+  ],
+  "placement": {
+    "strategy": "explicit",
+    "order": ["kpd", "ks4", "ks3", "ks2", "ks1", "ks0", "kick", "kan", "ka", "nwell_tap", "psub_tap"],
+    "origins_um": {
+      "kpd": {"x": 0.0, "y": 0.0},
+      "ks4": {"x": 5.84, "y": 3.5},
+      "ks3": {"x": 15.68, "y": 3.5},
+      "ks2": {"x": 25.52, "y": 3.5},
+      "ks1": {"x": 35.36, "y": 3.5},
+      "ks0": {"x": 45.20, "y": 3.5},
+      "kick": {"x": -1.0, "y": 3.5},
+      "kan": {"x": -14.16, "y": 3.0},
+      "ka":  {"x": -27.0, "y": 3.5},
+      "nwell_tap": {"x": -29.04, "y": 3.08},
+      "psub_tap": {"x": -35.0, "y": 3.5}
+    }
+  },
+  "routing": {"layer_role": "metal", "width_um": 0.17},
+  "connectivity": [
+    {
+      "net": "vdd",
+      "pins": [
+        {"block": "ks0", "port": "U0_D"},
+        {"block": "ks0", "port": "U0_G"},
+        {"block": "ka", "port": "U0_S"},
+        {"block": "nwell_tap", "port": "TAP_E"},
+        {"block": "nwell_tap", "port": "TAP_N"}
+      ],
+      "legs": [
+        {"from_pin": {"block": "ks0", "port": "U0_D"}, "to_pin": {"block": "ks0", "port": "U0_G"}},
+        {"from_pin": {"block": "ka", "port": "U0_S"}, "to_pin": {"block": "nwell_tap", "port": "TAP_E"}},
+        {"from_pin": {"block": "nwell_tap", "port": "TAP_N"}, "to_pin": {"block": "ks0", "port": "U0_G"},
+         "waypoints_um": [[-28.12, 13.0], [49.62, 13.0]]}
+      ]
+    },
+    {"net": "ks1", "pins": [
+      {"block": "ks0", "port": "U0_S"}, {"block": "ks1", "port": "U0_D"}, {"block": "ks1", "port": "U0_G"}
+    ]},
+    {"net": "ks2", "pins": [
+      {"block": "ks1", "port": "U0_S"}, {"block": "ks2", "port": "U0_D"}, {"block": "ks2", "port": "U0_G"}
+    ]},
+    {"net": "ks3", "pins": [
+      {"block": "ks2", "port": "U0_S"}, {"block": "ks3", "port": "U0_D"}, {"block": "ks3", "port": "U0_G"}
+    ]},
+    {"net": "ks4", "pins": [
+      {"block": "ks3", "port": "U0_S"}, {"block": "ks4", "port": "U0_D"}, {"block": "ks4", "port": "U0_G"}
+    ]},
+    {
+      "net": "nkg",
+      "pins": [
+        {"block": "ks4", "port": "U0_S"},
+        {"block": "kpd", "port": "U0_D"},
+        {"block": "kick", "port": "U0_G"}
+      ],
+      "legs": [
+        {"from_pin": {"block": "ks4", "port": "U0_S"}, "to_pin": {"block": "kpd", "port": "U0_D"}},
+        {"from_pin": {"block": "kick", "port": "U0_G"}, "to_pin": {"block": "kpd", "port": "U0_D"},
+         "waypoints_um": [[-3.42, 10.0], [5.3, 10.0], [5.3, 4.0]]}
+      ]
+    },
+    {
+      "net": "vss",
+      "pins": [
+        {"block": "kpd", "port": "U0_S"},
+        {"block": "kan", "port": "U0_S"},
+        {"block": "kick", "port": "U0_S"},
+        {"block": "psub_tap", "port": "TAP_S"}
+      ],
+      "legs": [
+        {"from_pin": {"block": "kick", "port": "U0_S"}, "to_pin": {"block": "kpd", "port": "U0_S"}},
+        {"from_pin": {"block": "kan", "port": "U0_S"}, "to_pin": {"block": "kpd", "port": "U0_S"},
+         "waypoints_um": [[-14.0, 6.5], [-0.42, 6.5], [-0.42, 4.0]]},
+        {"from_pin": {"block": "psub_tap", "port": "TAP_S"}, "to_pin": {"block": "kpd", "port": "U0_S"},
+         "waypoints_um": [[-34.08, -1.0], [-0.42, -1.0], [-0.42, 4.0]]}
+      ]
+    },
+    {
+      "net": "nkm",
+      "layer_role": "metal2",
+      "pins": [
+        {"block": "kpd", "port": "U0_G"},
+        {"block": "kan", "port": "U0_D"},
+        {"block": "kan", "port": "U0_G"},
+        {"block": "ka", "port": "U0_D"}
+      ],
+      "legs": [
+        {"from_pin": {"block": "kpd", "port": "U0_G"}, "to_pin": {"block": "kan", "port": "U0_G"},
+         "waypoints_um": [[2.42, 9.5], [-16.58, 9.5]]},
+        {"from_pin": {"block": "kan", "port": "U0_D"}, "to_pin": {"block": "kan", "port": "U0_G"}},
+        {"from_pin": {"block": "kan", "port": "U0_D"}, "to_pin": {"block": "ka", "port": "U0_D"}}
+      ]
+    }
+  ],
+  "pins": [
+    {"block": "ka", "port": "U0_G", "net": "pb"},
+    {"block": "kick", "port": "U0_D", "net": "pg"}
+  ],
+  "lvs": {
+    "reference": "layout/bias_core_startup/reference.spice",
+    "subckt": "bias_core_startup"
+  }
+}

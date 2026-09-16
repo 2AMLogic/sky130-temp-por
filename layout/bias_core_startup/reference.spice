@@ -1,0 +1,27 @@
+* Hand-extracted LVS reference for layout/bias_core_startup/cell.json --
+* a byte-for-byte copy of design/netlist/bias_core.spice's own XKS0..XKS4 /
+* XKA / XKAN / XKPD / XKICK device cards (the startup kick chain group),
+* wrapped in a two-port .subckt -- not an xschem export, since the design's
+* own .subckt bias_core is the whole cell, not this sub-group alone. See
+* that file's own header comment and layout/bias_core_pnp8_leg/reference.spice
+* for the same convention this mirrors.
+.subckt bias_core_startup VDD VSS KS1 KS2 KS3 KS4 NKG NKM PB PG
+XKS0 VDD VDD KS1 VSS sky130_fd_pr__nfet_g5v0d10v5 L=8 W=1 nf=1 ad=0.29 as=0.29 pd=2.58 ps=2.58 nrd=0.29 nrs=0.29 sa=0 sb=0 sd=0
++ mult=1 m=1
+XKS1 KS1 KS1 KS2 VSS sky130_fd_pr__nfet_g5v0d10v5 L=8 W=1 nf=1 ad=0.29 as=0.29 pd=2.58 ps=2.58 nrd=0.29 nrs=0.29 sa=0 sb=0 sd=0
++ mult=1 m=1
+XKS2 KS2 KS2 KS3 VSS sky130_fd_pr__nfet_g5v0d10v5 L=8 W=1 nf=1 ad=0.29 as=0.29 pd=2.58 ps=2.58 nrd=0.29 nrs=0.29 sa=0 sb=0 sd=0
++ mult=1 m=1
+XKS3 KS3 KS3 KS4 VSS sky130_fd_pr__nfet_g5v0d10v5 L=8 W=1 nf=1 ad=0.29 as=0.29 pd=2.58 ps=2.58 nrd=0.29 nrs=0.29 sa=0 sb=0 sd=0
++ mult=1 m=1
+XKS4 KS4 KS4 NKG VSS sky130_fd_pr__nfet_g5v0d10v5 L=8 W=1 nf=1 ad=0.29 as=0.29 pd=2.58 ps=2.58 nrd=0.29 nrs=0.29 sa=0 sb=0 sd=0
++ mult=1 m=1
+XKA NKM PB VDD VDD sky130_fd_pr__pfet_g5v0d10v5 L=4 W=1 nf=1 ad=0.29 as=0.29 pd=2.58 ps=2.58 nrd=0.29 nrs=0.29 sa=0 sb=0 sd=0
++ mult=1 m=1
+XKAN NKM NKM VSS VSS sky130_fd_pr__nfet_g5v0d10v5 L=4 W=2 nf=1 ad=0.58 as=0.58 pd=4.58 ps=4.58 nrd=0.145 nrs=0.145 sa=0 sb=0 sd=0
++ mult=1 m=1
+XKPD NKG NKM VSS VSS sky130_fd_pr__nfet_g5v0d10v5 L=4 W=8 nf=1 ad=2.32 as=2.32 pd=16.58 ps=16.58 nrd=0.03625 nrs=0.03625 sa=0 sb=0
++ sd=0 mult=1 m=1
+XKICK PG NKG VSS VSS sky130_fd_pr__nfet_g5v0d10v5 L=4 W=1 nf=1 ad=0.29 as=0.29 pd=2.58 ps=2.58 nrd=0.29 nrs=0.29 sa=0 sb=0 sd=0
++ mult=1 m=1
+.ends bias_core_startup
