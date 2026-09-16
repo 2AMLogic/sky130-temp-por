@@ -4,6 +4,35 @@ Physical layout evidence for sky130-temp-por, built with `klayout-tools`
 (`klt`) against the sky130 open PDK. See `layout/pdk.json` for the PDK/tool
 pin.
 
+## `klt` version pin: the commit, not the semver, is authoritative (issue #51)
+
+`layout/pdk.json` carries two fields for the `klt` build this evidence was
+generated/verified against: `klt_version_pin` (the full `version` string
+`klt version --format json` reports, e.g. `0.4.0+gba213c617b4e`) and
+`klt_commit_pin` (just the `git_commit` half of that same build, e.g.
+`ba213c617b4e`). **`klt_commit_pin` is the one that actually identifies the
+build** — the leading semver is not reliable on its own. The same commit can
+be packaged under more than one semver (a local `+g<hash>` build bumps
+`package_version` independently of `git_commit`), and the reverse has also
+been observed in a churning toolchain (`klt_version_pin` moving *backwards*
+in semver order between sessions while `open_pdks_commit` held still — see
+`2AMLogic/sky130-trng`'s own `layout/pdk.json` `_comment` for a worked
+example). A host whose installed `klt` happens to share a semver prefix with
+the pin but not the commit is still stale, and vice versa.
+
+`layout/bin/_klt_common.py`'s `check_klt_pin()` runs `klt version --format
+json` once per `layout/bin/compose-cell.py` invocation and compares the
+installed build's `git_commit` against `klt_commit_pin`. A mismatch prints a
+**warning**, not a hard failure — the pin is "a provenance pin, not a hard
+gate" (`layout/pdk.json`'s own `_comment`), and re-verifying against a newer
+`klt` is expected to happen and should simply update the pin plus the
+affected evidence directories together. The point of the warning is to make
+a stale install self-report plainly, up front, instead of surfacing many
+steps later as a confusing "unrecognized key(s)" error deep inside a `klt
+gen-compose` call the way it did in issue #51 — at that point the installed
+`klt` predated `connectivity[].layer_role` entirely and simply did not
+recognize the key.
+
 **Status (issue #30, this increment): the recipe lands, proven on a real
 `bias_core` sub-block.** `layout/bin/compose-cell.py` and
 `layout/bin/_klt_common.py` are ported byte-for-byte from
