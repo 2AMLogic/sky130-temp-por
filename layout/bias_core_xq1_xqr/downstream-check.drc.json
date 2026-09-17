@@ -1,6 +1,6 @@
 {
   "schema_version": 1,
-  "file": "bias_core_pnp8_leg.gds",
+  "file": "downstream-check.gds",
   "deck": "sky130",
   "dbu_um": 0.001,
   "status": "clean",
@@ -41,6 +41,7 @@
     "layers_in_stream_without_rules": [
       "65/44",
       "67/5",
+      "68/5",
       "82/44"
     ],
     "rules_skipped": [
@@ -112,7 +113,7 @@
       "released": true
     },
     "input": {
-      "content_hash": "sha256:ed7959612a3a47053690815b8102ba942aefb67cc3302429788a452330d8b1b6"
+      "content_hash": "sha256:2bd96a13e153612fb2d5dd82b46174ec8d657c5bcbaa37ce00b90bf3188a266a"
     },
     "klayout_version_mismatch": true
   }

@@ -41,7 +41,36 @@
     "cross-block bus routing example layout/bias_core_pnp8_leg/ used, just",
     "with one same-block net here instead of two ('na'/'er' are each a",
     "single-pin declare-only top-level pin, not a connectivity[] net, so",
-    "neither needs its own routing pass)."
+    "neither needs its own routing pass).",
+    "",
+    "FULL-CELL ASSEMBLY PIN (issue #61): 'vss' is a real cross-sub-block net",
+    "-- bias_core's own global ground -- so #40's full-cell assembly needs it",
+    "externally reachable, not just bussed between Q0_B and Q1_B in here.",
+    "Promoting it needs a route OUT of the array, and `klt gen-compose`",
+    "refuses any leg to a non-tap port of a block whose guard/collector ring",
+    "is a CLOSED loop ('a route to its non-tap port would cross the ring's",
+    "own metal loop and merge this net with the ring's tap net') -- the same",
+    "silent-short failure mode 2AMLogic/klayout-tools#1894 describes, now",
+    "caught instead of drawn. So the ring is regenerated with a routing",
+    "opening on its N side (params.ring_gap_side/ring_gap_um/",
+    "ring_gap_offset_um), centred exactly on Q0_B's own x (4.01um; the ring's",
+    "N midpoint is 4.42um, hence offset -0.41um), and 'vss' escapes straight",
+    "north through it onto 'stub_vss' -- a plain declare-only li1 stub",
+    "(promo_stub.gds) parked clear of the array, PR #62's own promotion",
+    "technique with the ring opening added. Q0_B sits 2.67um below the",
+    "block's own north edge (y=1.7, bbox y1=4.37) and the opening is centred",
+    "on its x, so the escape riser is a straight northward run that crosses",
+    "no other pad.",
+    "",
+    "COST OF THE OPENING, stated plainly: the collector ring is now a",
+    "C-shaped conductor, not a closed loop, so its substrate-isolation",
+    "function is interrupted at the 1.5um N-side opening. That is a real",
+    "floorplan change, not a free one -- but this ring is already NOT strapped",
+    "to VSS at all (the installed klt predates klayout-tools#1894's fix, so",
+    "`klt extract` still recovers it as a floating 'vsubs' node either way),",
+    "so the opening costs nothing this cell currently has. Revisit the side/",
+    "width, or close the ring again and route through a real COLL_* tap, once",
+    "the installed klt carries #1894's fix -- see README.md 'Upstream status'."
   ],
   "pdk": {
     "variant": "sky130A",
@@ -60,14 +89,45 @@
         "dummy": 0,
         "topology": "common_centroid",
         "ratio": 1,
-        "add_collector_ring": true
+        "add_collector_ring": true,
+        "ring_gap_side": "N",
+        "ring_gap_um": 1.5,
+        "ring_gap_offset_um": -0.41
+      }
+    },
+    {
+      "id": "stub_vss",
+      "cell": {
+        "gds_path": "promo_stub.gds",
+        "cell_name": "promo_stub",
+        "ports": [
+          {
+            "name": "CONN",
+            "x_um": 1.5,
+            "y_um": 0.085,
+            "layer": { "layer": 67, "datatype": 20 },
+            "width_um": 0.17,
+            "direction_deg": 0
+          },
+          {
+            "name": "PAD",
+            "x_um": 0.0,
+            "y_um": 0.085,
+            "layer": { "layer": 67, "datatype": 20 },
+            "width_um": 0.17,
+            "direction_deg": 180
+          }
+        ]
       }
     }
   ],
   "placement": {
     "strategy": "explicit",
-    "order": ["array"],
-    "origins_um": { "array": { "x": 0.0, "y": 0.0 } }
+    "order": ["array", "stub_vss"],
+    "origins_um": {
+      "array": { "x": 0.0, "y": 0.0 },
+      "stub_vss": { "x": -5.0, "y": 5.915 }
+    }
   },
   "routing": {
     "layer_role": "metal",
@@ -79,13 +139,15 @@
       "net": "vss",
       "pins": [
         { "block": "array", "port": "Q0_B" },
-        { "block": "array", "port": "Q1_B" }
+        { "block": "array", "port": "Q1_B" },
+        { "block": "stub_vss", "port": "CONN" }
       ]
     }
   ],
   "pins": [
     { "net": "na", "block": "array", "port": "Q0_E" },
-    { "net": "er", "block": "array", "port": "Q1_E" }
+    { "net": "er", "block": "array", "port": "Q1_E" },
+    { "net": "vss", "block": "stub_vss", "port": "PAD" }
   ],
   "lvs": {
     "reference": "layout/bias_core_xq1_xqr/reference.spice",

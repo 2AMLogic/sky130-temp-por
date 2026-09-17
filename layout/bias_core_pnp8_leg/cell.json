@@ -20,7 +20,7 @@
     "sky130-trng's ro_stage/ro_nand2 gates need it, since bjt_array already",
     "IS the composed common-centroid unit.",
     "",
-    "KNOWN GAP, reported upstream generically as 2AMLogic/klayout-tools#TODO",
+    "KNOWN GAP, reported upstream generically as 2AMLogic/klayout-tools#1894",
     "(see layout/README.md 'Known klt gaps hit building this recipe' for the",
     "full writeup): the collector guard ring (bjt_array's COLL_N/S/E/W",
     "ports, drawn on the diffusion role, not li1) is deliberately left OUT",
@@ -49,7 +49,43 @@
     "'ec' bussing 8 emitter pins, each crossing the other's intervening",
     "pads) -- this is docs/cli/gen-compose.md's own 'Cross-block bus",
     "routing (routing.cross_block_layer_role, #1168)' worked example,",
-    "reproduced almost verbatim against this same 8-unit bjt_array shape."
+    "reproduced almost verbatim against this same 8-unit bjt_array shape.",
+    "",
+    "FULL-CELL ASSEMBLY PINS (issue #61): both 'ec' (which reaches",
+    "bias_core_passives' XR1) and 'vss' (bias_core's global ground) are real",
+    "cross-sub-block nets, so #40's full-cell assembly needs both externally",
+    "reachable -- this cell.json previously had no pins[] at all. Promoting",
+    "them needs a route OUT of the array, and `klt gen-compose` refuses any",
+    "leg to a non-tap port of a block whose guard/collector ring is a CLOSED",
+    "loop ('a route to its non-tap port would cross the ring's own metal loop",
+    "and merge this net with the ring's tap net') -- the same silent-short",
+    "failure mode 2AMLogic/klayout-tools#1894 describes, now caught instead",
+    "of drawn. So the ring is regenerated with ONE routing opening on its N",
+    "side (params.ring_gap_side/ring_gap_um/ring_gap_offset_um), wide enough",
+    "to carry BOTH escapes: 4.0um centred at x=7.475um (the ring's N midpoint",
+    "is 9.04um, hence offset -1.565um), i.e. the opening spans [5.475,",
+    "9.475]um, which clears Q3_E's own x (6.32um) and Q3_B's own x (8.63um)",
+    "by 0.845um each -- comfortably over the 0.485um clearance gen-compose",
+    "requires for a 0.17um-wide route inside an opening (a first attempt at",
+    "3.2um was rejected at exactly 0.445um). 'ec' escapes north out of Q3_E",
+    "and runs west to 'stub_ec'; 'vss' escapes north out of Q3_B and runs",
+    "east to 'stub_vss'; opposite directions on separate lanes so neither",
+    "riser crosses the other's run. Both stubs are plain declare-only li1",
+    "(promo_stub.gds), PR #62's own promotion technique with the ring opening",
+    "added. Q3_E/Q3_B both sit 2.67um below the block's own north edge",
+    "(y=5.5, bbox y1=8.17), so each riser is a short straight run out through",
+    "the opening that crosses no other pad, and all 14 pre-existing bus legs",
+    "are unchanged.",
+    "",
+    "COST OF THE OPENING, stated plainly: the collector ring is now a",
+    "C-shaped conductor, not a closed loop, so its substrate-isolation",
+    "function is interrupted at the 4.0um N-side opening. That is a real",
+    "floorplan change, not a free one -- but this ring is already NOT strapped",
+    "to VSS at all (the installed klt predates klayout-tools#1894's fix, so",
+    "`klt extract` still recovers it as a floating 'vsubs' node either way),",
+    "so the opening costs nothing this cell currently has. Revisit the side/",
+    "width, or close the ring again and route through a real COLL_* tap, once",
+    "the installed klt carries #1894's fix -- see README.md 'Upstream status'."
   ],
   "pdk": {
     "variant": "sky130A",
@@ -68,14 +104,71 @@
         "dummy": 0,
         "topology": "common_centroid",
         "ratio": 8,
-        "add_collector_ring": true
+        "add_collector_ring": true,
+        "ring_gap_side": "N",
+        "ring_gap_um": 4.0,
+        "ring_gap_offset_um": -1.565
+      }
+    },
+    {
+      "id": "stub_ec",
+      "cell": {
+        "gds_path": "promo_stub.gds",
+        "cell_name": "promo_stub",
+        "ports": [
+          {
+            "name": "CONN",
+            "x_um": 1.5,
+            "y_um": 0.085,
+            "layer": { "layer": 67, "datatype": 20 },
+            "width_um": 0.17,
+            "direction_deg": 0
+          },
+          {
+            "name": "PAD",
+            "x_um": 0.0,
+            "y_um": 0.085,
+            "layer": { "layer": 67, "datatype": 20 },
+            "width_um": 0.17,
+            "direction_deg": 180
+          }
+        ]
+      }
+    },
+    {
+      "id": "stub_vss",
+      "cell": {
+        "gds_path": "promo_stub.gds",
+        "cell_name": "promo_stub",
+        "ports": [
+          {
+            "name": "CONN",
+            "x_um": 0.0,
+            "y_um": 0.085,
+            "layer": { "layer": 67, "datatype": 20 },
+            "width_um": 0.17,
+            "direction_deg": 180
+          },
+          {
+            "name": "PAD",
+            "x_um": 1.5,
+            "y_um": 0.085,
+            "layer": { "layer": 67, "datatype": 20 },
+            "width_um": 0.17,
+            "direction_deg": 0
+          }
+        ]
       }
     }
   ],
   "placement": {
     "strategy": "explicit",
-    "order": ["array"],
-    "origins_um": { "array": { "x": 0.0, "y": 0.0 } }
+    "order": ["array", "stub_ec", "stub_vss"],
+    "origins_um": {
+      "array": { "x": 0.0, "y": 0.0 },
+      "stub_ec": { "x": -5.0, "y": 9.915 },
+      "stub_vss": { "x": 22.0, "y": 8.915 }
+    }
   },
   "routing": {
     "layer_role": "metal",
@@ -93,7 +186,8 @@
         { "block": "array", "port": "Q4_B" },
         { "block": "array", "port": "Q5_B" },
         { "block": "array", "port": "Q6_B" },
-        { "block": "array", "port": "Q7_B" }
+        { "block": "array", "port": "Q7_B" },
+        { "block": "stub_vss", "port": "CONN" }
       ]
     },
     {
@@ -106,9 +200,14 @@
         { "block": "array", "port": "Q4_E" },
         { "block": "array", "port": "Q5_E" },
         { "block": "array", "port": "Q6_E" },
-        { "block": "array", "port": "Q7_E" }
+        { "block": "array", "port": "Q7_E" },
+        { "block": "stub_ec", "port": "CONN" }
       ]
     }
+  ],
+  "pins": [
+    { "net": "ec", "block": "stub_ec", "port": "PAD" },
+    { "net": "vss", "block": "stub_vss", "port": "PAD" }
   ],
   "lvs": {
     "reference": "layout/bias_core_pnp8_leg/reference.spice",

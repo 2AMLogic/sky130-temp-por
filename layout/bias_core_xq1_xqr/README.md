@@ -95,7 +95,106 @@ both units — only its strap to `VSS` is missing from this increment.
   well-isolated, understood cause `bias_core_pnp8_leg/README.md` documents,
   not a wiring error in this cell's own connectivity.
 
-Revisit once
-[`2AMLogic/klayout-tools#1894`](https://github.com/2AMLogic/klayout-tools/issues/1894)
-is resolved upstream — no floorplan change is expected to be needed, only
-adding the collector-ring pins back into `vss`'s `connectivity[]`.
+Revisit once the installed `klt` carries
+[`2AMLogic/klayout-tools#1894`](https://github.com/2AMLogic/klayout-tools/issues/1894)'s
+fix — see "Upstream status" below — at which point no floorplan change is
+expected to be needed beyond adding the collector-ring pins back into
+`vss`'s `connectivity[]`.
+
+## Full-cell assembly pins (issue #61)
+
+`pins[]` already promoted `na` and `er` — each a lone emitter pin, promoted
+without routing any metal. `vss` was the gap: a real cross-sub-block net
+(`bias_core`'s own global ground) that this cell only bussed *internally*,
+between `Q0_B` and `Q1_B`, with no externally reachable pad. #40's full-cell
+assembly needs it reachable from outside this block, so `pins[]` now
+promotes it too.
+
+### Why the ring had to be opened
+
+Same blocker as `layout/bias_core_pnp8_leg/`: `klt gen-compose` refuses any
+leg from a non-tap port of a block whose guard/collector ring is a closed
+loop ("a route to its non-tap port would cross the ring's own metal loop and
+merge this net with the ring's tap net"), so PR #62's plain west-edge-stub
+promotion cannot be used here — the rejection fires on the **first** leg
+leaving the block. Note this is a *different* failure from the one the
+"Routing" section above records: that one was about bussing `vss` between
+two *separately* ringed blocks, solved by housing both devices under one
+shared ring. This one is about getting a net out of that shared ring at all.
+
+The rejection is plane-agnostic — it fires identically for a backbone on
+`metal3` (met2, 70/20), two via levels above the ring's own diffusion role
+(65/20), where no merge is physically possible. Filed generically upstream
+as
+[`2AMLogic/klayout-tools#1960`](https://github.com/2AMLogic/klayout-tools/issues/1960).
+
+So the array is regenerated with a routing opening in the ring
+(`params.ring_gap_side: "N"`, `ring_gap_um: 1.5`,
+`ring_gap_offset_um: -0.41`), centred exactly on `Q0_B`'s own `x=4.01um`
+(the ring's N midpoint is `x=4.42um`). The generator now reports
+`COLL_S`/`COLL_E`/`COLL_W` plus a `GAP_N` marker there.
+
+| Net | Tap mechanism | Promoted pad |
+|---|---|---|
+| `vss` | new leg branching north out of `Q0_B` straight through `GAP_N`, then west | `stub_vss.PAD`, `x=-5.0, y=6.0` |
+
+`Q0_B` sits `2.67um` below the block's own north edge (`y=1.7`, bbox
+`y1=4.37`) and the opening is centred on its `x`, so the escape riser is a
+straight northward run that crosses no other pad. `stub_vss` is a plain
+declare-only li1 stub (`promo_stub.gds`), no PDK awareness needed.
+
+### What the opening costs, stated plainly
+
+The collector ring is now a C-shaped conductor, not a closed loop: its
+substrate-isolation function is interrupted for the `1.5um` of the N-side
+opening. That is a real floorplan change, not a free one — it just costs
+this cell nothing it currently *has*, since the ring is already not strapped
+to `VSS` at all and `klt extract` recovers it as the same floating `vsubs`
+node either way. Once the installed `klt` carries #1894's fix, close the
+ring again and promote `vss` through a real `COLL_*` tap instead.
+
+### Evidence: this changed no device, no net, and no verdict
+
+| | before #61 | after #61 |
+|---|---|---|
+| `klt drc` | clean, 0 violations | clean, 0 violations |
+| `klt extract` | 2 devices, 4 nets, 4 pins | 2 devices, 4 nets, 4 pins |
+| extracted netlist `sha256` | `f43e2ba9…` | `f43e2ba9…` (identical) |
+| `klt lvs` | `mismatch`, 11 (4 `device.unmatched` + 7 `net.unmatched`) | `mismatch`, 11 (4 + 7) — unchanged |
+
+The extracted-netlist hash being *identical* is the strongest available
+evidence that the ring opening merged nothing and broke nothing: `na`/`er`
+stay correctly separate, both bases stay on `vss`, and the collector stays
+the same separate `vsubs` node. The LVS mismatch is the same pre-existing,
+well-isolated collector-strap gap documented under "Verification" — **not**
+something this change introduced.
+
+**Verified against a downstream target, not just eyeballed.**
+
+```
+python3 layout/bin/check-promotion.py layout/bias_core_xq1_xqr/cell.json
+```
+
+places this cell's own composed GDS as a `blocks[].cell` reference plus one
+dummy pad for the newly-promoted pin, and routes a 2-pin net to it:
+`unrouted_nets: []`, and the downstream-composed stream is itself `klt
+drc`-clean. Evidence:
+`downstream-check.request.json`/`.response.json`/`.drc.json`/`.gds` next to
+this file. Re-run the whole chain with
+`python3 layout/bin/compose-cell.py layout/bias_core_xq1_xqr/cell.json --check`.
+
+`na`/`er` are unchanged by this issue — both are still promoted directly off
+`array.Q0_E`/`array.Q1_E`, and both still compose cleanly downstream.
+
+### Upstream status (as of 2026-09-16)
+
+[`#1894`](https://github.com/2AMLogic/klayout-tools/issues/1894) **is closed
+as COMPLETED**, by
+[PR #1930](https://github.com/2AMLogic/klayout-tools/pull/1930) (merged
+`2026-09-16T06:44:04Z`), which *did* land a real `COLL_*` diffusion-role
+contact fix. **This repo cannot use it yet**: the installed toolchain is
+`klt 0.5.0+gba213c617b4e`, built from `ba213c61` (`2026-09-15T23:03:10Z`) —
+about eight hours *before* that merge — and its `_resolve_via_drop_layer()`
+still has the pre-fix fallthrough. See
+`layout/bias_core_pnp8_leg/README.md`'s own "Upstream status" section for
+the full write-up.

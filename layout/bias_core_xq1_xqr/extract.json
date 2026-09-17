@@ -39,7 +39,17 @@
         "b": "vss",
         "e": "na"
       },
-      "params": {}
+      "params": {},
+      "instance_path": [
+        {
+          "cell": "array__xq1_xqr",
+          "array_index": null
+        },
+        {
+          "cell": "bjt_array",
+          "array_index": null
+        }
+      ]
     },
     {
       "name": "$2",
@@ -49,7 +59,17 @@
         "b": "vss",
         "e": "er"
       },
-      "params": {}
+      "params": {},
+      "instance_path": [
+        {
+          "cell": "array__xq1_xqr",
+          "array_index": null
+        },
+        {
+          "cell": "bjt_array",
+          "array_index": null
+        }
+      ]
     }
   ],
   "nets": [
@@ -90,6 +110,11 @@
       "label_positions_um": [
         {
           "text": "vss",
+          "x_um": -5.0,
+          "y_um": 6.0
+        },
+        {
+          "text": "vss",
           "x_um": 6.32,
           "y_um": 1.87
         }
@@ -126,24 +151,29 @@
         "top": 4.37
       },
       "shapes": 1,
-      "area_um2": 12.8352
+      "area_um2": 12.2052
     }
   ],
   "matched_device_groups": [],
   "pdk": null,
   "provenance": {
-    "klt_version": "0.4.0",
+    "klt_version": "0.5.0",
     "klayout_version": "0.30.12",
     "pdk": null,
     "deck": {
       "name": "sky130",
-      "content_hash": "sha256:7208f8878e98eb8412d2fc1dad6657046d0174dacefe6e3b3a24d8d2ed5d888e",
-      "released": false
+      "content_hash": "sha256:a903acb18b47d47e73460b10e9c80edd3466193ffc9da0c01c2103f7fdfcf36f",
+      "released": true
     },
     "input": {
-      "content_hash": "sha256:4b68174b51cfd831098677cd3416c33f0a9fd6315eb9945cb0ff0da0876ccf84"
+      "content_hash": "sha256:4a200ec8eb4efd5d169f2b0c5f527728e64b243d3c5f08820f106c4c5e268930"
     }
   },
   "parasitics": null,
-  "spef_path": null
+  "spef_path": null,
+  "metrics": {
+    "extract__device__count": 2,
+    "extract__net__count": 4,
+    "extract__pin__count": 4
+  }
 }

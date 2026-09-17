@@ -226,19 +226,6 @@
       "direction_deg": 90
     },
     {
-      "name": "COLL_N",
-      "net": null,
-      "layer": {
-        "layer": 65,
-        "datatype": 20,
-        "name": null
-      },
-      "x_um": 9.039999999999997,
-      "y_um": 7.96,
-      "width_um": 0.42000000000000004,
-      "direction_deg": 90
-    },
-    {
       "name": "COLL_S",
       "net": null,
       "layer": {
@@ -276,13 +263,28 @@
       "y_um": 3.6,
       "width_um": 0.42000000000000004,
       "direction_deg": 180
+    },
+    {
+      "name": "GAP_N",
+      "net": null,
+      "layer": {
+        "layer": 67,
+        "datatype": 20,
+        "name": null
+      },
+      "x_um": 7.474999999999999,
+      "y_um": 7.96,
+      "width_um": 4.0,
+      "direction_deg": 90
     }
   ],
+  "navigable_regions": [],
   "drc_hints": {
     "min_spacing_um": 0.4,
     "matched_group_id": "bjt_array:2x4:common_centroid:ratio8",
     "snapped_to_grid": false,
     "notes": [
+      "the ring carries a 4.0um routing opening on its 'N' side (params.ring_gap_side) -- it is a connected C-shaped conductor rather than a closed loop, so substrate isolation is interrupted there in exchange for letting a route reach the enclosed devices through the reported GAP_N position",
       "array holds 8 devices -- too few to realise the requested 8:1 matching ratio around a single reference device"
     ]
   },
