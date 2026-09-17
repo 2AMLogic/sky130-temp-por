@@ -1,0 +1,10 @@
+{
+  "layout": {
+    "netlist": "bias_core.spice"
+  },
+  "reference": {
+    "netlist": "bias_core.ref.spice",
+    "form": "subckt-call",
+    "deck": "sky130"
+  }
+}
