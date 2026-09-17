@@ -1,0 +1,143 @@
+{
+  "pdk": {
+    "variant": "sky130A"
+  },
+  "blocks": [
+    {
+      "id": "sub",
+      "cell": {
+        "gds_path": "bias_core_pnp8_leg.gds",
+        "cell_name": "bias_core_pnp8_leg",
+        "ports": [
+          {
+            "name": "ec",
+            "x_um": -5.0,
+            "y_um": 10.0,
+            "layer": {
+              "layer": 67,
+              "datatype": 20
+            },
+            "width_um": 0.17,
+            "direction_deg": 180
+          },
+          {
+            "name": "vss",
+            "x_um": 23.5,
+            "y_um": 9.0,
+            "layer": {
+              "layer": 67,
+              "datatype": 20
+            },
+            "width_um": 0.17,
+            "direction_deg": 0
+          }
+        ],
+        "bbox_um": {
+          "x0": -5.0,
+          "y0": -0.97,
+          "x1": 23.5,
+          "y1": 10.084999999999999
+        }
+      }
+    },
+    {
+      "id": "dummy_ec",
+      "cell": {
+        "gds_path": "promo_stub.gds",
+        "cell_name": "promo_stub",
+        "ports": [
+          {
+            "name": "PAD",
+            "x_um": 0.0,
+            "y_um": 0.085,
+            "layer": {
+              "layer": 67,
+              "datatype": 20
+            },
+            "width_um": 0.17,
+            "direction_deg": 0
+          }
+        ]
+      }
+    },
+    {
+      "id": "dummy_vss",
+      "cell": {
+        "gds_path": "promo_stub.gds",
+        "cell_name": "promo_stub",
+        "ports": [
+          {
+            "name": "PAD",
+            "x_um": 0.0,
+            "y_um": 0.085,
+            "layer": {
+              "layer": 67,
+              "datatype": 20
+            },
+            "width_um": 0.17,
+            "direction_deg": 180
+          }
+        ]
+      }
+    }
+  ],
+  "placement": {
+    "strategy": "explicit",
+    "order": [
+      "sub",
+      "dummy_ec",
+      "dummy_vss"
+    ],
+    "origins_um": {
+      "sub": {
+        "x": 0.0,
+        "y": 0.0
+      },
+      "dummy_ec": {
+        "x": -45.0,
+        "y": 9.915
+      },
+      "dummy_vss": {
+        "x": 63.5,
+        "y": 8.915
+      }
+    }
+  },
+  "connectivity": [
+    {
+      "net": "ec",
+      "pins": [
+        {
+          "block": "sub",
+          "port": "ec"
+        },
+        {
+          "block": "dummy_ec",
+          "port": "PAD"
+        }
+      ]
+    },
+    {
+      "net": "vss",
+      "pins": [
+        {
+          "block": "sub",
+          "port": "vss"
+        },
+        {
+          "block": "dummy_vss",
+          "port": "PAD"
+        }
+      ]
+    }
+  ],
+  "routing": {
+    "layer_role": "metal",
+    "width_um": 0.17,
+    "cross_block_layer_role": "metal2"
+  },
+  "options": {
+    "cell_name": "bias_core_pnp8_leg_downstream_check",
+    "output": "downstream-check.gds"
+  }
+}

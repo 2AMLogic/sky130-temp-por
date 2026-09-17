@@ -6,17 +6,53 @@
     {
       "id": "array",
       "generator_report": "gen/array.gen.json"
+    },
+    {
+      "id": "stub_vss",
+      "cell": {
+        "gds_path": "promo_stub.gds",
+        "cell_name": "promo_stub",
+        "ports": [
+          {
+            "name": "CONN",
+            "x_um": 1.5,
+            "y_um": 0.085,
+            "layer": {
+              "layer": 67,
+              "datatype": 20
+            },
+            "width_um": 0.17,
+            "direction_deg": 0
+          },
+          {
+            "name": "PAD",
+            "x_um": 0.0,
+            "y_um": 0.085,
+            "layer": {
+              "layer": 67,
+              "datatype": 20
+            },
+            "width_um": 0.17,
+            "direction_deg": 180
+          }
+        ]
+      }
     }
   ],
   "placement": {
     "strategy": "explicit",
     "order": [
-      "array"
+      "array",
+      "stub_vss"
     ],
     "origins_um": {
       "array": {
         "x": 0.0,
         "y": 0.0
+      },
+      "stub_vss": {
+        "x": -5.0,
+        "y": 5.915
       }
     }
   },
@@ -36,6 +72,10 @@
         {
           "block": "array",
           "port": "Q1_B"
+        },
+        {
+          "block": "stub_vss",
+          "port": "CONN"
         }
       ]
     }
@@ -50,6 +90,11 @@
       "net": "er",
       "block": "array",
       "port": "Q1_E"
+    },
+    {
+      "net": "vss",
+      "block": "stub_vss",
+      "port": "PAD"
     }
   ],
   "options": {

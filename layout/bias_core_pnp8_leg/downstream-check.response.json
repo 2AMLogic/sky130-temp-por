@@ -1,0 +1,150 @@
+{
+  "schema_version": 1,
+  "generator": "gen-compose",
+  "cell_name": "bias_core_pnp8_leg_downstream_check",
+  "gds_path": "downstream-check.gds",
+  "pdk": {
+    "name": "sky130A",
+    "variant": "sky130A",
+    "version": "open_pdks c6d73a35f524070e85faff4a6a9eef49553ebc2b"
+  },
+  "dbu_um": 0.001,
+  "bbox_um": {
+    "x0": -45.0,
+    "y0": -0.97,
+    "x1": 65.0,
+    "y1": 10.084999999999999
+  },
+  "ports": [],
+  "blocks": [
+    {
+      "id": "sub",
+      "source": "cell",
+      "generator": null,
+      "cell_name": "bias_core_pnp8_leg",
+      "offset_um": {
+        "x": 0.0,
+        "y": 0.0
+      },
+      "bbox_um": {
+        "x0": -5.0,
+        "y0": -0.97,
+        "x1": 23.5,
+        "y1": 10.084999999999999
+      },
+      "orientation": "none"
+    },
+    {
+      "id": "dummy_ec",
+      "source": "cell",
+      "generator": null,
+      "cell_name": "promo_stub",
+      "offset_um": {
+        "x": -45.0,
+        "y": 9.915
+      },
+      "bbox_um": {
+        "x0": -45.0,
+        "y0": 9.915,
+        "x1": -43.5,
+        "y1": 10.084999999999999
+      },
+      "orientation": "none"
+    },
+    {
+      "id": "dummy_vss",
+      "source": "cell",
+      "generator": null,
+      "cell_name": "promo_stub",
+      "offset_um": {
+        "x": 63.5,
+        "y": 8.915
+      },
+      "bbox_um": {
+        "x0": 63.5,
+        "y0": 8.915,
+        "x1": 65.0,
+        "y1": 9.084999999999999
+      },
+      "orientation": "none"
+    }
+  ],
+  "nets": [
+    {
+      "net": "ec",
+      "pins": [
+        {
+          "block": "sub",
+          "port": "ec"
+        },
+        {
+          "block": "dummy_ec",
+          "port": "PAD"
+        }
+      ],
+      "routed": true,
+      "route_length_um": 40.0,
+      "status": "routed",
+      "legs": [
+        {
+          "pins": [
+            {
+              "block": "sub",
+              "port": "ec"
+            },
+            {
+              "block": "dummy_ec",
+              "port": "PAD"
+            }
+          ],
+          "routed": true,
+          "route_length_um": 40.0,
+          "reason": null,
+          "channel_track": 0
+        }
+      ]
+    },
+    {
+      "net": "vss",
+      "pins": [
+        {
+          "block": "sub",
+          "port": "vss"
+        },
+        {
+          "block": "dummy_vss",
+          "port": "PAD"
+        }
+      ],
+      "routed": true,
+      "route_length_um": 40.0,
+      "status": "routed",
+      "legs": [
+        {
+          "pins": [
+            {
+              "block": "sub",
+              "port": "vss"
+            },
+            {
+              "block": "dummy_vss",
+              "port": "PAD"
+            }
+          ],
+          "routed": true,
+          "route_length_um": 40.0,
+          "reason": null,
+          "channel_track": 0
+        }
+      ]
+    }
+  ],
+  "pins": [],
+  "unrouted_nets": [],
+  "drc_hints": {
+    "min_spacing_um": null,
+    "matched_groups": [],
+    "notes": []
+  },
+  "warnings": []
+}

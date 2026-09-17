@@ -66,6 +66,11 @@ That gap traces to a real `klt gen-compose` limitation, not a cell.json bug —
 see "Known klt gaps hit building this recipe" below,
 [`2AMLogic/klayout-tools#1894`](https://github.com/2AMLogic/klayout-tools/issues/1894).
 
+Issue #61 added `pins[]` promotions for `ec` and `vss` (this cell had none
+at all before), via a `params.ring_gap_side` opening in the collector ring —
+device count, net count, LVS verdict, and the extracted netlist's own
+`sha256` are all unchanged by it. See that cell's own README.
+
 ## `bias_core_xq1_xqr`: the matching 1x reference PNPs (issue #36, part of #34)
 
 [`layout/bias_core_xq1_xqr/`](bias_core_xq1_xqr/README.md) lays out
@@ -83,6 +88,11 @@ mismatch** (0/2 devices, 0/3 nets) — the same single, well-isolated cause as
 right, and the only gap is the collector-ring-to-`VSS` strap
 [`2AMLogic/klayout-tools#1894`](https://github.com/2AMLogic/klayout-tools/issues/1894)
 blocks.
+
+Issue #61 added a `pins[]` promotion for `vss` alongside the existing
+`na`/`er`, via the same `params.ring_gap_side` opening technique — device
+count, net count, LVS verdict, and the extracted netlist's own `sha256` are
+all unchanged by it. See that cell's own README.
 
 ## `bias_core_passives`: the bias/ratio resistors and Miller caps (issue #37, part of #34)
 
@@ -227,12 +237,29 @@ emitter bus, `routing.cross_block_layer_role` configured per
    then extract correctly separate, per-device, matching the schematic
    exactly.
 
-Revisit `layout/bias_core_pnp8_leg/`'s and `layout/bias_core_xq1_xqr/`'s
-collector strap once that issue is resolved upstream, at which point a real
-base+collector+emitter LVS match should be possible without changing either
-cell's own floorplan.
+**Update (issue #61) — #1894 is fixed upstream, but the pinned `klt` predates
+the fix.** The issue **closed as COMPLETED on 2026-09-16**, by
+[PR #1930](https://github.com/2AMLogic/klayout-tools/pull/1930) (merged
+`2026-09-16T06:44:04Z`), and the fix is a *real* one, not just a guard:
+`_resolve_via_drop_layer()` gained a diffusion-role branch that drops
+through the deck's contact to `metals[0]` and ladders up, so a `COLL_*` port
+now receives an actual `licon`/`mcon` contact instead of falling through to
+"already covered, nothing to do". Finding 2 follows from finding 1 and is
+covered by the same fix.
 
-**Update (issue #56):** the installed `klt` build now actively *detects* a
+**None of that is usable in this repo yet.** The installed toolchain is
+`klt 0.5.0+gba213c617b4e`, built from `ba213c61` (`2026-09-15T23:03:10Z`) —
+roughly eight hours *before* that merge. Confirmed by reading the installed
+`gen_compose_routing.py`: `_resolve_via_drop_layer()` still has the pre-fix
+`return None, None` fallthrough for any non-metals-stack, non-poly port. So
+every collector-strap statement recorded above and in the two PNP cells'
+own READMEs still holds for the evidence this repo commits today. Closing
+the strap for real is gated on a `klt` upgrade plus a full re-run of both
+cells — worth doing, since it is the one remaining cause of their LVS
+mismatch, but it is a toolchain bump affecting every committed artifact in
+`layout/`, not a cell-level edit.
+
+**Update (issue #56):** the installed `klt` build also actively *detects* a
 closed guard/collector ring and refuses any leg targeting one of the
 array's own non-tap ports (`Q*_B`/`Q*_E`) once that block also carries an
 unopened `TAP_*`/`COLL_*` ring — "a route to its non-tap port would cross
@@ -241,17 +268,28 @@ the ring's own metal loop and merge this net with the ring's tap net"
 promotions on `bias_core_mirror_amp`/`bias_core_settle_flag` hit and
 resolved with a west-edge metal stub). That fix does not transfer here: the
 rejection fires on the very *first* leg leaving the block, before any
-question of tap-point placement, because `bjt_array`'s ring has no
+question of tap-point placement, because `bjt_array`'s ring had no
 `GAP_*` opening (`params.ring_gap_side` unset in both cells) — a
 defensive improvement (this is exactly the silent-short failure mode
 finding 2 above describes, now caught instead of silently drawn), but it
-means `bias_core_pnp8_leg`'s `ec`/`vss` and `bias_core_xq1_xqr`'s `vss` —
+meant `bias_core_pnp8_leg`'s `ec`/`vss` and `bias_core_xq1_xqr`'s `vss` —
 all of which the design's own device cards route outside this device
-group — still have no `pins[]` promotion, and #56 could not add one
-without either the upstream collector-strap fix or a `ring_gap_side`
-floorplan change to one (or both) of these cells. Filed as a scoped
-repo-level follow-up rather than reopening #56 or a new upstream issue
-(the upstream gap is already #1894).
+group — had no `pins[]` promotion, and #56 could not add one without either
+the upstream collector-strap fix or a `ring_gap_side` floorplan change to
+one (or both) of these cells.
+
+**Resolved by issue #61, via the floorplan route.** Since the upstream fix
+is merged but not installed (above), both cells were regenerated with a
+`params.ring_gap_side: "N"` opening and their nets promoted out through it
+— `ec`/`vss` on `bias_core_pnp8_leg`, `vss` on `bias_core_xq1_xqr`. Both
+cells' extracted netlists come back **byte-identical** to their pre-#61
+committed evidence (same `sha256`, same device/net/pin counts, same LVS
+verdict), so the opening merged nothing; and both promotions are verified
+downstream by `layout/bin/check-promotion.py` (`unrouted_nets: []`, clean
+downstream `klt drc`). Each cell's own README documents the opening and
+what it costs — the ring is now a C-shaped conductor, so its isolation is
+interrupted for the width of the opening. Revisit and close the rings again
+once `klt` is upgraded past #1930.
 
 Two more, both found building `layout/bias_core_settle_flag/` (the first MOS
 cell in this repo) and both filed the same way:
@@ -289,6 +327,24 @@ cell in this repo) and both filed the same way:
    [`2AMLogic/klayout-tools#1917`](https://github.com/2AMLogic/klayout-tools/issues/1917).
    `bias_core_startup` hit this building an early draft; its own README
    records the repro and the working single-pass alternative.
+
+And one more, found building issue #61's `ec`/`vss` promotions:
+
+6. **The closed-guard/collector-ring rejection is plane-agnostic**, so the
+   only way to give a net inside a ringed block an external pad is to
+   *break the ring*. `gen-compose` decides the rejection from block/port
+   identity alone, never from the level the leg would be drawn on:
+   verified by composing a leg from a `bjt_array`'s `Q0_B` (li1, 67/20) to
+   a stub outside the array with the backbone on `metal3` (met2, 70/20) —
+   two via levels above the ring's own diffusion role (65/20), where no
+   merge is physically possible, and where the via-drop ladder's landing
+   pads all sit at the port's own position *inside* the ring. Rejected
+   anyway, with the same message and the same three remedies. Of those
+   remedies, "route to the ring's own tap port" does not apply (the escaping
+   net is a device net, not the ring's tap net), and the other two both
+   destroy the ring. Filed generically as
+   [`2AMLogic/klayout-tools#1960`](https://github.com/2AMLogic/klayout-tools/issues/1960);
+   both PNP cells pay for it with a `ring_gap_side` opening (see #61 above).
 
 ## What's next
 

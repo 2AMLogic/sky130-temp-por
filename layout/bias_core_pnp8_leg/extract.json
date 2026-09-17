@@ -202,6 +202,11 @@
       "label_positions_um": [
         {
           "text": "ec",
+          "x_um": -5.0,
+          "y_um": 10.0
+        },
+        {
+          "text": "ec",
           "x_um": 6.32,
           "y_um": 3.6
         }
@@ -218,6 +223,11 @@
           "text": "vss",
           "x_um": 8.63,
           "y_um": 3.6
+        },
+        {
+          "text": "vss",
+          "x_um": 23.5,
+          "y_um": 9.0
         }
       ]
     },
@@ -252,24 +262,29 @@
         "top": 8.17
       },
       "shapes": 1,
-      "area_um2": 23.7888
+      "area_um2": 22.1088
     }
   ],
   "matched_device_groups": [],
   "pdk": null,
   "provenance": {
-    "klt_version": "0.4.0",
+    "klt_version": "0.5.0",
     "klayout_version": "0.30.12",
     "pdk": null,
     "deck": {
       "name": "sky130",
       "content_hash": "sha256:a903acb18b47d47e73460b10e9c80edd3466193ffc9da0c01c2103f7fdfcf36f",
-      "released": false
+      "released": true
     },
     "input": {
-      "content_hash": "sha256:099a25309d394eef4f4fd5586e62c041bfec701fac49ea00b13a9121626fb7d9"
+      "content_hash": "sha256:ed7959612a3a47053690815b8102ba942aefb67cc3302429788a452330d8b1b6"
     }
   },
   "parasitics": null,
-  "spef_path": null
+  "spef_path": null,
+  "metrics": {
+    "extract__device__count": 8,
+    "extract__net__count": 3,
+    "extract__pin__count": 3
+  }
 }

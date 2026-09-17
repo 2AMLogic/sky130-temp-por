@@ -10,12 +10,41 @@
   },
   "dbu_um": 0.001,
   "bbox_um": {
-    "x0": -0.97,
+    "x0": -5.0,
     "y0": -0.97,
-    "x1": 19.05,
-    "y1": 8.17
+    "x1": 23.5,
+    "y1": 10.084999999999999
   },
-  "ports": [],
+  "ports": [
+    {
+      "name": "ec",
+      "net": "ec",
+      "layer": {
+        "layer": 67,
+        "datatype": 20
+      },
+      "x_um": -5.0,
+      "y_um": 10.0,
+      "width_um": 0.17,
+      "direction_deg": 180,
+      "block": "stub_ec",
+      "port": "PAD"
+    },
+    {
+      "name": "vss",
+      "net": "vss",
+      "layer": {
+        "layer": 67,
+        "datatype": 20
+      },
+      "x_um": 23.5,
+      "y_um": 9.0,
+      "width_um": 0.17,
+      "direction_deg": 0,
+      "block": "stub_vss",
+      "port": "PAD"
+    }
+  ],
   "blocks": [
     {
       "id": "array",
@@ -31,6 +60,40 @@
         "y0": -0.97,
         "x1": 19.05,
         "y1": 8.17
+      },
+      "orientation": "none"
+    },
+    {
+      "id": "stub_ec",
+      "source": "cell",
+      "generator": null,
+      "cell_name": "promo_stub",
+      "offset_um": {
+        "x": -5.0,
+        "y": 9.915
+      },
+      "bbox_um": {
+        "x0": -5.0,
+        "y0": 9.915,
+        "x1": -3.5,
+        "y1": 10.084999999999999
+      },
+      "orientation": "none"
+    },
+    {
+      "id": "stub_vss",
+      "source": "cell",
+      "generator": null,
+      "cell_name": "promo_stub",
+      "offset_um": {
+        "x": 22.0,
+        "y": 8.915
+      },
+      "bbox_um": {
+        "x0": 22.0,
+        "y0": 8.915,
+        "x1": 23.5,
+        "y1": 9.084999999999999
       },
       "orientation": "none"
     }
@@ -70,10 +133,14 @@
         {
           "block": "array",
           "port": "Q7_B"
+        },
+        {
+          "block": "stub_vss",
+          "port": "CONN"
         }
       ],
       "routed": true,
-      "route_length_um": 30.08,
+      "route_length_um": 46.95,
       "status": "routed",
       "legs": [
         {
@@ -89,7 +156,8 @@
           ],
           "routed": true,
           "route_length_um": 3.8,
-          "reason": null
+          "reason": null,
+          "channel_track": 0
         },
         {
           "pins": [
@@ -104,7 +172,8 @@
           ],
           "routed": true,
           "route_length_um": 3.8,
-          "reason": null
+          "reason": null,
+          "channel_track": 0
         },
         {
           "pins": [
@@ -119,7 +188,8 @@
           ],
           "routed": true,
           "route_length_um": 3.8,
-          "reason": null
+          "reason": null,
+          "channel_track": 0
         },
         {
           "pins": [
@@ -134,7 +204,8 @@
           ],
           "routed": true,
           "route_length_um": 3.8,
-          "reason": null
+          "reason": null,
+          "channel_track": 0
         },
         {
           "pins": [
@@ -149,7 +220,8 @@
           ],
           "routed": true,
           "route_length_um": 4.959999999999997,
-          "reason": null
+          "reason": null,
+          "channel_track": 0
         },
         {
           "pins": [
@@ -164,7 +236,8 @@
           ],
           "routed": true,
           "route_length_um": 4.959999999999999,
-          "reason": null
+          "reason": null,
+          "channel_track": 0
         },
         {
           "pins": [
@@ -179,7 +252,24 @@
           ],
           "routed": true,
           "route_length_um": 4.960000000000001,
-          "reason": null
+          "reason": null,
+          "channel_track": 0
+        },
+        {
+          "pins": [
+            {
+              "block": "array",
+              "port": "Q3_B"
+            },
+            {
+              "block": "stub_vss",
+              "port": "CONN"
+            }
+          ],
+          "routed": true,
+          "route_length_um": 16.87,
+          "reason": null,
+          "channel_track": 0
         }
       ]
     },
@@ -217,10 +307,14 @@
         {
           "block": "array",
           "port": "Q7_E"
+        },
+        {
+          "block": "stub_ec",
+          "port": "CONN"
         }
       ],
       "routed": true,
-      "route_length_um": 33.54,
+      "route_length_um": 47.86,
       "status": "routed",
       "legs": [
         {
@@ -236,7 +330,8 @@
           ],
           "routed": true,
           "route_length_um": 3.8,
-          "reason": null
+          "reason": null,
+          "channel_track": 0
         },
         {
           "pins": [
@@ -251,7 +346,8 @@
           ],
           "routed": true,
           "route_length_um": 3.8,
-          "reason": null
+          "reason": null,
+          "channel_track": 0
         },
         {
           "pins": [
@@ -266,7 +362,8 @@
           ],
           "routed": true,
           "route_length_um": 3.8,
-          "reason": null
+          "reason": null,
+          "channel_track": 0
         },
         {
           "pins": [
@@ -281,7 +378,8 @@
           ],
           "routed": true,
           "route_length_um": 3.8,
-          "reason": null
+          "reason": null,
+          "channel_track": 0
         },
         {
           "pins": [
@@ -296,7 +394,8 @@
           ],
           "routed": true,
           "route_length_um": 4.959999999999999,
-          "reason": null
+          "reason": null,
+          "channel_track": 0
         },
         {
           "pins": [
@@ -311,7 +410,8 @@
           ],
           "routed": true,
           "route_length_um": 4.96,
-          "reason": null
+          "reason": null,
+          "channel_track": 0
         },
         {
           "pins": [
@@ -326,12 +426,42 @@
           ],
           "routed": true,
           "route_length_um": 8.42,
-          "reason": null
+          "reason": null,
+          "channel_track": 0
+        },
+        {
+          "pins": [
+            {
+              "block": "array",
+              "port": "Q3_E"
+            },
+            {
+              "block": "stub_ec",
+              "port": "CONN"
+            }
+          ],
+          "routed": true,
+          "route_length_um": 14.32,
+          "reason": null,
+          "channel_track": 0
         }
       ]
     }
   ],
-  "pins": [],
+  "pins": [
+    {
+      "net": "ec",
+      "block": "stub_ec",
+      "port": "PAD",
+      "labelled": true
+    },
+    {
+      "net": "vss",
+      "block": "stub_vss",
+      "port": "PAD",
+      "labelled": true
+    }
+  ],
   "unrouted_nets": [],
   "drc_hints": {
     "min_spacing_um": null,

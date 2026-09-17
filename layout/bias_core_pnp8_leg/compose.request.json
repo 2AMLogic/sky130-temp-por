@@ -6,17 +6,89 @@
     {
       "id": "array",
       "generator_report": "gen/array.gen.json"
+    },
+    {
+      "id": "stub_ec",
+      "cell": {
+        "gds_path": "promo_stub.gds",
+        "cell_name": "promo_stub",
+        "ports": [
+          {
+            "name": "CONN",
+            "x_um": 1.5,
+            "y_um": 0.085,
+            "layer": {
+              "layer": 67,
+              "datatype": 20
+            },
+            "width_um": 0.17,
+            "direction_deg": 0
+          },
+          {
+            "name": "PAD",
+            "x_um": 0.0,
+            "y_um": 0.085,
+            "layer": {
+              "layer": 67,
+              "datatype": 20
+            },
+            "width_um": 0.17,
+            "direction_deg": 180
+          }
+        ]
+      }
+    },
+    {
+      "id": "stub_vss",
+      "cell": {
+        "gds_path": "promo_stub.gds",
+        "cell_name": "promo_stub",
+        "ports": [
+          {
+            "name": "CONN",
+            "x_um": 0.0,
+            "y_um": 0.085,
+            "layer": {
+              "layer": 67,
+              "datatype": 20
+            },
+            "width_um": 0.17,
+            "direction_deg": 180
+          },
+          {
+            "name": "PAD",
+            "x_um": 1.5,
+            "y_um": 0.085,
+            "layer": {
+              "layer": 67,
+              "datatype": 20
+            },
+            "width_um": 0.17,
+            "direction_deg": 0
+          }
+        ]
+      }
     }
   ],
   "placement": {
     "strategy": "explicit",
     "order": [
-      "array"
+      "array",
+      "stub_ec",
+      "stub_vss"
     ],
     "origins_um": {
       "array": {
         "x": 0.0,
         "y": 0.0
+      },
+      "stub_ec": {
+        "x": -5.0,
+        "y": 9.915
+      },
+      "stub_vss": {
+        "x": 22.0,
+        "y": 8.915
       }
     }
   },
@@ -60,6 +132,10 @@
         {
           "block": "array",
           "port": "Q7_B"
+        },
+        {
+          "block": "stub_vss",
+          "port": "CONN"
         }
       ]
     },
@@ -97,11 +173,26 @@
         {
           "block": "array",
           "port": "Q7_E"
+        },
+        {
+          "block": "stub_ec",
+          "port": "CONN"
         }
       ]
     }
   ],
-  "pins": [],
+  "pins": [
+    {
+      "net": "ec",
+      "block": "stub_ec",
+      "port": "PAD"
+    },
+    {
+      "net": "vss",
+      "block": "stub_vss",
+      "port": "PAD"
+    }
+  ],
   "options": {
     "cell_name": "bias_core_pnp8_leg",
     "output": "bias_core_pnp8_leg.gds"
