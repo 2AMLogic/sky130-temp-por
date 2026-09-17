@@ -1,0 +1,546 @@
+{
+  "schema_version": 1,
+  "generator": "gen-compose",
+  "cell_name": "bias_core",
+  "gds_path": "bias_core.gds",
+  "pdk": {
+    "name": "sky130A",
+    "variant": "sky130A",
+    "version": "open_pdks c6d73a35f524070e85faff4a6a9eef49553ebc2b"
+  },
+  "dbu_um": 0.001,
+  "bbox_um": {
+    "x0": -104.0,
+    "y0": -100.0,
+    "x1": 10940.99,
+    "y1": 265.17
+  },
+  "ports": [
+    {
+      "name": "VDD",
+      "net": "VDD",
+      "layer": {
+        "layer": 67,
+        "datatype": 20
+      },
+      "x_um": -100.0,
+      "y_um": 10.0,
+      "width_um": 0.17,
+      "direction_deg": 180,
+      "block": "stub_VDD",
+      "port": "PAD"
+    },
+    {
+      "name": "VSS",
+      "net": "VSS",
+      "layer": {
+        "layer": 67,
+        "datatype": 20
+      },
+      "x_um": -104.0,
+      "y_um": 14.0,
+      "width_um": 0.17,
+      "direction_deg": 180,
+      "block": "stub_VSS",
+      "port": "PAD"
+    },
+    {
+      "name": "IBIAS",
+      "net": "IBIAS",
+      "layer": {
+        "layer": 67,
+        "datatype": 20
+      },
+      "x_um": 58.63,
+      "y_um": 242.97,
+      "width_um": 40.0,
+      "direction_deg": 0,
+      "block": "mirror_amp",
+      "port": "ibias"
+    },
+    {
+      "name": "VREF",
+      "net": "VREF",
+      "layer": {
+        "layer": 67,
+        "datatype": 20
+      },
+      "x_um": 13.629999999999999,
+      "y_um": 226.97,
+      "width_um": 8.0,
+      "direction_deg": 0,
+      "block": "mirror_amp",
+      "port": "vref"
+    },
+    {
+      "name": "BIAS_OK",
+      "net": "BIAS_OK",
+      "layer": {
+        "layer": 67,
+        "datatype": 20
+      },
+      "x_um": 10893.585,
+      "y_um": 219.5,
+      "width_um": 0.17,
+      "direction_deg": 270,
+      "block": "settle_flag",
+      "port": "bias_ok"
+    }
+  ],
+  "blocks": [
+    {
+      "id": "mirror_amp",
+      "source": "cell",
+      "generator": null,
+      "cell_name": "bias_core_mirror_amp",
+      "offset_um": {
+        "x": 0.0,
+        "y": 100.0
+      },
+      "bbox_um": {
+        "x0": -6.5,
+        "y0": 194.0,
+        "x1": 87.84,
+        "y1": 265.17
+      },
+      "orientation": "none"
+    },
+    {
+      "id": "xq1_xqr",
+      "source": "cell",
+      "generator": null,
+      "cell_name": "bias_core_xq1_xqr",
+      "offset_um": {
+        "x": 150.0,
+        "y": 100.0
+      },
+      "bbox_um": {
+        "x0": 299.03,
+        "y0": 199.03,
+        "x1": 309.81,
+        "y1": 204.37
+      },
+      "orientation": "none"
+    },
+    {
+      "id": "pnp8_leg",
+      "source": "cell",
+      "generator": null,
+      "cell_name": "bias_core_pnp8_leg",
+      "offset_um": {
+        "x": 200.0,
+        "y": 100.0
+      },
+      "bbox_um": {
+        "x0": 399.03,
+        "y0": 199.03,
+        "x1": 419.05,
+        "y1": 208.17000000000002
+      },
+      "orientation": "none"
+    },
+    {
+      "id": "startup",
+      "source": "cell",
+      "generator": null,
+      "cell_name": "bias_core_startup",
+      "offset_um": {
+        "x": 1350.0,
+        "y": 100.0
+      },
+      "bbox_um": {
+        "x0": 2660.0,
+        "y0": 200.0,
+        "x1": 2754.04,
+        "y1": 213.17000000000002
+      },
+      "orientation": "none"
+    },
+    {
+      "id": "settle_flag",
+      "source": "cell",
+      "generator": null,
+      "cell_name": "bias_core_settle_flag",
+      "offset_um": {
+        "x": 5450.0,
+        "y": 100.0
+      },
+      "bbox_um": {
+        "x0": 10893.5,
+        "y0": 194.0,
+        "x1": 10940.99,
+        "y1": 226.67000000000002
+      },
+      "orientation": "none"
+    },
+    {
+      "id": "passives",
+      "source": "cell",
+      "generator": null,
+      "cell_name": "bias_core_passives",
+      "offset_um": {
+        "x": 0.0,
+        "y": -50.0
+      },
+      "bbox_um": {
+        "x0": 0.0,
+        "y0": -100.0,
+        "x1": 5533.860000000001,
+        "y1": -78.08
+      },
+      "orientation": "none"
+    },
+    {
+      "id": "stub_VDD",
+      "source": "cell",
+      "generator": null,
+      "cell_name": "promo_stub",
+      "offset_um": {
+        "x": -100.0,
+        "y": 9.915
+      },
+      "bbox_um": {
+        "x0": -100.0,
+        "y0": 9.915,
+        "x1": -98.5,
+        "y1": 10.084999999999999
+      },
+      "orientation": "none"
+    },
+    {
+      "id": "stub_VSS",
+      "source": "cell",
+      "generator": null,
+      "cell_name": "promo_stub",
+      "offset_um": {
+        "x": -104.0,
+        "y": 13.915
+      },
+      "bbox_um": {
+        "x0": -104.0,
+        "y0": 13.915,
+        "x1": -102.5,
+        "y1": 14.084999999999999
+      },
+      "orientation": "none"
+    }
+  ],
+  "nets": [
+    {
+      "net": "VDD",
+      "pins": [
+        {
+          "block": "mirror_amp",
+          "port": "vdd"
+        },
+        {
+          "block": "startup",
+          "port": "vdd"
+        },
+        {
+          "block": "settle_flag",
+          "port": "vdd"
+        },
+        {
+          "block": "passives",
+          "port": "vdd"
+        },
+        {
+          "block": "stub_VDD",
+          "port": "CONN"
+        }
+      ],
+      "routed": true,
+      "route_length_um": 17972.420000000002,
+      "status": "routed",
+      "legs": [
+        {
+          "pins": [
+            {
+              "block": "mirror_amp",
+              "port": "vdd"
+            },
+            {
+              "block": "startup",
+              "port": "vdd"
+            }
+          ],
+          "routed": false,
+          "route_length_um": null,
+          "reason": "leg's drawn 0.17um metal overlaps 7.774um^2 of block 'startup''s own drawn geometry on the route layer (drawn geometry (no port of its own sits on it)) near its own port 'vdd' -- the escape from this port would draw a silent short to another net already present inside block 'startup' (issue #1527); tap a different point on the intended net, supply waypoints_um that route the approach clear of the obstruction, or route to a layer_role with a metal2/via stack instead (or configure routing.cross_block_layer_role, issue #1168)"
+        },
+        {
+          "pins": [
+            {
+              "block": "startup",
+              "port": "vdd"
+            },
+            {
+              "block": "settle_flag",
+              "port": "vdd"
+            }
+          ],
+          "routed": false,
+          "route_length_um": null,
+          "reason": "leg's drawn 0.17um metal overlaps 0.3485um^2 of block 'settle_flag''s own drawn geometry on the route layer (drawn geometry (no port of its own sits on it)) near its own port 'vdd' -- the escape from this port would draw a silent short to another net already present inside block 'settle_flag' (issue #1527); tap a different point on the intended net, supply waypoints_um that route the approach clear of the obstruction, or route to a layer_role with a metal2/via stack instead (or configure routing.cross_block_layer_role, issue #1168)"
+        },
+        {
+          "pins": [
+            {
+              "block": "settle_flag",
+              "port": "vdd"
+            },
+            {
+              "block": "passives",
+              "port": "vdd"
+            }
+          ],
+          "routed": true,
+          "route_length_um": 5941.945000000001,
+          "reason": null,
+          "channel_track": 0
+        },
+        {
+          "pins": [
+            {
+              "block": "mirror_amp",
+              "port": "vdd"
+            },
+            {
+              "block": "stub_VDD",
+              "port": "CONN"
+            }
+          ],
+          "routed": false,
+          "route_length_um": null,
+          "reason": "backbone's 0.17um-wide drawn path crosses 0.17um through its own pin's block 'stub_VDD' -- more than that pin's own 0.085um edge margin (including 0.085um for the route's own half-width), so the route plows through, or clips the edge of, the block's interior (e.g. a same-facing port pair reaching a pin on the block's far side, crossing another pin on the way, or a connecting jog running close enough alongside the block's own edge that the drawn wire's width still overlaps it) rather than approaching the pin cleanly"
+        },
+        {
+          "pins": [
+            {
+              "block": "startup",
+              "port": "vdd"
+            },
+            {
+              "block": "stub_VDD",
+              "port": "CONN"
+            }
+          ],
+          "routed": true,
+          "route_length_um": 2961.585,
+          "reason": null,
+          "channel_track": 0
+        },
+        {
+          "pins": [
+            {
+              "block": "startup",
+              "port": "vdd"
+            },
+            {
+              "block": "passives",
+              "port": "vdd"
+            }
+          ],
+          "routed": true,
+          "route_length_um": 3176.4450000000006,
+          "reason": null,
+          "channel_track": 0
+        },
+        {
+          "pins": [
+            {
+              "block": "mirror_amp",
+              "port": "vdd"
+            },
+            {
+              "block": "passives",
+              "port": "vdd"
+            }
+          ],
+          "routed": true,
+          "route_length_um": 5892.445000000001,
+          "reason": null,
+          "channel_track": 0
+        }
+      ]
+    },
+    {
+      "net": "VSS",
+      "pins": [
+        {
+          "block": "mirror_amp",
+          "port": "vss"
+        },
+        {
+          "block": "startup",
+          "port": "vss"
+        },
+        {
+          "block": "settle_flag",
+          "port": "vss"
+        },
+        {
+          "block": "stub_VSS",
+          "port": "CONN"
+        }
+      ],
+      "routed": true,
+      "route_length_um": 14176.545,
+      "status": "routed",
+      "legs": [
+        {
+          "pins": [
+            {
+              "block": "mirror_amp",
+              "port": "vss"
+            },
+            {
+              "block": "startup",
+              "port": "vss"
+            }
+          ],
+          "routed": false,
+          "route_length_um": null,
+          "reason": "leg's drawn 0.17um metal overlaps 0.0289um^2 of block 'startup''s own drawn geometry on the route layer (drawn geometry (no port of its own sits on it)) near its own port 'vss' -- the escape from this port would draw a silent short to another net already present inside block 'startup' (issue #1527); tap a different point on the intended net, supply waypoints_um that route the approach clear of the obstruction, or route to a layer_role with a metal2/via stack instead (or configure routing.cross_block_layer_role, issue #1168)"
+        },
+        {
+          "pins": [
+            {
+              "block": "startup",
+              "port": "vss"
+            },
+            {
+              "block": "settle_flag",
+              "port": "vss"
+            }
+          ],
+          "routed": false,
+          "route_length_um": null,
+          "reason": "leg's drawn 0.17um metal overlaps 3.485um^2 of block 'settle_flag''s own drawn geometry on the route layer (drawn geometry (no port of its own sits on it)) near its own port 'vss' -- the escape from this port would draw a silent short to another net already present inside block 'settle_flag' (issue #1527); tap a different point on the intended net, supply waypoints_um that route the approach clear of the obstruction, or route to a layer_role with a metal2/via stack instead (or configure routing.cross_block_layer_role, issue #1168)"
+        },
+        {
+          "pins": [
+            {
+              "block": "mirror_amp",
+              "port": "vss"
+            },
+            {
+              "block": "stub_VSS",
+              "port": "CONN"
+            }
+          ],
+          "routed": true,
+          "route_length_um": 318.415,
+          "reason": null,
+          "channel_track": 0
+        },
+        {
+          "pins": [
+            {
+              "block": "startup",
+              "port": "vss"
+            },
+            {
+              "block": "stub_VSS",
+              "port": "CONN"
+            }
+          ],
+          "routed": true,
+          "route_length_um": 2958.13,
+          "reason": null,
+          "channel_track": 0
+        },
+        {
+          "pins": [
+            {
+              "block": "mirror_amp",
+              "port": "vss"
+            },
+            {
+              "block": "settle_flag",
+              "port": "vss"
+            }
+          ],
+          "routed": true,
+          "route_length_um": 10900.0,
+          "reason": null,
+          "channel_track": 0
+        }
+      ]
+    },
+    {
+      "net": "nkg",
+      "pins": [
+        {
+          "block": "startup",
+          "port": "nkg"
+        },
+        {
+          "block": "settle_flag",
+          "port": "nkg"
+        }
+      ],
+      "routed": true,
+      "route_length_um": 10953.17,
+      "status": "routed",
+      "legs": [
+        {
+          "pins": [
+            {
+              "block": "startup",
+              "port": "nkg"
+            },
+            {
+              "block": "settle_flag",
+              "port": "nkg"
+            }
+          ],
+          "routed": true,
+          "route_length_um": 10953.17,
+          "reason": null,
+          "channel_track": 0
+        }
+      ]
+    }
+  ],
+  "pins": [
+    {
+      "net": "VDD",
+      "block": "stub_VDD",
+      "port": "PAD",
+      "labelled": true
+    },
+    {
+      "net": "VSS",
+      "block": "stub_VSS",
+      "port": "PAD",
+      "labelled": true
+    },
+    {
+      "net": "IBIAS",
+      "block": "mirror_amp",
+      "port": "ibias",
+      "labelled": true
+    },
+    {
+      "net": "VREF",
+      "block": "mirror_amp",
+      "port": "vref",
+      "labelled": true
+    },
+    {
+      "net": "BIAS_OK",
+      "block": "settle_flag",
+      "port": "bias_ok",
+      "labelled": true
+    }
+  ],
+  "unrouted_nets": [],
+  "drc_hints": {
+    "min_spacing_um": null,
+    "matched_groups": [],
+    "notes": []
+  },
+  "warnings": []
+}

@@ -346,15 +346,42 @@ And one more, found building issue #61's `ec`/`vss` promotions:
    [`2AMLogic/klayout-tools#1960`](https://github.com/2AMLogic/klayout-tools/issues/1960);
    both PNP cells pay for it with a `ring_gap_side` opening (see #61 above).
 
+## `bias_core`: the full-cell assembly (issue #40, the final step of #34)
+
+[`layout/bias_core/`](bias_core/README.md) composes all six `bias_core_*`
+device-group sub-blocks below into one cell against
+`design/netlist/bias_core.spice`'s own `.subckt bias_core VDD VSS IBIAS VREF
+BIAS_OK`, each placed as an opaque `blocks[].cell` sibling (no fresh `klt
+gen` calls in this cell.json at all).
+
+**`klt drc`: clean, 0 violations.** **`klt extract`: 50 devices, 50 nets,
+50 pins** — device count matches `design/netlist/bias_core.spice` exactly.
+**`klt lvs`: mismatch — 21/50 devices, 13/27 nets matched.** This is a real,
+partial result, not the single "PNP collector-strap" gap the parent issue
+anticipated: `VDD`, `VSS`, and `nkg` are wired and verified short-free;
+every other cross-block net is unrouted this increment for one of three
+independently-confirmed reasons — a genuine shortage of routing planes for
+the number of mutually-crossing nets this composition needs (filed
+generically as
+[`2AMLogic/klayout-tools#1962`](https://github.com/2AMLogic/klayout-tools/issues/1962)),
+a handful of pre-existing pads that reject any new externally-approaching
+route outright (the same class of gap issue #56 already fixed for six other
+pins, just not these ones), and the already-tracked
+[`2AMLogic/klayout-tools#1894`](https://github.com/2AMLogic/klayout-tools/issues/1894)
+PNP-ring gap, now confirmed to extend further than "just the collector
+strap". See that cell's own README for the full, per-net breakdown and
+[#64](https://github.com/2AMLogic/sky130-temp-por/issues/64) for the tracked
+follow-up.
+
 ## What's next
 
 Per issue #36, this fleet prefers landing DRC-clean/LVS-blocked increments
 (isolated to a known, upstream-filed gap) over waiting on the upstream fix —
 `bias_core_pnp8_leg`, `bias_core_xq1_xqr`, and `bias_core_passives` all ship
 that way; `bias_core_settle_flag`, `bias_core_startup`, and
-`bias_core_mirror_amp` land DRC- and LVS-clean outright. Every `bias_core`
-device group now has its own proof cell; the full-cell assembly is the
-remaining follow-on increment, tracked as a sibling sub-issue of
-[#34](https://github.com/2AMLogic/sky130-temp-por/issues/34); `temp_core`,
-`por_comparator`, `por_output_chain`, and `temp_por_top` are tracked from
+`bias_core_mirror_amp` land DRC- and LVS-clean outright, and `bias_core`
+itself (the full-cell assembly) lands DRC-clean with a real but partial LVS
+match, per above. [#64](https://github.com/2AMLogic/sky130-temp-por/issues/64)
+tracks completing that wiring; `temp_core`, `por_comparator`,
+`por_output_chain`, and `temp_por_top` are tracked from
 [#4](https://github.com/2AMLogic/sky130-temp-por/issues/4).
