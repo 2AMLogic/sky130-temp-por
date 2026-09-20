@@ -6656,7 +6656,14 @@ _extract_rm_targets_scan() {
 #      second, differently-shaped one appearing AFTER the safe mktemp
 #      assignment — poison the resolution and fail closed: the guard cannot
 #      tell which assignment's value the shell will see at the `rm` word, so
-#      ambiguity must never resolve to an allow.
+#      ambiguity must never resolve to an allow. The ONE exception is the
+#      exact, self-referential canonicalization chain described in
+#      _mktemp_canon_mask()'s own doc comment below (#7986) — a SECOND
+#      assignment whose entire RHS is the exact `$(realpath "$NAME")` form
+#      (optionally double-quoted) naming the SAME variable the first,
+#      mktemp-shaped assignment already proved safe. Every other
+#      second-assignment shape, any THIRD assignment, and any ordering other
+#      than mktemp-then-canonicalization still fail closed.
 #
 # On success, the caller treats the target as a proven /tmp-or-$TMPDIR-rooted
 # path and skips BOTH the unresolved-var deny AND the string-prefix scope
@@ -6700,11 +6707,147 @@ _rm_scope_bare_var_name() {
     return 1
 }
 
+# =============================================================================
+# SELF-REFERENTIAL CANONICALIZATION CHAIN (#7986)
+#
+# Shared by BOTH same-command mktemp fast paths below
+# (rm_scope_mktemp_same_command_safe() and wt_write_mktemp_same_command_safe()),
+# so the two cannot drift apart on exactly the shape they admit.
+#
+# The ambiguity rule above (point 3) is correct in general but also fails
+# closed on the routine realpath-canonicalization idiom that resolves a
+# symlinked temp root (macOS /tmp -> /private/tmp) before use:
+#   TMPROOT=$(mktemp -d); TMPROOT=$(realpath "$TMPROOT"); rm -rf "$TMPROOT"
+# The second assignment cannot produce a value outside the directory the FIRST
+# assignment already proved mktemp-safe: `realpath` either fails — the `$(...)`
+# captures nothing and NAME becomes EMPTY, which no consumer of these two fast
+# paths can turn into a destructive path — or it succeeds and prints the
+# canonical absolute path of that SAME directory.
+#
+# ONLY `realpath "$NAME"` is admitted — a `$(cd "$NAME" && pwd -P)` RHS is
+# deliberately NOT masked (PR #8016 review): `cd ""` is a documented no-op
+# SUCCESS, not a failure, on bash 3.2 (macOS stock `/bin/bash`), zsh and
+# `/bin/sh` — so when `mktemp` fails and NAME is empty, `$(cd "$NAME" &&
+# pwd -P)` on those shells prints the CALLER's cwd rather than staying empty,
+# and a `;`/newline-joined chain still runs that assignment even though the
+# first one failed. That turns a benign `mktemp`-failure no-op into
+# `rm -rf <cwd>` / a write into <cwd> — exactly the catastrophic-tier mistake
+# this fast path exists to prevent. `realpath ""` has no such failure mode: it
+# is a plain external command with no shell-builtin "empty path = cwd" special
+# case, so it fails (and prints nothing) on every join style.
+#
+# This is deliberately NOT a general "a safe-looking reassignment is fine"
+# rule. _mktemp_canon_mask() rewrites ONLY this ONE EXACT string, built around
+# the variable's OWN name (a canonicalization of any OTHER variable never
+# matches, and neither does any prefix/suffix/spacing variation), into one
+# opaque token carrying no shell separator:
+#   $(realpath "$NAME")
+# Masking is what makes the chain VISIBLE to the segment scan at all: qsplit()
+# is a quote-aware splitter with no `$( )` nesting awareness — a future
+# admitted form containing its own `&&`/`;` inside the `$( )` would otherwise
+# be split into phantom segments by qsplit() before the scan ever sees it, so
+# masking happens on a LOCAL working copy, before the scan. The scan then
+# treats a segment whose ENTIRE RHS is the token (optionally double-quoted,
+# for the `NAME="$(realpath "$NAME")"` form) as the canonicalization
+# assignment. A RHS that merely CONTAINS the token (`NAME=/etc$(realpath
+# "$NAME")`) is not an exact match, so it stays counted as an ordinary
+# ambiguous reassignment and still fails closed.
+#
+# Fail-closed detail: if the token's own bytes are already present in the
+# command text (they cannot be typed by accident — the token is delimited by
+# SOH control characters — but a crafted command could contain them), the mask
+# refuses outright rather than letting hand-planted token text impersonate a
+# proven canonicalization.
+#
+# On success the masked text is published in $_MKTEMP_CANON_MASKED (a global,
+# mirroring _wt_write_mktemp_leading_var()'s own out-parameter style, so the
+# byte-exact text survives without a command-substitution round trip).
+# =============================================================================
+_MKTEMP_CANON_TOKEN=$'\001LOOM_MKTEMP_CANON\001'
+_MKTEMP_CANON_MASKED=""
+_mktemp_canon_mask() {
+    local varname="$1" cmdtext="$2" needle_rp masked
+    _MKTEMP_CANON_MASKED=""
+    case "$cmdtext" in
+        *"$_MKTEMP_CANON_TOKEN"*) return 1 ;;
+    esac
+    needle_rp='$(realpath "$'"$varname"'")'
+    masked="$cmdtext"
+    # The needle is pattern-METACHARACTER-FREE by construction (varname is
+    # [A-Za-z_][A-Za-z0-9_]*, and the literal contains no *, ?, [ or \), so it
+    # is spelled UNQUOTED in the pattern position on purpose: a metachar-free
+    # pattern means the same thing to bash 3.2 (macOS stock) and to bash 5,
+    # with no version-dependent question about how the quote characters
+    # inside a QUOTED pattern are handled.
+    masked="${masked//$needle_rp/$_MKTEMP_CANON_TOKEN}"
+    _MKTEMP_CANON_MASKED="$masked"
+    return 0
+}
+
+# =============================================================================
+# SAME-COMMAND REBINDING RECOGNITION FOR THE TWO MKTEMP FAST PATHS (#8221)
+#
+# Both same-command mktemp fast paths below poison their ambiguity proof by
+# scanning for a `NAME=...` assignment whose segment text LITERALLY BEGINS
+# WITH `varname "="`. That misses every OTHER shell mechanism that rebinds the
+# same name: a leading declaration keyword (`export`/`readonly`/`declare`/
+# `typeset`/`local NAME=...`, already recognized by the general assignment
+# machinery above -- see match_assignword()'s and record_assign()'s header
+# comments and the identical keyword-stripping regex extract_write_targets()
+# applies, reused verbatim here rather than inventing a second copy) and three
+# rebindings-without-an-`=` at all: `read NAME`, `printf -v NAME`, and
+# `for NAME in ...`. Left unrecognized, `total` stayed at 1 for the FIRST
+# (mktemp-shaped, provably safe) assignment while the SECOND, dangerous
+# rebinding sailed through invisibly, so `total == 1 && safe == 1` still fired
+# and allowed a target the guard could no longer account for.
+#
+# _mktemp_strip_decl_kw() strips a leading declaration keyword (and its
+# flags) so the caller's existing `varname "="` prefix test also recognizes
+# `export NAME=...`/`declare NAME=...`/etc, not just a bare `NAME=...`
+# segment.
+#
+# _mktemp_is_other_rebind() recognizes the three `=`-free rebindings.
+# Deliberately permissive: a coincidental word match (e.g. a `read` argument
+# that happens to equal `varname`) still counts. The caller only ever adds
+# this to a POISONING total, never removes anything from it, so a false
+# positive here can only WIDEN a deny, never manufacture a new allow --
+# anything the scanner cannot confidently classify as NOT a rebinding of
+# `varname` counts as one (fail closed, per the issue's own framing).
+# =============================================================================
+_MKTEMP_REBIND_AWK='
+function _mktemp_strip_decl_kw(seg,   out) {
+    out = seg
+    if (out ~ /^(export|readonly|declare|typeset|local)[ \t]/) {
+        sub(/^(export|readonly|declare|typeset|local)[ \t]+/, "", out)
+        while (out ~ /^-/) {
+            if (!sub(/^-[^ \t]*[ \t]*/, "", out)) break
+        }
+    }
+    return out
+}
+function _mktemp_is_other_rebind(seg, varname,   n, i, toks) {
+    if (seg ~ /^printf([ \t]|$)/ && seg ~ ("(^|[ \t])-v[ \t]+" varname "([ \t]|$)")) return 1
+    if (seg ~ ("^for[ \t]+" varname "[ \t]+in([ \t]|$)")) return 1
+    if (seg ~ /^read([ \t]|$)/) {
+        n = split(seg, toks, /[ \t]+/)
+        for (i = 2; i <= n; i++) {
+            if (toks[i] == varname) return 1
+        }
+    }
+    return 0
+}
+'
+
 rm_scope_mktemp_same_command_safe() {
     local target="$1" cmdtext="$2" varname verdict
     varname=$(_rm_scope_bare_var_name "$target") || return 1
     [[ -n "$varname" ]] || return 1
-    verdict=$(printf '%s' "$cmdtext" | awk -v varname="$varname" "$_QSPLIT_AWK"'
+    # #7986: mask the self-referential canonicalization chain (if any) into an
+    # opaque, separator-free token BEFORE the segment scan — see
+    # _mktemp_canon_mask()'s doc comment above. A refusal (the token's bytes
+    # already occur in the command text) fails closed.
+    _mktemp_canon_mask "$varname" "$cmdtext" || return 1
+    verdict=$(printf '%s' "$_MKTEMP_CANON_MASKED" | awk -v varname="$varname" -v canontok="$_MKTEMP_CANON_TOKEN" "$_QSPLIT_AWK""$_MKTEMP_REBIND_AWK"'
     {
         $0 = qsplit($0)
         n = split($0, segs, "\n")
@@ -6712,20 +6855,38 @@ rm_scope_mktemp_same_command_safe() {
             seg = segs[i]
             sub(/^[ \t]+/, "", seg)
             sub(/[ \t]+$/, "", seg)
+            # #8221: recognize export/readonly/declare/typeset/local NAME=...
+            # as an assignment too (see _MKTEMP_REBIND_AWK'"'"'s header comment).
+            bseg = _mktemp_strip_decl_kw(seg)
             prefix = varname "="
             plen = length(prefix)
-            if (length(seg) > plen && substr(seg, 1, plen) == prefix) {
-                rhs = substr(seg, plen + 1)
+            if (length(bseg) > plen && substr(bseg, 1, plen) == prefix) {
+                rhs = substr(bseg, plen + 1)
                 total++
                 if (rhs == "$(mktemp -d)" || rhs == "$(mktemp)" || \
                     rhs == "\"$(mktemp -d)\"" || rhs == "\"$(mktemp)\"") {
                     safe++
+                    if (safeat == 0) safeat = total
+                } else if (rhs == canontok || rhs == "\"" canontok "\"") {
+                    canon++
+                    if (canonat == 0) canonat = total
                 }
+            } else if (_mktemp_is_other_rebind(seg, varname)) {
+                # #8221: read NAME / printf -v NAME / for NAME in ... rebind
+                # NAME without an `=` at all -- poison the count exactly like
+                # a second `NAME=` assignment, never treated as safe/canon.
+                total++
             }
         }
     }
     END {
+        # The historic single-assignment proof (#6520), plus the ONE chained
+        # form #7986 admits: EXACTLY two assignments, the mktemp-shaped one
+        # FIRST and the self-referential canonicalization SECOND. A third
+        # assignment, either shape repeated, or the reverse order all leave
+        # this false and fail closed.
         if (total == 1 && safe == 1) print "SAFE"
+        else if (total == 2 && safe == 1 && canon == 1 && safeat == 1 && canonat == 2) print "SAFE"
         else print "UNSAFE"
     }')
     [[ "$verdict" == "SAFE" ]]
@@ -6762,7 +6923,13 @@ rm_scope_mktemp_same_command_safe() {
 #      (`mktemp -d /other/dir/XXXXXX`, `mktemp --tmpdir=/other/dir`, …) never
 #      matches this exact-string test and falls through to today's
 #      fail-closed deny) and the SAME ambiguity rule (two or more assignments
-#      to NAME anywhere in the command poison the resolution and fail closed).
+#      to NAME anywhere in the command poison the resolution and fail closed),
+#      INCLUDING that rule's one exception: the exact self-referential
+#      canonicalization chain of #7986 (`NAME=$(mktemp -d)` followed by
+#      exactly one `NAME=$(realpath "$NAME")` assignment). Both fast paths
+#      share _mktemp_canon_mask() and apply the identical two-assignment END
+#      rule, so they cannot drift apart on the shape they admit — see that
+#      function's doc comment above.
 #   2. A NEW safety condition the rm-scope original does not need, precisely
 #      because it never allows a suffix at all: any `..` path-traversal
 #      component in the suffix (`/../`, or a suffix that IS or ends in `/..`)
@@ -6817,7 +6984,12 @@ wt_write_mktemp_same_command_safe() {
             */../*|*/..) return 1 ;;
         esac
     fi
-    verdict=$(printf '%s' "$cmdtext" | awk -v varname="$varname" "$_QSPLIT_AWK"'
+    # #7986: identical treatment to the rm-scope sibling — mask the exact
+    # self-referential canonicalization chain into a separator-free token
+    # before the segment scan, and fail closed if the token's own bytes are
+    # already present in the command text.
+    _mktemp_canon_mask "$varname" "$cmdtext" || return 1
+    verdict=$(printf '%s' "$_MKTEMP_CANON_MASKED" | awk -v varname="$varname" -v canontok="$_MKTEMP_CANON_TOKEN" "$_QSPLIT_AWK""$_MKTEMP_REBIND_AWK"'
     {
         $0 = qsplit($0)
         n = split($0, segs, "\n")
@@ -6825,20 +6997,36 @@ wt_write_mktemp_same_command_safe() {
             seg = segs[i]
             sub(/^[ \t]+/, "", seg)
             sub(/[ \t]+$/, "", seg)
+            # #8221: recognize export/readonly/declare/typeset/local NAME=...
+            # as an assignment too (see _MKTEMP_REBIND_AWK'"'"'s header comment).
+            bseg = _mktemp_strip_decl_kw(seg)
             prefix = varname "="
             plen = length(prefix)
-            if (length(seg) > plen && substr(seg, 1, plen) == prefix) {
-                rhs = substr(seg, plen + 1)
+            if (length(bseg) > plen && substr(bseg, 1, plen) == prefix) {
+                rhs = substr(bseg, plen + 1)
                 total++
                 if (rhs == "$(mktemp -d)" || rhs == "$(mktemp)" || \
                     rhs == "\"$(mktemp -d)\"" || rhs == "\"$(mktemp)\"") {
                     safe++
+                    if (safeat == 0) safeat = total
+                } else if (rhs == canontok || rhs == "\"" canontok "\"") {
+                    canon++
+                    if (canonat == 0) canonat = total
                 }
+            } else if (_mktemp_is_other_rebind(seg, varname)) {
+                # #8221: read NAME / printf -v NAME / for NAME in ... rebind
+                # NAME without an `=` at all -- poison the count exactly like
+                # a second `NAME=` assignment, never treated as safe/canon.
+                total++
             }
         }
     }
     END {
+        # Same two-assignment rule as rm_scope_mktemp_same_command_safe()
+        # (#7986): mktemp-shaped assignment FIRST, canonicalization SECOND,
+        # nothing else to the same NAME anywhere in the command.
         if (total == 1 && safe == 1) print "SAFE"
+        else if (total == 2 && safe == 1 && canon == 1 && safeat == 1 && canonat == 2) print "SAFE"
         else print "UNSAFE"
     }')
     [[ "$verdict" == "SAFE" ]]
