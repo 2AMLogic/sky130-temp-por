@@ -141,11 +141,11 @@ goes green on evidence it does not actually have.
 push/PR:
 
 1. installs the **same pinned `klt` build** the committed report was
-   rendered with (a `uv tool install` from the klayout-tools git rev — the
+   rendered with (a `pip install` of the klayout-tools git rev — the
    tier skeleton is bundled inside the installed package, so a checklist
    change like the 2026-09-17 item-11 addition only reaches this repo
    through a deliberate pin bump),
-2. re-runs `klt signoff --manifest manifest/sky130-temp-por.json --format
+2. re-runs `klt signoff --manifest manifests/sky130-temp-por.json --format
    json`, accepting exit `3` (rendered with unmet items — the block is
    mid-progress) as success and failing on `1`/`2`,
 3. byte-compares the fresh output against `manifests/signoff-report.json` —
