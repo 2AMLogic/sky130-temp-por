@@ -20,43 +20,65 @@ interface.
 **`klt drc --deck sky130`: clean, 0 violations.** **`klt extract --deck
 sky130`: 50 devices** (18 nfet + 16 pfet + 10 pnp + 4 res_xhigh_po + 2
 cap_mim — matching `design/netlist/bias_core.spice`'s own device count
-exactly), **50 nets, 50 pins.** **`klt lvs` against
-`design/netlist/bias_core.spice`'s own `.subckt bias_core`: mismatch — 21/50
-devices, 13/27 nets matched.** This is a real, partial match, not the
-single "PNP collector-strap gap" the parent issue's own text anticipated —
-see "What is not wired" below for the full, verified root-cause breakdown,
-and [#64](https://github.com/2AMLogic/sky130-temp-por/issues/64) for the
+exactly), **43 nets, 43 pins** — down from 50/50 before [#69]'s
+landing-frame fix, and the delta is exactly that fix: each block's supply
+island used to sit electrically separate from its rail, and the re-landed
+routes merge them (extract's own `merged_net_labels[]` now records the
+intended joins — `VDD|vdd`, `VSS|vss`, plus `IBIAS|ibias`, `VREF|vref`,
+`BIAS_OK|bias_ok`, each one assembly-level pin label merging with the
+corresponding sub-block's internal label on the *same* net). **`klt lvs`
+against `design/netlist/bias_core.spice`'s own `.subckt bias_core`:
+mismatch — 21/50 devices, 14/27 nets matched.** This is a real, partial
+match, not the single "PNP collector-strap gap" the parent issue's own text
+anticipated — see "What is not wired" below for the full, verified
+root-cause breakdown, and
+[#64](https://github.com/2AMLogic/sky130-temp-por/issues/64) for the
 tracked follow-up that completes the remaining wiring.
 
 `python3 layout/bin/compose-cell.py layout/bias_core/cell.json --check`
 reproduces this result byte-for-byte.
 
 **`klt erc` (T1 item 11 supply spec, issue #66): `erc_status: clean`, 0
-findings — with two scoped disclosures.** `klt erc layout/bias_core/bias_core.gds
+findings — now on rails that reach the blocks' internal supply networks.**
+`klt erc layout/bias_core/bias_core.gds
 layout/bias_core/erc-supply-spec.json --format json` (reproduce from the
 repo root; the spec's own `_comment` block documents and justifies every
 field) reports `VDD`/`VSS` each resolving to exactly **one** continuous
 electrical island under the declared stackup — zero `erc.unconnected_net`,
-zero `erc.supply_short` — over 22 gate nets with the `active_layer` fix
-(`poly ∩ diff`) applied. The run omits `--pdk` on purpose (antenna grading
-is not item 11's subject; the top-level `status` reads `not_checked` and the
-command exits `4`), and declares no `ties[]`, so `erc.missing_tie` is *not
-computed* — the spec's `_comment` records why (sky130's native substrate
-makes a VSS tie undeclarable, and the blanket `nwell → VDD` check was
-probed on this exact GDS: 18/18 merged n-wells report findings that
-conflate by-design PNP-tub ties with the partial-wiring state —
-non-actionable, not evidence). Scoped disclosure 2 — read before treating
-the clean verdict as "power delivery verified": the one-island-per-supply
-result is about the **assembly-level rail routes**. The ERC connectivity
-census run for #66 found each block's real supply pad sits in a *separate*
-island from its rail (the composed legs land on promo pins displaced from
-each block's placed geometry by the double-translation origin, one frame
-off — so the rails currently touch none of the blocks' internal supply
-networks). [#69](https://github.com/2AMLogic/sky130-temp-por/issues/69)
-tracks the landing-frame fix; the upstream coordinate-trust gap is
-[2AMLogic/klayout-tools#2210](https://github.com/2AMLogic/klayout-tools/issues/2210).
-The graded tracker row, its reasons, and the standing-in well-tie evidence
-are documented in `manifests/README.md`'s item-11 row.
+zero `erc.supply_short` — over 21 gate nets with the `active_layer` fix
+(`poly ∩ diff`) applied (the pre-#69 run reported 22: the two separate
+`nkg` islands and the island carrying the unconnected block-local `vdd`
+pin each counted as their own gate net; the re-landed routes merge them,
+one island per declared supply). The run omits `--pdk` on purpose
+(antenna grading is not item 11's subject; the top-level `status` reads
+`not_checked` and the command exits `4`), and declares no `ties[]`, so
+`erc.missing_tie` is *not computed* — the spec's `_comment` records why
+(sky130's native substrate makes a VSS tie undeclarable, and the blanket
+`nwell → VDD` probe on this exact GDS reports exactly 2 findings
+post-#69 — the two PNP device-group blocks' by-design tubs, see below —
+where the pre-#69 probe reported 18 conflated ones, 0/18 reaching VDD:
+the landing fix is what let every other n-well's taps reach VDD through
+the connected supply network).
+
+**Pad-point island census (issue #69's acceptance check, committed as
+evidence):** `python3 layout/bin/pad-island-census.py
+layout/bias_core/cell.json` re-runs the census that found the bug — it
+builds the same `LayoutToNetlist` connectivity graph `klt erc` builds,
+then probes a window at every pad the cell.json itself declares as a pin
+of a connectivity net (each pad at its block-local declared port
+coordinates, translated by `placement.origins_um` applied exactly once).
+Committed as
+`layout/bias_core/pad-island-census.json` (pinned to the GDS's sha256):
+every probed net is one electrical island — the `VDD` rail shares the
+island of `mirror_amp`/`startup`/`settle_flag`/`passives`'s real `vdd`
+pads *and* the west `stub_VDD` pin (expanded island name `VDD,vdd`),
+`VSS` likewise (`VSS,vss`), and `nkg` is a single shared island
+rather than the two separate ones the pre-#69 census found. The upstream
+coordinate-trust gap that let the pre-#69 composition report
+`routed: true` while landing on pads that touched nothing is
+[2AMLogic/klayout-tools#2210](https://github.com/2AMLogic/klayout-tools/issues/2210);
+the cleanliness of a rerun is graded by `manifests/README.md`'s item-11
+row.
 
 ## Placement
 
@@ -76,20 +98,37 @@ this composition exactly as any downstream caller of these six cells would:
 | `settle_flag` | (5450, 100) | settle-flag output stage (issue #39) |
 | `passives` | (0, -50) | bias/ratio resistors + Miller caps (issue #37) |
 
-The resulting composed bbox is **`x: -104..10940.99, y: -100..265.17`** —
-sparse by construction (`bias_core_passives` alone is ~5534µm wide, and every
-block sits hundreds to thousands of µm from its neighbours to leave room for
-the cross-block routing corridor described below) and, separately, larger
-than the placement table above implies: `cell.json`'s own `_comment`
-documents a bookkeeping quirk found only after the wiring below was already
-validated — each block's `ports[]` coordinates were pre-translated into this
-cell's own global frame, and `placement.origins_um` then applies that same
-offset a second time. The composition is still fully correct (every wire
-lands on the pin `klt gen-compose` actually placed, not the pin coordinate
-this cell.json's own comments describe), and `--check` reproduces it exactly
-— fixing the double-offset for a tighter bbox is cosmetic, deliberately left
-for a future pass rather than risking re-breaking already-validated routing
-this increment spent many `gen-compose` round-trips reaching.
+The resulting composed bbox is **`x: -104..5533.86, y: -50..165.17`** —
+still sparse by construction (`bias_core_passives` alone is ~5534µm wide,
+and every block sits hundreds to thousands of µm from its neighbours to
+leave room for the cross-block routing corridor described below). Each
+device block's hand-declared `ports[]`/`bbox_um` are written in **that
+block's own local frame**, exactly as its own `compose.response.json`
+(or, for the two PNP blocks, `gen/array.gen.json`) reports them, because
+`klt gen-compose`'s contract treats them that way:
+`placement.origins_um` is the single translation into this cell's
+assembly frame, so route landings land on the placed blocks' **real**
+port geometry. An earlier revision of this cell.json pre-translated those
+same entries into the assembly frame before handing them to the tool,
+which applied the origin a second time — every route landing pad sat
+100µm off each real pad, the assembly rails touched none of the blocks'
+internal supply networks, and the composed bbox ballooned to
+`x: -104..10940.99, y: -100..265.17`. That double-offset was
+deliberately left in place at #40 time ("cosmetic"), but [#69]'s island
+census disproved the "cosmetic" verdict and the entries were rewritten
+back to the reported block-local coordinates — a real routing change, not
+a coordinate cleanup: the VDD approach corridors were re-derived
+(including a rise-at-`x=5445` column threading the gap between
+`settle_flag`'s `bias_ok` stub and its `vdd` pad, a gap the old
+phantom-landing routes never had to fit through), DRC re-verified clean,
+and the pad-point island census re-run — committed as
+`layout/bin/pad-island-census.py` +
+`layout/bias_core/pad-island-census.json`. The declare-only top-level
+promoted pins (`IBIAS`, `VREF`, `BIAS_OK`) land on the real pads too —
+`IBIAS` at (58.63, 142.97), `VREF` at (13.63, 126.97), `BIAS_OK` at
+(5443.585, 119.5) — where the pre-#69 run stamped them a full origin
+higher (142.97+100, 126.97+100, 119.5+100 plus the x-translation for
+`settle_flag`'s origin, e.g. a `BIAS_OK` pin at (10893.585, 219.5)).
 
 `bias_core_pnp8_leg` has zero wired connections in this composition (both of
 its own nets, `vss`/`ec`, are blocked — see below); it is placed purely to
@@ -117,12 +156,21 @@ be present as 8 real, if unconnected, PNP devices in the extracted netlist.
   `bias_core_passives`'s own `vref` pin** (`XR2`'s own node in the design);
   see below.
 
-Each of these was verified via `klt extract`'s own net-merge report, not
-just `klt gen-compose`'s `routed: true` — no `merges N distinct labels`
-warning touches any of `VDD`/`VSS`/`nkg`, confirming the router did not
-silently short any of them against another net while reaching this result
-(`docs/cli/gen-compose.md`'s own "Geometry is advisory" caveat: a routed,
-DRC-clean leg is not by itself proof of correct connectivity).
+Each of these was verified electrically, not just via `klt
+gen-compose`'s `routed: true` (`docs/cli/gen-compose.md`'s own "Geometry
+is advisory" caveat: a routed, DRC-clean leg is not by itself proof of
+correct connectivity — the pre-#69 composition was fully `routed: true`
+while touching none of the blocks' real pads, which is exactly how that
+gap survived until #69's island census). Post-#69 the verification is
+`klt extract`'s own net-merge report listing the *intended* joins —
+`VDD|vdd`, `VSS|vss` (each rail merging with the sub-block pads' internal
+labels onto one net) and no unintended `supply_short` between them — plus
+the committed pad-point island census (`pad-island-census.json`), which
+probes every declared pad directly and shows one island per net *with*
+`nkg` shared between `startup` and `settle_flag`. The upstream gap that
+made `routed: true` trustable on nothing more than caller-declared
+coordinates is
+[2AMLogic/klayout-tools#2210](https://github.com/2AMLogic/klayout-tools/issues/2210).
 
 ## What is not wired
 
@@ -204,6 +252,17 @@ tracked follow-up covering all three findings.
   new, filed this issue: `klt gen-compose` has no layer/track-assignment
   help for a composition with more mutually-crossing nets than available
   routing planes.
+- [`2AMLogic/klayout-tools#2210`](https://github.com/2AMLogic/klayout-tools/issues/2210) —
+  `klt gen-compose`'s `routed: true` verifies landings against the
+  caller-declared port coordinates only, with no connectivity check that a
+  leg's landing pin ever touches the placed block's internal net. #69's
+  landing-frame fix survived precisely because of this gap (the pre-#69
+  composition reported every net `routed: true` while touching none of the
+  blocks' real pads); this cell now also commits a pad-point island census
+  (`layout/bin/pad-island-census.py` → `pad-island-census.json`) as the
+  in-repo backstop, and no `klt` verb exposes island membership today —
+  filed generically as
+  [2AMLogic/klayout-tools#2218](https://github.com/2AMLogic/klayout-tools/issues/2218).
 
 ## What's next
 

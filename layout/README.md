@@ -354,9 +354,11 @@ device-group sub-blocks below into one cell against
 BIAS_OK`, each placed as an opaque `blocks[].cell` sibling (no fresh `klt
 gen` calls in this cell.json at all).
 
-**`klt drc`: clean, 0 violations.** **`klt extract`: 50 devices, 50 nets,
-50 pins** — device count matches `design/netlist/bias_core.spice` exactly.
-**`klt lvs`: mismatch — 21/50 devices, 13/27 nets matched.** This is a real,
+**`klt drc`: clean, 0 violations.** **`klt extract`: 50 devices, 43 nets,
+43 pins** — device count matches `design/netlist/bias_core.spice` exactly,
+and the supply islands now merge with their blocks' pads ([#69]'s
+landing-frame fix; see that cell's README for the island-census evidence).
+**`klt lvs`: mismatch — 21/50 devices, 14/27 nets matched.** This is a real,
 partial result, not the single "PNP collector-strap" gap the parent issue
 anticipated: `VDD`, `VSS`, and `nkg` are wired and verified short-free;
 every other cross-block net is unrouted this increment for one of three

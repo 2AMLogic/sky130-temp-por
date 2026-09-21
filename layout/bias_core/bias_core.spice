@@ -1,12 +1,15 @@
 * extracted by klt extract --deck sky130
 
 * cell bias_core
-* pin bias_ok
+* pin BIAS_OK,bias_ok
+* pin IBIAS,ibias
+* pin VDD,vdd
+* pin VREF,vref
+* pin VSS,vss
 * pin ec
 * pin ec
 * pin er
 * pin er
-* pin ibias
 * pin ks1
 * pin ks2
 * pin ks3
@@ -24,7 +27,6 @@
 * pin nbtop
 * pin nbtop
 * pin nkg
-* pin nkg
 * pin nkm
 * pin nokl
 * pin noko
@@ -39,134 +41,133 @@
 * pin pg
 * pin pg
 * pin tok
-* pin vdd
-* pin vdd
-* pin vdd
-* pin vdd
-* pin vref
 * pin vref
 * pin vss
 * pin vss
-* pin vss
-* pin VDD
-* pin VSS
-* pin nkg
-.SUBCKT bias_core bias_ok ec ec$1 er er$1 ibias ks1 ks2 ks3 ks4 n1 n2 n2$1 na
-+ na$1 na$2 nb nb$1 nbg nbtop nbtop$1 nbtop$2 nkg nkg$1 nkm nokl noko nokx
-+ nokx$1 nt nz pb pb$1 pb$2 pg pg$1 pg$2 tok vdd vdd$1 vdd$2 vdd$3 vref vref$1
-+ vss vss$1 vss$2 VDD VSS nkg$2
+.SUBCKT bias_core BIAS_OK|bias_ok IBIAS|ibias VDD|vdd VREF|vref VSS|vss ec ec$1
++ er er$1 ks1 ks2 ks3 ks4 n1 n2 n2$1 na na$1 na$2 nb nb$1 nbg nbtop nbtop$1
++ nbtop$2 nkg nkm nokl noko nokx nokx$1 nt nz pb pb$1 pb$2 pg pg$1 pg$2 tok
++ vref vss vss$1
 * device instance $1 r0 *1 26.42,101 nfet
-M$1 nbg nbg vss$2 vss$2 nfet L=4U W=2U AS=0.84P AD=0.84P PS=4.84U PD=4.84U
+M$1 nbg nbg VSS|vss VSS|vss nfet L=4U W=2U AS=0.84P AD=0.84P PS=4.84U PD=4.84U
 * device instance $2 r0 *1 33.42,101 nfet
-M$2 pb nbg vss$2 vss$2 nfet L=4U W=2U AS=0.84P AD=0.84P PS=4.84U PD=4.84U
+M$2 pb nbg VSS|vss VSS|vss nfet L=4U W=2U AS=0.84P AD=0.84P PS=4.84U PD=4.84U
 * device instance $3 r0 *1 5460.42,101 nfet
-M$3 nokl nokl vss$2 vss$2 nfet L=4U W=2U AS=0.84P AD=0.84P PS=4.84U PD=4.84U
+M$3 nokl nokl VSS|vss VSS|vss nfet L=4U W=2U AS=0.84P AD=0.84P PS=4.84U PD=4.84U
 * device instance $4 r0 *1 5467.92,101 nfet
-M$4 noko nokl vss$2 vss$2 nfet L=4U W=2U AS=0.84P AD=0.84P PS=4.84U PD=4.84U
+M$4 noko nokl VSS|vss VSS|vss nfet L=4U W=2U AS=0.84P AD=0.84P PS=4.84U PD=4.84U
 * device instance $5 r0 *1 5473.92,101 nfet
-M$5 noko nkg vss$2 vss$2 nfet L=1U W=2U AS=0.84P AD=0.84P PS=4.84U PD=4.84U
+M$5 noko nkg VSS|vss VSS|vss nfet L=1U W=2U AS=0.84P AD=0.84P PS=4.84U PD=4.84U
 * device instance $6 r0 *1 5480.42,101 nfet
-M$6 nokx$1 noko vss$2 vss$2 nfet L=4U W=2U AS=0.84P AD=0.84P PS=4.84U PD=4.84U
+M$6 nokx$1 noko VSS|vss VSS|vss nfet L=4U W=2U AS=0.84P AD=0.84P PS=4.84U
++ PD=4.84U
 * device instance $7 r0 *1 72.42,102 nfet
-M$7 n1 n1 vss$2 vss$2 nfet L=8U W=4U AS=1.68P AD=1.68P PS=8.84U PD=8.84U
+M$7 n1 n1 VSS|vss VSS|vss nfet L=8U W=4U AS=1.68P AD=1.68P PS=8.84U PD=8.84U
 * device instance $8 r0 *1 83.42,102 nfet
-M$8 n2$1 n1 vss$2 vss$2 nfet L=8U W=4U AS=1.68P AD=1.68P PS=8.84U PD=8.84U
+M$8 n2$1 n1 VSS|vss VSS|vss nfet L=8U W=4U AS=1.68P AD=1.68P PS=8.84U PD=8.84U
 * device instance $9 r0 *1 5486.67,102 nfet
-M$9 bias_ok nokx$1 vss$2 vss$2 nfet L=0.5U W=4U AS=1.68P AD=1.68P PS=8.84U
-+ PD=8.84U
+M$9 BIAS_OK|bias_ok nokx$1 VSS|vss VSS|vss nfet L=0.5U W=4U AS=1.68P AD=1.68P
++ PS=8.84U PD=8.84U
 * device instance $10 r0 *1 1346.58,104 nfet
-M$10 vss$2 nkg$1 pg$1 vss$2 nfet L=4U W=1U AS=0.42P AD=0.42P PS=2.84U PD=2.84U
+M$10 VSS|vss nkg pg$1 VSS|vss nfet L=4U W=1U AS=0.42P AD=0.42P PS=2.84U PD=2.84U
 * device instance $11 r0 *1 1360.26,104 nfet
-M$11 ks4 ks4 nkg$1 vss$2 nfet L=8U W=1U AS=0.42P AD=0.42P PS=2.84U PD=2.84U
+M$11 ks4 ks4 nkg VSS|vss nfet L=8U W=1U AS=0.42P AD=0.42P PS=2.84U PD=2.84U
 * device instance $12 r0 *1 1370.1,104 nfet
-M$12 ks3 ks3 ks4 vss$2 nfet L=8U W=1U AS=0.42P AD=0.42P PS=2.84U PD=2.84U
+M$12 ks3 ks3 ks4 VSS|vss nfet L=8U W=1U AS=0.42P AD=0.42P PS=2.84U PD=2.84U
 * device instance $13 r0 *1 1379.94,104 nfet
-M$13 ks2 ks2 ks3 vss$2 nfet L=8U W=1U AS=0.42P AD=0.42P PS=2.84U PD=2.84U
+M$13 ks2 ks2 ks3 VSS|vss nfet L=8U W=1U AS=0.42P AD=0.42P PS=2.84U PD=2.84U
 * device instance $14 r0 *1 1389.78,104 nfet
-M$14 ks1 ks1 ks2 vss$2 nfet L=8U W=1U AS=0.42P AD=0.42P PS=2.84U PD=2.84U
+M$14 ks1 ks1 ks2 VSS|vss nfet L=8U W=1U AS=0.42P AD=0.42P PS=2.84U PD=2.84U
 * device instance $15 r0 *1 1399.62,104 nfet
-M$15 vdd$1 vdd$1 ks1 vss$2 nfet L=8U W=1U AS=0.42P AD=0.42P PS=2.84U PD=2.84U
-* device instance $16 r0 *1 1333.42,104 nfet
-M$16 vss$2 nkm nkm vss$2 nfet L=4U W=2U AS=0.84P AD=0.84P PS=4.84U PD=4.84U
-* device instance $17 r0 *1 42.42,104 nfet
-M$17 pg$2 n2$1 vss$2 vss$2 nfet L=8U W=8U AS=3.36P AD=3.36P PS=16.84U PD=16.84U
-* device instance $18 r0 *1 1352.42,104 nfet
-M$18 nkg$1 nkm vss$2 vss$2 nfet L=4U W=8U AS=3.36P AD=3.36P PS=16.84U PD=16.84U
-* device instance $19 r0 *1 1325.42,104 pfet
-M$19 nkm pb$1 vdd$1 vdd$1 pfet L=4U W=1U AS=0.42P AD=0.42P PS=2.84U PD=2.84U
-* device instance $20 r0 *1 5452.42,115.47 pfet
-M$20 tok pb$2 vdd$2 vdd$2 pfet L=4U W=1U AS=0.42P AD=0.42P PS=2.84U PD=2.84U
-* device instance $21 r0 *1 5479.42,115.47 pfet
-M$21 nokx$1 pb$2 vdd$2 vdd$2 pfet L=4U W=1U AS=0.42P AD=0.42P PS=2.84U PD=2.84U
-* device instance $22 r0 *1 5488.42,115.47 pfet
-M$22 bias_ok nokx$1 vdd$2 vdd$2 pfet L=4U W=1U AS=0.42P AD=0.42P PS=2.84U
+M$15 VDD|vdd VDD|vdd ks1 VSS|vss nfet L=8U W=1U AS=0.42P AD=0.42P PS=2.84U
 + PD=2.84U
+* device instance $16 r0 *1 1333.42,104 nfet
+M$16 VSS|vss nkm nkm VSS|vss nfet L=4U W=2U AS=0.84P AD=0.84P PS=4.84U PD=4.84U
+* device instance $17 r0 *1 42.42,104 nfet
+M$17 pg$2 n2$1 VSS|vss VSS|vss nfet L=8U W=8U AS=3.36P AD=3.36P PS=16.84U
++ PD=16.84U
+* device instance $18 r0 *1 1352.42,104 nfet
+M$18 nkg nkm VSS|vss VSS|vss nfet L=4U W=8U AS=3.36P AD=3.36P PS=16.84U
++ PD=16.84U
+* device instance $19 r0 *1 1325.42,104 pfet
+M$19 nkm pb$1 VDD|vdd VDD|vdd pfet L=4U W=1U AS=0.42P AD=0.42P PS=2.84U PD=2.84U
+* device instance $20 r0 *1 5452.42,115.47 pfet
+M$20 tok pb$2 VDD|vdd VDD|vdd pfet L=4U W=1U AS=0.42P AD=0.42P PS=2.84U PD=2.84U
+* device instance $21 r0 *1 5479.42,115.47 pfet
+M$21 nokx$1 pb$2 VDD|vdd VDD|vdd pfet L=4U W=1U AS=0.42P AD=0.42P PS=2.84U
++ PD=2.84U
+* device instance $22 r0 *1 5488.42,115.47 pfet
+M$22 BIAS_OK|bias_ok nokx$1 VDD|vdd VDD|vdd pfet L=4U W=1U AS=0.42P AD=0.42P
++ PS=2.84U PD=2.84U
 * device instance $23 r0 *1 5461.42,118.97 pfet
-M$23 nokl nbtop$1 tok vdd$2 pfet L=4U W=8U AS=3.36P AD=3.36P PS=16.84U PD=16.84U
+M$23 nokl nbtop$1 tok VDD|vdd pfet L=4U W=8U AS=3.36P AD=3.36P PS=16.84U
++ PD=16.84U
 * device instance $24 r0 *1 5470.58,118.97 pfet
-M$24 tok na$1 noko vdd$2 pfet L=4U W=8U AS=3.36P AD=3.36P PS=16.84U PD=16.84U
+M$24 tok na$1 noko VDD|vdd pfet L=4U W=8U AS=3.36P AD=3.36P PS=16.84U PD=16.84U
 * device instance $25 r0 *1 29.42,123.97 pfet
-M$25 nbg pg$2 vdd$3 vdd$3 pfet L=4U W=2U AS=0.84P AD=0.84P PS=4.84U PD=4.84U
+M$25 nbg pg$2 VDD|vdd VDD|vdd pfet L=4U W=2U AS=0.84P AD=0.84P PS=4.84U PD=4.84U
 * device instance $26 r0 *1 38.42,123.97 pfet
-M$26 pg$2 pb vdd$3 vdd$3 pfet L=4U W=2U AS=0.84P AD=0.84P PS=4.84U PD=4.84U
+M$26 pg$2 pb VDD|vdd VDD|vdd pfet L=4U W=2U AS=0.84P AD=0.84P PS=4.84U PD=4.84U
 * device instance $27 r0 *1 47.42,123.97 pfet
-M$27 pb pb vdd$3 vdd$3 pfet L=4U W=2U AS=0.84P AD=0.84P PS=4.84U PD=4.84U
+M$27 pb pb VDD|vdd VDD|vdd pfet L=4U W=2U AS=0.84P AD=0.84P PS=4.84U PD=4.84U
 * device instance $28 r0 *1 65.42,123.97 pfet
-M$28 nt pb vdd$3 vdd$3 pfet L=4U W=2U AS=0.84P AD=0.84P PS=4.84U PD=4.84U
+M$28 nt pb VDD|vdd VDD|vdd pfet L=4U W=2U AS=0.84P AD=0.84P PS=4.84U PD=4.84U
 * device instance $29 r0 *1 2.42,126.97 pfet
-M$29 nbtop$2 pg$2 vdd$3 vdd$3 pfet L=4U W=8U AS=3.36P AD=3.36P PS=16.84U
+M$29 nbtop$2 pg$2 VDD|vdd VDD|vdd pfet L=4U W=8U AS=3.36P AD=3.36P PS=16.84U
 + PD=16.84U
 * device instance $30 r0 *1 11.42,126.97 pfet
-M$30 vref$1 pg$2 vdd$3 vdd$3 pfet L=4U W=8U AS=3.36P AD=3.36P PS=16.84U
+M$30 VREF|vref pg$2 VDD|vdd VDD|vdd pfet L=4U W=8U AS=3.36P AD=3.36P PS=16.84U
 + PD=16.84U
 * device instance $31 r0 *1 20.42,126.97 pfet
-M$31 na$2 pg$2 vdd$3 vdd$3 pfet L=4U W=8U AS=3.36P AD=3.36P PS=16.84U PD=16.84U
+M$31 na$2 pg$2 VDD|vdd VDD|vdd pfet L=4U W=8U AS=3.36P AD=3.36P PS=16.84U
++ PD=16.84U
 * device instance $32 r0 *1 74.42,130.97 pfet
-M$32 n1 na$2 nt vdd$3 pfet L=4U W=16U AS=6.72P AD=6.72P PS=32.84U PD=32.84U
+M$32 n1 na$2 nt VDD|vdd pfet L=4U W=16U AS=6.72P AD=6.72P PS=32.84U PD=32.84U
 * device instance $33 r0 *1 83.42,130.97 pfet
-M$33 n2$1 nb$1 nt vdd$3 pfet L=4U W=16U AS=6.72P AD=6.72P PS=32.84U PD=32.84U
+M$33 n2$1 nb$1 nt VDD|vdd pfet L=4U W=16U AS=6.72P AD=6.72P PS=32.84U PD=32.84U
 * device instance $34 r0 *1 56.42,142.97 pfet
-M$34 ibias pb vdd$3 vdd$3 pfet L=4U W=40U AS=16.8P AD=16.8P PS=80.84U PD=80.84U
+M$34 IBIAS|ibias pb VDD|vdd VDD|vdd pfet L=4U W=40U AS=16.8P AD=16.8P PS=80.84U
++ PD=80.84U
 * device instance $35 r0 *1 151.7,101.7 pnp
-Q$35 vss$2 vss na pnp AE=11.56P PE=13.6U AB=12.96P PB=14.4U AC=12.96P PC=14.4U
-+ NE=1
+Q$35 VSS|vss vss$1 na pnp AE=11.56P PE=13.6U AB=12.96P PB=14.4U AC=12.96P
++ PC=14.4U NE=1
 * device instance $36 r0 *1 156.32,101.7 pnp
-Q$36 vss$2 vss er$1 pnp AE=11.56P PE=13.6U AB=12.96P PB=14.4U AC=12.96P
+Q$36 VSS|vss vss$1 er$1 pnp AE=11.56P PE=13.6U AB=12.96P PB=14.4U AC=12.96P
 + PC=14.4U NE=1
 * device instance $37 r0 *1 201.7,101.7 pnp
-Q$37 vss$2 vss$1 ec$1 pnp AE=11.56P PE=13.6U AB=12.96P PB=14.4U AC=12.96P
+Q$37 VSS|vss vss ec$1 pnp AE=11.56P PE=13.6U AB=12.96P PB=14.4U AC=12.96P
 + PC=14.4U NE=1
 * device instance $38 r0 *1 206.32,101.7 pnp
-Q$38 vss$2 vss$1 ec$1 pnp AE=11.56P PE=13.6U AB=12.96P PB=14.4U AC=12.96P
+Q$38 VSS|vss vss ec$1 pnp AE=11.56P PE=13.6U AB=12.96P PB=14.4U AC=12.96P
 + PC=14.4U NE=1
 * device instance $39 r0 *1 210.94,101.7 pnp
-Q$39 vss$2 vss$1 ec$1 pnp AE=11.56P PE=13.6U AB=12.96P PB=14.4U AC=12.96P
+Q$39 VSS|vss vss ec$1 pnp AE=11.56P PE=13.6U AB=12.96P PB=14.4U AC=12.96P
 + PC=14.4U NE=1
 * device instance $40 r0 *1 215.56,101.7 pnp
-Q$40 vss$2 vss$1 ec$1 pnp AE=11.56P PE=13.6U AB=12.96P PB=14.4U AC=12.96P
+Q$40 VSS|vss vss ec$1 pnp AE=11.56P PE=13.6U AB=12.96P PB=14.4U AC=12.96P
 + PC=14.4U NE=1
 * device instance $41 r0 *1 201.7,105.5 pnp
-Q$41 vss$2 vss$1 ec$1 pnp AE=11.56P PE=13.6U AB=12.96P PB=14.4U AC=12.96P
+Q$41 VSS|vss vss ec$1 pnp AE=11.56P PE=13.6U AB=12.96P PB=14.4U AC=12.96P
 + PC=14.4U NE=1
 * device instance $42 r0 *1 206.32,105.5 pnp
-Q$42 vss$2 vss$1 ec$1 pnp AE=11.56P PE=13.6U AB=12.96P PB=14.4U AC=12.96P
+Q$42 VSS|vss vss ec$1 pnp AE=11.56P PE=13.6U AB=12.96P PB=14.4U AC=12.96P
 + PC=14.4U NE=1
 * device instance $43 r0 *1 210.94,105.5 pnp
-Q$43 vss$2 vss$1 ec$1 pnp AE=11.56P PE=13.6U AB=12.96P PB=14.4U AC=12.96P
+Q$43 VSS|vss vss ec$1 pnp AE=11.56P PE=13.6U AB=12.96P PB=14.4U AC=12.96P
 + PC=14.4U NE=1
 * device instance $44 r0 *1 215.56,105.5 pnp
-Q$44 vss$2 vss$1 ec$1 pnp AE=11.56P PE=13.6U AB=12.96P PB=14.4U AC=12.96P
+Q$44 VSS|vss vss ec$1 pnp AE=11.56P PE=13.6U AB=12.96P PB=14.4U AC=12.96P
 + PC=14.4U NE=1
-* device instance $45 r0 *1 1405.52,-39.5 sky130_fd_pr__model__cap_mim
-C$45 nz pg 8.152e-13
-* device instance $46 r0 *1 5530.36,-46.5 sky130_fd_pr__model__cap_mim
-C$46 vdd nokx 7.656e-14
+* device instance $45 r0 *1 5530.36,-46.5 sky130_fd_pr__model__cap_mim
+C$45 VDD|vdd nokx 7.656e-14
+* device instance $46 r0 *1 1405.52,-39.5 sky130_fd_pr__model__cap_mim
+C$46 nz pg 8.152e-13
 * device instance $47 r0 *1 9.17,-49 res_xhigh_po
-R$47 nbtop nb vss$2 17500 res_xhigh_po L=17.5U W=2U
+R$47 nbtop nb VSS|vss 17500 res_xhigh_po L=17.5U W=2U
 * device instance $48 r0 *1 196.76,-49 res_xhigh_po
-R$48 nb ec vss$2 350000 res_xhigh_po L=350U W=2U
+R$48 nb ec VSS|vss 350000 res_xhigh_po L=350U W=2U
 * device instance $49 r0 *1 883.6,-49 res_xhigh_po
-R$49 n2 nz vss$2 1016000 res_xhigh_po L=1016U W=2U
+R$49 n2 nz VSS|vss 1016000 res_xhigh_po L=1016U W=2U
 * device instance $50 r0 *1 3471.44,-49 res_xhigh_po
-R$50 vref er vss$2 4104000 res_xhigh_po L=4104U W=2U
+R$50 vref er VSS|vss 4104000 res_xhigh_po L=4104U W=2U
 .ENDS bias_core

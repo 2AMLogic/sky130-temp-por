@@ -51,7 +51,7 @@
         "command": null,
         "kind": "drc",
         "check_status": "clean",
-        "content_hash": "sha256:ff4feb965142394ffaf9de60b6fde278bd23f560790f7c8cde74274bee3e3772",
+        "content_hash": "sha256:c396d6c68db55097d8fadc902151480139ae24545ba694ff4a982b74051f7988",
         "exit_status": 0,
         "coverage": {
           "layers_in_stream_without_rules": [
@@ -73,7 +73,9 @@
             "capm2.width.1",
             "met4.enclosing.capm2.1",
             "met4.enclosing.via4.1",
+            "met5.area.1",
             "met5.enclosing.via4.1",
+            "met5.holes_area.1",
             "met5.space.1",
             "met5.width.1",
             "via4.space.1",

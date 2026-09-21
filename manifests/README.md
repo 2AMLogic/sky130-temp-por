@@ -82,8 +82,9 @@ part of the claim and travel with it):
   sub-block increment, not the block's layout, and no citation is made.
 - **Item 3 — DRC clean: `met`** via `layout/bias_core/drc.json` (`status:
   clean`, 0 violations), pinned to
-  `content_hash sha256:ff4feb96…e3772` — the sha256 of the committed
-  `layout/bias_core/bias_core.gds` the run executed on, so the citation is
+  `content_hash sha256:c396d6c6…f7988` — the sha256 of the committed
+  `layout/bias_core/bias_core.gds` the run executed on (#69's re-landed
+  composition), so the citation is
   provably fresh against the current artifact (CI re-asserts this). **Scope
   disclosure, per item 3's own claimant-enforced rule:** the cited report
   covers the `bias_core` full-cell assembly — the most complete committed
@@ -126,40 +127,61 @@ part of the claim and travel with it):
   rows are the machine-honest statement "no check backs this claim", not
   statements that the testbenches or hygiene are absent.
 - **Item 11 — Power delivery (structural): `unmet` (`check_failed`)** —
-  the evidence half of this compound item now exists and is cited; the
-  row stays unmet on the LVS half. Cited: the `klt erc` supply spec and
+  the ERC half of this compound item is now established at
+  **full-assembly scope**: the supply rails genuinely reach every
+  block's internal supply network. Cited: the `klt erc` supply spec and
   report added by #66 — `layout/bias_core/erc-supply-spec.json` (layer
   numbers resolved from the sky130A `.lyp` and cross-checked against
   klayout-tools' curated sky130 deck; `stackup[0]` gate role plus
   `active_layer` for the `poly ∩ diff` antenna denominator) and
   `layout/bias_core/erc.json`, pinned to the committed GDS's
-  `sha256:ff4feb…e3772` exactly like item 3's DRC citation, with every
-  field of the committed GDS's supplies graded per the item's own rules.
-  **What the ERC run does establish:** with `VDD`/`VSS` declared
-  `kind: "supply"` (the `.subckt bias_core` interface spellings), the
-  run reports `erc_status: "clean"` — zero `erc.unconnected_net`, zero
-  `erc.supply_short` — i.e. each declared supply resolves to exactly
-  **one** continuous electrical island under the declared stackup. The
-  run deliberately omits `--pdk`, so the report's top-level `status` is
-  `not_checked` (the antenna question was never asked) and the command
+  `sha256:c396d6…f7988` exactly like item 3's DRC citation, re-rendered
+  over the re-landed composition. The row still renders `check_failed`
+  solely on the compound item's LVS half (item 4, #64). **What the ERC
+  citation establishes now:** with `VDD`/`VSS` declared `kind: "supply"`
+  (the `.subckt bias_core` interface spellings), the run reports
+  `erc_status: "clean"` — zero `erc.unconnected_net`, zero
+  `erc.supply_short` — over 21 gate nets: each declared supply resolves
+  to exactly **one** continuous electrical island, and the islands now
+  *contain* the blocks. #69 re-derived the assembly's hand-declared
+  `ports[]`/`bbox_um` to the blocks' own reported coordinates (fixing
+  the pre-#69 double translation that left each block's real supply pad
+  in its own island while every net reported `routed: true` — the
+  upstream coordinate-trust gap is klayout-tools#2210). Two independent
+  committed envelopes verify the landings, beyond `routed: true`:
+  `klt extract`'s own `merged_net_labels[]` records the intended joins
+  (`VDD|vdd`, `VSS|vss`, and `IBIAS|ibias`/`VREF|vref`/`BIAS_OK|bias_ok`
+  — each assembly pin label merging with the sub-block pads' internal
+  label on the *same* net), and the pad-point island census
+  (`layout/bin/pad-island-census.py` →
+  `layout/bias_core/pad-island-census.json`, pinned to the GDS's sha256)
+  probes every declared pad directly: all `VDD` pads
+  (`mirror_amp`/`startup`/`settle_flag`/`passives` + the west stub)
+  share one island, all `VSS` pads share one island, and `nkg` is one
+  shared island between its two blocks — where the pre-#69 census found
+  the rails isolated and `nkg` split in two. The run deliberately omits
+  `--pdk`, so the report's top-level `status` is `not_checked` (the
+  antenna question was never asked) and the command
   exits `4`; the structural read the item grades is `erc_status`, not
-  the exit code. **What it does not establish — read before citing this
-  row as a pass:**
+  the exit code. **What it still does not establish:**
   1. `erc.missing_tie` is **not computed**: the spec deliberately
      declares no `ties[]`. sky130's native p-type substrate has no drawn
      well layer, so a substrate (VSS) tie is structurally undeclarable
      in `klt erc` today (klayout-tools#2186's documented remaining
-     limitation), and a blanket `nwell → VDD` tie was probed on this
-     exact GDS before committing: 18/18 merged n-well polygons report
-     `erc.missing_tie`, because this analog block's wells include
-     design-legitimate non-VDD tubs (the PNP collector/base regions tie
-     to their own nodes), so the blanket check conflates by-design state
-     with the assembly's known partial-wiring — it is non-actionable
-     noise here, not evidence. The historical reason in #66's body
-     (the upstream tie-collapse bug, klayout-tools#2169) is fixed in
-     the pinned klt build and is no longer the operative reason.
-     Standing-in well-tie/supply evidence that does exist: PG pin labels
-     in the committed GDS, taps drawn on `65/44` inside all 18 merged
+     limitation; the historical tie-collapse bug klayout-tools#2169 is
+     fixed in the pinned klt build and is no longer an operative
+     reason). A blanket `nwell → VDD` tie was re-probed on this exact
+     GDS after #69's fix: exactly 2 findings remain, both on the two
+     PNP device-group blocks' collector/base tubs — this analog block's
+     wells include design-legitimate non-VDD tubs whose regions tie to
+     their own nodes by design (the #1894-blocked `ec`/`er` strap
+     question covers them, not item 11) — where the pre-#69 probe
+     reported 18 conflated findings, 0/18 reaches to `VDD`, precisely
+     because the rails then touched none of the blocks' internal
+     networks: every other n-well's taps now reach `VDD` through the
+     connected supply network itself, which is #69's landing fix at
+     work. Standing-in well-tie/supply evidence: taps drawn on `65/44`
+     inside the merged
      n-well polygons, and the three device-group sub-block LVS matches
      (`bias_core_mirror_amp`, `bias_core_settle_flag`, `bias_core_startup`)
      whose `net_correspondence` pairs layout-side `VDD`/`VSS` to
@@ -167,22 +189,10 @@ part of the claim and travel with it):
      device-level compare at sub-block scope. Zero `erc.missing_tie` in
      the committed report is an **absence of evidence, not evidence of
      absence**.
-  2. **The one-island-per-supply verdict is about the assembly-level
-     rail routes, not about power actually reaching the blocks.** The
-     ERC connectivity census run for #66 found the supply rails are
-     continuous single islands — but each block's real supply pad sits
-     in a *separate* island: the composed legs land on promo pins at
-     doubly-translated positions displaced from each block's placed
-     geometry, so the rails currently touch none of
-     `mirror_amp`/`startup`/`settle_flag`'s internal supply networks
-     (**#69** tracks the landing-frame fix; the upstream coordinate-trust
-     gap is klayout-tools#2210). The structural power-delivery question
-     at full-assembly scope is therefore *not yet verifiable-clean*
-     however clean this ERC run's findings read.
-  3. **The `/lvs` half fails:** the compound item cites item 4's own LVS
+  2. **The `/lvs` half fails:** the compound item cites item 4's own LVS
      report, and the full-cell LVS is `status: mismatch` (#64) — the
      direct cause of the row's rendered `check_failed` reason, and the
-     first thing to change when #64/#69 land (re-render this manifest
+     first thing to change when #64 lands (re-render this manifest
      and report together then: `Regenerate` above).
 
 A nearly-all-`unmet` manifest is a correct result — "the honest

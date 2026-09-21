@@ -7,7 +7,7 @@
     },
     "3": {
       "file": "layout/bias_core/drc.json",
-      "content_hash": "sha256:ff4feb965142394ffaf9de60b6fde278bd23f560790f7c8cde74274bee3e3772"
+      "content_hash": "sha256:c396d6c68db55097d8fadc902151480139ae24545ba694ff4a982b74051f7988"
     },
     "4": {
       "file": "layout/bias_core/lvs.json"
@@ -15,9 +15,11 @@
     "11": [
       {
         "file": "layout/bias_core/erc.json",
-        "content_hash": "sha256:ff4feb965142394ffaf9de60b6fde278bd23f560790f7c8cde74274bee3e3772"
+        "content_hash": "sha256:c396d6c68db55097d8fadc902151480139ae24545ba694ff4a982b74051f7988"
       },
-      { "file": "layout/bias_core/lvs.json" }
+      {
+        "file": "layout/bias_core/lvs.json"
+      }
     ]
   }
 }
