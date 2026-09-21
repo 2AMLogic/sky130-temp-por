@@ -1,0 +1,16 @@
+{
+  "block": "sky130-temp-por",
+  "kind": "analog",
+  "evidence": {
+    "1": {
+      "file": "layout/bias_core_mirror_amp/lvs.json"
+    },
+    "3": {
+      "file": "layout/bias_core/drc.json",
+      "content_hash": "sha256:ff4feb965142394ffaf9de60b6fde278bd23f560790f7c8cde74274bee3e3772"
+    },
+    "4": {
+      "file": "layout/bias_core/lvs.json"
+    }
+  }
+}
