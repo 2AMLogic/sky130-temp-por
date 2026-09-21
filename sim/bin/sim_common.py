@@ -32,16 +32,13 @@ and/or `corner-run.py` itself):
     load_corner_run()    the importlib shim that loads corner-run.py (its
                           filename has a dash, so it can't be `import`ed
                           normally)
-    parse_measurements()   extracts `.meas`-style `let`/`print` results from
-                          an ngspice log via `corner-run.py`'s `MEAS_RE`
     parse_samples()        parses the repeated `op`+`print` blocks of a
                           Monte Carlo loop's ngspice log into per-sample
                           dicts
-    write_log()            writes the append-only per-point `.log` file
-                          (header + .spiceinit + deck + ngspice output),
-                          `name`-keyed
-    render_log()            the shared tail-formatting skeleton underneath
-                          every `write_log()`
+    render_log()            the shared `.log` tail-formatting skeleton,
+                          called directly by both bespoke scripts (inline
+                          in `run_op_branch.py`; from inside
+                          `run_pnp_mismatch.py`'s own local `write_log()`)
     render_record_id_experiment() the `Record ID` + `Experiment` lines
                           shared verbatim across every bespoke script's
                           (and `corner-run.py`'s) `render_record()`
@@ -73,8 +70,6 @@ from pathlib import Path
 from types import ModuleType
 
 BIN_DIR = Path(__file__).resolve().parent
-SIM_DIR = BIN_DIR.parent
-SPICEINIT_FILE = SIM_DIR / "spiceinit"
 
 
 @dataclass(frozen=True)
@@ -220,27 +215,6 @@ def load_corner_run() -> ModuleType:
     return module
 
 
-_cr_module: ModuleType | None = None
-
-
-def _cr() -> ModuleType:
-    """Lazily load+cache corner-run.py, for `parse_measurements()`'s `MEAS_RE`.
-
-    Cached at module scope so repeated `parse_measurements()` calls (e.g. once
-    per PVT corner in a sweep) don't re-exec corner-run.py's module body each
-    time.
-    """
-    global _cr_module
-    if _cr_module is None:
-        _cr_module = load_corner_run()
-    return _cr_module
-
-
-def parse_measurements(log: str) -> dict[str, float]:
-    """Extract `meas_<name> = <value>` results from an ngspice log."""
-    return _cr().parse_measurements(log)
-
-
 _PRINT_LINE = re.compile(r"^([A-Za-z_][A-Za-z0-9_]*)\s*=\s*(-?[0-9.]+(?:[eE][-+]?[0-9]+)?)$")
 
 
@@ -311,31 +285,6 @@ def render_log(header_lines, pdk, rc, timed_out, stamp, sections, raw) -> str:
         lines += [f"# ==== {label} ====", *[f"| {ln}" for ln in text.splitlines()], ""]
     lines += ["# ==== ngspice stdout+stderr ====", raw.rstrip(), ""]
     return "\n".join(lines)
-
-
-def write_log(
-    corners_dir: Path,
-    name: str,
-    record_id: str,
-    pdk,
-    stamp,
-    deck: str,
-    raw: str,
-    rc: int,
-    timed_out: bool,
-) -> Path:
-    """Write the append-only per-point `.log` file, return its `Path`.
-
-    Header + exact `.spiceinit` + exact deck + raw ngspice stdout/stderr,
-    `name`-keyed.
-    """
-    corners_dir.mkdir(parents=True, exist_ok=True)
-    path = corners_dir / f"{name}.log"
-    init_text = SPICEINIT_FILE.read_text()
-    sections = [(".spiceinit (exact)", init_text), ("deck (exact input given to ngspice)", deck)]
-    header = [f"# point: {name}", f"# record: {record_id}"]
-    path.write_text(render_log(header, pdk, rc, timed_out, stamp, sections, raw))
-    return path
 
 
 def mean(values: list[float]) -> float:
