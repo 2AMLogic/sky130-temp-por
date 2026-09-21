@@ -909,6 +909,22 @@ in `defaults/scripts/tests/lib/live-state-sandbox.sh`, whose
 `live_host_leak_snapshot` / `live_host_leak_assert_unchanged` pair
 `run-ci-suites.sh` wraps around every suite it runs.
 
+The dispatcher also sets one **build-environment** default (#8456):
+`CARGO_INCREMENTAL=0`, for every spawned worker on every runtime adapter —
+native harnesses and legacy shell adapters alike, containerized dispatch
+included (`spawn-claude.sh`'s containment env exports it alongside
+`CARGO_TARGET_DIR`; `spawn-codex.sh`'s session-exec wraps the CLI in
+`docker exec -e CARGO_INCREMENTAL=0`). Unlike the two variables above it is
+**unconditional**, not `${VAR:-default}`: an incrementally-compiled crate is
+non-cacheable by sccache, and cargo keys incremental session state by the
+crate's absolute source path, so on a shared-`target-dir` host it is orphaned
+disk the moment a worktree goes away (213 GB / 6,402 session dirs on one fleet
+host) — an inherited `CARGO_INCREMENTAL=1` would silently re-enable both.
+Spawn-time only: an operator's interactive shell is unaffected, and a worker
+can still opt a single command back in with an inline `CARGO_INCREMENTAL=1
+cargo …` prefix. Full rationale:
+[`build-gate.md` → Worker builds run with `CARGO_INCREMENTAL=0`](build-gate.md).
+
 ### Adapter observability markers
 
 Daemon-compatible runners emit a small, secret-free contract on stderr:
@@ -1263,6 +1279,33 @@ name host filesystem paths (`LOOM_PI_BIN`, `LOOM_OPENCODE_BIN`, `LOOM_DAEMON_BIN
 …) are deliberately *not* forwarded, and neither is `CLAUDE_*`: a native
 container has no business holding a Claude token, and the Claude token pool is
 not mounted into it at all.
+
+**Known limitation: file-path credentials are not mounted (#8454).** The
+by-name forwarding above assumes a credential's VALUE is the secret itself —
+correct for every API-key profile that ships bundled today. It is wrong for a
+credential whose value names a HOST FILE the provider's SDK then reads: the
+two `example-*` templates (`REPLACE_WITH_*` model IDs, so neither runs as-is)
+declare exactly that shape —
+
+- `example-vertex`'s `GOOGLE_APPLICATION_CREDENTIALS` is a path to a
+  service-account JSON file.
+- `example-bedrock`'s `AWS_PROFILE` is a profile name resolved against
+  `~/.aws/credentials`.
+
+`-e VAR` sets the variable correctly inside the container, but `extra_mounts`
+(`containment.rs`) mounts only the workspace, `~/.gitconfig`, `~/.config/gh`,
+an out-of-workspace log directory, and an out-of-workspace
+`CARGO_TARGET_DIR` — never the file such a variable points at (or, for
+`AWS_PROFILE`, the fixed `~/.aws/credentials` its *value* does not even name
+directly). The failure inside the container reads as a provider auth error,
+not a missing mount, which is confusing to debug from that vantage point.
+This is deliberately documentation, not a `docker_command`-time detector:
+`GOOGLE_APPLICATION_CREDENTIALS`'s value is a literal path, but
+`AWS_PROFILE`'s is an opaque name that only *indirectly* requires a host
+file at a fixed, provider-specific location — a generic check that only
+catches the first shape would give false confidence that both are handled.
+Copying either template today means either adding a matching bind mount by
+hand (extending `extra_mounts`) or running that profile uncontained.
 
 **Resource limits and teardown** are inherited from #7430's shape, not
 reinvented: `--cpus` resolves `LOOM_SWEEP_CONTAINER_CPUS` → `runtimes.containment.cpus`
