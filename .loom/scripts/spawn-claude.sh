@@ -597,11 +597,15 @@ fi
 # finish before the daemon exits, so the orphan case above is a hard-stop
 # fallback, not the common path. Reconciling a still-running orphaned
 # container after a daemon restart (`SweepRegistry::reconstruct`'s
-# container-recognition extension) and teaching `cancel_sweep` to `docker
-# stop`/`docker rm` a containerized sweep it explicitly cancels are real,
-# named Phase 3 obligations ADR-0017 defers past this issue's own scope note
-# ("only add the dispatch mode itself") — tracked as a follow-up rather than
-# silently assumed done.
+# container-recognition extension) remains a real, named Phase 3 obligation
+# ADR-0017 defers past this issue's own scope note ("only add the dispatch
+# mode itself") — tracked as a follow-up rather than silently assumed done.
+# Teaching `cancel_sweep` (and every watchdog/deadline-driven cancel, which
+# compose the same begin/finish pair) to stop the container LANDED in #8435:
+# the daemon's cancellation path label-identifies this container via
+# `loom.sweep.issue=<N>` + `loom.dispatch=container` (the labels below) and
+# issues `docker stop --time <grace>` then `docker kill` on expiry, so a
+# cancelled containerized sweep no longer leaks its container.
 #
 # Build-cache placement (MOUNT-CONTRACT.md §4, issue #6013/#6014): a
 # container that mounts no build-cache path gets a fresh, empty `target/`
@@ -779,7 +783,7 @@ if [[ "$CONTAINMENT_ENABLED" == "1" ]]; then
     [[ -n "$_containment_cpus" ]] && _containment_limit_flags+=(--cpus "$_containment_cpus")
     [[ -n "$_containment_memory" ]] && _containment_limit_flags+=(--memory "$_containment_memory")
 
-    _containment_labels=(--label "loom.sweep=1" --label "loom.dispatch=container")
+    _containment_labels=(--label "loom.sweep=1" --label "loom.dispatch=container" --label "loom.containment=claude-ephemeral")
     [[ -n "${LOOM_SWEEP_CLAIM_OWNED:-}" ]] && _containment_labels+=(--label "loom.sweep.issue=${LOOM_SWEEP_CLAIM_OWNED}")
     [[ -n "$_containment_cpus" ]] && _containment_labels+=(--label "loom.dispatch.cpus=${_containment_cpus}")
     [[ -n "$_containment_memory" ]] && _containment_labels+=(--label "loom.dispatch.memory=${_containment_memory}")
@@ -791,8 +795,14 @@ if [[ "$CONTAINMENT_ENABLED" == "1" ]]; then
     # `loom-daemon status`/health output — see
     # `sweep_registry::containment_signal::parse_containment_after`. `none`
     # (not an empty field) marks an intentionally-unbounded axis so the
-    # parser can always find both `cpus=`/`memory=` tokens.
-    echo "# LOOM_DISPATCH_MODE mode=container image=${_containment_image} cpus=${_containment_cpus:-none} memory=${_containment_memory:-none}" >&2
+    # parser can always find both `cpus=`/`memory=` tokens. The trailing
+    # `containment=` token (issue #8403) names the container SHAPE, so a
+    # reader can tell this per-sweep Claude container apart from a native
+    # harness's (`containment=native-ephemeral`, written by the Rust
+    # `worker_spawn::containment` dispatch) without inspecting the image name.
+    # It is APPENDED, never inserted: every existing parser and test asserts
+    # on the prefix through `memory=`, and this keeps all of them valid.
+    echo "# LOOM_DISPATCH_MODE mode=container image=${_containment_image} cpus=${_containment_cpus:-none} memory=${_containment_memory:-none} containment=claude-ephemeral" >&2
     # Retained for backward compatibility with anything already grepping the
     # pre-#7430 marker text.
     echo "# LOOM_CONTAINMENT_ENABLED image=${_containment_image}" >&2
