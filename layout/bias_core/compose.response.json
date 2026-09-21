@@ -11,9 +11,9 @@
   "dbu_um": 0.001,
   "bbox_um": {
     "x0": -104.0,
-    "y0": -100.0,
-    "x1": 10940.99,
-    "y1": 265.17
+    "y0": -50.0,
+    "x1": 5533.860000000001,
+    "y1": 165.17000000000002
   },
   "ports": [
     {
@@ -52,7 +52,7 @@
         "datatype": 20
       },
       "x_um": 58.63,
-      "y_um": 242.97,
+      "y_um": 142.97,
       "width_um": 40.0,
       "direction_deg": 0,
       "block": "mirror_amp",
@@ -66,7 +66,7 @@
         "datatype": 20
       },
       "x_um": 13.629999999999999,
-      "y_um": 226.97,
+      "y_um": 126.97,
       "width_um": 8.0,
       "direction_deg": 0,
       "block": "mirror_amp",
@@ -79,8 +79,8 @@
         "layer": 67,
         "datatype": 20
       },
-      "x_um": 10893.585,
-      "y_um": 219.5,
+      "x_um": 5443.585,
+      "y_um": 119.5,
       "width_um": 0.17,
       "direction_deg": 270,
       "block": "settle_flag",
@@ -93,15 +93,17 @@
       "source": "cell",
       "generator": null,
       "cell_name": "bias_core_mirror_amp",
+      "source_path": "/Users/rwalters/GitHub/sky130-temp-por/.loom/worktrees/issue-69/layout/bias_core/../bias_core_mirror_amp/bias_core_mirror_amp.gds",
+      "source_digest": "sha256:30689c9bdcc65b4899bfb21a500fdfaed7b42a0b60d2633a9664b8257e4304d5",
       "offset_um": {
         "x": 0.0,
         "y": 100.0
       },
       "bbox_um": {
         "x0": -6.5,
-        "y0": 194.0,
+        "y0": 94.0,
         "x1": 87.84,
-        "y1": 265.17
+        "y1": 165.17000000000002
       },
       "orientation": "none"
     },
@@ -110,15 +112,17 @@
       "source": "cell",
       "generator": null,
       "cell_name": "bias_core_xq1_xqr",
+      "source_path": "/Users/rwalters/GitHub/sky130-temp-por/.loom/worktrees/issue-69/layout/bias_core/../bias_core_xq1_xqr/bias_core_xq1_xqr.gds",
+      "source_digest": "sha256:d876f13ca6df5e701d4966c7984430dceea453318373371355ca0dd2cf60f814",
       "offset_um": {
         "x": 150.0,
         "y": 100.0
       },
       "bbox_um": {
-        "x0": 299.03,
-        "y0": 199.03,
-        "x1": 309.81,
-        "y1": 204.37
+        "x0": 149.03,
+        "y0": 99.03,
+        "x1": 159.81,
+        "y1": 104.37
       },
       "orientation": "none"
     },
@@ -127,15 +131,17 @@
       "source": "cell",
       "generator": null,
       "cell_name": "bias_core_pnp8_leg",
+      "source_path": "/Users/rwalters/GitHub/sky130-temp-por/.loom/worktrees/issue-69/layout/bias_core/../bias_core_pnp8_leg/bias_core_pnp8_leg.gds",
+      "source_digest": "sha256:3d3ba6cc0934feeff3d599840928868d27f1bcf76b8207661002e6ea51906a9f",
       "offset_um": {
         "x": 200.0,
         "y": 100.0
       },
       "bbox_um": {
-        "x0": 399.03,
-        "y0": 199.03,
-        "x1": 419.05,
-        "y1": 208.17000000000002
+        "x0": 199.03,
+        "y0": 99.03,
+        "x1": 219.05,
+        "y1": 108.17
       },
       "orientation": "none"
     },
@@ -144,15 +150,17 @@
       "source": "cell",
       "generator": null,
       "cell_name": "bias_core_startup",
+      "source_path": "/Users/rwalters/GitHub/sky130-temp-por/.loom/worktrees/issue-69/layout/bias_core/../bias_core_startup/bias_core_startup.gds",
+      "source_digest": "sha256:ce2e3e301b09c546888503af2df30a109b25139ed8b82c4a73afefbf6552927b",
       "offset_um": {
         "x": 1350.0,
         "y": 100.0
       },
       "bbox_um": {
-        "x0": 2660.0,
-        "y0": 200.0,
-        "x1": 2754.04,
-        "y1": 213.17000000000002
+        "x0": 1310.0,
+        "y0": 100.0,
+        "x1": 1404.04,
+        "y1": 113.17
       },
       "orientation": "none"
     },
@@ -161,15 +169,17 @@
       "source": "cell",
       "generator": null,
       "cell_name": "bias_core_settle_flag",
+      "source_path": "/Users/rwalters/GitHub/sky130-temp-por/.loom/worktrees/issue-69/layout/bias_core/../bias_core_settle_flag/bias_core_settle_flag.gds",
+      "source_digest": "sha256:d8b81d9f19b8d681d41869f77e85d910d7287a8dea5f66afbef83b9cbcdc73f1",
       "offset_um": {
         "x": 5450.0,
         "y": 100.0
       },
       "bbox_um": {
-        "x0": 10893.5,
-        "y0": 194.0,
-        "x1": 10940.99,
-        "y1": 226.67000000000002
+        "x0": 5443.5,
+        "y0": 94.0,
+        "x1": 5490.99,
+        "y1": 126.67
       },
       "orientation": "none"
     },
@@ -178,15 +188,17 @@
       "source": "cell",
       "generator": null,
       "cell_name": "bias_core_passives",
+      "source_path": "/Users/rwalters/GitHub/sky130-temp-por/.loom/worktrees/issue-69/layout/bias_core/../bias_core_passives/bias_core_passives.gds",
+      "source_digest": "sha256:8b6feecf83bd4de83d0dcd53493f554c3be9be0c733ac3d208ee43c123507be4",
       "offset_um": {
         "x": 0.0,
         "y": -50.0
       },
       "bbox_um": {
         "x0": 0.0,
-        "y0": -100.0,
+        "y0": -50.0,
         "x1": 5533.860000000001,
-        "y1": -78.08
+        "y1": -28.08
       },
       "orientation": "none"
     },
@@ -195,6 +207,8 @@
       "source": "cell",
       "generator": null,
       "cell_name": "promo_stub",
+      "source_path": "/Users/rwalters/GitHub/sky130-temp-por/.loom/worktrees/issue-69/layout/bias_core/promo_stub.gds",
+      "source_digest": "sha256:902ff80454f309f31943b44b8a7f942a6d96817455a784cbefd7f85d019f84ab",
       "offset_um": {
         "x": -100.0,
         "y": 9.915
@@ -212,6 +226,8 @@
       "source": "cell",
       "generator": null,
       "cell_name": "promo_stub",
+      "source_path": "/Users/rwalters/GitHub/sky130-temp-por/.loom/worktrees/issue-69/layout/bias_core/promo_stub.gds",
+      "source_digest": "sha256:902ff80454f309f31943b44b8a7f942a6d96817455a784cbefd7f85d019f84ab",
       "offset_um": {
         "x": -104.0,
         "y": 13.915
@@ -251,7 +267,7 @@
         }
       ],
       "routed": true,
-      "route_length_um": 17972.420000000002,
+      "route_length_um": 6609.370000000001,
       "status": "routed",
       "legs": [
         {
@@ -265,9 +281,10 @@
               "port": "vdd"
             }
           ],
-          "routed": false,
-          "route_length_um": null,
-          "reason": "leg's drawn 0.17um metal overlaps 7.774um^2 of block 'startup''s own drawn geometry on the route layer (drawn geometry (no port of its own sits on it)) near its own port 'vdd' -- the escape from this port would draw a silent short to another net already present inside block 'startup' (issue #1527); tap a different point on the intended net, supply waypoints_um that route the approach clear of the obstruction, or route to a layer_role with a metal2/via stack instead (or configure routing.cross_block_layer_role, issue #1168)"
+          "routed": true,
+          "route_length_um": 1660.17,
+          "reason": null,
+          "channel_track": 0
         },
         {
           "pins": [
@@ -280,9 +297,10 @@
               "port": "vdd"
             }
           ],
-          "routed": false,
-          "route_length_um": null,
-          "reason": "leg's drawn 0.17um metal overlaps 0.3485um^2 of block 'settle_flag''s own drawn geometry on the route layer (drawn geometry (no port of its own sits on it)) near its own port 'vdd' -- the escape from this port would draw a silent short to another net already present inside block 'settle_flag' (issue #1527); tap a different point on the intended net, supply waypoints_um that route the approach clear of the obstruction, or route to a layer_role with a metal2/via stack instead (or configure routing.cross_block_layer_role, issue #1168)"
+          "routed": true,
+          "route_length_um": 4443.67,
+          "reason": null,
+          "channel_track": 0
         },
         {
           "pins": [
@@ -296,7 +314,7 @@
             }
           ],
           "routed": true,
-          "route_length_um": 5941.945000000001,
+          "route_length_um": 255.9450000000006,
           "reason": null,
           "channel_track": 0
         },
@@ -311,55 +329,8 @@
               "port": "CONN"
             }
           ],
-          "routed": false,
-          "route_length_um": null,
-          "reason": "backbone's 0.17um-wide drawn path crosses 0.17um through its own pin's block 'stub_VDD' -- more than that pin's own 0.085um edge margin (including 0.085um for the route's own half-width), so the route plows through, or clips the edge of, the block's interior (e.g. a same-facing port pair reaching a pin on the block's far side, crossing another pin on the way, or a connecting jog running close enough alongside the block's own edge that the drawn wire's width still overlaps it) rather than approaching the pin cleanly"
-        },
-        {
-          "pins": [
-            {
-              "block": "startup",
-              "port": "vdd"
-            },
-            {
-              "block": "stub_VDD",
-              "port": "CONN"
-            }
-          ],
           "routed": true,
-          "route_length_um": 2961.585,
-          "reason": null,
-          "channel_track": 0
-        },
-        {
-          "pins": [
-            {
-              "block": "startup",
-              "port": "vdd"
-            },
-            {
-              "block": "passives",
-              "port": "vdd"
-            }
-          ],
-          "routed": true,
-          "route_length_um": 3176.4450000000006,
-          "reason": null,
-          "channel_track": 0
-        },
-        {
-          "pins": [
-            {
-              "block": "mirror_amp",
-              "port": "vdd"
-            },
-            {
-              "block": "passives",
-              "port": "vdd"
-            }
-          ],
-          "routed": true,
-          "route_length_um": 5892.445000000001,
+          "route_length_um": 249.58499999999998,
           "reason": null,
           "channel_track": 0
         }
@@ -386,7 +357,7 @@
         }
       ],
       "routed": true,
-      "route_length_um": 14176.545,
+      "route_length_um": 6201.425,
       "status": "routed",
       "legs": [
         {
@@ -400,9 +371,10 @@
               "port": "vss"
             }
           ],
-          "routed": false,
-          "route_length_um": null,
-          "reason": "leg's drawn 0.17um metal overlaps 0.0289um^2 of block 'startup''s own drawn geometry on the route layer (drawn geometry (no port of its own sits on it)) near its own port 'vss' -- the escape from this port would draw a silent short to another net already present inside block 'startup' (issue #1527); tap a different point on the intended net, supply waypoints_um that route the approach clear of the obstruction, or route to a layer_role with a metal2/via stack instead (or configure routing.cross_block_layer_role, issue #1168)"
+          "routed": true,
+          "route_length_um": 1585.7150000000001,
+          "reason": null,
+          "channel_track": 0
         },
         {
           "pins": [
@@ -415,9 +387,10 @@
               "port": "vss"
             }
           ],
-          "routed": false,
-          "route_length_um": null,
-          "reason": "leg's drawn 0.17um metal overlaps 3.485um^2 of block 'settle_flag''s own drawn geometry on the route layer (drawn geometry (no port of its own sits on it)) near its own port 'vss' -- the escape from this port would draw a silent short to another net already present inside block 'settle_flag' (issue #1527); tap a different point on the intended net, supply waypoints_um that route the approach clear of the obstruction, or route to a layer_role with a metal2/via stack instead (or configure routing.cross_block_layer_role, issue #1168)"
+          "routed": true,
+          "route_length_um": 4397.295,
+          "reason": null,
+          "channel_track": 0
         },
         {
           "pins": [
@@ -431,39 +404,7 @@
             }
           ],
           "routed": true,
-          "route_length_um": 318.415,
-          "reason": null,
-          "channel_track": 0
-        },
-        {
-          "pins": [
-            {
-              "block": "startup",
-              "port": "vss"
-            },
-            {
-              "block": "stub_VSS",
-              "port": "CONN"
-            }
-          ],
-          "routed": true,
-          "route_length_um": 2958.13,
-          "reason": null,
-          "channel_track": 0
-        },
-        {
-          "pins": [
-            {
-              "block": "mirror_amp",
-              "port": "vss"
-            },
-            {
-              "block": "settle_flag",
-              "port": "vss"
-            }
-          ],
-          "routed": true,
-          "route_length_um": 10900.0,
+          "route_length_um": 218.415,
           "reason": null,
           "channel_track": 0
         }
@@ -482,7 +423,7 @@
         }
       ],
       "routed": true,
-      "route_length_um": 10953.17,
+      "route_length_um": 4318.83,
       "status": "routed",
       "legs": [
         {
@@ -497,7 +438,7 @@
             }
           ],
           "routed": true,
-          "route_length_um": 10953.17,
+          "route_length_um": 4318.83,
           "reason": null,
           "channel_track": 0
         }
@@ -542,5 +483,16 @@
     "matched_groups": [],
     "notes": []
   },
-  "warnings": []
+  "warnings": [],
+  "provenance": {
+    "klt_version": "0.5.0+g2b1e55e51bb8.dirty",
+    "klayout_version": "0.30.12",
+    "pdk": {
+      "name": "sky130A",
+      "source": "search root: ~/.volare",
+      "version": "open_pdks c6d73a35f524070e85faff4a6a9eef49553ebc2b"
+    },
+    "deck": null,
+    "input": null
+  }
 }
