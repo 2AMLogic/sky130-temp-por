@@ -192,7 +192,7 @@
         "Both columns rest on the same `klt erc` **supply spec** run (`docs/cli/erc.md`): a spec declaring every supply as a `nets[]` entry with `\"kind\": \"supply\"`, a stackup covering the layers the supply is routed on, and the `ties[]` declarations for the well/substrate taps. Every declared supply must resolve to exactly **one** electrical island \u2014 no `erc.unconnected_net` and no `erc.supply_short` naming it \u2014 and the run must report zero `erc.missing_tie`. Those are the rules this item grades, not the report's overall `status`: an antenna verdict or a floating-gate finding is a real defect, but it is not this item's subject and does not block it (#1994). IR-drop and EM (`klt power`) stay deliberately **outside** this item \u2014 see \"Power/IR-drop + EM evidence\" below. This item is the *structural* question (\"is the supply connected to what it powers\"), not the *analysis* question (\"how far does it droop, and does any segment exceed its EM limit\")."
       ],
       "status": "unmet",
-      "reason": "no_evidence",
+      "reason": "check_failed",
       "citation": null
     },
     {

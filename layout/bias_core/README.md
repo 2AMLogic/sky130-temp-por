@@ -31,6 +31,33 @@ tracked follow-up that completes the remaining wiring.
 `python3 layout/bin/compose-cell.py layout/bias_core/cell.json --check`
 reproduces this result byte-for-byte.
 
+**`klt erc` (T1 item 11 supply spec, issue #66): `erc_status: clean`, 0
+findings — with two scoped disclosures.** `klt erc layout/bias_core/bias_core.gds
+layout/bias_core/erc-supply-spec.json --format json` (reproduce from the
+repo root; the spec's own `_comment` block documents and justifies every
+field) reports `VDD`/`VSS` each resolving to exactly **one** continuous
+electrical island under the declared stackup — zero `erc.unconnected_net`,
+zero `erc.supply_short` — over 22 gate nets with the `active_layer` fix
+(`poly ∩ diff`) applied. The run omits `--pdk` on purpose (antenna grading
+is not item 11's subject; the top-level `status` reads `not_checked` and the
+command exits `4`), and declares no `ties[]`, so `erc.missing_tie` is *not
+computed* — the spec's `_comment` records why (sky130's native substrate
+makes a VSS tie undeclarable, and the blanket `nwell → VDD` check was
+probed on this exact GDS: 18/18 merged n-wells report findings that
+conflate by-design PNP-tub ties with the partial-wiring state —
+non-actionable, not evidence). Scoped disclosure 2 — read before treating
+the clean verdict as "power delivery verified": the one-island-per-supply
+result is about the **assembly-level rail routes**. The ERC connectivity
+census run for #66 found each block's real supply pad sits in a *separate*
+island from its rail (the composed legs land on promo pins displaced from
+each block's placed geometry by the double-translation origin, one frame
+off — so the rails currently touch none of the blocks' internal supply
+networks). [#69](https://github.com/2AMLogic/sky130-temp-por/issues/69)
+tracks the landing-frame fix; the upstream coordinate-trust gap is
+[2AMLogic/klayout-tools#2210](https://github.com/2AMLogic/klayout-tools/issues/2210).
+The graded tracker row, its reasons, and the standing-in well-tie evidence
+are documented in `manifests/README.md`'s item-11 row.
+
 ## Placement
 
 All six sub-blocks are placed as pre-existing, already-verified GDS streams

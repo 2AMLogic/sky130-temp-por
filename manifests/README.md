@@ -125,10 +125,65 @@ part of the claim and travel with it):
   the rows green is exactly the failure mode the contract names. These
   rows are the machine-honest statement "no check backs this claim", not
   statements that the testbenches or hygiene are absent.
-- **Item 11 — Power delivery (structural): `unmet` (`no_evidence`)**:
-  this repo has no `klt erc` supply spec or report — companion issue
-  **#66** tracks exactly that gap, and the row is rendered here (never
-  hidden) so the gap stays visible in the fleet roll-up.
+- **Item 11 — Power delivery (structural): `unmet` (`check_failed`)** —
+  the evidence half of this compound item now exists and is cited; the
+  row stays unmet on the LVS half. Cited: the `klt erc` supply spec and
+  report added by #66 — `layout/bias_core/erc-supply-spec.json` (layer
+  numbers resolved from the sky130A `.lyp` and cross-checked against
+  klayout-tools' curated sky130 deck; `stackup[0]` gate role plus
+  `active_layer` for the `poly ∩ diff` antenna denominator) and
+  `layout/bias_core/erc.json`, pinned to the committed GDS's
+  `sha256:ff4feb…e3772` exactly like item 3's DRC citation, with every
+  field of the committed GDS's supplies graded per the item's own rules.
+  **What the ERC run does establish:** with `VDD`/`VSS` declared
+  `kind: "supply"` (the `.subckt bias_core` interface spellings), the
+  run reports `erc_status: "clean"` — zero `erc.unconnected_net`, zero
+  `erc.supply_short` — i.e. each declared supply resolves to exactly
+  **one** continuous electrical island under the declared stackup. The
+  run deliberately omits `--pdk`, so the report's top-level `status` is
+  `not_checked` (the antenna question was never asked) and the command
+  exits `4`; the structural read the item grades is `erc_status`, not
+  the exit code. **What it does not establish — read before citing this
+  row as a pass:**
+  1. `erc.missing_tie` is **not computed**: the spec deliberately
+     declares no `ties[]`. sky130's native p-type substrate has no drawn
+     well layer, so a substrate (VSS) tie is structurally undeclarable
+     in `klt erc` today (klayout-tools#2186's documented remaining
+     limitation), and a blanket `nwell → VDD` tie was probed on this
+     exact GDS before committing: 18/18 merged n-well polygons report
+     `erc.missing_tie`, because this analog block's wells include
+     design-legitimate non-VDD tubs (the PNP collector/base regions tie
+     to their own nodes), so the blanket check conflates by-design state
+     with the assembly's known partial-wiring — it is non-actionable
+     noise here, not evidence. The historical reason in #66's body
+     (the upstream tie-collapse bug, klayout-tools#2169) is fixed in
+     the pinned klt build and is no longer the operative reason.
+     Standing-in well-tie/supply evidence that does exist: PG pin labels
+     in the committed GDS, taps drawn on `65/44` inside all 18 merged
+     n-well polygons, and the three device-group sub-block LVS matches
+     (`bias_core_mirror_amp`, `bias_core_settle_flag`, `bias_core_startup`)
+     whose `net_correspondence` pairs layout-side `VDD`/`VSS` to
+     reference-side supply pins — the supplies were part of a passing
+     device-level compare at sub-block scope. Zero `erc.missing_tie` in
+     the committed report is an **absence of evidence, not evidence of
+     absence**.
+  2. **The one-island-per-supply verdict is about the assembly-level
+     rail routes, not about power actually reaching the blocks.** The
+     ERC connectivity census run for #66 found the supply rails are
+     continuous single islands — but each block's real supply pad sits
+     in a *separate* island: the composed legs land on promo pins at
+     doubly-translated positions displaced from each block's placed
+     geometry, so the rails currently touch none of
+     `mirror_amp`/`startup`/`settle_flag`'s internal supply networks
+     (**#69** tracks the landing-frame fix; the upstream coordinate-trust
+     gap is klayout-tools#2210). The structural power-delivery question
+     at full-assembly scope is therefore *not yet verifiable-clean*
+     however clean this ERC run's findings read.
+  3. **The `/lvs` half fails:** the compound item cites item 4's own LVS
+     report, and the full-cell LVS is `status: mismatch` (#64) — the
+     direct cause of the row's rendered `check_failed` reason, and the
+     first thing to change when #64/#69 land (re-render this manifest
+     and report together then: `Regenerate` above).
 
 A nearly-all-`unmet` manifest is a correct result — "the honest
 machine-readable statement of the gap" — and that is what these rows are.
