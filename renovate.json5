@@ -64,7 +64,8 @@
   "prConcurrentLimit": 5,
 
   // Add release notes and changelogs to PR body for agent review
-  "fetchReleaseNotes": true,
+  // (fetchChangeLogs replaces the deprecated fetchReleaseNotes key)
+  "fetchChangeLogs": "pr",
 
   // --- Package grouping ---
 
