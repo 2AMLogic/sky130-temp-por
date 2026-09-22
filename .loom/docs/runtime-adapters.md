@@ -8,10 +8,13 @@ so that Loom can drive Claude Code, OpenAI Codex CLI, Amp, oh-my-pi (omp), and
 future tools through **one** interface instead of a growing pile of per-runtime
 special cases.
 
-Pi and OpenCode have experimental **native Rust** adapters behind the same
-worker entry point. Harness selection, model profiles and trial evidence are
-separate: see [Native harness and model trials](runtime-model-trials.md).
-Guarded issue roles and sweeps: [native guardrail parity](guardrail-parity-native.md).
+Pi, OpenCode and Kimi Code CLI have experimental **native Rust** adapters
+behind the same worker entry point. Harness selection, model profiles and
+trial evidence are separate: see [Native harness and model
+trials](runtime-model-trials.md). Guarded issue roles and sweeps: [native
+guardrail parity](guardrail-parity-native.md) — Kimi is not covered there yet:
+it has no guarded `loom_*` tool binding (#8562), so it is admitted only for
+roles with no `runtimeRequirements`.
 
 > **Path convention.** This doc lives at `defaults/docs/runtime-adapters.md` in
 > the Loom source repo and cites `defaults/` paths throughout. A consumer
@@ -72,6 +75,7 @@ them but does not decide them.
 | Claude Code | `defaults/scripts/spawn-claude.sh` | **1** (default) | n/a — Loom's guards *are* the Claude implementation | the whole existing suite | Zero-regression default; no `LOOM_RUNTIME` needed. |
 | OpenAI Codex CLI | `defaults/scripts/spawn-codex.sh` | **2** | [`guardrail-parity-codex.md`](guardrail-parity-codex.md) | `codex-adapter-smoke` in `.github/workflows/ci.yml` (mocked; no live calls) | **Shipped** by epic #4167 Phase 2 (#4468), ported from the gpeyton fork. Requires Codex CLI ≥ 0.146.0. Capability manifest `defaults/runtimes/codex.json` declares `worktreeIsolation: partial`, so `check-runtime-capabilities.sh` fails Builder+codex closed while Judge+codex passes. |
 | Amp, oh-my-pi (omp), … | — | — | — | — | Not started (tier-2 candidates; still need a parity doc + CI leg). |
+| Pi, OpenCode, Kimi Code CLI | native Rust, `loom-daemon/src/worker_spawn/harness.rs` | **2** | [`guardrail-parity-native.md`](guardrail-parity-native.md) (Pi/OpenCode only — Kimi is not covered) | none dedicated (`worker_spawn.rs`/`worker_spawn_kimi.rs` integration tests) | Setup, model profiles and live-canary evidence live in [`runtime-model-trials.md`](runtime-model-trials.md), not here. Kimi (#8561) declares every `defaults/runtimes/kimi.json` capability `"no"` — no guarded `loom_*` tool binding exists yet (#8562) — so it is admitted only for roles with no `runtimeRequirements` (Curator, Guide, Auditor); Pi/OpenCode's `worktreeIsolation`/`loomControl` are `"yes"`. |
 | Aider ([aider.chat](https://aider.chat)) | `defaults/scripts/spawn-aider.sh` (thin wrapper over `defaults/scripts/spawn-generic.sh`) | **3** (generic passthrough, unverified) | n/a — tier-3 does not require one | none (no CI leg is required for tier-3; the checker assertion below is a plain `test-*.sh`, not an adapter-admission gate) | **Worked example** for issue #4780 — proves the tier-3 mechanism end-to-end, not a vetted integration. Capability manifest `defaults/runtimes/aider.json` declares every capability `"no"`, including `worktreeIsolation: "no"` EXPLICITLY (not `"partial"`). |
 
 ### Tier 3: generic passthrough
@@ -391,6 +395,21 @@ reauthenticates, quarantines, and purges named Codex profiles, while automatic
 ranking/rotation remains deferred to #4493. The lifecycle CLI treats
 `auth.json` as opaque mutable canonical state, enforces `0700`/`0600`
 permissions, and emits only bounded secret-free diagnostics.
+
+**Kimi (#8563).** Like Pi/OpenCode, Kimi has no transcript this layer reads —
+usage accounting for its Moonshot-platform API-key route rides the same
+`api_keys_pool` signals every other API-key provider uses: the `# LOOM_LAUNCH`
+record's `credentialProvider`/`credentialAccount` identify the session, and
+`api_keys_pool::ingest` classifies the retained launch log after the fact
+(`classify.rs`'s two live-captured Kimi rows — a no-credential failure and an
+exhausted in-process rate-limit ladder, see
+[`token-pool.md` § Kimi's Moonshot-platform API-key route](token-pool.md#kimis-moonshot-platform-api-key-route-8563))
+to decide whether to bad-mark the account. No per-message token/model stream
+exists for this route, so cost fidelity is the aggregate-log tier. Kimi's
+**other** credential shape — the OAuth subscription (`kimi login`, a
+per-account `KIMI_CODE_HOME`) — has no usage-accounting story yet at all; it
+needs its own account-lifecycle foundation first (an `AccountProvider::Kimi`
+analogous to the Codex paragraph above), tracked as follow-up #8628.
 
 ### 5. Instruction format
 
@@ -1114,6 +1133,16 @@ ids and with completely different economics, so `modelProfile` is what
 distinguishes them. A bare runtime name is shorthand for "that runtime with
 whatever profile it would have chosen anyway".
 
+> **A `modelProfile` currently gates but does not pin.** Availability is read
+> against exactly the named profile's provider and credential pool, but nothing
+> carries the name to the launched child — the launch resolves whatever profile
+> that runtime would have used anyway, so for two profiles on *different*
+> providers the tap that ran is not the tap whose pool was checked. Bare-runtime
+> entries are unaffected (their profile is that default resolution). Pinning it
+> needs `LOOM_MODEL_PROFILE` set at the same launch sites #8599 has to touch, so
+> it is tracked behind that in #8602; until it lands, prefer bare entries unless
+> the named profile *is* the runtime's default.
+
 **Resolution, per launch**: walk the list and take the first tap that is
 **(a)** admitted for the role and **(b)** has a spawnable credential right now.
 `rolePreference.<role>` outranks `preference`; an empty list means "unset, fall
@@ -1143,9 +1172,9 @@ process that wrote the change. Use `rolePreference.judge` to keep Judge on a
 different tap from the one that built it; prefer that over relying on the
 fleet-wide order.
 
-**One sweep, one runtime.** Fall-through is decided at **dispatch**, never
-mid-sweep (see `guardrail-parity-native.md`). A sweep that exhausts its runtime
-in flight fails and is re-dispatched, where it re-resolves. Hysteresis follows
+**One sweep, one runtime.** A sweep uses one runtime throughout, so
+fall-through is decided at **dispatch**, never mid-sweep. A sweep that exhausts
+its runtime in flight fails and is re-dispatched, where it re-resolves. Hysteresis follows
 for free: once a higher-preference pool recovers, new spawns return to it while
 in-flight backstop sweeps finish where they are. No pinning mechanism exists or
 is needed.
@@ -1162,12 +1191,118 @@ crash-signal reader takes the entire rest of that line as the runtime name, so
 appending to it would report a runtime called `"opencode tier=2"`. "How much work
 is going to the backstop" reduces to counting markers whose `tier` is not `0`.
 
-> **Status.** As of this writing the resolver, its shared credential-availability
-> mapping, and config parsing/validation are implemented
-> (`loom-daemon/src/runtime_preference/`), but **dispatch is not yet wired to
-> it** — neither the work finder nor the role runner calls it, so no launch
-> changes until the wiring lands. The metered-tier concurrency ceiling is
-> likewise still to come. See the follow-up issues on #8436.
+Today each dispatch seam emits that marker to the **daemon log**
+(`loom-daemon logs`), which is where all three resolve. Writing it into the
+per-sweep launch record, beside that record's own `# LOOM_RUNTIME_RESOLVED`
+line, additionally requires teaching `crash_signals::log_has_progress` not to
+read it as child progress — tracked in #8599 rather than done half-way.
+
+### Bounding the metered backstop tier (issue #8555)
+
+The backstop tap is the only entry in a preference list with a **marginal
+cost**. Every other tap is flat rate: a Claude subscription, a Codex seat —
+overusing one costs nothing extra, it exhausts on a plan limit and recovers on a
+clock, which is exactly what the availability mapping above already models. A
+metered pay-per-token endpoint has the opposite failure mode: it effectively
+never exhausts, so nothing stops it. An all-day Claude outage would route the
+*entire* backlog through it, unnoticed, because falling through is precisely
+what the resolver is supposed to do.
+
+`runtimes.backstopCeiling` is the admission bound that stops that:
+
+```jsonc
+{
+  "runtimes": {
+    "preference": ["claude", "codex", {"runtime": "opencode", "modelProfile": "zai-metered"}],
+    "backstopCeiling": {
+      "maxConcurrent": 2,       // most concurrent metered dispatches this HOST may hold
+      "appliesFrom": 2,         // first tier the ceiling governs (default 1)
+      "minComplexity": "complex" // optional: least complexity tier allowed onto the metered tap
+    }
+  }
+}
+```
+
+| Key | Meaning |
+|---|---|
+| `maxConcurrent` | Most concurrent governed dispatches this host may hold. Absent ⇒ unbounded (no state is read or written). `0` switches the metered tier off without editing the preference list. Overridden by `LOOM_BACKSTOP_MAX_CONCURRENT` (`env > config > default`). |
+| `appliesFrom` | 0-based index of the first tier the ceiling governs; default `1`, i.e. every tap the walk *falls through* to. A fleet whose tier 1 is another flat-rate subscription raises this so the bound starts at the tier that actually costs per token. `0` is rejected — tier 0 is the subscription the fleet already pays for, and bounding it inverts the feature's purpose. |
+| `minComplexity` | `mechanical` \| `routine` \| `complex`. Work below this stratum never reaches a governed tap. An unmarked issue counts as `routine`, the daemon's existing default for a missing `<!-- loom:complexity= -->` marker. Absent ⇒ every tier is eligible. |
+
+| Guarantee | Meaning |
+|---|---|
+| **A resource bound, never an approval gate** | A refusal is recorded as a skip and the walk continues to the next tap, failing closed if nothing below qualifies. Nothing waits on a human and nothing is queued for approval — it behaves *exactly* as an unavailable tap. |
+| **Absent key ⇒ no behaviour change** | With no `backstopCeiling` and no env override, no directory is created, no lease is written, and resolution is byte-identical to a build without the bound. |
+| **A higher tap that recovers still wins** | The ceiling governs only the tiers it is configured for. While tier 0 can serve the work it is chosen without the ceiling being consulted at all, so a pinned backstop never throttles subscription capacity. |
+| **A spend ceiling, not a cooldown** | Deliberately *not* modelled as a bad-mark/cooldown (the shape the token pools use): a cooldown says "temporarily unusable, will heal", which is false of a metered endpoint. This says "this host may hold at most N metered dispatches at once", which is true of one. |
+| **Fails closed on an unknown count** | Unlike `api_keys_pool::inflight`'s degrade-open politeness throttle, an unreadable/unwritable lease store yields `ceiling-unknown` and a skip. An unknown metered-concurrency count must never read as "there is room" — guessing wrong costs real money, while the fallback costs only throughput. |
+| **Malformed config fails closed** | An unknown key, a wrong type, a bad tier name, or `appliesFrom: 0` is an error surfaced by `loom-daemon validate` and by the launch itself — never a silently dropped bound. |
+
+**Per-host, so the state is machine-wide.** Leases live at
+`~/.loom/leases/backstop/` (override: `LOOM_BACKSTOP_LEASE_DIR`), not under a
+repo's `.loom/`: a host runs several workspaces and one ceiling governs all of
+them. A **fleet-wide** ceiling over a metered key shared *between* hosts is
+explicitly out of scope — per-host state cannot govern a shared credential; that
+needs provider-side budget controls (#8556).
+
+**Lease lifecycle.** Selecting a governed tap takes a *reservation* under a
+`mkdir` control lock (so two concurrent dispatches cannot both admit at
+`limit - 1`), owned by the resolving process and short-lived. The launch path
+then calls `Reservation::attach(pid)` with the spawned worker's PID, converting
+it into a lease that lives exactly as long as that process (age-backstopped at 4
+hours). An unattached reservation is released **on drop**, so resolving without
+launching — or panicking between the two — cannot leak a slot. Dead owners'
+leases are reaped lazily by the next count; no explicit release step is needed
+when a sweep dies.
+
+The daemon *selects* and then spawns a child that outlives the selection, so
+those two steps are different places in the code. The reservation is carried
+**by value** between them, on the value that already crosses that seam — the
+`PreparedIssueDispatch` box on the sweep path, the role tick's own local on the
+role-runner path — and attached at the spawn site
+(`runtime_preference::handoff::attach`). Nothing is stored in shared state, so
+no dispatch can lose or delete another's slot, whichever thread each happens to
+run on: the IPC handler `.await`s a `spawn_blocking` poll between the two
+steps, and the reaper prepares a whole batch of pending resumes before
+finishing any of them. Dropping the carried value instead of attaching it
+releases the slot, so a dispatch that is refused or fails to spawn between
+resolution and launch holds nothing.
+
+**Probing does not consume.** `work_finder::pool_preflight` re-resolves the list
+every tick for every workspace purely to decide whether to hold dispatch. That
+path resolves with **probe** intent: it reports the ceiling honestly (a host at
+its metered ceiling with a dry Claude pool really does have nothing to dispatch
+onto) but takes no slot, creates no store, and writes no lease. Only a real
+launch reserves — otherwise a tick loop would churn a lease per root per tick
+and, far worse, could transiently occupy the very slot the dispatch it was asked
+about was about to claim.
+
+**Observability.** A launch that consumed a slot appends it to the same
+preference marker that records the fall-through it paid for:
+
+```text
+# LOOM_RUNTIME_PREFERENCE order=claude,opencode tier=1 tap=opencode skipped=claude:unavailable(claude_tokens: 0/21 spawnable) source=preference backstop=1/2
+```
+
+A refused one is recorded on the skipped tap, with a kind that distinguishes the
+three operator responses: `ceiling-at-capacity` (working as designed),
+`ceiling-ineligible` (a policy verdict on this dispatch), `ceiling-unknown` (a
+host fault to repair before the metered tier can be used again).
+
+> **Status.** The resolver, its shared credential-availability mapping, config
+> parsing/validation, the dispatch wiring (#8554), and this per-host backstop
+> ceiling (#8555) are all implemented, so a configured `runtimes.preference`
+> changes real launches at three seams: sweep dispatch resolves the sweep's
+> runtime through the list (`sweep_registry::dispatch`), the work finder's #7708
+> pool-exhaustion hold arms only when the *whole* list is unavailable
+> (`work_finder::pool_preflight`), and a role tick's runtime is chosen by the
+> list with the #6201/#8408 pre-spawn gate kept as its fail-closed reporter
+> (`role_runner::runtime_preflight`). Sweep dispatch and role ticks both attach
+> the ceiling's slot to the child they spawn. Still to come: carrying the chosen
+> tier into the `role_tick.outcome`/launch-record surfaces (#8599 — today the
+> chosen tier is logged by the daemon, not written into the per-sweep log), and
+> the `modelProfile` launch pin noted above (#8602), which shares those same
+> sites. See also the other follow-up issues on #8436.
 
 ### Adding a runtime adapter
 
@@ -1291,8 +1426,9 @@ install; see [`docker/native/README.md`](https://github.com/rjwalters/loom/blob/
 
 ### Native-harness ephemeral containment (issue #8403, epic #6896 Phase 3)
 
-Native-harness sweeps (Pi, OpenCode — admitted by #8363/#8400) run **uncontained
-on the host by default**, exactly as before. Opt in per workspace:
+Native-harness sweeps (Pi, OpenCode — admitted by #8363/#8400; Kimi — #8561,
+contained by #8565) run **uncontained on the host by default**, exactly as
+before. Opt in per workspace:
 
 ```json
 {
@@ -1355,12 +1491,27 @@ writable layer:
 | `XDG_CONFIG_HOME` | XDG-honouring config, including `gh`'s (bind-mounted *into* this path, not the host's `~/.config/gh`, so `gh` can still find it) |
 | `XDG_CACHE_HOME`, `XDG_STATE_HOME` | the remaining XDG bases, relocated for completeness rather than left to leak |
 | `OPENCODE_CONFIG_DIR` | the injected deny-by-default `loom-worker` agent config; `OPENCODE_CONFIG_CONTENT` itself is unchanged |
+| `KIMI_CODE_HOME` | Kimi's **whole** state in one variable (#8565) — config, `mcp.json`, session store, `logs/kimi-code.log`, credential store, plugins, and the `rg`/`fd` binaries it downloads into `$KIMI_CODE_HOME/bin/` on first use. Unset it is `~/.kimi-code`, i.e. one shared home for every worker; the image bakes no value, so this assignment is the only thing standing between N Kimi workers and one session store. A *guarded* launch relocates it again, into `native_tools::provision`'s 0700 directory under the per-launch `LOOM_NATIVE_TOOLS_DIR` below — resolving inside the container, as `OPENCODE_CONFIG_DIR` does |
 | `LOOM_NATIVE_TOOLS_DIR` | the generated guarded-tool bindings (`native_tools::provision`), which otherwise default to the *shared*, parity-mounted `<workspace>/.loom/native-tools` |
 
 Two concurrent contained workers are therefore disjoint twice over: different
 containers, **and** different paths within them. The per-launch id is not
 redundant — it makes the disjointness inspectable (`docker exec <id> ls
 /home/loom/.loom-native`) rather than merely implied by the container boundary.
+
+A name in that table is **never** forwarded by the by-name passthrough below,
+even when a model profile's `credentialTargets` names one: `-e NAME` with no
+`=value` is read from the *host* and, coming later on the command line, would
+beat the assignment that established the per-launch path. The exclusion is
+derived from the same `ISOLATED_DIRS` constant that emits the assignments, so
+the two cannot drift.
+
+The image also bakes `OPENCODE_DISABLE_AUTOUPDATE=1`,
+`KIMI_CODE_NO_AUTO_UPDATE=1` and `KIMI_DISABLE_TELEMETRY=1`, and the dispatch
+passes the same three at `docker run` time — the first two are the runtime half
+of the image's version pins (a pinned install is worth nothing if the CLI
+updates itself on first launch), the third keeps a dispatched worker from
+phoning home.
 
 **Credential shape.** The selected model profile's `credentialEnv` and its
 per-harness `credentialTargets` entry are forwarded **by name only** (`-e VAR`,
@@ -1434,7 +1585,14 @@ check that tests what the *CLI* writes, not only what the dispatcher passes),
 and **#8435** is `cancel_sweep`'s container teardown, which is owed to the
 *Claude* ephemeral path identically (killing the `docker run` client does not
 stop the container dockerd owns) and so is fixed once for both shapes rather
-than branched per runtime.
+than branched per runtime. #8434 stays open and Pi/OpenCode-scoped — Kimi got
+its own live containment run when Docker happened to be available in the
+builder worktree that added it (#8565):
+[`kimi-containment-verification-2026-09-22.md`](kimi-containment-verification-2026-09-22.md)
+covers the image build, the version-pin assertions, two-worker
+disjointness, and the writable-layer credential scan, but — like #8434's own
+still-open canary item — **not** a credentialed functional run (no Kimi
+account was available either).
 
 ### Containerized dispatch mode for Claude sweeps (issue #7429, epic #6896 Phase 3)
 
