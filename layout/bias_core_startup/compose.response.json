@@ -96,6 +96,8 @@
       "source": "generator_report",
       "generator": "mos_array",
       "cell_name": "kpd",
+      "source_path": "gen/kpd.gds",
+      "source_digest": "sha256:e2b55694d3247016a596fb5bf56feaf40f5879c93a68a3bd385ad636ad81d185",
       "offset_um": {
         "x": 0.0,
         "y": 0.0
@@ -113,6 +115,8 @@
       "source": "generator_report",
       "generator": "mos_array",
       "cell_name": "ks4",
+      "source_path": "gen/ks4.gds",
+      "source_digest": "sha256:430cbc8029f265f56e3c7f5e30a33d7cf4c2c9218cac1c34c15529b7024e5477",
       "offset_um": {
         "x": 5.84,
         "y": 3.5
@@ -130,6 +134,8 @@
       "source": "generator_report",
       "generator": "mos_array",
       "cell_name": "ks3",
+      "source_path": "gen/ks3.gds",
+      "source_digest": "sha256:ea6f2f2d2d9c2a9086b0f3d54e84811d0090746aa1b421fdb34a0d39364cd304",
       "offset_um": {
         "x": 15.68,
         "y": 3.5
@@ -147,6 +153,8 @@
       "source": "generator_report",
       "generator": "mos_array",
       "cell_name": "ks2",
+      "source_path": "gen/ks2.gds",
+      "source_digest": "sha256:c913437ad22d61c3763ed553713b0b1b5fd905ca068cf081645c4c001c5315f0",
       "offset_um": {
         "x": 25.52,
         "y": 3.5
@@ -164,6 +172,8 @@
       "source": "generator_report",
       "generator": "mos_array",
       "cell_name": "ks1",
+      "source_path": "gen/ks1.gds",
+      "source_digest": "sha256:361538caaf0fa40c325ac75c4784c2224fc68436ffe7381dfec87fcb9707b941",
       "offset_um": {
         "x": 35.36,
         "y": 3.5
@@ -181,6 +191,8 @@
       "source": "generator_report",
       "generator": "mos_array",
       "cell_name": "ks0",
+      "source_path": "gen/ks0.gds",
+      "source_digest": "sha256:b7ea73e80f65fb1d4e11e0663bfc3f22abac720aa52f676073acd85d60a07b73",
       "offset_um": {
         "x": 45.2,
         "y": 3.5
@@ -198,6 +210,8 @@
       "source": "generator_report",
       "generator": "mos_array",
       "cell_name": "kick",
+      "source_path": "gen/kick.gds",
+      "source_digest": "sha256:d6dd7333a6afb779e21f1417740b64f81ae3826e1e8bb5fa99732cd81427b73e",
       "offset_um": {
         "x": -1.0,
         "y": 3.5
@@ -215,6 +229,8 @@
       "source": "generator_report",
       "generator": "mos_array",
       "cell_name": "kan",
+      "source_path": "gen/kan.gds",
+      "source_digest": "sha256:f2050ce0b243a382df276874474faee8c9665ebf61fb0bd04329546b5619fa31",
       "offset_um": {
         "x": -14.16,
         "y": 3.0
@@ -232,6 +248,8 @@
       "source": "generator_report",
       "generator": "mos_array",
       "cell_name": "ka",
+      "source_path": "gen/ka.gds",
+      "source_digest": "sha256:bcb314ec7b373708bf3eb448156077859ad058e819f6bd8bb537acd2a1ed733e",
       "offset_um": {
         "x": -27.0,
         "y": 3.5
@@ -249,6 +267,8 @@
       "source": "generator_report",
       "generator": "guard_ring",
       "cell_name": "nwell_tap",
+      "source_path": "gen/nwell_tap.gds",
+      "source_digest": "sha256:04ccc3d928f2b2714b47cbae124c4cbd24f5106fc19210ba1a17607f5ea5ad97",
       "offset_um": {
         "x": -29.04,
         "y": 3.08
@@ -266,6 +286,8 @@
       "source": "generator_report",
       "generator": "guard_ring",
       "cell_name": "psub_tap",
+      "source_path": "gen/psub_tap.gds",
+      "source_digest": "sha256:b00a05a21af31ea3b88dafa583df9a94184c806f625a85d8b7a73376ebd1cbf3",
       "offset_um": {
         "x": -35.0,
         "y": 3.5
@@ -283,6 +305,8 @@
       "source": "cell",
       "generator": null,
       "cell_name": "promo_stub",
+      "source_path": "/home/ubuntu/GitHub/sky130-temp-por/.loom/worktrees/issue-30/layout/bias_core_startup/promo_stub.gds",
+      "source_digest": "sha256:902ff80454f309f31943b44b8a7f942a6d96817455a784cbefd7f85d019f84ab",
       "offset_um": {
         "x": -40.0,
         "y": 13.0
@@ -300,6 +324,8 @@
       "source": "cell",
       "generator": null,
       "cell_name": "promo_stub",
+      "source_path": "/home/ubuntu/GitHub/sky130-temp-por/.loom/worktrees/issue-30/layout/bias_core_startup/promo_stub.gds",
+      "source_digest": "sha256:902ff80454f309f31943b44b8a7f942a6d96817455a784cbefd7f85d019f84ab",
       "offset_um": {
         "x": -40.0,
         "y": 10.0
@@ -345,6 +371,7 @@
       "routed": true,
       "route_length_um": 120.03500000000001,
       "status": "routed",
+      "landed_on_block": true,
       "legs": [
         {
           "pins": [
@@ -360,7 +387,8 @@
           "routed": true,
           "route_length_um": 5.319999999999993,
           "reason": null,
-          "channel_track": 0
+          "channel_track": 0,
+          "landed_on_block": true
         },
         {
           "pins": [
@@ -376,7 +404,8 @@
           "routed": true,
           "route_length_um": 0.620000000000001,
           "reason": null,
-          "channel_track": 0
+          "channel_track": 0,
+          "landed_on_block": true
         },
         {
           "pins": [
@@ -392,7 +421,8 @@
           "routed": true,
           "route_length_um": 93.92000000000002,
           "reason": null,
-          "channel_track": 0
+          "channel_track": 0,
+          "landed_on_block": true
         },
         {
           "pins": [
@@ -408,7 +438,8 @@
           "routed": true,
           "route_length_um": 18.755000000000003,
           "reason": null,
-          "channel_track": 0
+          "channel_track": 0,
+          "landed_on_block": true
         },
         {
           "pins": [
@@ -424,7 +455,8 @@
           "routed": true,
           "route_length_um": 1.4199999999999973,
           "reason": null,
-          "channel_track": 0
+          "channel_track": 0,
+          "landed_on_block": true
         }
       ]
     },
@@ -447,6 +479,7 @@
       "routed": true,
       "route_length_um": 6.740000000000002,
       "status": "routed",
+      "landed_on_block": true,
       "legs": [
         {
           "pins": [
@@ -462,7 +495,8 @@
           "routed": true,
           "route_length_um": 1.4200000000000088,
           "reason": null,
-          "channel_track": 0
+          "channel_track": 0,
+          "landed_on_block": true
         },
         {
           "pins": [
@@ -478,7 +512,8 @@
           "routed": true,
           "route_length_um": 5.319999999999993,
           "reason": null,
-          "channel_track": 0
+          "channel_track": 0,
+          "landed_on_block": true
         }
       ]
     },
@@ -501,6 +536,7 @@
       "routed": true,
       "route_length_um": 6.740000000000002,
       "status": "routed",
+      "landed_on_block": true,
       "legs": [
         {
           "pins": [
@@ -516,7 +552,8 @@
           "routed": true,
           "route_length_um": 1.4200000000000017,
           "reason": null,
-          "channel_track": 0
+          "channel_track": 0,
+          "landed_on_block": true
         },
         {
           "pins": [
@@ -532,7 +569,8 @@
           "routed": true,
           "route_length_um": 5.32,
           "reason": null,
-          "channel_track": 0
+          "channel_track": 0,
+          "landed_on_block": true
         }
       ]
     },
@@ -555,6 +593,7 @@
       "routed": true,
       "route_length_um": 6.739999999999998,
       "status": "routed",
+      "landed_on_block": true,
       "legs": [
         {
           "pins": [
@@ -570,7 +609,8 @@
           "routed": true,
           "route_length_um": 1.4200000000000017,
           "reason": null,
-          "channel_track": 0
+          "channel_track": 0,
+          "landed_on_block": true
         },
         {
           "pins": [
@@ -586,7 +626,8 @@
           "routed": true,
           "route_length_um": 5.319999999999997,
           "reason": null,
-          "channel_track": 0
+          "channel_track": 0,
+          "landed_on_block": true
         }
       ]
     },
@@ -609,6 +650,7 @@
       "routed": true,
       "route_length_um": 6.74,
       "status": "routed",
+      "landed_on_block": true,
       "legs": [
         {
           "pins": [
@@ -624,7 +666,8 @@
           "routed": true,
           "route_length_um": 1.4200000000000017,
           "reason": null,
-          "channel_track": 0
+          "channel_track": 0,
+          "landed_on_block": true
         },
         {
           "pins": [
@@ -640,7 +683,8 @@
           "routed": true,
           "route_length_um": 5.3199999999999985,
           "reason": null,
-          "channel_track": 0
+          "channel_track": 0,
+          "landed_on_block": true
         }
       ]
     },
@@ -667,6 +711,7 @@
       "routed": true,
       "route_length_um": 61.755,
       "status": "routed",
+      "landed_on_block": true,
       "legs": [
         {
           "pins": [
@@ -682,7 +727,8 @@
           "routed": true,
           "route_length_um": 1.42,
           "reason": null,
-          "channel_track": 0
+          "channel_track": 0,
+          "landed_on_block": true
         },
         {
           "pins": [
@@ -698,7 +744,8 @@
           "routed": true,
           "route_length_um": 20.28,
           "reason": null,
-          "channel_track": 0
+          "channel_track": 0,
+          "landed_on_block": true
         },
         {
           "pins": [
@@ -714,7 +761,8 @@
           "routed": true,
           "route_length_um": 40.055,
           "reason": null,
-          "channel_track": 0
+          "channel_track": 0,
+          "landed_on_block": true
         }
       ]
     },
@@ -741,6 +789,7 @@
       "routed": true,
       "route_length_um": 61.68000000000001,
       "status": "routed",
+      "landed_on_block": true,
       "legs": [
         {
           "pins": [
@@ -756,7 +805,8 @@
           "routed": true,
           "route_length_um": 1.42,
           "reason": null,
-          "channel_track": 0
+          "channel_track": 0,
+          "landed_on_block": true
         },
         {
           "pins": [
@@ -787,7 +837,8 @@
           "routed": true,
           "route_length_um": 44.0,
           "reason": null,
-          "channel_track": 0
+          "channel_track": 0,
+          "landed_on_block": true
         },
         {
           "pins": [
@@ -803,7 +854,8 @@
           "routed": true,
           "route_length_um": 16.26,
           "reason": null,
-          "channel_track": 0
+          "channel_track": 0,
+          "landed_on_block": true
         }
       ]
     },
@@ -830,6 +882,7 @@
       "routed": true,
       "route_length_um": 31.180000000000003,
       "status": "routed",
+      "landed_on_block": true,
       "legs": [
         {
           "pins": [
@@ -845,7 +898,8 @@
           "routed": true,
           "route_length_um": 23.78,
           "reason": null,
-          "channel_track": 0
+          "channel_track": 0,
+          "landed_on_block": true
         },
         {
           "pins": [
@@ -861,7 +915,8 @@
           "routed": true,
           "route_length_um": 3.8200000000000003,
           "reason": null,
-          "channel_track": 0
+          "channel_track": 0,
+          "landed_on_block": true
         },
         {
           "pins": [
@@ -877,7 +932,8 @@
           "routed": true,
           "route_length_um": 3.580000000000002,
           "reason": null,
-          "channel_track": 0
+          "channel_track": 0,
+          "landed_on_block": true
         }
       ]
     }
@@ -939,5 +995,16 @@
   "warnings": [
     "block 'nwell_tap' is placed 0.00um from block 'ka' (strategy: explicit), closer than ka's own declared drc_hints.min_spacing_um of 0.40um",
     "block 'ka' is placed 0.00um from block 'nwell_tap' (strategy: explicit), closer than nwell_tap's own declared drc_hints.min_spacing_um of 0.40um"
-  ]
+  ],
+  "provenance": {
+    "klt_version": "0.6.0",
+    "klayout_version": "0.30.10",
+    "pdk": {
+      "name": "sky130A",
+      "source": "search root: ~/.volare",
+      "version": "open_pdks c6d73a35f524070e85faff4a6a9eef49553ebc2b"
+    },
+    "deck": null,
+    "input": null
+  }
 }

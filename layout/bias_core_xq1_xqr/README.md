@@ -66,40 +66,35 @@ single `bjt_array` call, as shipped) sidesteps the whole class of problem —
 `vss` never needs to leave the block it's declared on — and is the approach
 this cell.json uses.
 
-**The collector guard ring (`COLL_N`/`COLL_S`/`COLL_E`/`COLL_W`) is
-deliberately left out of `vss`'s connectivity**, for the same reason as
-`layout/bias_core_pnp8_leg/`: wiring it in never actually lands a contact on
-the diffusion-role port (`klt extract` always recovers the collector as a
-separate, unstrapped `vsubs` node despite a `routed: true`/clean-`klt drc`
-report). Filed generically:
-[`2AMLogic/klayout-tools#1894`](https://github.com/2AMLogic/klayout-tools/issues/1894).
-Dropping it from `connectivity[]`/`pins[]` avoids that failure mode; the
-diffusion region itself is still drawn (the generator's own guard ring,
-unchanged) and still extracts as one correctly-merged physical node across
-both units — only its strap to `VSS` is missing from this increment.
+**The collector guard ring's east tap (`COLL_E`) is strapped into `vss`**,
+same as `layout/bias_core_pnp8_leg/`: with the `klt 0.6.0` toolchain bump
+(carrying
+[`2AMLogic/klayout-tools#2312`](https://github.com/2AMLogic/klayout-tools/issues/2312)'s
+fix, PR [#2320](https://github.com/2AMLogic/klayout-tools/pull/2320)), a
+`{"block": "array", "port": "COLL_E"}` pin in `vss`'s `connectivity[]` now
+lands a real contact and `klt extract` merges the collector into `vss` —
+no separate `vsubs` node. On the pre-0.6.0 toolchain this same strap
+reported `routed: true`/clean-`klt drc` while never actually landing a
+contact (the gap originally filed as
+[`2AMLogic/klayout-tools#1894`](https://github.com/2AMLogic/klayout-tools/issues/1894)).
 
-## Verification
+## Verification (as of the `klt 0.6.0` toolchain bump, issue #30)
 
 - **`klt drc --deck sky130`: clean, 0 violations.**
-- **`klt extract --deck sky130`: 2 devices, 4 nets** (`na`, `er`, `vss`, and
-  the unstrapped `vsubs` collector node).
-- **`klt lvs` against `reference.spice`: mismatch** (0/2 devices, 0/3 nets,
-  per `lvs.json`). The extracted per-device topology is confirmed correct —
-  `extract.json`'s own `devices[]` reads `{"c": "vsubs", "b": "vss", "e":
-  "na"}` for `XQ1` and `{"c": "vsubs", "b": "vss", "e": "er"}` for `XQR`,
-  i.e. base lands on exactly the net the schematic puts it on (`VSS`), each
-  emitter lands on its own correctly-separate net (`NA`/`ER`), and the only
-  discrepancy is the collector/`vsubs` vs. reference's `VSS` difference
-  (this cell has 4 nets where the 3-port reference has 3, so no
-  `net`/`pin` count can match while that strap is open) — the same single,
-  well-isolated, understood cause `bias_core_pnp8_leg/README.md` documents,
-  not a wiring error in this cell's own connectivity.
-
-Revisit once the installed `klt` carries
-[`2AMLogic/klayout-tools#1894`](https://github.com/2AMLogic/klayout-tools/issues/1894)'s
-fix — see "Upstream status" below — at which point no floorplan change is
-expected to be needed beyond adding the collector-ring pins back into
-`vss`'s `connectivity[]`.
+- **`klt extract --deck sky130`: 2 devices, 3 nets** (`na`, `er`, `vss` —
+  the formerly unstrapped `vsubs` collector node is gone; `extract.json`'s
+  own `devices[]` reads `{"c": "vss", "b": "vss", "e": "na"}` for `XQ1` and
+  `{"c": "vss", "b": "vss", "e": "er"}` for `XQR`, exactly the reference's
+  own `XQ1 VSS VSS NA` / `XQR VSS VSS ER` cards).
+- **`klt lvs` against `reference.spice`: match** — 2/2 devices, 3/3 nets,
+  3/3 pins — **with six disclosed device-parameter exclusions**: the cell's
+  `lvs.options.compare_parameters` scopes the `PNP` class to compare only
+  `NE`, excluding `AB`/`AC`/`AE`/`PB`/`PC`/`PE` (one
+  `device.parameter_excluded` warning each in `lvs.json`). Same known,
+  disclosed scope as `bias_core_pnp8_leg/` (the sky130 fixed-geometry `AE`
+  gap,
+  [`2AMLogic/klayout-tools#2335`](https://github.com/2AMLogic/klayout-tools/issues/2335));
+  the `match` does not claim agreement on the excluded parameters.
 
 ## Full-cell assembly pins (issue #61)
 
@@ -147,11 +142,12 @@ declare-only li1 stub (`promo_stub.gds`), no PDK awareness needed.
 
 The collector ring is now a C-shaped conductor, not a closed loop: its
 substrate-isolation function is interrupted for the `1.5um` of the N-side
-opening. That is a real floorplan change, not a free one — it just costs
-this cell nothing it currently *has*, since the ring is already not strapped
-to `VSS` at all and `klt extract` recovers it as the same floating `vsubs`
-node either way. Once the installed `klt` carries #1894's fix, close the
-ring again and promote `vss` through a real `COLL_*` tap instead.
+opening. That is a real floorplan change, not a free one. The `klt 0.6.0`
+strap above goes through `COLL_E` with the ring still open, and the opening
+stays load-bearing for the `vss` stub escape (see "Why the ring had to be
+opened"). Closing the ring again — like `bias_core_pnp8_leg/` — is now
+decoupled from electrical correctness and deliberately left as a follow-up
+judgement call, out of this increment's scope.
 
 ### Evidence: this changed no device, no net, and no verdict
 
@@ -186,15 +182,11 @@ this file. Re-run the whole chain with
 `na`/`er` are unchanged by this issue — both are still promoted directly off
 `array.Q0_E`/`array.Q1_E`, and both still compose cleanly downstream.
 
-### Upstream status (as of 2026-09-16)
+### Upstream status (as of 2026-09-23, issue #30's toolchain bump)
 
-[`#1894`](https://github.com/2AMLogic/klayout-tools/issues/1894) **is closed
-as COMPLETED**, by
-[PR #1930](https://github.com/2AMLogic/klayout-tools/pull/1930) (merged
-`2026-09-16T06:44:04Z`), which *did* land a real `COLL_*` diffusion-role
-contact fix. **This repo cannot use it yet**: the installed toolchain is
-`klt 0.5.0+gba213c617b4e`, built from `ba213c61` (`2026-09-15T23:03:10Z`) —
-about eight hours *before* that merge — and its `_resolve_via_drop_layer()`
-still has the pre-fix fallthrough. See
-`layout/bias_core_pnp8_leg/README.md`'s own "Upstream status" section for
-the full write-up.
+The collector-strap gap is resolved and **in use here** — this repo's
+evidence is regenerated against `klt 0.6.0` (`c622e8addb36`,
+`layout/pdk.json`'s pin), which contains PR
+[#2320](https://github.com/2AMLogic/klayout-tools/pull/2320)'s fix
+(`ba1039d4`). See `layout/bias_core_pnp8_leg/README.md`'s own "Upstream
+status" section for the full #1894 → #2008 → #2312 write-up.

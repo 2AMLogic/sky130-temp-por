@@ -448,20 +448,22 @@
   "matched_device_groups": [],
   "pdk": null,
   "provenance": {
-    "klt_version": "0.4.0",
+    "klt_version": "0.6.0",
     "klayout_version": "0.30.10",
     "pdk": null,
     "deck": {
       "name": "sky130",
-      "content_hash": "sha256:a903acb18b47d47e73460b10e9c80edd3466193ffc9da0c01c2103f7fdfcf36f",
-      "released": true
+      "content_hash": "sha256:a1d90e066e822d0a8f36e2d4f4969b83df4360692f689b5815be9c3f151f7c8e",
+      "released": false
     },
     "input": {
-      "content_hash": "sha256:cea0cf568032e9fdae5f4cd8e87a14516342e9a337129427671f69a69bf2eb17"
+      "content_hash": "sha256:cea0cf568032e9fdae5f4cd8e87a14516342e9a337129427671f69a69bf2eb17",
+      "role": "layout"
     }
   },
   "parasitics": null,
   "spef_path": null,
+  "subcircuit": null,
   "metrics": {
     "extract__device__count": 9,
     "extract__net__count": 10,

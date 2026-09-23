@@ -3,6 +3,7 @@
   "file": "layout/bias_core/bias_core.gds",
   "spec": "layout/bias_core/erc-supply-spec.json",
   "pdk": null,
+  "findings_only": false,
   "gate_role": "poly",
   "gate_count": 21,
   "gates": [
@@ -1997,19 +1998,23 @@
     ],
     "unknown": [],
     "nothing_checked": false,
-    "nothing_checked_reasons": []
+    "nothing_checked_reasons": [],
+    "checked_by_assertion": [],
+    "checked_by_well_assertion": []
   },
+  "ties_disclosure": null,
   "provenance": {
-    "klt_version": "0.5.0+g2b1e55e51bb8.dirty",
-    "klayout_version": "0.30.12",
+    "klt_version": "0.6.0",
+    "klayout_version": "0.30.10",
     "pdk": null,
     "deck": null,
     "input": {
-      "content_hash": "sha256:c396d6c68db55097d8fadc902151480139ae24545ba694ff4a982b74051f7988",
+      "content_hash": "sha256:72588e8fe5f2a41868442444b58eec36703ad761f92aba62c2e9f6cca2a2e2c7",
       "role": "layout"
     },
     "spec": {
       "content_hash": "sha256:94e5415c166442a41fa86e64d0574768c23fed0d9da60e1cd5dbc987e90d65b1"
-    }
+    },
+    "devices": []
   }
 }

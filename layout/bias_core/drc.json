@@ -247,8 +247,8 @@
     "nothing_checked_reasons": []
   },
   "provenance": {
-    "klt_version": "0.5.0+g2b1e55e51bb8.dirty",
-    "klayout_version": "0.30.12",
+    "klt_version": "0.6.0",
+    "klayout_version": "0.30.10",
     "pdk": null,
     "deck": {
       "name": "sky130",
@@ -256,9 +256,9 @@
       "released": false
     },
     "input": {
-      "content_hash": "sha256:c396d6c68db55097d8fadc902151480139ae24545ba694ff4a982b74051f7988",
+      "content_hash": "sha256:72588e8fe5f2a41868442444b58eec36703ad761f92aba62c2e9f6cca2a2e2c7",
       "role": "layout"
     },
-    "klayout_version_mismatch": true
+    "klayout_version_mismatch": false
   }
 }

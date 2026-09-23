@@ -187,6 +187,7 @@
         { "block": "array", "port": "Q5_B" },
         { "block": "array", "port": "Q6_B" },
         { "block": "array", "port": "Q7_B" },
+        { "block": "array", "port": "COLL_E" },
         { "block": "stub_vss", "port": "CONN" }
       ]
     },
@@ -211,6 +212,7 @@
   ],
   "lvs": {
     "reference": "layout/bias_core_pnp8_leg/reference.spice",
-    "subckt": "bias_core_pnp8_leg"
+    "subckt": "bias_core_pnp8_leg",
+    "options": { "compare_parameters": { "pnp": ["NE"] } }
   }
 }

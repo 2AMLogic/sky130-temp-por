@@ -12,233 +12,234 @@
     "flatten_layout": false,
     "flatten_reference": false,
     "netgen_setup": null,
-    "parameter_tolerance": null
+    "parameter_tolerance": null,
+    "compare_parameters": {
+      "pnp": [
+        "NE"
+      ]
+    },
+    "power_connectivity": null,
+    "supply_nets": [
+      "GND",
+      "VCC",
+      "VDD",
+      "VGND",
+      "VPWR",
+      "VSS"
+    ]
   },
-  "status": "mismatch",
-  "mismatch_count": 11,
-  "error_count": 11,
+  "hints_applied": null,
+  "status": "match",
+  "power_connectivity": {
+    "status": "unchecked",
+    "reason": "reference.form is 'subckt-call', whose reference netlist carries its own power/ground pins and nets -- they take part in the ordinary compare, so this check (which exists to cover the signal-only 'gate-level-verilog' form) does not apply",
+    "power_pins": [],
+    "power_pins_derivation": null,
+    "instance_count": 0,
+    "expected_nets": null,
+    "unchecked_expected_pins": [],
+    "findings": [],
+    "finding_count": 0
+  },
+  "body_verification": {
+    "status": "unchecked",
+    "reason": "no request.layout.deck was given (the pre-extracted request.layout.netlist form), so nothing establishes this layout's substrate/well-tap convention and no synthesized body net can be told apart from a real one -- this run verified nothing about the device bodies either way",
+    "device_classes": [],
+    "device_count": 0,
+    "findings": [],
+    "finding_count": 0
+  },
+  "mismatch_count": 6,
+  "error_count": 0,
   "category_counts": {
-    "device.unmatched": 4,
-    "net.unmatched": 7
+    "device.parameter_excluded": 6
   },
-  "category_error_counts": {
-    "device.unmatched": 4,
-    "net.unmatched": 7
-  },
+  "category_error_counts": {},
   "counts": {
     "nets": {
-      "layout": 4,
+      "layout": 3,
       "reference": 3,
-      "matched": 0
+      "matched": 3
     },
     "devices": {
       "layout": 2,
       "reference": 2,
-      "matched": 0
+      "matched": 2
     },
     "pins": {
-      "layout": 4,
+      "layout": 3,
       "reference": 3,
-      "matched": 7
+      "matched": 3
     }
   },
   "device_classes": null,
   "environment": {
     "engine": "klayout",
-    "engine_version": "0.30.12",
-    "layout_sha256": "f43e2ba946afd3779c3c84cee1611159e0446eaffea0efeb8369ebeab4714f2b",
+    "engine_version": "0.30.10",
+    "layout_sha256": "219d1d5aa29dca115791d22f99dafbf4e00734dfc2d160ce50b84ab41f79c637",
     "reference_sha256": "79ed580a9a04ffbead61235b7c52dd3db2b19610e061830dc0437474b582658c",
     "extracted_netlist": null
   },
   "provenance": {
-    "klt_version": "0.5.0",
-    "klayout_version": "0.30.12",
+    "klt_version": "0.6.0",
+    "klayout_version": "0.30.10",
     "pdk": null,
     "deck": null,
-    "input": null,
-    "klayout_version_mismatch": true
+    "input": {
+      "content_hash": "sha256:219d1d5aa29dca115791d22f99dafbf4e00734dfc2d160ce50b84ab41f79c637",
+      "role": "netlist"
+    },
+    "klayout_version_mismatch": false
   },
   "mismatches": [
     {
-      "category": "device.unmatched",
-      "severity": "error",
-      "description": "device has no counterpart on the other side",
-      "side": "layout",
+      "category": "device.parameter_excluded",
+      "severity": "warning",
+      "description": "options.compare_parameters scoped device class 'PNP' to compare only ['NE'] -- 'AB' was excluded from this compare and is NOT verified; a 'match' does not confirm the two sides agree on it (see docs/cli/lvs.md, 'device.parameter_excluded')",
+      "side": "both",
       "net": null,
       "device": {
-        "layout": "\\$1",
+        "layout": null,
         "reference": null,
         "class": "PNP"
       },
       "property": null,
-      "details": null,
+      "details": {
+        "parameter": "AB",
+        "compared_parameters": [
+          "NE"
+        ]
+      },
       "circuit": null,
       "instance": null,
       "subcircuit": null
     },
     {
-      "category": "device.unmatched",
-      "severity": "error",
-      "description": "device has no counterpart on the other side",
-      "side": "layout",
+      "category": "device.parameter_excluded",
+      "severity": "warning",
+      "description": "options.compare_parameters scoped device class 'PNP' to compare only ['NE'] -- 'AC' was excluded from this compare and is NOT verified; a 'match' does not confirm the two sides agree on it (see docs/cli/lvs.md, 'device.parameter_excluded')",
+      "side": "both",
       "net": null,
       "device": {
-        "layout": "\\$2",
+        "layout": null,
         "reference": null,
         "class": "PNP"
       },
       "property": null,
-      "details": null,
+      "details": {
+        "parameter": "AC",
+        "compared_parameters": [
+          "NE"
+        ]
+      },
       "circuit": null,
       "instance": null,
       "subcircuit": null
     },
     {
-      "category": "device.unmatched",
-      "severity": "error",
-      "description": "device has no counterpart on the other side",
-      "side": "reference",
+      "category": "device.parameter_excluded",
+      "severity": "warning",
+      "description": "options.compare_parameters scoped device class 'PNP' to compare only ['NE'] -- 'AE' was excluded from this compare and is NOT verified; a 'match' does not confirm the two sides agree on it (see docs/cli/lvs.md, 'device.parameter_excluded')",
+      "side": "both",
       "net": null,
       "device": {
         "layout": null,
-        "reference": "1",
+        "reference": null,
         "class": "PNP"
       },
       "property": null,
-      "details": null,
+      "details": {
+        "parameter": "AE",
+        "compared_parameters": [
+          "NE"
+        ]
+      },
       "circuit": null,
       "instance": null,
       "subcircuit": null
     },
     {
-      "category": "device.unmatched",
-      "severity": "error",
-      "description": "device has no counterpart on the other side",
-      "side": "reference",
+      "category": "device.parameter_excluded",
+      "severity": "warning",
+      "description": "options.compare_parameters scoped device class 'PNP' to compare only ['NE'] -- 'PB' was excluded from this compare and is NOT verified; a 'match' does not confirm the two sides agree on it (see docs/cli/lvs.md, 'device.parameter_excluded')",
+      "side": "both",
       "net": null,
       "device": {
         "layout": null,
-        "reference": "R",
+        "reference": null,
         "class": "PNP"
       },
       "property": null,
-      "details": null,
-      "circuit": null,
-      "instance": null,
-      "subcircuit": null
-    },
-    {
-      "category": "net.unmatched",
-      "severity": "error",
-      "description": "layout net has no reference counterpart",
-      "side": "layout",
-      "net": {
-        "layout": "ER",
-        "reference": null
+      "details": {
+        "parameter": "PB",
+        "compared_parameters": [
+          "NE"
+        ]
       },
-      "device": null,
-      "property": null,
-      "details": null,
       "circuit": null,
       "instance": null,
       "subcircuit": null
     },
     {
-      "category": "net.unmatched",
-      "severity": "error",
-      "description": "layout net has no reference counterpart",
-      "side": "layout",
-      "net": {
-        "layout": "NA",
-        "reference": null
-      },
-      "device": null,
-      "property": null,
-      "details": null,
-      "circuit": null,
-      "instance": null,
-      "subcircuit": null
-    },
-    {
-      "category": "net.unmatched",
-      "severity": "error",
-      "description": "layout net has no reference counterpart",
-      "side": "layout",
-      "net": {
-        "layout": "VSS",
-        "reference": null
-      },
-      "device": null,
-      "property": null,
-      "details": null,
-      "circuit": null,
-      "instance": null,
-      "subcircuit": null
-    },
-    {
-      "category": "net.unmatched",
-      "severity": "error",
-      "description": "layout net has no reference counterpart",
-      "side": "layout",
-      "net": {
-        "layout": "VSUBS",
-        "reference": null
-      },
-      "device": null,
-      "property": null,
-      "details": null,
-      "circuit": null,
-      "instance": null,
-      "subcircuit": null
-    },
-    {
-      "category": "net.unmatched",
-      "severity": "error",
-      "description": "reference net has no layout counterpart",
-      "side": "reference",
-      "net": {
+      "category": "device.parameter_excluded",
+      "severity": "warning",
+      "description": "options.compare_parameters scoped device class 'PNP' to compare only ['NE'] -- 'PC' was excluded from this compare and is NOT verified; a 'match' does not confirm the two sides agree on it (see docs/cli/lvs.md, 'device.parameter_excluded')",
+      "side": "both",
+      "net": null,
+      "device": {
         "layout": null,
-        "reference": "ER"
+        "reference": null,
+        "class": "PNP"
       },
-      "device": null,
       "property": null,
-      "details": null,
+      "details": {
+        "parameter": "PC",
+        "compared_parameters": [
+          "NE"
+        ]
+      },
       "circuit": null,
       "instance": null,
       "subcircuit": null
     },
     {
-      "category": "net.unmatched",
-      "severity": "error",
-      "description": "reference net has no layout counterpart",
-      "side": "reference",
-      "net": {
+      "category": "device.parameter_excluded",
+      "severity": "warning",
+      "description": "options.compare_parameters scoped device class 'PNP' to compare only ['NE'] -- 'PE' was excluded from this compare and is NOT verified; a 'match' does not confirm the two sides agree on it (see docs/cli/lvs.md, 'device.parameter_excluded')",
+      "side": "both",
+      "net": null,
+      "device": {
         "layout": null,
-        "reference": "NA"
+        "reference": null,
+        "class": "PNP"
       },
-      "device": null,
       "property": null,
-      "details": null,
-      "circuit": null,
-      "instance": null,
-      "subcircuit": null
-    },
-    {
-      "category": "net.unmatched",
-      "severity": "error",
-      "description": "reference net has no layout counterpart",
-      "side": "reference",
-      "net": {
-        "layout": null,
-        "reference": "VSS"
+      "details": {
+        "parameter": "PE",
+        "compared_parameters": [
+          "NE"
+        ]
       },
-      "device": null,
-      "property": null,
-      "details": null,
       "circuit": null,
       "instance": null,
       "subcircuit": null
     }
   ],
-  "net_correspondence": []
+  "net_correspondence": [
+    {
+      "layout": "ER",
+      "reference": "ER",
+      "pin": true
+    },
+    {
+      "layout": "NA",
+      "reference": "NA",
+      "pin": true
+    },
+    {
+      "layout": "VSS",
+      "reference": "VSS",
+      "pin": true
+    }
+  ]
 }

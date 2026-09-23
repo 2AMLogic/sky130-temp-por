@@ -1,5 +1,5 @@
 {
-  "schema_version": 1,
+  "schema_version": 2,
   "file": "bias_core_startup.gds",
   "deck": "sky130",
   "dbu_um": 0.001,
@@ -46,6 +46,31 @@
       "67/5",
       "68/5"
     ],
+    "rules_checked": [
+      "diff.enclosing.licon.1",
+      "diff.width.1",
+      "li1.enclosing.licon1.1",
+      "li1.space.1",
+      "li1.width.1",
+      "mcon.space.1",
+      "met1.area.1",
+      "met1.enclosing.mcon.1",
+      "met1.enclosing.via.1",
+      "met1.holes_area.1",
+      "met1.space.1",
+      "met1.width.1",
+      "met2.area.1",
+      "met2.enclosing.via.1",
+      "met2.holes_area.1",
+      "met2.space.1",
+      "met2.width.1",
+      "nwell.space.1",
+      "nwell.width.1",
+      "poly.enclosing.licon.1",
+      "poly.width.1",
+      "via.space.1",
+      "via.width.1"
+    ],
     "rules_skipped": [
       "capm.enclosing.via3.1",
       "capm.separation.via3.1",
@@ -56,17 +81,23 @@
       "capm2.space.1",
       "capm2.width.1",
       "met2.enclosing.via2.1",
+      "met3.area.1",
       "met3.enclosing.capm.1",
       "met3.enclosing.via2.1",
       "met3.enclosing.via3.1",
+      "met3.holes_area.1",
       "met3.space.1",
       "met3.width.1",
+      "met4.area.1",
       "met4.enclosing.capm2.1",
       "met4.enclosing.via3.1",
       "met4.enclosing.via4.1",
+      "met4.holes_area.1",
       "met4.space.1",
       "met4.width.1",
+      "met5.area.1",
       "met5.enclosing.via4.1",
+      "met5.holes_area.1",
       "met5.space.1",
       "met5.width.1",
       "via2.space.1",
@@ -95,19 +126,189 @@
       "via2",
       "via3",
       "via4"
-    ]
+    ],
+    "schema_version": 1,
+    "known": true,
+    "checked": [
+      "diff.enclosing.licon.1",
+      "diff.width.1",
+      "li1.enclosing.licon1.1",
+      "li1.space.1",
+      "li1.width.1",
+      "mcon.space.1",
+      "met1.area.1",
+      "met1.enclosing.mcon.1",
+      "met1.enclosing.via.1",
+      "met1.holes_area.1",
+      "met1.space.1",
+      "met1.width.1",
+      "met2.area.1",
+      "met2.enclosing.via.1",
+      "met2.holes_area.1",
+      "met2.space.1",
+      "met2.width.1",
+      "nwell.space.1",
+      "nwell.width.1",
+      "poly.enclosing.licon.1",
+      "poly.width.1",
+      "via.space.1",
+      "via.width.1"
+    ],
+    "skipped": [],
+    "inapplicable": [
+      {
+        "id": "capm.enclosing.via3.1",
+        "reason": "no_applicable_geometry"
+      },
+      {
+        "id": "capm.separation.via3.1",
+        "reason": "no_applicable_geometry"
+      },
+      {
+        "id": "capm.space.1",
+        "reason": "no_applicable_geometry"
+      },
+      {
+        "id": "capm.width.1",
+        "reason": "no_applicable_geometry"
+      },
+      {
+        "id": "capm2.enclosing.via4.1",
+        "reason": "no_applicable_geometry"
+      },
+      {
+        "id": "capm2.separation.via4.1",
+        "reason": "no_applicable_geometry"
+      },
+      {
+        "id": "capm2.space.1",
+        "reason": "no_applicable_geometry"
+      },
+      {
+        "id": "capm2.width.1",
+        "reason": "no_applicable_geometry"
+      },
+      {
+        "id": "met2.enclosing.via2.1",
+        "reason": "no_applicable_geometry"
+      },
+      {
+        "id": "met3.area.1",
+        "reason": "no_applicable_geometry"
+      },
+      {
+        "id": "met3.enclosing.capm.1",
+        "reason": "no_applicable_geometry"
+      },
+      {
+        "id": "met3.enclosing.via2.1",
+        "reason": "no_applicable_geometry"
+      },
+      {
+        "id": "met3.enclosing.via3.1",
+        "reason": "no_applicable_geometry"
+      },
+      {
+        "id": "met3.holes_area.1",
+        "reason": "no_applicable_geometry"
+      },
+      {
+        "id": "met3.space.1",
+        "reason": "no_applicable_geometry"
+      },
+      {
+        "id": "met3.width.1",
+        "reason": "no_applicable_geometry"
+      },
+      {
+        "id": "met4.area.1",
+        "reason": "no_applicable_geometry"
+      },
+      {
+        "id": "met4.enclosing.capm2.1",
+        "reason": "no_applicable_geometry"
+      },
+      {
+        "id": "met4.enclosing.via3.1",
+        "reason": "no_applicable_geometry"
+      },
+      {
+        "id": "met4.enclosing.via4.1",
+        "reason": "no_applicable_geometry"
+      },
+      {
+        "id": "met4.holes_area.1",
+        "reason": "no_applicable_geometry"
+      },
+      {
+        "id": "met4.space.1",
+        "reason": "no_applicable_geometry"
+      },
+      {
+        "id": "met4.width.1",
+        "reason": "no_applicable_geometry"
+      },
+      {
+        "id": "met5.area.1",
+        "reason": "no_applicable_geometry"
+      },
+      {
+        "id": "met5.enclosing.via4.1",
+        "reason": "no_applicable_geometry"
+      },
+      {
+        "id": "met5.holes_area.1",
+        "reason": "no_applicable_geometry"
+      },
+      {
+        "id": "met5.space.1",
+        "reason": "no_applicable_geometry"
+      },
+      {
+        "id": "met5.width.1",
+        "reason": "no_applicable_geometry"
+      },
+      {
+        "id": "via2.space.1",
+        "reason": "no_applicable_geometry"
+      },
+      {
+        "id": "via2.width.1",
+        "reason": "no_applicable_geometry"
+      },
+      {
+        "id": "via3.space.1",
+        "reason": "no_applicable_geometry"
+      },
+      {
+        "id": "via3.width.1",
+        "reason": "no_applicable_geometry"
+      },
+      {
+        "id": "via4.space.1",
+        "reason": "no_applicable_geometry"
+      },
+      {
+        "id": "via4.width.1",
+        "reason": "no_applicable_geometry"
+      }
+    ],
+    "unknown": [],
+    "nothing_checked": false,
+    "nothing_checked_reasons": []
   },
   "provenance": {
-    "klt_version": "0.4.0",
+    "klt_version": "0.6.0",
     "klayout_version": "0.30.10",
     "pdk": null,
     "deck": {
       "name": "sky130",
-      "content_hash": "sha256:a903acb18b47d47e73460b10e9c80edd3466193ffc9da0c01c2103f7fdfcf36f",
-      "released": true
+      "content_hash": "sha256:a1d90e066e822d0a8f36e2d4f4969b83df4360692f689b5815be9c3f151f7c8e",
+      "released": false
     },
     "input": {
-      "content_hash": "sha256:cea0cf568032e9fdae5f4cd8e87a14516342e9a337129427671f69a69bf2eb17"
+      "content_hash": "sha256:cea0cf568032e9fdae5f4cd8e87a14516342e9a337129427671f69a69bf2eb17",
+      "role": "layout"
     },
     "klayout_version_mismatch": false
   }

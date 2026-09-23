@@ -3,30 +3,21 @@
 * cell bias_core_pnp8_leg
 * pin ec
 * pin vss
-* pin vsubs
-.SUBCKT bias_core_pnp8_leg ec vss vsubs
+.SUBCKT bias_core_pnp8_leg ec vss
 * device instance $1 r0 *1 6.32,1.7 pnp
-Q$1 vsubs vss ec pnp AE=11.56P PE=13.6U AB=12.96P PB=14.4U AC=12.96P PC=14.4U
-+ NE=1
+Q$1 vss vss ec pnp AE=11.56P PE=13.6U AB=12.96P PB=14.4U AC=12.96P PC=14.4U NE=1
 * device instance $2 r0 *1 10.94,5.5 pnp
-Q$2 vsubs vss ec pnp AE=11.56P PE=13.6U AB=12.96P PB=14.4U AC=12.96P PC=14.4U
-+ NE=1
+Q$2 vss vss ec pnp AE=11.56P PE=13.6U AB=12.96P PB=14.4U AC=12.96P PC=14.4U NE=1
 * device instance $3 r0 *1 10.94,1.7 pnp
-Q$3 vsubs vss ec pnp AE=11.56P PE=13.6U AB=12.96P PB=14.4U AC=12.96P PC=14.4U
-+ NE=1
+Q$3 vss vss ec pnp AE=11.56P PE=13.6U AB=12.96P PB=14.4U AC=12.96P PC=14.4U NE=1
 * device instance $4 r0 *1 6.32,5.5 pnp
-Q$4 vsubs vss ec pnp AE=11.56P PE=13.6U AB=12.96P PB=14.4U AC=12.96P PC=14.4U
-+ NE=1
+Q$4 vss vss ec pnp AE=11.56P PE=13.6U AB=12.96P PB=14.4U AC=12.96P PC=14.4U NE=1
 * device instance $5 r0 *1 1.7,1.7 pnp
-Q$5 vsubs vss ec pnp AE=11.56P PE=13.6U AB=12.96P PB=14.4U AC=12.96P PC=14.4U
-+ NE=1
+Q$5 vss vss ec pnp AE=11.56P PE=13.6U AB=12.96P PB=14.4U AC=12.96P PC=14.4U NE=1
 * device instance $6 r0 *1 15.56,5.5 pnp
-Q$6 vsubs vss ec pnp AE=11.56P PE=13.6U AB=12.96P PB=14.4U AC=12.96P PC=14.4U
-+ NE=1
+Q$6 vss vss ec pnp AE=11.56P PE=13.6U AB=12.96P PB=14.4U AC=12.96P PC=14.4U NE=1
 * device instance $7 r0 *1 15.56,1.7 pnp
-Q$7 vsubs vss ec pnp AE=11.56P PE=13.6U AB=12.96P PB=14.4U AC=12.96P PC=14.4U
-+ NE=1
+Q$7 vss vss ec pnp AE=11.56P PE=13.6U AB=12.96P PB=14.4U AC=12.96P PC=14.4U NE=1
 * device instance $8 r0 *1 1.7,5.5 pnp
-Q$8 vsubs vss ec pnp AE=11.56P PE=13.6U AB=12.96P PB=14.4U AC=12.96P PC=14.4U
-+ NE=1
+Q$8 vss vss ec pnp AE=11.56P PE=13.6U AB=12.96P PB=14.4U AC=12.96P PC=14.4U NE=1
 .ENDS bias_core_pnp8_leg

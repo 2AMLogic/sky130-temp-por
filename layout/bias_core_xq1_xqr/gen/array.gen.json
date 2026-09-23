@@ -74,7 +74,7 @@
       "net": null,
       "layer": {
         "layer": 65,
-        "datatype": 20,
+        "datatype": 44,
         "name": null
       },
       "x_um": 4.420000000000001,
@@ -87,7 +87,7 @@
       "net": null,
       "layer": {
         "layer": 65,
-        "datatype": 20,
+        "datatype": 44,
         "name": null
       },
       "x_um": 9.6,
@@ -100,7 +100,7 @@
       "net": null,
       "layer": {
         "layer": 65,
-        "datatype": 20,
+        "datatype": 44,
         "name": null
       },
       "x_um": -0.76,
@@ -131,5 +131,16 @@
       "the ring carries a 1.5um routing opening on its 'N' side (params.ring_gap_side) -- it is a connected C-shaped conductor rather than a closed loop, so substrate isolation is interrupted there in exchange for letting a route reach the enclosed devices through the reported GAP_N position"
     ]
   },
-  "warnings": []
+  "warnings": [],
+  "provenance": {
+    "klt_version": "0.6.0",
+    "klayout_version": "0.30.10",
+    "pdk": {
+      "name": "sky130A",
+      "source": "search root: ~/.volare",
+      "version": "open_pdks c6d73a35f524070e85faff4a6a9eef49553ebc2b"
+    },
+    "deck": null,
+    "input": null
+  }
 }

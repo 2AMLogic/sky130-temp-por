@@ -12,9 +12,39 @@
     "flatten_layout": false,
     "flatten_reference": false,
     "netgen_setup": null,
-    "parameter_tolerance": null
+    "parameter_tolerance": null,
+    "compare_parameters": null,
+    "power_connectivity": null,
+    "supply_nets": [
+      "GND",
+      "VCC",
+      "VDD",
+      "VGND",
+      "VPWR",
+      "VSS"
+    ]
   },
+  "hints_applied": null,
   "status": "match",
+  "power_connectivity": {
+    "status": "unchecked",
+    "reason": "reference.form is 'subckt-call', whose reference netlist carries its own power/ground pins and nets -- they take part in the ordinary compare, so this check (which exists to cover the signal-only 'gate-level-verilog' form) does not apply",
+    "power_pins": [],
+    "power_pins_derivation": null,
+    "instance_count": 0,
+    "expected_nets": null,
+    "unchecked_expected_pins": [],
+    "findings": [],
+    "finding_count": 0
+  },
+  "body_verification": {
+    "status": "unchecked",
+    "reason": "no request.layout.deck was given (the pre-extracted request.layout.netlist form), so nothing establishes this layout's substrate/well-tap convention and no synthesized body net can be told apart from a real one -- this run verified nothing about the device bodies either way",
+    "device_classes": [],
+    "device_count": 0,
+    "findings": [],
+    "finding_count": 0
+  },
   "mismatch_count": 0,
   "error_count": 0,
   "category_counts": {},
@@ -45,11 +75,14 @@
     "extracted_netlist": null
   },
   "provenance": {
-    "klt_version": "0.4.0",
+    "klt_version": "0.6.0",
     "klayout_version": "0.30.10",
     "pdk": null,
     "deck": null,
-    "input": null,
+    "input": {
+      "content_hash": "sha256:14abdb6a9d5c81894215d6c1e6f341193e33c13a037d0b0d83854fb83813a2ac",
+      "role": "netlist"
+    },
     "klayout_version_mismatch": false
   },
   "mismatches": [],

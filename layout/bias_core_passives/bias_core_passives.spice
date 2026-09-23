@@ -18,11 +18,11 @@ C$1 nz pg 8.152e-13
 * device instance $2 r0 *1 5530.36,3.5 sky130_fd_pr__model__cap_mim
 C$2 vdd nokx 7.656e-14
 * device instance $3 r0 *1 9.17,1 res_xhigh_po
-R$3 nbtop nb vsubs 17500 res_xhigh_po
+R$3 nbtop nb vsubs 17500 res_xhigh_po L=17.5U W=2U
 * device instance $4 r0 *1 196.76,1 res_xhigh_po
-R$4 nb ec vsubs 350000 res_xhigh_po
+R$4 nb ec vsubs 350000 res_xhigh_po L=350U W=2U
 * device instance $5 r0 *1 883.6,1 res_xhigh_po
-R$5 n2 nz vsubs 1016000 res_xhigh_po
+R$5 n2 nz vsubs 1016000 res_xhigh_po L=1016U W=2U
 * device instance $6 r0 *1 3471.44,1 res_xhigh_po
-R$6 vref er vsubs 4104000 res_xhigh_po
+R$6 vref er vsubs 4104000 res_xhigh_po L=4104U W=2U
 .ENDS bias_core_passives
