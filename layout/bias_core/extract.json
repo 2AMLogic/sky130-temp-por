@@ -5,11 +5,11 @@
   "top": "bias_core",
   "dbu_um": 0.001,
   "netlist_path": "bias_core.spice",
-  "netlist_sha256": "de4d27f835d4fa44047369c2fa59cda0d2227b243d5f31c332faf45dce7fe796",
+  "netlist_sha256": "b58a31e698234711f5314873d42479baa96f1708489599aa67afea48dc8fa4eb",
   "status": "extracted",
   "device_count": 50,
-  "net_count": 43,
-  "pin_count": 43,
+  "net_count": 41,
+  "pin_count": 41,
   "device_counts": {
     "nfet": 18,
     "pfet": 16,
@@ -956,7 +956,7 @@
       "class": "pnp",
       "nets": {
         "c": "VSS|vss",
-        "b": "vss",
+        "b": "VSS|vss",
         "e": "na"
       },
       "params": {},
@@ -980,7 +980,7 @@
       "class": "pnp",
       "nets": {
         "c": "VSS|vss",
-        "b": "vss",
+        "b": "VSS|vss",
         "e": "er"
       },
       "params": {},
@@ -1004,7 +1004,7 @@
       "class": "pnp",
       "nets": {
         "c": "VSS|vss",
-        "b": "vss",
+        "b": "VSS|vss",
         "e": "ec"
       },
       "params": {},
@@ -1028,7 +1028,7 @@
       "class": "pnp",
       "nets": {
         "c": "VSS|vss",
-        "b": "vss",
+        "b": "VSS|vss",
         "e": "ec"
       },
       "params": {},
@@ -1052,7 +1052,7 @@
       "class": "pnp",
       "nets": {
         "c": "VSS|vss",
-        "b": "vss",
+        "b": "VSS|vss",
         "e": "ec"
       },
       "params": {},
@@ -1108,7 +1108,7 @@
       "class": "pnp",
       "nets": {
         "c": "VSS|vss",
-        "b": "vss",
+        "b": "VSS|vss",
         "e": "ec"
       },
       "params": {},
@@ -1132,7 +1132,7 @@
       "class": "pnp",
       "nets": {
         "c": "VSS|vss",
-        "b": "vss",
+        "b": "VSS|vss",
         "e": "ec"
       },
       "params": {},
@@ -1156,7 +1156,7 @@
       "class": "pnp",
       "nets": {
         "c": "VSS|vss",
-        "b": "vss",
+        "b": "VSS|vss",
         "e": "ec"
       },
       "params": {},
@@ -1180,7 +1180,7 @@
       "class": "pnp",
       "nets": {
         "c": "VSS|vss",
-        "b": "vss",
+        "b": "VSS|vss",
         "e": "ec"
       },
       "params": {},
@@ -1204,7 +1204,7 @@
       "class": "pnp",
       "nets": {
         "c": "VSS|vss",
-        "b": "vss",
+        "b": "VSS|vss",
         "e": "ec"
       },
       "params": {},
@@ -1563,7 +1563,7 @@
       "name": "BIAS_OK|bias_ok",
       "pin": true,
       "device_count": 2,
-      "net_id": 31,
+      "net_id": 27,
       "pin_index": 0,
       "label_positions_um": [
         {
@@ -1587,7 +1587,7 @@
       "name": "IBIAS|ibias",
       "pin": true,
       "device_count": 1,
-      "net_id": 45,
+      "net_id": 41,
       "pin_index": 1,
       "label_positions_um": [
         {
@@ -1660,7 +1660,7 @@
       "name": "VREF|vref",
       "pin": true,
       "device_count": 1,
-      "net_id": 43,
+      "net_id": 39,
       "pin_index": 3,
       "label_positions_um": [
         {
@@ -1678,8 +1678,8 @@
     {
       "name": "VSS|vss",
       "pin": true,
-      "device_count": 45,
-      "net_id": 46,
+      "device_count": 55,
+      "net_id": 42,
       "pin_index": 4,
       "label_positions_um": [
         {
@@ -1701,6 +1701,26 @@
           "text": "vss",
           "x_um": 27.71,
           "y_um": 94.0
+        },
+        {
+          "text": "vss",
+          "x_um": 145.0,
+          "y_um": 106.0
+        },
+        {
+          "text": "vss",
+          "x_um": 159.115,
+          "y_um": 101.7
+        },
+        {
+          "text": "vss",
+          "x_um": 217.87,
+          "y_um": 104.065
+        },
+        {
+          "text": "vss",
+          "x_um": 223.5,
+          "y_um": 109.0
         },
         {
           "text": "vss",
@@ -1742,7 +1762,7 @@
       "name": "ec",
       "pin": true,
       "device_count": 8,
-      "net_id": 22,
+      "net_id": 18,
       "pin_index": 6,
       "label_positions_um": [
         {
@@ -1775,7 +1795,7 @@
       "name": "er",
       "pin": true,
       "device_count": 1,
-      "net_id": 21,
+      "net_id": 17,
       "pin_index": 8,
       "label_positions_um": [
         {
@@ -1789,7 +1809,7 @@
       "name": "ks1",
       "pin": true,
       "device_count": 3,
-      "net_id": 30,
+      "net_id": 26,
       "pin_index": 9,
       "label_positions_um": [
         {
@@ -1803,7 +1823,7 @@
       "name": "ks2",
       "pin": true,
       "device_count": 3,
-      "net_id": 29,
+      "net_id": 25,
       "pin_index": 10,
       "label_positions_um": [
         {
@@ -1817,7 +1837,7 @@
       "name": "ks3",
       "pin": true,
       "device_count": 3,
-      "net_id": 28,
+      "net_id": 24,
       "pin_index": 11,
       "label_positions_um": [
         {
@@ -1831,7 +1851,7 @@
       "name": "ks4",
       "pin": true,
       "device_count": 3,
-      "net_id": 27,
+      "net_id": 23,
       "pin_index": 12,
       "label_positions_um": [
         {
@@ -1873,7 +1893,7 @@
       "name": "n2",
       "pin": true,
       "device_count": 3,
-      "net_id": 32,
+      "net_id": 28,
       "pin_index": 15,
       "label_positions_um": [
         {
@@ -1892,7 +1912,7 @@
       "name": "na",
       "pin": true,
       "device_count": 1,
-      "net_id": 19,
+      "net_id": 16,
       "pin_index": 16,
       "label_positions_um": [
         {
@@ -1906,7 +1926,7 @@
       "name": "na",
       "pin": true,
       "device_count": 1,
-      "net_id": 38,
+      "net_id": 34,
       "pin_index": 17,
       "label_positions_um": [
         {
@@ -1920,7 +1940,7 @@
       "name": "na",
       "pin": true,
       "device_count": 2,
-      "net_id": 44,
+      "net_id": 40,
       "pin_index": 18,
       "label_positions_um": [
         {
@@ -1953,7 +1973,7 @@
       "name": "nb",
       "pin": true,
       "device_count": 1,
-      "net_id": 40,
+      "net_id": 36,
       "pin_index": 20,
       "label_positions_um": [
         {
@@ -1995,7 +2015,7 @@
       "name": "nbtop",
       "pin": true,
       "device_count": 1,
-      "net_id": 37,
+      "net_id": 33,
       "pin_index": 23,
       "label_positions_um": [
         {
@@ -2009,7 +2029,7 @@
       "name": "nbtop",
       "pin": true,
       "device_count": 1,
-      "net_id": 42,
+      "net_id": 38,
       "pin_index": 24,
       "label_positions_um": [
         {
@@ -2023,7 +2043,7 @@
       "name": "nkg",
       "pin": true,
       "device_count": 4,
-      "net_id": 34,
+      "net_id": 29,
       "pin_index": 25,
       "label_positions_um": [
         {
@@ -2057,7 +2077,7 @@
       "name": "nkm",
       "pin": true,
       "device_count": 4,
-      "net_id": 25,
+      "net_id": 21,
       "pin_index": 26,
       "label_positions_um": [
         {
@@ -2071,7 +2091,7 @@
       "name": "nokl",
       "pin": true,
       "device_count": 4,
-      "net_id": 17,
+      "net_id": 14,
       "pin_index": 27,
       "label_positions_um": [
         {
@@ -2085,7 +2105,7 @@
       "name": "noko",
       "pin": true,
       "device_count": 4,
-      "net_id": 23,
+      "net_id": 19,
       "pin_index": 28,
       "label_positions_um": [
         {
@@ -2113,7 +2133,7 @@
       "name": "nokx",
       "pin": true,
       "device_count": 4,
-      "net_id": 33,
+      "net_id": 30,
       "pin_index": 30,
       "label_positions_um": [
         {
@@ -2132,7 +2152,7 @@
       "name": "nt",
       "pin": true,
       "device_count": 3,
-      "net_id": 41,
+      "net_id": 37,
       "pin_index": 31,
       "label_positions_um": [
         {
@@ -2160,7 +2180,7 @@
       "name": "pb",
       "pin": true,
       "device_count": 6,
-      "net_id": 18,
+      "net_id": 15,
       "pin_index": 33,
       "label_positions_um": [
         {
@@ -2179,7 +2199,7 @@
       "name": "pb",
       "pin": true,
       "device_count": 1,
-      "net_id": 24,
+      "net_id": 20,
       "pin_index": 34,
       "label_positions_um": [
         {
@@ -2193,7 +2213,7 @@
       "name": "pb",
       "pin": true,
       "device_count": 2,
-      "net_id": 35,
+      "net_id": 31,
       "pin_index": 35,
       "label_positions_um": [
         {
@@ -2226,7 +2246,7 @@
       "name": "pg",
       "pin": true,
       "device_count": 1,
-      "net_id": 26,
+      "net_id": 22,
       "pin_index": 37,
       "label_positions_um": [
         {
@@ -2240,7 +2260,7 @@
       "name": "pg",
       "pin": true,
       "device_count": 6,
-      "net_id": 36,
+      "net_id": 32,
       "pin_index": 38,
       "label_positions_um": [
         {
@@ -2259,7 +2279,7 @@
       "name": "tok",
       "pin": true,
       "device_count": 3,
-      "net_id": 39,
+      "net_id": 35,
       "pin_index": 39,
       "label_positions_um": [
         {
@@ -2282,49 +2302,10 @@
           "y_um": -49.0
         }
       ]
-    },
-    {
-      "name": "vss",
-      "pin": true,
-      "device_count": 8,
-      "net_id": 16,
-      "pin_index": 41,
-      "label_positions_um": [
-        {
-          "text": "vss",
-          "x_um": 208.63,
-          "y_um": 103.6
-        },
-        {
-          "text": "vss",
-          "x_um": 223.5,
-          "y_um": 109.0
-        }
-      ]
-    },
-    {
-      "name": "vss",
-      "pin": true,
-      "device_count": 2,
-      "net_id": 20,
-      "pin_index": 42,
-      "label_positions_um": [
-        {
-          "text": "vss",
-          "x_um": 145.0,
-          "y_um": 106.0
-        },
-        {
-          "text": "vss",
-          "x_um": 156.32,
-          "y_um": 101.87
-        }
-      ]
     }
   ],
   "warnings": [
-    "promoted 23 net(s) to top-level pins from label(s) found only below the top cell (inside instanced sub-cells): ec, er, ks1, ks2, ks3, ks4, n1, n2, na, nb, nbg, nbtop, nkm, nokl, noko, nokx, nt, nz, pb, pg, tok, vref, vss -- these are internal nodes once instanced; pass top_cell_pins_only (--top-cell-pins) to keep them internal (issue #291)",
-    "2 routing-stack clusters (2 shapes on 67/20) join no extracted net -- no via lands on this geometry and no same-layer wiring touches it, so it is invisible to the extracted netlist and to every downstream `klt lvs`/`klt sim` view; deliberate dead metal (artwork, fill) is expected here, unexplained dead metal usually means the connection you intended is missing -- see dead_metal[] for the per-cluster layer/bbox/shape count.",
+    "promoted 22 net(s) to top-level pins from label(s) found only below the top cell (inside instanced sub-cells): ec, er, ks1, ks2, ks3, ks4, n1, n2, na, nb, nbg, nbtop, nkm, nokl, noko, nokx, nt, nz, pb, pg, tok, vref -- these are internal nodes once instanced; pass top_cell_pins_only (--top-cell-pins) to keep them internal (issue #291)",
     "net 'BIAS_OK|bias_ok' merges 2 distinct labels (BIAS_OK, bias_ok) onto one net -- KLayout joins multiple labels found on the same electrical net (as '|' here and in the written netlist, matching NetlistSpiceWriter's own node-name escaping); this usually means two differently-named nets were shorted together in the layout -- see docs/cli/extract.md's 'Merged net labels' section.",
     "net 'IBIAS|ibias' merges 2 distinct labels (IBIAS, ibias) onto one net -- KLayout joins multiple labels found on the same electrical net (as '|' here and in the written netlist, matching NetlistSpiceWriter's own node-name escaping); this usually means two differently-named nets were shorted together in the layout -- see docs/cli/extract.md's 'Merged net labels' section.",
     "net 'VDD|vdd' merges 2 distinct labels (VDD, vdd) onto one net -- KLayout joins multiple labels found on the same electrical net (as '|' here and in the written netlist, matching NetlistSpiceWriter's own node-name escaping); this usually means two differently-named nets were shorted together in the layout -- see docs/cli/extract.md's 'Merged net labels' section.",
@@ -2374,39 +2355,12 @@
   "voltage_domain_warnings": [],
   "unbiased_pmos_body_nets": [],
   "single_terminal_nets": [],
-  "dead_metal": [
-    {
-      "role": "metal0",
-      "layer": 67,
-      "datatype": 20,
-      "bbox_um": {
-        "left": 149.03,
-        "bottom": 99.03,
-        "right": 159.81,
-        "top": 104.37
-      },
-      "shapes": 1,
-      "area_um2": 12.2052
-    },
-    {
-      "role": "metal0",
-      "layer": 67,
-      "datatype": 20,
-      "bbox_um": {
-        "left": 199.03,
-        "bottom": 99.03,
-        "right": 219.05,
-        "top": 108.17
-      },
-      "shapes": 1,
-      "area_um2": 22.1088
-    }
-  ],
+  "dead_metal": [],
   "matched_device_groups": [],
   "pdk": null,
   "provenance": {
-    "klt_version": "0.5.0+g2b1e55e51bb8.dirty",
-    "klayout_version": "0.30.12",
+    "klt_version": "0.6.0",
+    "klayout_version": "0.30.10",
     "pdk": null,
     "deck": {
       "name": "sky130",
@@ -2414,15 +2368,16 @@
       "released": false
     },
     "input": {
-      "content_hash": "sha256:c396d6c68db55097d8fadc902151480139ae24545ba694ff4a982b74051f7988",
+      "content_hash": "sha256:72588e8fe5f2a41868442444b58eec36703ad761f92aba62c2e9f6cca2a2e2c7",
       "role": "layout"
     }
   },
   "parasitics": null,
   "spef_path": null,
+  "subcircuit": null,
   "metrics": {
     "extract__device__count": 50,
-    "extract__net__count": 43,
-    "extract__pin__count": 43
+    "extract__net__count": 41,
+    "extract__pin__count": 41
   }
 }

@@ -5,11 +5,11 @@
   "top": "bias_core_pnp8_leg",
   "dbu_um": 0.001,
   "netlist_path": "bias_core_pnp8_leg.spice",
-  "netlist_sha256": "52326d72590ce005ef480a77c5b299861dcd0a746224dddbd793a4e59e7ab384",
+  "netlist_sha256": "73cc738b0d93cc97baec17d8fad0ba2a986864fb58405fccc292d70658fca87f",
   "status": "extracted",
   "device_count": 8,
-  "net_count": 3,
-  "pin_count": 3,
+  "net_count": 2,
+  "pin_count": 2,
   "device_counts": {
     "pnp": 8
   },
@@ -35,7 +35,7 @@
       "name": "$1",
       "class": "pnp",
       "nets": {
-        "c": "vsubs",
+        "c": "vss",
         "b": "vss",
         "e": "ec"
       },
@@ -55,7 +55,7 @@
       "name": "$2",
       "class": "pnp",
       "nets": {
-        "c": "vsubs",
+        "c": "vss",
         "b": "vss",
         "e": "ec"
       },
@@ -75,7 +75,7 @@
       "name": "$3",
       "class": "pnp",
       "nets": {
-        "c": "vsubs",
+        "c": "vss",
         "b": "vss",
         "e": "ec"
       },
@@ -95,7 +95,7 @@
       "name": "$4",
       "class": "pnp",
       "nets": {
-        "c": "vsubs",
+        "c": "vss",
         "b": "vss",
         "e": "ec"
       },
@@ -115,7 +115,7 @@
       "name": "$5",
       "class": "pnp",
       "nets": {
-        "c": "vsubs",
+        "c": "vss",
         "b": "vss",
         "e": "ec"
       },
@@ -135,7 +135,7 @@
       "name": "$6",
       "class": "pnp",
       "nets": {
-        "c": "vsubs",
+        "c": "vss",
         "b": "vss",
         "e": "ec"
       },
@@ -155,7 +155,7 @@
       "name": "$7",
       "class": "pnp",
       "nets": {
-        "c": "vsubs",
+        "c": "vss",
         "b": "vss",
         "e": "ec"
       },
@@ -175,7 +175,7 @@
       "name": "$8",
       "class": "pnp",
       "nets": {
-        "c": "vsubs",
+        "c": "vss",
         "b": "vss",
         "e": "ec"
       },
@@ -197,7 +197,7 @@
       "name": "ec",
       "pin": true,
       "device_count": 8,
-      "net_id": 3,
+      "net_id": 2,
       "pin_index": 0,
       "label_positions_um": [
         {
@@ -215,14 +215,14 @@
     {
       "name": "vss",
       "pin": true,
-      "device_count": 8,
-      "net_id": 2,
+      "device_count": 16,
+      "net_id": 3,
       "pin_index": 1,
       "label_positions_um": [
         {
           "text": "vss",
-          "x_um": 8.63,
-          "y_um": 3.6
+          "x_um": 17.87,
+          "y_um": 4.065
         },
         {
           "text": "vss",
@@ -230,19 +230,9 @@
           "y_um": 9.0
         }
       ]
-    },
-    {
-      "name": "vsubs",
-      "pin": true,
-      "device_count": 8,
-      "net_id": 4,
-      "pin_index": 2,
-      "label_positions_um": []
     }
   ],
-  "warnings": [
-    "1 routing-stack cluster (1 shape on 67/20) join no extracted net -- no via lands on this geometry and no same-layer wiring touches it, so it is invisible to the extracted netlist and to every downstream `klt lvs`/`klt sim` view; deliberate dead metal (artwork, fill) is expected here, unexplained dead metal usually means the connection you intended is missing -- see dead_metal[] for the per-cluster layer/bbox/shape count."
-  ],
+  "warnings": [],
   "black_box_regions": [],
   "abstracted_cells": [],
   "unmodelled_poly": [],
@@ -250,41 +240,29 @@
   "voltage_domain_warnings": [],
   "unbiased_pmos_body_nets": [],
   "single_terminal_nets": [],
-  "dead_metal": [
-    {
-      "role": "metal0",
-      "layer": 67,
-      "datatype": 20,
-      "bbox_um": {
-        "left": -0.97,
-        "bottom": -0.97,
-        "right": 19.05,
-        "top": 8.17
-      },
-      "shapes": 1,
-      "area_um2": 22.1088
-    }
-  ],
+  "dead_metal": [],
   "matched_device_groups": [],
   "pdk": null,
   "provenance": {
-    "klt_version": "0.5.0",
-    "klayout_version": "0.30.12",
+    "klt_version": "0.6.0",
+    "klayout_version": "0.30.10",
     "pdk": null,
     "deck": {
       "name": "sky130",
-      "content_hash": "sha256:a903acb18b47d47e73460b10e9c80edd3466193ffc9da0c01c2103f7fdfcf36f",
-      "released": true
+      "content_hash": "sha256:a1d90e066e822d0a8f36e2d4f4969b83df4360692f689b5815be9c3f151f7c8e",
+      "released": false
     },
     "input": {
-      "content_hash": "sha256:ed7959612a3a47053690815b8102ba942aefb67cc3302429788a452330d8b1b6"
+      "content_hash": "sha256:8ce824abb5ab3973ceba0973474cd2d109672c1d6ab70ae22c03004c5e55347a",
+      "role": "layout"
     }
   },
   "parasitics": null,
   "spef_path": null,
+  "subcircuit": null,
   "metrics": {
     "extract__device__count": 8,
-    "extract__net__count": 3,
-    "extract__pin__count": 3
+    "extract__net__count": 2,
+    "extract__pin__count": 2
   }
 }

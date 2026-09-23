@@ -20,15 +20,24 @@ interface.
 **`klt drc --deck sky130`: clean, 0 violations.** **`klt extract --deck
 sky130`: 50 devices** (18 nfet + 16 pfet + 10 pnp + 4 res_xhigh_po + 2
 cap_mim — matching `design/netlist/bias_core.spice`'s own device count
-exactly), **43 nets, 43 pins** — down from 50/50 before [#69]'s
+exactly), **41 nets, 41 pins** — down from 50/50 before [#69]'s
 landing-frame fix, and the delta is exactly that fix: each block's supply
 island used to sit electrically separate from its rail, and the re-landed
 routes merge them (extract's own `merged_net_labels[]` now records the
 intended joins — `VDD|vdd`, `VSS|vss`, plus `IBIAS|ibias`, `VREF|vref`,
 `BIAS_OK|bias_ok`, each one assembly-level pin label merging with the
-corresponding sub-block's internal label on the *same* net). **`klt lvs`
+corresponding sub-block's internal label on the *same* net). The further
+drop from 43 to 41 nets (issue #30's `klt 0.6.0` toolchain bump) is the two
+PNP blocks' `COLL_E` collector straps landing electrically: each block's
+formerly separate `vsubs` island now merges into `VSS`, exactly as in the
+two PNP cells' own standalone evidence. **`klt lvs`
 against `design/netlist/bias_core.spice`'s own `.subckt bias_core`:
-mismatch — 21/50 devices, 14/27 nets matched.** This is a real, partial
+mismatch — 21/50 devices, 14/27 nets matched** (66 mismatches: 18
+`net.split` + 4 `net.merged` + 35 `device.unmatched` + 2 `topology` + 1
+`device.placeholder_value`, plus 6 disclosed `device.parameter_excluded`
+warnings — the same `PNP`-scoped `NE`-only compare the two PNP cells use,
+now wired through `compose-cell.py`'s `lvs.options` pass-through). This is a
+real, partial
 match, not the single "PNP collector-strap gap" the parent issue's own text
 anticipated — see "What is not wired" below for the full, verified
 root-cause breakdown, and
@@ -213,25 +222,31 @@ distinct, independently-confirmed root causes, not one:
    `width_um: 0.42` floor, confirmed DRC-clean and short-free in isolation —
    but still excluded from the final wiring set here purely by the
    layer-budget problem in (1) above, not by this obstacle).
-3. **`ec`/`er` (the PNP collector/base/emitter buses on `pnp8_leg`/
-   `xq1_xqr`) remain blocked by the already-tracked
-   [`2AMLogic/klayout-tools#1894`](https://github.com/2AMLogic/klayout-tools/issues/1894)** —
-   confirmed directly, in this issue's own investigation, to extend to
-   *any* leg leaving either block's own `Q*_B`/`Q*_E` ports, not only the
-   collector strap the parent issue's own text anticipated. Two failure
-   modes were reproduced: (a) composing the `bjt_array` generator alongside
+3. **`ec`/`er` (the PNP emitter buses on `pnp8_leg`/`xq1_xqr`) were blocked by
+   the then-tracked
+   [`2AMLogic/klayout-tools#1894`](https://github.com/2AMLogic/klayout-tools/issues/1894)
+   chain — resolved as of issue #30's `klt 0.6.0` toolchain bump (PR
+   [#2320](https://github.com/2AMLogic/klayout-tools/pull/2320): the
+   collector ring drawn on the `tap` role, so a strap `klt extract`
+   actually recognizes — both PNP cells' own `vss` straps now land and their
+   standalone LVS goes to `match`, and this cell's extract drops 43→41 nets
+   accordingly). What still blocks `ec`/`er` *here* is only the layer-budget
+   problem in (1) above. The original investigation's two failure modes are
+   preserved for the record: (a) composing the `bjt_array` generator alongside
    a new stub *within the same `gen-compose` call* (the technique that fixed
-   finding 2's pins) is refused outright — `klt gen-compose` detects the
+   finding 2's pins) was refused outright — `klt gen-compose` detects the
    block's own closed collector ring and rejects any leg from a non-tap
-   port before even considering where the new pin would land; (b) treating
-   `pnp8_leg`/`xq1_xqr` as opaque `blocks[].cell` siblings (hiding the ring
-   from the composing call, since an opaque stream reports no `ports[]`
-   beyond what this cell.json hand-declares) lets `klt gen-compose` draw a
-   route and report `routed: true` with a clean `klt drc` — but `klt
-   extract` then shows the tapped net silently merged with the ring's own
-   internal base/collector bus (`er|vss` in one reproduction), the exact
-   `#1894` finding-2 failure mode, just triggered from outside the block
-   instead of from within it. `xq1_xqr`'s own `na` pin is the one exception:
+   port before even considering where the new pin would land (both arrays
+   now carry `ring_gap_side` openings from #61, so this rejection no longer
+   fires for the escape legs); (b) treating `pnp8_leg`/`xq1_xqr` as opaque
+   `blocks[].cell` siblings (hiding the ring from the composing call, since
+   an opaque stream reports no `ports[]` beyond what this cell.json
+   hand-declares) let `klt gen-compose` draw a route and report `routed:
+   true` with a clean `klt drc` — but `klt extract` then showed the tapped
+   net silently merged with the ring's own internal base/collector bus
+   (`er|vss` in one reproduction), the exact `#1894` finding-2 failure
+   mode, just triggered from outside the block instead of from within it.
+   `xq1_xqr`'s own `na` pin is the one exception:
    it is *already* a declare-only top-level promotion inside `xq1_xqr`'s own
    `cell.json` (an existing, previously-drawn pad, not a new leg), so it
    carries none of this risk — but it was left out of the final wiring set
@@ -247,7 +262,9 @@ tracked follow-up covering all three findings.
   already tracked (see `layout/README.md`'s own "Known klt gaps" section);
   finding 3 above extends its confirmed blast radius from "the collector
   strap only" to "any externally-approaching leg on either PNP group's own
-  `Q*_B`/`Q*_E` ports".
+  `Q*_B`/`Q*_E` ports". **Resolved as of issue #30's `klt 0.6.0` pin** (the
+  #1894 → #2008 → #2312 chain, closed by PR #2320 — both PNP cells' own
+  straps now land and their standalone LVS reads `match`).
 - [`2AMLogic/klayout-tools#1962`](https://github.com/2AMLogic/klayout-tools/issues/1962) —
   new, filed this issue: `klt gen-compose` has no layer/track-assignment
   help for a composition with more mutually-crossing nets than available
@@ -271,7 +288,9 @@ the remaining `pg`/`pb`/`n2`/`na`/`nbtop`/`vref`/`nokx` nets (findings 1 and
 2 above) once a channel-routing/layer-assignment plan (by hand or via
 `klayout-tools#1962`) is worked out, plus promoting `mirror_amp`'s `nb` and
 `settle_flag`'s `na`/`nbtop` pins the same way issue #56 already did for six
-other pins on these sub-blocks. `ec`/`er` (finding 3) stay blocked on the
-upstream `#1894` fix. With `bias_core` now composed (even partially),
+other pins on these sub-blocks. `ec`/`er` (finding 3) are unblocked
+upstream as of issue #30's `klt 0.6.0` pin (the strap fix landed); what
+still holds them out of the wiring set is the layer-budget problem of
+finding 1. With `bias_core` now composed (even partially),
 `temp_core`, `por_comparator`, `por_output_chain`, and `temp_por_top` remain
 the layout work tracked from [#4](https://github.com/2AMLogic/sky130-temp-por/issues/4).

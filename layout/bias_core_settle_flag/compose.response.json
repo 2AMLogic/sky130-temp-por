@@ -137,6 +137,8 @@
       "source": "generator_report",
       "generator": "mos_array",
       "cell_name": "mpok_pfet",
+      "source_path": "gen/mpok.gds",
+      "source_digest": "sha256:4dfc5c3c88188832a75006ede88fa7ae20779a381e2d9d8a600e44855a675f30",
       "offset_um": {
         "x": 0.0,
         "y": 15.97
@@ -154,6 +156,8 @@
       "source": "generator_report",
       "generator": "mos_array",
       "cell_name": "mokb_pfet",
+      "source_path": "gen/mokb.gds",
+      "source_digest": "sha256:59b2c56df62d05fd99f5b25223aba5c2bf4e7b10ae4d28fef0c6506fde889f3a",
       "offset_um": {
         "x": 9.0,
         "y": 22.97
@@ -171,6 +175,8 @@
       "source": "generator_report",
       "generator": "mos_array",
       "cell_name": "moka_pfet",
+      "source_path": "gen/moka.gds",
+      "source_digest": "sha256:9d891de05a0b10f3a317de963c6a9ad322eedd40e15c460c3647b3384db537da",
       "offset_um": {
         "x": 23.0,
         "y": 22.97
@@ -188,6 +194,8 @@
       "source": "generator_report",
       "generator": "mos_array",
       "cell_name": "mok2p_pfet",
+      "source_path": "gen/mok2p.gds",
+      "source_digest": "sha256:f383db6d75ec0a4f4b74db8e007ee366b2818af713e09a8ec59977db849b0d3c",
       "offset_um": {
         "x": 27.0,
         "y": 15.97
@@ -205,6 +213,8 @@
       "source": "generator_report",
       "generator": "mos_array",
       "cell_name": "mo1p_pfet",
+      "source_path": "gen/mo1p.gds",
+      "source_digest": "sha256:2589f0070fb3ce637c3576b316845135ca1c2f53eca7e89405505544da997b00",
       "offset_um": {
         "x": 36.0,
         "y": 15.97
@@ -222,6 +232,8 @@
       "source": "generator_report",
       "generator": "mos_array",
       "cell_name": "mol1_nfet",
+      "source_path": "gen/mol1.gds",
+      "source_digest": "sha256:546fba4e67e65614dbcebdf84c149a068b089aacdc0426844e2a1a78a6d21210",
       "offset_um": {
         "x": 8.0,
         "y": 0.0
@@ -239,6 +251,8 @@
       "source": "generator_report",
       "generator": "mos_array",
       "cell_name": "mol2_nfet",
+      "source_path": "gen/mol2.gds",
+      "source_digest": "sha256:3aceb50503c001aa9682364cb46ea79cc5518b0b05a35160a013a24930a656e7",
       "offset_um": {
         "x": 15.5,
         "y": 0.0
@@ -256,6 +270,8 @@
       "source": "generator_report",
       "generator": "mos_array",
       "cell_name": "mokc_nfet",
+      "source_path": "gen/mokc.gds",
+      "source_digest": "sha256:865de839e2fc640ba29f1ef2075fc2ec4217292127c33ce048860588b4bc91ca",
       "offset_um": {
         "x": 23.0,
         "y": 0.0
@@ -273,6 +289,8 @@
       "source": "generator_report",
       "generator": "mos_array",
       "cell_name": "mok2_nfet",
+      "source_path": "gen/mok2.gds",
+      "source_digest": "sha256:ce92b73a05b134d85c7a0d9332f5363ed94ae9ec961f826345fd84c7866c5525",
       "offset_um": {
         "x": 28.0,
         "y": 0.0
@@ -290,6 +308,8 @@
       "source": "generator_report",
       "generator": "mos_array",
       "cell_name": "mo1n_nfet",
+      "source_path": "gen/mo1n.gds",
+      "source_digest": "sha256:2243538bce81418b92b41c093872890d494d488f216fdcbea9573574cdd21a99",
       "offset_um": {
         "x": 36.0,
         "y": 0.0
@@ -307,6 +327,8 @@
       "source": "generator_report",
       "generator": "guard_ring",
       "cell_name": "nwt_mpok",
+      "source_path": "gen/nwt_mpok.gds",
+      "source_digest": "sha256:29b134e3ae2150ec1f9929d99f8c43d193cdb3d5dc96619c01ea6d318413e56c",
       "offset_um": {
         "x": -2.04,
         "y": 14.2
@@ -324,6 +346,8 @@
       "source": "generator_report",
       "generator": "guard_ring",
       "cell_name": "nwt_mokb",
+      "source_path": "gen/nwt_mokb.gds",
+      "source_digest": "sha256:afdf3553ba2e922a0d2aefae942c6eedb5053736fe5a3ad008f34aac03a9a8e3",
       "offset_um": {
         "x": 6.96,
         "y": 14.2
@@ -341,6 +365,8 @@
       "source": "generator_report",
       "generator": "guard_ring",
       "cell_name": "nwt_moka",
+      "source_path": "gen/nwt_moka.gds",
+      "source_digest": "sha256:b527dc1072f4a495ddd33516847d851f3292680398b80df41375ea9beef8e221",
       "offset_um": {
         "x": 19.01,
         "y": 23.17
@@ -358,6 +384,8 @@
       "source": "generator_report",
       "generator": "guard_ring",
       "cell_name": "nwt_mok2p",
+      "source_path": "gen/nwt_mok2p.gds",
+      "source_digest": "sha256:9fb50c75d5ca47e1c6d5324cf8b54ec554d8139b31f23f3baba96fdec0484a18",
       "offset_um": {
         "x": 24.96,
         "y": 14.2
@@ -375,6 +403,8 @@
       "source": "generator_report",
       "generator": "guard_ring",
       "cell_name": "nwt_mo1p",
+      "source_path": "gen/nwt_mo1p.gds",
+      "source_digest": "sha256:d219601952f3f5a1f74a19ee819a2099c5b3386d89cf4cf7d163b02a3762d834",
       "offset_um": {
         "x": 33.96,
         "y": 14.2
@@ -392,6 +422,8 @@
       "source": "generator_report",
       "generator": "guard_ring",
       "cell_name": "pst1",
+      "source_path": "gen/pst1.gds",
+      "source_digest": "sha256:e7df0c362e8c9a9dcea7f03bd5fdc0223beb0aa0b5e0b71b1efdfc457a20eec3",
       "offset_um": {
         "x": 10.0,
         "y": -3.5
@@ -409,6 +441,8 @@
       "source": "generator_report",
       "generator": "guard_ring",
       "cell_name": "pst2",
+      "source_path": "gen/pst2.gds",
+      "source_digest": "sha256:7bd5d1e15ef3772c740cf6c1074222768c74705d40ce875f322442452f68cf8e",
       "offset_um": {
         "x": 30.0,
         "y": -3.5
@@ -426,6 +460,8 @@
       "source": "cell",
       "generator": null,
       "cell_name": "promo_stub",
+      "source_path": "/home/ubuntu/GitHub/sky130-temp-por/.loom/worktrees/issue-30/layout/bias_core_settle_flag/promo_stub.gds",
+      "source_digest": "sha256:902ff80454f309f31943b44b8a7f942a6d96817455a784cbefd7f85d019f84ab",
       "offset_um": {
         "x": -4.0,
         "y": 26.5
@@ -443,6 +479,8 @@
       "source": "cell",
       "generator": null,
       "cell_name": "promo_stub",
+      "source_path": "/home/ubuntu/GitHub/sky130-temp-por/.loom/worktrees/issue-30/layout/bias_core_settle_flag/promo_stub.gds",
+      "source_digest": "sha256:902ff80454f309f31943b44b8a7f942a6d96817455a784cbefd7f85d019f84ab",
       "offset_um": {
         "x": -4.0,
         "y": -6.0
@@ -460,6 +498,8 @@
       "source": "cell",
       "generator": null,
       "cell_name": "promo_stub",
+      "source_path": "/home/ubuntu/GitHub/sky130-temp-por/.loom/worktrees/issue-30/layout/bias_core_settle_flag/promo_stub.gds",
+      "source_digest": "sha256:902ff80454f309f31943b44b8a7f942a6d96817455a784cbefd7f85d019f84ab",
       "offset_um": {
         "x": -4.0,
         "y": 11.5
@@ -477,6 +517,8 @@
       "source": "cell",
       "generator": null,
       "cell_name": "promo_stub",
+      "source_path": "/home/ubuntu/GitHub/sky130-temp-por/.loom/worktrees/issue-30/layout/bias_core_settle_flag/promo_stub.gds",
+      "source_digest": "sha256:902ff80454f309f31943b44b8a7f942a6d96817455a784cbefd7f85d019f84ab",
       "offset_um": {
         "x": -4.0,
         "y": 8.0
@@ -494,6 +536,8 @@
       "source": "cell",
       "generator": null,
       "cell_name": "promo_stub",
+      "source_path": "/home/ubuntu/GitHub/sky130-temp-por/.loom/worktrees/issue-30/layout/bias_core_settle_flag/promo_stub.gds",
+      "source_digest": "sha256:902ff80454f309f31943b44b8a7f942a6d96817455a784cbefd7f85d019f84ab",
       "offset_um": {
         "x": -4.0,
         "y": 7.0
@@ -511,6 +555,8 @@
       "source": "cell",
       "generator": null,
       "cell_name": "promo_stub_v",
+      "source_path": "/home/ubuntu/GitHub/sky130-temp-por/.loom/worktrees/issue-30/layout/bias_core_settle_flag/promo_stub_v.gds",
+      "source_digest": "sha256:d424bed4ea0c150c3b587f778629b56bbddafe6074de3201ed45fcc12436409c",
       "offset_um": {
         "x": -6.5,
         "y": 19.5
@@ -568,6 +614,7 @@
       "routed": true,
       "route_length_um": 182.705,
       "status": "routed",
+      "landed_on_block": true,
       "legs": [
         {
           "pins": [
@@ -583,7 +630,8 @@
           "routed": true,
           "route_length_um": 23.03,
           "reason": null,
-          "channel_track": 0
+          "channel_track": 0,
+          "landed_on_block": true
         },
         {
           "pins": [
@@ -599,7 +647,8 @@
           "routed": true,
           "route_length_um": 29.37,
           "reason": null,
-          "channel_track": 0
+          "channel_track": 0,
+          "landed_on_block": true
         },
         {
           "pins": [
@@ -615,7 +664,8 @@
           "routed": true,
           "route_length_um": 24.42,
           "reason": null,
-          "channel_track": 0
+          "channel_track": 0,
+          "landed_on_block": true
         },
         {
           "pins": [
@@ -631,7 +681,8 @@
           "routed": true,
           "route_length_um": 18.320000000000004,
           "reason": null,
-          "channel_track": 0
+          "channel_track": 0,
+          "landed_on_block": true
         },
         {
           "pins": [
@@ -647,7 +698,8 @@
           "routed": true,
           "route_length_um": 23.03000000000001,
           "reason": null,
-          "channel_track": 0
+          "channel_track": 0,
+          "landed_on_block": true
         },
         {
           "pins": [
@@ -663,7 +715,8 @@
           "routed": true,
           "route_length_um": 29.370000000000005,
           "reason": null,
-          "channel_track": 0
+          "channel_track": 0,
+          "landed_on_block": true
         },
         {
           "pins": [
@@ -679,7 +732,8 @@
           "routed": true,
           "route_length_um": 23.03,
           "reason": null,
-          "channel_track": 0
+          "channel_track": 0,
+          "landed_on_block": true
         },
         {
           "pins": [
@@ -695,7 +749,8 @@
           "routed": true,
           "route_length_um": 12.135000000000003,
           "reason": null,
-          "channel_track": 0
+          "channel_track": 0,
+          "landed_on_block": true
         }
       ]
     },
@@ -738,6 +793,7 @@
       "routed": true,
       "route_length_um": 113.635,
       "status": "routed",
+      "landed_on_block": true,
       "legs": [
         {
           "pins": [
@@ -753,7 +809,8 @@
           "routed": true,
           "route_length_um": 12.419999999999998,
           "reason": null,
-          "channel_track": 0
+          "channel_track": 0,
+          "landed_on_block": true
         },
         {
           "pins": [
@@ -769,7 +826,8 @@
           "routed": true,
           "route_length_um": 14.500000000000002,
           "reason": null,
-          "channel_track": 0
+          "channel_track": 0,
+          "landed_on_block": true
         },
         {
           "pins": [
@@ -785,7 +843,8 @@
           "routed": true,
           "route_length_um": 21.5,
           "reason": null,
-          "channel_track": 0
+          "channel_track": 0,
+          "landed_on_block": true
         },
         {
           "pins": [
@@ -801,7 +860,8 @@
           "routed": true,
           "route_length_um": 19.0,
           "reason": null,
-          "channel_track": 0
+          "channel_track": 0,
+          "landed_on_block": true
         },
         {
           "pins": [
@@ -817,7 +877,8 @@
           "routed": true,
           "route_length_um": 12.420000000000002,
           "reason": null,
-          "channel_track": 0
+          "channel_track": 0,
+          "landed_on_block": true
         },
         {
           "pins": [
@@ -833,7 +894,8 @@
           "routed": true,
           "route_length_um": 16.0,
           "reason": null,
-          "channel_track": 0
+          "channel_track": 0,
+          "landed_on_block": true
         },
         {
           "pins": [
@@ -849,7 +911,8 @@
           "routed": true,
           "route_length_um": 17.795,
           "reason": null,
-          "channel_track": 0
+          "channel_track": 0,
+          "landed_on_block": true
         }
       ]
     },
@@ -872,6 +935,7 @@
       "routed": true,
       "route_length_um": 41.56,
       "status": "routed",
+      "landed_on_block": true,
       "legs": [
         {
           "pins": [
@@ -887,7 +951,8 @@
           "routed": true,
           "route_length_um": 8.079999999999998,
           "reason": null,
-          "channel_track": 0
+          "channel_track": 0,
+          "landed_on_block": true
         },
         {
           "pins": [
@@ -903,7 +968,8 @@
           "routed": true,
           "route_length_um": 33.480000000000004,
           "reason": null,
-          "channel_track": 0
+          "channel_track": 0,
+          "landed_on_block": true
         }
       ]
     },
@@ -926,6 +992,7 @@
       "routed": true,
       "route_length_um": 40.585,
       "status": "routed",
+      "landed_on_block": true,
       "legs": [
         {
           "pins": [
@@ -941,7 +1008,8 @@
           "routed": true,
           "route_length_um": 32.72,
           "reason": null,
-          "channel_track": 0
+          "channel_track": 0,
+          "landed_on_block": true
         },
         {
           "pins": [
@@ -957,7 +1025,8 @@
           "routed": true,
           "route_length_um": 7.865000000000002,
           "reason": null,
-          "channel_track": 0
+          "channel_track": 0,
+          "landed_on_block": true
         }
       ]
     },
@@ -984,6 +1053,7 @@
       "routed": true,
       "route_length_um": 39.27000000000001,
       "status": "routed",
+      "landed_on_block": true,
       "legs": [
         {
           "pins": [
@@ -999,7 +1069,8 @@
           "routed": true,
           "route_length_um": 20.650000000000002,
           "reason": null,
-          "channel_track": 0
+          "channel_track": 0,
+          "landed_on_block": true
         },
         {
           "pins": [
@@ -1015,7 +1086,8 @@
           "routed": true,
           "route_length_um": 10.280000000000003,
           "reason": null,
-          "channel_track": 0
+          "channel_track": 0,
+          "landed_on_block": true
         },
         {
           "pins": [
@@ -1031,7 +1103,8 @@
           "routed": true,
           "route_length_um": 8.340000000000002,
           "reason": null,
-          "channel_track": 0
+          "channel_track": 0,
+          "landed_on_block": true
         }
       ]
     },
@@ -1058,6 +1131,7 @@
       "routed": true,
       "route_length_um": 56.03,
       "status": "routed",
+      "landed_on_block": true,
       "legs": [
         {
           "pins": [
@@ -1073,7 +1147,8 @@
           "routed": true,
           "route_length_um": 23.809999999999995,
           "reason": null,
-          "channel_track": 0
+          "channel_track": 0,
+          "landed_on_block": true
         },
         {
           "pins": [
@@ -1089,7 +1164,8 @@
           "routed": true,
           "route_length_um": 18.04,
           "reason": null,
-          "channel_track": 0
+          "channel_track": 0,
+          "landed_on_block": true
         },
         {
           "pins": [
@@ -1105,7 +1181,8 @@
           "routed": true,
           "route_length_um": 14.180000000000003,
           "reason": null,
-          "channel_track": 0
+          "channel_track": 0,
+          "landed_on_block": true
         }
       ]
     },
@@ -1136,6 +1213,7 @@
       "routed": true,
       "route_length_um": 85.785,
       "status": "routed",
+      "landed_on_block": true,
       "legs": [
         {
           "pins": [
@@ -1151,7 +1229,8 @@
           "routed": true,
           "route_length_um": 17.21,
           "reason": null,
-          "channel_track": 0
+          "channel_track": 0,
+          "landed_on_block": true
         },
         {
           "pins": [
@@ -1167,7 +1246,8 @@
           "routed": true,
           "route_length_um": 14.43,
           "reason": null,
-          "channel_track": 0
+          "channel_track": 0,
+          "landed_on_block": true
         },
         {
           "pins": [
@@ -1183,7 +1263,8 @@
           "routed": true,
           "route_length_um": 11.5,
           "reason": null,
-          "channel_track": 0
+          "channel_track": 0,
+          "landed_on_block": true
         },
         {
           "pins": [
@@ -1199,7 +1280,8 @@
           "routed": true,
           "route_length_um": 42.645,
           "reason": null,
-          "channel_track": 0
+          "channel_track": 0,
+          "landed_on_block": true
         }
       ]
     },
@@ -1222,6 +1304,7 @@
       "routed": true,
       "route_length_um": 89.02499999999999,
       "status": "routed",
+      "landed_on_block": true,
       "legs": [
         {
           "pins": [
@@ -1237,7 +1320,8 @@
           "routed": true,
           "route_length_um": 19.709999999999994,
           "reason": null,
-          "channel_track": 0
+          "channel_track": 0,
+          "landed_on_block": true
         },
         {
           "pins": [
@@ -1253,7 +1337,8 @@
           "routed": true,
           "route_length_um": 69.315,
           "reason": null,
-          "channel_track": 0
+          "channel_track": 0,
+          "landed_on_block": true
         }
       ]
     },
@@ -1272,6 +1357,7 @@
       "routed": true,
       "route_length_um": 30.895000000000003,
       "status": "routed",
+      "landed_on_block": true,
       "legs": [
         {
           "pins": [
@@ -1287,7 +1373,8 @@
           "routed": true,
           "route_length_um": 30.895000000000003,
           "reason": null,
-          "channel_track": 0
+          "channel_track": 0,
+          "landed_on_block": true
         }
       ]
     }
@@ -1376,5 +1463,16 @@
     "block 'moka' is placed 0.00um from block 'nwt_moka' (strategy: explicit), closer than nwt_moka's own declared drc_hints.min_spacing_um of 0.40um",
     "block 'mok2p' is placed 0.00um from block 'nwt_mok2p' (strategy: explicit), closer than nwt_mok2p's own declared drc_hints.min_spacing_um of 0.40um",
     "block 'mo1p' is placed 0.00um from block 'nwt_mo1p' (strategy: explicit), closer than nwt_mo1p's own declared drc_hints.min_spacing_um of 0.40um"
-  ]
+  ],
+  "provenance": {
+    "klt_version": "0.6.0",
+    "klayout_version": "0.30.10",
+    "pdk": {
+      "name": "sky130A",
+      "source": "search root: ~/.volare",
+      "version": "open_pdks c6d73a35f524070e85faff4a6a9eef49553ebc2b"
+    },
+    "deck": null,
+    "input": null
+  }
 }

@@ -4,12 +4,9 @@
 * pin er
 * pin na
 * pin vss
-* pin vsubs
-.SUBCKT bias_core_xq1_xqr er na vss vsubs
+.SUBCKT bias_core_xq1_xqr er na vss
 * device instance $1 r0 *1 1.7,1.7 pnp
-Q$1 vsubs vss na pnp AE=11.56P PE=13.6U AB=12.96P PB=14.4U AC=12.96P PC=14.4U
-+ NE=1
+Q$1 vss vss na pnp AE=11.56P PE=13.6U AB=12.96P PB=14.4U AC=12.96P PC=14.4U NE=1
 * device instance $2 r0 *1 6.32,1.7 pnp
-Q$2 vsubs vss er pnp AE=11.56P PE=13.6U AB=12.96P PB=14.4U AC=12.96P PC=14.4U
-+ NE=1
+Q$2 vss vss er pnp AE=11.56P PE=13.6U AB=12.96P PB=14.4U AC=12.96P PC=14.4U NE=1
 .ENDS bias_core_xq1_xqr

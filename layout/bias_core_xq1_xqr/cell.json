@@ -140,6 +140,7 @@
       "pins": [
         { "block": "array", "port": "Q0_B" },
         { "block": "array", "port": "Q1_B" },
+        { "block": "array", "port": "COLL_E" },
         { "block": "stub_vss", "port": "CONN" }
       ]
     }
@@ -151,6 +152,7 @@
   ],
   "lvs": {
     "reference": "layout/bias_core_xq1_xqr/reference.spice",
-    "subckt": "bias_core_xq1_xqr"
+    "subckt": "bias_core_xq1_xqr",
+    "options": { "compare_parameters": { "pnp": ["NE"] } }
   }
 }

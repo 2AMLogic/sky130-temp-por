@@ -42,41 +42,43 @@ intervening pads, exactly `docs/cli/gen-compose.md`'s own "Cross-block bus
 routing (`routing.cross_block_layer_role`, #1168)" worked example, which
 uses this same 8-unit `bjt_array` shape.
 
-**The collector guard ring (`COLL_N`/`COLL_S`/`COLL_E`/`COLL_W`) is
-deliberately left out of `vss`'s connectivity.** Wiring it in — at any
-`routing.layer_role` tried — never actually lands a contact on the
-diffusion-role port (`klt extract` always recovers the collector as a
-separate, unstrapped `vsubs` node despite a `routed: true`/clean-`klt-drc`
-report), and combining it with a second same-block net was observed to
-silently short the two together. Filed generically:
-[`2AMLogic/klayout-tools#1894`](https://github.com/2AMLogic/klayout-tools/issues/1894).
-Dropping it from `connectivity[]` avoids both failure modes; the diffusion
-region itself is still drawn (the generator's own guard ring, unchanged) and
-still extracts as one correctly-merged physical node across all 8 units —
-only its strap to `VSS` is missing from this increment.
+**The collector guard ring's east tap (`COLL_E`) is strapped into `vss`.**
+With the toolchain bump to `klt 0.6.0` (which carries
+[`2AMLogic/klayout-tools#2312`](https://github.com/2AMLogic/klayout-tools/issues/2312)'s
+fix, PR [#2320](https://github.com/2AMLogic/klayout-tools/pull/2320) — the
+collector ring drawn on the `tap` role so `klt extract` merges the strapped
+net), a `{"block": "array", "port": "COLL_E"}` pin in `vss`'s
+`connectivity[]` now lands a real contact: `klt extract` recovers the
+collector as part of `vss` itself — no separate `vsubs` node — and the LVS
+below goes to `match`. On the pre-0.6.0 toolchain this same strap was the
+one wired `routed: true`/clean-DRC report that never actually landed a
+contact (the gap originally filed as
+[`2AMLogic/klayout-tools#1894`](https://github.com/2AMLogic/klayout-tools/issues/1894),
+chased through #2008 → #2312); the historical narrative is preserved under
+"Upstream status" below.
 
-## Verification
+## Verification (as of the `klt 0.6.0` toolchain bump, issue #30)
 
 - **`klt drc --deck sky130`: clean, 0 violations.**
-- **`klt extract --deck sky130`: 8 devices, 3 nets** (`ec`, `vss`, and the
-  unstrapped `vsubs` collector node).
-- **`klt lvs` against `reference.spice`: mismatch** (0/8 devices, 0/2 nets,
-  per `lvs.json`). The extracted per-device topology is confirmed correct —
-  every one of the 8 devices reads `Q$N vsubs vss ec` (collector, base,
-  emitter), i.e. base and emitter land on exactly the two nets the schematic
-  puts them on, and stay correctly *separate* from each other — the mismatch
-  is entirely the collector/`vsubs` vs. reference's `VSS` difference (this
-  cell has 3 nets where the 2-port reference has 2, so no `net`/`pin` count
-  can match while that strap is open). This was independently confirmed with
-  a reduced probe cell.json that also excludes `ec`; the same collector/vss
-  split holds, isolating the mismatch to a single, understood cause rather
-  than a routing error in this cell's own connectivity.
-
-Revisit once the installed `klt` carries
-[`2AMLogic/klayout-tools#1894`](https://github.com/2AMLogic/klayout-tools/issues/1894)'s
-fix — see "Upstream status" below — at which point no floorplan change is
-expected to be needed beyond adding the collector-ring pins back into
-`vss`'s `connectivity[]`.
+- **`klt extract --deck sky130`: 8 devices, 2 nets** (`ec` and `vss` — the
+  formerly unstrapped `vsubs` collector node is gone; every one of the 8
+  devices now reads `Q$N vss vss ec`, collector and base both on `vss`,
+  exactly the reference's own `XQ8A VSS VSS EC` cards).
+- **`klt lvs` against `reference.spice`: match** — 8/8 devices, 2/2 nets,
+  2/2 pins — **with six disclosed device-parameter exclusions**: the cell's
+  `lvs.options.compare_parameters` scopes the `PNP` class to compare only
+  `NE`, excluding `AB`/`AC`/`AE`/`PB`/`PC`/`PE` (`lvs.json` carries one
+  `device.parameter_excluded` warning per parameter, severity `warning`).
+  This is a known, disclosed scope, not a silent widening: `klt lvs`'s
+  `subckt-call` conversion emits sky130's fixed-geometry PNP as a bare
+  `Q … pnp` card with no `AE`, which KLayout's BJT device class compares by
+  default — a zero-vs-nonzero difference no tolerance can absorb (filed
+  generically upstream as
+  [`2AMLogic/klayout-tools#2335`](https://github.com/2AMLogic/klayout-tools/issues/2335);
+  the `compare_parameters` escape hatch is
+  [klayout-tools#1928](https://github.com/2AMLogic/klayout-tools/issues/1928)).
+  The `match` does **not** claim the two sides agree on the six excluded
+  parameters.
 
 ## Full-cell assembly pins (issue #61)
 
@@ -142,12 +144,13 @@ li1 (`promo_stub.gds`), no PDK awareness needed.
 
 The collector ring is now a C-shaped conductor, not a closed loop: its
 substrate-isolation function is interrupted for the `4.0um` of the N-side
-opening. That is a real floorplan change, not a free one. It costs this
-cell nothing it currently *has*, though — the ring is already not strapped
-to `VSS` at all (see "Routing" above), and `klt extract` recovers it as the
-same floating `vsubs` node either way. Once the installed `klt` carries
-#1894's fix, the right move is to revisit this: close the ring again and
-promote `vss` through a real `COLL_*` tap instead.
+opening. That is a real floorplan change, not a free one. The `klt 0.6.0`
+strap above goes through `COLL_E` with the ring still open, so the opening
+stays load-bearing for the `ec`/`vss` stub escapes (see "Why the ring had to
+be opened"). Closing the ring again is now decoupled from electrical
+correctness — it would be an isolation-geometry judgement call, not a
+prerequisite for the strap — and is deliberately left for a follow-up, out
+of this increment's scope.
 
 ### Evidence: this changed no device, no net, and no verdict
 
@@ -182,17 +185,18 @@ itself `klt drc`-clean. Evidence:
 this file. Re-run the whole chain with
 `python3 layout/bin/compose-cell.py layout/bias_core_pnp8_leg/cell.json --check`.
 
-### Upstream status (as of 2026-09-16)
+### Upstream status (as of 2026-09-23, issue #30's toolchain bump)
 
-[`#1894`](https://github.com/2AMLogic/klayout-tools/issues/1894) **is
-closed as COMPLETED**, by
-[PR #1930](https://github.com/2AMLogic/klayout-tools/pull/1930) (merged
-`2026-09-16T06:44:04Z`), which *did* land a real fix: `COLL_*` diffusion-role
-via-drops now draw an actual `licon`/`mcon` contact instead of falling
-through to "nothing to do". **This repo cannot use it yet.** The installed
-toolchain is `klt 0.5.0+gba213c617b4e`, built from `ba213c61`
-(`2026-09-15T23:03:10Z`) — about eight hours *before* that merge — and its
-`_resolve_via_drop_layer()` still has the pre-fix fallthrough, confirmed by
-reading the installed source. So the collector strap remains open here, and
-the ring opening above is the correct answer *for the pinned toolchain*, not
-a permanent one.
+The collector-strap gap this cell's original verification chased upstream is
+resolved and **in use here**: #1894's first fix (PR #1930) did not survive
+direct reproduction, so the gap was re-filed with byte-exact repros as
+[#2008](https://github.com/2AMLogic/klayout-tools/issues/2008) (closed by an
+investigation that found no repro) and then
+[#2312](https://github.com/2AMLogic/klayout-tools/issues/2312), closed by
+[PR #2320](https://github.com/2AMLogic/klayout-tools/pull/2320) (merged
+`2026-09-22T18:10:31Z`, commit `ba1039d4`): the collector ring is drawn on
+the `tap` role extraction uses to unify substrate ties, so the strap `klt
+gen-compose` always drew is now electrically recognized by `klt extract`.
+This repo's evidence is regenerated against `klt 0.6.0` (`c622e8addb36`,
+`layout/pdk.json`'s pin), which contains that fix — verified by direct
+reproduction (the `match` above), not by trusting the closed status.

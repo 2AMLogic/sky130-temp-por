@@ -93,7 +93,7 @@
       "source": "cell",
       "generator": null,
       "cell_name": "bias_core_mirror_amp",
-      "source_path": "/Users/rwalters/GitHub/sky130-temp-por/.loom/worktrees/issue-69/layout/bias_core/../bias_core_mirror_amp/bias_core_mirror_amp.gds",
+      "source_path": "/home/ubuntu/GitHub/sky130-temp-por/.loom/worktrees/issue-30/layout/bias_core/../bias_core_mirror_amp/bias_core_mirror_amp.gds",
       "source_digest": "sha256:30689c9bdcc65b4899bfb21a500fdfaed7b42a0b60d2633a9664b8257e4304d5",
       "offset_um": {
         "x": 0.0,
@@ -112,8 +112,8 @@
       "source": "cell",
       "generator": null,
       "cell_name": "bias_core_xq1_xqr",
-      "source_path": "/Users/rwalters/GitHub/sky130-temp-por/.loom/worktrees/issue-69/layout/bias_core/../bias_core_xq1_xqr/bias_core_xq1_xqr.gds",
-      "source_digest": "sha256:d876f13ca6df5e701d4966c7984430dceea453318373371355ca0dd2cf60f814",
+      "source_path": "/home/ubuntu/GitHub/sky130-temp-por/.loom/worktrees/issue-30/layout/bias_core/../bias_core_xq1_xqr/bias_core_xq1_xqr.gds",
+      "source_digest": "sha256:267e55f2fabaf4af7ac467b1bdfb1cd604cc4b920f8a7ee042a84fece30def9e",
       "offset_um": {
         "x": 150.0,
         "y": 100.0
@@ -131,8 +131,8 @@
       "source": "cell",
       "generator": null,
       "cell_name": "bias_core_pnp8_leg",
-      "source_path": "/Users/rwalters/GitHub/sky130-temp-por/.loom/worktrees/issue-69/layout/bias_core/../bias_core_pnp8_leg/bias_core_pnp8_leg.gds",
-      "source_digest": "sha256:3d3ba6cc0934feeff3d599840928868d27f1bcf76b8207661002e6ea51906a9f",
+      "source_path": "/home/ubuntu/GitHub/sky130-temp-por/.loom/worktrees/issue-30/layout/bias_core/../bias_core_pnp8_leg/bias_core_pnp8_leg.gds",
+      "source_digest": "sha256:449afd4bbfedc430bf2232e16e03a6b51242436cc58fa3ad0862b542f2d0dfc4",
       "offset_um": {
         "x": 200.0,
         "y": 100.0
@@ -150,7 +150,7 @@
       "source": "cell",
       "generator": null,
       "cell_name": "bias_core_startup",
-      "source_path": "/Users/rwalters/GitHub/sky130-temp-por/.loom/worktrees/issue-69/layout/bias_core/../bias_core_startup/bias_core_startup.gds",
+      "source_path": "/home/ubuntu/GitHub/sky130-temp-por/.loom/worktrees/issue-30/layout/bias_core/../bias_core_startup/bias_core_startup.gds",
       "source_digest": "sha256:ce2e3e301b09c546888503af2df30a109b25139ed8b82c4a73afefbf6552927b",
       "offset_um": {
         "x": 1350.0,
@@ -169,7 +169,7 @@
       "source": "cell",
       "generator": null,
       "cell_name": "bias_core_settle_flag",
-      "source_path": "/Users/rwalters/GitHub/sky130-temp-por/.loom/worktrees/issue-69/layout/bias_core/../bias_core_settle_flag/bias_core_settle_flag.gds",
+      "source_path": "/home/ubuntu/GitHub/sky130-temp-por/.loom/worktrees/issue-30/layout/bias_core/../bias_core_settle_flag/bias_core_settle_flag.gds",
       "source_digest": "sha256:d8b81d9f19b8d681d41869f77e85d910d7287a8dea5f66afbef83b9cbcdc73f1",
       "offset_um": {
         "x": 5450.0,
@@ -188,8 +188,8 @@
       "source": "cell",
       "generator": null,
       "cell_name": "bias_core_passives",
-      "source_path": "/Users/rwalters/GitHub/sky130-temp-por/.loom/worktrees/issue-69/layout/bias_core/../bias_core_passives/bias_core_passives.gds",
-      "source_digest": "sha256:8b6feecf83bd4de83d0dcd53493f554c3be9be0c733ac3d208ee43c123507be4",
+      "source_path": "/home/ubuntu/GitHub/sky130-temp-por/.loom/worktrees/issue-30/layout/bias_core/../bias_core_passives/bias_core_passives.gds",
+      "source_digest": "sha256:c19f70fd280598690eea0065cfa825e56574cb819867f6f427388793e34419a9",
       "offset_um": {
         "x": 0.0,
         "y": -50.0
@@ -207,7 +207,7 @@
       "source": "cell",
       "generator": null,
       "cell_name": "promo_stub",
-      "source_path": "/Users/rwalters/GitHub/sky130-temp-por/.loom/worktrees/issue-69/layout/bias_core/promo_stub.gds",
+      "source_path": "/home/ubuntu/GitHub/sky130-temp-por/.loom/worktrees/issue-30/layout/bias_core/promo_stub.gds",
       "source_digest": "sha256:902ff80454f309f31943b44b8a7f942a6d96817455a784cbefd7f85d019f84ab",
       "offset_um": {
         "x": -100.0,
@@ -226,7 +226,7 @@
       "source": "cell",
       "generator": null,
       "cell_name": "promo_stub",
-      "source_path": "/Users/rwalters/GitHub/sky130-temp-por/.loom/worktrees/issue-69/layout/bias_core/promo_stub.gds",
+      "source_path": "/home/ubuntu/GitHub/sky130-temp-por/.loom/worktrees/issue-30/layout/bias_core/promo_stub.gds",
       "source_digest": "sha256:902ff80454f309f31943b44b8a7f942a6d96817455a784cbefd7f85d019f84ab",
       "offset_um": {
         "x": -104.0,
@@ -269,6 +269,7 @@
       "routed": true,
       "route_length_um": 6609.370000000001,
       "status": "routed",
+      "landed_on_block": true,
       "legs": [
         {
           "pins": [
@@ -284,7 +285,8 @@
           "routed": true,
           "route_length_um": 1660.17,
           "reason": null,
-          "channel_track": 0
+          "channel_track": 0,
+          "landed_on_block": true
         },
         {
           "pins": [
@@ -300,7 +302,8 @@
           "routed": true,
           "route_length_um": 4443.67,
           "reason": null,
-          "channel_track": 0
+          "channel_track": 0,
+          "landed_on_block": true
         },
         {
           "pins": [
@@ -316,7 +319,8 @@
           "routed": true,
           "route_length_um": 255.9450000000006,
           "reason": null,
-          "channel_track": 0
+          "channel_track": 0,
+          "landed_on_block": true
         },
         {
           "pins": [
@@ -332,7 +336,8 @@
           "routed": true,
           "route_length_um": 249.58499999999998,
           "reason": null,
-          "channel_track": 0
+          "channel_track": 0,
+          "landed_on_block": true
         }
       ]
     },
@@ -359,6 +364,7 @@
       "routed": true,
       "route_length_um": 6201.425,
       "status": "routed",
+      "landed_on_block": true,
       "legs": [
         {
           "pins": [
@@ -374,7 +380,8 @@
           "routed": true,
           "route_length_um": 1585.7150000000001,
           "reason": null,
-          "channel_track": 0
+          "channel_track": 0,
+          "landed_on_block": true
         },
         {
           "pins": [
@@ -390,7 +397,8 @@
           "routed": true,
           "route_length_um": 4397.295,
           "reason": null,
-          "channel_track": 0
+          "channel_track": 0,
+          "landed_on_block": true
         },
         {
           "pins": [
@@ -406,7 +414,8 @@
           "routed": true,
           "route_length_um": 218.415,
           "reason": null,
-          "channel_track": 0
+          "channel_track": 0,
+          "landed_on_block": true
         }
       ]
     },
@@ -425,6 +434,7 @@
       "routed": true,
       "route_length_um": 4318.83,
       "status": "routed",
+      "landed_on_block": true,
       "legs": [
         {
           "pins": [
@@ -440,7 +450,8 @@
           "routed": true,
           "route_length_um": 4318.83,
           "reason": null,
-          "channel_track": 0
+          "channel_track": 0,
+          "landed_on_block": true
         }
       ]
     }
@@ -485,8 +496,8 @@
   },
   "warnings": [],
   "provenance": {
-    "klt_version": "0.5.0+g2b1e55e51bb8.dirty",
-    "klayout_version": "0.30.12",
+    "klt_version": "0.6.0",
+    "klayout_version": "0.30.10",
     "pdk": {
       "name": "sky130A",
       "source": "search root: ~/.volare",

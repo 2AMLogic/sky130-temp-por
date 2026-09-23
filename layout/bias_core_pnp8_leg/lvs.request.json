@@ -6,5 +6,12 @@
     "netlist": "bias_core_pnp8_leg.ref.spice",
     "form": "subckt-call",
     "deck": "sky130"
+  },
+  "options": {
+    "compare_parameters": {
+      "pnp": [
+        "NE"
+      ]
+    }
   }
 }

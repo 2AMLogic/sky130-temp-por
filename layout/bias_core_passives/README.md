@@ -92,8 +92,10 @@ cell's own LVS run.
   matches `L / W * 2000` (sky130's `res_xhigh_po` sheet rho) exactly —
   `17500`/`350000`/`1016000`/`4104000` Ω for `L=17.5`/`350.0`/`1016.0`/
   `4104.0` respectively.
-- **`klt lvs` against `reference.spice`: mismatch** (0/6 devices, 0/11 nets,
-  per `lvs.json`) — but, unlike the sibling PNP recipes, **not** because of
+- **`klt lvs` against `reference.spice`: mismatch** (4/6 devices, 7/11 nets,
+  per `lvs.json`, as of the `klt 0.6.0` toolchain bump, issue #30 — improved
+  from 0/6 devices, 0/11 nets on the pre-0.6.0 pin) — but, unlike the sibling
+  PNP recipes, **not** because of
   the `VSS`/`vsubs` naming gap the "Routing" section above describes.
   Confirmed directly: renaming `VSS` to `vsubs` throughout a scratch copy of
   `reference.spice` (so the two sides' 11th net is byte-identical) does not
@@ -102,7 +104,15 @@ cell's own LVS run.
   conversion already gives the reference-side resistor class the same
   3-terminal arity as the layout side.
 
-  The real, confirmed root cause is two independent, generic
+  On `klt 0.6.0` the compare now proceeds past the resistor-class blocker
+  below (gap 1) and matches every resistor and every resistor-touching net —
+  the committed evidence now shows natively what the scratch
+  `form: "plain-element"` experiment below demonstrated (4/6 devices, 7/11
+  nets): the two remaining unmatched devices are exactly the two MiM caps
+  and their 4 cap-touching nets (gap 2), plus the still-reported
+  `device.placeholder_value` warning on `RES_XHIGH_PO` (gap 1's placeholder
+  itself is unchanged — only its match-blocking effect is gone). The real,
+  confirmed root causes remain two independent, generic
   `klayout-tools` gaps in how a resistor/capacitor round-trips through the
   SPICE text `klt lvs`'s `form: "subckt-call"` reference conversion and
   `klt extract`'s own netlist writer produce:

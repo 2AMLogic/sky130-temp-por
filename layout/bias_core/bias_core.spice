@@ -42,12 +42,9 @@
 * pin pg
 * pin tok
 * pin vref
-* pin vss
-* pin vss
 .SUBCKT bias_core BIAS_OK|bias_ok IBIAS|ibias VDD|vdd VREF|vref VSS|vss ec ec$1
 + er er$1 ks1 ks2 ks3 ks4 n1 n2 n2$1 na na$1 na$2 nb nb$1 nbg nbtop nbtop$1
-+ nbtop$2 nkg nkm nokl noko nokx nokx$1 nt nz pb pb$1 pb$2 pg pg$1 pg$2 tok
-+ vref vss vss$1
++ nbtop$2 nkg nkm nokl noko nokx nokx$1 nt nz pb pb$1 pb$2 pg pg$1 pg$2 tok vref
 * device instance $1 r0 *1 26.42,101 nfet
 M$1 nbg nbg VSS|vss VSS|vss nfet L=4U W=2U AS=0.84P AD=0.84P PS=4.84U PD=4.84U
 * device instance $2 r0 *1 33.42,101 nfet
@@ -129,34 +126,34 @@ M$33 n2$1 nb$1 nt VDD|vdd pfet L=4U W=16U AS=6.72P AD=6.72P PS=32.84U PD=32.84U
 M$34 IBIAS|ibias pb VDD|vdd VDD|vdd pfet L=4U W=40U AS=16.8P AD=16.8P PS=80.84U
 + PD=80.84U
 * device instance $35 r0 *1 151.7,101.7 pnp
-Q$35 VSS|vss vss$1 na pnp AE=11.56P PE=13.6U AB=12.96P PB=14.4U AC=12.96P
+Q$35 VSS|vss VSS|vss na pnp AE=11.56P PE=13.6U AB=12.96P PB=14.4U AC=12.96P
 + PC=14.4U NE=1
 * device instance $36 r0 *1 156.32,101.7 pnp
-Q$36 VSS|vss vss$1 er$1 pnp AE=11.56P PE=13.6U AB=12.96P PB=14.4U AC=12.96P
+Q$36 VSS|vss VSS|vss er$1 pnp AE=11.56P PE=13.6U AB=12.96P PB=14.4U AC=12.96P
 + PC=14.4U NE=1
 * device instance $37 r0 *1 201.7,101.7 pnp
-Q$37 VSS|vss vss ec$1 pnp AE=11.56P PE=13.6U AB=12.96P PB=14.4U AC=12.96P
+Q$37 VSS|vss VSS|vss ec$1 pnp AE=11.56P PE=13.6U AB=12.96P PB=14.4U AC=12.96P
 + PC=14.4U NE=1
 * device instance $38 r0 *1 206.32,101.7 pnp
-Q$38 VSS|vss vss ec$1 pnp AE=11.56P PE=13.6U AB=12.96P PB=14.4U AC=12.96P
+Q$38 VSS|vss VSS|vss ec$1 pnp AE=11.56P PE=13.6U AB=12.96P PB=14.4U AC=12.96P
 + PC=14.4U NE=1
 * device instance $39 r0 *1 210.94,101.7 pnp
-Q$39 VSS|vss vss ec$1 pnp AE=11.56P PE=13.6U AB=12.96P PB=14.4U AC=12.96P
+Q$39 VSS|vss VSS|vss ec$1 pnp AE=11.56P PE=13.6U AB=12.96P PB=14.4U AC=12.96P
 + PC=14.4U NE=1
 * device instance $40 r0 *1 215.56,101.7 pnp
-Q$40 VSS|vss vss ec$1 pnp AE=11.56P PE=13.6U AB=12.96P PB=14.4U AC=12.96P
+Q$40 VSS|vss VSS|vss ec$1 pnp AE=11.56P PE=13.6U AB=12.96P PB=14.4U AC=12.96P
 + PC=14.4U NE=1
 * device instance $41 r0 *1 201.7,105.5 pnp
-Q$41 VSS|vss vss ec$1 pnp AE=11.56P PE=13.6U AB=12.96P PB=14.4U AC=12.96P
+Q$41 VSS|vss VSS|vss ec$1 pnp AE=11.56P PE=13.6U AB=12.96P PB=14.4U AC=12.96P
 + PC=14.4U NE=1
 * device instance $42 r0 *1 206.32,105.5 pnp
-Q$42 VSS|vss vss ec$1 pnp AE=11.56P PE=13.6U AB=12.96P PB=14.4U AC=12.96P
+Q$42 VSS|vss VSS|vss ec$1 pnp AE=11.56P PE=13.6U AB=12.96P PB=14.4U AC=12.96P
 + PC=14.4U NE=1
 * device instance $43 r0 *1 210.94,105.5 pnp
-Q$43 VSS|vss vss ec$1 pnp AE=11.56P PE=13.6U AB=12.96P PB=14.4U AC=12.96P
+Q$43 VSS|vss VSS|vss ec$1 pnp AE=11.56P PE=13.6U AB=12.96P PB=14.4U AC=12.96P
 + PC=14.4U NE=1
 * device instance $44 r0 *1 215.56,105.5 pnp
-Q$44 VSS|vss vss ec$1 pnp AE=11.56P PE=13.6U AB=12.96P PB=14.4U AC=12.96P
+Q$44 VSS|vss VSS|vss ec$1 pnp AE=11.56P PE=13.6U AB=12.96P PB=14.4U AC=12.96P
 + PC=14.4U NE=1
 * device instance $45 r0 *1 5530.36,-46.5 sky130_fd_pr__model__cap_mim
 C$45 VDD|vdd nokx 7.656e-14

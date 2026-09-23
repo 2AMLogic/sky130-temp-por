@@ -915,6 +915,7 @@
   ],
   "lvs": {
     "reference": "design/netlist/bias_core.spice",
-    "subckt": "bias_core"
+    "subckt": "bias_core",
+    "options": { "compare_parameters": { "pnp": ["NE"] } }
   }
 }

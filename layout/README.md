@@ -54,17 +54,18 @@ as a standalone proof cell, using `klt gen bjt_array`'s common-centroid
 matched-array generator (one call draws the whole matched, guard-ringed
 group; no manual multi-block placement the way a digital gate needs).
 
-**`klt drc`: clean, 0 violations.** **`klt extract`: 8 devices, 3 nets.**
+**`klt drc`: clean, 0 violations.** **`klt extract`: 8 devices, 2 nets.**
 **`klt lvs` against `design/netlist/bias_core.spice`'s own device cards:
-mismatch** (0/8 devices, 0/2 nets) — but a single, well-isolated, understood
-cause, not a wiring error in this cell's own `cell.json`: the base ↔ emitter
-topology extracts **exactly right** for all 8 devices (confirmed by a reduced
-probe that excludes the collector, see below); the only gap is the
-collector-ring-to-`VSS` strap the schematic's own device cards require
-(`XQ8A VSS VSS EC ...` — collector and base both explicitly tied to `VSS`).
-That gap traces to a real `klt gen-compose` limitation, not a cell.json bug —
-see "Known klt gaps hit building this recipe" below,
-[`2AMLogic/klayout-tools#1894`](https://github.com/2AMLogic/klayout-tools/issues/1894).
+match** (8/8 devices, 2/2 nets, as of issue #30's `klt 0.6.0` toolchain
+bump) — with six disclosed `device.parameter_excluded` warnings (the `PNP`
+class scoped to compare only `NE`, excluding `AB`/`AC`/`AE`/`PB`/`PC`/`PE`).
+The collector-ring-to-`VSS` strap the schematic's own device cards require
+(`XQ8A VSS VSS EC ...` — collector and base both explicitly tied to `VSS`)
+is now landed through the array's own `COLL_E` tap; the gap it previously
+hit was a real `klt gen-compose`/`klt extract` limitation, not a cell.json
+bug — see "Known klt gaps hit building this recipe" below,
+[`2AMLogic/klayout-tools#1894`](https://github.com/2AMLogic/klayout-tools/issues/1894)
+→ #2008 → #2312 (resolved by PR #2320, in the pinned `klt 0.6.0`).
 
 Issue #61 added `pins[]` promotions for `ec` and `vss` (this cell had none
 at all before), via a `params.ring_gap_side` opening in the collector ring —
@@ -81,13 +82,14 @@ shared-ring `klt gen bjt_array` call (`rows=1 cols=2 ratio=1`) rather than
 two independently-ringed blocks (bussing a net between two closed guard
 rings does not route — see that cell's own README "Routing" section).
 
-**`klt drc`: clean, 0 violations.** **`klt extract`: 2 devices, 4 nets.**
+**`klt drc`: clean, 0 violations.** **`klt extract`: 2 devices, 3 nets.**
 **`klt lvs` against `design/netlist/bias_core.spice`'s own device cards:
-mismatch** (0/2 devices, 0/3 nets) — the same single, well-isolated cause as
-`bias_core_pnp8_leg`: base and each device's own emitter extract exactly
-right, and the only gap is the collector-ring-to-`VSS` strap
+match** (2/2 devices, 3/3 nets, as of issue #30's `klt 0.6.0` toolchain
+bump, with the same six disclosed `PNP` parameter exclusions as
+`bias_core_pnp8_leg`): the `COLL_E` collector strap that
 [`2AMLogic/klayout-tools#1894`](https://github.com/2AMLogic/klayout-tools/issues/1894)
-blocks.
+→ #2008 → #2312 used to block now lands (resolved by PR #2320, in the
+pinned `klt 0.6.0`).
 
 Issue #61 added a `pins[]` promotion for `vss` alongside the existing
 `na`/`er`, via the same `params.ring_gap_side` opening technique — device
@@ -107,7 +109,10 @@ each other).
 
 **`klt drc`: clean, 0 violations.** **`klt extract`: 6 devices, 11 nets.**
 **`klt lvs` against `design/netlist/bias_core.spice`'s own device cards:
-mismatch** (0/6 devices, 0/11 nets) — **not** the `bias_core_pnp8_leg`/
+mismatch** (4/6 devices, 7/11 nets as of issue #30's `klt 0.6.0` toolchain
+bump — improved from 0/6 devices, 0/11 nets; every resistor and
+resistor-touching net now matches, leaving exactly the two MiM caps and
+their 4 cap-touching nets unmatched) — **not** the `bias_core_pnp8_leg`/
 `bias_core_xq1_xqr` collector-strap gap (confirmed: this device group's own
 `VSS`↔`vsubs` naming makes no difference to the result). Two different,
 newly-found `klt lvs`/`klt extract` gaps block it instead — see that cell's
@@ -247,17 +252,29 @@ now receives an actual `licon`/`mcon` contact instead of falling through to
 "already covered, nothing to do". Finding 2 follows from finding 1 and is
 covered by the same fix.
 
-**None of that is usable in this repo yet.** The installed toolchain is
-`klt 0.5.0+gba213c617b4e`, built from `ba213c61` (`2026-09-15T23:03:10Z`) —
-roughly eight hours *before* that merge. Confirmed by reading the installed
-`gen_compose_routing.py`: `_resolve_via_drop_layer()` still has the pre-fix
-`return None, None` fallthrough for any non-metals-stack, non-poly port. So
-every collector-strap statement recorded above and in the two PNP cells'
-own READMEs still holds for the evidence this repo commits today. Closing
-the strap for real is gated on a `klt` upgrade plus a full re-run of both
-cells — worth doing, since it is the one remaining cause of their LVS
-mismatch, but it is a toolchain bump affecting every committed artifact in
-`layout/`, not a cell-level edit.
+**Update (issue #30, 2026-09-23) — the strap gap is closed for real, under
+the `klt 0.6.0` pin.** #1930's fix did not survive direct reproduction (a
+wired `routed: true` strap still extracted as an unmerged `vsubs` node), so
+the gap was re-filed with byte-exact repros as
+[#2008](https://github.com/2AMLogic/klayout-tools/issues/2008) (closed by
+an investigation that found no repro) and then
+[#2312](https://github.com/2AMLogic/klayout-tools/issues/2312), closed by
+[PR #2320](https://github.com/2AMLogic/klayout-tools/pull/2320) (merged
+`2026-09-22T18:10:31Z`, commit `ba1039d4`): the collector ring is drawn on
+the `tap` role extraction uses to unify substrate ties, so the strap is
+electrically recognized. `layout/pdk.json` now pins `klt 0.6.0`
+(`c622e8addb36`, which contains that fix), every `layout/*/` evidence
+directory is regenerated against it, and both PNP cells strap `vss` through
+their array's own `COLL_E` tap: their `klt extract` drops the separate
+`vsubs` node (8 devices / 2 nets, and 2 devices / 3 nets respectively) and
+their `klt lvs` reads `match` — with six disclosed
+`device.parameter_excluded` warnings each (the `PNP` class scoped to
+compare only `NE`, excluding `AB`/`AC`/`AE`/`PB`/`PC`/`PE`, via
+`compose-cell.py`'s new `lvs.options` pass-through — the sky130
+fixed-geometry `AE` gap, filed generically as
+[#2335](https://github.com/2AMLogic/klayout-tools/issues/2335)). Findings 1
+and 2 above are the *historical* record of the pre-fix behavior; they no
+longer describe the committed evidence.
 
 **Update (issue #56):** the installed `klt` build also actively *detects* a
 closed guard/collector ring and refuses any leg targeting one of the

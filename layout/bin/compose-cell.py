@@ -776,6 +776,14 @@ def compose_cell(spec: dict, spec_dir: Path, out_dir: Path) -> dict:
         lvs_options["flatten_reference"] = True
     if lvs_spec.get("flatten_layout"):
         lvs_options["flatten_layout"] = True
+    # Forward the cell.json's own declared LVS options verbatim (e.g.
+    # ``options.compare_parameters``, the disclosed device-parameter
+    # exclusion the PNP cells use for sky130's fixed-geometry ``AE`` gap --
+    # klayout-tools#2335) so a cell can scope its own comparison without a
+    # compose-cell.py change per option. Explicit lvs block keys keep
+    # winning over same-named forwarded keys.
+    for key, value in (lvs_spec.get("options") or {}).items():
+        lvs_options.setdefault(key, value)
     lvs_request = {
         "layout": {"netlist": str(Path(extract["netlist_path"]).name)},
         "reference": {

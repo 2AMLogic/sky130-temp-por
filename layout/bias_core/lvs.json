@@ -13,7 +13,11 @@
     "flatten_reference": false,
     "netgen_setup": null,
     "parameter_tolerance": null,
-    "compare_parameters": null,
+    "compare_parameters": {
+      "pnp": [
+        "NE"
+      ]
+    },
     "power_connectivity": null,
     "supply_nets": [
       "GND",
@@ -45,24 +49,25 @@
     "findings": [],
     "finding_count": 0
   },
-  "mismatch_count": 72,
-  "error_count": 71,
+  "mismatch_count": 66,
+  "error_count": 59,
   "category_counts": {
+    "device.parameter_excluded": 6,
     "device.placeholder_value": 1,
-    "device.unmatched": 45,
+    "device.unmatched": 35,
     "net.merged": 4,
-    "net.split": 20,
+    "net.split": 18,
     "topology": 2
   },
   "category_error_counts": {
-    "device.unmatched": 45,
+    "device.unmatched": 35,
     "net.merged": 4,
-    "net.split": 20,
+    "net.split": 18,
     "topology": 2
   },
   "counts": {
     "nets": {
-      "layout": 43,
+      "layout": 41,
       "reference": 27,
       "matched": 14
     },
@@ -72,31 +77,163 @@
       "matched": 21
     },
     "pins": {
-      "layout": 43,
+      "layout": 41,
       "reference": 5,
-      "matched": 44
+      "matched": 42
     }
   },
   "device_classes": null,
   "environment": {
     "engine": "klayout",
-    "engine_version": "0.30.12",
-    "layout_sha256": "de4d27f835d4fa44047369c2fa59cda0d2227b243d5f31c332faf45dce7fe796",
+    "engine_version": "0.30.10",
+    "layout_sha256": "b58a31e698234711f5314873d42479baa96f1708489599aa67afea48dc8fa4eb",
     "reference_sha256": "6f52ad69cc3d31e135554f29742d63e5530ac2f84d3104bf993fe520b09b0cd2",
     "extracted_netlist": null
   },
   "provenance": {
-    "klt_version": "0.5.0+g2b1e55e51bb8.dirty",
-    "klayout_version": "0.30.12",
+    "klt_version": "0.6.0",
+    "klayout_version": "0.30.10",
     "pdk": null,
     "deck": null,
     "input": {
-      "content_hash": "sha256:de4d27f835d4fa44047369c2fa59cda0d2227b243d5f31c332faf45dce7fe796",
+      "content_hash": "sha256:b58a31e698234711f5314873d42479baa96f1708489599aa67afea48dc8fa4eb",
       "role": "netlist"
     },
-    "klayout_version_mismatch": true
+    "klayout_version_mismatch": false
   },
   "mismatches": [
+    {
+      "category": "device.parameter_excluded",
+      "severity": "warning",
+      "description": "options.compare_parameters scoped device class 'PNP' to compare only ['NE'] -- 'AB' was excluded from this compare and is NOT verified; a 'match' does not confirm the two sides agree on it (see docs/cli/lvs.md, 'device.parameter_excluded')",
+      "side": "both",
+      "net": null,
+      "device": {
+        "layout": null,
+        "reference": null,
+        "class": "PNP"
+      },
+      "property": null,
+      "details": {
+        "parameter": "AB",
+        "compared_parameters": [
+          "NE"
+        ]
+      },
+      "circuit": null,
+      "instance": null,
+      "subcircuit": null
+    },
+    {
+      "category": "device.parameter_excluded",
+      "severity": "warning",
+      "description": "options.compare_parameters scoped device class 'PNP' to compare only ['NE'] -- 'AC' was excluded from this compare and is NOT verified; a 'match' does not confirm the two sides agree on it (see docs/cli/lvs.md, 'device.parameter_excluded')",
+      "side": "both",
+      "net": null,
+      "device": {
+        "layout": null,
+        "reference": null,
+        "class": "PNP"
+      },
+      "property": null,
+      "details": {
+        "parameter": "AC",
+        "compared_parameters": [
+          "NE"
+        ]
+      },
+      "circuit": null,
+      "instance": null,
+      "subcircuit": null
+    },
+    {
+      "category": "device.parameter_excluded",
+      "severity": "warning",
+      "description": "options.compare_parameters scoped device class 'PNP' to compare only ['NE'] -- 'AE' was excluded from this compare and is NOT verified; a 'match' does not confirm the two sides agree on it (see docs/cli/lvs.md, 'device.parameter_excluded')",
+      "side": "both",
+      "net": null,
+      "device": {
+        "layout": null,
+        "reference": null,
+        "class": "PNP"
+      },
+      "property": null,
+      "details": {
+        "parameter": "AE",
+        "compared_parameters": [
+          "NE"
+        ]
+      },
+      "circuit": null,
+      "instance": null,
+      "subcircuit": null
+    },
+    {
+      "category": "device.parameter_excluded",
+      "severity": "warning",
+      "description": "options.compare_parameters scoped device class 'PNP' to compare only ['NE'] -- 'PB' was excluded from this compare and is NOT verified; a 'match' does not confirm the two sides agree on it (see docs/cli/lvs.md, 'device.parameter_excluded')",
+      "side": "both",
+      "net": null,
+      "device": {
+        "layout": null,
+        "reference": null,
+        "class": "PNP"
+      },
+      "property": null,
+      "details": {
+        "parameter": "PB",
+        "compared_parameters": [
+          "NE"
+        ]
+      },
+      "circuit": null,
+      "instance": null,
+      "subcircuit": null
+    },
+    {
+      "category": "device.parameter_excluded",
+      "severity": "warning",
+      "description": "options.compare_parameters scoped device class 'PNP' to compare only ['NE'] -- 'PC' was excluded from this compare and is NOT verified; a 'match' does not confirm the two sides agree on it (see docs/cli/lvs.md, 'device.parameter_excluded')",
+      "side": "both",
+      "net": null,
+      "device": {
+        "layout": null,
+        "reference": null,
+        "class": "PNP"
+      },
+      "property": null,
+      "details": {
+        "parameter": "PC",
+        "compared_parameters": [
+          "NE"
+        ]
+      },
+      "circuit": null,
+      "instance": null,
+      "subcircuit": null
+    },
+    {
+      "category": "device.parameter_excluded",
+      "severity": "warning",
+      "description": "options.compare_parameters scoped device class 'PNP' to compare only ['NE'] -- 'PE' was excluded from this compare and is NOT verified; a 'match' does not confirm the two sides agree on it (see docs/cli/lvs.md, 'device.parameter_excluded')",
+      "side": "both",
+      "net": null,
+      "device": {
+        "layout": null,
+        "reference": null,
+        "class": "PNP"
+      },
+      "property": null,
+      "details": {
+        "parameter": "PE",
+        "compared_parameters": [
+          "NE"
+        ]
+      },
+      "circuit": null,
+      "instance": null,
+      "subcircuit": null
+    },
     {
       "category": "device.placeholder_value",
       "severity": "warning",
@@ -121,176 +258,6 @@
           4104000.0
         ]
       },
-      "circuit": null,
-      "instance": null,
-      "subcircuit": null
-    },
-    {
-      "category": "device.unmatched",
-      "severity": "error",
-      "description": "device has no counterpart on the other side",
-      "side": "layout",
-      "net": null,
-      "device": {
-        "layout": "\\$35",
-        "reference": null,
-        "class": "PNP"
-      },
-      "property": null,
-      "details": null,
-      "circuit": null,
-      "instance": null,
-      "subcircuit": null
-    },
-    {
-      "category": "device.unmatched",
-      "severity": "error",
-      "description": "device has no counterpart on the other side",
-      "side": "layout",
-      "net": null,
-      "device": {
-        "layout": "\\$36",
-        "reference": null,
-        "class": "PNP"
-      },
-      "property": null,
-      "details": null,
-      "circuit": null,
-      "instance": null,
-      "subcircuit": null
-    },
-    {
-      "category": "device.unmatched",
-      "severity": "error",
-      "description": "device has no counterpart on the other side",
-      "side": "layout",
-      "net": null,
-      "device": {
-        "layout": "\\$37",
-        "reference": null,
-        "class": "PNP"
-      },
-      "property": null,
-      "details": null,
-      "circuit": null,
-      "instance": null,
-      "subcircuit": null
-    },
-    {
-      "category": "device.unmatched",
-      "severity": "error",
-      "description": "device has no counterpart on the other side",
-      "side": "layout",
-      "net": null,
-      "device": {
-        "layout": "\\$38",
-        "reference": null,
-        "class": "PNP"
-      },
-      "property": null,
-      "details": null,
-      "circuit": null,
-      "instance": null,
-      "subcircuit": null
-    },
-    {
-      "category": "device.unmatched",
-      "severity": "error",
-      "description": "device has no counterpart on the other side",
-      "side": "layout",
-      "net": null,
-      "device": {
-        "layout": "\\$39",
-        "reference": null,
-        "class": "PNP"
-      },
-      "property": null,
-      "details": null,
-      "circuit": null,
-      "instance": null,
-      "subcircuit": null
-    },
-    {
-      "category": "device.unmatched",
-      "severity": "error",
-      "description": "device has no counterpart on the other side",
-      "side": "layout",
-      "net": null,
-      "device": {
-        "layout": "\\$40",
-        "reference": null,
-        "class": "PNP"
-      },
-      "property": null,
-      "details": null,
-      "circuit": null,
-      "instance": null,
-      "subcircuit": null
-    },
-    {
-      "category": "device.unmatched",
-      "severity": "error",
-      "description": "device has no counterpart on the other side",
-      "side": "layout",
-      "net": null,
-      "device": {
-        "layout": "\\$41",
-        "reference": null,
-        "class": "PNP"
-      },
-      "property": null,
-      "details": null,
-      "circuit": null,
-      "instance": null,
-      "subcircuit": null
-    },
-    {
-      "category": "device.unmatched",
-      "severity": "error",
-      "description": "device has no counterpart on the other side",
-      "side": "layout",
-      "net": null,
-      "device": {
-        "layout": "\\$42",
-        "reference": null,
-        "class": "PNP"
-      },
-      "property": null,
-      "details": null,
-      "circuit": null,
-      "instance": null,
-      "subcircuit": null
-    },
-    {
-      "category": "device.unmatched",
-      "severity": "error",
-      "description": "device has no counterpart on the other side",
-      "side": "layout",
-      "net": null,
-      "device": {
-        "layout": "\\$43",
-        "reference": null,
-        "class": "PNP"
-      },
-      "property": null,
-      "details": null,
-      "circuit": null,
-      "instance": null,
-      "subcircuit": null
-    },
-    {
-      "category": "device.unmatched",
-      "severity": "error",
-      "description": "device has no counterpart on the other side",
-      "side": "layout",
-      "net": null,
-      "device": {
-        "layout": "\\$44",
-        "reference": null,
-        "class": "PNP"
-      },
-      "property": null,
-      "details": null,
       "circuit": null,
       "instance": null,
       "subcircuit": null
@@ -406,23 +373,6 @@
       "device": {
         "layout": null,
         "reference": "1",
-        "class": "PNP"
-      },
-      "property": null,
-      "details": null,
-      "circuit": null,
-      "instance": null,
-      "subcircuit": null
-    },
-    {
-      "category": "device.unmatched",
-      "severity": "error",
-      "description": "device has no counterpart on the other side",
-      "side": "reference",
-      "net": null,
-      "device": {
-        "layout": null,
-        "reference": "1",
         "class": "RES_XHIGH_PO"
       },
       "property": null,
@@ -441,142 +391,6 @@
         "layout": null,
         "reference": "2",
         "class": "RES_XHIGH_PO"
-      },
-      "property": null,
-      "details": null,
-      "circuit": null,
-      "instance": null,
-      "subcircuit": null
-    },
-    {
-      "category": "device.unmatched",
-      "severity": "error",
-      "description": "device has no counterpart on the other side",
-      "side": "reference",
-      "net": null,
-      "device": {
-        "layout": null,
-        "reference": "8A",
-        "class": "PNP"
-      },
-      "property": null,
-      "details": null,
-      "circuit": null,
-      "instance": null,
-      "subcircuit": null
-    },
-    {
-      "category": "device.unmatched",
-      "severity": "error",
-      "description": "device has no counterpart on the other side",
-      "side": "reference",
-      "net": null,
-      "device": {
-        "layout": null,
-        "reference": "8B",
-        "class": "PNP"
-      },
-      "property": null,
-      "details": null,
-      "circuit": null,
-      "instance": null,
-      "subcircuit": null
-    },
-    {
-      "category": "device.unmatched",
-      "severity": "error",
-      "description": "device has no counterpart on the other side",
-      "side": "reference",
-      "net": null,
-      "device": {
-        "layout": null,
-        "reference": "8C",
-        "class": "PNP"
-      },
-      "property": null,
-      "details": null,
-      "circuit": null,
-      "instance": null,
-      "subcircuit": null
-    },
-    {
-      "category": "device.unmatched",
-      "severity": "error",
-      "description": "device has no counterpart on the other side",
-      "side": "reference",
-      "net": null,
-      "device": {
-        "layout": null,
-        "reference": "8D",
-        "class": "PNP"
-      },
-      "property": null,
-      "details": null,
-      "circuit": null,
-      "instance": null,
-      "subcircuit": null
-    },
-    {
-      "category": "device.unmatched",
-      "severity": "error",
-      "description": "device has no counterpart on the other side",
-      "side": "reference",
-      "net": null,
-      "device": {
-        "layout": null,
-        "reference": "8E",
-        "class": "PNP"
-      },
-      "property": null,
-      "details": null,
-      "circuit": null,
-      "instance": null,
-      "subcircuit": null
-    },
-    {
-      "category": "device.unmatched",
-      "severity": "error",
-      "description": "device has no counterpart on the other side",
-      "side": "reference",
-      "net": null,
-      "device": {
-        "layout": null,
-        "reference": "8F",
-        "class": "PNP"
-      },
-      "property": null,
-      "details": null,
-      "circuit": null,
-      "instance": null,
-      "subcircuit": null
-    },
-    {
-      "category": "device.unmatched",
-      "severity": "error",
-      "description": "device has no counterpart on the other side",
-      "side": "reference",
-      "net": null,
-      "device": {
-        "layout": null,
-        "reference": "8G",
-        "class": "PNP"
-      },
-      "property": null,
-      "details": null,
-      "circuit": null,
-      "instance": null,
-      "subcircuit": null
-    },
-    {
-      "category": "device.unmatched",
-      "severity": "error",
-      "description": "device has no counterpart on the other side",
-      "side": "reference",
-      "net": null,
-      "device": {
-        "layout": null,
-        "reference": "8H",
-        "class": "PNP"
       },
       "property": null,
       "details": null,
@@ -611,23 +425,6 @@
         "layout": null,
         "reference": "OK",
         "class": "SKY130_FD_PR__MODEL__CAP_MIM"
-      },
-      "property": null,
-      "details": null,
-      "circuit": null,
-      "instance": null,
-      "subcircuit": null
-    },
-    {
-      "category": "device.unmatched",
-      "severity": "error",
-      "description": "device has no counterpart on the other side",
-      "side": "reference",
-      "net": null,
-      "device": {
-        "layout": null,
-        "reference": "R",
-        "class": "PNP"
       },
       "property": null,
       "details": null,
@@ -796,23 +593,6 @@
       "net": null,
       "device": {
         "layout": "\\$29",
-        "reference": "P1",
-        "class": "PFET"
-      },
-      "property": null,
-      "details": null,
-      "circuit": null,
-      "instance": null,
-      "subcircuit": null
-    },
-    {
-      "category": "device.unmatched",
-      "severity": "error",
-      "description": "device has no counterpart on the other side",
-      "side": "reference",
-      "net": null,
-      "device": {
-        "layout": "\\$30",
         "reference": "P2",
         "class": "PFET"
       },
@@ -829,8 +609,25 @@
       "side": "reference",
       "net": null,
       "device": {
-        "layout": "\\$31",
+        "layout": "\\$30",
         "reference": "P3",
+        "class": "PFET"
+      },
+      "property": null,
+      "details": null,
+      "circuit": null,
+      "instance": null,
+      "subcircuit": null
+    },
+    {
+      "category": "device.unmatched",
+      "severity": "error",
+      "description": "device has no counterpart on the other side",
+      "side": "reference",
+      "net": null,
+      "device": {
+        "layout": "\\$31",
+        "reference": "P1",
         "class": "PFET"
       },
       "property": null,
@@ -883,6 +680,176 @@
         "layout": "\\$34",
         "reference": "PIB",
         "class": "PFET"
+      },
+      "property": null,
+      "details": null,
+      "circuit": null,
+      "instance": null,
+      "subcircuit": null
+    },
+    {
+      "category": "device.unmatched",
+      "severity": "error",
+      "description": "device has no counterpart on the other side",
+      "side": "reference",
+      "net": null,
+      "device": {
+        "layout": "\\$35",
+        "reference": "1",
+        "class": "PNP"
+      },
+      "property": null,
+      "details": null,
+      "circuit": null,
+      "instance": null,
+      "subcircuit": null
+    },
+    {
+      "category": "device.unmatched",
+      "severity": "error",
+      "description": "device has no counterpart on the other side",
+      "side": "reference",
+      "net": null,
+      "device": {
+        "layout": "\\$36",
+        "reference": "8A",
+        "class": "PNP"
+      },
+      "property": null,
+      "details": null,
+      "circuit": null,
+      "instance": null,
+      "subcircuit": null
+    },
+    {
+      "category": "device.unmatched",
+      "severity": "error",
+      "description": "device has no counterpart on the other side",
+      "side": "reference",
+      "net": null,
+      "device": {
+        "layout": "\\$37",
+        "reference": "8B",
+        "class": "PNP"
+      },
+      "property": null,
+      "details": null,
+      "circuit": null,
+      "instance": null,
+      "subcircuit": null
+    },
+    {
+      "category": "device.unmatched",
+      "severity": "error",
+      "description": "device has no counterpart on the other side",
+      "side": "reference",
+      "net": null,
+      "device": {
+        "layout": "\\$38",
+        "reference": "8G",
+        "class": "PNP"
+      },
+      "property": null,
+      "details": null,
+      "circuit": null,
+      "instance": null,
+      "subcircuit": null
+    },
+    {
+      "category": "device.unmatched",
+      "severity": "error",
+      "description": "device has no counterpart on the other side",
+      "side": "reference",
+      "net": null,
+      "device": {
+        "layout": "\\$39",
+        "reference": "8C",
+        "class": "PNP"
+      },
+      "property": null,
+      "details": null,
+      "circuit": null,
+      "instance": null,
+      "subcircuit": null
+    },
+    {
+      "category": "device.unmatched",
+      "severity": "error",
+      "description": "device has no counterpart on the other side",
+      "side": "reference",
+      "net": null,
+      "device": {
+        "layout": "\\$40",
+        "reference": "8D",
+        "class": "PNP"
+      },
+      "property": null,
+      "details": null,
+      "circuit": null,
+      "instance": null,
+      "subcircuit": null
+    },
+    {
+      "category": "device.unmatched",
+      "severity": "error",
+      "description": "device has no counterpart on the other side",
+      "side": "reference",
+      "net": null,
+      "device": {
+        "layout": "\\$41",
+        "reference": "8E",
+        "class": "PNP"
+      },
+      "property": null,
+      "details": null,
+      "circuit": null,
+      "instance": null,
+      "subcircuit": null
+    },
+    {
+      "category": "device.unmatched",
+      "severity": "error",
+      "description": "device has no counterpart on the other side",
+      "side": "reference",
+      "net": null,
+      "device": {
+        "layout": "\\$42",
+        "reference": "8F",
+        "class": "PNP"
+      },
+      "property": null,
+      "details": null,
+      "circuit": null,
+      "instance": null,
+      "subcircuit": null
+    },
+    {
+      "category": "device.unmatched",
+      "severity": "error",
+      "description": "device has no counterpart on the other side",
+      "side": "reference",
+      "net": null,
+      "device": {
+        "layout": "\\$43",
+        "reference": "8H",
+        "class": "PNP"
+      },
+      "property": null,
+      "details": null,
+      "circuit": null,
+      "instance": null,
+      "subcircuit": null
+    },
+    {
+      "category": "device.unmatched",
+      "severity": "error",
+      "description": "device has no counterpart on the other side",
+      "side": "reference",
+      "net": null,
+      "device": {
+        "layout": "\\$44",
+        "reference": "R",
+        "class": "PNP"
       },
       "property": null,
       "details": null,
@@ -1233,38 +1200,6 @@
       "side": "layout",
       "net": {
         "layout": "VREF|VREF",
-        "reference": null
-      },
-      "device": null,
-      "property": null,
-      "details": null,
-      "circuit": null,
-      "instance": null,
-      "subcircuit": null
-    },
-    {
-      "category": "net.split",
-      "severity": "error",
-      "description": "a reference net's role is divided across multiple layout nets",
-      "side": "layout",
-      "net": {
-        "layout": "VSS",
-        "reference": null
-      },
-      "device": null,
-      "property": null,
-      "details": null,
-      "circuit": null,
-      "instance": null,
-      "subcircuit": null
-    },
-    {
-      "category": "net.split",
-      "severity": "error",
-      "description": "a reference net's role is divided across multiple layout nets",
-      "side": "layout",
-      "net": {
-        "layout": "VSS$1",
         "reference": null
       },
       "device": null,
