@@ -6,6 +6,8 @@ open PDK — designed by AI agents driving
 [klayout-tools](https://github.com/2AMLogic/klayout-tools) and the
 open-source xschem + ngspice flow.
 
+![fleet burndown](https://raw.githubusercontent.com/2AMLogic/2am/main/fleet-metrics/charts/sky130-temp-por.svg)
+
 **Status: schematic complete and netlisted; verification and layout
 in progress.** `design/` has a full, netlist-checked schematic hierarchy
 (four leaf cells plus the assembled `temp_por_top`); `sim/` has testbench
