@@ -82,7 +82,7 @@ part of the claim and travel with it):
   sub-block increment, not the block's layout, and no citation is made.
 - **Item 3 — DRC clean: `met`** via `layout/bias_core/drc.json` (`status:
   clean`, 0 violations), pinned to
-  `content_hash sha256:c396d6c6…f7988` — the sha256 of the committed
+  `content_hash sha256:72588e8f…2e2c7` — the sha256 of the committed
   `layout/bias_core/bias_core.gds` the run executed on (#69's re-landed
   composition), so the citation is
   provably fresh against the current artifact (CI re-asserts this). **Scope
@@ -98,7 +98,7 @@ part of the claim and travel with it):
   where the gaps are disclosed.
 - **Item 4 — LVS clean: `unmet` (`check_failed`)**, truthfully: the same
   `bias_core` full-cell composition's LVS run reports `status: mismatch`
-  (21/50 devices, 13/27 nets matched) — the full-cell assembly's remaining
+  (21/50 devices, 14/27 nets matched) — the full-cell assembly's remaining
   cross-block nets are unrouted this increment, tracked by #64 with
   upstream `klt` gaps filed generically. Three device-group sub-blocks
   (`bias_core_settle_flag`, `bias_core_startup`, `bias_core_mirror_amp`)
@@ -135,7 +135,7 @@ part of the claim and travel with it):
   klayout-tools' curated sky130 deck; `stackup[0]` gate role plus
   `active_layer` for the `poly ∩ diff` antenna denominator) and
   `layout/bias_core/erc.json`, pinned to the committed GDS's
-  `sha256:c396d6…f7988` exactly like item 3's DRC citation, re-rendered
+  `sha256:72588e8f…2e2c7` exactly like item 3's DRC citation, re-rendered
   over the re-landed composition. The row still renders `check_failed`
   solely on the compound item's LVS half (item 4, #64). **What the ERC
   citation establishes now:** with `VDD`/`VSS` declared `kind: "supply"`
