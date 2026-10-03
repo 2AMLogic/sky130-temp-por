@@ -48,18 +48,24 @@ be re-derived against sky130 models, and supply-ramp-rate coverage belongs in
 the testbench matrix from the start — a POR that is only ever simulated with
 one ramp rate has not been verified at all.
 
-## Target specification (DRAFT — engineering to ratify, see issue #1)
+## Target specification (partially ratified — DR-003, issue #78; remaining rows TBD)
 
-| Parameter | Target | Stretch |
-|---|---|---|
-| Operating temperature | −40…+125 °C | — |
-| Temperature error, untrimmed | ±3 °C | ±1.5 °C with 1-point trim |
-| Sensor output | analog PTAT + CTAT pads | digital out via SAR pairing |
-| POR thresholds VPOR↑ / VPOR↓ | re-derive against sky130 models | — |
-| POR hysteresis | ≥ 100 mV | — |
-| Supply | confirm against sky130 flavors (1.8 V core vs 3.3/5 V devices) | — |
-| Iq (block total) | < 20 µA | < 5 µA |
-| Supply-ramp coverage | ramp-rate sweep in the POR testbench matrix | — |
+Ratified by [DR-003](spec/decision-records/DR-003-ratify-target-spec-recommendation.md)
+through the two-key path, per the operator ruling of 2026-10-02 on issue #31:
+**only** the operating-temperature and supply rows are final. Every other row
+is an explicit placeholder (`[TBD-n]`, numbering per DR-003) until measured;
+no T1 tier is awarded and no draft number below is a ratified target.
+
+| Parameter | Target | Stretch | Status |
+|---|---|---|---|
+| Operating temperature | −40…+125 °C | — | final |
+| Temperature error, untrimmed | [TBD-1] | [TBD-1] | not ratified |
+| Sensor output | [TBD] (draft: analog PTAT + CTAT pads) | [TBD] (draft: digital out via SAR pairing) | not ratified |
+| POR thresholds VPOR↑ / VPOR↓ | [TBD-2] (re-derive against sky130 models) | — | not ratified |
+| POR hysteresis | [TBD-3] | — | not ratified |
+| Supply | 2.97–3.63 V (3.3 V ±10 %, DR-001) | — | final |
+| Iq (block total) | [TBD-4] por-iq / [TBD-5] temp-iq / [TBD-6] iq-total | [TBD-4..6] | not ratified |
+| Supply-ramp coverage | [TBD] (draft: ramp-rate sweep in the POR testbench matrix) | — | not ratified |
 
 Port parity note: the targets deliberately mirror `gf180-temp-por`'s ratified
 spec where a target is device-independent. Where sky130's devices make a

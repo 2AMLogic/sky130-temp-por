@@ -1,11 +1,10 @@
 # DR-003: Recommended values for README.md's DRAFT target-specification table
 
-- **Status**: proposed (a Builder-drafted recommendation with an evidence
-  record behind each row, per the standing ruling on issue #4/#29 — this
-  record does not itself flip README.md's table out of DRAFT, ratify a T1
-  tier, or edit any spec row outside this file; that is a separate
-  two-key/operator step, matching the precedent DR-001 and DR-002 already
-  set of staying `proposed` while the README table stays DRAFT)
+- **Status**: ratified (two-key path, issue #78, operator ruling of
+  2026-10-02 on #31) — **scoped**: only row 1 (operating temperature,
+  −40…+125 °C as drafted) and row 6 (supply, 2.97–3.63 V per DR-001) become
+  final. All other rows stay explicit `[TBD]` placeholders in README.md. This
+  ratification awards no T1 tier and relaxes nothing else in the spec.
 - **Date**: 2026-09-15
 - **Decided by**: Loom Builder agent, issue #29
 
@@ -140,8 +139,8 @@ nominal, ±10 % ⇒ 2.97–3.63 V**, on
 ([DR-001](DR-001-supply-flavor.md), full reasoning there — not repeated
 here). Every `sim/` PVT campaign on `main` already runs its supply axis at
 exactly 2.97/3.30/3.63 V, consistent with this row. `DR-001` itself remains
-`Status: proposed`; this record recommends its value for the table without
-separately re-ratifying it.
+`Status: proposed`; this record's ratification (issue #78) makes this row's
+value final in the table without separately re-ratifying DR-001.
 
 ### 7. Iq (block total): < 20 µA / < 5 µA stretch
 
@@ -247,11 +246,12 @@ testbench-matrix requirement, unchanged from the README draft.
 
 `README.md`'s "Target specification" table (the `## Target specification
 (DRAFT — engineering to ratify, see issue #1)` section) — every row, per the
-numbered dispositions above. This record does **not** edit that table (see
-Status above and the DR-001/DR-002 precedent of staying `proposed` while the
-table stays DRAFT) — it recommends the values a future ratification step
-should write there, plus the `[TBD-#n]` tags marking rows with insufficient
-evidence to ratify yet. Once `spec/target-spec.md` is created
+numbered dispositions above. Per the ratification (Status above), README.md's table
+is out of DRAFT for rows 1 and 6 only; the other rows are written there as
+explicit `[TBD]` placeholders (rows 2, 4, 5, 7 carrying `[TBD-#n]` tags as
+dispositioned above; rows 3 and 8 marked not ratified). Rows 3 and 8 are
+HOLD-as-drafted recommendations that the ruling did not name, so they are
+not final. Once `spec/target-spec.md` is created
 (`spec/porting-plan.md` §4 item 4), the values/deferrals above are its
 starting content for this table's rows, each retaining the citation trail
 above rather than being asserted bare.
