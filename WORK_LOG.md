@@ -1,0 +1,67 @@
+# Work Log
+
+Chronological record of recently merged pull requests and closed issues. This file is maintained by the Loom Guide role.
+
+### 2026-09-23
+
+- **PR #77**: fix: strap PNP collectors to VSS and reach LVS match on klt 0.6.0
+- **PR #76**: docs: embed fleet burndown chart in README
+- **Issue #30** (closed): T1 item 2/10: lay out bias_core (first increment toward layout)
+- **Issue #75** (closed): README: embed the fleet burndown chart (one line)
+
+### 2026-09-21
+
+- **PR #73**: fix: land bias_core supply legs on the real pads (block-local ports)
+- **PR #72**: refactor: drop dead helpers and stale doc claims from sim_common.py
+- **PR #70**: feat: add klt erc supply spec and report for bias_core (T1 item 11)
+- **PR #68**: feat: add klt signoff block manifest as the T1 verdict of record
+- **Issue #69** (closed): bias_core assembly: supply routes are single continuous rail islands but connect to none of the blocks' internal supply pads
+- **Issue #71** (closed): Remove dead parse_measurements()/_cr() and write_log() from sim_common.py: zero callers, stale 'actually used' docstring claims
+- **Issue #66** (closed): T1 item 11 (power delivery, structural): no klt erc supply spec or report in this repo
+- **Issue #67** (closed): Commit a klt signoff block manifest so this block's T1 state is graded, not hand-read
+
+### 2026-09-17
+
+- **PR #65**: feat: compose bias_core sub-blocks into one DRC-clean assembly
+- **PR #63**: layout: promote ec/vss (pnp8_leg) and vss (xq1_xqr) external pins
+- **Issue #61** (closed): bias_core: promote ec/vss (pnp8_leg) and vss (xq1_xqr) external pins once the closed-collector-ring escape restriction is addressed
+
+### 2026-09-16
+
+- **PR #62**: layout: promote missing external pins on bias_core sub-blocks
+- **PR #60**: docs: fix stale narrative in design/netlist.py module docstring
+- **PR #58**: Docs: correct stale "empty"/"pre-spec" status claims
+- **PR #55**: layout: unambiguous klt commit pin + pin-mismatch warning
+- **PR #54**: chore: remove unused shutil import in run_op_branch.py
+- **PR #52**: layout: compose bias_core's current-mirror + error-amp stack, DRC- and LVS-clean
+- **PR #50**: chore: remove dead run_ngspice()/mc_control_block() from sim_common.py
+- **PR #48**: layout: bias_core startup kick chain, DRC- and LVS-clean
+- **PR #47**: layout: trim residual fictional references in _klt_common.py docstrings
+- **PR #46**: layout: compose bias_core's settle-flag output stage (BIAS_OK), DRC- and LVS-clean
+- **Issue #56** (closed): bias_core: promote missing external pins on mirror_amp/settle_flag for full-cell assembly
+- **Issue #59** (closed): design/netlist.py: module docstring is stale — temp_por_top/sim-harness claims no longer true
+- **Issue #57** (closed): Docs: README.md and chipalooza proposal still claim the repo is empty/pre-spec
+- **Issue #51** (closed): layout: host klt install is 38 commits behind layout/pdk.json's klt_version_pin, so compose-cell.py --check fails on every existing cell
+- **Issue #53** (closed): Remove unused shutil import: run_op_branch.py
+- **Issue #35** (closed): bias_core layout: PFET/NFET current-mirror + error-amp stack
+- **Issue #49** (closed): Dead code + duplicated ngspice-run logic in sim/bin/sim_common.py
+- **Issue #38** (closed): bias_core layout: startup kick chain
+- **Issue #45** (closed): Trim residual fictional references in _klt_common.py's function docstrings (follow-up to #42)
+- **Issue #39** (closed): bias_core layout: settle-flag output stage (BIAS_OK)
+
+### 2026-09-15
+
+- **PR #44**: docs: rewrite _klt_common.py module docstring to match this repo
+- **PR #43**: layout: bias_core bias/ratio resistors + Miller caps sub-block
+- **PR #41**: feat: lay out bias_core's XQ1/XQR reference PNPs (DRC-clean, LVS-blocked)
+- **PR #33**: layout: port compose-cell recipe, lay out bias_core's 8:1 PNP leg
+- **PR #32**: docs: DR-003, recommended target-spec table values with sim evidence
+- **Issue #42** (closed): Fix fictional provenance narrative in layout/bin/_klt_common.py's docstring
+- **Issue #37** (closed): bias_core layout: bias/ratio resistors + Miller compensation caps
+- **Issue #36** (closed): bias_core layout: XQ1/XQR reference PNPs (collector-strap blocked in part)
+- **Issue #29** (closed): T1 item 5/10: ratify the target spec table as a decision-record PR
+
+### 2026-09-09
+
+- **PR #28**: sim: characterize sky130 native devices (nfet_05v0_nvt vs nfet_03v3_nvt) for MASSIST
+- **Issue #27** (closed): Characterize sky130's native devices (nfet_05v0_nvt vs nfet_03v3_nvt) for the POR startup-assist leg: Vth spread, minimum operating voltage, and MASSIST's always-on static current over PVT (porting-plan §2.6 / §4 item 2)
