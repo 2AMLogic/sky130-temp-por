@@ -4,7 +4,13 @@ Chronological record of recently merged pull requests and closed issues. This fi
 
 ### 2026-10-08
 
+- **PR #91**: bias_core: wire all cross-block nets on met3-met5, LVS match 50/50 devices, 27/27 nets (#81)
+- **PR #87**: docs: block-level characterization report (T1 item 8)
 - **PR #83**: spec: ratify DR-003 via the two-key ceremony (operating temperature + supply rows only)
+- **Issue #81** (closed): bias_core: wire the nine remaining cross-block nets on the met3–met5 planes klayout-tools#2738 added (T1 items 4 and 11)
+- **Issue #64** (closed): bias_core: wire remaining cross-block nets (pg/pb/n2/na/nbtop/VREF/nokx) once layer-assignment tooling improves
+- **Issue #40** (closed): bias_core: full-cell assembly (compose all device-group sub-blocks)
+- **Issue #31** (closed): T1 item 8/10: aggregate a block-level characterization report
 - **Issue #78** (closed): Run the two-key ratification ceremony on DR-003 (target-spec table)
 
 ### 2026-09-23
