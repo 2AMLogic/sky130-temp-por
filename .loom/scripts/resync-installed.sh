@@ -535,6 +535,9 @@ if [[ -n "$BASE_REF" && -z "$OUTPUT_DIR" ]]; then
     BASE_REF=""
 fi
 
+# requires-daemon: host optional   #10179 opted-out host refuses re-provisioning; absent/older binary (no `host` verb, exit 1/2) proceeds unguarded.
+command -v loom-daemon >/dev/null 2>&1 && { _hc="$(loom-daemon host check --entry-point resync-installed.sh 2>&1)"; [ $? -ne 10 ] || { printf '%s\n' "$_hc" >&2; exit 1; }; } || true  # only exit 10 = disabled; an older binary (1/2 for unknown `host`) proceeds
+
 # ---------- resolve the installed repo root (worktree-safe) ----------
 
 if ! git rev-parse --git-dir >/dev/null 2>&1; then
@@ -2562,11 +2565,19 @@ restamp_metadata() {
     # freezing whatever was recorded at install time. Best-effort: empty when
     # SOURCE_ROOT isn't a git checkout or has no `origin` configured.
     remote="$(git -C "$SOURCE_ROOT" remote get-url origin 2>/dev/null || true)"
+    # #10717: requires_daemon (the compatibility contract, #10716) travels with
+    # the files, so it is read from the tree they came from, the same way
+    # scripts/install/loom-source-path.sh reads it at install time. A source
+    # that predates the contract makes no claim: the field is dropped rather
+    # than left describing files this run just replaced.
+    local req
+    req="$(sed -n 's/^pub const REQUIRES_DAEMON: &str = "\([0-9][0-9.]*\)";$/\1/p' \
+        "$SOURCE_ROOT/loom-daemon/src/install_compat.rs" 2>/dev/null || true)"
     tmp="${meta}.tmp.$$"
 
     if command -v jq >/dev/null 2>&1; then
-        if jq --arg v "$version" --arg c "$commit" --arg r "$today" --arg src "$remote" \
-              '.loom_version=$v | .loom_commit=$c | .last_resync=$r | .loom_source_remote=$src | del(.loom_source)' \
+        if jq --arg v "$version" --arg c "$commit" --arg r "$today" --arg src "$remote" --arg q "$req" \
+              '.loom_version=$v | .loom_commit=$c | .last_resync=$r | .loom_source_remote=$src | del(.loom_source) | if $q == "" then del(.requires_daemon) else .requires_daemon=$q end' \
               "$meta" > "$tmp" 2>/dev/null && [[ -s "$tmp" ]]; then
             mv "$tmp" "$meta"
             note "  ${GREEN}re-stamped${NC} install-metadata.json (loom_version=$version, loom_commit=$commit, last_resync=$today)"
@@ -2576,7 +2587,7 @@ restamp_metadata() {
     fi
 
     if command -v python3 >/dev/null 2>&1; then
-        if META="$meta" VERSION="$version" COMMIT="$commit" TODAY="$today" REMOTE="$remote" \
+        if META="$meta" VERSION="$version" COMMIT="$commit" TODAY="$today" REMOTE="$remote" REQ="$req" \
            python3 - "$tmp" <<'PY' 2>/dev/null && [[ -s "$tmp" ]]; then
 import json, os, sys
 with open(os.environ["META"]) as f:
@@ -2586,6 +2597,9 @@ data["loom_commit"] = os.environ["COMMIT"]
 data["last_resync"] = os.environ["TODAY"]
 data["loom_source_remote"] = os.environ["REMOTE"]
 data.pop("loom_source", None)
+data.pop("requires_daemon", None)
+if os.environ["REQ"]:
+    data["requires_daemon"] = os.environ["REQ"]
 with open(sys.argv[1], "w") as f:
     json.dump(data, f, indent=2)
     f.write("\n")
@@ -2797,6 +2811,7 @@ _gitignore_warn_if_stale() {
     fi
 }
 
+EGRESS_BIN=""
 refresh_gitignore_block() {
     local locate_lib bin
     locate_lib="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)/lib/locate-daemon-bin.sh"
@@ -2825,6 +2840,7 @@ refresh_gitignore_block() {
         warn "  Newer runtime paths (e.g. .loom/sweep-checkpoint/, .loom/worktrees-local/) may stay untracked-and-unignored."
         return 0
     fi
+    EGRESS_BIN="$bin"   # #9996: reused by the forge egress doctor step below
     # `update-gitignore` has no dedicated --dry-run; on a dry run we only probe
     # that the subcommand exists (never writing), so the preview neither mutates
     # nor claims a refresh a pre-#4280 binary cannot perform.
@@ -3444,6 +3460,25 @@ else
     printf '%b\n' "${GREEN}[resync] Already in sync (${N_UNCHANGED} unchanged, ${N_SKIPPED} skipped).${NC}${CHECK_NOTE}"
 fi
 
+# #9996: forge egress routing check, delegated to the daemon (the shell never
+# parses the policy). Last step so a failure cannot cut the sync short; the
+# doctor's own exit code is carried to the final exit. --dry-run exits earlier
+# (before this step), so it never runs the doctor and never fails.
+# requires-daemon: forge optional   older daemon without `forge egress`: warn, never fail
+EGRESS_RC=0
+if [[ -n "$EGRESS_BIN" ]]; then
+    if ! "$EGRESS_BIN" forge egress --help >/dev/null 2>&1; then
+        warn "forge egress check unavailable: '$EGRESS_BIN' has no 'forge egress' subcommand (rebuild the daemon)."
+    else
+        egress_output="$(cd "$REPO_ROOT" && "$EGRESS_BIN" forge egress doctor 2>&1)" || EGRESS_RC=$?
+        if [[ -n "$egress_output" ]]; then
+            printf '%b\n' "${YELLOW}[resync] Forge egress (loom-daemon forge egress doctor):${NC}"
+            printf '%s\n' "$egress_output" | sed 's/^/    /'
+        fi
+        [[ "$EGRESS_RC" -eq 0 ]] || warn "forge egress routing check failed (exit $EGRESS_RC); resync itself completed."
+    fi
+fi
+
 # 75 (EX_TEMPFAIL), matching create-issue.sh's DEFERRED convention: the
 # surface sync itself SUCCEEDED and must not be re-run blindly, but one
 # check did not execute, so this run is not a clean bill of health. A
@@ -3452,4 +3487,4 @@ fi
 if [[ "$LABEL_CHECK_BROKEN" -eq 1 || "$GUARD_CHECK_BROKEN" -eq 1 ]]; then
     exit 75
 fi
-exit 0
+exit "${EGRESS_RC:-0}"

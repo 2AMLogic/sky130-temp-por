@@ -38,6 +38,28 @@ the next person to add one will have an equally good argument.
    `startup_failure`. Do not re-run it to "complete" the record, and do not
    treat it as a skipped check.
 
+   Releases follow the same verdict: `release.yml` releases only a `main`
+   commit whose `CI` run concluded `success` (`workflow_run`, #10826). A
+   `cancelled` or red commit is never released; its version may be skipped
+   ([release-cadence](release-cadence.md)).
+
+   Tell the two kinds of `cancelled` apart before reading a high rate as a
+   regression (#10670): a run the bound superseded while *pending* has no
+   jobs; a run cancelled after it *started* has some, and that one breaks
+   this rule. On 2026-10-06 54 of the last 100 `main` runs were cancelled and
+   every one was job-less. `signoz/ci-queries.sql` section 18 reports the
+   split (`cancelled_after_start` must stay 0), and loom-daemon's
+   `merge_group_ci::main_cancel` lint fails CI if any workflow change could
+   cancel a started `push` or `merge_group` run: a `cancel-in-progress` that
+   is not provably false there, a group shared with a cancelling PR run, or a
+   run-cancelling step reachable there. The lint runs on every PR that
+   touches any `.github/workflows/**` file (ci.yml's `Workflow Cancellation
+   Lint` job), not only on Rust changes. One gap is known: concurrency groups
+   are repo-wide, but the lint compares groups only within one workflow, so
+   two *different* workflows sharing a literal group (one on `push`, one
+   cancelling on `pull_request`) is not detected. Keep every group prefixed
+   with its workflow's name, as all current ones are.
+
 3. **Path-filtering is an optimisation, not a correctness tool.** A check that
    can fail because of a file *outside* its path group must not be filtered by
    path. `conflict-markers` states this in its own comment and is right:
@@ -69,6 +91,18 @@ the next person to add one will have an equally good argument.
    than be skipped (`if: ${{ !cancelled() }}` plus a download that fails when
    the artifact is missing), because a skipped required check counts as
    passing (rule 6).
+
+   The aggregate backstop is the `CI Result` job (#10444): `if: always()`,
+   `needs:` every job, and it fails when `Detect Changes` is not `success` on
+   a PR (a cancelled / never-acquired runner otherwise skips every filtered
+   job while the always-run required checks stay green, as on #10403), when
+   any job failed or was cancelled, or when a job was skipped only because its
+   upstream did not succeed. A skip the path filter decided still passes. The
+   rule lives in `scripts/ci-result-gate.sh`; `merge-pr.sh` independently
+   refuses a head whose latest `CI` run is not `success` and names the
+   cancelled jobs. Remedy: `gh run rerun --failed <run>` (in place, never a
+   cancel). `CI Result` becomes a required context only after it has reported
+   on `main`; that ruleset change is an operator step.
 
 8. **Group required gates by component, and judge each component on its own
    inputs.** Many tiny required jobs compete for the concurrent-job cap, so
@@ -122,6 +156,17 @@ the next person to add one will have an equally good argument.
     next optimisation lands on `ci.yml`, the question is not "is this safe on
     its own" but "which run still makes the observation this removes".
 
+11. **A merge-group run is held to the same rules as a `main` run** (#10257).
+    Each merge group is a distinct commit, the combined tree that will land.
+    Its run is never cancelled once started (rule 2). Its concurrency group is
+    keyed on its own head SHA, so no other run can supersede it while it is
+    still pending. Without that key the queue would wait on a check that never
+    reports. A suite that is skipped on `merge_group` is not coverage
+    (rule 6), and path filters do not apply there (rule 3). `merge_group` runs
+    exactly what `push` runs. `loom-daemon merge-group-ci audit` checks all of
+    this statically, and it counts any suite it cannot prove runs as
+    uncovered. See [merge-queue-ci](merge-queue-ci.md).
+
 ## The daily backstop and its tracking issues
 
 `.github/workflows/ci-daily.yml` (#9085) is the slow run rule 10 requires. It
@@ -134,6 +179,12 @@ first build, the whole release target matrix minus signing, every
 `package-lock.json`, `cargo deny` against `deny.toml`, the shell suites at
 parallelism 1 and 8 and on macOS/bash 3.2, `nextest` three times over for
 flakes, Rust beta, and the Docker smokes without their path filter.
+
+The full **default-feature** suite runs only here (#10823): `ci.yml`'s
+`Rust Unit Tests` legs run the whole workspace with `--features
+loom-daemon/otlp` (the shipped configuration), and the PR gate adds only a
+targeted `--lib` step for the `#[cfg(not(feature = "otlp"))]` tests, whose
+names it derives from source.
 
 **A red daily run nobody reads is worse than none**, because it trains people
 to ignore red. So the `report` job is part of the mechanism, not a nicety:
@@ -216,6 +267,7 @@ a cancellation rate.
 
 - #7779 / PR #7803 — the cancellation fix; #9608 — the bounded `main` queue
   (one running + newest pending) that rule 2 now allows
+- #10670 — the `main_cancel` lint and the superseded-vs-started cancel split
 - #7789 / #7791 — flake tracking, and why retry must *record* rather than hide
 - #7745 / #7761 — the same "a skipped check must not read as a pass" rule,
   learned in the resync and guard layers
@@ -223,6 +275,10 @@ a cancellation rate.
   predicate, and rule 9's two narrowings
 - #9065 / #9069 — the wall-time work rule 10 exists to balance, and #9085 —
   `ci-daily.yml`, the slow run that balances it
+- #10826 — releases only from a green `main` `CI` run, at its `head_sha`
+  ([release-cadence](release-cadence.md))
+- #10257 — merge-queue qualification: rule 11, the `merge_group` trigger in
+  `ci.yml`, and the audit that proves it ([merge-queue-ci](merge-queue-ci.md))
 - [`ci-observability.md`](ci-observability.md) — the observability face of
   the same family: every run, job, duration, outcome and log is captured in
   SigNoz as standing policy, so a regression like #7779's cancellation storm

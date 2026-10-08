@@ -91,7 +91,7 @@ hop is specified:
 |---|---|---|---|
 | 1 | `loom-daemon ci-telemetry` poller: `ci.run`/`ci.job` records, duration histograms, run→job traces, dedup ledger, local journal, `status` | [#8824](https://github.com/rjwalters/loom/issues/8824) | Landed — see [Phase 1 reference](#phase-1-reference-runs-and-jobs-8824) |
 | 2 | Full completed-job logs as chunked `ci.job.log` records, with secret redaction enforced at the gateway | [#8825](https://github.com/rjwalters/loom/issues/8825) | Landed — see [Phase 2 reference](#phase-2-reference-completed-job-logs-8825) |
-| 3 | SigNoz retro surfaces (`ci-queries.sql`, six saved views) and the metrics ≥30d retention split | [#8826](https://github.com/rjwalters/loom/issues/8826) | Queries, drift guard and retention policy landed — see [Standing queries](#standing-queries) and [Retention](#retention). Creating the saved views in the trial org and the logs/traces 7-day API step need the org login: [#8946](https://github.com/rjwalters/loom/issues/8946) |
+| 3 | SigNoz retro surfaces (`ci-queries.sql`, six saved views) and the trial's metrics ≥30d retention split | [#8826](https://github.com/rjwalters/loom/issues/8826) | Queries, drift guard and trial retention policy landed — see [Standing queries](#standing-queries) and [Retention](#retention). Creating the saved views in the trial org and the logs/traces 7-day API step need the org login: [#8946](https://github.com/rjwalters/loom/issues/8946) |
 | 4 | This policy doc and its wiring | [#8827](https://github.com/rjwalters/loom/issues/8827) | This doc |
 
 Each phase adds its own reference section (config keys, dedup contract,
@@ -139,12 +139,19 @@ scheduled.
 
 ## Retention
 
+> **Trial-only policy.** The 7-day / 30-day split below describes the SigNoz
+> **trial** deployment ([#8826](https://github.com/rjwalters/loom/issues/8826),
+> `defaults/observability/signoz/`), not the live harness-ops store Loom exports
+> to, which keeps logs 3650 days and traces/metrics 10 years
+> ([#10195](https://github.com/rjwalters/loom/issues/10195)). Native-HTTPS-only
+> kinds are governed by the loom-ui telemetry store's own retention issues.
+
 | Signal | Retention | Why |
 |---|---|---|
 | Metrics (`loom.ci.*.duration_ms`, outcome counts) | **≥ 30 days** | Trends are the retro asset — "is CI getting slower" needs weeks of history, and metrics are cheap relative to logs |
 | Logs (`ci.job.log`) and traces | **7 days** | Raw detail is for recent investigation; a regression is found by trend, then read in a recent run |
 
-This 7-day / 30-day split is the **standing policy** (#8826). Trends outlive
+This 7-day / 30-day split is the **trial's** policy (#8826). Trends outlive
 raw data by design: a regression is *found* in the metrics (weeks of
 P50/P95 history per job, and the outcome mix per workflow), then *read* in a
 recent run's `ci.run` / `ci.job` records and job log. Keeping raw logs for 30
@@ -562,9 +569,9 @@ spans](#suite-spans-9089)):
 
 | `record.kind` | Fields | OTLP signal |
 |---|---|---|
-| `ci.run` | `repo`, `visibility`, `run_id`, `run_attempt`, `workflow`, `ref`, `head_sha`, `event`, `status`, `conclusion`, `triggered_by`, `started_at`, `completed_at`, `duration_ms`, `queued_ms` (`run_started_at − created_at`, #9007 follow-up; absent when GitHub reported no start), `trigger_reason` (#9337, see [Trigger attribution](#trigger-attribution-9337)) | log record `ci.run`, timestamped at `completed_at` |
-| `ci.job` | `repo`, `visibility`, `run_id`, `job_id`, `workflow`, `job`, `runner` (first runner label), `attempts` (the job's run attempt), `status`, `conclusion`, `timed_out`, `started_at`, `completed_at`, `duration_ms`, `queued_ms` (`started_at − created_at`, #9089; absent when GitHub reported no `created_at` for the job), `dependency_wait_ms` (`created_at` − the run attempt's earliest job creation, #9089, see [Dependency wait](#dependency-wait-9089)), `shard_index` / `shard_total` / `shard_kind` (#9089, see [Per-job queue wait and shard attributes](#per-job-queue-wait-and-shard-attributes-9089)) | log record `ci.job` |
-| `ci.duration` | `metric` (`run`\|`job`), `repo`, `visibility`, `run_id`, `run_attempt`, `job_id`, `workflow`, `job`, `runner`, `conclusion`, `started_at`, `completed_at`, `duration_ms` | one data point of the `loom.ci.run.duration_ms` / `loom.ci.job.duration_ms` delta histogram |
+| `ci.run` | `repo`, `visibility`, `run_id`, `run_attempt`, `workflow`, `ref`, `head_sha`, `event`, `status`, `conclusion`, `triggered_by`, `started_at`, `completed_at`, `duration_ms`, `queued_ms` (`run_started_at − created_at`, #9007 follow-up; absent when GitHub reported no start), `trigger_reason` (#9337, see [Trigger attribution](#trigger-attribution-9337)), `observed_at` (#10511: when this daemon observed the record — its knowable-at instant for point-in-time readers, distinct from GitHub's `completed_at`; absent on older records) | log record `ci.run`, timestamped at `completed_at` |
+| `ci.job` | `repo`, `visibility`, `run_id`, `job_id`, `workflow`, `job`, `runner` (first runner label), `attempts` (the job's run attempt), `status`, `conclusion`, `timed_out`, `started_at`, `completed_at`, `duration_ms`, `queued_ms` (`started_at − created_at`, #9089; absent when GitHub reported no `created_at` for the job), `dependency_wait_ms` (`created_at` − the run attempt's earliest job creation, #9089, see [Dependency wait](#dependency-wait-9089)), `shard_index` / `shard_total` / `shard_kind` (#9089, see [Per-job queue wait and shard attributes](#per-job-queue-wait-and-shard-attributes-9089)), `observed_at` (#10511, as on `ci.run`) | log record `ci.job` |
+| `ci.duration` | `metric` (`run`\|`job`), `repo`, `visibility`, `run_id`, `run_attempt`, `job_id`, `workflow`, `job`, `runner`, `conclusion`, `started_at`, `completed_at`, `duration_ms`, `observed_at` (#10511; on the record only, never a metric label) | one data point of the `loom.ci.run.duration_ms` / `loom.ci.job.duration_ms` delta histogram |
 | `trace.span` | `loom.ci.run` (root), `loom.ci.job` (child of its run span), `loom.ci.step` (#9089, child of its job span), or `loom.ci.suite` (#9089, also a child of its job span) | trace: one per run attempt, one span per job, one span per executed step, one span per executed suite of a sharded shell-suite leg |
 
 Why `ci.duration` is a separate record: each envelope maps to exactly one
@@ -672,9 +679,8 @@ from data the poller already fetches — no extra API calls:
   `loom.ci.shard.kind`, parsed from the job's *display name* by
   `ci_telemetry::records::parse_shard` — no artifact or annotation needed.
   `ci.yml`'s two sharded job families already print `(index/total)` in their
-  `name:`: `Rust Unit Tests (1/3)`, `Rust OTLP Feature Tests (2/3)` (both
-  `cargo nextest run --partition count:k/N`, `shard_kind =
-  nextest-partition`), and `Shell Test Suites (hermetic, 1/2)`
+  `name:`: `Rust Unit Tests (1/3)` (`cargo nextest run --partition count:k/N`,
+  `shard_kind = nextest-partition`), and `Shell Test Suites (hermetic, 1/2)`
   (`LOOM_CI_SHARD` round robin, `shard_kind = shell-suite-shard`). A job whose
   name carries no trailing `(k/N)` group is unsharded: `shard_kind = "none"`,
   `shard_index` and `shard_total` both `None`. `shard_kind` is always present
@@ -856,8 +862,8 @@ section 10's "whether it is imbalanced") consume these.
 ### Per-test spans (#9456)
 
 The suite spans above only exist for the `LOOM_CI_SHARD` **shell** legs. The
-`nextest-partition` legs — `Rust Unit Tests (k/3)` and `Rust OTLP Feature Tests
-(k/3)` — had nothing below step granularity, so "~110s of this leg's 250s was
+`nextest-partition` legs — `Rust Unit Tests (k/3)` (the former separate
+`Rust OTLP Feature Tests` family was folded into it, #10823) — had nothing below step granularity, so "~110s of this leg's 250s was
 the test step" was answerable but *which tests* spent it was not, and
 rebalancing `--partition count:k/N` stayed guesswork (the same Unit partition's
 test step has ranged 50s–139s between runs, #9089). Each selected test now
@@ -882,7 +888,7 @@ for the file.
 |---|---|
 | Producer | `.config/nextest.toml`'s `[profile.ci.junit] path = "junit.xml"` → `target/nextest/ci/junit.xml`, written by every `cargo nextest run --profile ci` |
 | Wire format | nextest's JUnit XML: `<testcase name= classname= timestamp= time=>` plus, for a non-pass, one `<failure>` / `<error>` / `<skipped>` / `<flakyFailure>` / `<rerunFailure>` child. `classname` is the **binary id** (`loom-daemon` for the lib tests, `loom-daemon::<target>` for an integration binary), `name` the test path inside it — a test path is only unique within its binary, so both halves are part of the identity |
-| Artifact | `ci-test-timings-<family>-<k>-<N>`, uploaded `if: always()` with `if-no-files-found: ignore`. **The name is the entire pairing key** — JUnit XML carries no run id, no shard and no job name, so unlike a suite-timings record there is nothing inside the file to pair on. `<family>` is the leg's display name with its `(k/N)` suffix stripped and slugified (`Rust Unit Tests (1/3)` → `rust-unit-tests`), which is load-bearing rather than cosmetic: `ci.yml` has **two** nextest-partition families both sharding `1..3`, so `(kind, k, N)` alone matches two jobs. Renaming the artifact — or renaming the job without renaming the artifact — silently stops test spans, which `ci_telemetry::tests::test_spans` asserts against `ci.yml` itself |
+| Artifact | `ci-test-timings-<family>-<k>-<N>`, uploaded `if: always()` with `if-no-files-found: ignore`. **The name is the entire pairing key** — JUnit XML carries no run id, no shard and no job name, so unlike a suite-timings record there is nothing inside the file to pair on. `<family>` is the leg's display name with its `(k/N)` suffix stripped and slugified (`Rust Unit Tests (1/3)` → `rust-unit-tests`), which keeps the key unambiguous: `ci.yml` has one nextest-partition family today (`Rust Unit Tests`, since #10823), but the family slug stays in the name so a second family sharding `1..3` cannot make `(kind, k, N)` match two jobs. Renaming the artifact — or renaming the job without renaming the artifact — silently stops test spans, which `ci_telemetry::tests::test_spans` asserts against `ci.yml` itself |
 | Transport | the same `gh run download` path as a suite-timings artifact, and the same single artifacts listing: one listing serves both families, so a run with both pays one request, not two |
 | Cost gate | **Zero requests** unless the run has at least one *not-yet-emitted* `nextest-partition` job. The gate is **per family**: a run with only nextest legs never downloads a suite-timings artifact, and vice versa |
 | Pairing | the unique `nextest-partition` job of that run with the same family and `(index, total)`. Zero matches or several is `NoUniqueJob` — never guessed, the same rule [suite spans](#suite-spans-9089) and [story stitching](#story-stitching-9088) follow |
@@ -895,7 +901,7 @@ for the file.
 **Volume is the one risk the suite work did not face, and the emission is a
 deliberate tail sample.** A nextest leg runs **4,242 tests** against a shell
 leg's ~118 suites, so one span per test would be ~25,400 spans per CI run
-across the six nextest legs — two orders of magnitude more trace volume than
+across the three nextest legs — two orders of magnitude more trace volume than
 every other CI span combined. Both questions these spans exist for ("what
 should move between partitions", "which test regressed or flakes") live
 entirely in the slow tail: a 3 ms test is not a rebalancing candidate at any

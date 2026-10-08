@@ -237,7 +237,7 @@ if [[ "$1" == "forge" && "$2" == "verdict-equivalent" ]]; then
     exit 2
   fi
   if [[ -f "$STUB_DIR_FROM_ENV/tree-compare-fail" ]]; then
-    echo "stub loom-daemon: could not decide $4 -> $5" >&2
+    echo "stub loom-daemon: could not decide $4 -> $5 — re-review (fail closed). Why: clean-merge: new head $5 is not in the local clone and could not be fetched: stub" >&2
     exit 1
   fi
   EQ_KIND=""
@@ -682,16 +682,21 @@ run_guard 216 --clear
 assert_eq "1" "$RC" "(m) Label-write failure -> exit 1"
 assert_eq "0" "$(get_field "$OUT" CLEARED)" "(m) CLEARED=0 when the label write failed"
 assert_contains "$ERR" "failed to clear" "(m) stderr names the failed clear"
+assert_eq "STALE" "$(get_field "$OUT" DECISION)" "(m) DECISION=STALE on label-edit failure"
+# #10601: never claim a state change that did not happen, and write no marker.
+assert_eq "" "$COMMENTS_POSTED" "(m) No 'cleared' comment when the label edit failed (#10601)"
 
-# (m2) Comment-write failure during --clear -> exit 1 and NO label write, so
-#      the transition is never applied without its audit trail.
+# (m2) Comment-write failure AFTER a successful flip (#10601): the label state is
+#      the source of truth, so the flip stands, CLEARED=1, exit 12, stderr error.
 reset_state
 pr_json 217 "$SHA_B" "loom:changes-requested"
 { echo "["; verdict_comment "2026-08-08T02:22:00Z" "$SHA_A" "changes-requested"; echo "]"; } > "$STUB_DIR/comments-217.json"
 touch "$STUB_DIR/comment-fail-217"
 run_guard 217 --clear
-assert_eq "1" "$RC" "(m2) Comment-write failure -> exit 1"
-assert_eq "" "$WRITES" "(m2) Labels untouched when the audit comment could not be posted"
+assert_eq "12" "$RC" "(m2) Comment-write failure after flip -> exit 12"
+assert_eq "1" "$(get_field "$OUT" CLEARED)" "(m2) CLEARED=1: flip not undone"
+assert_contains "$WRITES" "--add-label loom:review-requested" "(m2) Labels flipped despite comment failure"
+assert_contains "$ERR" "failed to post stale-verdict comment" "(m2) stderr reports the comment failure"
 
 # (n) Ordinary new commits (not a rebase) also invalidate the verdict — the
 #     guard deliberately has no force-push-vs-fast-forward detector, because
@@ -1284,6 +1289,7 @@ assert_eq "STALE" "$(get_field "$OUT" DECISION)" "(u2) DECISION=STALE"
 assert_eq "1" "$(get_field "$OUT" CLEARED)" "(u2) CLEARED=1"
 assert_contains "$WRITES" "--remove-label loom:pr" "(u2) The approval is still cleared on a real change"
 assert_contains "$TREE_CALLS" "forge verdict-equivalent" "(u2) The comparison was consulted"
+assert_not_contains "$OUT" "could not be checked" "(u2) A provable change is not reported as an unchecked one (#10134)"
 
 # (u3) FAIL CLOSED (AC2): the comparison itself failed (`gh api compare` error,
 #      unparsable response). The verdict must still be invalidated — matching
@@ -1296,6 +1302,8 @@ run_guard 272 --clear
 assert_eq "12" "$RC" "(u3) Failed compare -> exit 12 (fail closed)"
 assert_eq "1" "$(get_field "$OUT" CLEARED)" "(u3) CLEARED=1 — an unavailable comparison never keeps a verdict"
 assert_contains "$WRITES" "--remove-label loom:pr" "(u3) The approval is cleared"
+assert_contains "$OUT" "equivalence could not be checked, failing closed (#10134)" "(u3) REASON says the clear is fail-closed, not a found change (#10134)"
+assert_contains "$OUT" "could not be fetched" "(u3) REASON carries the verb's Why: line"
 
 # (u4) FAIL CLOSED on a daemon predating the verb (clap: non-zero, empty
 #      stdout) — indistinguishable from a failed compare, and must behave

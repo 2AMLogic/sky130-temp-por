@@ -454,8 +454,23 @@ waited (`loom.dispatch.idle_slot_seconds`). Forge label-stage dwell
 (`loom.forge.stage_dwell{state}` / `.samples`, `loom.forge.stage_items{state}`)
 covers created → curated, curated → `loom:issue`, building → review requested
 and review requested → merged. It reads ETag-cached stage listings every 5
-minutes plus at most 8 per-item reads per sample, never per tick. Details are
-in [`telemetry-schema.md`](telemetry-schema.md#metricpoints).
+minutes plus at most 8 per-item reads per sample, never per tick. With
+`fleet.captainGauges` configured, the fleet captain samples for the fleet and
+dispatchers stand down while its published data is fresh
+(`loom.captain.gauge_age_seconds`, `loom.captain.gauge_fallback`; see
+[`daemon-reference.md`](daemon-reference.md#fleet-gauges-produced-by-the-captain-w12)).
+The same heartbeat can carry two forge facts (`starFacts`, `queueBlocked`), so
+the liveness pass's idle operator-label listings and the snapshot's
+`loom:blocked` listing are made by the captain alone.
+Details are in [`telemetry-schema.md`](telemetry-schema.md#metricpoints).
+
+**Merge-chain re-date pressure (#10163).** Three gauges track the #8508
+re-date remedy over a trailing 24 h: `loom.merge.redate_prs{state}`
+(`landed`, `pending`, `stuck`), `loom.merge.redates_max{state}` and
+`loom.merge.time_to_land_max`. They are read from local `git log` on the
+`host.health` cadence, with no forge call. A non-zero `stuck` series is a
+merge-chain head that `main` keeps moving under. Details are in
+[`telemetry-schema.md`](telemetry-schema.md#metricpoints).
 
 **Per-issue dispatch disposition (#9222).** `loom.dispatch.admission` only
 covers candidates that reached a `dispatch()` attempt — a candidate filtered
@@ -511,13 +526,203 @@ versus a session limit), which the snapshot-derived `loom.pool.exhaustions`
 cannot do. Each work-finder pool hold emits a `loom.pool.hold` span when it
 clears. At a sweep's terminal transition, the execution's exact token
 breakdown is journalled as one `loom.runtime.usage` span per model and scope
-(execution/attempt) in the sweep's trace,
+(execution/attempt) in the sweep's trace, each stamped with `llm.billing` /
+`llm.credential.kind` / `llm.provider.profile` (#10749),
 and the transcript-ingest pass stamps the sweep's `session.summary` log with
 the same trace when the match is unambiguous — which needs the summary to know
 its issue, so #9445 resolves that from the session's worktree/branch as well as
 from a slash-command argument (and its `loom.repo` from the workspace's git
 remote, as an `owner/name` slug or not at all). Details are in
 [`telemetry-schema.md`](telemetry-schema.md#metricpoints).
+
+**GitHub rate limit (#10022).** Each rate-limit breaker trip emits one
+`loom.ratelimit.trip` span (never one per re-trip while cooling), carrying the
+job that tripped it (`loom.ratelimit.source`), the cooldown end and, per pool,
+the probe's `used` split into this host's own share and the external share
+(`github.ratelimit.{core,graphql}.{used,own,external}`) — the `attribution:`
+line from `daemon.log`, now queryable fleet-wide. Every 60 s the collector
+probes `gh api rate_limit` (free: it does not count against the quota). On a
+GitHub App host the reading is booked into the bucket book below as the
+writer App's bucket for the workspace's own owner; on an ambient-login host it
+is exported as `github.ratelimit.{remaining,used,reset}` gauges labelled
+`resource` (`core`|`graphql`), `account` (the `gh` login, else `unknown` —
+never a token or path), `owner="-"` and `role="ambient"`. The collector also
+flushes `github.ratelimit.breaker_skips{reason=<job>}`: one per
+pass a job skipped while the breaker suppressed. A host that never enables an
+OTLP exporter exports none of this; its evidence stays in `daemon.log`.
+
+**Per-bucket rate limits and `loom.forge.calls` (W1).** GitHub bills each App
+installation separately, so the daemon also keeps a *bucket book*: the newest
+reading of every `(account, owner, resource)` pool it spends, from the free
+`x-ratelimit-*` headers of `gh api --include` calls and from one free
+`gh api rate_limit` probe per published credential directory after every
+reader-refresh pass, plus the 60 s probe above. Each believed reading is
+exported once per tick as `github.ratelimit.{remaining,used,reset}` labelled
+`resource`, `account`, `owner`, `installation` and `role` (`writer`|`reader`)
+— since #10343 no point leaves without `owner`, and since #10571 `account`/
+`owner` are keyed by the identity minted into each credential directory (its
+`identity.json` sidecar), so a label set is one GitHub bucket. Several hosts
+still export one bucket with readings of different ages, and older daemons'
+data can interleave two windows: read `used` together with its `reset` (the
+window), never as a monotone series.
+`loom.forge.calls` is a delta counter of the requests the `gh` facade sent,
+labelled by caller, inventoried operation, identity role, credential bucket
+(`account`, `cred_owner`, `installation`, `resource`), `target_owner` and `outcome`; the free
+`rate_limit` probe appears under `resource="other"` and is never charged to a
+bucket. On a host
+without an exporter, `loom-daemon forge calls --by bucket` shows the same
+picture from the local forge-call sink. Each `invoke github` span carries the
+same facts per call (#10343): `github.http.{status,not_modified,requests,source}`
+(`unknown` when `gh` gave no HTTP evidence — never guessed),
+`github.billing` (`ok`|`not_modified`|`rate_limited`|`error`|`not_sent`) and
+the bucket join keys `github.{resource,account,cred_owner,role}`. Since
+#10752 a span also carries `github.repo`, a write carries `github.number`, and
+a call made by a daemon pass inside its caller scope carries `github.caller`
+(the `loom:blocked` release pass: `stale_blocked_release`). That pass also
+emits a `pass.summary` log per pass and a `pass.verdict` per artifact; see
+[`telemetry-schema.md`](telemetry-schema.md) and
+`defaults/observability/signoz/pass-queries.sql`.
+
+**Shadow reconciliation (#10343).** *Shadow* spend is what GitHub billed a
+bucket that Loom did not attribute: GitHub's bill per `(account, owner,
+resource)` hour, minus that bucket's `loom.forge.calls`. The bill keys every
+`github.ratelimit.used` reading by its quota window (the paired
+`github.ratelimit.reset`) and charges each window's high-water mark once, so
+stale readings from another host and interleaved windows never re-charge. It is a band, not a point: `outcome="ok"` rows
+are surely charged (the band's high end), and `ok`+`error` bounds the
+attributed figure from above (an `error` may be a charged 4xx or a local
+failure that sent nothing); 304s and the free probe are excluded. The
+recipe is `defaults/observability/signoz/github-shadow.sql`
+(queries 1–3, with query 4 cross-checking against the spans); a large
+shadow on a bucket means spend from outside this fleet's daemons (agent `gh`
+calls, another host, an operator) or an uninstrumented caller. A negative
+shadow means the bucket's readings undercount it (sparse readings, or a
+pre-#10571 daemon's readings of another bucket), not that Loom over-spent.
+
+**Codex session-container state (#10455).** An always-on daemon task (started
+with the other observers, whether or not any telemetry exporter is configured)
+reads every enabled, session-managed Codex account's container once a minute.
+Each pass is one bounded snapshot of all `loom-codex-session-*` containers (one
+`docker ps -a` plus one `docker inspect`, killed after 8 s), never a call per
+account, and none at all on a host without such an account. The daemon logs a
+WARN on each state change (recovery included) and repeats it every 15 min while
+the container stays down; it is per account, outside the role runner's
+per-root DEBUG demotion. When telemetry is configured, each collector pass
+exports the newest observations as
+`loom.codex_session.state{account,state,container}`: one point per `state` in
+`running`, `stopped`, `restarting`, `missing`, `stale_mounts` (1 for the
+current state, 0 for the rest), with the standard `host.id` / `service.version`
+resource attributes. The collector never calls docker itself. `restarting` is
+a crash loop Docker is backing off (`State.Restarting`, which Docker reports
+alongside `Running=true`); it counts as down, and the spawn-time posture check
+treats it the same way. `stale_mounts` means the container's workspace mounts
+differ from what `accounts session start --mount-workspace <its loom.workspace
+label>` would mount today, in either direction (#10364): a registered root
+under the label is not mounted, or a mount is no longer registered (a
+deregistered repository that Codex can still write with its own sandbox off),
+or a mount `session start` would refuse today although it is still registered
+(the home directory, a `firewall: true` repository). That is the session
+reconciler's own drift definition, shared since #10600, so a container the
+reconciler is about to remove never reads `running`. While the workspace
+registry cannot be read there is no verdict, never `stale_mounts`.
+Private-clone containers never get this verdict. The watch covers every
+registered root's session-managed accounts, not only the daemon's own, and is
+registered with task liveness as `codex_session_watch`; while such accounts
+exist and the newest snapshot is older than 120 s it WARNs on the same 15 min
+cadence. Two more per-account gauges ride the same pass:
+`loom.codex_session.record{account,kind,container}` (`hold`, `drift_removal`:
+1 while that on-disk record stands) and
+`loom.codex_session.mount_drift{account,kind,container}` (`missing`, `extra`,
+`denied`: path counts). `loom-daemon status` shows the same per-account view
+(state, mounts, posture, hold, removal record, the reconciler's last action)
+under `Session containers:`. If docker cannot be queried at all
+(CLI missing, Docker daemon unreachable, timeout), nothing about any container
+is known. The tracker holds each account's last state and no gauge point is
+emitted, so nothing reads that as `missing`. Because it is still a host-wide
+Codex outage on a host with session-managed accounts, the daemon WARNs once
+when docker becomes unqueryable, repeats that every 15 min while it lasts, and
+WARNs again when docker answers. A failed `docker inspect` counts as an answer
+only when every error says the container does not exist. Readers of the
+published snapshot on the dispatch path should use `LATEST_MAX_AGE` (120 s, two
+watch intervals) and treat an older, absent or unavailable snapshot as "cannot
+observe". A tick refused because the container was not running is read by
+the daemon as `category=SESSION_DOWN` (exit 78 kept): `session-exec host`
+announces the cause on stderr as `# LOOM_SESSION_REFUSAL v=1
+category=SESSION_DOWN`, and the terminal-record parser applies it to the
+adapter's generic `RECOVERABLE`/78 record, so no adapter script carries a
+per-cause arm. It is carried as
+`loom.admission.reason="session-down"` on the `loom.role_attempt` span; it
+records no account hold. `session-down` on the span includes "Docker did not
+answer at spawn" (a failed `docker inspect`), not only a stopped, restarting or
+missing container; the watch's unqueryable-docker WARN is what tells the two
+apart. A spawn-time probe that was abandoned (deadline, signal) is not labelled
+`session-down`.
+
+**Stale-mount dispatch refusal (#10364).** Before `docker exec --workdir`,
+`session-exec host` checks that one of the running container's mounts covers
+the workdir, reading the same single `docker inspect` that tells it the
+container is running, so dispatch makes no extra docker call. If no mount
+covers it (the repository was registered after the container was created), it
+does not exec: it prints the recreate command, announces
+`# LOOM_SESSION_REFUSAL v=1 category=SESSION_MOUNT_STALE` and exits 78. The
+adapter passes both through unchanged and the terminal-record parser relabels
+the tick's record, as for `SESSION_DOWN`. The tick carries
+`loom.admission.reason="session-mount-stale"` and records no account hold
+(the container is stale, not the account). `loom-daemon workspace add` /
+`remove` print every host-mode session container the registry change left
+drifted. The session reconciler recreates idle ones itself (busy ones on a
+later pass; see `daemon-reference.md`), so the manual recreate it prints is an
+override for a stopped daemon or an opted-out reconciler.
+
+**Uncovered `gh` callers (#10343, tracked in #10618).** Spend from `safehouse.rs`,
+`auto_update`/`release_resolve`, `credential_preflight`, `sweep-lease-renew.sh`,
+`peer_coord.rs` and `main_health_gate` bypasses the `invoke github` span, so it
+reads as shadow spend. The span-vs-`/rate_limit` hourly reconciliation is an
+operational check on a fleet host (shadow recipe above), not a CI check.
+
+**Long-running task liveness and self-update decisions (#10414).** Each
+long-running daemon loop beats a process-global liveness registry
+(`crate::task_liveness`) once per finished iteration. The loops are the
+self-update loop (`auto_update`), the ETA fleet refresh
+(`eta_fleet_refresh`), the 5-minute ETA pass (`eta_pass`) and each role-runner
+loop (`role_runner.<role>`). Every 60 s, on its own ticker independent of the
+collector pass, the daemon exports `loom.daemon.task_alive{task}`. The value
+is `1` while the loop has beaten within its staleness window. That window is
+two intervals plus 60 s, and the self-update loop adds its 35-minute tick
+bound. The value is `0` once the loop has gone quiet past that window or has
+marked itself dead. So a loop that exited, or whose blocking cycle never
+returns, reads `0` within one window. Before #10414 it simply went silent.
+`loom.daemon.task_faults{task,reason}` counts `panic` (an iteration panicked
+and the loop caught it), `overrun` (an iteration ran past the loop's own
+bound), `exit` (the loop stopped for good) and, on `task=eta_pass` only,
+`eta_non_authority_emit` (a host that is not the fleet's ETA authority reached
+the ETA sink; the records were dropped, #10498). The same entries are listed
+under `Task liveness:` in `loom-daemon status`, and as `task_liveness` in
+`status --json`. Alert on `task_alive == 0`, and also on the series going
+silent: that means the sampler or the whole daemon stopped. The self-update
+loop also emits one `auto_update.tick` log per tick. It records the decision
+(`skip`, `defer`, `stale_repo`, `fetch`, `rebuild`, `drain_wait`,
+`roll_stall`, `panic`), the installed and target versions, the defer reason,
+the drain state and the deciding build's version and revision. A host that
+stops converging now says why on every tick. See
+[`telemetry-schema.md` → `auto_update.tick`](telemetry-schema.md#auto_updatetick).
+The token-ranking refresh loop (default-on, every 600 s) emits one
+`token_ranking.refresh` log per workspace per round (#10744). It records the
+accounts probed against `api.anthropic.com`, each account's outcome and
+credential kind, and `api_key_probe_count`, the probes that were metered spend.
+Before #10744 this recurring provider call from every host was invisible. See
+[`telemetry-schema.md` → `token_ranking.refresh`](telemetry-schema.md#token_rankingrefresh).
+
+**IPC latency (#10765).** `loom.daemon.ipc.latency_max{kind}`,
+`loom.daemon.ipc.latency{kind}` and `loom.daemon.ipc.requests{kind}` time
+every IPC request from read to response written, so a live but slow daemon is
+visible without the watchdog. A request slower than 5 s is also logged at WARN
+(`ipc: <kind> request took ...`), except `DaemonStatus` and
+`DaemonStatusSections` (`status --json --section`, #10787; it has its own
+`kind` so cheap sectioned calls do not dilute the full build's series), which
+log their own phase breakdown, and `CancelSweep` / `DispatchSweep` (slow by
+design: the SIGTERM grace and the token-capture poll). See
+[`telemetry-schema.md`](telemetry-schema.md) for the labels.
 
 To add a signal, add a `MetricName` or `SpanName` variant. If it needs a new
 label or attribute key, extend `OPS_METRIC_LABEL_KEYS` or

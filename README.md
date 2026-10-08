@@ -11,8 +11,10 @@ open-source xschem + ngspice flow.
 **Status: schematic complete and netlisted; verification and layout
 in progress.** `design/` has a full, netlist-checked schematic hierarchy
 (four leaf cells plus the assembled `temp_por_top`); `sim/` has testbench
-harnesses with recorded PVT-corner results; `layout/` has an active
-multi-cell composition pass on the `bias_core` sub-blocks. `spec/` is not
+harnesses with recorded PVT-corner results; `layout/` has all six
+`bias_core` sub-blocks composed into a DRC-clean assembly with recorded
+signoff evidence, while final cross-block routing and full LVS remain open.
+`spec/` is not
 yet ratified — three decision records (`proposed`) plus a two-key
 ratification process are in progress (`spec/README.md`,
 `spec/decision-records/`, `ratification/`). See "Target specification"
@@ -78,8 +80,9 @@ measured silicon. **Current position: schematic complete and netlisted,
 with per-cell PVT sim results recorded in `sim/`; spec ratification and
 layout are both advancing in parallel rather than in strict ladder order —
 `spec/decision-records/` has three records (`proposed`, not yet ratified,
-with a two-key `ratification/` process under way) and `layout/` has an
-active multi-cell composition pass (six `bias_core_*` sub-blocks) — so no
+with a two-key `ratification/` process under way) and `layout/` has all six
+`bias_core_*` sub-blocks in a DRC-clean assembly with recorded signoff
+evidence, while final cross-block routing and full LVS remain open — so no
 single ladder rung is complete yet.**
 
 ## Repo layout

@@ -28,6 +28,7 @@ documented here.
 - [Who writes one (every claim path — #6320, #8193, #9453)](#who-writes-one-every-claim-path--6320-8193-9453)
 - [When it is written](#when-it-is-written)
 - [What this phase explicitly does not do](#what-this-phase-explicitly-does-not-do)
+- [Renewer ownership, completion and request budget (Issue #10229)](#renewer-ownership-completion-and-request-budget-issue-10229)
 - [For Phase 2 (reclamation) and Phase 3 (fencing)](#for-phase-2-reclamation-and-phase-3-fencing)
 - [Phase 2, dispatch-time half: claim-then-verify-order (#6287)](#phase-2-dispatch-time-half-claim-then-verify-order-6287)
 - [Phase 3 (Issue #6309) has now shipped: sweep-side fencing before push/PR-open](#phase-3-issue-6309-has-now-shipped-sweep-side-fencing-before-pushpr-open)
@@ -192,6 +193,34 @@ pid — exactly what `--watch-pid` wants
 any one marker admits the publish; `--force` semantics are unchanged, and a
 blank marker still refuses.
 
+**Call-site parity and observable outcome (#10570).** `worktree.sh`'s
+`_wt_lease_claim` uses the same `${LOOM_AGENT_SESSION_PID:-${CLAUDE_PID:-$PPID}}`
+chain as the CLAUDE.md recipe; it previously omitted `LOOM_AGENT_SESSION_PID`
+(falling to `$PPID`, a short-lived tool shell, so renewal self-terminated and
+the lease aged out) and sent stderr to `/dev/null`, hiding the one-line
+`lease ensure: ...` outcome. Exit 0 never certifies publication; read that line
+(`Renewing` = published and renewed; anything else = no fresh lease, so another
+host's orphan recovery may reclaim the claim after its grace period).
+
+**A declined publish is retried, not final (#10570).** The #10161 incident
+(2026-10-06) was not the pid chain: the attended claim at 12:24:24Z landed while
+a *released* fleet sweep's lease (last renewed 12:14:54Z, claim dropped
+12:19:28Z) was still inside the 15-minute TTL. Publish exited 4 ("a peer holds
+a fresh lease"), `lease ensure` stopped there, and no attended lease ever
+appeared; when the leftover aged out, another host's recovery correctly found
+only a stale lease and reclaimed at 12:35:51Z. Now an exit 4 or 2 spawns one
+detached **deferred publisher** per issue per checkout. It re-runs the same
+publish (same trusted format, same peer rules, so a live peer is never
+superseded) every 60 s, slowing to 300 s once the peer has outlived the TTL. It
+stops when a publish settles (then starts the normal renewer with the time left
+of the original cap), when the watched session dies, or at the cap. Every
+outcome is appended to `.loom/logs/lease-ensure/issue-<N>.log`. An attended
+lease's sweep id is stable per watched session
+(`sweep-insession-s<pid>-<start-time>`), so a second `lease ensure` from the
+same session re-attaches to its own lease. Without that, the session's first
+lease would read as a live peer and block the second call. An in-session
+sweep's `LOOM_SWEEP_RUN_ID` still wins.
+
 **Why the second writer exists.** `/loom:sweep`'s in-session path dispatches
 its Builder through the Task tool, one level deep, deliberately (the skill's
 own "CRITICAL: One level deep" rule). Those Builders are subagents of the
@@ -272,6 +301,57 @@ future reclamation decision's evidence, not the claim's own validity.
 - **No reclamation or fencing logic.** Deciding what to do with a lease that
   has gone stale (Phase 2) and bounding the cost of the underlying
   acquisition race #4028 describes (Phase 3) are both out of scope here.
+
+## Renewer ownership, completion and request budget (Issue #10229)
+
+- **One renewer per (repo, host, sweep, issue).** `sweep-lease-renew.sh start`
+  hands the forked loop to `loom-daemon lease renewer claim`, which records its
+  pid, start-time identity and a per-start token under `~/.loom/lease-renew/`
+  (`LOOM_LEASE_RENEW_STATE_DIR`) behind an exclusive `flock`. A repeated start
+  with a live owner prints that pid and drops its own loop; a dead owner or
+  recycled pid is recovered; other keys never collide.
+- **Completion.** Each cycle reads the issue (an explicit `GET issues/N` via
+  `forge_gh_perm_safe`; the comments response has no state) and asks
+  `lease renewer check`: `closed`, a release or a newer owner ends the loop
+  even while the interactive parent lives; an unreadable state skips that
+  cycle's PATCH and keeps the loop. `release <issue>` ends that key's loop
+  explicitly (idempotent). A daemon predating the verb renews as before (`start` probes `lease renewer --help` once and then skips the state read, `check` and `claim`, #10348). A daemon-dispatched start (`LOOM_SWEEP_LEASE_RENEW_SOURCE=dispatch`, set by `run_lease_renewal_start`) also skips the state read and passes `--issue-state open`: its watched pid is the sweep child, which already bounds the loop. A
+  remote authenticated release marker is not defined.
+- **Budget.** Per path at the default 300 s (#10348): daemon-dispatched and
+  verb-absent loops make two requests per cycle (one non-paginated `?since=`
+  window, one PATCH), 24/h per held lease. In-session loops with the verb add
+  the state read, three requests per cycle, 36/h, which buys the closed-issue
+  stop on long-lived interactive pids instead of renewing until the 4 h / 24 h
+  age cap. The #10229 SigNoz target is therefore <= 24/h dispatched and
+  verb-absent, 36/h in-session. Re-list reasons (`full-window`,
+  `missing-comment`, `patch-404`) are logged and exported as
+  `LOOM_LEASE_FALLBACK_REASON` for gh-shim telemetry.
+- **Whose bucket.** Each call asks `loom-daemon forge token` for the host's
+  GitHub App installation: a reader App for the two GETs, the writer App for
+  the PATCH. `forge_gh_perm_safe`'s 403 ladder still runs under that token.
+  A host with no App, or an App attempt that fails for any reason, re-runs
+  the call on the caller's own credential, exactly as before, and tags it
+  `lease-credential=ambient-fallback` on stderr. `LOOM_LEASE_CREDENTIAL`
+  (`app` or `ambient`) is exported for gh-shim telemetry per attempt, not per
+  call: when the ladder recovers an App 403 on a personal rung
+  (`LOOM_PERSONAL_GH_TOKEN` or the ambient personal login), that attempt is
+  `ambient`, an escalated ladder prints one `lease-credential-attempt:` line
+  per attempt, and the call is tagged `lease-credential=ambient-recovered`,
+  even though it succeeded. On a host with an
+  App, a held lease therefore costs the personal login nothing in steady
+  state. The 36/h lands on the App buckets instead.
+- **Why `--paginate` recurred.** A full listing is meant to happen once per
+  loop, on its first cycle. Two paths made it recur. First, a loop with no
+  trusted, matching lease comment exits 2 on every cycle. That clears the
+  cache, so the next cycle lists everything again, for the loop's whole life.
+  Such a loop now stops after two consecutive misses, one interval apart, and
+  any successful renewal in between resets the count. Second, the cached window
+  was anchored at the lease's `created_at`, so it grew for the claim's whole
+  life and could fill a page (`full-window`). The cursor is now the lease
+  comment's `updated_at` as the previous cycle listed it. Every comment
+  created after that listing is still inside the window, so the own-yield
+  guard sees every new `loom:lease-yield`. The window now spans about two
+  intervals.
 
 ## For Phase 2 (reclamation) and Phase 3 (fencing)
 
