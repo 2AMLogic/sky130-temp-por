@@ -19,7 +19,8 @@ _None._
 
 Human-approved issues ready for implementation (`loom:issue`).
 
-_None._
+- **#31**: T1 item 8/10: aggregate a block-level characterization report
+- **#81**: bias_core: wire the nine remaining cross-block nets on the met3–met5 planes klayout-tools#2738 added (T1 items 4 and 11)
 
 ## In Progress
 
@@ -44,7 +45,7 @@ _None._
 Issues carrying `loom:curated`.
 
 - **#40**: bias_core: full-cell assembly (compose all device-group sub-blocks) *(curated)*
-- **#78**: Run the two-key ratification ceremony on DR-003 (target-spec table) *(curated)*
+- **#81**: bias_core: wire the nine remaining cross-block nets on the met3–met5 planes klayout-tools#2738 added (T1 items 4 and 11) *(curated)*
 
 ## Proposed (Architect / Hermit)
 
@@ -61,7 +62,7 @@ _None._
 |------|-------|
 | Operator merge-risk holds | 0 |
 | Operator priority | 0 |
-| Ready (`loom:issue`) | 0 |
+| Ready (`loom:issue`) | 2 |
 | In Progress (`loom:building`) | 0 |
 | PRs awaiting review | 0 |
 | Approved PRs awaiting merge | 0 |
