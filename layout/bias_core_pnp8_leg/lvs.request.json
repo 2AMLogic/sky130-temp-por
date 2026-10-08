@@ -1,6 +1,7 @@
 {
   "layout": {
-    "netlist": "bias_core_pnp8_leg.spice"
+    "netlist": "bias_core_pnp8_leg.spice",
+    "deck": "sky130"
   },
   "reference": {
     "netlist": "bias_core_pnp8_leg.ref.spice",

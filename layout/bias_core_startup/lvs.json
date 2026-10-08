@@ -15,6 +15,7 @@
     "parameter_tolerance": null,
     "compare_parameters": null,
     "power_connectivity": null,
+    "anchor_top_level_pins": null,
     "supply_nets": [
       "GND",
       "VCC",
@@ -38,13 +39,14 @@
     "finding_count": 0
   },
   "body_verification": {
-    "status": "unchecked",
-    "reason": "no request.layout.deck was given (the pre-extracted request.layout.netlist form), so nothing establishes this layout's substrate/well-tap convention and no synthesized body net can be told apart from a real one -- this run verified nothing about the device bodies either way",
+    "status": "verified",
+    "reason": null,
     "device_classes": [],
     "device_count": 0,
     "findings": [],
     "finding_count": 0
   },
+  "device_parameter_coverage": [],
   "mismatch_count": 0,
   "error_count": 0,
   "category_counts": {},
@@ -66,19 +68,31 @@
       "matched": 10
     }
   },
-  "device_classes": null,
+  "device_classes": [
+    "nfet",
+    "pfet",
+    "pnp",
+    "sky130_fd_pr__model__cap_mim",
+    "sky130_fd_pr__model__cap_mim_m4",
+    "resistor"
+  ],
   "environment": {
     "engine": "klayout",
-    "engine_version": "0.30.10",
+    "engine_version": "0.30.12",
+    "netgen_binary": null,
     "layout_sha256": "b6aabed6a503be536d2bd7d3f88974ccb84b373d04195af16f853c53df00b1f7",
     "reference_sha256": "62d41eca71588d859a6436d5689fecfdf0c574db9d0601d842d0ebfad7cf76ff",
     "extracted_netlist": null
   },
   "provenance": {
-    "klt_version": "0.6.0",
-    "klayout_version": "0.30.10",
+    "klt_version": "0.6.0+g0ce8c64842d9",
+    "klayout_version": "0.30.12",
     "pdk": null,
-    "deck": null,
+    "deck": {
+      "name": "sky130",
+      "content_hash": "sha256:f8f2c3f48eada473dc34a7a8926c0b04fef446fb351a70a636ce43a9ca9c70ba",
+      "released": false
+    },
     "input": {
       "content_hash": "sha256:b6aabed6a503be536d2bd7d3f88974ccb84b373d04195af16f853c53df00b1f7",
       "role": "netlist"

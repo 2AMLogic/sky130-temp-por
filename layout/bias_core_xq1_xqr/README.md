@@ -185,8 +185,9 @@ this file. Re-run the whole chain with
 ### Upstream status (as of 2026-09-23, issue #30's toolchain bump)
 
 The collector-strap gap is resolved and **in use here** — this repo's
-evidence is regenerated against `klt 0.6.0` (`c622e8addb36`,
-`layout/pdk.json`'s pin), which contains PR
+evidence is regenerated against `klt 0.6.0` (`c622e8addb36`), and since issue
+#81 against `main` @ `0ce8c64842d9` (`layout/pdk.json`'s pin); both
+contain PR
 [#2320](https://github.com/2AMLogic/klayout-tools/pull/2320)'s fix
 (`ba1039d4`). See `layout/bias_core_pnp8_leg/README.md`'s own "Upstream
 status" section for the full #1894 → #2008 → #2312 write-up.

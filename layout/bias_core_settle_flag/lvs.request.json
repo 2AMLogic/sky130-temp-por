@@ -1,6 +1,7 @@
 {
   "layout": {
-    "netlist": "bias_core_settle_flag.spice"
+    "netlist": "bias_core_settle_flag.spice",
+    "deck": "sky130"
   },
   "reference": {
     "netlist": "bias_core_settle_flag.ref.spice",

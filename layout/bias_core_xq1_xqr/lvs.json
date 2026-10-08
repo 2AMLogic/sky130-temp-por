@@ -19,6 +19,7 @@
       ]
     },
     "power_connectivity": null,
+    "anchor_top_level_pins": null,
     "supply_nets": [
       "GND",
       "VCC",
@@ -42,17 +43,18 @@
     "finding_count": 0
   },
   "body_verification": {
-    "status": "unchecked",
-    "reason": "no request.layout.deck was given (the pre-extracted request.layout.netlist form), so nothing establishes this layout's substrate/well-tap convention and no synthesized body net can be told apart from a real one -- this run verified nothing about the device bodies either way",
+    "status": "verified",
+    "reason": null,
     "device_classes": [],
     "device_count": 0,
     "findings": [],
     "finding_count": 0
   },
-  "mismatch_count": 6,
+  "device_parameter_coverage": [],
+  "mismatch_count": 1,
   "error_count": 0,
   "category_counts": {
-    "device.parameter_excluded": 6
+    "device.parameter_excluded": 1
   },
   "category_error_counts": {},
   "counts": {
@@ -72,19 +74,31 @@
       "matched": 3
     }
   },
-  "device_classes": null,
+  "device_classes": [
+    "nfet",
+    "pfet",
+    "pnp",
+    "sky130_fd_pr__model__cap_mim",
+    "sky130_fd_pr__model__cap_mim_m4",
+    "resistor"
+  ],
   "environment": {
     "engine": "klayout",
-    "engine_version": "0.30.10",
+    "engine_version": "0.30.12",
+    "netgen_binary": null,
     "layout_sha256": "219d1d5aa29dca115791d22f99dafbf4e00734dfc2d160ce50b84ab41f79c637",
     "reference_sha256": "79ed580a9a04ffbead61235b7c52dd3db2b19610e061830dc0437474b582658c",
     "extracted_netlist": null
   },
   "provenance": {
-    "klt_version": "0.6.0",
-    "klayout_version": "0.30.10",
+    "klt_version": "0.6.0+g0ce8c64842d9",
+    "klayout_version": "0.30.12",
     "pdk": null,
-    "deck": null,
+    "deck": {
+      "name": "sky130",
+      "content_hash": "sha256:f8f2c3f48eada473dc34a7a8926c0b04fef446fb351a70a636ce43a9ca9c70ba",
+      "released": false
+    },
     "input": {
       "content_hash": "sha256:219d1d5aa29dca115791d22f99dafbf4e00734dfc2d160ce50b84ab41f79c637",
       "role": "netlist"
@@ -92,50 +106,6 @@
     "klayout_version_mismatch": false
   },
   "mismatches": [
-    {
-      "category": "device.parameter_excluded",
-      "severity": "warning",
-      "description": "options.compare_parameters scoped device class 'PNP' to compare only ['NE'] -- 'AB' was excluded from this compare and is NOT verified; a 'match' does not confirm the two sides agree on it (see docs/cli/lvs.md, 'device.parameter_excluded')",
-      "side": "both",
-      "net": null,
-      "device": {
-        "layout": null,
-        "reference": null,
-        "class": "PNP"
-      },
-      "property": null,
-      "details": {
-        "parameter": "AB",
-        "compared_parameters": [
-          "NE"
-        ]
-      },
-      "circuit": null,
-      "instance": null,
-      "subcircuit": null
-    },
-    {
-      "category": "device.parameter_excluded",
-      "severity": "warning",
-      "description": "options.compare_parameters scoped device class 'PNP' to compare only ['NE'] -- 'AC' was excluded from this compare and is NOT verified; a 'match' does not confirm the two sides agree on it (see docs/cli/lvs.md, 'device.parameter_excluded')",
-      "side": "both",
-      "net": null,
-      "device": {
-        "layout": null,
-        "reference": null,
-        "class": "PNP"
-      },
-      "property": null,
-      "details": {
-        "parameter": "AC",
-        "compared_parameters": [
-          "NE"
-        ]
-      },
-      "circuit": null,
-      "instance": null,
-      "subcircuit": null
-    },
     {
       "category": "device.parameter_excluded",
       "severity": "warning",
@@ -150,72 +120,6 @@
       "property": null,
       "details": {
         "parameter": "AE",
-        "compared_parameters": [
-          "NE"
-        ]
-      },
-      "circuit": null,
-      "instance": null,
-      "subcircuit": null
-    },
-    {
-      "category": "device.parameter_excluded",
-      "severity": "warning",
-      "description": "options.compare_parameters scoped device class 'PNP' to compare only ['NE'] -- 'PB' was excluded from this compare and is NOT verified; a 'match' does not confirm the two sides agree on it (see docs/cli/lvs.md, 'device.parameter_excluded')",
-      "side": "both",
-      "net": null,
-      "device": {
-        "layout": null,
-        "reference": null,
-        "class": "PNP"
-      },
-      "property": null,
-      "details": {
-        "parameter": "PB",
-        "compared_parameters": [
-          "NE"
-        ]
-      },
-      "circuit": null,
-      "instance": null,
-      "subcircuit": null
-    },
-    {
-      "category": "device.parameter_excluded",
-      "severity": "warning",
-      "description": "options.compare_parameters scoped device class 'PNP' to compare only ['NE'] -- 'PC' was excluded from this compare and is NOT verified; a 'match' does not confirm the two sides agree on it (see docs/cli/lvs.md, 'device.parameter_excluded')",
-      "side": "both",
-      "net": null,
-      "device": {
-        "layout": null,
-        "reference": null,
-        "class": "PNP"
-      },
-      "property": null,
-      "details": {
-        "parameter": "PC",
-        "compared_parameters": [
-          "NE"
-        ]
-      },
-      "circuit": null,
-      "instance": null,
-      "subcircuit": null
-    },
-    {
-      "category": "device.parameter_excluded",
-      "severity": "warning",
-      "description": "options.compare_parameters scoped device class 'PNP' to compare only ['NE'] -- 'PE' was excluded from this compare and is NOT verified; a 'match' does not confirm the two sides agree on it (see docs/cli/lvs.md, 'device.parameter_excluded')",
-      "side": "both",
-      "net": null,
-      "device": {
-        "layout": null,
-        "reference": null,
-        "class": "PNP"
-      },
-      "property": null,
-      "details": {
-        "parameter": "PE",
         "compared_parameters": [
           "NE"
         ]

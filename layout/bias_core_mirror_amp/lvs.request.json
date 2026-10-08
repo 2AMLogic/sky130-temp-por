@@ -1,6 +1,7 @@
 {
   "layout": {
-    "netlist": "bias_core_mirror_amp.spice"
+    "netlist": "bias_core_mirror_amp.spice",
+    "deck": "sky130"
   },
   "reference": {
     "netlist": "bias_core_mirror_amp.ref.spice",

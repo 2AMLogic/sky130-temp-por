@@ -121,6 +121,15 @@ own README "Verification" section for the full diagnosis,
 and
 [`2AMLogic/klayout-tools#1908`](https://github.com/2AMLogic/klayout-tools/issues/1908).
 
+**Update (issue #81): `klt lvs` now reads `match`, with 6/6 devices and
+11/11 nets.** Two things changed together. The `klt` pin moved to
+`0ce8c64842d9`. `layout/bin/compose-cell.py` now passes the deck on the
+`klt lvs` request's layout side, so the bare-mode 3-terminal resistor `X`
+cards that `klt extract` writes (klayout-tools#2336) read back as
+resistors instead of unmatched subcircuit stubs. The two MiM caps match
+too. The `R=0`/`C=0` reference placeholders remain, so the match is
+topology only (see that cell's README).
+
 ## `bias_core_settle_flag`: the settle-flag output stage (issue #39, part of #34)
 
 [`layout/bias_core_settle_flag/`](bias_core_settle_flag/README.md) lays out
@@ -262,8 +271,10 @@ an investigation that found no repro) and then
 [PR #2320](https://github.com/2AMLogic/klayout-tools/pull/2320) (merged
 `2026-09-22T18:10:31Z`, commit `ba1039d4`): the collector ring is drawn on
 the `tap` role extraction uses to unify substrate ties, so the strap is
-electrically recognized. `layout/pdk.json` now pins `klt 0.6.0`
-(`c622e8addb36`, which contains that fix), every `layout/*/` evidence
+electrically recognized. `layout/pdk.json` then pinned `klt 0.6.0`
+(`c622e8addb36`, which contains that fix; issue #81 later moved the pin to
+`main` @ `0ce8c64842d9` for the met3–met5 routing roles of
+klayout-tools#2738), every `layout/*/` evidence
 directory is regenerated against it, and both PNP cells strap `vss` through
 their array's own `COLL_E` tap: their `klt extract` drops the separate
 `vsubs` node (8 devices / 2 nets, and 2 devices / 3 nets respectively) and
@@ -371,36 +382,24 @@ device-group sub-blocks below into one cell against
 BIAS_OK`, each placed as an opaque `blocks[].cell` sibling (no fresh `klt
 gen` calls in this cell.json at all).
 
-**`klt drc`: clean, 0 violations.** **`klt extract`: 50 devices, 43 nets,
-43 pins** — device count matches `design/netlist/bias_core.spice` exactly,
-and the supply islands now merge with their blocks' pads ([#69]'s
-landing-frame fix; see that cell's README for the island-census evidence).
-**`klt lvs`: mismatch — 21/50 devices, 14/27 nets matched.** This is a real,
-partial result, not the single "PNP collector-strap" gap the parent issue
-anticipated: `VDD`, `VSS`, and `nkg` are wired and verified short-free;
-every other cross-block net is unrouted this increment for one of three
-independently-confirmed reasons — a genuine shortage of routing planes for
-the number of mutually-crossing nets this composition needs (filed
-generically as
-[`2AMLogic/klayout-tools#1962`](https://github.com/2AMLogic/klayout-tools/issues/1962)),
-a handful of pre-existing pads that reject any new externally-approaching
-route outright (the same class of gap issue #56 already fixed for six other
-pins, just not these ones), and the already-tracked
-[`2AMLogic/klayout-tools#1894`](https://github.com/2AMLogic/klayout-tools/issues/1894)
-PNP-ring gap, now confirmed to extend further than "just the collector
-strap". See that cell's own README for the full, per-net breakdown and
-[#64](https://github.com/2AMLogic/sky130-temp-por/issues/64) for the tracked
-follow-up.
+**`klt drc`: clean, 0 violations.** **`klt extract`: 50 devices, 27 nets,
+27 pins.** The device count matches `design/netlist/bias_core.spice`
+exactly. **`klt lvs`: `match`, 50/50 devices and 27/27 nets** (issue #81;
+up from 21/50 devices and 14/27 nets). Every cross-block net is wired:
+`VDD`/`VSS`/`nkg` on li1/met1/met2 as before, and the remaining ten nets
+on the met3/met4/met5 routing roles klayout-tools#2738 added, by a
+hand-made layer plan (that cell's README, "Layer plan"). Five disclosed
+warnings limit the match to topology: PNP `AE` is not compared, and the
+resistor/MiM values and secondary geometry are not compared. `klt erc`
+is `erc_status: clean` with `VDD`/`VSS` one island each, and the
+pad-point island census passes for all 15 nets. See that cell's README
+for the full evidence, the MiM clearance, and the remaining limits.
 
 ## What's next
 
 Per issue #36, this fleet prefers landing DRC-clean/LVS-blocked increments
-(isolated to a known, upstream-filed gap) over waiting on the upstream fix —
-`bias_core_pnp8_leg`, `bias_core_xq1_xqr`, and `bias_core_passives` all ship
-that way; `bias_core_settle_flag`, `bias_core_startup`, and
-`bias_core_mirror_amp` land DRC- and LVS-clean outright, and `bias_core`
-itself (the full-cell assembly) lands DRC-clean with a real but partial LVS
-match, per above. [#64](https://github.com/2AMLogic/sky130-temp-por/issues/64)
-tracks completing that wiring; `temp_core`, `por_comparator`,
-`por_output_chain`, and `temp_por_top` are tracked from
-[#4](https://github.com/2AMLogic/sky130-temp-por/issues/4).
+(isolated to a known, upstream-filed gap) over waiting on the upstream fix.
+As of issue #81, all six `bias_core_*` sub-blocks and the `bias_core`
+full-cell assembly are DRC-clean and LVS `match` at the `0ce8c64842d9` pin.
+`temp_core`, `por_comparator`, `por_output_chain`, and `temp_por_top` are
+tracked from [#4](https://github.com/2AMLogic/sky130-temp-por/issues/4).

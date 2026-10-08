@@ -59,20 +59,6 @@
       "port": "ibias"
     },
     {
-      "name": "VREF",
-      "net": "VREF",
-      "layer": {
-        "layer": 67,
-        "datatype": 20
-      },
-      "x_um": 13.629999999999999,
-      "y_um": 126.97,
-      "width_um": 8.0,
-      "direction_deg": 0,
-      "block": "mirror_amp",
-      "port": "vref"
-    },
-    {
       "name": "BIAS_OK",
       "net": "BIAS_OK",
       "layer": {
@@ -93,8 +79,8 @@
       "source": "cell",
       "generator": null,
       "cell_name": "bias_core_mirror_amp",
-      "source_path": "/home/ubuntu/GitHub/sky130-temp-por/.loom/worktrees/issue-30/layout/bias_core/../bias_core_mirror_amp/bias_core_mirror_amp.gds",
-      "source_digest": "sha256:30689c9bdcc65b4899bfb21a500fdfaed7b42a0b60d2633a9664b8257e4304d5",
+      "source_path": "/home/ubuntu/GitHub/sky130-temp-por/.loom/worktrees/issue-81/layout/bias_core/../bias_core_mirror_amp/bias_core_mirror_amp.gds",
+      "source_digest": "sha256:227070ec2f7c6ab2789f75382e2380efd543ee31e9f5dffe793cfc06ecda2eaa",
       "offset_um": {
         "x": 0.0,
         "y": 100.0
@@ -105,15 +91,16 @@
         "x1": 87.84,
         "y1": 165.17000000000002
       },
-      "orientation": "none"
+      "orientation": "none",
+      "abuts": []
     },
     {
       "id": "xq1_xqr",
       "source": "cell",
       "generator": null,
       "cell_name": "bias_core_xq1_xqr",
-      "source_path": "/home/ubuntu/GitHub/sky130-temp-por/.loom/worktrees/issue-30/layout/bias_core/../bias_core_xq1_xqr/bias_core_xq1_xqr.gds",
-      "source_digest": "sha256:267e55f2fabaf4af7ac467b1bdfb1cd604cc4b920f8a7ee042a84fece30def9e",
+      "source_path": "/home/ubuntu/GitHub/sky130-temp-por/.loom/worktrees/issue-81/layout/bias_core/../bias_core_xq1_xqr/bias_core_xq1_xqr.gds",
+      "source_digest": "sha256:e280b5d171577e3fa62b7f986da92e705ba5804aa21190d72684d6cbf925bf57",
       "offset_um": {
         "x": 150.0,
         "y": 100.0
@@ -124,34 +111,36 @@
         "x1": 159.81,
         "y1": 104.37
       },
-      "orientation": "none"
+      "orientation": "none",
+      "abuts": []
     },
     {
       "id": "pnp8_leg",
       "source": "cell",
       "generator": null,
       "cell_name": "bias_core_pnp8_leg",
-      "source_path": "/home/ubuntu/GitHub/sky130-temp-por/.loom/worktrees/issue-30/layout/bias_core/../bias_core_pnp8_leg/bias_core_pnp8_leg.gds",
-      "source_digest": "sha256:449afd4bbfedc430bf2232e16e03a6b51242436cc58fa3ad0862b542f2d0dfc4",
+      "source_path": "/home/ubuntu/GitHub/sky130-temp-por/.loom/worktrees/issue-81/layout/bias_core/../bias_core_pnp8_leg/bias_core_pnp8_leg.gds",
+      "source_digest": "sha256:33b366fe82f84b9ce0a30639f0c4c9b2aadb955237a84a23dd562a654834c6f4",
       "offset_um": {
         "x": 200.0,
         "y": 100.0
       },
       "bbox_um": {
-        "x0": 199.03,
+        "x0": 195.0,
         "y0": 99.03,
-        "x1": 219.05,
-        "y1": 108.17
+        "x1": 223.5,
+        "y1": 110.08500000000001
       },
-      "orientation": "none"
+      "orientation": "none",
+      "abuts": []
     },
     {
       "id": "startup",
       "source": "cell",
       "generator": null,
       "cell_name": "bias_core_startup",
-      "source_path": "/home/ubuntu/GitHub/sky130-temp-por/.loom/worktrees/issue-30/layout/bias_core/../bias_core_startup/bias_core_startup.gds",
-      "source_digest": "sha256:ce2e3e301b09c546888503af2df30a109b25139ed8b82c4a73afefbf6552927b",
+      "source_path": "/home/ubuntu/GitHub/sky130-temp-por/.loom/worktrees/issue-81/layout/bias_core/../bias_core_startup/bias_core_startup.gds",
+      "source_digest": "sha256:588297a74848df4cef5a8549e00441130cc8f85d2a81fe160624a23facbf42ff",
       "offset_um": {
         "x": 1350.0,
         "y": 100.0
@@ -162,15 +151,16 @@
         "x1": 1404.04,
         "y1": 113.17
       },
-      "orientation": "none"
+      "orientation": "none",
+      "abuts": []
     },
     {
       "id": "settle_flag",
       "source": "cell",
       "generator": null,
       "cell_name": "bias_core_settle_flag",
-      "source_path": "/home/ubuntu/GitHub/sky130-temp-por/.loom/worktrees/issue-30/layout/bias_core/../bias_core_settle_flag/bias_core_settle_flag.gds",
-      "source_digest": "sha256:d8b81d9f19b8d681d41869f77e85d910d7287a8dea5f66afbef83b9cbcdc73f1",
+      "source_path": "/home/ubuntu/GitHub/sky130-temp-por/.loom/worktrees/issue-81/layout/bias_core/../bias_core_settle_flag/bias_core_settle_flag.gds",
+      "source_digest": "sha256:8981ca480bae6642aaf5fc239cb156267e184b8c96b32513c221c9335b99b372",
       "offset_um": {
         "x": 5450.0,
         "y": 100.0
@@ -181,15 +171,16 @@
         "x1": 5490.99,
         "y1": 126.67
       },
-      "orientation": "none"
+      "orientation": "none",
+      "abuts": []
     },
     {
       "id": "passives",
       "source": "cell",
       "generator": null,
       "cell_name": "bias_core_passives",
-      "source_path": "/home/ubuntu/GitHub/sky130-temp-por/.loom/worktrees/issue-30/layout/bias_core/../bias_core_passives/bias_core_passives.gds",
-      "source_digest": "sha256:c19f70fd280598690eea0065cfa825e56574cb819867f6f427388793e34419a9",
+      "source_path": "/home/ubuntu/GitHub/sky130-temp-por/.loom/worktrees/issue-81/layout/bias_core/../bias_core_passives/bias_core_passives.gds",
+      "source_digest": "sha256:b17b662712b92993db7de8e0e6e59fd9619605c558b145bf35edd45712f96c96",
       "offset_um": {
         "x": 0.0,
         "y": -50.0
@@ -200,14 +191,15 @@
         "x1": 5533.860000000001,
         "y1": -28.08
       },
-      "orientation": "none"
+      "orientation": "none",
+      "abuts": []
     },
     {
       "id": "stub_VDD",
       "source": "cell",
       "generator": null,
       "cell_name": "promo_stub",
-      "source_path": "/home/ubuntu/GitHub/sky130-temp-por/.loom/worktrees/issue-30/layout/bias_core/promo_stub.gds",
+      "source_path": "/home/ubuntu/GitHub/sky130-temp-por/.loom/worktrees/issue-81/layout/bias_core/promo_stub.gds",
       "source_digest": "sha256:902ff80454f309f31943b44b8a7f942a6d96817455a784cbefd7f85d019f84ab",
       "offset_um": {
         "x": -100.0,
@@ -219,14 +211,15 @@
         "x1": -98.5,
         "y1": 10.084999999999999
       },
-      "orientation": "none"
+      "orientation": "none",
+      "abuts": []
     },
     {
       "id": "stub_VSS",
       "source": "cell",
       "generator": null,
       "cell_name": "promo_stub",
-      "source_path": "/home/ubuntu/GitHub/sky130-temp-por/.loom/worktrees/issue-30/layout/bias_core/promo_stub.gds",
+      "source_path": "/home/ubuntu/GitHub/sky130-temp-por/.loom/worktrees/issue-81/layout/bias_core/promo_stub.gds",
       "source_digest": "sha256:902ff80454f309f31943b44b8a7f942a6d96817455a784cbefd7f85d019f84ab",
       "offset_um": {
         "x": -104.0,
@@ -238,7 +231,8 @@
         "x1": -102.5,
         "y1": 14.084999999999999
       },
-      "orientation": "none"
+      "orientation": "none",
+      "abuts": []
     }
   ],
   "nets": [
@@ -454,6 +448,450 @@
           "landed_on_block": true
         }
       ]
+    },
+    {
+      "net": "n2",
+      "pins": [
+        {
+          "block": "passives",
+          "port": "n2"
+        },
+        {
+          "block": "mirror_amp",
+          "port": "n2"
+        }
+      ],
+      "routed": true,
+      "route_length_um": 541.275,
+      "status": "routed",
+      "landed_on_block": true,
+      "legs": [
+        {
+          "pins": [
+            {
+              "block": "passives",
+              "port": "n2"
+            },
+            {
+              "block": "mirror_amp",
+              "port": "n2"
+            }
+          ],
+          "routed": true,
+          "route_length_um": 541.275,
+          "reason": null,
+          "channel_track": 0,
+          "landed_on_block": true
+        }
+      ]
+    },
+    {
+      "net": "nb",
+      "pins": [
+        {
+          "block": "passives",
+          "port": "nb"
+        },
+        {
+          "block": "mirror_amp",
+          "port": "nb"
+        }
+      ],
+      "routed": true,
+      "route_length_um": 294.62000000000006,
+      "status": "routed",
+      "landed_on_block": true,
+      "legs": [
+        {
+          "pins": [
+            {
+              "block": "passives",
+              "port": "nb"
+            },
+            {
+              "block": "mirror_amp",
+              "port": "nb"
+            }
+          ],
+          "routed": true,
+          "route_length_um": 294.62000000000006,
+          "reason": null,
+          "channel_track": 0,
+          "landed_on_block": true
+        }
+      ]
+    },
+    {
+      "net": "ec",
+      "pins": [
+        {
+          "block": "passives",
+          "port": "ec"
+        },
+        {
+          "block": "pnp8_leg",
+          "port": "ec"
+        }
+      ],
+      "routed": true,
+      "route_length_um": 358.03000000000003,
+      "status": "routed",
+      "landed_on_block": true,
+      "legs": [
+        {
+          "pins": [
+            {
+              "block": "passives",
+              "port": "ec"
+            },
+            {
+              "block": "pnp8_leg",
+              "port": "ec"
+            }
+          ],
+          "routed": true,
+          "route_length_um": 358.03000000000003,
+          "reason": null,
+          "channel_track": 0,
+          "landed_on_block": true
+        }
+      ]
+    },
+    {
+      "net": "VREF",
+      "pins": [
+        {
+          "block": "passives",
+          "port": "vref"
+        },
+        {
+          "block": "mirror_amp",
+          "port": "vref"
+        }
+      ],
+      "routed": true,
+      "route_length_um": 1591.11,
+      "status": "routed",
+      "landed_on_block": true,
+      "legs": [
+        {
+          "pins": [
+            {
+              "block": "passives",
+              "port": "vref"
+            },
+            {
+              "block": "mirror_amp",
+              "port": "vref"
+            }
+          ],
+          "routed": true,
+          "route_length_um": 1591.11,
+          "reason": null,
+          "channel_track": 0,
+          "landed_on_block": true
+        }
+      ]
+    },
+    {
+      "net": "nokx",
+      "pins": [
+        {
+          "block": "passives",
+          "port": "nokx"
+        },
+        {
+          "block": "settle_flag",
+          "port": "nokx"
+        }
+      ],
+      "routed": true,
+      "route_length_um": 235.53499999999985,
+      "status": "routed",
+      "landed_on_block": true,
+      "legs": [
+        {
+          "pins": [
+            {
+              "block": "passives",
+              "port": "nokx"
+            },
+            {
+              "block": "settle_flag",
+              "port": "nokx"
+            }
+          ],
+          "routed": true,
+          "route_length_um": 235.53499999999985,
+          "reason": null,
+          "channel_track": 0,
+          "landed_on_block": true
+        }
+      ]
+    },
+    {
+      "net": "pg",
+      "pins": [
+        {
+          "block": "startup",
+          "port": "pg"
+        },
+        {
+          "block": "mirror_amp",
+          "port": "pg"
+        },
+        {
+          "block": "passives",
+          "port": "pg"
+        }
+      ],
+      "routed": true,
+      "route_length_um": 2918.0099999999998,
+      "status": "routed",
+      "landed_on_block": true,
+      "legs": [
+        {
+          "pins": [
+            {
+              "block": "startup",
+              "port": "pg"
+            },
+            {
+              "block": "mirror_amp",
+              "port": "pg"
+            }
+          ],
+          "routed": true,
+          "route_length_um": 1362.2849999999999,
+          "reason": null,
+          "channel_track": 0,
+          "landed_on_block": true
+        },
+        {
+          "pins": [
+            {
+              "block": "passives",
+              "port": "pg"
+            },
+            {
+              "block": "mirror_amp",
+              "port": "pg"
+            }
+          ],
+          "routed": true,
+          "route_length_um": 1555.725,
+          "reason": null,
+          "channel_track": 0,
+          "landed_on_block": true
+        }
+      ]
+    },
+    {
+      "net": "er",
+      "pins": [
+        {
+          "block": "passives",
+          "port": "er"
+        },
+        {
+          "block": "xq1_xqr",
+          "port": "er"
+        }
+      ],
+      "routed": true,
+      "route_length_um": 5548.63,
+      "status": "routed",
+      "landed_on_block": true,
+      "legs": [
+        {
+          "pins": [
+            {
+              "block": "passives",
+              "port": "er"
+            },
+            {
+              "block": "xq1_xqr",
+              "port": "er"
+            }
+          ],
+          "routed": true,
+          "route_length_um": 5548.63,
+          "reason": null,
+          "channel_track": 0,
+          "landed_on_block": true
+        }
+      ]
+    },
+    {
+      "net": "nbtop",
+      "pins": [
+        {
+          "block": "passives",
+          "port": "nbtop"
+        },
+        {
+          "block": "mirror_amp",
+          "port": "nbtop"
+        },
+        {
+          "block": "settle_flag",
+          "port": "nbtop"
+        }
+      ],
+      "routed": true,
+      "route_length_um": 5712.27,
+      "status": "routed",
+      "landed_on_block": true,
+      "legs": [
+        {
+          "pins": [
+            {
+              "block": "passives",
+              "port": "nbtop"
+            },
+            {
+              "block": "mirror_amp",
+              "port": "nbtop"
+            }
+          ],
+          "routed": true,
+          "route_length_um": 204.81,
+          "reason": null,
+          "channel_track": 0,
+          "landed_on_block": true
+        },
+        {
+          "pins": [
+            {
+              "block": "settle_flag",
+              "port": "nbtop"
+            },
+            {
+              "block": "mirror_amp",
+              "port": "nbtop"
+            }
+          ],
+          "routed": true,
+          "route_length_um": 5507.46,
+          "reason": null,
+          "channel_track": 0,
+          "landed_on_block": true
+        }
+      ]
+    },
+    {
+      "net": "na",
+      "pins": [
+        {
+          "block": "xq1_xqr",
+          "port": "na"
+        },
+        {
+          "block": "mirror_amp",
+          "port": "na"
+        },
+        {
+          "block": "settle_flag",
+          "port": "na"
+        }
+      ],
+      "routed": true,
+      "route_length_um": 5705.05,
+      "status": "routed",
+      "landed_on_block": true,
+      "legs": [
+        {
+          "pins": [
+            {
+              "block": "xq1_xqr",
+              "port": "na"
+            },
+            {
+              "block": "mirror_amp",
+              "port": "na"
+            }
+          ],
+          "routed": true,
+          "route_length_um": 165.415,
+          "reason": null,
+          "channel_track": 0,
+          "landed_on_block": true
+        },
+        {
+          "pins": [
+            {
+              "block": "settle_flag",
+              "port": "na"
+            },
+            {
+              "block": "mirror_amp",
+              "port": "na"
+            }
+          ],
+          "routed": true,
+          "route_length_um": 5539.635,
+          "reason": null,
+          "channel_track": 0,
+          "landed_on_block": true
+        }
+      ]
+    },
+    {
+      "net": "pb",
+      "pins": [
+        {
+          "block": "startup",
+          "port": "pb"
+        },
+        {
+          "block": "mirror_amp",
+          "port": "pb"
+        },
+        {
+          "block": "settle_flag",
+          "port": "pb"
+        }
+      ],
+      "routed": true,
+      "route_length_um": 6798.895,
+      "status": "routed",
+      "landed_on_block": true,
+      "legs": [
+        {
+          "pins": [
+            {
+              "block": "startup",
+              "port": "pb"
+            },
+            {
+              "block": "mirror_amp",
+              "port": "pb"
+            }
+          ],
+          "routed": true,
+          "route_length_um": 1342.3950000000002,
+          "reason": null,
+          "channel_track": 0,
+          "landed_on_block": true
+        },
+        {
+          "pins": [
+            {
+              "block": "settle_flag",
+              "port": "pb"
+            },
+            {
+              "block": "mirror_amp",
+              "port": "pb"
+            }
+          ],
+          "routed": true,
+          "route_length_um": 5456.5,
+          "reason": null,
+          "channel_track": 0,
+          "landed_on_block": true
+        }
+      ]
     }
   ],
   "pins": [
@@ -476,12 +914,6 @@
       "labelled": true
     },
     {
-      "net": "VREF",
-      "block": "mirror_amp",
-      "port": "vref",
-      "labelled": true
-    },
-    {
       "net": "BIAS_OK",
       "block": "settle_flag",
       "port": "bias_ok",
@@ -496,8 +928,8 @@
   },
   "warnings": [],
   "provenance": {
-    "klt_version": "0.6.0",
-    "klayout_version": "0.30.10",
+    "klt_version": "0.6.0+g0ce8c64842d9",
+    "klayout_version": "0.30.12",
     "pdk": {
       "name": "sky130A",
       "source": "search root: ~/.volare",

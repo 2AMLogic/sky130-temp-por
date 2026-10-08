@@ -82,33 +82,40 @@ part of the claim and travel with it):
   sub-block increment, not the block's layout, and no citation is made.
 - **Item 3 — DRC clean: `met`** via `layout/bias_core/drc.json` (`status:
   clean`, 0 violations), pinned to
-  `content_hash sha256:72588e8f…2e2c7` — the sha256 of the committed
-  `layout/bias_core/bias_core.gds` the run executed on (#69's re-landed
-  composition), so the citation is
-  provably fresh against the current artifact (CI re-asserts this). **Scope
-  disclosure, per item 3's own claimant-enforced rule:** the cited report
-  covers the `bias_core` full-cell assembly — the most complete committed
-  layout artifact, 50 devices — *not* a block-level GDS. Its graded
-  coverage gaps are quoted verbatim in the committed report's
-  `citation.coverage` block (10 rule-free drawn layers incl. `65/44` and
-  `94/20`; 11 skipped rules, all `capm2`/`met4`/`met5`/`via4`;
-  `deck_scope` listing the 17 deck chapters the run was measured inside).
+  `content_hash sha256:9c414f91…7ab68e`, the sha256 of the committed
+  `layout/bias_core/bias_core.gds` the run executed on (#81's fully
+  wired composition), so the citation is provably fresh against the
+  current artifact (CI re-asserts this). **Scope disclosure, per item 3's
+  own claimant-enforced rule:** the cited report covers the `bias_core`
+  full-cell assembly (the most complete committed layout artifact, 50
+  devices), *not* a block-level GDS. Its graded coverage gaps are quoted
+  verbatim in the committed report's `citation.coverage` block: 9 drawn
+  layers with no rule (the pin-text purposes `67/5`…`72/5`, plus `66/13`
+  `poly.res`, `79/20` `urpm`, `82/44`); 46 skipped rules, all
+  `angle`/`ongrid` checks for layers this stream does not draw plus the
+  `capm2.*`/`met4.enclosing.capm2.1` second-MiM rules; and `deck_scope`
+  listing the 18 deck chapters the run was measured inside. At the #81 pin
+  the `met5.*`, `via4.*` and `capm.*` rules are evaluated (they were
+  skipped or rule-free before).
   A `met` verdict here does not assert those gaps were acceptable — it
   asserts the run was clean inside the coverage it had, and this README is
   where the gaps are disclosed.
-- **Item 4 — LVS clean: `unmet` (`check_failed`)**, truthfully: the same
-  `bias_core` full-cell composition's LVS run reports `status: mismatch`
-  (21/50 devices, 14/27 nets matched) — the full-cell assembly's remaining
-  cross-block nets are unrouted this increment, tracked by #64 with
-  upstream `klt` gaps filed generically. Three device-group sub-blocks
-  (`bias_core_settle_flag`, `bias_core_startup`, `bias_core_mirror_amp`)
-  reach full LVS matches and one of those matches is the item-1 citation
-  above; the full-cell LVS is cited here instead because item 4's claim is
-  block LVS cleanliness, and the honest citation is the check that ran at
-  the widest available scope and its true verdict. The cited envelope
-  carries no `power_connectivity` verdict (analog SPICE-reference compare —
-  that sub-check does not arise for this `reference.form`), and no
-  warnings-only mismatches are reported in the matching sub-block runs.
+- **Item 4 — LVS clean: `met`** via `layout/bias_core/lvs.json`. The
+  `bias_core` full-cell composition's LVS against
+  `design/netlist/bias_core.spice`'s `.subckt bias_core` reports `status:
+  match`, **50/50 devices and 27/27 nets**, 0 errors. Issue #81 wired the
+  remaining cross-block nets on the met3/met4/met5 routing roles that
+  klayout-tools#2738 added (layer plan in `layout/bias_core/README.md`);
+  before it, the compare stood at 21/50 devices and 14/27 nets. **Not
+  proven by this envelope:** it is the `bias_core` assembly, not a
+  block-level (`temp_por_top`) layout (see item 2). It also carries five
+  disclosed warnings: the `PNP` compare is scoped to `NE`, so `AE` is not
+  verified; the subckt-call reference has `R=0`/`C=0` placeholders on the
+  4 `res_xhigh_po` and 2 MiM caps, so their values are not compared; and
+  resistor `L/W/A/P` and MiM `A/P` are secondary parameters KLayout does
+  not compare. The match is a topology match. The envelope carries no
+  `power_connectivity` verdict, because that sub-check does not arise for
+  an analog SPICE-reference compare.
 - **Items 5, 6, 7, 8 — `unmet` (`no_evidence`)**, each for a real reason:
   the target spec is **not ratified** (`spec/decision-records/DR-003` is
   `proposed`; no `target-spec.md` exists), so item 5's "vs a ratified spec"
@@ -126,74 +133,48 @@ part of the claim and travel with it):
   the rows green is exactly the failure mode the contract names. These
   rows are the machine-honest statement "no check backs this claim", not
   statements that the testbenches or hygiene are absent.
-- **Item 11 — Power delivery (structural): `unmet` (`check_failed`)** —
-  the ERC half of this compound item is now established at
-  **full-assembly scope**: the supply rails genuinely reach every
-  block's internal supply network. Cited: the `klt erc` supply spec and
-  report added by #66 — `layout/bias_core/erc-supply-spec.json` (layer
-  numbers resolved from the sky130A `.lyp` and cross-checked against
-  klayout-tools' curated sky130 deck; `stackup[0]` gate role plus
-  `active_layer` for the `poly ∩ diff` antenna denominator) and
-  `layout/bias_core/erc.json`, pinned to the committed GDS's
-  `sha256:72588e8f…2e2c7` exactly like item 3's DRC citation, re-rendered
-  over the re-landed composition. The row still renders `check_failed`
-  solely on the compound item's LVS half (item 4, #64). **What the ERC
-  citation establishes now:** with `VDD`/`VSS` declared `kind: "supply"`
-  (the `.subckt bias_core` interface spellings), the run reports
-  `erc_status: "clean"` — zero `erc.unconnected_net`, zero
-  `erc.supply_short` — over 21 gate nets: each declared supply resolves
-  to exactly **one** continuous electrical island, and the islands now
-  *contain* the blocks. #69 re-derived the assembly's hand-declared
-  `ports[]`/`bbox_um` to the blocks' own reported coordinates (fixing
-  the pre-#69 double translation that left each block's real supply pad
-  in its own island while every net reported `routed: true` — the
-  upstream coordinate-trust gap is klayout-tools#2210). Two independent
-  committed envelopes verify the landings, beyond `routed: true`:
-  `klt extract`'s own `merged_net_labels[]` records the intended joins
-  (`VDD|vdd`, `VSS|vss`, and `IBIAS|ibias`/`VREF|vref`/`BIAS_OK|bias_ok`
-  — each assembly pin label merging with the sub-block pads' internal
-  label on the *same* net), and the pad-point island census
+- **Item 11 — Power delivery (structural): `unmet`
+  (`supply_spec_incomplete`)**. Before #81 this row rendered
+  `check_failed` because its LVS half (item 4) was a mismatch. That half
+  now passes (item 4 above), and the grader stops at the ERC half
+  instead. Reason `supply_spec_incomplete` here means that the cited spec
+  declares no `ties[]` and no `ties_disclosure`, so `erc.missing_tie` is
+  never computed (klayout-tools `docs/cli/signoff.md` reason table). The
+  follow-up is tracked in #90.
+  Cited: `layout/bias_core/erc-supply-spec.json` (rationale in
+  `layout/bias_core/erc-supply-spec.md`, because klt at this pin rejects
+  an inline `_comment`) and `layout/bias_core/erc.json`, pinned to the
+  committed GDS's `sha256:9c414f91…7ab68e`, the same pin as item 3.
+  **What the ERC citation establishes:** with `VDD`/`VSS` declared
+  `kind: "supply"`, `erc_status: "clean"`, with zero
+  `erc.unconnected_net` and zero `erc.supply_short` over 18 gate nets.
+  Each supply resolves to exactly **one** island, and those islands
+  contain the blocks' real supply pads. The pad-point island census
   (`layout/bin/pad-island-census.py` →
-  `layout/bias_core/pad-island-census.json`, pinned to the GDS's sha256)
-  probes every declared pad directly: all `VDD` pads
-  (`mirror_amp`/`startup`/`settle_flag`/`passives` + the west stub)
-  share one island, all `VSS` pads share one island, and `nkg` is one
-  shared island between its two blocks — where the pre-#69 census found
-  the rails isolated and `nkg` split in two. The run deliberately omits
-  `--pdk`, so the report's top-level `status` is `not_checked` (the
-  antenna question was never asked) and the command
-  exits `4`; the structural read the item grades is `erc_status`, not
-  the exit code. **What it still does not establish:**
-  1. `erc.missing_tie` is **not computed**: the spec deliberately
-     declares no `ties[]`. sky130's native p-type substrate has no drawn
-     well layer, so a substrate (VSS) tie is structurally undeclarable
-     in `klt erc` today (klayout-tools#2186's documented remaining
-     limitation; the historical tie-collapse bug klayout-tools#2169 is
-     fixed in the pinned klt build and is no longer an operative
-     reason). A blanket `nwell → VDD` tie was re-probed on this exact
-     GDS after #69's fix: exactly 2 findings remain, both on the two
-     PNP device-group blocks' collector/base tubs — this analog block's
-     wells include design-legitimate non-VDD tubs whose regions tie to
-     their own nodes by design (the #1894-blocked `ec`/`er` strap
-     question covers them, not item 11) — where the pre-#69 probe
-     reported 18 conflated findings, 0/18 reaches to `VDD`, precisely
-     because the rails then touched none of the blocks' internal
-     networks: every other n-well's taps now reach `VDD` through the
-     connected supply network itself, which is #69's landing fix at
-     work. Standing-in well-tie/supply evidence: taps drawn on `65/44`
-     inside the merged
-     n-well polygons, and the three device-group sub-block LVS matches
-     (`bias_core_mirror_amp`, `bias_core_settle_flag`, `bias_core_startup`)
-     whose `net_correspondence` pairs layout-side `VDD`/`VSS` to
-     reference-side supply pins — the supplies were part of a passing
-     device-level compare at sub-block scope. Zero `erc.missing_tie` in
-     the committed report is an **absence of evidence, not evidence of
-     absence**.
-  2. **The `/lvs` half fails:** the compound item cites item 4's own LVS
-     report, and the full-cell LVS is `status: mismatch` (#64) — the
-     direct cause of the row's rendered `check_failed` reason, and the
-     first thing to change when #64 lands (re-render this manifest
-     and report together then: `Regenerate` above).
+  `layout/bias_core/pad-island-census.json`, pinned to the GDS sha256)
+  probes all 39 declared pads of the 15 connectivity/pin nets and finds
+  each net to be exactly one island (`VDD,vdd`, `VSS,vss`, …). The spec's
+  stackup now includes met5/via4 (the `pb` route), and its `devices[]`
+  cuts the poly-resistor bodies (`66/13`) and the MiM top-plate via3
+  (`89/44`) out of the conductor graph. Without those cuts the graph
+  bridged the resistor and capacitor terminals: island names like
+  `VDD,nokx` appeared, which LVS shows are not shorts. The run omits
+  `--pdk` deliberately, so the top-level `status` is `not_checked` and the
+  command exits `4`. The item grades `erc_status`, not the exit code.
+  **What it does not establish:**
+  1. `erc.missing_tie` is **not computed** (no `ties[]`). sky130's native
+     p-substrate has no drawn well layer, so a VSS substrate tie is
+     undeclarable in `klt erc` today (klayout-tools#2186's documented
+     limitation). A blanket `nwell → VDD` probe after #69 left exactly 2
+     findings, both on the PNP device-group tubs, which tie to their own
+     nodes by design. That probe was **not** re-run for #81. Zero
+     `erc.missing_tie` in the committed report is an **absence of
+     evidence, not evidence of absence**. #90 tracks declaring the
+     nwell tie with the PNP tubs excluded and disclosing the substrate
+     class.
+  2. The LVS half rests on item 4's topology match. The supplies
+     appear in its `net_correspondence` paired to the reference's
+     `VDD`/`VSS`, but device values are not compared (see item 4).
 
 A nearly-all-`unmet` manifest is a correct result — "the honest
 machine-readable statement of the gap" — and that is what these rows are.

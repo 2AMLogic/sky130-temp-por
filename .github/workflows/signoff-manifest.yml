@@ -24,7 +24,7 @@ jobs:
       - name: Install the pinned klt build the committed report was rendered with
         run: |
           python -m pip install --upgrade pip
-          pip install "klayout-tools @ git+https://github.com/2AMLogic/klayout-tools@c622e8addb362491664d44ba4d717f354ca88bbd"
+          pip install "klayout-tools @ git+https://github.com/2AMLogic/klayout-tools@0ce8c64842d9cbcd7689d40ebfa3774355c1da4c"
           klt version
 
       - name: Re-run the graded tier-verdict report

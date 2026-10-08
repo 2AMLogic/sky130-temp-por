@@ -160,6 +160,31 @@ def _region(kdb, layout, cell, layer):
     return kdb.Region(cell.begin_shapes_rec(index))
 
 
+def _device_body_cuts(kdb, layout, cell, erc_spec: dict) -> dict:
+    """The spec's ``devices[]`` carve-outs, keyed by the role they cut.
+
+    Mirrors klayout-tools' ``_devices._device_body_cuts`` (klt erc's
+    ``devices[]``, issue #2183): each entry's ``body_layer`` region is
+    subtracted from its ``on`` role (a ``stackup`` or ``vias`` name) before
+    that role is registered, so a poly resistor body or a MiM top-plate
+    contact breaks the net instead of bridging the device's two terminals.
+    Without it the census would name islands like ``VDD,nokx`` that are a
+    graph-model artifact, not a short.
+    """
+    names = {e["name"] for e in erc_spec.get("stackup", [])} | {
+        v["name"] for v in erc_spec.get("vias", [])
+    }
+    cuts: dict = {}
+    for index, entry in enumerate(erc_spec.get("devices", [])):
+        on = entry.get("on")
+        if on not in names:
+            _fail(f"devices[{index}].on names no stackup/vias entry: {on!r}")
+            raise SystemExit(1)
+        body = _region(kdb, layout, cell, _spec_layer(entry.get("body_layer")))
+        cuts[on] = (cuts[on] + body) if on in cuts else body
+    return cuts
+
+
 def _texts(kdb, layout, cell, layer):
     index = layout.find_layer(*layer) if layer else None
     if index is None:
@@ -180,7 +205,12 @@ def _probe_points(spec: dict, spec_dir: Path) -> list[dict]:
     source: `declared_matches_source` false is the #69 bug returning and
     fails the census however the islands connect. Blocks with no sibling
     response (the declare-only promo-stub external pins) fall back to the
-    assembly's own declaration and are recorded as such.
+    assembly's own declaration and are recorded as such. So does a port a
+    sibling wires internally but cannot promote (gen-compose refuses
+    ``pins[]`` on a port its own ``connectivity[]`` already labels): its
+    probe is recorded as ``assembly_declaration_unpromoted_sibling_port``
+    with ``declared_matches_source: null`` -- island membership is still
+    probed, but no frame check is possible for it.
     """
     origins = spec.get("placement", {}).get("origins_um", {})
     blocks = {block["id"]: block for block in spec.get("blocks", [])}
@@ -232,17 +262,26 @@ def _probe_points(spec: dict, spec_dir: Path) -> list[dict]:
                 break
         sibling_ports = sibling_response_ports(block_id)
         source = None
+        unpromoted = False
         if sibling_ports:
             for port in sibling_ports:
                 if port["name"] == port_name:
                     source = port
                     break
             if source is None:
-                _fail(
-                    f"block {block_id!r}'s sibling compose.response.json "
-                    f"reports no port {port_name!r} the assembly pins"
-                )
-                raise SystemExit(1)
+                if declared is None:
+                    _fail(
+                        f"block {block_id!r}'s sibling compose.response.json "
+                        f"reports no port {port_name!r} the assembly pins"
+                    )
+                    raise SystemExit(1)
+                # A sibling-internal net the sibling cannot promote (klt
+                # gen-compose refuses pins[] on a port its own connectivity[]
+                # already wires, e.g. bias_core_passives' `nb` strap): the
+                # assembly's declaration is the only coordinate source. The
+                # probe still tests island membership at that point, but the
+                # #69 frame check cannot run, and the evidence says so.
+                unpromoted = True
         if source is None and declared is None:
             _fail(f"block {block_id!r} declares no port {port_name!r}")
             raise SystemExit(1)
@@ -270,7 +309,9 @@ def _probe_points(spec: dict, spec_dir: Path) -> list[dict]:
                     else str(anchor.get("layer"))
                 ),
                 "probe_source": (
-                    "assembly_declaration"
+                    "assembly_declaration_unpromoted_sibling_port"
+                    if unpromoted
+                    else "assembly_declaration"
                     if probe_from_declaration
                     else "sibling_compose_response"
                 ),
@@ -302,12 +343,15 @@ def run_census(
         raise SystemExit(1)
 
     l2n = kdb.LayoutToNetlist(top_cell.name, layout.dbu)
+    cuts = _device_body_cuts(kdb, layout, top_cell, erc_spec)
     conductor_layers: list[tuple[str, int]] = []
     regions_by_name: dict[str, object] = {}
     register_index_by_layer: dict[tuple[int, int], int] = {}
     for entry in erc_spec.get("stackup", []):
         layer = _spec_layer(entry.get("layer"))
         reg = _region(kdb, layout, top_cell, layer)
+        if entry["name"] in cuts:
+            reg = reg - cuts[entry["name"]]
         register_index = l2n.register(reg, entry["name"])
         l2n.connect(reg)
         label_layer = _spec_layer(entry.get("label_layer"))
@@ -321,6 +365,8 @@ def run_census(
             register_index_by_layer[layer] = register_index
     for via in erc_spec.get("vias", []):
         via_region = _region(kdb, layout, top_cell, _spec_layer(via.get("layer")))
+        if via["name"] in cuts:
+            via_region = via_region - cuts[via["name"]]
         l2n.register(via_region, via["name"])
         l2n.connect(via_region)
         role_a, role_b = via["between"]

@@ -81,6 +81,29 @@
           "block": "stub_vss",
           "port": "CONN"
         }
+      ],
+      "legs": [
+        {
+          "from_pin": {
+            "block": "array",
+            "port": "Q0_B"
+          },
+          "to_pin": {
+            "block": "array",
+            "port": "Q1_B"
+          },
+          "waypoints_um": [
+            [
+              4.01,
+              0.55
+            ],
+            [
+              8.63,
+              0.55
+            ]
+          ],
+          "layer_role": "metal2"
+        }
       ]
     }
   ],

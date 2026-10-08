@@ -197,6 +197,7 @@ investigation that found no repro) and then
 `2026-09-22T18:10:31Z`, commit `ba1039d4`): the collector ring is drawn on
 the `tap` role extraction uses to unify substrate ties, so the strap `klt
 gen-compose` always drew is now electrically recognized by `klt extract`.
-This repo's evidence is regenerated against `klt 0.6.0` (`c622e8addb36`,
-`layout/pdk.json`'s pin), which contains that fix — verified by direct
+This repo's evidence is regenerated against `klt 0.6.0` (`c622e8addb36`), and since issue
+#81 against `main` @ `0ce8c64842d9` (`layout/pdk.json`'s pin); both
+contain that fix — verified by direct
 reproduction (the `match` above), not by trusting the closed status.
