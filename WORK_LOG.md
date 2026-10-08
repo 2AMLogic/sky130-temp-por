@@ -2,6 +2,11 @@
 
 Chronological record of recently merged pull requests and closed issues. This file is maintained by the Loom Guide role.
 
+### 2026-10-08
+
+- **PR #83**: spec: ratify DR-003 via the two-key ceremony (operating temperature + supply rows only)
+- **Issue #78** (closed): Run the two-key ratification ceremony on DR-003 (target-spec table)
+
 ### 2026-09-23
 
 - **PR #77**: fix: strap PNP collectors to VSS and reach LVS match on klt 0.6.0
