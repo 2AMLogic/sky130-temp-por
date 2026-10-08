@@ -115,8 +115,8 @@
         },
         {
           "text": "vss",
-          "x_um": 9.115,
-          "y_um": 1.7
+          "x_um": 6.32,
+          "y_um": 0.55
         }
       ]
     }
@@ -127,22 +127,25 @@
   "unmodelled_poly": [],
   "merged_net_labels": [],
   "voltage_domain_warnings": [],
+  "missing_flavour_markers": [],
   "unbiased_pmos_body_nets": [],
   "single_terminal_nets": [],
   "dead_metal": [],
   "matched_device_groups": [],
+  "def_pin_promotion": null,
+  "label_layers": null,
   "pdk": null,
   "provenance": {
-    "klt_version": "0.6.0",
-    "klayout_version": "0.30.10",
+    "klt_version": "0.6.0+g0ce8c64842d9",
+    "klayout_version": "0.30.12",
     "pdk": null,
     "deck": {
       "name": "sky130",
-      "content_hash": "sha256:a1d90e066e822d0a8f36e2d4f4969b83df4360692f689b5815be9c3f151f7c8e",
+      "content_hash": "sha256:f8f2c3f48eada473dc34a7a8926c0b04fef446fb351a70a636ce43a9ca9c70ba",
       "released": false
     },
     "input": {
-      "content_hash": "sha256:a1be38b6a7b3b0309435d6c0582384872d704af43cd8fec8434c7a4a9774167a",
+      "content_hash": "sha256:b1a4014447bd282c8444a7307fb972e24ba8d67f41134605914069d113aadd47",
       "role": "layout"
     }
   },

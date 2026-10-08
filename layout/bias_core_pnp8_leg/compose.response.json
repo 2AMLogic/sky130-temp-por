@@ -52,7 +52,7 @@
       "generator": "bjt_array",
       "cell_name": "pnp8",
       "source_path": "gen/array.gds",
-      "source_digest": "sha256:4169893ff21f7628b743d0cd7a4f3ea50bf1d765b105c62dd143697f9a0681d0",
+      "source_digest": "sha256:1258a42bedfa71e787d33c4965d5694750fd621d16f5fe4e442a3225d796c80d",
       "offset_um": {
         "x": 0.0,
         "y": 0.0
@@ -63,14 +63,15 @@
         "x1": 19.05,
         "y1": 8.17
       },
-      "orientation": "none"
+      "orientation": "none",
+      "abuts": []
     },
     {
       "id": "stub_ec",
       "source": "cell",
       "generator": null,
       "cell_name": "promo_stub",
-      "source_path": "/home/ubuntu/GitHub/sky130-temp-por/.loom/worktrees/issue-30/layout/bias_core_pnp8_leg/promo_stub.gds",
+      "source_path": "/home/ubuntu/GitHub/sky130-temp-por/.loom/worktrees/issue-81/layout/bias_core_pnp8_leg/promo_stub.gds",
       "source_digest": "sha256:902ff80454f309f31943b44b8a7f942a6d96817455a784cbefd7f85d019f84ab",
       "offset_um": {
         "x": -5.0,
@@ -82,14 +83,15 @@
         "x1": -3.5,
         "y1": 10.084999999999999
       },
-      "orientation": "none"
+      "orientation": "none",
+      "abuts": []
     },
     {
       "id": "stub_vss",
       "source": "cell",
       "generator": null,
       "cell_name": "promo_stub",
-      "source_path": "/home/ubuntu/GitHub/sky130-temp-por/.loom/worktrees/issue-30/layout/bias_core_pnp8_leg/promo_stub.gds",
+      "source_path": "/home/ubuntu/GitHub/sky130-temp-por/.loom/worktrees/issue-81/layout/bias_core_pnp8_leg/promo_stub.gds",
       "source_digest": "sha256:902ff80454f309f31943b44b8a7f942a6d96817455a784cbefd7f85d019f84ab",
       "offset_um": {
         "x": 22.0,
@@ -101,7 +103,8 @@
         "x1": 23.5,
         "y1": 9.084999999999999
       },
-      "orientation": "none"
+      "orientation": "none",
+      "abuts": []
     }
   ],
   "nets": [
@@ -166,7 +169,7 @@
             }
           ],
           "routed": true,
-          "route_length_um": 2.8699999999999988,
+          "route_length_um": 2.8699999999999983,
           "reason": null,
           "channel_track": 0,
           "landed_on_block": true
@@ -302,7 +305,7 @@
             }
           ],
           "routed": true,
-          "route_length_um": 8.560000000000004,
+          "route_length_um": 8.560000000000002,
           "reason": null,
           "channel_track": 0,
           "landed_on_block": true
@@ -523,8 +526,8 @@
   },
   "warnings": [],
   "provenance": {
-    "klt_version": "0.6.0",
-    "klayout_version": "0.30.10",
+    "klt_version": "0.6.0+g0ce8c64842d9",
+    "klayout_version": "0.30.12",
     "pdk": {
       "name": "sky130A",
       "source": "search root: ~/.volare",

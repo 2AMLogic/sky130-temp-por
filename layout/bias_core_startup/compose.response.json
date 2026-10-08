@@ -97,7 +97,7 @@
       "generator": "mos_array",
       "cell_name": "kpd",
       "source_path": "gen/kpd.gds",
-      "source_digest": "sha256:e2b55694d3247016a596fb5bf56feaf40f5879c93a68a3bd385ad636ad81d185",
+      "source_digest": "sha256:251ae5360b62baf4f5d17cd1fcf04dd9bab43771e5c45813b9145534043710cf",
       "offset_um": {
         "x": 0.0,
         "y": 0.0
@@ -108,7 +108,8 @@
         "x1": 4.84,
         "y1": 8.82
       },
-      "orientation": "none"
+      "orientation": "none",
+      "abuts": []
     },
     {
       "id": "ks4",
@@ -116,7 +117,7 @@
       "generator": "mos_array",
       "cell_name": "ks4",
       "source_path": "gen/ks4.gds",
-      "source_digest": "sha256:430cbc8029f265f56e3c7f5e30a33d7cf4c2c9218cac1c34c15529b7024e5477",
+      "source_digest": "sha256:79fdae7a92ec719fd4c0a71144d2ee443804ad49ec08747622c244a83f4cee34",
       "offset_um": {
         "x": 5.84,
         "y": 3.5
@@ -127,7 +128,8 @@
         "x1": 14.68,
         "y1": 5.32
       },
-      "orientation": "none"
+      "orientation": "none",
+      "abuts": []
     },
     {
       "id": "ks3",
@@ -135,7 +137,7 @@
       "generator": "mos_array",
       "cell_name": "ks3",
       "source_path": "gen/ks3.gds",
-      "source_digest": "sha256:ea6f2f2d2d9c2a9086b0f3d54e84811d0090746aa1b421fdb34a0d39364cd304",
+      "source_digest": "sha256:93422c2d42f8f899ecd56624ebe8ed13966c2bc3e5c6afdfde8e4d4d56ebdcf3",
       "offset_um": {
         "x": 15.68,
         "y": 3.5
@@ -146,7 +148,8 @@
         "x1": 24.52,
         "y1": 5.32
       },
-      "orientation": "none"
+      "orientation": "none",
+      "abuts": []
     },
     {
       "id": "ks2",
@@ -154,7 +157,7 @@
       "generator": "mos_array",
       "cell_name": "ks2",
       "source_path": "gen/ks2.gds",
-      "source_digest": "sha256:c913437ad22d61c3763ed553713b0b1b5fd905ca068cf081645c4c001c5315f0",
+      "source_digest": "sha256:5d96fb80868436db68ea6614865305bb04bba70f32324bdf645fcf2919429af5",
       "offset_um": {
         "x": 25.52,
         "y": 3.5
@@ -165,7 +168,8 @@
         "x1": 34.36,
         "y1": 5.32
       },
-      "orientation": "none"
+      "orientation": "none",
+      "abuts": []
     },
     {
       "id": "ks1",
@@ -173,7 +177,7 @@
       "generator": "mos_array",
       "cell_name": "ks1",
       "source_path": "gen/ks1.gds",
-      "source_digest": "sha256:361538caaf0fa40c325ac75c4784c2224fc68436ffe7381dfec87fcb9707b941",
+      "source_digest": "sha256:b50891b8c6f8f15d1081b9a28626c71593391d9b7220e28aa1eee9ae363c1794",
       "offset_um": {
         "x": 35.36,
         "y": 3.5
@@ -184,7 +188,8 @@
         "x1": 44.2,
         "y1": 5.32
       },
-      "orientation": "none"
+      "orientation": "none",
+      "abuts": []
     },
     {
       "id": "ks0",
@@ -192,7 +197,7 @@
       "generator": "mos_array",
       "cell_name": "ks0",
       "source_path": "gen/ks0.gds",
-      "source_digest": "sha256:b7ea73e80f65fb1d4e11e0663bfc3f22abac720aa52f676073acd85d60a07b73",
+      "source_digest": "sha256:bae499fd037198d7650a5aa8121f99011537615377a2dbe3d6ca71678d3c5190",
       "offset_um": {
         "x": 45.2,
         "y": 3.5
@@ -203,7 +208,8 @@
         "x1": 54.040000000000006,
         "y1": 5.32
       },
-      "orientation": "none"
+      "orientation": "none",
+      "abuts": []
     },
     {
       "id": "kick",
@@ -211,7 +217,7 @@
       "generator": "mos_array",
       "cell_name": "kick",
       "source_path": "gen/kick.gds",
-      "source_digest": "sha256:d6dd7333a6afb779e21f1417740b64f81ae3826e1e8bb5fa99732cd81427b73e",
+      "source_digest": "sha256:c69cb7b91012b3864383fc25e8ff4e16e2979d7684dffbac13bf018ff63b6dd8",
       "offset_um": {
         "x": -1.0,
         "y": 3.5
@@ -222,7 +228,8 @@
         "x1": -1.0,
         "y1": 5.32
       },
-      "orientation": "mirror_x"
+      "orientation": "mirror_x",
+      "abuts": []
     },
     {
       "id": "kan",
@@ -230,7 +237,7 @@
       "generator": "mos_array",
       "cell_name": "kan",
       "source_path": "gen/kan.gds",
-      "source_digest": "sha256:f2050ce0b243a382df276874474faee8c9665ebf61fb0bd04329546b5619fa31",
+      "source_digest": "sha256:e8e3f2af6e3965bcbc025db659ab96aabc5276e301ea822bde510cbfd84091da",
       "offset_um": {
         "x": -14.16,
         "y": 3.0
@@ -241,7 +248,8 @@
         "x1": -14.16,
         "y1": 5.82
       },
-      "orientation": "mirror_x"
+      "orientation": "mirror_x",
+      "abuts": []
     },
     {
       "id": "ka",
@@ -249,7 +257,7 @@
       "generator": "mos_array",
       "cell_name": "ka",
       "source_path": "gen/ka.gds",
-      "source_digest": "sha256:bcb314ec7b373708bf3eb448156077859ad058e819f6bd8bb537acd2a1ed733e",
+      "source_digest": "sha256:2de9185da20e278ce2f3d3805491799e2e4e2cc96a880c4704d524dd8a82ffcf",
       "offset_um": {
         "x": -27.0,
         "y": 3.5
@@ -260,7 +268,8 @@
         "x1": -22.009999999999998,
         "y1": 5.47
       },
-      "orientation": "none"
+      "orientation": "none",
+      "abuts": []
     },
     {
       "id": "nwell_tap",
@@ -268,7 +277,7 @@
       "generator": "guard_ring",
       "cell_name": "nwell_tap",
       "source_path": "gen/nwell_tap.gds",
-      "source_digest": "sha256:04ccc3d928f2b2714b47cbae124c4cbd24f5106fc19210ba1a17607f5ea5ad97",
+      "source_digest": "sha256:917b4852d8b992ea5749af4a0121fc3295cec7dc043ccedaf495c8e71ca9bb31",
       "offset_um": {
         "x": -29.04,
         "y": 3.08
@@ -279,7 +288,8 @@
         "x1": -27.05,
         "y1": 5.07
       },
-      "orientation": "none"
+      "orientation": "none",
+      "abuts": []
     },
     {
       "id": "psub_tap",
@@ -287,7 +297,7 @@
       "generator": "guard_ring",
       "cell_name": "psub_tap",
       "source_path": "gen/psub_tap.gds",
-      "source_digest": "sha256:b00a05a21af31ea3b88dafa583df9a94184c806f625a85d8b7a73376ebd1cbf3",
+      "source_digest": "sha256:8d690ae9ef0edc8789c498803a1f81fc529b589db89bd3cf8c3fd909369fe6fd",
       "offset_um": {
         "x": -35.0,
         "y": 3.5
@@ -298,14 +308,15 @@
         "x1": -33.16,
         "y1": 5.34
       },
-      "orientation": "none"
+      "orientation": "none",
+      "abuts": []
     },
     {
       "id": "stub_vdd",
       "source": "cell",
       "generator": null,
       "cell_name": "promo_stub",
-      "source_path": "/home/ubuntu/GitHub/sky130-temp-por/.loom/worktrees/issue-30/layout/bias_core_startup/promo_stub.gds",
+      "source_path": "/home/ubuntu/GitHub/sky130-temp-por/.loom/worktrees/issue-81/layout/bias_core_startup/promo_stub.gds",
       "source_digest": "sha256:902ff80454f309f31943b44b8a7f942a6d96817455a784cbefd7f85d019f84ab",
       "offset_um": {
         "x": -40.0,
@@ -317,14 +328,15 @@
         "x1": -38.5,
         "y1": 13.17
       },
-      "orientation": "none"
+      "orientation": "none",
+      "abuts": []
     },
     {
       "id": "stub_nkg",
       "source": "cell",
       "generator": null,
       "cell_name": "promo_stub",
-      "source_path": "/home/ubuntu/GitHub/sky130-temp-por/.loom/worktrees/issue-30/layout/bias_core_startup/promo_stub.gds",
+      "source_path": "/home/ubuntu/GitHub/sky130-temp-por/.loom/worktrees/issue-81/layout/bias_core_startup/promo_stub.gds",
       "source_digest": "sha256:902ff80454f309f31943b44b8a7f942a6d96817455a784cbefd7f85d019f84ab",
       "offset_um": {
         "x": -40.0,
@@ -336,7 +348,8 @@
         "x1": -38.5,
         "y1": 10.17
       },
-      "orientation": "none"
+      "orientation": "none",
+      "abuts": []
     }
   ],
   "nets": [
@@ -997,8 +1010,8 @@
     "block 'ka' is placed 0.00um from block 'nwell_tap' (strategy: explicit), closer than nwell_tap's own declared drc_hints.min_spacing_um of 0.40um"
   ],
   "provenance": {
-    "klt_version": "0.6.0",
-    "klayout_version": "0.30.10",
+    "klt_version": "0.6.0+g0ce8c64842d9",
+    "klayout_version": "0.30.12",
     "pdk": {
       "name": "sky130A",
       "source": "search root: ~/.volare",

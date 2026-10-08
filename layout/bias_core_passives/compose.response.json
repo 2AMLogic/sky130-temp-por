@@ -144,7 +144,7 @@
       "generator": "res_array",
       "cell_name": "res_rt",
       "source_path": "gen/rt.gds",
-      "source_digest": "sha256:63cc6da668aa919f2b96995d9d52d74255518f44bd7776acf1c20417198c1c42",
+      "source_digest": "sha256:7ead9de9335ab46be03ce9552dd719e5929ebb17b95f1e1060ae3de1677c167d",
       "offset_um": {
         "x": 0.0,
         "y": 0.0
@@ -155,7 +155,8 @@
         "x1": 18.34,
         "y1": 2.0
       },
-      "orientation": "none"
+      "orientation": "none",
+      "abuts": []
     },
     {
       "id": "r1",
@@ -163,7 +164,7 @@
       "generator": "res_array",
       "cell_name": "res_r1",
       "source_path": "gen/r1.gds",
-      "source_digest": "sha256:f8fa0f6860cde1fc54a569396077e193f2dd9b614cccd26f95b621f07f545487",
+      "source_digest": "sha256:1d722026cbe1815f55b350b7afbac6899b347a8ee5788e580d40d480d25e0866",
       "offset_um": {
         "x": 21.34,
         "y": 0.0
@@ -174,7 +175,8 @@
         "x1": 372.18,
         "y1": 2.0
       },
-      "orientation": "none"
+      "orientation": "none",
+      "abuts": []
     },
     {
       "id": "rz",
@@ -182,7 +184,7 @@
       "generator": "res_array",
       "cell_name": "res_rz",
       "source_path": "gen/rz.gds",
-      "source_digest": "sha256:f1f9e0c5111bbf40f4e774251c783efd994318b3b98253b49c370243561dfdd0",
+      "source_digest": "sha256:c6337e2c491562fd6ed1401c0521ec6e0b09387d9e3245a6f40cf4ce50b8842b",
       "offset_um": {
         "x": 375.18,
         "y": 0.0
@@ -193,7 +195,8 @@
         "x1": 1392.02,
         "y1": 2.0
       },
-      "orientation": "none"
+      "orientation": "none",
+      "abuts": []
     },
     {
       "id": "cc",
@@ -201,7 +204,7 @@
       "generator": "cap_array",
       "cell_name": "cap_cc",
       "source_path": "gen/cc.gds",
-      "source_digest": "sha256:f1dbb52cb1f01878790e348d08d6276b4a91e9306857f48b6368dfef25caf004",
+      "source_digest": "sha256:8bf23bb4ccd4faf80a5514eba88eeee71f5738151bb86afab037447089aeee4f",
       "offset_um": {
         "x": 1395.02,
         "y": 0.0
@@ -212,7 +215,8 @@
         "x1": 1416.02,
         "y1": 21.92
       },
-      "orientation": "none"
+      "orientation": "none",
+      "abuts": []
     },
     {
       "id": "r2",
@@ -220,7 +224,7 @@
       "generator": "res_array",
       "cell_name": "res_r2",
       "source_path": "gen/r2.gds",
-      "source_digest": "sha256:bb62b86bc244e938a0b318366da1e4316fbeac2e5428a28a594dacbf4c6fc18d",
+      "source_digest": "sha256:23faacad41398908b463cf99fc0a1b78f7f7a56e7d522b8ac3b27dbff397723f",
       "offset_um": {
         "x": 1419.02,
         "y": 0.0
@@ -231,7 +235,8 @@
         "x1": 5523.860000000001,
         "y1": 2.0
       },
-      "orientation": "none"
+      "orientation": "none",
+      "abuts": []
     },
     {
       "id": "cok",
@@ -239,7 +244,7 @@
       "generator": "cap_array",
       "cell_name": "cap_cok",
       "source_path": "gen/cok.gds",
-      "source_digest": "sha256:98dd5431ab2b71b6540a9d02742115adb1d21ffbb10e7a166f9f69a1dd0d0263",
+      "source_digest": "sha256:a382e150417f04cecd876170740b5cf71d5a7ee9155f0b66a140c5867a930515",
       "offset_um": {
         "x": 5526.860000000001,
         "y": 0.0
@@ -250,7 +255,8 @@
         "x1": 5533.860000000001,
         "y1": 7.92
       },
-      "orientation": "none"
+      "orientation": "none",
+      "abuts": []
     }
   ],
   "nets": [
@@ -404,8 +410,8 @@
   },
   "warnings": [],
   "provenance": {
-    "klt_version": "0.6.0",
-    "klayout_version": "0.30.10",
+    "klt_version": "0.6.0+g0ce8c64842d9",
+    "klayout_version": "0.30.12",
     "pdk": {
       "name": "sky130A",
       "source": "search root: ~/.volare",

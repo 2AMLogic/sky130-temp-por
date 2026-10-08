@@ -532,7 +532,7 @@
       "name": "nbg",
       "pin": true,
       "device_count": 4,
-      "net_id": 3,
+      "net_id": 2,
       "pin_index": 5,
       "label_positions_um": [
         {
@@ -574,7 +574,7 @@
       "name": "pb",
       "pin": true,
       "device_count": 6,
-      "net_id": 2,
+      "net_id": 3,
       "pin_index": 8,
       "label_positions_um": [
         {
@@ -667,22 +667,25 @@
   "unmodelled_poly": [],
   "merged_net_labels": [],
   "voltage_domain_warnings": [],
+  "missing_flavour_markers": [],
   "unbiased_pmos_body_nets": [],
   "single_terminal_nets": [],
   "dead_metal": [],
   "matched_device_groups": [],
+  "def_pin_promotion": null,
+  "label_layers": null,
   "pdk": null,
   "provenance": {
-    "klt_version": "0.6.0",
-    "klayout_version": "0.30.10",
+    "klt_version": "0.6.0+g0ce8c64842d9",
+    "klayout_version": "0.30.12",
     "pdk": null,
     "deck": {
       "name": "sky130",
-      "content_hash": "sha256:a1d90e066e822d0a8f36e2d4f4969b83df4360692f689b5815be9c3f151f7c8e",
+      "content_hash": "sha256:f8f2c3f48eada473dc34a7a8926c0b04fef446fb351a70a636ce43a9ca9c70ba",
       "released": false
     },
     "input": {
-      "content_hash": "sha256:6b70630e989b2d695a72416eddc4322e1f01342fe5a7c3e1d1d1b1e48898841b",
+      "content_hash": "sha256:3b61ca635eefd91f198db1e43e6f9ed740ac66f940863a73ff74951c2794ab9b",
       "role": "layout"
     }
   },

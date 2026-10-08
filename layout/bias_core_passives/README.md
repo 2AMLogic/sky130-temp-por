@@ -92,7 +92,16 @@ cell's own LVS run.
   matches `L / W * 2000` (sky130's `res_xhigh_po` sheet rho) exactly —
   `17500`/`350000`/`1016000`/`4104000` Ω for `L=17.5`/`350.0`/`1016.0`/
   `4104.0` respectively.
-- **`klt lvs` against `reference.spice`: mismatch** (4/6 devices, 7/11 nets,
+- **Update (issue #81): `klt lvs` now reads `match`, with 6/6 devices,
+  11/11 nets and 0 errors** (`lvs.json` at the `0ce8c64842d9` pin). The
+  history below is kept as it was. What changed is that
+  `layout/bin/compose-cell.py` now hands `klt lvs` the deck on the layout
+  side, so `klt extract`'s bare-mode 3-terminal resistor cards
+  (klayout-tools#2336) read back as resistors, and the MiM caps match as
+  well. Gap 1's `R=0`/`C=0` placeholders are unchanged and still reported
+  as `device.placeholder_value` warnings, so resistor and capacitor values
+  are **not** compared. The match is topology only.
+- **`klt lvs` against `reference.spice` (pre-#81): mismatch** (4/6 devices, 7/11 nets,
   per `lvs.json`, as of the `klt 0.6.0` toolchain bump, issue #30 — improved
   from 0/6 devices, 0/11 nets on the pre-0.6.0 pin) — but, unlike the sibling
   PNP recipes, **not** because of

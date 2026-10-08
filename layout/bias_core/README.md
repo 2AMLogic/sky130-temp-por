@@ -17,77 +17,74 @@ interface.
 
 ## Result
 
+All numbers below come from `klt 0.6.0+g0ce8c64842d9` (klayout-tools
+`main` @ `0ce8c64842d9cbcd7689d40ebfa3774355c1da4c`, the `layout/pdk.json`
+pin since issue #81; KLayout 0.30.12), rendered by
+`python3 layout/bin/compose-cell.py layout/bias_core/cell.json`.
+
 **`klt drc --deck sky130`: clean, 0 violations.** **`klt extract --deck
 sky130`: 50 devices** (18 nfet + 16 pfet + 10 pnp + 4 res_xhigh_po + 2
 cap_mim — matching `design/netlist/bias_core.spice`'s own device count
-exactly), **41 nets, 41 pins** — down from 50/50 before [#69]'s
-landing-frame fix, and the delta is exactly that fix: each block's supply
-island used to sit electrically separate from its rail, and the re-landed
-routes merge them (extract's own `merged_net_labels[]` now records the
-intended joins — `VDD|vdd`, `VSS|vss`, plus `IBIAS|ibias`, `VREF|vref`,
-`BIAS_OK|bias_ok`, each one assembly-level pin label merging with the
-corresponding sub-block's internal label on the *same* net). The further
-drop from 43 to 41 nets (issue #30's `klt 0.6.0` toolchain bump) is the two
-PNP blocks' `COLL_E` collector straps landing electrically: each block's
-formerly separate `vsubs` island now merges into `VSS`, exactly as in the
-two PNP cells' own standalone evidence. **`klt lvs`
-against `design/netlist/bias_core.spice`'s own `.subckt bias_core`:
-mismatch — 21/50 devices, 14/27 nets matched** (66 mismatches: 18
-`net.split` + 4 `net.merged` + 35 `device.unmatched` + 2 `topology` + 1
-`device.placeholder_value`, plus 6 disclosed `device.parameter_excluded`
-warnings — the same `PNP`-scoped `NE`-only compare the two PNP cells use,
-now wired through `compose-cell.py`'s `lvs.options` pass-through). This is a
-real, partial
-match, not the single "PNP collector-strap gap" the parent issue's own text
-anticipated — see "What is not wired" below for the full, verified
-root-cause breakdown, and
-[#64](https://github.com/2AMLogic/sky130-temp-por/issues/64) for the
-tracked follow-up that completes the remaining wiring.
+exactly), **27 nets, 27 pins**. `merged_net_labels[]` records only the
+intended assembly-pin/sub-block-label joins (`VDD|vdd`, `VSS|vss`,
+`IBIAS|ibias`, `VREF|vref`, `BIAS_OK|bias_ok`).
+
+**`klt lvs` against `design/netlist/bias_core.spice`'s own `.subckt
+bias_core`: `status: "match"` — 50/50 devices, 27/27 nets matched**, 0
+errors. That is up from the pre-#81 baseline of 21/50 devices and 14/27
+nets (41 layout nets). The reference netlist is unchanged. The match comes
+with five warnings, and each one limits what it proves:
+
+- `device.parameter_excluded`: the `PNP` compare is scoped to `NE` (the
+  same scope the two PNP sub-cells use), so `AE` is **not** verified.
+- `device.placeholder_value` ×2: the subckt-call reference carries `R=0` /
+  `C=0` placeholders for the 4 `res_xhigh_po` and 2 MiM caps, so resistor
+  and capacitor **values** are not compared.
+- `device.geometry_not_compared` ×2: resistor `L/W/A/P` and MiM `A/P` are
+  KLayout *secondary* parameters and are not compared.
+
+So the match proves topology: every device's terminals land on the right
+nets, with no opens and no shorts across the 27 nets. It does not prove
+device sizing.
 
 `python3 layout/bin/compose-cell.py layout/bias_core/cell.json --check`
-reproduces this result byte-for-byte.
+reproduces this result byte-for-byte (exit 0), and so does each of the six
+sub-block cells at the same pin.
 
-**`klt erc` (T1 item 11 supply spec, issue #66): `erc_status: clean`, 0
-findings — now on rails that reach the blocks' internal supply networks.**
-`klt erc layout/bias_core/bias_core.gds
-layout/bias_core/erc-supply-spec.json --format json` (reproduce from the
-repo root; the spec's own `_comment` block documents and justifies every
-field) reports `VDD`/`VSS` each resolving to exactly **one** continuous
-electrical island under the declared stackup — zero `erc.unconnected_net`,
-zero `erc.supply_short` — over 21 gate nets with the `active_layer` fix
-(`poly ∩ diff`) applied (the pre-#69 run reported 22: the two separate
-`nkg` islands and the island carrying the unconnected block-local `vdd`
-pin each counted as their own gate net; the re-landed routes merge them,
-one island per declared supply). The run omits `--pdk` on purpose
-(antenna grading is not item 11's subject; the top-level `status` reads
-`not_checked` and the command exits `4`), and declares no `ties[]`, so
-`erc.missing_tie` is *not computed* — the spec's `_comment` records why
-(sky130's native substrate makes a VSS tie undeclarable, and the blanket
-`nwell → VDD` probe on this exact GDS reports exactly 2 findings
-post-#69 — the two PNP device-group blocks' by-design tubs, see below —
-where the pre-#69 probe reported 18 conflated ones, 0/18 reaching VDD:
-the landing fix is what let every other n-well's taps reach VDD through
-the connected supply network).
+**`klt erc` (T1 item 11 supply spec): `erc_status: clean`, 0 findings.**
+Reproduce from the repo root:
 
-**Pad-point island census (issue #69's acceptance check, committed as
-evidence):** `python3 layout/bin/pad-island-census.py
-layout/bias_core/cell.json` re-runs the census that found the bug — it
-builds the same `LayoutToNetlist` connectivity graph `klt erc` builds,
-then probes a window at every pad the cell.json itself declares as a pin
-of a connectivity net (each pad at its block-local declared port
-coordinates, translated by `placement.origins_um` applied exactly once).
-Committed as
-`layout/bias_core/pad-island-census.json` (pinned to the GDS's sha256):
-every probed net is one electrical island — the `VDD` rail shares the
-island of `mirror_amp`/`startup`/`settle_flag`/`passives`'s real `vdd`
-pads *and* the west `stub_VDD` pin (expanded island name `VDD,vdd`),
-`VSS` likewise (`VSS,vss`), and `nkg` is a single shared island
-rather than the two separate ones the pre-#69 census found. The upstream
-coordinate-trust gap that let the pre-#69 composition report
-`routed: true` while landing on pads that touched nothing is
-[2AMLogic/klayout-tools#2210](https://github.com/2AMLogic/klayout-tools/issues/2210);
-the cleanliness of a rerun is graded by `manifests/README.md`'s item-11
-row.
+    klt erc layout/bias_core/bias_core.gds \
+         layout/bias_core/erc-supply-spec.json \
+         --format json > layout/bias_core/erc.json
+
+`VDD` and `VSS` each resolve to exactly **one** electrical island (zero
+`erc.unconnected_net`, zero `erc.supply_short`) over 18 gate nets. The run
+omits `--pdk` on purpose, so the top-level `status` is `not_checked` and
+the command **exits 4**. The structural verdict is `erc_status`, not the
+exit code. No `ties[]` are declared, so `erc.missing_tie` is **not
+computed**. The spec rationale, including why it has no ties and what its
+`devices[]` cuts do, is in
+[`erc-supply-spec.md`](erc-supply-spec.md). The spec cannot carry it
+inline because klt at this pin rejects unknown keys such as `_comment`.
+
+**Pad-point island census:** `python3 layout/bin/pad-island-census.py
+layout/bias_core/cell.json` exits 0, with the result committed as
+`pad-island-census.json` and pinned to the GDS sha256. It probes all 15
+connectivity/pin nets at 39 declared pads, and each net is exactly one
+island. The census uses the ERC spec's graph, including the `devices[]`
+cuts, so each island name also shows that the nets stay apart: `VDD,vdd`,
+`VSS,vss`, `VREF,vref`, `ec`, `er`, `n2`, `na`, `nb`, `nbtop`, `nkg`,
+`nokx`, `pb`, `pg`, `IBIAS,ibias` and `BIAS_OK,bias_ok`. One probe has a
+weaker guarantee: `passives.nb` is a net that `bias_core_passives` wires
+internally but cannot promote, because `klt gen-compose` refuses `pins[]`
+on a port that its `connectivity[]` already wires. That block's
+`compose.response.json` therefore reports no `nb` port. The probe is
+recorded as `assembly_declaration_unpromoted_sibling_port`, and the #69
+frame check cannot run for it. The landing is still independently
+confirmed by the LVS match on `NB`. The census proves same-net
+connectivity. Cross-net shorts are excluded by extract/LVS (27 separate
+nets matched one-to-one), not by the census.
 
 ## Placement
 
@@ -139,158 +136,172 @@ promoted pins (`IBIAS`, `VREF`, `BIAS_OK`) land on the real pads too —
 higher (142.97+100, 126.97+100, 119.5+100 plus the x-translation for
 `settle_flag`'s origin, e.g. a `BIAS_OK` pin at (10893.585, 219.5)).
 
-`bias_core_pnp8_leg` has zero wired connections in this composition (both of
-its own nets, `vss`/`ec`, are blocked — see below); it is placed purely to
-be present as 8 real, if unconnected, PNP devices in the extracted netlist.
+`bias_core_pnp8_leg`'s `ec` escape stub is wired to `passives.ec` (issue
+#81). Its `vss` reaches `VSS` through the block's own collector strap, the
+same as in its standalone evidence.
 
 ## What is wired
 
-- **`VDD`** (top-level pin): a 4-way bus — `mirror_amp` → `startup` →
-  `settle_flag` → `passives`, on `"metal"` (li1), routed through a shared
-  west-of-everything stub (`stub_VDD`, a small declare-only `promo_stub.gds`
-  block) for external visibility.
-- **`VSS`** (top-level pin): a 3-way bus — `mirror_amp` → `startup` →
-  `settle_flag` (not `passives`/`pnp8_leg`/`xq1_xqr` — see below), on
-  `"metal2"` (met1), same `stub_VSS` external-pin mechanism.
-- **`nkg`**: `startup` ↔ `settle_flag`, on `"metal3"` (met2), routed through
-  a dedicated high lane (`y=200`, clear of every block's own bbox and of the
-  `VDD`/`VSS` buses' own corridor) since this net does not need to reach
-  `passives` at all.
-- **`IBIAS`**, **`VREF`**, **`BIAS_OK`** (top-level pins): each declare-only,
-  pointing directly at the one sub-block that touches it
-  (`mirror_amp.ibias`, `mirror_amp.vref`, `settle_flag.bias_ok`) — no new
-  metal drawn, matching every other single-touch-net promotion in this
-  repo's own `bias_core_*` cells. **`VREF` is declare-only here — it is
-  `bias_core_mirror_amp`'s own `vref` pin, not (yet) wired to
-  `bias_core_passives`'s own `vref` pin** (`XR2`'s own node in the design);
-  see below.
+Every net that crosses a device-group boundary in
+`design/netlist/bias_core.spice` is wired. Each one is listed below with its
+plane. Role names are the `klt` sky130 deck's routing roles: `metal` = li1,
+`metal2` = met1, `metal3` = met2, and since klayout-tools#2738 `metal4` =
+met3, `metal5` = met4, `metal6` = met5.
 
-Each of these was verified electrically, not just via `klt
-gen-compose`'s `routed: true` (`docs/cli/gen-compose.md`'s own "Geometry
-is advisory" caveat: a routed, DRC-clean leg is not by itself proof of
-correct connectivity — the pre-#69 composition was fully `routed: true`
-while touching none of the blocks' real pads, which is exactly how that
-gap survived until #69's island census). Post-#69 the verification is
-`klt extract`'s own net-merge report listing the *intended* joins —
-`VDD|vdd`, `VSS|vss` (each rail merging with the sub-block pads' internal
-labels onto one net) and no unintended `supply_short` between them — plus
-the committed pad-point island census (`pad-island-census.json`), which
-probes every declared pad directly and shows one island per net *with*
-`nkg` shared between `startup` and `settle_flag`. The upstream gap that
-made `routed: true` trustable on nothing more than caller-declared
-coordinates is
-[2AMLogic/klayout-tools#2210](https://github.com/2AMLogic/klayout-tools/issues/2210).
+| Net | Plane (role) | Width (µm) | Pins |
+|---|---|---|---|
+| `VDD` | li1 (`metal`) | default | `mirror_amp` / `startup` / `settle_flag` / `passives` `vdd` + west `stub_VDD` |
+| `VSS` | met1 (`metal2`) | default | `mirror_amp` / `startup` / `settle_flag` `vss` + west `stub_VSS` |
+| `nkg` | met2 (`metal3`) | default | `startup` ↔ `settle_flag` |
+| `n2` | met3 (`metal4`) | 0.4 | `passives` ↔ `mirror_amp` |
+| `nb` | met3 (`metal4`) | 0.4 | `passives` (XRT/XR1 strap) ↔ `mirror_amp` |
+| `ec` | met3 (`metal4`) | 0.4 | `passives` ↔ `pnp8_leg` |
+| `VREF` | met3 (`metal4`) | 0.4 | `passives` ↔ `mirror_amp` (top-level pin) |
+| `er` | met3 (`metal4`) | 0.4 | `passives` ↔ `xq1_xqr` |
+| `nbtop` | met3 (`metal4`) | 0.4 | `passives` / `settle_flag` → `mirror_amp` |
+| `nokx` | met4 (`metal5`) | 0.4 | `passives` (XCOK top plate) ↔ `settle_flag` |
+| `pg` | met4 (`metal5`) | 0.4 | `passives` (XCC top plate) / `startup` → `mirror_amp` |
+| `na` | met4 (`metal5`) | 0.4 | `xq1_xqr` / `settle_flag` → `mirror_amp` |
+| `pb` | met5 (`metal6`) | 1.6 | `startup` / `settle_flag` → `mirror_amp` |
 
-## What is not wired
+`IBIAS` and `BIAS_OK` are declare-only top-level pins on the one sub-block
+pad each touches (`mirror_amp.ibias`, `settle_flag.bias_ok`). `VREF` used
+to be declare-only too, but is now a real `connectivity[]` net named
+`VREF`. A port may be promoted by `pins[]` or wired by `connectivity[]`,
+not both, and the net has to reach `passives.vref` (XR2's node).
 
-Every other net that crosses a device-group boundary in
-`design/netlist/bias_core.spice` — `pg`, `pb`, `n2`, `na`, `nbtop`, `vref`
-(the `mirror_amp` ↔ `passives` half), `nokx`, plus both PNP groups' own
-`ec`/`er`/(the rest of) `vss` — is left unrouted this increment. Three
-distinct, independently-confirmed root causes, not one:
+`nb` is a tenth net beyond the nine the issue named. The `mirror_amp` side
+of `nb` (promoted by #56) has to meet XRT/XR1's shared strap inside
+`bias_core_passives`. That strap is not a promoted port of that block (see
+the census note above), so the assembly declares it at the strap's
+midpoint (19.84, 1.0), read from the block's own GDS.
 
-1. **Insufficient routing layers for the number of mutually-crossing nets.**
-   The curated sky130 deck exposes exactly 3 routable planes (`"metal"`/
-   `"metal2"`/`"metal3"`). This composition needs on the order of 10
-   cross-block nets, most of whose bounding boxes span most of the assembly
-   (several sub-blocks sit far apart; `passives` alone is ~5534µm wide). At
-   most 3 mutually-non-crossing nets can share one plane — `VDD`/`VSS`/
-   `nkg` already claim all three across the shared corridor between the
-   upper transistor cluster and `passives`, and every further net collided
-   with one of those three (`klt gen-compose`'s own `crosses already-routed
-   net '<name>'` diagnostic) no matter which layer or waypoint path was
-   tried. `klt gen-compose` offers no assignment help for this — filed
-   generically as
-   [`2AMLogic/klayout-tools#1962`](https://github.com/2AMLogic/klayout-tools/issues/1962)
-   per this repo's own friction protocol.
-2. **A handful of pre-existing raw device pads reject *any*
-   externally-approaching route outright**, independent of the layer-budget
-   problem above (`klt gen-compose`'s own #1527 "own drawn geometry"
-   self-collision check): `mirror_amp`'s own `nb` pin, and both
-   `settle_flag`'s `na`/`nbtop` pins, sit too close to that sub-block's own
-   already-drawn metal for a new externally-arriving leg to land without
-   risking a silent short. This is the *same class* of gap issue #56 already
-   fixed for six *other* pins on these same three sub-blocks (a declare-only
-   west-edge metal stub, wired as an additional branch off the pin's own
-   already-routed net, entirely inside that sub-block's own `cell.json` —
-   see `bias_core_mirror_amp/README.md`'s own "Full-cell assembly pins
-   (issue #56)" section) — `nb`/`na`/`nbtop` were not in #56's own scope and
-   remain unfixed. `passives`'s own `pg`/`nokx` pins hit a related but
-   distinct obstacle (their ports sit on a MiM cap's own top-plate `met4`
-   layer, not `li1` — resolved *within this cell.json* via
-   `connectivity[].layer_role: "cap_top_via_metal"` plus an explicit
-   `width_um: 0.42` floor, confirmed DRC-clean and short-free in isolation —
-   but still excluded from the final wiring set here purely by the
-   layer-budget problem in (1) above, not by this obstacle).
-3. **`ec`/`er` (the PNP emitter buses on `pnp8_leg`/`xq1_xqr`) were blocked by
-   the then-tracked
-   [`2AMLogic/klayout-tools#1894`](https://github.com/2AMLogic/klayout-tools/issues/1894)
-   chain — resolved as of issue #30's `klt 0.6.0` toolchain bump (PR
-   [#2320](https://github.com/2AMLogic/klayout-tools/pull/2320): the
-   collector ring drawn on the `tap` role, so a strap `klt extract`
-   actually recognizes — both PNP cells' own `vss` straps now land and their
-   standalone LVS goes to `match`, and this cell's extract drops 43→41 nets
-   accordingly). What still blocks `ec`/`er` *here* is only the layer-budget
-   problem in (1) above. The original investigation's two failure modes are
-   preserved for the record: (a) composing the `bjt_array` generator alongside
-   a new stub *within the same `gen-compose` call* (the technique that fixed
-   finding 2's pins) was refused outright — `klt gen-compose` detects the
-   block's own closed collector ring and rejects any leg from a non-tap
-   port before even considering where the new pin would land (both arrays
-   now carry `ring_gap_side` openings from #61, so this rejection no longer
-   fires for the escape legs); (b) treating `pnp8_leg`/`xq1_xqr` as opaque
-   `blocks[].cell` siblings (hiding the ring from the composing call, since
-   an opaque stream reports no `ports[]` beyond what this cell.json
-   hand-declares) let `klt gen-compose` draw a route and report `routed:
-   true` with a clean `klt drc` — but `klt extract` then showed the tapped
-   net silently merged with the ring's own internal base/collector bus
-   (`er|vss` in one reproduction), the exact `#1894` finding-2 failure
-   mode, just triggered from outside the block instead of from within it.
-   `xq1_xqr`'s own `na` pin is the one exception:
-   it is *already* a declare-only top-level promotion inside `xq1_xqr`'s own
-   `cell.json` (an existing, previously-drawn pad, not a new leg), so it
-   carries none of this risk — but it was left out of the final wiring set
-   here purely by the layer-budget problem in (1), the same way `passives`'s
-   `pg`/`nokx` were.
+Two sub-block changes support this:
 
-See [#64](https://github.com/2AMLogic/sky130-temp-por/issues/64) for the
-tracked follow-up covering all three findings.
+- **`bias_core_xq1_xqr`**: the auto-routed `Q0_B`–`Q1_B` met1 base bus ran
+  across the middle of `Q1_E`'s emitter pad at y=1.7, exactly where the
+  assembly must land `er`'s via ladder. A ladder there shorted `er` to
+  `VSS` in a trial composition. That leg is now hand-routed along y=0.55,
+  0.65 µm clear of the 0.42 µm landing pad. The cell still reaches LVS
+  `match` (`layout/bias_core_xq1_xqr/lvs.json`).
+- **`bias_core_pnp8_leg`**: no geometry change. The assembly now declares
+  the block's existing `ec` escape stub (-5, 10) and its real composed bbox,
+  both taken from that block's own `compose.response.json`.
+
+None of this rests on `routed: true` alone. Every net is verified by the LVS
+match (each reference net is matched to exactly one layout net, and no
+layout net is left over), by `merged_net_labels[]` containing only the
+intended joins, and by the pad-point island census.
+
+## Layer plan
+
+This is the plan the routes were built from. The waypoints in `cell.json`
+are its concrete record.
+
+**Constraint.** Before #81 the curated deck exposed three routable planes,
+and `VDD` (li1), `VSS` (met1) and `nkg` (met2) used all three across the
+shared corridor between the upper transistor row (y ≈ 94–165) and
+`passives` (y = -50…-28). Every further net crossed one of them (#64).
+klayout-tools#2738 added met3/met4/met5 as routing roles, so the nine
+remaining nets (ten with `nb`) go on those three new planes and never
+touch the lower three. `VDD`, `VSS` and `nkg` keep their existing routes
+unchanged.
+
+**Assignment rule.** No two nets on one plane may cross. Each plane
+therefore gets a family of nets whose routes nest or sit side by side.
+
+- **met3 (`metal4`): the vertical risers out of `passives`.** `n2`, `nb`,
+  `ec`, `VREF`, `er` and `nbtop` all start on `passives`' li1 pads along
+  y ≈ -49. Each rises on its own x column (`nbtop` x=-12, `nb` x=-10, `ec`
+  x=378, `er` x=380, `VREF` x=1424), with `n2` running west along y=-30 to
+  `mirror_amp`. Each then turns along its own y lane: `n2` -30, `nb`
+  -38→122, `ec` 110, `er` -54→112, `VREF` 126, `nbtop` 126/130. Lanes are
+  nested so that a net that rises further west turns at a higher or lower
+  y than its neighbour and never crosses it. `er` runs under the passives
+  row at y=-54, below every other riser's start, to reach x=380.
+- **met4 (`metal5`): the nets whose `passives` end already sits on met4,
+  plus `na`.** `pg` and `nokx` land on MiM top-plate contacts, which are
+  met4 by construction (`passives`' `pg`/`nokx` ports are 71/20). Keeping
+  them on met4 avoids a via ladder through the met3 bottom-plate level
+  next to the caps. `pg` rises at x=1342 and runs west along y=116, `nokx`
+  rises at x=5530 and runs west along y=88, and `na` runs along y=106/108
+  (from `xq1_xqr`) and y=120 (from `settle_flag`). None of these lanes
+  cross.
+- **met5 (`metal6`): `pb` alone.** It spans the full upper row
+  (`settle_flag` x≈5446 → `mirror_amp` x=16) along y=118, crossing the
+  `pg` and `na` met4 lanes, so it takes the top plane by itself. Width is
+  1.6 µm, sky130 `m5.1`'s minimum met5 width (the deck's own rule). The
+  lower-plane 0.4 µm width is **not** reused on met5. The via4 landings
+  are drawn by `klt gen-compose`'s `via5` role (physical via4, 71/44) and
+  pass the deck's `via4.*`/`m5.*` rules.
+
+Signal widths on met3/met4 are 0.4 µm, above `m3.1` (0.3 µm) and `m4.1`
+(0.3 µm).
+
+**How the plan was checked.** The waypoints were laid out with a scratch
+maze search over the endpoint coordinates the sub-blocks report (that
+helper was not committed; the `cell.json` waypoints are the record). Each
+net was then added through `compose-cell.py`, where `klt gen-compose`
+checks crossings and own-geometry collisions, followed by `klt drc`
+(clean), `klt extract` and `klt lvs` (match).
+
+## MiM capacitor clearance
+
+`bias_core_passives` holds the two `sky130_fd_pr__cap_mim_m3_1` caps:
+`XCC` (`PG`–`NZ`, 20×20 µm, capm at (1395.52, -49.5)–(1415.52, -29.5)) and
+`XCOK` (`VDD`–`NOKX`, 6×6 µm, capm at (5527.36, -49.5)–(5533.36, -43.5)).
+Both have their bottom plate on met3 and their top plate (capm, 89/44)
+contacted by via3 up to met4. The only routes that touch them are the
+intended ones: `pg` and `nokx` land on the met4 top-plate contacts, and
+`VDD` lands on `XCOK`'s met3 bottom plate (`passives.vdd`). The
+clearances below were measured on the committed GDS, with each
+unrelated net checked against the plates:
+
+| Check | Measured | Rule |
+|---|---|---|
+| unrelated met3 → met3 bottom plates | 2.725 µm | `m3.2` 0.3 µm |
+| unrelated met3 → capm | 3.467 µm | (no capm–met3 spacing rule in the deck; `capm.3` is enclosure) |
+| unrelated met4 → capm | > 20 µm (none within the search radius) | — |
+| unrelated met4 → top-plate contact met4 | 1.562 µm | `m4.2` 0.3 µm |
+| met4 overlapping capm that is not the plate's own net | 0 shapes | — |
+| met5 (`pb`) → capm | > 20 µm | — |
+
+The routing kept at least 2.7 µm (met3) and 1.5 µm (met4) clear of
+each cap's plates and plate contacts, well above the 0.3 µm minimum
+spacing. `klt drc` over the deck's `capm.*` rules (`capm.1`, `capm.2a`,
+`capm.3`, `capm.4`, `capm.5`) is clean.
 
 ## Known klt gaps hit building this cell
 
-- [`2AMLogic/klayout-tools#1894`](https://github.com/2AMLogic/klayout-tools/issues/1894) —
-  already tracked (see `layout/README.md`'s own "Known klt gaps" section);
-  finding 3 above extends its confirmed blast radius from "the collector
-  strap only" to "any externally-approaching leg on either PNP group's own
-  `Q*_B`/`Q*_E` ports". **Resolved as of issue #30's `klt 0.6.0` pin** (the
-  #1894 → #2008 → #2312 chain, closed by PR #2320 — both PNP cells' own
-  straps now land and their standalone LVS reads `match`).
 - [`2AMLogic/klayout-tools#1962`](https://github.com/2AMLogic/klayout-tools/issues/1962) —
-  new, filed this issue: `klt gen-compose` has no layer/track-assignment
-  help for a composition with more mutually-crossing nets than available
-  routing planes.
-- [`2AMLogic/klayout-tools#2210`](https://github.com/2AMLogic/klayout-tools/issues/2210) —
-  `klt gen-compose`'s `routed: true` verifies landings against the
-  caller-declared port coordinates only, with no connectivity check that a
-  leg's landing pin ever touches the placed block's internal net. #69's
-  landing-frame fix survived precisely because of this gap (the pre-#69
-  composition reported every net `routed: true` while touching none of the
-  blocks' real pads); this cell now also commits a pad-point island census
-  (`layout/bin/pad-island-census.py` → `pad-island-census.json`) as the
-  in-repo backstop, and no `klt` verb exposes island membership today —
-  filed generically as
-  [2AMLogic/klayout-tools#2218](https://github.com/2AMLogic/klayout-tools/issues/2218).
+  `klt gen-compose` has no layer/track-assignment help for compositions
+  with more mutually crossing nets than planes. Still open. This cell
+  worked around it with the hand-made layer plan above, made possible by
+  the extra planes from #2738.
+- [`2AMLogic/klayout-tools#2210`](https://github.com/2AMLogic/klayout-tools/issues/2210) /
+  [`#2218`](https://github.com/2AMLogic/klayout-tools/issues/2218) —
+  `routed: true` checks landings against caller-declared coordinates only,
+  and no `klt` verb exposes island membership. The in-repo backstop is the
+  pad-point census (`layout/bin/pad-island-census.py`).
+- [`2AMLogic/klayout-tools#2881`](https://github.com/2AMLogic/klayout-tools/issues/2881) —
+  filed for #81: `klt gen-compose` refuses `pins[]` on a port its own
+  `connectivity[]` already wires. A composed cell therefore cannot expose an internally
+  wired net as a port without adding a stub branch, which is why
+  `passives.nb` is assembly-declared (see the census note above).
+- [`2AMLogic/klayout-tools#2822`](https://github.com/2AMLogic/klayout-tools/issues/2822) —
+  already tracked: `klt erc`'s spec rejects unknown top-level keys at this
+  pin, so a spec can no longer carry inline rationale (`_comment`). It now lives in
+  [`erc-supply-spec.md`](erc-supply-spec.md).
+- [`2AMLogic/klayout-tools#1894`](https://github.com/2AMLogic/klayout-tools/issues/1894) —
+  closed (as of the `klt 0.6.0` pin). The PNP collector straps land, and
+  `ec`/`er` are now wired here.
 
 ## What's next
 
-[#64](https://github.com/2AMLogic/sky130-temp-por/issues/64) tracks wiring
-the remaining `pg`/`pb`/`n2`/`na`/`nbtop`/`vref`/`nokx` nets (findings 1 and
-2 above) once a channel-routing/layer-assignment plan (by hand or via
-`klayout-tools#1962`) is worked out, plus promoting `mirror_amp`'s `nb` and
-`settle_flag`'s `na`/`nbtop` pins the same way issue #56 already did for six
-other pins on these sub-blocks. `ec`/`er` (finding 3) are unblocked
-upstream as of issue #30's `klt 0.6.0` pin (the strap fix landed); what
-still holds them out of the wiring set is the layer-budget problem of
-finding 1. With `bias_core` now composed (even partially),
-`temp_core`, `por_comparator`, `por_output_chain`, and `temp_por_top` remain
-the layout work tracked from [#4](https://github.com/2AMLogic/sky130-temp-por/issues/4).
+`bias_core` is the first full-cell assembly to reach LVS `match`.
+`temp_core`, `por_comparator`, `por_output_chain` and `temp_por_top`
+remain the layout work tracked from
+[#4](https://github.com/2AMLogic/sky130-temp-por/issues/4). Sizing
+verification of the passives (resistor and MiM values) needs a reference
+form that carries real `R`/`C`, or a PEX run (T1 item 7). The match above
+does not cover it.

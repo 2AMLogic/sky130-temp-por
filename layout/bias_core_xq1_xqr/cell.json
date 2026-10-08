@@ -70,7 +70,16 @@
     "`klt extract` still recovers it as a floating 'vsubs' node either way),",
     "so the opening costs nothing this cell currently has. Revisit the side/",
     "width, or close the ring again and route through a real COLL_* tap, once",
-    "the installed klt carries #1894's fix -- see README.md 'Upstream status'."
+    "the installed klt carries #1894's fix -- see README.md 'Upstream status'.",
+    "",
+    "BASE-BUS DETOUR (issue #81): the Q0_B-Q1_B met1 bus the auto-router drew",
+    "ran at y=1.7, straight across the middle of Q1_E's emitter pad -- the",
+    "exact spot the full-cell assembly must land `er`'s via ladder (a ladder",
+    "mcon/via1 at the declared Q1_E port shorted `er` to VSS in",
+    "layout/bias_core). The leg is now hand-routed on met1 along y=0.55,",
+    "below the ladder landing (0.65um clear of the 0.42um landing pad), so",
+    "the emitter pad centre is free for an upper-metal via. The other two",
+    "legs of the net are still auto-completed."
   ],
   "pdk": {
     "variant": "sky130A",
@@ -142,6 +151,14 @@
         { "block": "array", "port": "Q1_B" },
         { "block": "array", "port": "COLL_E" },
         { "block": "stub_vss", "port": "CONN" }
+      ],
+      "legs": [
+        {
+          "from_pin": { "block": "array", "port": "Q0_B" },
+          "to_pin": { "block": "array", "port": "Q1_B" },
+          "waypoints_um": [[4.01, 0.55], [8.63, 0.55]],
+          "layer_role": "metal2"
+        }
       ]
     }
   ],

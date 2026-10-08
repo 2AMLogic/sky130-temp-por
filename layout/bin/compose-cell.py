@@ -785,7 +785,14 @@ def compose_cell(spec: dict, spec_dir: Path, out_dir: Path) -> dict:
     for key, value in (lvs_spec.get("options") or {}).items():
         lvs_options.setdefault(key, value)
     lvs_request = {
-        "layout": {"netlist": str(Path(extract["netlist_path"]).name)},
+        # ``deck`` on the layout side lets klt lvs re-ingest the bare-mode
+        # 3-terminal resistor ``X`` cards klt extract writes since
+        # klayout-tools#2336 (without it they read back as unmatched
+        # subcircuit stubs, not resistors).
+        "layout": {
+            "netlist": str(Path(extract["netlist_path"]).name),
+            "deck": deck,
+        },
         "reference": {
             "netlist": reference_path.name,
             "form": "subckt-call",

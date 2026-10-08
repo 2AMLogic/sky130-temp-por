@@ -62,14 +62,17 @@
     "min_spacing_um": 0.4,
     "matched_group_id": "mos_array:1x1:common_centroid",
     "snapped_to_grid": false,
-    "notes": [],
+    "notes": [
+      "family 'sky130' declares no S/D implant role ('pplus') for flavor 'pfet' -- no implant mask was drawn"
+    ],
     "voltage_flavor": null,
-    "voltage_flavor_mark_present": false
+    "voltage_flavor_mark_present": false,
+    "sd_implant_present": false
   },
   "warnings": [],
   "provenance": {
-    "klt_version": "0.6.0",
-    "klayout_version": "0.30.10",
+    "klt_version": "0.6.0+g0ce8c64842d9",
+    "klayout_version": "0.30.12",
     "pdk": {
       "name": "sky130A",
       "source": "search root: ~/.volare",
