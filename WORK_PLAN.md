@@ -19,8 +19,7 @@ _None._
 
 Human-approved issues ready for implementation (`loom:issue`).
 
-- **#31**: T1 item 8/10: aggregate a block-level characterization report
-- **#81**: bias_core: wire the nine remaining cross-block nets on the met3–met5 planes klayout-tools#2738 added (T1 items 4 and 11)
+_None._
 
 ## In Progress
 
@@ -44,8 +43,7 @@ _None._
 
 Issues carrying `loom:curated`.
 
-- **#40**: bias_core: full-cell assembly (compose all device-group sub-blocks) *(curated)*
-- **#81**: bias_core: wire the nine remaining cross-block nets on the met3–met5 planes klayout-tools#2738 added (T1 items 4 and 11) *(curated)*
+_None._
 
 ## Proposed (Architect / Hermit)
 
@@ -62,11 +60,11 @@ _None._
 |------|-------|
 | Operator merge-risk holds | 0 |
 | Operator priority | 0 |
-| Ready (`loom:issue`) | 2 |
+| Ready (`loom:issue`) | 0 |
 | In Progress (`loom:building`) | 0 |
 | PRs awaiting review | 0 |
 | Approved PRs awaiting merge | 0 |
-| Curated | 2 |
+| Curated | 0 |
 | Architect / Hermit proposals | 0 |
 | Active epics | 2 |
 <!-- guide:plan-body:end -->
