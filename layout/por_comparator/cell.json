@@ -1,0 +1,2570 @@
+{
+  "cell": "por_comparator",
+  "_comment": [
+    "Cell descriptor for layout/bin/compose-cell.py -- see layout/README.md for the recipe",
+    "and layout/por_comparator/README.md for this cell's floorplan, routing, matching",
+    "strategy and results. Issue #82 (T1 item 2); follows the recipe layout/",
+    "bias_core_settle_flag/ (MOS floorplan, tap islands, per-net layer_role) and layout/",
+    "bias_core_passives/ (straight single-instance xhigh resistors) established.",
+    "",
+    "This is design/netlist/por_comparator.spice's whole .subckt por_comparator VDD VSS",
+    "IBIAS VREF BIAS_OK POR_RAW: 21 devices (6 pfet_g5v0d10v5, 12 nfet_g5v0d10v5, 3",
+    "res_xhigh_po), the LVS reference is the design netlist itself, not a hand copy.",
+    "",
+    "FLOORPLAN: NMOS row along y=0 (gates north), PMOS row mirrored so every gate sits on",
+    "y=20 (gates south), signal channel between; VDD rail y=29 and VSS rail y=-6 on met1.",
+    "XMINA/XMINB are U0/U1 of ONE mos_array (rows=1 cols=2 topology=array dummy=1) and",
+    "XMLA/XMLB are U0/U1 of ONE pfet mos_array, so each pair shares geometry, orientation,",
+    "pitch and (via the dummy units) both neighbours. The three resistors are straight",
+    "single-instance res_array bodies (num=1 dummy=0 flavor=xhigh, W=2, L exactly the",
+    "netlist value) in rows at x>=100; the divider's far end (RTOP.B, RBOT.B/RHYS.A,",
+    "RHYS.B) and XMHSW sit ~6.9-8.0 mm east of the comparator, so VDD, VSS and N1 each",
+    "have one long single-plane lane (y=29, y=-28, y=-24) to that end.",
+    "",
+    "ROUTING: every net is a star of legs from a hub pin whose spurs run on one plane per",
+    "net (connectivity[].layer_role), chosen so no two nets sharing a plane come within",
+    "the layer's spacing of each other or of each other's via-stack pads; the final",
+    "approach to an east/west-facing destination pin is written out explicitly (a jog",
+    "sized to the net's plane) rather than left to gen-compose's own normalization.",
+    "Short D-D / G-G pair links and the SNSB divider tap are li1 legs.",
+    "",
+    "KNOWN GAPS, disclosed in README.md: no hvi marker at the pinned klt build",
+    "(2AMLogic/klayout-tools#1912, closed upstream after this pin), resistor R is not",
+    "compared by LVS (only L and W, via lvs.options.compare_parameters; 2AMLogic/",
+    "klayout-tools#2461), dummy units are unwired."
+  ],
+  "pdk": {
+    "variant": "sky130A",
+    "deck": "sky130"
+  },
+  "blocks": [
+    {
+      "id": "menn",
+      "generator": "mos_array",
+      "cell_name": "menn",
+      "orientation": "none",
+      "params": {
+        "w_um": 1,
+        "l_um": 0.5,
+        "rows": 1,
+        "cols": 1,
+        "dummy": 0,
+        "flavor": "nfet",
+        "gate_contact": true
+      }
+    },
+    {
+      "id": "mdnb",
+      "generator": "mos_array",
+      "cell_name": "mdnb",
+      "orientation": "none",
+      "params": {
+        "w_um": 2,
+        "l_um": 0.5,
+        "rows": 1,
+        "cols": 1,
+        "dummy": 0,
+        "flavor": "nfet",
+        "gate_contact": true
+      }
+    },
+    {
+      "id": "mbd",
+      "generator": "mos_array",
+      "cell_name": "mbd",
+      "orientation": "none",
+      "params": {
+        "w_um": 2,
+        "l_um": 2,
+        "rows": 1,
+        "cols": 1,
+        "dummy": 0,
+        "flavor": "nfet",
+        "gate_contact": true
+      }
+    },
+    {
+      "id": "mpass",
+      "generator": "mos_array",
+      "cell_name": "mpass",
+      "orientation": "none",
+      "params": {
+        "w_um": 2,
+        "l_um": 0.5,
+        "rows": 1,
+        "cols": 1,
+        "dummy": 0,
+        "flavor": "nfet",
+        "gate_contact": true
+      }
+    },
+    {
+      "id": "mdib",
+      "generator": "mos_array",
+      "cell_name": "mdib",
+      "orientation": "none",
+      "params": {
+        "w_um": 1,
+        "l_um": 1,
+        "rows": 1,
+        "cols": 1,
+        "dummy": 0,
+        "flavor": "nfet",
+        "gate_contact": true
+      }
+    },
+    {
+      "id": "mtail",
+      "generator": "mos_array",
+      "cell_name": "mtail",
+      "orientation": "none",
+      "params": {
+        "w_um": 1,
+        "l_um": 10,
+        "rows": 1,
+        "cols": 1,
+        "dummy": 0,
+        "flavor": "nfet",
+        "gate_contact": true
+      }
+    },
+    {
+      "id": "mina_b",
+      "generator": "mos_array",
+      "cell_name": "mina_b",
+      "orientation": "none",
+      "params": {
+        "w_um": 2,
+        "l_um": 1,
+        "rows": 1,
+        "cols": 2,
+        "dummy": 1,
+        "flavor": "nfet",
+        "gate_contact": true,
+        "topology": "array"
+      }
+    },
+    {
+      "id": "mdcmpo",
+      "generator": "mos_array",
+      "cell_name": "mdcmpo",
+      "orientation": "none",
+      "params": {
+        "w_um": 2,
+        "l_um": 1,
+        "rows": 1,
+        "cols": 1,
+        "dummy": 0,
+        "flavor": "nfet",
+        "gate_contact": true
+      }
+    },
+    {
+      "id": "mi1n",
+      "generator": "mos_array",
+      "cell_name": "mi1n",
+      "orientation": "none",
+      "params": {
+        "w_um": 1,
+        "l_um": 0.5,
+        "rows": 1,
+        "cols": 1,
+        "dummy": 0,
+        "flavor": "nfet",
+        "gate_contact": true
+      }
+    },
+    {
+      "id": "mi2n",
+      "generator": "mos_array",
+      "cell_name": "mi2n",
+      "orientation": "none",
+      "params": {
+        "w_um": 1,
+        "l_um": 0.5,
+        "rows": 1,
+        "cols": 1,
+        "dummy": 0,
+        "flavor": "nfet",
+        "gate_contact": true
+      }
+    },
+    {
+      "id": "menp",
+      "generator": "mos_array",
+      "cell_name": "menp",
+      "orientation": "mirror_y",
+      "params": {
+        "w_um": 2,
+        "l_um": 0.5,
+        "rows": 1,
+        "cols": 1,
+        "dummy": 0,
+        "flavor": "pfet",
+        "gate_contact": true
+      }
+    },
+    {
+      "id": "mensrc",
+      "generator": "mos_array",
+      "cell_name": "mensrc",
+      "orientation": "mirror_y",
+      "params": {
+        "w_um": 4,
+        "l_um": 0.5,
+        "rows": 1,
+        "cols": 1,
+        "dummy": 0,
+        "flavor": "pfet",
+        "gate_contact": true
+      }
+    },
+    {
+      "id": "mla_b",
+      "generator": "mos_array",
+      "cell_name": "mla_b",
+      "orientation": "mirror_y",
+      "params": {
+        "w_um": 4,
+        "l_um": 1,
+        "rows": 1,
+        "cols": 2,
+        "dummy": 1,
+        "flavor": "pfet",
+        "gate_contact": true,
+        "topology": "array"
+      }
+    },
+    {
+      "id": "mi1p",
+      "generator": "mos_array",
+      "cell_name": "mi1p",
+      "orientation": "mirror_y",
+      "params": {
+        "w_um": 2,
+        "l_um": 0.5,
+        "rows": 1,
+        "cols": 1,
+        "dummy": 0,
+        "flavor": "pfet",
+        "gate_contact": true
+      }
+    },
+    {
+      "id": "mi2p",
+      "generator": "mos_array",
+      "cell_name": "mi2p",
+      "orientation": "mirror_y",
+      "params": {
+        "w_um": 2,
+        "l_um": 0.5,
+        "rows": 1,
+        "cols": 1,
+        "dummy": 0,
+        "flavor": "pfet",
+        "gate_contact": true
+      }
+    },
+    {
+      "id": "nwt_menp",
+      "generator": "guard_ring",
+      "cell_name": "nwt_menp",
+      "orientation": "none",
+      "params": {
+        "inner_width_um": 1.0,
+        "inner_height_um": 1.0,
+        "ring_width_um": 0.42,
+        "contacts_per_side": 2,
+        "add_well": true
+      }
+    },
+    {
+      "id": "nwt_mensrc",
+      "generator": "guard_ring",
+      "cell_name": "nwt_mensrc",
+      "orientation": "none",
+      "params": {
+        "inner_width_um": 1.0,
+        "inner_height_um": 1.0,
+        "ring_width_um": 0.42,
+        "contacts_per_side": 2,
+        "add_well": true
+      }
+    },
+    {
+      "id": "nwt_mla_b",
+      "generator": "guard_ring",
+      "cell_name": "nwt_mla_b",
+      "orientation": "none",
+      "params": {
+        "inner_width_um": 1.0,
+        "inner_height_um": 1.0,
+        "ring_width_um": 0.42,
+        "contacts_per_side": 2,
+        "add_well": true
+      }
+    },
+    {
+      "id": "nwt_mi1p",
+      "generator": "guard_ring",
+      "cell_name": "nwt_mi1p",
+      "orientation": "none",
+      "params": {
+        "inner_width_um": 1.0,
+        "inner_height_um": 1.0,
+        "ring_width_um": 0.42,
+        "contacts_per_side": 2,
+        "add_well": true
+      }
+    },
+    {
+      "id": "nwt_mi2p",
+      "generator": "guard_ring",
+      "cell_name": "nwt_mi2p",
+      "orientation": "none",
+      "params": {
+        "inner_width_um": 1.0,
+        "inner_height_um": 1.0,
+        "ring_width_um": 0.42,
+        "contacts_per_side": 2,
+        "add_well": true
+      }
+    },
+    {
+      "id": "pst1",
+      "generator": "guard_ring",
+      "cell_name": "pst1",
+      "orientation": "none",
+      "params": {
+        "inner_width_um": 1.0,
+        "inner_height_um": 1.0,
+        "ring_width_um": 0.42,
+        "contacts_per_side": 2,
+        "add_well": false
+      }
+    },
+    {
+      "id": "pst2",
+      "generator": "guard_ring",
+      "cell_name": "pst2",
+      "orientation": "none",
+      "params": {
+        "inner_width_um": 1.0,
+        "inner_height_um": 1.0,
+        "ring_width_um": 0.42,
+        "contacts_per_side": 2,
+        "add_well": false
+      }
+    },
+    {
+      "id": "pst3",
+      "generator": "guard_ring",
+      "cell_name": "pst3",
+      "orientation": "none",
+      "params": {
+        "inner_width_um": 1.0,
+        "inner_height_um": 1.0,
+        "ring_width_um": 0.42,
+        "contacts_per_side": 2,
+        "add_well": false
+      }
+    },
+    {
+      "id": "pst4",
+      "generator": "guard_ring",
+      "cell_name": "pst4",
+      "orientation": "none",
+      "params": {
+        "inner_width_um": 1.0,
+        "inner_height_um": 1.0,
+        "ring_width_um": 0.42,
+        "contacts_per_side": 2,
+        "add_well": false
+      }
+    },
+    {
+      "id": "pst5",
+      "generator": "guard_ring",
+      "cell_name": "pst5",
+      "orientation": "none",
+      "params": {
+        "inner_width_um": 1.0,
+        "inner_height_um": 1.0,
+        "ring_width_um": 0.42,
+        "contacts_per_side": 2,
+        "add_well": false
+      }
+    },
+    {
+      "id": "rtop",
+      "generator": "res_array",
+      "cell_name": "rtop",
+      "orientation": "none",
+      "params": {
+        "length_um": 7897.44,
+        "width_um": 2.0,
+        "num": 1,
+        "dummy": 0,
+        "flavor": "xhigh"
+      }
+    },
+    {
+      "id": "rbot",
+      "generator": "res_array",
+      "cell_name": "rbot",
+      "orientation": "none",
+      "params": {
+        "length_um": 6769.23,
+        "width_um": 2.0,
+        "num": 1,
+        "dummy": 0,
+        "flavor": "xhigh"
+      }
+    },
+    {
+      "id": "rhys",
+      "generator": "res_array",
+      "cell_name": "rhys",
+      "orientation": "none",
+      "params": {
+        "length_um": 775.0,
+        "width_um": 2.0,
+        "num": 1,
+        "dummy": 0,
+        "flavor": "xhigh"
+      }
+    },
+    {
+      "id": "mhsw",
+      "generator": "mos_array",
+      "cell_name": "mhsw",
+      "orientation": "rotate_180",
+      "params": {
+        "w_um": 10,
+        "l_um": 0.5,
+        "rows": 1,
+        "cols": 1,
+        "dummy": 0,
+        "flavor": "nfet",
+        "gate_contact": true
+      }
+    },
+    {
+      "id": "pst_far",
+      "generator": "guard_ring",
+      "cell_name": "pst_far",
+      "orientation": "none",
+      "params": {
+        "inner_width_um": 1.0,
+        "inner_height_um": 1.0,
+        "ring_width_um": 0.42,
+        "contacts_per_side": 2,
+        "add_well": false
+      }
+    },
+    {
+      "id": "stub_vdd",
+      "cell": {
+        "gds_path": "promo_stub.gds",
+        "cell_name": "promo_stub",
+        "ports": [
+          {
+            "name": "CONN",
+            "x_um": 1.5,
+            "y_um": 0.085,
+            "layer": {
+              "layer": 67,
+              "datatype": 20
+            },
+            "width_um": 0.17,
+            "direction_deg": 0
+          },
+          {
+            "name": "PAD",
+            "x_um": 0.0,
+            "y_um": 0.085,
+            "layer": {
+              "layer": 67,
+              "datatype": 20
+            },
+            "width_um": 0.17,
+            "direction_deg": 180
+          }
+        ]
+      }
+    },
+    {
+      "id": "stub_vss",
+      "cell": {
+        "gds_path": "promo_stub.gds",
+        "cell_name": "promo_stub",
+        "ports": [
+          {
+            "name": "CONN",
+            "x_um": 1.5,
+            "y_um": 0.085,
+            "layer": {
+              "layer": 67,
+              "datatype": 20
+            },
+            "width_um": 0.17,
+            "direction_deg": 0
+          },
+          {
+            "name": "PAD",
+            "x_um": 0.0,
+            "y_um": 0.085,
+            "layer": {
+              "layer": 67,
+              "datatype": 20
+            },
+            "width_um": 0.17,
+            "direction_deg": 180
+          }
+        ]
+      }
+    },
+    {
+      "id": "stub_bias_ok",
+      "cell": {
+        "gds_path": "promo_stub.gds",
+        "cell_name": "promo_stub",
+        "ports": [
+          {
+            "name": "CONN",
+            "x_um": 1.5,
+            "y_um": 0.085,
+            "layer": {
+              "layer": 67,
+              "datatype": 20
+            },
+            "width_um": 0.17,
+            "direction_deg": 0
+          },
+          {
+            "name": "PAD",
+            "x_um": 0.0,
+            "y_um": 0.085,
+            "layer": {
+              "layer": 67,
+              "datatype": 20
+            },
+            "width_um": 0.17,
+            "direction_deg": 180
+          }
+        ]
+      }
+    },
+    {
+      "id": "stub_ibias",
+      "cell": {
+        "gds_path": "promo_stub_v.gds",
+        "cell_name": "promo_stub_v",
+        "ports": [
+          {
+            "name": "CONN",
+            "x_um": 0.085,
+            "y_um": 1.5,
+            "layer": {
+              "layer": 67,
+              "datatype": 20
+            },
+            "width_um": 0.17,
+            "direction_deg": 90
+          },
+          {
+            "name": "PAD",
+            "x_um": 0.085,
+            "y_um": 0.0,
+            "layer": {
+              "layer": 67,
+              "datatype": 20
+            },
+            "width_um": 0.17,
+            "direction_deg": 270
+          }
+        ]
+      }
+    },
+    {
+      "id": "stub_por_raw",
+      "cell": {
+        "gds_path": "promo_stub.gds",
+        "cell_name": "promo_stub",
+        "ports": [
+          {
+            "name": "CONN",
+            "x_um": 1.5,
+            "y_um": 0.085,
+            "layer": {
+              "layer": 67,
+              "datatype": 20
+            },
+            "width_um": 0.17,
+            "direction_deg": 0
+          },
+          {
+            "name": "PAD",
+            "x_um": 0.0,
+            "y_um": 0.085,
+            "layer": {
+              "layer": 67,
+              "datatype": 20
+            },
+            "width_um": 0.17,
+            "direction_deg": 180
+          }
+        ]
+      },
+      "orientation": "rotate_180"
+    },
+    {
+      "id": "stub_vref",
+      "cell": {
+        "gds_path": "promo_stub_v.gds",
+        "cell_name": "promo_stub_v",
+        "ports": [
+          {
+            "name": "CONN",
+            "x_um": 0.085,
+            "y_um": 1.5,
+            "layer": {
+              "layer": 67,
+              "datatype": 20
+            },
+            "width_um": 0.17,
+            "direction_deg": 90
+          },
+          {
+            "name": "PAD",
+            "x_um": 0.085,
+            "y_um": 0.0,
+            "layer": {
+              "layer": 67,
+              "datatype": 20
+            },
+            "width_um": 0.17,
+            "direction_deg": 270
+          }
+        ]
+      },
+      "orientation": "rotate_180"
+    }
+  ],
+  "placement": {
+    "strategy": "explicit",
+    "order": [
+      "menn",
+      "mdnb",
+      "mbd",
+      "mpass",
+      "mdib",
+      "mtail",
+      "mina_b",
+      "mdcmpo",
+      "mi1n",
+      "mi2n",
+      "menp",
+      "mensrc",
+      "mla_b",
+      "mi1p",
+      "mi2p",
+      "nwt_menp",
+      "nwt_mensrc",
+      "nwt_mla_b",
+      "nwt_mi1p",
+      "nwt_mi2p",
+      "pst1",
+      "pst2",
+      "pst3",
+      "pst4",
+      "pst5",
+      "rtop",
+      "rbot",
+      "rhys",
+      "mhsw",
+      "pst_far",
+      "stub_vdd",
+      "stub_vss",
+      "stub_bias_ok",
+      "stub_ibias",
+      "stub_por_raw",
+      "stub_vref"
+    ],
+    "origins_um": {
+      "menn": {
+        "x": 0,
+        "y": 0
+      },
+      "mdnb": {
+        "x": 8,
+        "y": 0
+      },
+      "mbd": {
+        "x": 14,
+        "y": 0
+      },
+      "mpass": {
+        "x": 22,
+        "y": 0
+      },
+      "mdib": {
+        "x": 28,
+        "y": 0
+      },
+      "mtail": {
+        "x": 36,
+        "y": 0
+      },
+      "mina_b": {
+        "x": 52,
+        "y": 0
+      },
+      "mdcmpo": {
+        "x": 64,
+        "y": 0
+      },
+      "mi1n": {
+        "x": 70,
+        "y": 0
+      },
+      "mi2n": {
+        "x": 78,
+        "y": 0
+      },
+      "menp": {
+        "x": 0,
+        "y": 22.61
+      },
+      "mensrc": {
+        "x": 40,
+        "y": 24.61
+      },
+      "mla_b": {
+        "x": 46,
+        "y": 24.61
+      },
+      "mi1p": {
+        "x": 70,
+        "y": 22.61
+      },
+      "mi2p": {
+        "x": 78,
+        "y": 22.61
+      },
+      "nwt_menp": {
+        "x": -2.04,
+        "y": 19.84
+      },
+      "nwt_mensrc": {
+        "x": 37.96,
+        "y": 19.84
+      },
+      "nwt_mla_b": {
+        "x": 52.52,
+        "y": 19.84
+      },
+      "nwt_mi1p": {
+        "x": 67.96,
+        "y": 19.84
+      },
+      "nwt_mi2p": {
+        "x": 75.96,
+        "y": 19.84
+      },
+      "pst1": {
+        "x": 4,
+        "y": -3.5
+      },
+      "pst2": {
+        "x": 18,
+        "y": -3.5
+      },
+      "pst3": {
+        "x": 32,
+        "y": -3.5
+      },
+      "pst4": {
+        "x": 58,
+        "y": -3.5
+      },
+      "pst5": {
+        "x": 74,
+        "y": -3.5
+      },
+      "rtop": {
+        "x": 100.0,
+        "y": 20.0
+      },
+      "rbot": {
+        "x": 100.0,
+        "y": 12.0
+      },
+      "rhys": {
+        "x": 6869.65,
+        "y": 4.0
+      },
+      "mhsw": {
+        "x": 6880.0,
+        "y": -5.0
+      },
+      "pst_far": {
+        "x": 6883.0,
+        "y": -13.0
+      },
+      "stub_vdd": {
+        "x": -6.0,
+        "y": 28.915
+      },
+      "stub_vss": {
+        "x": -6.0,
+        "y": -6.085
+      },
+      "stub_bias_ok": {
+        "x": -10.0,
+        "y": 7.415
+      },
+      "stub_ibias": {
+        "x": 16.545,
+        "y": -12.0
+      },
+      "stub_por_raw": {
+        "x": 88.0,
+        "y": 0.585
+      },
+      "stub_vref": {
+        "x": 55.245,
+        "y": 37.5
+      }
+    }
+  },
+  "routing": {
+    "layer_role": "metal",
+    "width_um": 0.17
+  },
+  "connectivity": [
+    {
+      "net": "BIAS_OKB",
+      "layer_role": "metal2",
+      "pins": [
+        {
+          "block": "menp",
+          "port": "U0_D"
+        },
+        {
+          "block": "menn",
+          "port": "U0_D"
+        },
+        {
+          "block": "mdnb",
+          "port": "U0_G"
+        },
+        {
+          "block": "mdib",
+          "port": "U0_G"
+        },
+        {
+          "block": "mensrc",
+          "port": "U0_G"
+        },
+        {
+          "block": "mdcmpo",
+          "port": "U0_G"
+        }
+      ],
+      "legs": [
+        {
+          "from_pin": {
+            "block": "menp",
+            "port": "U0_D"
+          },
+          "to_pin": {
+            "block": "menn",
+            "port": "U0_D"
+          },
+          "waypoints_um": [
+            [
+              1.79,
+              21.61
+            ],
+            [
+              1.79,
+              0.5
+            ]
+          ],
+          "layer_role": "metal"
+        },
+        {
+          "from_pin": {
+            "block": "mdnb",
+            "port": "U0_G"
+          },
+          "to_pin": {
+            "block": "menn",
+            "port": "U0_D"
+          },
+          "waypoints_um": [
+            [
+              8.67,
+              8.5
+            ],
+            [
+              1.63,
+              8.5
+            ],
+            [
+              1.63,
+              0.5
+            ]
+          ]
+        },
+        {
+          "from_pin": {
+            "block": "mdnb",
+            "port": "U0_G"
+          },
+          "to_pin": {
+            "block": "mdib",
+            "port": "U0_G"
+          },
+          "waypoints_um": [
+            [
+              8.67,
+              8.5
+            ],
+            [
+              28.92,
+              8.5
+            ]
+          ]
+        },
+        {
+          "from_pin": {
+            "block": "mdnb",
+            "port": "U0_G"
+          },
+          "to_pin": {
+            "block": "mensrc",
+            "port": "U0_G"
+          },
+          "waypoints_um": [
+            [
+              8.67,
+              8.5
+            ],
+            [
+              40.67,
+              8.5
+            ]
+          ]
+        },
+        {
+          "from_pin": {
+            "block": "mdnb",
+            "port": "U0_G"
+          },
+          "to_pin": {
+            "block": "mdcmpo",
+            "port": "U0_G"
+          },
+          "waypoints_um": [
+            [
+              8.67,
+              8.5
+            ],
+            [
+              64.92,
+              8.5
+            ]
+          ]
+        }
+      ]
+    },
+    {
+      "net": "BIAS_OK",
+      "layer_role": "metal5",
+      "width_um": 0.4,
+      "pins": [
+        {
+          "block": "menn",
+          "port": "U0_G"
+        },
+        {
+          "block": "menp",
+          "port": "U0_G"
+        },
+        {
+          "block": "stub_bias_ok",
+          "port": "CONN"
+        },
+        {
+          "block": "mpass",
+          "port": "U0_G"
+        }
+      ],
+      "legs": [
+        {
+          "from_pin": {
+            "block": "menn",
+            "port": "U0_G"
+          },
+          "to_pin": {
+            "block": "menp",
+            "port": "U0_G"
+          },
+          "layer_role": "metal"
+        },
+        {
+          "from_pin": {
+            "block": "menn",
+            "port": "U0_G"
+          },
+          "to_pin": {
+            "block": "stub_bias_ok",
+            "port": "CONN"
+          },
+          "waypoints_um": [
+            [
+              0.67,
+              7.5
+            ],
+            [
+              -8.5,
+              7.5
+            ]
+          ]
+        },
+        {
+          "from_pin": {
+            "block": "menn",
+            "port": "U0_G"
+          },
+          "to_pin": {
+            "block": "mpass",
+            "port": "U0_G"
+          },
+          "waypoints_um": [
+            [
+              0.67,
+              7.5
+            ],
+            [
+              22.67,
+              7.5
+            ]
+          ]
+        }
+      ]
+    },
+    {
+      "net": "NBG",
+      "layer_role": "metal3",
+      "pins": [
+        {
+          "block": "mbd",
+          "port": "U0_G"
+        },
+        {
+          "block": "mdnb",
+          "port": "U0_D"
+        },
+        {
+          "block": "mpass",
+          "port": "U0_S"
+        },
+        {
+          "block": "mtail",
+          "port": "U0_G"
+        }
+      ],
+      "legs": [
+        {
+          "from_pin": {
+            "block": "mbd",
+            "port": "U0_G"
+          },
+          "to_pin": {
+            "block": "mdnb",
+            "port": "U0_D"
+          },
+          "waypoints_um": [
+            [
+              15.42,
+              6.5
+            ],
+            [
+              9.63,
+              6.5
+            ],
+            [
+              9.63,
+              1.0
+            ]
+          ]
+        },
+        {
+          "from_pin": {
+            "block": "mbd",
+            "port": "U0_G"
+          },
+          "to_pin": {
+            "block": "mpass",
+            "port": "U0_S"
+          },
+          "waypoints_um": [
+            [
+              15.42,
+              6.5
+            ],
+            [
+              21.71,
+              6.5
+            ],
+            [
+              21.71,
+              1.0
+            ]
+          ]
+        },
+        {
+          "from_pin": {
+            "block": "mbd",
+            "port": "U0_G"
+          },
+          "to_pin": {
+            "block": "mtail",
+            "port": "U0_G"
+          },
+          "waypoints_um": [
+            [
+              15.42,
+              6.5
+            ],
+            [
+              41.42,
+              6.5
+            ]
+          ]
+        }
+      ]
+    },
+    {
+      "net": "IBIAS",
+      "layer_role": "metal4",
+      "width_um": 0.4,
+      "pins": [
+        {
+          "block": "mbd",
+          "port": "U0_D"
+        },
+        {
+          "block": "mpass",
+          "port": "U0_D"
+        },
+        {
+          "block": "mdib",
+          "port": "U0_D"
+        },
+        {
+          "block": "stub_ibias",
+          "port": "CONN"
+        }
+      ],
+      "legs": [
+        {
+          "from_pin": {
+            "block": "mbd",
+            "port": "U0_D"
+          },
+          "to_pin": {
+            "block": "mpass",
+            "port": "U0_D"
+          },
+          "waypoints_um": [
+            [
+              16.63,
+              5.5
+            ],
+            [
+              23.93,
+              5.5
+            ],
+            [
+              23.93,
+              1.0
+            ]
+          ]
+        },
+        {
+          "from_pin": {
+            "block": "mbd",
+            "port": "U0_D"
+          },
+          "to_pin": {
+            "block": "mdib",
+            "port": "U0_D"
+          },
+          "waypoints_um": [
+            [
+              16.63,
+              5.5
+            ],
+            [
+              30.43,
+              5.5
+            ],
+            [
+              30.43,
+              0.5
+            ]
+          ]
+        },
+        {
+          "from_pin": {
+            "block": "mbd",
+            "port": "U0_D"
+          },
+          "to_pin": {
+            "block": "stub_ibias",
+            "port": "CONN"
+          }
+        }
+      ]
+    },
+    {
+      "net": "TN",
+      "layer_role": "metal2",
+      "pins": [
+        {
+          "block": "mina_b",
+          "port": "U1_S"
+        },
+        {
+          "block": "mtail",
+          "port": "U0_D"
+        },
+        {
+          "block": "mina_b",
+          "port": "U0_S"
+        }
+      ],
+      "legs": [
+        {
+          "from_pin": {
+            "block": "mina_b",
+            "port": "U1_S"
+          },
+          "to_pin": {
+            "block": "mtail",
+            "port": "U0_D"
+          },
+          "waypoints_um": [
+            [
+              54.45,
+              4.5
+            ],
+            [
+              47.13,
+              4.5
+            ],
+            [
+              47.13,
+              0.5
+            ]
+          ]
+        },
+        {
+          "from_pin": {
+            "block": "mina_b",
+            "port": "U1_S"
+          },
+          "to_pin": {
+            "block": "mina_b",
+            "port": "U0_S"
+          },
+          "waypoints_um": [
+            [
+              54.45,
+              4.5
+            ],
+            [
+              51.71,
+              4.5
+            ],
+            [
+              51.71,
+              1.0
+            ]
+          ]
+        }
+      ]
+    },
+    {
+      "net": "NA",
+      "layer_role": "metal5",
+      "width_um": 0.4,
+      "pins": [
+        {
+          "block": "mina_b",
+          "port": "U0_D"
+        },
+        {
+          "block": "mla_b",
+          "port": "U0_D"
+        },
+        {
+          "block": "mla_b",
+          "port": "U0_G"
+        },
+        {
+          "block": "mla_b",
+          "port": "U1_G"
+        }
+      ],
+      "legs": [
+        {
+          "from_pin": {
+            "block": "mina_b",
+            "port": "U0_D"
+          },
+          "to_pin": {
+            "block": "mla_b",
+            "port": "U0_D"
+          },
+          "waypoints_um": [
+            [
+              53.63,
+              12
+            ],
+            [
+              48.4,
+              12
+            ],
+            [
+              48.4,
+              22.61
+            ]
+          ]
+        },
+        {
+          "from_pin": {
+            "block": "mina_b",
+            "port": "U0_D"
+          },
+          "to_pin": {
+            "block": "mla_b",
+            "port": "U0_G"
+          },
+          "waypoints_um": [
+            [
+              53.63,
+              12
+            ],
+            [
+              46.92,
+              12
+            ]
+          ]
+        },
+        {
+          "from_pin": {
+            "block": "mina_b",
+            "port": "U0_D"
+          },
+          "to_pin": {
+            "block": "mla_b",
+            "port": "U1_G"
+          },
+          "waypoints_um": [
+            [
+              53.63,
+              12
+            ],
+            [
+              49.16,
+              12
+            ]
+          ]
+        }
+      ]
+    },
+    {
+      "net": "CMPO",
+      "layer_role": "metal3",
+      "pins": [
+        {
+          "block": "mi1p",
+          "port": "U0_G"
+        },
+        {
+          "block": "mi1n",
+          "port": "U0_G"
+        },
+        {
+          "block": "mina_b",
+          "port": "U1_D"
+        },
+        {
+          "block": "mla_b",
+          "port": "U1_D"
+        },
+        {
+          "block": "mdcmpo",
+          "port": "U0_D"
+        }
+      ],
+      "legs": [
+        {
+          "from_pin": {
+            "block": "mi1p",
+            "port": "U0_G"
+          },
+          "to_pin": {
+            "block": "mi1n",
+            "port": "U0_G"
+          },
+          "layer_role": "metal"
+        },
+        {
+          "from_pin": {
+            "block": "mina_b",
+            "port": "U1_D"
+          },
+          "to_pin": {
+            "block": "mla_b",
+            "port": "U1_D"
+          },
+          "waypoints_um": [
+            [
+              55.87,
+              10
+            ],
+            [
+              50.37,
+              10
+            ],
+            [
+              50.37,
+              22.61
+            ]
+          ]
+        },
+        {
+          "from_pin": {
+            "block": "mina_b",
+            "port": "U1_D"
+          },
+          "to_pin": {
+            "block": "mdcmpo",
+            "port": "U0_D"
+          },
+          "waypoints_um": [
+            [
+              55.87,
+              10
+            ],
+            [
+              66.13,
+              10
+            ],
+            [
+              66.13,
+              1.0
+            ]
+          ]
+        },
+        {
+          "from_pin": {
+            "block": "mina_b",
+            "port": "U1_D"
+          },
+          "to_pin": {
+            "block": "mi1n",
+            "port": "U0_G"
+          },
+          "waypoints_um": [
+            [
+              55.87,
+              10
+            ],
+            [
+              70.67,
+              10
+            ]
+          ]
+        }
+      ]
+    },
+    {
+      "net": "VDDA",
+      "layer_role": "metal2",
+      "pins": [
+        {
+          "block": "mla_b",
+          "port": "U1_S"
+        },
+        {
+          "block": "mensrc",
+          "port": "U0_D"
+        },
+        {
+          "block": "mla_b",
+          "port": "U0_S"
+        }
+      ],
+      "legs": [
+        {
+          "from_pin": {
+            "block": "mla_b",
+            "port": "U1_S"
+          },
+          "to_pin": {
+            "block": "mensrc",
+            "port": "U0_D"
+          },
+          "waypoints_um": [
+            [
+              48.45,
+              17.5
+            ],
+            [
+              41.69,
+              17.5
+            ],
+            [
+              41.69,
+              22.61
+            ]
+          ]
+        },
+        {
+          "from_pin": {
+            "block": "mla_b",
+            "port": "U1_S"
+          },
+          "to_pin": {
+            "block": "mla_b",
+            "port": "U0_S"
+          },
+          "waypoints_um": [
+            [
+              48.45,
+              17.5
+            ],
+            [
+              45.71,
+              17.5
+            ],
+            [
+              45.71,
+              22.61
+            ]
+          ]
+        }
+      ]
+    },
+    {
+      "net": "SNS",
+      "layer_role": "metal4",
+      "width_um": 0.4,
+      "pins": [
+        {
+          "block": "mina_b",
+          "port": "U0_G"
+        },
+        {
+          "block": "rtop",
+          "port": "R0_A"
+        },
+        {
+          "block": "rbot",
+          "port": "R0_A"
+        }
+      ],
+      "legs": [
+        {
+          "from_pin": {
+            "block": "mina_b",
+            "port": "U0_G"
+          },
+          "to_pin": {
+            "block": "rtop",
+            "port": "R0_A"
+          },
+          "waypoints_um": [
+            [
+              52.92,
+              15.0
+            ],
+            [
+              99.01,
+              15.0
+            ],
+            [
+              99.01,
+              21.0
+            ]
+          ]
+        },
+        {
+          "from_pin": {
+            "block": "rbot",
+            "port": "R0_A"
+          },
+          "to_pin": {
+            "block": "rtop",
+            "port": "R0_A"
+          },
+          "waypoints_um": [
+            [
+              99.01,
+              13.0
+            ],
+            [
+              99.01,
+              21.0
+            ]
+          ],
+          "layer_role": "metal"
+        }
+      ]
+    },
+    {
+      "net": "VREF",
+      "layer_role": "metal5",
+      "width_um": 0.4,
+      "pins": [
+        {
+          "block": "mina_b",
+          "port": "U1_G"
+        },
+        {
+          "block": "stub_vref",
+          "port": "CONN"
+        }
+      ],
+      "legs": [
+        {
+          "from_pin": {
+            "block": "mina_b",
+            "port": "U1_G"
+          },
+          "to_pin": {
+            "block": "stub_vref",
+            "port": "CONN"
+          }
+        }
+      ]
+    },
+    {
+      "net": "N1",
+      "layer_role": "metal2",
+      "pins": [
+        {
+          "block": "mi1p",
+          "port": "U0_D"
+        },
+        {
+          "block": "mi1n",
+          "port": "U0_D"
+        },
+        {
+          "block": "mi2p",
+          "port": "U0_G"
+        },
+        {
+          "block": "mi2n",
+          "port": "U0_G"
+        },
+        {
+          "block": "mhsw",
+          "port": "U0_G"
+        }
+      ],
+      "legs": [
+        {
+          "from_pin": {
+            "block": "mi1p",
+            "port": "U0_D"
+          },
+          "to_pin": {
+            "block": "mi1n",
+            "port": "U0_D"
+          },
+          "waypoints_um": [
+            [
+              71.79,
+              21.61
+            ],
+            [
+              71.79,
+              0.5
+            ]
+          ],
+          "layer_role": "metal"
+        },
+        {
+          "from_pin": {
+            "block": "mi2p",
+            "port": "U0_G"
+          },
+          "to_pin": {
+            "block": "mi2n",
+            "port": "U0_G"
+          },
+          "layer_role": "metal"
+        },
+        {
+          "from_pin": {
+            "block": "mi1n",
+            "port": "U0_D"
+          },
+          "to_pin": {
+            "block": "mi2n",
+            "port": "U0_G"
+          },
+          "waypoints_um": [
+            [
+              71.13,
+              14.0
+            ],
+            [
+              78.67,
+              14.0
+            ]
+          ]
+        },
+        {
+          "from_pin": {
+            "block": "mi2n",
+            "port": "U0_G"
+          },
+          "to_pin": {
+            "block": "mhsw",
+            "port": "U0_G"
+          },
+          "waypoints_um": [
+            [
+              78.67,
+              -24.0
+            ],
+            [
+              6879.33,
+              -24.0
+            ]
+          ]
+        }
+      ]
+    },
+    {
+      "net": "SNSB",
+      "layer_role": "metal",
+      "pins": [
+        {
+          "block": "rbot",
+          "port": "R0_B"
+        },
+        {
+          "block": "rhys",
+          "port": "R0_A"
+        },
+        {
+          "block": "mhsw",
+          "port": "U0_D"
+        }
+      ],
+      "legs": [
+        {
+          "from_pin": {
+            "block": "rbot",
+            "port": "R0_B"
+          },
+          "to_pin": {
+            "block": "rhys",
+            "port": "R0_A"
+          },
+          "waypoints_um": [
+            [
+              6870.41,
+              13.0
+            ],
+            [
+              6870.41,
+              8.0
+            ],
+            [
+              6869.16,
+              8.0
+            ],
+            [
+              6869.16,
+              5.0
+            ]
+          ]
+        },
+        {
+          "from_pin": {
+            "block": "rhys",
+            "port": "R0_A"
+          },
+          "to_pin": {
+            "block": "mhsw",
+            "port": "U0_D"
+          },
+          "waypoints_um": [
+            [
+              6869.16,
+              5.0
+            ],
+            [
+              6869.16,
+              -10.0
+            ]
+          ]
+        }
+      ]
+    },
+    {
+      "net": "POR_RAW",
+      "layer_role": "metal",
+      "pins": [
+        {
+          "block": "mi2p",
+          "port": "U0_D"
+        },
+        {
+          "block": "mi2n",
+          "port": "U0_D"
+        },
+        {
+          "block": "stub_por_raw",
+          "port": "CONN"
+        }
+      ],
+      "legs": [
+        {
+          "from_pin": {
+            "block": "mi2p",
+            "port": "U0_D"
+          },
+          "to_pin": {
+            "block": "mi2n",
+            "port": "U0_D"
+          },
+          "waypoints_um": [
+            [
+              79.79,
+              21.61
+            ],
+            [
+              79.79,
+              0.5
+            ]
+          ]
+        },
+        {
+          "from_pin": {
+            "block": "mi2n",
+            "port": "U0_D"
+          },
+          "to_pin": {
+            "block": "stub_por_raw",
+            "port": "CONN"
+          }
+        }
+      ]
+    },
+    {
+      "net": "VDD",
+      "layer_role": "metal2",
+      "pins": [
+        {
+          "block": "stub_vdd",
+          "port": "CONN"
+        },
+        {
+          "block": "nwt_menp",
+          "port": "TAP_N"
+        },
+        {
+          "block": "menp",
+          "port": "U0_S"
+        },
+        {
+          "block": "nwt_mensrc",
+          "port": "TAP_N"
+        },
+        {
+          "block": "mensrc",
+          "port": "U0_S"
+        },
+        {
+          "block": "nwt_mla_b",
+          "port": "TAP_N"
+        },
+        {
+          "block": "nwt_mi1p",
+          "port": "TAP_N"
+        },
+        {
+          "block": "mi1p",
+          "port": "U0_S"
+        },
+        {
+          "block": "nwt_mi2p",
+          "port": "TAP_N"
+        },
+        {
+          "block": "mi2p",
+          "port": "U0_S"
+        },
+        {
+          "block": "rtop",
+          "port": "R0_B"
+        }
+      ],
+      "legs": [
+        {
+          "from_pin": {
+            "block": "stub_vdd",
+            "port": "CONN"
+          },
+          "to_pin": {
+            "block": "nwt_menp",
+            "port": "TAP_N"
+          },
+          "waypoints_um": [
+            [
+              -4.5,
+              29.0
+            ],
+            [
+              -1.12,
+              29.0
+            ]
+          ]
+        },
+        {
+          "from_pin": {
+            "block": "nwt_menp",
+            "port": "TAP_N"
+          },
+          "to_pin": {
+            "block": "menp",
+            "port": "U0_S"
+          },
+          "waypoints_um": [
+            [
+              -1.12,
+              29.0
+            ],
+            [
+              0.21,
+              29.0
+            ]
+          ]
+        },
+        {
+          "from_pin": {
+            "block": "menp",
+            "port": "U0_S"
+          },
+          "to_pin": {
+            "block": "nwt_mensrc",
+            "port": "TAP_N"
+          },
+          "waypoints_um": [
+            [
+              0.21,
+              29.0
+            ],
+            [
+              38.88,
+              29.0
+            ]
+          ]
+        },
+        {
+          "from_pin": {
+            "block": "nwt_mensrc",
+            "port": "TAP_N"
+          },
+          "to_pin": {
+            "block": "mensrc",
+            "port": "U0_S"
+          },
+          "waypoints_um": [
+            [
+              38.88,
+              29.0
+            ],
+            [
+              40.21,
+              29.0
+            ]
+          ]
+        },
+        {
+          "from_pin": {
+            "block": "mensrc",
+            "port": "U0_S"
+          },
+          "to_pin": {
+            "block": "nwt_mla_b",
+            "port": "TAP_N"
+          },
+          "waypoints_um": [
+            [
+              40.21,
+              29.0
+            ],
+            [
+              53.44,
+              29.0
+            ]
+          ]
+        },
+        {
+          "from_pin": {
+            "block": "nwt_mla_b",
+            "port": "TAP_N"
+          },
+          "to_pin": {
+            "block": "nwt_mi1p",
+            "port": "TAP_N"
+          },
+          "waypoints_um": [
+            [
+              53.44,
+              29.0
+            ],
+            [
+              68.88,
+              29.0
+            ]
+          ]
+        },
+        {
+          "from_pin": {
+            "block": "nwt_mi1p",
+            "port": "TAP_N"
+          },
+          "to_pin": {
+            "block": "mi1p",
+            "port": "U0_S"
+          },
+          "waypoints_um": [
+            [
+              68.88,
+              29.0
+            ],
+            [
+              70.21,
+              29.0
+            ]
+          ]
+        },
+        {
+          "from_pin": {
+            "block": "mi1p",
+            "port": "U0_S"
+          },
+          "to_pin": {
+            "block": "nwt_mi2p",
+            "port": "TAP_N"
+          },
+          "waypoints_um": [
+            [
+              70.21,
+              29.0
+            ],
+            [
+              76.88,
+              29.0
+            ]
+          ]
+        },
+        {
+          "from_pin": {
+            "block": "nwt_mi2p",
+            "port": "TAP_N"
+          },
+          "to_pin": {
+            "block": "mi2p",
+            "port": "U0_S"
+          },
+          "waypoints_um": [
+            [
+              76.88,
+              29.0
+            ],
+            [
+              78.21,
+              29.0
+            ]
+          ]
+        },
+        {
+          "from_pin": {
+            "block": "mi2p",
+            "port": "U0_S"
+          },
+          "to_pin": {
+            "block": "rtop",
+            "port": "R0_B"
+          },
+          "waypoints_um": [
+            [
+              78.21,
+              29.0
+            ],
+            [
+              7998.07,
+              29.0
+            ]
+          ]
+        }
+      ]
+    },
+    {
+      "net": "VSS",
+      "layer_role": "metal2",
+      "pins": [
+        {
+          "block": "stub_vss",
+          "port": "CONN"
+        },
+        {
+          "block": "menn",
+          "port": "U0_S"
+        },
+        {
+          "block": "pst1",
+          "port": "TAP_S"
+        },
+        {
+          "block": "mdnb",
+          "port": "U0_S"
+        },
+        {
+          "block": "mbd",
+          "port": "U0_S"
+        },
+        {
+          "block": "pst2",
+          "port": "TAP_S"
+        },
+        {
+          "block": "mdib",
+          "port": "U0_S"
+        },
+        {
+          "block": "pst3",
+          "port": "TAP_S"
+        },
+        {
+          "block": "mtail",
+          "port": "U0_S"
+        },
+        {
+          "block": "pst4",
+          "port": "TAP_S"
+        },
+        {
+          "block": "mdcmpo",
+          "port": "U0_S"
+        },
+        {
+          "block": "mi1n",
+          "port": "U0_S"
+        },
+        {
+          "block": "pst5",
+          "port": "TAP_S"
+        },
+        {
+          "block": "mi2n",
+          "port": "U0_S"
+        },
+        {
+          "block": "mhsw",
+          "port": "U0_S"
+        },
+        {
+          "block": "pst_far",
+          "port": "TAP_S"
+        },
+        {
+          "block": "rhys",
+          "port": "R0_B"
+        }
+      ],
+      "legs": [
+        {
+          "from_pin": {
+            "block": "stub_vss",
+            "port": "CONN"
+          },
+          "to_pin": {
+            "block": "menn",
+            "port": "U0_S"
+          },
+          "waypoints_um": [
+            [
+              -4.5,
+              -6.0
+            ],
+            [
+              0.21,
+              -6.0
+            ]
+          ]
+        },
+        {
+          "from_pin": {
+            "block": "menn",
+            "port": "U0_S"
+          },
+          "to_pin": {
+            "block": "pst1",
+            "port": "TAP_S"
+          },
+          "waypoints_um": [
+            [
+              0.21,
+              -6.0
+            ],
+            [
+              4.92,
+              -6.0
+            ]
+          ]
+        },
+        {
+          "from_pin": {
+            "block": "pst1",
+            "port": "TAP_S"
+          },
+          "to_pin": {
+            "block": "mdnb",
+            "port": "U0_S"
+          },
+          "waypoints_um": [
+            [
+              4.92,
+              -6.0
+            ],
+            [
+              8.21,
+              -6.0
+            ]
+          ]
+        },
+        {
+          "from_pin": {
+            "block": "mdnb",
+            "port": "U0_S"
+          },
+          "to_pin": {
+            "block": "mbd",
+            "port": "U0_S"
+          },
+          "waypoints_um": [
+            [
+              8.21,
+              -6.0
+            ],
+            [
+              14.21,
+              -6.0
+            ]
+          ]
+        },
+        {
+          "from_pin": {
+            "block": "mbd",
+            "port": "U0_S"
+          },
+          "to_pin": {
+            "block": "pst2",
+            "port": "TAP_S"
+          },
+          "waypoints_um": [
+            [
+              14.21,
+              -6.0
+            ],
+            [
+              18.92,
+              -6.0
+            ]
+          ]
+        },
+        {
+          "from_pin": {
+            "block": "pst2",
+            "port": "TAP_S"
+          },
+          "to_pin": {
+            "block": "mdib",
+            "port": "U0_S"
+          },
+          "waypoints_um": [
+            [
+              18.92,
+              -6.0
+            ],
+            [
+              28.21,
+              -6.0
+            ]
+          ]
+        },
+        {
+          "from_pin": {
+            "block": "mdib",
+            "port": "U0_S"
+          },
+          "to_pin": {
+            "block": "pst3",
+            "port": "TAP_S"
+          },
+          "waypoints_um": [
+            [
+              28.21,
+              -6.0
+            ],
+            [
+              32.92,
+              -6.0
+            ]
+          ]
+        },
+        {
+          "from_pin": {
+            "block": "pst3",
+            "port": "TAP_S"
+          },
+          "to_pin": {
+            "block": "mtail",
+            "port": "U0_S"
+          },
+          "waypoints_um": [
+            [
+              32.92,
+              -6.0
+            ],
+            [
+              36.21,
+              -6.0
+            ]
+          ]
+        },
+        {
+          "from_pin": {
+            "block": "mtail",
+            "port": "U0_S"
+          },
+          "to_pin": {
+            "block": "pst4",
+            "port": "TAP_S"
+          },
+          "waypoints_um": [
+            [
+              36.21,
+              -6.0
+            ],
+            [
+              58.92,
+              -6.0
+            ]
+          ]
+        },
+        {
+          "from_pin": {
+            "block": "pst4",
+            "port": "TAP_S"
+          },
+          "to_pin": {
+            "block": "mdcmpo",
+            "port": "U0_S"
+          },
+          "waypoints_um": [
+            [
+              58.92,
+              -6.0
+            ],
+            [
+              64.21,
+              -6.0
+            ]
+          ]
+        },
+        {
+          "from_pin": {
+            "block": "mdcmpo",
+            "port": "U0_S"
+          },
+          "to_pin": {
+            "block": "mi1n",
+            "port": "U0_S"
+          },
+          "waypoints_um": [
+            [
+              64.21,
+              -6.0
+            ],
+            [
+              70.21,
+              -6.0
+            ]
+          ]
+        },
+        {
+          "from_pin": {
+            "block": "mi1n",
+            "port": "U0_S"
+          },
+          "to_pin": {
+            "block": "pst5",
+            "port": "TAP_S"
+          },
+          "waypoints_um": [
+            [
+              70.21,
+              -6.0
+            ],
+            [
+              74.92,
+              -6.0
+            ]
+          ]
+        },
+        {
+          "from_pin": {
+            "block": "pst5",
+            "port": "TAP_S"
+          },
+          "to_pin": {
+            "block": "mi2n",
+            "port": "U0_S"
+          },
+          "waypoints_um": [
+            [
+              74.92,
+              -6.0
+            ],
+            [
+              78.21,
+              -6.0
+            ]
+          ]
+        },
+        {
+          "from_pin": {
+            "block": "mi2n",
+            "port": "U0_S"
+          },
+          "to_pin": {
+            "block": "mhsw",
+            "port": "U0_S"
+          },
+          "waypoints_um": [
+            [
+              78.21,
+              -28.0
+            ],
+            [
+              6879.79,
+              -28.0
+            ]
+          ]
+        },
+        {
+          "from_pin": {
+            "block": "mhsw",
+            "port": "U0_S"
+          },
+          "to_pin": {
+            "block": "pst_far",
+            "port": "TAP_S"
+          },
+          "waypoints_um": [
+            [
+              6879.79,
+              -28.0
+            ],
+            [
+              6883.92,
+              -28.0
+            ]
+          ]
+        },
+        {
+          "from_pin": {
+            "block": "pst_far",
+            "port": "TAP_S"
+          },
+          "to_pin": {
+            "block": "rhys",
+            "port": "R0_B"
+          },
+          "waypoints_um": [
+            [
+              6883.92,
+              -28.0
+            ],
+            [
+              7645.28,
+              -28.0
+            ]
+          ]
+        }
+      ]
+    }
+  ],
+  "pins": [
+    {
+      "net": "VDD",
+      "block": "stub_vdd",
+      "port": "PAD"
+    },
+    {
+      "net": "VSS",
+      "block": "stub_vss",
+      "port": "PAD"
+    },
+    {
+      "net": "IBIAS",
+      "block": "stub_ibias",
+      "port": "PAD"
+    },
+    {
+      "net": "VREF",
+      "block": "stub_vref",
+      "port": "PAD"
+    },
+    {
+      "net": "BIAS_OK",
+      "block": "stub_bias_ok",
+      "port": "PAD"
+    },
+    {
+      "net": "POR_RAW",
+      "block": "stub_por_raw",
+      "port": "PAD"
+    }
+  ],
+  "lvs": {
+    "reference": "design/netlist/por_comparator.spice",
+    "subckt": "por_comparator",
+    "options": {
+      "compare_parameters": {
+        "res_xhigh_po": [
+          "L",
+          "W"
+        ]
+      }
+    }
+  }
+}
