@@ -7,13 +7,18 @@ every grid point and by its ``selftest`` on synthetic constant / drifting
 currents.  Nothing here is a spec limit: every threshold comes from
 experiment.json ``measurement`` and is an exploratory measurement definition.
 
-Statuses: ok | non-physical-branch | unsettled | nonconverged.
+Statuses: ok | non-physical-branch | unsettled | nonconverged.  Structurally or
+numerically invalid input (NaN/inf, unequal columns, non-increasing time) is
+reported as ``nonconverged`` with ``invalid_input: True`` and a ``reason``; it
+can never be graded ``ok``.
 """
 
 from __future__ import annotations
 
 import gzip
 import json
+import math
+import sys
 from pathlib import Path
 
 SUBCELLS = {
@@ -30,12 +35,40 @@ def load_wave(path: Path) -> dict[str, list[float]]:
     opener = gzip.open if str(path).endswith(".gz") else open
     with opener(path, "rt") as fh:
         doc = json.load(fh)
-    names = [v["name"].lower() for v in doc["variables"]]
+    try:
+        names = [v["name"].lower() for v in doc["variables"]]
+        rows = doc["points"]
+    except (KeyError, TypeError, AttributeError) as e:
+        raise ValueError(f"malformed waveform document: {e!r}") from e
+    if not names or not isinstance(rows, list):
+        raise ValueError("malformed waveform document: no variables or points not a list")
     cols: dict[str, list[float]] = {n: [] for n in names}
-    for row in doc["points"]:
+    for i, row in enumerate(rows):
+        if not isinstance(row, (list, tuple)) or len(row) != len(names):
+            raise ValueError(f"malformed waveform row {i}: expected {len(names)} values, got {len(row) if isinstance(row, (list, tuple)) else type(row).__name__}")
         for n, x in zip(names, row):
-            cols[n].append(float(x))
+            try:
+                cols[n].append(float(x))
+            except (TypeError, ValueError) as e:
+                raise ValueError(f"malformed waveform row {i}: non-numeric value {x!r} for {n}") from e
     return cols
+
+
+def validate_wave(wave: dict) -> str | None:
+    """Return a reason string if the waveform is structurally/numerically invalid, else None."""
+    t = wave.get("time")
+    if not isinstance(t, (list, tuple)):
+        return "invalid input: no time vector"
+    for name, y in wave.items():
+        if not isinstance(y, (list, tuple)) or len(y) != len(t):
+            return f"invalid input: column {name} has {len(y) if isinstance(y, (list, tuple)) else 'non-list'} samples, time has {len(t)}"
+        for k, x in enumerate(y):
+            if isinstance(x, bool) or not isinstance(x, (int, float)) or not math.isfinite(x):
+                return f"invalid input: non-finite or non-numeric sample {x!r} in {name} at index {k}"
+    for k in range(len(t) - 1):
+        if not t[k + 1] > t[k]:
+            return f"invalid input: time not strictly increasing at index {k + 1} ({t[k]!r} -> {t[k + 1]!r})"
+    return None
 
 
 def window(t, y, lo, hi):
@@ -62,6 +95,9 @@ def wstats(t, y, w):
 def grade(wave: dict[str, list[float]], state: str, vf: float, cfg: dict) -> dict:
     """Grade one point's waveform.  Returns a dict with ``status`` and the evidence."""
     m = cfg["measurement"]
+    bad_input = validate_wave(wave)
+    if bad_input:
+        return {"status": "nonconverged", "invalid_input": True, "reason": bad_input}
     t = wave.get("time", [])
     need = [TOTAL_VEC, "v(vdd)", "v(resetn)", *SUBCELLS.values()] + ([FORCE_VEC] if state == "por-iq" else [])
     missing = [n for n in need if n not in wave]
@@ -171,7 +207,81 @@ def selftest_cases(cfg: dict):
     short = synth("iq-total")
     cut = {k: v[:1500] for k, v in short.items()}
     cases.append(("ended_before_trailing_window", cut, "iq-total", 3.3, "nonconverged"))
-    return cases
+    return cases + invalid_cases()
+
+
+def _with(w, key, idx, val):
+    w = {k: list(v) for k, v in w.items()}
+    w[key][idx] = val
+    return w
+
+
+def invalid_cases():
+    """Malformed / non-finite waveforms: must never grade ``ok``."""
+    nan, inf = float("nan"), float("inf")
+    base = synth("iq-total")
+    n = len(base["time"])
+    c = []
+    allnan = {k: list(v) for k, v in base.items()}
+    allnan["i(bvdd)"] = [nan] * n
+    c.append(("invalid_nan_all_current", allnan, "iq-total", 3.3, "nonconverged"))
+    c.append(("invalid_nan_one_current", _with(base, "i(bvdd)", n - 5, nan), "iq-total", 3.3, "nonconverged"))
+    c.append(("invalid_inf_current", _with(base, "i(bvdd)", n - 5, inf), "iq-total", 3.3, "nonconverged"))
+    c.append(("invalid_nan_voltage", _with(base, "v(vdd)", n - 5, nan), "iq-total", 3.3, "nonconverged"))
+    c.append(("invalid_inf_voltage", _with(base, "v(resetn)", n - 5, -inf), "iq-total", 3.3, "nonconverged"))
+    c.append(("invalid_nan_time", _with(base, "time", n // 2, nan), "iq-total", 3.3, "nonconverged"))
+    c.append(("invalid_inf_time", _with(base, "time", n - 1, inf), "iq-total", 3.3, "nonconverged"))
+    short = {k: list(v) for k, v in base.items()}
+    short["i(bvdd)"] = short["i(bvdd)"][:-1]
+    c.append(("invalid_unequal_columns", short, "iq-total", 3.3, "nonconverged"))
+    c.append(("invalid_duplicate_time", _with(base, "time", n // 2, base["time"][n // 2 - 1]), "iq-total", 3.3, "nonconverged"))
+    rev = _with(base, "time", n // 2, base["time"][n // 2 - 1] - 1e-6)
+    c.append(("invalid_reversed_time", rev, "iq-total", 3.3, "nonconverged"))
+    return c
+
+
+def irregular_wave(state="iq-total"):
+    """Valid non-uniform grid (dense then sparse); constant current, so mean is exact."""
+    w = synth(state, n=3001)
+    keep = sorted(set(list(range(0, 3001, 7)) + list(range(2000, 3001, 1)) + [3000]))
+    return {k: [v[i] for i in keep] for k, v in w.items()}
+
+
+def weighted_wave(cfg: dict, state="iq-total", vf=3.3, i0=20e-6, a=0.012):
+    """Non-constant current on a non-uniform grid with an exactly known time-weighted mean.
+
+    Grid: 10 us spacing everywhere, plus 0.5 us spacing in [25.0, 27.5] ms (dense where the
+    current ramps).  Current: I0 up to 25.0 ms, a linear ramp to I0*(1+a) at 27.5 ms, then
+    constant to 30 ms.  Both breakpoints are grid points and the window edges are hit exactly,
+    so the trapezoid integral over the trailing window [25, 30] ms is exact:
+        mean = I0 * (1 + a * (0.5*0.5 + 0.5)) = I0 * (1 + 0.75*a).
+    The dense ramp samples pull a plain arithmetic mean of the window samples well below that
+    (~I0*(1 + 0.53*a)), so the fixture discriminates time weighting from sample averaging.
+    Returns (wave, exact_trailing_mean_a, arithmetic_trailing_mean_a).
+    """
+    tw = cfg["measurement"]["trail_window_s"]
+    # integer grid in units of 0.5 us; k / 2e6 is the correctly rounded value, so it equals the
+    # float literals 0.025 / 0.0275 / 0.03 used for the window edges exactly
+    k0, k1, kend = round(tw[0] * 2e6), round((tw[0] + tw[1]) / 2 * 2e6), round(tw[1] * 2e6)
+    ks = sorted(set(range(0, kend + 1, 20)) | set(range(k0, k1 + 1)))
+    t = [k / 2e6 for k in ks]
+    assert t[0] == 0.0 and tw[0] in t and tw[1] == t[-1]
+
+    def shape(k):
+        return 1.0 if k <= k0 else (1.0 + a * (k - k0) / (k1 - k0) if k <= k1 else 1.0 + a)
+
+    n = len(t)
+    fr = {"bias_core": 0.1, "por_comparator": 0.2, "por_output_chain": 0.3, "temp_core": 0.4 if state == "iq-total" else 0.0}
+    tot = sum(fr.values())
+    w = {"time": t, "v(vdd)": [vf] * n, "v(ptat)": [1.4] * n, "v(ctat)": [0.6] * n,
+         "v(resetn)": [(vf if state == "iq-total" else 0.0)] * n, "i(bvdd)": [-i0 * shape(k) for k in ks]}
+    for name, vec in SUBCELLS.items():
+        w[vec] = [i0 * fr[name] / tot * shape(k) for k in ks]
+    if state == "por-iq":
+        w["i(vrst)"] = [0.0] * n
+    exact = i0 * (1 + 0.75 * a)
+    _, yy = window(t, [-x for x in w["i(bvdd)"]], tw[0], tw[1])
+    return w, exact, sum(yy) / len(yy)
 
 
 def run_selftest(cfg: dict, fixture_dir: Path | None = None):
@@ -186,3 +296,77 @@ def run_selftest(cfg: dict, fixture_dir: Path | None = None):
             doc = {"variables": [{"name": n} for n in names], "points": [[wave[n][i] for n in names] for i in range(0, len(wave["time"]), 10)]}
             (fixture_dir / f"{name}.wave.json").write_text(json.dumps(doc) + "\n")
     return rows
+
+
+def selftest_load_wave_cases() -> list[tuple[str, bool]]:
+    """load_wave must reject malformed documents (ValueError) and accept a valid one."""
+    import tempfile
+
+    docs = {
+        "ragged_row_short": {"variables": [{"name": "time"}, {"name": "v(a)"}], "points": [[0, 1], [1]]},
+        "ragged_row_long": {"variables": [{"name": "time"}, {"name": "v(a)"}], "points": [[0, 1], [1, 2, 3]]},
+        "row_not_list": {"variables": [{"name": "time"}], "points": [5]},
+        "non_numeric": {"variables": [{"name": "time"}], "points": [["abc"]]},
+        "missing_points": {"variables": [{"name": "time"}]},
+    }
+    res = []
+    with tempfile.TemporaryDirectory() as td:
+        for name, doc in docs.items():
+            p = Path(td) / f"{name}.json"
+            p.write_text(json.dumps(doc))
+            try:
+                load_wave(p)
+                res.append((f"load_wave_rejects_{name}", False))
+            except ValueError:
+                res.append((f"load_wave_rejects_{name}", True))
+        good = Path(td) / "good.json"
+        good.write_text(json.dumps({"variables": [{"name": "Time"}, {"name": "V(a)"}], "points": [[0, 1], [1, 2]]}))
+        res.append(("load_wave_accepts_valid", load_wave(good) == {"time": [0.0, 1.0], "v(a)": [1.0, 2.0]}))
+    return res
+
+
+def main() -> int:
+    """Stdlib CI selftest: no simulation, no records written."""
+    cfg = json.loads((Path(__file__).resolve().parent / "experiment.json").read_text())
+    fails = []
+    for r in run_selftest(cfg):
+        print(f"{'PASS' if r['ok'] else 'FAIL'} {r['case']}: expected {r['expected']}, got {r['got']}")
+        if not r["ok"]:
+            fails.append(r["case"])
+    for name, wave, state, vf, _ in invalid_cases():
+        g = grade(wave, state, vf, cfg)
+        if g["status"] == "ok" or not g.get("invalid_input") or not g.get("reason"):
+            fails.append(name + ":invalid-not-flagged")
+    w = irregular_wave()
+    g = grade(w, "iq-total", 3.3, cfg)
+    ref = grade(synth("iq-total"), "iq-total", 3.3, cfg)
+    good = g["status"] == "ok" and not g.get("invalid_input") and abs(g["i_total_a"] - ref["i_total_a"]) <= 1e-12 * abs(ref["i_total_a"])
+    print(f"{'PASS' if good else 'FAIL'} irregular_sampling_time_weighted: {g['status']} i={g.get('i_total_a')} ref={ref['i_total_a']}")
+    if not good:
+        fails.append("irregular_sampling")
+    # non-constant current on a non-uniform grid: must equal the exact trapezoid mean, which is
+    # chosen to differ from the arithmetic sample mean (otherwise the check is not discriminating)
+    ww, exact, arith = weighted_wave(cfg)
+    gw = grade(ww, "iq-total", 3.3, cfg)
+    discriminating = abs(exact - arith) > 1e-3 * abs(exact)
+    good = (gw["status"] == "ok" and not gw.get("invalid_input") and discriminating
+            and abs(gw["i_total_a"] - exact) <= 1e-9 * abs(exact) and abs(gw["i_total_a"] - arith) > 1e-3 * abs(exact))
+    print(f"{'PASS' if good else 'FAIL'} irregular_nonconstant_time_weighted: {gw['status']} i={gw.get('i_total_a')} exact={exact} arith_mean={arith}")
+    if not good:
+        fails.append("irregular_nonconstant_time_weighted")
+    # drifting irregular grid: time-weighting must still detect the drift
+    wd = synth("iq-total", drift=0.5)
+    keep = sorted(set(list(range(0, 3001, 7)) + list(range(2000, 3001)) + [3000]))
+    gd = grade({k: [v[i] for i in keep] for k, v in wd.items()}, "iq-total", 3.3, cfg)
+    if gd["status"] != "unsettled":
+        fails.append("irregular_drift")
+    for name, ok in selftest_load_wave_cases():
+        print(f"{'PASS' if ok else 'FAIL'} {name}")
+        if not ok:
+            fails.append(name)
+    print("FAILED: " + ", ".join(fails) if fails else "all iq_checker selftests passed")
+    return 1 if fails else 0
+
+
+if __name__ == "__main__":
+    sys.exit(main())
