@@ -78,8 +78,11 @@ part of the claim and travel with it):
   no envelope can honestly back a block-level layout claim. Partial
   progress exists — six `bias_core` device-group sub-blocks, the `bias_core` full-cell assembly and the
   `por_comparator` leaf cell (21 devices, DRC clean, LVS `match`, #82) are
-  committed under `layout/` (see `layout/README.md`) — but those are
-  sub-block increments, not the block's layout, and no citation is made.
+  committed under `layout/` (see `layout/README.md`), as is the
+  `por_output_chain` leaf cell (#97: DRC clean, LVS `match` 33/33 devices,
+  but **without** its native-Vt device `XMASSIST`, which klt cannot draw or
+  compare, so that cell is incomplete) — but those are sub-block increments,
+  not the block's layout, and no citation is made.
 - **Item 3 — DRC clean: `met`** via `layout/bias_core/drc.json` (`status:
   clean`, 0 violations), pinned to
   `content_hash sha256:9c414f91…7ab68e`, the sha256 of the committed

@@ -395,11 +395,34 @@ is `erc_status: clean` with `VDD`/`VSS` one island each, and the
 pad-point island census passes for all 15 nets. See that cell's README
 for the full evidence, the MiM clearance, and the remaining limits.
 
+## `por_comparator` and `por_output_chain`: the POR leaf cells (issues #82, #97)
+
+Two further whole-subckt leaf cells, each composed from per-device `klt gen`
+calls against its own `design/netlist/*.spice` subckt:
+
+- [`layout/por_comparator/`](por_comparator/README.md) (#82): 21 devices,
+  `klt drc` clean, `klt lvs` `match` 21/21 devices.
+- [`layout/por_output_chain/`](por_output_chain/README.md) (#97): 28 MOS and
+  5 MiM capacitors drawn, `klt drc` clean, `klt lvs` `match` 33/33 devices and
+  18/18 nets **with one disclosed exclusion**: `XMASSIST`, the native-Vt NMOS
+  `sky130_fd_pr__nfet_05v0_nvt`, which klt can neither draw (`mos_array` has
+  no native flavor) nor compare (`klt lvs` does not know the model), so it is
+  absent from both the layout and the generated reference
+  ([klayout-tools#2912](https://github.com/2AMLogic/klayout-tools/issues/2912)).
+  The cell is therefore not a complete layout of its subckt. Its
+  `lvs.expand_multiplier` option (new in `compose-cell.py`) writes the
+  reference's `m=4` capacitor as four single devices, as the layout draws it.
+
+Neither is a block-level layout claim: whole-block item 2 stays `unmet`
+(`manifests/README.md`).
+
 ## What's next
 
 Per issue #36, this fleet prefers landing DRC-clean/LVS-blocked increments
 (isolated to a known, upstream-filed gap) over waiting on the upstream fix.
 As of issue #81, all six `bias_core_*` sub-blocks and the `bias_core`
 full-cell assembly are DRC-clean and LVS `match` at the `0ce8c64842d9` pin.
-`temp_core`, `por_comparator`, `por_output_chain`, and `temp_por_top` are
-tracked from [#4](https://github.com/2AMLogic/sky130-temp-por/issues/4).
+`por_comparator` (#82) and `por_output_chain` (#97, minus the native device it
+cannot yet draw) are DRC-clean and LVS `match` as well. `temp_core` and
+`temp_por_top` are tracked from
+[#4](https://github.com/2AMLogic/sky130-temp-por/issues/4).
