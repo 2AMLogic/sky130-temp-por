@@ -169,7 +169,8 @@ at `MASSIST`'s own drawn bin (`nfet_05v0_nvt` `L=25/W=1`), the next-longest
 ## Sizing
 
 **Every drawn `W`/`L` for the devices gf180's own `por_output_chain` already
-has is carried over unchanged** (bare micron numbers per this repo's own
+has is carried over unchanged, with one exception: `MN1` (issue #101, next
+subsection)** (bare micron numbers per this repo's own
 sky130 unit convention — see `design/README.md`), same convention as
 `bias_core`/`por_comparator`. `CDG` (11 µm × 11 µm) and `CTIM` (4 × 28 µm ×
 28 µm, `MF=4`) are carried as **first-order placeholder timing elements** —
@@ -180,6 +181,58 @@ makes a fixed-width pulse buildable in a sub-µA budget) carries. `MASSIST`
 (new in this port) is sized at the longest-channel bin its device menu
 offers, per [Device mapping](#device-mapping-sky130-devicemappingmd-2-2-dr-002) above — a
 menu constraint, not a free sizing choice.
+
+### `MN1` model-bin legality (issue #101)
+
+The mechanical port carried gf180's `MN1` as `L=25 W=0.5`. That geometry has
+**no model bin** on sky130's `nfet_g5v0d10v5`: ngspice stops with "could not
+find a valid modelname" (ngspice 42 and 46), so the as-drawn cell and
+`temp_por_top` could not be simulated at all. (This is a porting artifact, not
+a spec matter; no `spec/` row is touched.)
+
+**Bin table**, read from the pinned PDK
+(`open_pdks c6d73a35...`, `libs.tech/combined/continuous/models_fet.spice`,
+`nhv_model.1..56`, the models `sky130.lib.spice` actually selects for
+`nfet_g5v0d10v5`; ranges are `lmin <= L < lmax`, `wmin <= W < wmax`, in um,
+`binunit = 2`). The bins are the full cross product of 7 L ranges and 8 W
+ranges (56 bins):
+
+| axis | bin ranges (um) |
+| --- | --- |
+| L | 0.5-0.6, 0.6-0.8, 0.8-1, 1-2, 2-4, 4-8, **8-20.2** |
+| W | 0.42-0.75, 0.75-1, 1-3, 3-5, 5-7, 7-15, 15-20, 20-1010 |
+
+So a legal drawn device needs `0.5 <= L < 20.2` and `0.42 <= W < 1010`. **The
+longest legal L is 20.2 um; L=25 is out of range on every W**. (Checked
+empirically: `L=10 W=2` resolves, `L=25 W=0.5` does not. The sibling
+`pfet_g5v0d10v5` and the other `nfet_g5v0d10v5` devices in this cell are all
+`L <= 10` and unaffected. `MASSIST` is a different device family,
+`nfet_05v0_nvt`, with its own menu above.)
+
+**Choice: `MN1` is now one device, `L=20 W=0.42`.** `MN1` is the IBIAS-mirror
+pull-down current-source leg (`MBD` -> `MN1` -> `MPD`, the first stage of the
+1:50 PMOS reference), so what matters is its mirror ratio to `MBD`
+(`L=4 W=4`), i.e. `W/L`:
+
+| option | `W/L` | vs. drawn 0.5/25 = 0.0200 | notes |
+| --- | --- | --- | --- |
+| `L=20 W=0.5` | 0.0250 | +25% | in bin, but the largest ratio shift |
+| **`L=20 W=0.42`** | **0.0210** | **+5%** | one device, same bin as before in W (0.42-0.75); `W=0.42` is the bin's lower edge |
+| 2 x `L=12.5 W=0.5` in series | 0.0200 | 0% (nominal) | exact ratio, but two devices, an extra internal node, and a re-routed layout row |
+
+`L=20 W=0.42` is the smallest change that keeps the ratio close: a one-device,
+one-parameter-pair edit, no new node and no new layout block, and a ratio
+within +5% of the port's nominal. The series stack was rejected because it
+buys back only 5% of a ratio that was itself a first-order carry-over (this
+cell is explicitly "not a characterized design"), at the cost of a topology
+change. Cross-check (single-corner, tt/27 C, Vgs=0.9 V, Vds=1 V; ngspice 42, a
+probe, not a recorded result): drain current `L=20 W=0.42` 16.7 nA,
+`L=20 W=0.5` 19.1 nA, 2 x `L=12.5 W=0.5` 13.9 nA; the original geometry cannot
+be simulated, so a 1/L extrapolation of the `L=20 W=0.5` current (about 15.3
+nA) is the nominal reference, putting the single device at about +9% and the
+stack at about -9% -- neither is closer, which is why the smaller edit wins.
+If characterization later shows the PDN branch needs a different current, that
+is a sizing decision for a decision record, not this correction.
 
 ## Verification done for this issue
 

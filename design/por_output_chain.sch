@@ -117,8 +117,8 @@ C {devices/lab_pin.sym} -740 70 0 0 {name=l7 lab=VSS}
 N -740 0 -690 0 {}
 C {devices/lab_pin.sym} -690 0 0 0 {name=l8 lab=VSS}
 C {sky130_fd_pr/nfet_g5v0d10v5.sym} -760 0 0 0 {name=MN1
-L=25
-W=0.5
+L=20
+W=0.42
 nf=1
 mult=1
 model=nfet_g5v0d10v5

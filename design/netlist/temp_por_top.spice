@@ -155,7 +155,7 @@ XMI2N POR_RAW N1 VSS VSS sky130_fd_pr__nfet_g5v0d10v5 L=0.5 W=1 nf=1 ad=0.29 as=
 *.PININFO VDD:B VSS:B IBIAS:I POR_RAW:I RESETn:O
 XMBD IBIAS IBIAS VSS VSS sky130_fd_pr__nfet_g5v0d10v5 L=4 W=4 nf=1 ad=1.16 as=1.16 pd=8.58 ps=8.58 nrd=0.0725 nrs=0.0725 sa=0 sb=0
 + sd=0 mult=1 m=1
-XMN1 PDN IBIAS VSS VSS sky130_fd_pr__nfet_g5v0d10v5 L=25 W=0.5 nf=1 ad=0.145 as=0.145 pd=1.58 ps=1.58 nrd=0.58 nrs=0.58 sa=0 sb=0
+XMN1 PDN IBIAS VSS VSS sky130_fd_pr__nfet_g5v0d10v5 L=20 W=0.42 nf=1 ad=0.1218 as=0.1218 pd=1.42 ps=1.42 nrd=0.690476 nrs=0.690476 sa=0 sb=0
 + sd=0 mult=1 m=1
 XMPD PDN PDN VDD VDD sky130_fd_pr__pfet_g5v0d10v5 L=10 W=2 nf=1 ad=0.58 as=0.58 pd=4.58 ps=4.58 nrd=0.145 nrs=0.145 sa=0 sb=0 sd=0
 + mult=1 m=1
