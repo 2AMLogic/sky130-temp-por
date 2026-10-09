@@ -319,12 +319,18 @@ def analyze_variant(variant: str, run_dir: Path, man: dict, corners_dir: Path) -
         d = run_dir / variant / tag
         rq = {"rate_v_per_s": rate, "tag": tag, "primary_rate": primary, "tstop_s": tstop_for(rate, man)}
         attempts = []
-        for ad in sorted(d.glob("attempt*")):
-            try:
-                body = json.loads((ad / "report.json").read_text())
-                attempts.append(scrub((body.get("error") or {}).get("message") or f"report status {body.get('status')}", run_dir)[:400])
-            except (json.JSONDecodeError, OSError):
-                attempts.append("unparseable report")
+        for ad in sorted(d.glob("attempt*"), key=lambda p: int(p.name[7:] or 0)):
+            body = None
+            # klt --format json writes a launch-failure error document to stderr with an empty stdout
+            for src in ("report.json", "klt.stderr"):
+                try:
+                    txt = (ad / src).read_text()
+                    body = json.loads(txt[txt.index("{"):]) if "{" in txt else None
+                except (json.JSONDecodeError, OSError, ValueError):
+                    body = None
+                if body:
+                    break
+            attempts.append(scrub((body.get("error") or {}).get("message") or f"report status {body.get('status')}", run_dir)[:400] if body else "unparseable report")
         if attempts:
             rq["failed_earlier_attempts"] = attempts
         rp = d / "report.json"
@@ -447,7 +453,7 @@ def render_md(rec: dict) -> str:
                  + " -- the commit whose netlists the fleet simulated; the line above is the commit that extracted and wrote this record")
     t = rec["tools"]
     L.append(f"- **Fleet runner**: klt `{t['fleet_runner_klt']}` / `{t['fleet_ngspice']}` (client klt `{t['klt_client']}`); {t['fleet_note']}")
-    L.append(f"- **Corner axis**: `{rec['matrix'].get('axis', 'main')}` -- {rec['matrix'].get('axis_note', '')}. Never merged with the other axis's table.")
+    L.append(f"- **Corner axis**: `{rec['matrix'].get('axis', 'main')}` -- {rec['matrix'].get('axis_note', '').rstrip('.')}. Never merged with the other axis's table.")
     L.append("- **Corner matrix run**: process " + ", ".join(rec["matrix"]["process"]) + "; temperature " + ", ".join(f"{cr.fmt_temp(x)} C" for x in rec["matrix"]["temperature_c"]) +
              f"; VDD is the swept variable (0 -> {rec['matrix']['peak_v']} V -> 0), no separate supply axis; sweep rates {', '.join(f'{r:g}' for r in rec['matrix']['rates_v_per_s'])} V/s (primary + half-rate guard). " +
              f"{rec['matrix']['n_corners']} process x temperature points; full matrix, no subset.")
@@ -458,10 +464,11 @@ def render_md(rec: dict) -> str:
         L.append(f"- **{k}**: {v}")
     L.append("")
     L.append("## Fleet submissions")
-    L.append("| rate (V/s) | tstop (ms) | outcome | job id | runner klt | state |")
-    L.append("|---|---|---|---|---|---|")
+    L.append("| rate (V/s) | tstop (ms) | outcome | job id | runner klt | state | submitted at commit | refused earlier attempts |")
+    L.append("|---|---|---|---|---|---|---|---|")
     for r in rec["requests"]:
-        L.append(f"| {r['rate_v_per_s']:g} | {r['tstop_s'] * 1e3:.4g} | {r.get('outcome')} | {r.get('job_id')} | {r.get('runner_klt_version')} | {r.get('state')} |")
+        L.append(f"| {r['rate_v_per_s']:g} | {r['tstop_s'] * 1e3:.4g} | {r.get('outcome')} | {r.get('job_id')} | {r.get('runner_klt_version')} | {r.get('state')} | "
+                 f"{r.get('submit_git') or 'unknown'} | {len(r.get('failed_earlier_attempts', []))} |")
     L.append("")
     prim = man["primary_rate"]
     L.append(f"## Per-corner results (primary rate {prim:g} V/s; all {len(rec['table'])} process x temperature points)")
@@ -532,6 +539,15 @@ def cmd_record(args) -> int:
             if pth.exists():
                 raise SystemExit(f"{pth} exists -- sim/ is append-only")
         res = analyze_variant(variant, run_dir, man, corners_dir)
+        # per-request submit commit: a retried request ran at the retry's (clean) commit, not run.json's
+        submit_git = {}
+        for mf in sorted(run_dir.glob("run*.json"), key=lambda p: p.stat().st_mtime):
+            m = json.loads(mf.read_text())
+            for s in m.get("submit_results", []):
+                if s.get("variant") == variant and s.get("status") not in (None, "NO-JSON"):
+                    submit_git[s["tag"]] = m["git"]["sha"] + (" (DIRTY)" if m["git"].get("dirty") else " (clean)")
+        for rq in res["requests"]:
+            rq["submit_git"] = submit_git.get(rq["tag"])
         table = point_table(man, res["points"], procs)
         b = binding(table)
         margin = None
