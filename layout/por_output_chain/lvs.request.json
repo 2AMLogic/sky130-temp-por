@@ -1,0 +1,11 @@
+{
+  "layout": {
+    "netlist": "por_output_chain.spice",
+    "deck": "sky130"
+  },
+  "reference": {
+    "netlist": "por_output_chain.ref.spice",
+    "form": "subckt-call",
+    "deck": "sky130"
+  }
+}

@@ -1,0 +1,3433 @@
+{
+  "pdk": {
+    "variant": "sky130A"
+  },
+  "blocks": [
+    {
+      "id": "mbd",
+      "generator_report": "gen/mbd.gen.json"
+    },
+    {
+      "id": "mn1",
+      "generator_report": "gen/mn1.gen.json"
+    },
+    {
+      "id": "mpd",
+      "generator_report": "gen/mpd.gen.json",
+      "orientation": "mirror_y"
+    },
+    {
+      "id": "mp2",
+      "generator_report": "gen/mp2.gen.json",
+      "orientation": "mirror_y"
+    },
+    {
+      "id": "mnd",
+      "generator_report": "gen/mnd.gen.json"
+    },
+    {
+      "id": "mdgpt",
+      "generator_report": "gen/mdgpt.gen.json",
+      "orientation": "mirror_y"
+    },
+    {
+      "id": "mdgpi",
+      "generator_report": "gen/mdgpi.gen.json",
+      "orientation": "mirror_y"
+    },
+    {
+      "id": "mdgni",
+      "generator_report": "gen/mdgni.gen.json"
+    },
+    {
+      "id": "mdgnt",
+      "generator_report": "gen/mdgnt.gen.json"
+    },
+    {
+      "id": "mg1p",
+      "generator_report": "gen/mg1p.gen.json",
+      "orientation": "mirror_y"
+    },
+    {
+      "id": "mg1n",
+      "generator_report": "gen/mg1n.gen.json"
+    },
+    {
+      "id": "mg2p",
+      "generator_report": "gen/mg2p.gen.json",
+      "orientation": "mirror_y"
+    },
+    {
+      "id": "mg2n",
+      "generator_report": "gen/mg2n.gen.json"
+    },
+    {
+      "id": "mpt",
+      "generator_report": "gen/mpt.gen.json",
+      "orientation": "mirror_y"
+    },
+    {
+      "id": "mtsw",
+      "generator_report": "gen/mtsw.gen.json",
+      "orientation": "mirror_y"
+    },
+    {
+      "id": "mdis",
+      "generator_report": "gen/mdis.gen.json"
+    },
+    {
+      "id": "mdapi",
+      "generator_report": "gen/mdapi.gen.json",
+      "orientation": "mirror_y"
+    },
+    {
+      "id": "mdant",
+      "generator_report": "gen/mdant.gen.json"
+    },
+    {
+      "id": "mdbni",
+      "generator_report": "gen/mdbni.gen.json"
+    },
+    {
+      "id": "mdbpt",
+      "generator_report": "gen/mdbpt.gen.json",
+      "orientation": "mirror_y"
+    },
+    {
+      "id": "mrlk",
+      "generator_report": "gen/mrlk.gen.json"
+    },
+    {
+      "id": "mnap1",
+      "generator_report": "gen/mnap1.gen.json",
+      "orientation": "mirror_y"
+    },
+    {
+      "id": "mnap2",
+      "generator_report": "gen/mnap2.gen.json",
+      "orientation": "mirror_y"
+    },
+    {
+      "id": "mnan1",
+      "generator_report": "gen/mnan1.gen.json"
+    },
+    {
+      "id": "mnan2",
+      "generator_report": "gen/mnan2.gen.json"
+    },
+    {
+      "id": "mast",
+      "generator_report": "gen/mast.gen.json",
+      "orientation": "mirror_y"
+    },
+    {
+      "id": "mop",
+      "generator_report": "gen/mop.gen.json",
+      "orientation": "mirror_y"
+    },
+    {
+      "id": "mon",
+      "generator_report": "gen/mon.gen.json"
+    },
+    {
+      "id": "nwt_mpd",
+      "generator_report": "gen/nwt_mpd.gen.json"
+    },
+    {
+      "id": "nwt_mp2",
+      "generator_report": "gen/nwt_mp2.gen.json"
+    },
+    {
+      "id": "nwt_mpt",
+      "generator_report": "gen/nwt_mpt.gen.json"
+    },
+    {
+      "id": "nwt_mdgpt",
+      "generator_report": "gen/nwt_mdgpt.gen.json"
+    },
+    {
+      "id": "nwt_mdgpi",
+      "generator_report": "gen/nwt_mdgpi.gen.json"
+    },
+    {
+      "id": "nwt_mg1p",
+      "generator_report": "gen/nwt_mg1p.gen.json"
+    },
+    {
+      "id": "nwt_mg2p",
+      "generator_report": "gen/nwt_mg2p.gen.json"
+    },
+    {
+      "id": "nwt_mtsw",
+      "generator_report": "gen/nwt_mtsw.gen.json"
+    },
+    {
+      "id": "nwt_mdapi",
+      "generator_report": "gen/nwt_mdapi.gen.json"
+    },
+    {
+      "id": "nwt_mdbpt",
+      "generator_report": "gen/nwt_mdbpt.gen.json"
+    },
+    {
+      "id": "nwt_mnap2",
+      "generator_report": "gen/nwt_mnap2.gen.json"
+    },
+    {
+      "id": "nwt_mnap1",
+      "generator_report": "gen/nwt_mnap1.gen.json"
+    },
+    {
+      "id": "nwt_mast",
+      "generator_report": "gen/nwt_mast.gen.json"
+    },
+    {
+      "id": "nwt_mop",
+      "generator_report": "gen/nwt_mop.gen.json"
+    },
+    {
+      "id": "pst1",
+      "generator_report": "gen/pst1.gen.json"
+    },
+    {
+      "id": "pst2",
+      "generator_report": "gen/pst2.gen.json"
+    },
+    {
+      "id": "pst3",
+      "generator_report": "gen/pst3.gen.json"
+    },
+    {
+      "id": "pst4",
+      "generator_report": "gen/pst4.gen.json"
+    },
+    {
+      "id": "pst5",
+      "generator_report": "gen/pst5.gen.json"
+    },
+    {
+      "id": "pst6",
+      "generator_report": "gen/pst6.gen.json"
+    },
+    {
+      "id": "pst7",
+      "generator_report": "gen/pst7.gen.json"
+    },
+    {
+      "id": "cdg",
+      "generator_report": "gen/cdg.gen.json"
+    },
+    {
+      "id": "ctim0",
+      "generator_report": "gen/ctim0.gen.json"
+    },
+    {
+      "id": "ctim1",
+      "generator_report": "gen/ctim1.gen.json"
+    },
+    {
+      "id": "ctim2",
+      "generator_report": "gen/ctim2.gen.json"
+    },
+    {
+      "id": "ctim3",
+      "generator_report": "gen/ctim3.gen.json"
+    },
+    {
+      "id": "stub_ibias",
+      "cell": {
+        "gds_path": "promo_stub.gds",
+        "cell_name": "promo_stub",
+        "ports": [
+          {
+            "name": "CONN",
+            "x_um": 1.5,
+            "y_um": 0.085,
+            "layer": {
+              "layer": 67,
+              "datatype": 20
+            },
+            "width_um": 0.17,
+            "direction_deg": 0
+          },
+          {
+            "name": "PAD",
+            "x_um": 0.0,
+            "y_um": 0.085,
+            "layer": {
+              "layer": 67,
+              "datatype": 20
+            },
+            "width_um": 0.17,
+            "direction_deg": 180
+          }
+        ]
+      }
+    },
+    {
+      "id": "stub_por_raw",
+      "cell": {
+        "gds_path": "promo_stub.gds",
+        "cell_name": "promo_stub",
+        "ports": [
+          {
+            "name": "CONN",
+            "x_um": 1.5,
+            "y_um": 0.085,
+            "layer": {
+              "layer": 67,
+              "datatype": 20
+            },
+            "width_um": 0.17,
+            "direction_deg": 0
+          },
+          {
+            "name": "PAD",
+            "x_um": 0.0,
+            "y_um": 0.085,
+            "layer": {
+              "layer": 67,
+              "datatype": 20
+            },
+            "width_um": 0.17,
+            "direction_deg": 180
+          }
+        ]
+      }
+    },
+    {
+      "id": "stub_resetn",
+      "cell": {
+        "gds_path": "promo_stub.gds",
+        "cell_name": "promo_stub",
+        "ports": [
+          {
+            "name": "CONN",
+            "x_um": 1.5,
+            "y_um": 0.085,
+            "layer": {
+              "layer": 67,
+              "datatype": 20
+            },
+            "width_um": 0.17,
+            "direction_deg": 0
+          },
+          {
+            "name": "PAD",
+            "x_um": 0.0,
+            "y_um": 0.085,
+            "layer": {
+              "layer": 67,
+              "datatype": 20
+            },
+            "width_um": 0.17,
+            "direction_deg": 180
+          }
+        ]
+      },
+      "orientation": "rotate_180"
+    },
+    {
+      "id": "stub_vdd",
+      "cell": {
+        "gds_path": "promo_stub.gds",
+        "cell_name": "promo_stub",
+        "ports": [
+          {
+            "name": "CONN",
+            "x_um": 1.5,
+            "y_um": 0.085,
+            "layer": {
+              "layer": 67,
+              "datatype": 20
+            },
+            "width_um": 0.17,
+            "direction_deg": 0
+          },
+          {
+            "name": "PAD",
+            "x_um": 0.0,
+            "y_um": 0.085,
+            "layer": {
+              "layer": 67,
+              "datatype": 20
+            },
+            "width_um": 0.17,
+            "direction_deg": 180
+          }
+        ]
+      }
+    },
+    {
+      "id": "stub_vss",
+      "cell": {
+        "gds_path": "promo_stub.gds",
+        "cell_name": "promo_stub",
+        "ports": [
+          {
+            "name": "CONN",
+            "x_um": 1.5,
+            "y_um": 0.085,
+            "layer": {
+              "layer": 67,
+              "datatype": 20
+            },
+            "width_um": 0.17,
+            "direction_deg": 0
+          },
+          {
+            "name": "PAD",
+            "x_um": 0.0,
+            "y_um": 0.085,
+            "layer": {
+              "layer": 67,
+              "datatype": 20
+            },
+            "width_um": 0.17,
+            "direction_deg": 180
+          }
+        ]
+      }
+    }
+  ],
+  "placement": {
+    "strategy": "explicit",
+    "order": [
+      "mbd",
+      "mn1",
+      "mpd",
+      "mp2",
+      "mnd",
+      "mdgpt",
+      "mdgpi",
+      "mdgni",
+      "mdgnt",
+      "mg1p",
+      "mg1n",
+      "mg2p",
+      "mg2n",
+      "mpt",
+      "mtsw",
+      "mdis",
+      "mdapi",
+      "mdant",
+      "mdbni",
+      "mdbpt",
+      "mrlk",
+      "mnap1",
+      "mnap2",
+      "mnan1",
+      "mnan2",
+      "mast",
+      "mop",
+      "mon",
+      "nwt_mpd",
+      "nwt_mp2",
+      "nwt_mpt",
+      "nwt_mdgpt",
+      "nwt_mdgpi",
+      "nwt_mg1p",
+      "nwt_mg2p",
+      "nwt_mtsw",
+      "nwt_mdapi",
+      "nwt_mdbpt",
+      "nwt_mnap2",
+      "nwt_mnap1",
+      "nwt_mast",
+      "nwt_mop",
+      "pst1",
+      "pst2",
+      "pst3",
+      "pst4",
+      "pst5",
+      "pst6",
+      "pst7",
+      "cdg",
+      "ctim0",
+      "ctim1",
+      "ctim2",
+      "ctim3",
+      "stub_ibias",
+      "stub_por_raw",
+      "stub_resetn",
+      "stub_vdd",
+      "stub_vss"
+    ],
+    "origins_um": {
+      "mbd": {
+        "x": 0.0,
+        "y": 0.0
+      },
+      "mn1": {
+        "x": 8.84,
+        "y": 0.0
+      },
+      "mnd": {
+        "x": 41.68,
+        "y": 0.0
+      },
+      "mdgnt": {
+        "x": 56.52,
+        "y": 0.0
+      },
+      "mdgni": {
+        "x": 74.36,
+        "y": 0.0
+      },
+      "mg1n": {
+        "x": 79.7,
+        "y": 0.0
+      },
+      "mg2n": {
+        "x": 88.04,
+        "y": 0.0
+      },
+      "mdis": {
+        "x": 94.88,
+        "y": 0.0
+      },
+      "mdant": {
+        "x": 103.72,
+        "y": 0.0
+      },
+      "mdbni": {
+        "x": 118.56,
+        "y": 0.0
+      },
+      "mrlk": {
+        "x": 127.4,
+        "y": 0.0
+      },
+      "mnan2": {
+        "x": 133.24,
+        "y": 0.0
+      },
+      "mnan1": {
+        "x": 141.58,
+        "y": 0.0
+      },
+      "mon": {
+        "x": 146.92,
+        "y": 0.0
+      },
+      "mpd": {
+        "x": 2.64,
+        "y": 47.81
+      },
+      "nwt_mpd": {
+        "x": 0.6,
+        "y": 45.04
+      },
+      "mp2": {
+        "x": 20.27,
+        "y": 47.81
+      },
+      "nwt_mp2": {
+        "x": 18.23,
+        "y": 45.04
+      },
+      "mpt": {
+        "x": 37.9,
+        "y": 46.31
+      },
+      "nwt_mpt": {
+        "x": 35.86,
+        "y": 45.04
+      },
+      "mdgpt": {
+        "x": 55.53,
+        "y": 55.81
+      },
+      "nwt_mdgpt": {
+        "x": 53.49,
+        "y": 45.04
+      },
+      "mdgpi": {
+        "x": 73.16,
+        "y": 46.81
+      },
+      "nwt_mdgpi": {
+        "x": 71.12,
+        "y": 45.04
+      },
+      "mg1p": {
+        "x": 81.29,
+        "y": 46.31
+      },
+      "nwt_mg1p": {
+        "x": 79.25,
+        "y": 45.04
+      },
+      "mg2p": {
+        "x": 90.92,
+        "y": 47.81
+      },
+      "nwt_mg2p": {
+        "x": 88.88,
+        "y": 45.04
+      },
+      "mtsw": {
+        "x": 99.05,
+        "y": 47.81
+      },
+      "nwt_mtsw": {
+        "x": 97.01,
+        "y": 45.04
+      },
+      "mdapi": {
+        "x": 107.68,
+        "y": 47.81
+      },
+      "nwt_mdapi": {
+        "x": 105.64,
+        "y": 45.04
+      },
+      "mdbpt": {
+        "x": 116.31,
+        "y": 46.31
+      },
+      "nwt_mdbpt": {
+        "x": 114.27,
+        "y": 45.04
+      },
+      "mnap2": {
+        "x": 133.94,
+        "y": 49.81
+      },
+      "nwt_mnap2": {
+        "x": 131.9,
+        "y": 45.04
+      },
+      "mnap1": {
+        "x": 142.07,
+        "y": 49.81
+      },
+      "nwt_mnap1": {
+        "x": 140.03,
+        "y": 45.04
+      },
+      "mast": {
+        "x": 150.2,
+        "y": 46.31
+      },
+      "nwt_mast": {
+        "x": 148.16,
+        "y": 45.04
+      },
+      "mop": {
+        "x": 167.83,
+        "y": 46.81
+      },
+      "nwt_mop": {
+        "x": 165.79,
+        "y": 45.04
+      },
+      "cdg": {
+        "x": 187.82,
+        "y": -2.0
+      },
+      "ctim0": {
+        "x": 202.82,
+        "y": -2.0
+      },
+      "ctim1": {
+        "x": 234.82,
+        "y": -2.0
+      },
+      "ctim2": {
+        "x": 266.82,
+        "y": -2.0
+      },
+      "ctim3": {
+        "x": 298.82,
+        "y": -2.0
+      },
+      "pst1": {
+        "x": -3.2,
+        "y": -3.5
+      },
+      "pst2": {
+        "x": 38.48,
+        "y": -3.5
+      },
+      "pst3": {
+        "x": 71.16,
+        "y": -3.5
+      },
+      "pst4": {
+        "x": 84.84,
+        "y": -3.5
+      },
+      "pst5": {
+        "x": 100.52,
+        "y": -3.5
+      },
+      "pst6": {
+        "x": 124.2,
+        "y": -3.5
+      },
+      "pst7": {
+        "x": 138.38,
+        "y": -3.5
+      },
+      "stub_ibias": {
+        "x": -10.0,
+        "y": 12.915
+      },
+      "stub_por_raw": {
+        "x": -10.0,
+        "y": 23.715
+      },
+      "stub_resetn": {
+        "x": 173.96,
+        "y": 43.085
+      },
+      "stub_vdd": {
+        "x": -6.0,
+        "y": 58.725
+      },
+      "stub_vss": {
+        "x": -6.0,
+        "y": -6.085
+      }
+    }
+  },
+  "routing": {
+    "layer_role": "metal",
+    "width_um": 0.17
+  },
+  "connectivity": [
+    {
+      "net": "IBIAS",
+      "layer_role": "metal3",
+      "pins": [
+        {
+          "block": "mbd",
+          "port": "U0_D"
+        },
+        {
+          "block": "mbd",
+          "port": "U0_G"
+        },
+        {
+          "block": "mn1",
+          "port": "U0_G"
+        },
+        {
+          "block": "stub_ibias",
+          "port": "CONN"
+        }
+      ],
+      "legs": [
+        {
+          "from_pin": {
+            "block": "mn1",
+            "port": "U0_G"
+          },
+          "to_pin": {
+            "block": "mbd",
+            "port": "U0_D"
+          },
+          "waypoints_um": [
+            [
+              21.76,
+              13.0
+            ],
+            [
+              4.63,
+              13.0
+            ]
+          ]
+        },
+        {
+          "from_pin": {
+            "block": "mn1",
+            "port": "U0_G"
+          },
+          "to_pin": {
+            "block": "mbd",
+            "port": "U0_G"
+          },
+          "waypoints_um": [
+            [
+              21.76,
+              13.0
+            ],
+            [
+              2.42,
+              13.0
+            ]
+          ]
+        },
+        {
+          "from_pin": {
+            "block": "mn1",
+            "port": "U0_G"
+          },
+          "to_pin": {
+            "block": "stub_ibias",
+            "port": "CONN"
+          },
+          "waypoints_um": [
+            [
+              21.76,
+              13.0
+            ],
+            [
+              -8.5,
+              13.0
+            ]
+          ]
+        }
+      ]
+    },
+    {
+      "net": "PDN",
+      "layer_role": "metal6",
+      "width_um": 1.6,
+      "pins": [
+        {
+          "block": "mn1",
+          "port": "U0_D"
+        },
+        {
+          "block": "mpd",
+          "port": "U0_D"
+        },
+        {
+          "block": "mpd",
+          "port": "U0_G"
+        },
+        {
+          "block": "mp2",
+          "port": "U0_G"
+        },
+        {
+          "block": "mdgpt",
+          "port": "U0_G"
+        },
+        {
+          "block": "mpt",
+          "port": "U0_G"
+        },
+        {
+          "block": "mdbpt",
+          "port": "U0_G"
+        }
+      ],
+      "legs": [
+        {
+          "from_pin": {
+            "block": "mdbpt",
+            "port": "U0_G"
+          },
+          "to_pin": {
+            "block": "mn1",
+            "port": "U0_D"
+          },
+          "waypoints_um": [
+            [
+              121.73,
+              34.6
+            ],
+            [
+              34.47,
+              34.6
+            ]
+          ]
+        },
+        {
+          "from_pin": {
+            "block": "mdbpt",
+            "port": "U0_G"
+          },
+          "to_pin": {
+            "block": "mpd",
+            "port": "U0_D"
+          },
+          "waypoints_um": [
+            [
+              121.73,
+              34.6
+            ],
+            [
+              13.27,
+              34.6
+            ]
+          ]
+        },
+        {
+          "from_pin": {
+            "block": "mdbpt",
+            "port": "U0_G"
+          },
+          "to_pin": {
+            "block": "mpd",
+            "port": "U0_G"
+          },
+          "waypoints_um": [
+            [
+              121.73,
+              34.6
+            ],
+            [
+              8.06,
+              34.6
+            ]
+          ]
+        },
+        {
+          "from_pin": {
+            "block": "mdbpt",
+            "port": "U0_G"
+          },
+          "to_pin": {
+            "block": "mp2",
+            "port": "U0_G"
+          },
+          "waypoints_um": [
+            [
+              121.73,
+              34.6
+            ],
+            [
+              25.69,
+              34.6
+            ]
+          ]
+        },
+        {
+          "from_pin": {
+            "block": "mdbpt",
+            "port": "U0_G"
+          },
+          "to_pin": {
+            "block": "mdgpt",
+            "port": "U0_G"
+          },
+          "waypoints_um": [
+            [
+              121.73,
+              34.6
+            ],
+            [
+              60.95,
+              34.6
+            ]
+          ]
+        },
+        {
+          "from_pin": {
+            "block": "mdbpt",
+            "port": "U0_G"
+          },
+          "to_pin": {
+            "block": "mpt",
+            "port": "U0_G"
+          },
+          "waypoints_um": [
+            [
+              121.73,
+              34.6
+            ],
+            [
+              43.32,
+              34.6
+            ]
+          ]
+        }
+      ]
+    },
+    {
+      "net": "NDL",
+      "layer_role": "metal4",
+      "width_um": 0.4,
+      "pins": [
+        {
+          "block": "mp2",
+          "port": "U0_D"
+        },
+        {
+          "block": "mnd",
+          "port": "U0_D"
+        },
+        {
+          "block": "mnd",
+          "port": "U0_G"
+        },
+        {
+          "block": "mdgnt",
+          "port": "U0_G"
+        },
+        {
+          "block": "mdant",
+          "port": "U0_G"
+        }
+      ],
+      "legs": [
+        {
+          "from_pin": {
+            "block": "mdant",
+            "port": "U0_G"
+          },
+          "to_pin": {
+            "block": "mp2",
+            "port": "U0_D"
+          },
+          "waypoints_um": [
+            [
+              109.14,
+              22.6
+            ],
+            [
+              30.9,
+              22.6
+            ]
+          ]
+        },
+        {
+          "from_pin": {
+            "block": "mdant",
+            "port": "U0_G"
+          },
+          "to_pin": {
+            "block": "mnd",
+            "port": "U0_D"
+          },
+          "waypoints_um": [
+            [
+              109.14,
+              22.6
+            ],
+            [
+              52.31,
+              22.6
+            ]
+          ]
+        },
+        {
+          "from_pin": {
+            "block": "mdant",
+            "port": "U0_G"
+          },
+          "to_pin": {
+            "block": "mnd",
+            "port": "U0_G"
+          },
+          "waypoints_um": [
+            [
+              109.14,
+              22.6
+            ],
+            [
+              47.1,
+              22.6
+            ]
+          ]
+        },
+        {
+          "from_pin": {
+            "block": "mdant",
+            "port": "U0_G"
+          },
+          "to_pin": {
+            "block": "mdgnt",
+            "port": "U0_G"
+          },
+          "waypoints_um": [
+            [
+              109.14,
+              22.6
+            ],
+            [
+              61.94,
+              22.6
+            ]
+          ]
+        }
+      ]
+    },
+    {
+      "net": "NDGP",
+      "layer_role": "metal4",
+      "width_um": 0.4,
+      "pins": [
+        {
+          "block": "mdgpt",
+          "port": "U0_D"
+        },
+        {
+          "block": "mdgpi",
+          "port": "U0_S"
+        }
+      ],
+      "legs": [
+        {
+          "from_pin": {
+            "block": "mdgpi",
+            "port": "U0_S"
+          },
+          "to_pin": {
+            "block": "mdgpt",
+            "port": "U0_D"
+          },
+          "waypoints_um": [
+            [
+              73.37,
+              29.8
+            ],
+            [
+              66.16,
+              29.8
+            ]
+          ]
+        }
+      ]
+    },
+    {
+      "net": "NDG",
+      "layer_role": "metal2",
+      "pins": [
+        {
+          "block": "mdgpi",
+          "port": "U0_D"
+        },
+        {
+          "block": "mdgni",
+          "port": "U0_D"
+        },
+        {
+          "block": "mg1p",
+          "port": "U0_G"
+        },
+        {
+          "block": "mg1n",
+          "port": "U0_G"
+        },
+        {
+          "block": "cdg",
+          "port": "C0_TOP"
+        }
+      ],
+      "legs": [
+        {
+          "from_pin": {
+            "block": "mg1p",
+            "port": "U0_G"
+          },
+          "to_pin": {
+            "block": "mdgpi",
+            "port": "U0_D"
+          },
+          "waypoints_um": [
+            [
+              82.71,
+              37.0
+            ],
+            [
+              74.29,
+              37.0
+            ]
+          ]
+        },
+        {
+          "from_pin": {
+            "block": "mg1p",
+            "port": "U0_G"
+          },
+          "to_pin": {
+            "block": "mdgni",
+            "port": "U0_D"
+          },
+          "waypoints_um": [
+            [
+              82.71,
+              37.0
+            ],
+            [
+              75.49,
+              37.0
+            ]
+          ]
+        },
+        {
+          "from_pin": {
+            "block": "mg1p",
+            "port": "U0_G"
+          },
+          "to_pin": {
+            "block": "mg1n",
+            "port": "U0_G"
+          },
+          "waypoints_um": [
+            [
+              82.71,
+              37.0
+            ],
+            [
+              80.37,
+              37.0
+            ]
+          ]
+        },
+        {
+          "from_pin": {
+            "block": "mg1p",
+            "port": "U0_G"
+          },
+          "to_pin": {
+            "block": "cdg",
+            "port": "C0_TOP"
+          },
+          "waypoints_um": [
+            [
+              82.71,
+              37.0
+            ],
+            [
+              193.82,
+              37.0
+            ]
+          ],
+          "layer_role": "metal5",
+          "width_um": 0.4
+        }
+      ]
+    },
+    {
+      "net": "POR_RAW",
+      "layer_role": "metal2",
+      "pins": [
+        {
+          "block": "mdgpi",
+          "port": "U0_G"
+        },
+        {
+          "block": "mdgni",
+          "port": "U0_G"
+        },
+        {
+          "block": "stub_por_raw",
+          "port": "CONN"
+        }
+      ],
+      "legs": [
+        {
+          "from_pin": {
+            "block": "mdgni",
+            "port": "U0_G"
+          },
+          "to_pin": {
+            "block": "mdgpi",
+            "port": "U0_G"
+          },
+          "waypoints_um": [
+            [
+              75.03,
+              23.8
+            ],
+            [
+              73.83,
+              23.8
+            ]
+          ]
+        },
+        {
+          "from_pin": {
+            "block": "mdgni",
+            "port": "U0_G"
+          },
+          "to_pin": {
+            "block": "stub_por_raw",
+            "port": "CONN"
+          },
+          "waypoints_um": [
+            [
+              75.03,
+              23.8
+            ],
+            [
+              -8.5,
+              23.8
+            ]
+          ]
+        }
+      ]
+    },
+    {
+      "net": "NDGN",
+      "layer_role": "metal4",
+      "width_um": 0.4,
+      "pins": [
+        {
+          "block": "mdgni",
+          "port": "U0_S"
+        },
+        {
+          "block": "mdgnt",
+          "port": "U0_D"
+        }
+      ],
+      "legs": [
+        {
+          "from_pin": {
+            "block": "mdgni",
+            "port": "U0_S"
+          },
+          "to_pin": {
+            "block": "mdgnt",
+            "port": "U0_D"
+          },
+          "waypoints_um": [
+            [
+              74.57,
+              17.8
+            ],
+            [
+              67.15,
+              17.8
+            ]
+          ]
+        }
+      ]
+    },
+    {
+      "net": "PGDG",
+      "layer_role": "metal2",
+      "pins": [
+        {
+          "block": "mg1p",
+          "port": "U0_D"
+        },
+        {
+          "block": "mg1n",
+          "port": "U0_D"
+        },
+        {
+          "block": "mg2p",
+          "port": "U0_G"
+        },
+        {
+          "block": "mg2n",
+          "port": "U0_G"
+        },
+        {
+          "block": "mnap2",
+          "port": "U0_G"
+        },
+        {
+          "block": "mnan2",
+          "port": "U0_G"
+        }
+      ],
+      "legs": [
+        {
+          "from_pin": {
+            "block": "mnap2",
+            "port": "U0_G"
+          },
+          "to_pin": {
+            "block": "mg1p",
+            "port": "U0_D"
+          },
+          "waypoints_um": [
+            [
+              134.61,
+              23.8
+            ],
+            [
+              83.92,
+              23.8
+            ]
+          ]
+        },
+        {
+          "from_pin": {
+            "block": "mnap2",
+            "port": "U0_G"
+          },
+          "to_pin": {
+            "block": "mg1n",
+            "port": "U0_D"
+          },
+          "waypoints_um": [
+            [
+              134.61,
+              23.8
+            ],
+            [
+              80.83,
+              23.8
+            ]
+          ]
+        },
+        {
+          "from_pin": {
+            "block": "mnap2",
+            "port": "U0_G"
+          },
+          "to_pin": {
+            "block": "mg2p",
+            "port": "U0_G"
+          },
+          "waypoints_um": [
+            [
+              134.61,
+              23.8
+            ],
+            [
+              91.59,
+              23.8
+            ]
+          ]
+        },
+        {
+          "from_pin": {
+            "block": "mnap2",
+            "port": "U0_G"
+          },
+          "to_pin": {
+            "block": "mg2n",
+            "port": "U0_G"
+          },
+          "waypoints_um": [
+            [
+              134.61,
+              23.8
+            ],
+            [
+              89.46,
+              23.8
+            ]
+          ]
+        },
+        {
+          "from_pin": {
+            "block": "mnap2",
+            "port": "U0_G"
+          },
+          "to_pin": {
+            "block": "mnan2",
+            "port": "U0_G"
+          },
+          "waypoints_um": [
+            [
+              134.61,
+              23.8
+            ],
+            [
+              133.91,
+              23.8
+            ]
+          ]
+        }
+      ]
+    },
+    {
+      "net": "PGDGB",
+      "layer_role": "metal3",
+      "pins": [
+        {
+          "block": "mg2p",
+          "port": "U0_D"
+        },
+        {
+          "block": "mg2n",
+          "port": "U0_D"
+        },
+        {
+          "block": "mtsw",
+          "port": "U0_G"
+        },
+        {
+          "block": "mdis",
+          "port": "U0_G"
+        }
+      ],
+      "legs": [
+        {
+          "from_pin": {
+            "block": "mtsw",
+            "port": "U0_G"
+          },
+          "to_pin": {
+            "block": "mg2p",
+            "port": "U0_D"
+          },
+          "waypoints_um": [
+            [
+              99.97,
+              39.4
+            ],
+            [
+              92.05,
+              39.4
+            ]
+          ]
+        },
+        {
+          "from_pin": {
+            "block": "mtsw",
+            "port": "U0_G"
+          },
+          "to_pin": {
+            "block": "mg2n",
+            "port": "U0_D"
+          },
+          "waypoints_um": [
+            [
+              99.97,
+              39.4
+            ],
+            [
+              90.67,
+              39.4
+            ]
+          ]
+        },
+        {
+          "from_pin": {
+            "block": "mtsw",
+            "port": "U0_G"
+          },
+          "to_pin": {
+            "block": "mdis",
+            "port": "U0_G"
+          },
+          "waypoints_um": [
+            [
+              99.97,
+              39.4
+            ],
+            [
+              95.8,
+              39.4
+            ]
+          ]
+        }
+      ]
+    },
+    {
+      "net": "NTS",
+      "layer_role": "metal4",
+      "width_um": 0.4,
+      "pins": [
+        {
+          "block": "mpt",
+          "port": "U0_D"
+        },
+        {
+          "block": "mtsw",
+          "port": "U0_S"
+        }
+      ],
+      "legs": [
+        {
+          "from_pin": {
+            "block": "mtsw",
+            "port": "U0_S"
+          },
+          "to_pin": {
+            "block": "mpt",
+            "port": "U0_D"
+          },
+          "waypoints_um": [
+            [
+              99.26,
+              25.0
+            ],
+            [
+              48.53,
+              25.0
+            ]
+          ]
+        }
+      ]
+    },
+    {
+      "net": "TIM",
+      "layer_role": "metal3",
+      "pins": [
+        {
+          "block": "mtsw",
+          "port": "U0_D"
+        },
+        {
+          "block": "mdis",
+          "port": "U0_D"
+        },
+        {
+          "block": "mdapi",
+          "port": "U0_G"
+        },
+        {
+          "block": "ctim0",
+          "port": "C0_TOP"
+        },
+        {
+          "block": "ctim1",
+          "port": "C0_TOP"
+        },
+        {
+          "block": "ctim2",
+          "port": "C0_TOP"
+        },
+        {
+          "block": "ctim3",
+          "port": "C0_TOP"
+        }
+      ],
+      "legs": [
+        {
+          "from_pin": {
+            "block": "mdapi",
+            "port": "U0_G"
+          },
+          "to_pin": {
+            "block": "mtsw",
+            "port": "U0_D"
+          },
+          "waypoints_um": [
+            [
+              108.6,
+              38.2
+            ],
+            [
+              100.68,
+              38.2
+            ]
+          ]
+        },
+        {
+          "from_pin": {
+            "block": "mdapi",
+            "port": "U0_G"
+          },
+          "to_pin": {
+            "block": "mdis",
+            "port": "U0_D"
+          },
+          "waypoints_um": [
+            [
+              108.6,
+              38.2
+            ],
+            [
+              96.51,
+              38.2
+            ]
+          ]
+        },
+        {
+          "from_pin": {
+            "block": "mdapi",
+            "port": "U0_G"
+          },
+          "to_pin": {
+            "block": "ctim0",
+            "port": "C0_TOP"
+          },
+          "waypoints_um": [
+            [
+              108.6,
+              38.2
+            ],
+            [
+              217.32,
+              38.2
+            ]
+          ],
+          "layer_role": "metal5",
+          "width_um": 0.4
+        },
+        {
+          "from_pin": {
+            "block": "mdapi",
+            "port": "U0_G"
+          },
+          "to_pin": {
+            "block": "ctim1",
+            "port": "C0_TOP"
+          },
+          "waypoints_um": [
+            [
+              108.6,
+              38.2
+            ],
+            [
+              249.32,
+              38.2
+            ]
+          ],
+          "layer_role": "metal5",
+          "width_um": 0.4
+        },
+        {
+          "from_pin": {
+            "block": "mdapi",
+            "port": "U0_G"
+          },
+          "to_pin": {
+            "block": "ctim2",
+            "port": "C0_TOP"
+          },
+          "waypoints_um": [
+            [
+              108.6,
+              38.2
+            ],
+            [
+              281.32,
+              38.2
+            ]
+          ],
+          "layer_role": "metal5",
+          "width_um": 0.4
+        },
+        {
+          "from_pin": {
+            "block": "mdapi",
+            "port": "U0_G"
+          },
+          "to_pin": {
+            "block": "ctim3",
+            "port": "C0_TOP"
+          },
+          "waypoints_um": [
+            [
+              108.6,
+              38.2
+            ],
+            [
+              313.32,
+              38.2
+            ]
+          ],
+          "layer_role": "metal5",
+          "width_um": 0.4
+        }
+      ]
+    },
+    {
+      "net": "ND1",
+      "layer_role": "metal3",
+      "pins": [
+        {
+          "block": "mdapi",
+          "port": "U0_D"
+        },
+        {
+          "block": "mdant",
+          "port": "U0_D"
+        },
+        {
+          "block": "mdbni",
+          "port": "U0_G"
+        },
+        {
+          "block": "mrlk",
+          "port": "U0_D"
+        }
+      ],
+      "legs": [
+        {
+          "from_pin": {
+            "block": "mrlk",
+            "port": "U0_D"
+          },
+          "to_pin": {
+            "block": "mdapi",
+            "port": "U0_D"
+          },
+          "waypoints_um": [
+            [
+              129.03,
+              26.2
+            ],
+            [
+              109.31,
+              26.2
+            ]
+          ]
+        },
+        {
+          "from_pin": {
+            "block": "mrlk",
+            "port": "U0_D"
+          },
+          "to_pin": {
+            "block": "mdant",
+            "port": "U0_D"
+          },
+          "waypoints_um": [
+            [
+              129.03,
+              26.2
+            ],
+            [
+              114.35,
+              26.2
+            ]
+          ]
+        },
+        {
+          "from_pin": {
+            "block": "mrlk",
+            "port": "U0_D"
+          },
+          "to_pin": {
+            "block": "mdbni",
+            "port": "U0_G"
+          },
+          "waypoints_um": [
+            [
+              129.03,
+              26.2
+            ],
+            [
+              119.48,
+              26.2
+            ]
+          ]
+        }
+      ]
+    },
+    {
+      "net": "TRIP",
+      "layer_role": "metal6",
+      "width_um": 1.6,
+      "pins": [
+        {
+          "block": "mdbni",
+          "port": "U0_D"
+        },
+        {
+          "block": "mdbpt",
+          "port": "U0_D"
+        },
+        {
+          "block": "mnap1",
+          "port": "U0_G"
+        },
+        {
+          "block": "mnan1",
+          "port": "U0_G"
+        }
+      ],
+      "legs": [
+        {
+          "from_pin": {
+            "block": "mnap1",
+            "port": "U0_G"
+          },
+          "to_pin": {
+            "block": "mdbni",
+            "port": "U0_D"
+          },
+          "waypoints_um": [
+            [
+              142.74,
+              19.0
+            ],
+            [
+              120.19,
+              19.0
+            ]
+          ]
+        },
+        {
+          "from_pin": {
+            "block": "mnap1",
+            "port": "U0_G"
+          },
+          "to_pin": {
+            "block": "mdbpt",
+            "port": "U0_D"
+          },
+          "waypoints_um": [
+            [
+              142.74,
+              19.0
+            ],
+            [
+              126.94,
+              19.0
+            ]
+          ]
+        },
+        {
+          "from_pin": {
+            "block": "mnap1",
+            "port": "U0_G"
+          },
+          "to_pin": {
+            "block": "mnan1",
+            "port": "U0_G"
+          },
+          "waypoints_um": [
+            [
+              142.74,
+              19.0
+            ],
+            [
+              142.25,
+              19.0
+            ]
+          ]
+        }
+      ]
+    },
+    {
+      "net": "RESETn",
+      "layer_role": "metal4",
+      "width_um": 0.4,
+      "pins": [
+        {
+          "block": "mrlk",
+          "port": "U0_G"
+        },
+        {
+          "block": "mast",
+          "port": "U0_G"
+        },
+        {
+          "block": "mop",
+          "port": "U0_D"
+        },
+        {
+          "block": "mon",
+          "port": "U0_D"
+        },
+        {
+          "block": "stub_resetn",
+          "port": "CONN"
+        }
+      ],
+      "legs": [
+        {
+          "from_pin": {
+            "block": "mop",
+            "port": "U0_D"
+          },
+          "to_pin": {
+            "block": "mrlk",
+            "port": "U0_G"
+          },
+          "waypoints_um": [
+            [
+              169.46,
+              43.0
+            ],
+            [
+              128.32,
+              43.0
+            ]
+          ]
+        },
+        {
+          "from_pin": {
+            "block": "mop",
+            "port": "U0_D"
+          },
+          "to_pin": {
+            "block": "mast",
+            "port": "U0_G"
+          },
+          "waypoints_um": [
+            [
+              169.46,
+              43.0
+            ],
+            [
+              155.62,
+              43.0
+            ]
+          ]
+        },
+        {
+          "from_pin": {
+            "block": "mop",
+            "port": "U0_D"
+          },
+          "to_pin": {
+            "block": "mon",
+            "port": "U0_D"
+          },
+          "waypoints_um": [
+            [
+              169.46,
+              43.0
+            ],
+            [
+              148.05,
+              43.0
+            ]
+          ]
+        },
+        {
+          "from_pin": {
+            "block": "mop",
+            "port": "U0_D"
+          },
+          "to_pin": {
+            "block": "stub_resetn",
+            "port": "CONN"
+          },
+          "waypoints_um": [
+            [
+              169.46,
+              43.0
+            ],
+            [
+              172.46,
+              43.0
+            ]
+          ]
+        }
+      ]
+    },
+    {
+      "net": "RSTB",
+      "layer_role": "metal2",
+      "pins": [
+        {
+          "block": "mnap1",
+          "port": "U0_D"
+        },
+        {
+          "block": "mnap2",
+          "port": "U0_D"
+        },
+        {
+          "block": "mnan1",
+          "port": "U0_D"
+        },
+        {
+          "block": "mast",
+          "port": "U0_D"
+        },
+        {
+          "block": "mop",
+          "port": "U0_G"
+        },
+        {
+          "block": "mon",
+          "port": "U0_G"
+        }
+      ],
+      "legs": [
+        {
+          "from_pin": {
+            "block": "mop",
+            "port": "U0_G"
+          },
+          "to_pin": {
+            "block": "mnap1",
+            "port": "U0_D"
+          },
+          "waypoints_um": [
+            [
+              168.75,
+              35.8
+            ],
+            [
+              143.2,
+              35.8
+            ]
+          ]
+        },
+        {
+          "from_pin": {
+            "block": "mop",
+            "port": "U0_G"
+          },
+          "to_pin": {
+            "block": "mnap2",
+            "port": "U0_D"
+          },
+          "waypoints_um": [
+            [
+              168.75,
+              35.8
+            ],
+            [
+              135.07,
+              35.8
+            ]
+          ]
+        },
+        {
+          "from_pin": {
+            "block": "mop",
+            "port": "U0_G"
+          },
+          "to_pin": {
+            "block": "mnan1",
+            "port": "U0_D"
+          },
+          "waypoints_um": [
+            [
+              168.75,
+              35.8
+            ],
+            [
+              142.71,
+              35.8
+            ]
+          ]
+        },
+        {
+          "from_pin": {
+            "block": "mop",
+            "port": "U0_G"
+          },
+          "to_pin": {
+            "block": "mast",
+            "port": "U0_D"
+          },
+          "waypoints_um": [
+            [
+              168.75,
+              35.8
+            ],
+            [
+              160.83,
+              35.8
+            ]
+          ]
+        },
+        {
+          "from_pin": {
+            "block": "mop",
+            "port": "U0_G"
+          },
+          "to_pin": {
+            "block": "mon",
+            "port": "U0_G"
+          },
+          "waypoints_um": [
+            [
+              168.75,
+              35.8
+            ],
+            [
+              147.59,
+              35.8
+            ]
+          ]
+        }
+      ]
+    },
+    {
+      "net": "NNAND",
+      "layer_role": "metal2",
+      "pins": [
+        {
+          "block": "mnan1",
+          "port": "U0_S"
+        },
+        {
+          "block": "mnan2",
+          "port": "U0_D"
+        }
+      ],
+      "legs": [
+        {
+          "from_pin": {
+            "block": "mnan1",
+            "port": "U0_S"
+          },
+          "to_pin": {
+            "block": "mnan2",
+            "port": "U0_D"
+          },
+          "waypoints_um": [
+            [
+              141.79,
+              13.0
+            ],
+            [
+              134.37,
+              13.0
+            ]
+          ]
+        }
+      ]
+    },
+    {
+      "net": "VDD",
+      "layer_role": "metal2",
+      "pins": [
+        {
+          "block": "stub_vdd",
+          "port": "CONN"
+        },
+        {
+          "block": "mpd",
+          "port": "U0_S"
+        },
+        {
+          "block": "mp2",
+          "port": "U0_S"
+        },
+        {
+          "block": "mdgpt",
+          "port": "U0_S"
+        },
+        {
+          "block": "mg1p",
+          "port": "U0_S"
+        },
+        {
+          "block": "mg2p",
+          "port": "U0_S"
+        },
+        {
+          "block": "mpt",
+          "port": "U0_S"
+        },
+        {
+          "block": "mdapi",
+          "port": "U0_S"
+        },
+        {
+          "block": "mdbpt",
+          "port": "U0_S"
+        },
+        {
+          "block": "mnap1",
+          "port": "U0_S"
+        },
+        {
+          "block": "mnap2",
+          "port": "U0_S"
+        },
+        {
+          "block": "mast",
+          "port": "U0_S"
+        },
+        {
+          "block": "mop",
+          "port": "U0_S"
+        },
+        {
+          "block": "nwt_mpd",
+          "port": "TAP_N"
+        },
+        {
+          "block": "nwt_mp2",
+          "port": "TAP_N"
+        },
+        {
+          "block": "nwt_mpt",
+          "port": "TAP_N"
+        },
+        {
+          "block": "nwt_mdgpt",
+          "port": "TAP_N"
+        },
+        {
+          "block": "nwt_mdgpi",
+          "port": "TAP_N"
+        },
+        {
+          "block": "nwt_mg1p",
+          "port": "TAP_N"
+        },
+        {
+          "block": "nwt_mg2p",
+          "port": "TAP_N"
+        },
+        {
+          "block": "nwt_mtsw",
+          "port": "TAP_N"
+        },
+        {
+          "block": "nwt_mdapi",
+          "port": "TAP_N"
+        },
+        {
+          "block": "nwt_mdbpt",
+          "port": "TAP_N"
+        },
+        {
+          "block": "nwt_mnap2",
+          "port": "TAP_N"
+        },
+        {
+          "block": "nwt_mnap1",
+          "port": "TAP_N"
+        },
+        {
+          "block": "nwt_mast",
+          "port": "TAP_N"
+        },
+        {
+          "block": "nwt_mop",
+          "port": "TAP_N"
+        }
+      ],
+      "legs": [
+        {
+          "from_pin": {
+            "block": "stub_vdd",
+            "port": "CONN"
+          },
+          "to_pin": {
+            "block": "mpd",
+            "port": "U0_S"
+          },
+          "waypoints_um": [
+            [
+              -4.5,
+              58.81
+            ],
+            [
+              2.85,
+              58.81
+            ]
+          ]
+        },
+        {
+          "from_pin": {
+            "block": "stub_vdd",
+            "port": "CONN"
+          },
+          "to_pin": {
+            "block": "mp2",
+            "port": "U0_S"
+          },
+          "waypoints_um": [
+            [
+              -4.5,
+              58.81
+            ],
+            [
+              20.48,
+              58.81
+            ]
+          ]
+        },
+        {
+          "from_pin": {
+            "block": "stub_vdd",
+            "port": "CONN"
+          },
+          "to_pin": {
+            "block": "mdgpt",
+            "port": "U0_S"
+          },
+          "waypoints_um": [
+            [
+              -4.5,
+              58.81
+            ],
+            [
+              55.74,
+              58.81
+            ]
+          ]
+        },
+        {
+          "from_pin": {
+            "block": "stub_vdd",
+            "port": "CONN"
+          },
+          "to_pin": {
+            "block": "mg1p",
+            "port": "U0_S"
+          },
+          "waypoints_um": [
+            [
+              -4.5,
+              58.81
+            ],
+            [
+              81.5,
+              58.81
+            ]
+          ]
+        },
+        {
+          "from_pin": {
+            "block": "stub_vdd",
+            "port": "CONN"
+          },
+          "to_pin": {
+            "block": "mg2p",
+            "port": "U0_S"
+          },
+          "waypoints_um": [
+            [
+              -4.5,
+              58.81
+            ],
+            [
+              91.13,
+              58.81
+            ]
+          ]
+        },
+        {
+          "from_pin": {
+            "block": "stub_vdd",
+            "port": "CONN"
+          },
+          "to_pin": {
+            "block": "mpt",
+            "port": "U0_S"
+          },
+          "waypoints_um": [
+            [
+              -4.5,
+              58.81
+            ],
+            [
+              38.11,
+              58.81
+            ]
+          ]
+        },
+        {
+          "from_pin": {
+            "block": "stub_vdd",
+            "port": "CONN"
+          },
+          "to_pin": {
+            "block": "mdapi",
+            "port": "U0_S"
+          },
+          "waypoints_um": [
+            [
+              -4.5,
+              58.81
+            ],
+            [
+              107.89,
+              58.81
+            ]
+          ]
+        },
+        {
+          "from_pin": {
+            "block": "stub_vdd",
+            "port": "CONN"
+          },
+          "to_pin": {
+            "block": "mdbpt",
+            "port": "U0_S"
+          },
+          "waypoints_um": [
+            [
+              -4.5,
+              58.81
+            ],
+            [
+              116.52,
+              58.81
+            ]
+          ]
+        },
+        {
+          "from_pin": {
+            "block": "stub_vdd",
+            "port": "CONN"
+          },
+          "to_pin": {
+            "block": "mnap1",
+            "port": "U0_S"
+          },
+          "waypoints_um": [
+            [
+              -4.5,
+              58.81
+            ],
+            [
+              142.28,
+              58.81
+            ]
+          ]
+        },
+        {
+          "from_pin": {
+            "block": "stub_vdd",
+            "port": "CONN"
+          },
+          "to_pin": {
+            "block": "mnap2",
+            "port": "U0_S"
+          },
+          "waypoints_um": [
+            [
+              -4.5,
+              58.81
+            ],
+            [
+              134.15,
+              58.81
+            ]
+          ]
+        },
+        {
+          "from_pin": {
+            "block": "stub_vdd",
+            "port": "CONN"
+          },
+          "to_pin": {
+            "block": "mast",
+            "port": "U0_S"
+          },
+          "waypoints_um": [
+            [
+              -4.5,
+              58.81
+            ],
+            [
+              150.41,
+              58.81
+            ]
+          ]
+        },
+        {
+          "from_pin": {
+            "block": "stub_vdd",
+            "port": "CONN"
+          },
+          "to_pin": {
+            "block": "mop",
+            "port": "U0_S"
+          },
+          "waypoints_um": [
+            [
+              -4.5,
+              58.81
+            ],
+            [
+              168.04,
+              58.81
+            ]
+          ]
+        },
+        {
+          "from_pin": {
+            "block": "stub_vdd",
+            "port": "CONN"
+          },
+          "to_pin": {
+            "block": "nwt_mpd",
+            "port": "TAP_N"
+          },
+          "waypoints_um": [
+            [
+              -4.5,
+              58.81
+            ],
+            [
+              1.52,
+              58.81
+            ]
+          ]
+        },
+        {
+          "from_pin": {
+            "block": "stub_vdd",
+            "port": "CONN"
+          },
+          "to_pin": {
+            "block": "nwt_mp2",
+            "port": "TAP_N"
+          },
+          "waypoints_um": [
+            [
+              -4.5,
+              58.81
+            ],
+            [
+              19.15,
+              58.81
+            ]
+          ]
+        },
+        {
+          "from_pin": {
+            "block": "stub_vdd",
+            "port": "CONN"
+          },
+          "to_pin": {
+            "block": "nwt_mpt",
+            "port": "TAP_N"
+          },
+          "waypoints_um": [
+            [
+              -4.5,
+              58.81
+            ],
+            [
+              36.78,
+              58.81
+            ]
+          ]
+        },
+        {
+          "from_pin": {
+            "block": "stub_vdd",
+            "port": "CONN"
+          },
+          "to_pin": {
+            "block": "nwt_mdgpt",
+            "port": "TAP_N"
+          },
+          "waypoints_um": [
+            [
+              -4.5,
+              58.81
+            ],
+            [
+              54.41,
+              58.81
+            ]
+          ]
+        },
+        {
+          "from_pin": {
+            "block": "stub_vdd",
+            "port": "CONN"
+          },
+          "to_pin": {
+            "block": "nwt_mdgpi",
+            "port": "TAP_N"
+          },
+          "waypoints_um": [
+            [
+              -4.5,
+              58.81
+            ],
+            [
+              72.04,
+              58.81
+            ]
+          ]
+        },
+        {
+          "from_pin": {
+            "block": "stub_vdd",
+            "port": "CONN"
+          },
+          "to_pin": {
+            "block": "nwt_mg1p",
+            "port": "TAP_N"
+          },
+          "waypoints_um": [
+            [
+              -4.5,
+              58.81
+            ],
+            [
+              80.17,
+              58.81
+            ]
+          ]
+        },
+        {
+          "from_pin": {
+            "block": "stub_vdd",
+            "port": "CONN"
+          },
+          "to_pin": {
+            "block": "nwt_mg2p",
+            "port": "TAP_N"
+          },
+          "waypoints_um": [
+            [
+              -4.5,
+              58.81
+            ],
+            [
+              89.8,
+              58.81
+            ]
+          ]
+        },
+        {
+          "from_pin": {
+            "block": "stub_vdd",
+            "port": "CONN"
+          },
+          "to_pin": {
+            "block": "nwt_mtsw",
+            "port": "TAP_N"
+          },
+          "waypoints_um": [
+            [
+              -4.5,
+              58.81
+            ],
+            [
+              97.93,
+              58.81
+            ]
+          ]
+        },
+        {
+          "from_pin": {
+            "block": "stub_vdd",
+            "port": "CONN"
+          },
+          "to_pin": {
+            "block": "nwt_mdapi",
+            "port": "TAP_N"
+          },
+          "waypoints_um": [
+            [
+              -4.5,
+              58.81
+            ],
+            [
+              106.56,
+              58.81
+            ]
+          ]
+        },
+        {
+          "from_pin": {
+            "block": "stub_vdd",
+            "port": "CONN"
+          },
+          "to_pin": {
+            "block": "nwt_mdbpt",
+            "port": "TAP_N"
+          },
+          "waypoints_um": [
+            [
+              -4.5,
+              58.81
+            ],
+            [
+              115.19,
+              58.81
+            ]
+          ]
+        },
+        {
+          "from_pin": {
+            "block": "stub_vdd",
+            "port": "CONN"
+          },
+          "to_pin": {
+            "block": "nwt_mnap2",
+            "port": "TAP_N"
+          },
+          "waypoints_um": [
+            [
+              -4.5,
+              58.81
+            ],
+            [
+              132.82,
+              58.81
+            ]
+          ]
+        },
+        {
+          "from_pin": {
+            "block": "stub_vdd",
+            "port": "CONN"
+          },
+          "to_pin": {
+            "block": "nwt_mnap1",
+            "port": "TAP_N"
+          },
+          "waypoints_um": [
+            [
+              -4.5,
+              58.81
+            ],
+            [
+              140.95,
+              58.81
+            ]
+          ]
+        },
+        {
+          "from_pin": {
+            "block": "stub_vdd",
+            "port": "CONN"
+          },
+          "to_pin": {
+            "block": "nwt_mast",
+            "port": "TAP_N"
+          },
+          "waypoints_um": [
+            [
+              -4.5,
+              58.81
+            ],
+            [
+              149.08,
+              58.81
+            ]
+          ]
+        },
+        {
+          "from_pin": {
+            "block": "stub_vdd",
+            "port": "CONN"
+          },
+          "to_pin": {
+            "block": "nwt_mop",
+            "port": "TAP_N"
+          },
+          "waypoints_um": [
+            [
+              -4.5,
+              58.81
+            ],
+            [
+              166.71,
+              58.81
+            ]
+          ]
+        }
+      ]
+    },
+    {
+      "net": "VSS",
+      "layer_role": "metal2",
+      "pins": [
+        {
+          "block": "stub_vss",
+          "port": "CONN"
+        },
+        {
+          "block": "mbd",
+          "port": "U0_S"
+        },
+        {
+          "block": "mn1",
+          "port": "U0_S"
+        },
+        {
+          "block": "mnd",
+          "port": "U0_S"
+        },
+        {
+          "block": "mdgnt",
+          "port": "U0_S"
+        },
+        {
+          "block": "mg1n",
+          "port": "U0_S"
+        },
+        {
+          "block": "mg2n",
+          "port": "U0_S"
+        },
+        {
+          "block": "mdis",
+          "port": "U0_S"
+        },
+        {
+          "block": "mdant",
+          "port": "U0_S"
+        },
+        {
+          "block": "mdbni",
+          "port": "U0_S"
+        },
+        {
+          "block": "mrlk",
+          "port": "U0_S"
+        },
+        {
+          "block": "mnan2",
+          "port": "U0_S"
+        },
+        {
+          "block": "mon",
+          "port": "U0_S"
+        },
+        {
+          "block": "pst1",
+          "port": "TAP_S"
+        },
+        {
+          "block": "pst2",
+          "port": "TAP_S"
+        },
+        {
+          "block": "pst3",
+          "port": "TAP_S"
+        },
+        {
+          "block": "pst4",
+          "port": "TAP_S"
+        },
+        {
+          "block": "pst5",
+          "port": "TAP_S"
+        },
+        {
+          "block": "pst6",
+          "port": "TAP_S"
+        },
+        {
+          "block": "pst7",
+          "port": "TAP_S"
+        },
+        {
+          "block": "cdg",
+          "port": "C0_BOT"
+        },
+        {
+          "block": "ctim0",
+          "port": "C0_BOT"
+        },
+        {
+          "block": "ctim1",
+          "port": "C0_BOT"
+        },
+        {
+          "block": "ctim2",
+          "port": "C0_BOT"
+        },
+        {
+          "block": "ctim3",
+          "port": "C0_BOT"
+        }
+      ],
+      "legs": [
+        {
+          "from_pin": {
+            "block": "stub_vss",
+            "port": "CONN"
+          },
+          "to_pin": {
+            "block": "mbd",
+            "port": "U0_S"
+          },
+          "waypoints_um": [
+            [
+              -4.5,
+              -6.0
+            ],
+            [
+              0.21,
+              -6.0
+            ]
+          ]
+        },
+        {
+          "from_pin": {
+            "block": "stub_vss",
+            "port": "CONN"
+          },
+          "to_pin": {
+            "block": "mn1",
+            "port": "U0_S"
+          },
+          "waypoints_um": [
+            [
+              -4.5,
+              -6.0
+            ],
+            [
+              9.05,
+              -6.0
+            ]
+          ]
+        },
+        {
+          "from_pin": {
+            "block": "stub_vss",
+            "port": "CONN"
+          },
+          "to_pin": {
+            "block": "mnd",
+            "port": "U0_S"
+          },
+          "waypoints_um": [
+            [
+              -4.5,
+              -6.0
+            ],
+            [
+              41.89,
+              -6.0
+            ]
+          ]
+        },
+        {
+          "from_pin": {
+            "block": "stub_vss",
+            "port": "CONN"
+          },
+          "to_pin": {
+            "block": "mdgnt",
+            "port": "U0_S"
+          },
+          "waypoints_um": [
+            [
+              -4.5,
+              -6.0
+            ],
+            [
+              56.73,
+              -6.0
+            ]
+          ]
+        },
+        {
+          "from_pin": {
+            "block": "stub_vss",
+            "port": "CONN"
+          },
+          "to_pin": {
+            "block": "mg1n",
+            "port": "U0_S"
+          },
+          "waypoints_um": [
+            [
+              -4.5,
+              -6.0
+            ],
+            [
+              79.91,
+              -6.0
+            ]
+          ]
+        },
+        {
+          "from_pin": {
+            "block": "stub_vss",
+            "port": "CONN"
+          },
+          "to_pin": {
+            "block": "mg2n",
+            "port": "U0_S"
+          },
+          "waypoints_um": [
+            [
+              -4.5,
+              -6.0
+            ],
+            [
+              88.25,
+              -6.0
+            ]
+          ]
+        },
+        {
+          "from_pin": {
+            "block": "stub_vss",
+            "port": "CONN"
+          },
+          "to_pin": {
+            "block": "mdis",
+            "port": "U0_S"
+          },
+          "waypoints_um": [
+            [
+              -4.5,
+              -6.0
+            ],
+            [
+              95.09,
+              -6.0
+            ]
+          ]
+        },
+        {
+          "from_pin": {
+            "block": "stub_vss",
+            "port": "CONN"
+          },
+          "to_pin": {
+            "block": "mdant",
+            "port": "U0_S"
+          },
+          "waypoints_um": [
+            [
+              -4.5,
+              -6.0
+            ],
+            [
+              103.93,
+              -6.0
+            ]
+          ]
+        },
+        {
+          "from_pin": {
+            "block": "stub_vss",
+            "port": "CONN"
+          },
+          "to_pin": {
+            "block": "mdbni",
+            "port": "U0_S"
+          },
+          "waypoints_um": [
+            [
+              -4.5,
+              -6.0
+            ],
+            [
+              118.77,
+              -6.0
+            ]
+          ]
+        },
+        {
+          "from_pin": {
+            "block": "stub_vss",
+            "port": "CONN"
+          },
+          "to_pin": {
+            "block": "mrlk",
+            "port": "U0_S"
+          },
+          "waypoints_um": [
+            [
+              -4.5,
+              -6.0
+            ],
+            [
+              127.61,
+              -6.0
+            ]
+          ]
+        },
+        {
+          "from_pin": {
+            "block": "stub_vss",
+            "port": "CONN"
+          },
+          "to_pin": {
+            "block": "mnan2",
+            "port": "U0_S"
+          },
+          "waypoints_um": [
+            [
+              -4.5,
+              -6.0
+            ],
+            [
+              133.45,
+              -6.0
+            ]
+          ]
+        },
+        {
+          "from_pin": {
+            "block": "stub_vss",
+            "port": "CONN"
+          },
+          "to_pin": {
+            "block": "mon",
+            "port": "U0_S"
+          },
+          "waypoints_um": [
+            [
+              -4.5,
+              -6.0
+            ],
+            [
+              147.13,
+              -6.0
+            ]
+          ]
+        },
+        {
+          "from_pin": {
+            "block": "stub_vss",
+            "port": "CONN"
+          },
+          "to_pin": {
+            "block": "pst1",
+            "port": "TAP_S"
+          },
+          "waypoints_um": [
+            [
+              -4.5,
+              -6.0
+            ],
+            [
+              -2.28,
+              -6.0
+            ]
+          ]
+        },
+        {
+          "from_pin": {
+            "block": "stub_vss",
+            "port": "CONN"
+          },
+          "to_pin": {
+            "block": "pst2",
+            "port": "TAP_S"
+          },
+          "waypoints_um": [
+            [
+              -4.5,
+              -6.0
+            ],
+            [
+              39.4,
+              -6.0
+            ]
+          ]
+        },
+        {
+          "from_pin": {
+            "block": "stub_vss",
+            "port": "CONN"
+          },
+          "to_pin": {
+            "block": "pst3",
+            "port": "TAP_S"
+          },
+          "waypoints_um": [
+            [
+              -4.5,
+              -6.0
+            ],
+            [
+              72.08,
+              -6.0
+            ]
+          ]
+        },
+        {
+          "from_pin": {
+            "block": "stub_vss",
+            "port": "CONN"
+          },
+          "to_pin": {
+            "block": "pst4",
+            "port": "TAP_S"
+          },
+          "waypoints_um": [
+            [
+              -4.5,
+              -6.0
+            ],
+            [
+              85.76,
+              -6.0
+            ]
+          ]
+        },
+        {
+          "from_pin": {
+            "block": "stub_vss",
+            "port": "CONN"
+          },
+          "to_pin": {
+            "block": "pst5",
+            "port": "TAP_S"
+          },
+          "waypoints_um": [
+            [
+              -4.5,
+              -6.0
+            ],
+            [
+              101.44,
+              -6.0
+            ]
+          ]
+        },
+        {
+          "from_pin": {
+            "block": "stub_vss",
+            "port": "CONN"
+          },
+          "to_pin": {
+            "block": "pst6",
+            "port": "TAP_S"
+          },
+          "waypoints_um": [
+            [
+              -4.5,
+              -6.0
+            ],
+            [
+              125.12,
+              -6.0
+            ]
+          ]
+        },
+        {
+          "from_pin": {
+            "block": "stub_vss",
+            "port": "CONN"
+          },
+          "to_pin": {
+            "block": "pst7",
+            "port": "TAP_S"
+          },
+          "waypoints_um": [
+            [
+              -4.5,
+              -6.0
+            ],
+            [
+              139.3,
+              -6.0
+            ]
+          ]
+        },
+        {
+          "from_pin": {
+            "block": "stub_vss",
+            "port": "CONN"
+          },
+          "to_pin": {
+            "block": "cdg",
+            "port": "C0_BOT"
+          },
+          "waypoints_um": [
+            [
+              -4.5,
+              -6.0
+            ],
+            [
+              186.32,
+              -6.0
+            ],
+            [
+              186.32,
+              4.0
+            ]
+          ]
+        },
+        {
+          "from_pin": {
+            "block": "stub_vss",
+            "port": "CONN"
+          },
+          "to_pin": {
+            "block": "ctim0",
+            "port": "C0_BOT"
+          },
+          "waypoints_um": [
+            [
+              -4.5,
+              -6.0
+            ],
+            [
+              201.32,
+              -6.0
+            ],
+            [
+              201.32,
+              12.5
+            ]
+          ]
+        },
+        {
+          "from_pin": {
+            "block": "stub_vss",
+            "port": "CONN"
+          },
+          "to_pin": {
+            "block": "ctim1",
+            "port": "C0_BOT"
+          },
+          "waypoints_um": [
+            [
+              -4.5,
+              -6.0
+            ],
+            [
+              233.32,
+              -6.0
+            ],
+            [
+              233.32,
+              12.5
+            ]
+          ]
+        },
+        {
+          "from_pin": {
+            "block": "stub_vss",
+            "port": "CONN"
+          },
+          "to_pin": {
+            "block": "ctim2",
+            "port": "C0_BOT"
+          },
+          "waypoints_um": [
+            [
+              -4.5,
+              -6.0
+            ],
+            [
+              265.32,
+              -6.0
+            ],
+            [
+              265.32,
+              12.5
+            ]
+          ]
+        },
+        {
+          "from_pin": {
+            "block": "stub_vss",
+            "port": "CONN"
+          },
+          "to_pin": {
+            "block": "ctim3",
+            "port": "C0_BOT"
+          },
+          "waypoints_um": [
+            [
+              -4.5,
+              -6.0
+            ],
+            [
+              297.32,
+              -6.0
+            ],
+            [
+              297.32,
+              12.5
+            ]
+          ]
+        }
+      ]
+    }
+  ],
+  "pins": [
+    {
+      "net": "VDD",
+      "block": "stub_vdd",
+      "port": "PAD"
+    },
+    {
+      "net": "VSS",
+      "block": "stub_vss",
+      "port": "PAD"
+    },
+    {
+      "net": "IBIAS",
+      "block": "stub_ibias",
+      "port": "PAD"
+    },
+    {
+      "net": "POR_RAW",
+      "block": "stub_por_raw",
+      "port": "PAD"
+    },
+    {
+      "net": "RESETn",
+      "block": "stub_resetn",
+      "port": "PAD"
+    }
+  ],
+  "options": {
+    "cell_name": "por_output_chain",
+    "output": "por_output_chain.gds"
+  }
+}

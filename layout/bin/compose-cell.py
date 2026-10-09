@@ -166,6 +166,16 @@ first exercised by ``layout/ro_ring5/``:
 ``lvs.drop_kwargs``
     Pass-through keyword arguments to strip from instance-call lines that
     are not in ``lvs.params`` -- see ``build_reference``'s transformation 2.
+``lvs.drop_prefixes``
+    Element-card name prefixes removed from the generated reference. A
+    ``+`` continuation line after a removed card is removed with it. Whatever
+    this removes is an *LVS exclusion* and must be disclosed in the cell's
+    README (``layout/por_output_chain/`` drops ``XMASSIST``, a native-Vt NMOS
+    klt can neither draw nor compare).
+``lvs.expand_multiplier``
+    Names of element cards carrying ``m=N`` that are rewritten as N
+    single-instance cards (``<name>_0``..) because ``klt lvs``'s plain-element
+    converter refuses multiplied devices; the layout must draw N devices.
 
 A same-subckt, differently-parametrized reference (``lvs.dependency_variants``,
 #22/#27)
@@ -279,6 +289,7 @@ def build_reference(
     params: dict[str, float] | None,
     drop_prefixes: tuple[str, ...],
     drop_kwargs: tuple[str, ...] = (),
+    expand_multiplier: tuple[str, ...] = (),
 ) -> list[str]:
     """Rewrite an xschem-exported subckt into a klt-lvs-ready reference.
 
@@ -319,10 +330,26 @@ def build_reference(
        counterpart in the layout, not a device the layout omits.
     4. Unitless ``L=``/``W=`` values gain an explicit ``u`` suffix -- see this
        module's docstring for why (klayout-tools#1492).
+    5. (``expand_multiplier``, issue #97) A named element card carrying
+       ``m=N`` (N > 1) is replaced by N single-instance cards
+       ``<name>_0``..``<name>_<N-1>`` with ``m=1``/``MF=1``, because ``klt
+       lvs``'s plain-element converter refuses a multiplied device ("one
+       device per drawn gate"). The layout draws N separate devices, so this
+       is the same circuit written the way the layout draws it; the written
+       reference shows the expansion.
+
+    A ``+`` continuation line that follows a card removed by step 3 is removed
+    with it (otherwise it would attach to the previous, unrelated card).
     """
     out: list[str] = []
+    dropping = False
     for line in lines:
         stripped = line.strip()
+        if stripped.startswith("+"):
+            if dropping:
+                continue
+        else:
+            dropping = False
         if stripped.lower().startswith(".subckt"):
             # Drop `name=value` parameter defaults from the port list.
             head = [tok for tok in stripped.split() if "=" not in tok]
@@ -331,6 +358,17 @@ def build_reference(
         if drop_prefixes and stripped.upper().startswith(
             tuple(p.upper() for p in drop_prefixes)
         ):
+            dropping = True
+            continue
+        toks = stripped.split()
+        if toks and toks[0] in expand_multiplier:
+            mm = re.search(r"\bm=(\d+)\b", stripped)
+            count = int(mm.group(1)) if mm else 1
+            for k in range(count):
+                card = re.sub(r"\bm=\d+\b", "m=1", stripped)
+                card = re.sub(r"\bMF=\d+\b", "MF=1", card)
+                card = card.replace(toks[0], f"{toks[0]}_{k}", 1)
+                out.append(_GEOMETRY_RE.sub(r"\1=\2u", card))
             continue
         for name in drop_kwargs:
             line = re.sub(rf"\s+{re.escape(name)}={re.escape(name)}\b", "", line)
@@ -463,6 +501,7 @@ def build_lvs_reference(
     params = lvs_spec.get("params")
     drop_prefixes = tuple(lvs_spec.get("drop_prefixes", ()))
     drop_kwargs = tuple(lvs_spec.get("drop_kwargs", ()))
+    expand_multiplier = tuple(lvs_spec.get("expand_multiplier", ()))
     dependency_subckts = lvs_spec.get("dependencies", ())
     dependency_variants = lvs_spec.get("dependency_variants", ())
 
@@ -472,6 +511,7 @@ def build_lvs_reference(
             params=params,
             drop_prefixes=drop_prefixes,
             drop_kwargs=drop_kwargs,
+            expand_multiplier=expand_multiplier,
         )
         if dependency_variants:
             lines = repoint_variant_instances(lines, dependency_variants)

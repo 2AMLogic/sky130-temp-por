@@ -1,0 +1,90 @@
+* extracted by klt extract --deck sky130
+
+* cell por_output_chain
+* pin IBIAS
+* pin ND1
+* pin NDG
+* pin NDGN
+* pin NDGP
+* pin NDL
+* pin NNAND
+* pin NTS
+* pin PDN
+* pin PGDG
+* pin PGDGB
+* pin POR_RAW
+* pin RESETn
+* pin RSTB
+* pin TIM
+* pin TRIP
+* pin VDD
+* pin VSS
+.SUBCKT por_output_chain IBIAS ND1 NDG NDGN NDGP NDL NNAND NTS PDN PGDG PGDGB
++ POR_RAW RESETn RSTB TIM TRIP VDD VSS
+* device instance $1 r0 *1 21.76,0.25 nfet
+M$1 PDN IBIAS VSS VSS nfet L=25U W=0.5U AS=0.21P AD=0.21P PS=1.84U PD=1.84U
+* device instance $2 r0 *1 89.46,0.25 nfet
+M$2 PGDGB PGDG VSS VSS nfet L=2U W=0.5U AS=0.21P AD=0.21P PS=1.84U PD=1.84U
+* device instance $3 r0 *1 109.14,0.25 nfet
+M$3 ND1 NDL VSS VSS nfet L=10U W=0.5U AS=0.21P AD=0.21P PS=1.84U PD=1.84U
+* device instance $4 r0 *1 75.03,0.5 nfet
+M$4 NDG POR_RAW NDGN VSS nfet L=0.5U W=1U AS=0.42P AD=0.42P PS=2.84U PD=2.84U
+* device instance $5 r0 *1 95.8,0.5 nfet
+M$5 TIM PGDGB VSS VSS nfet L=1U W=1U AS=0.42P AD=0.42P PS=2.84U PD=2.84U
+* device instance $6 r0 *1 119.48,0.5 nfet
+M$6 TRIP ND1 VSS VSS nfet L=1U W=1U AS=0.42P AD=0.42P PS=2.84U PD=2.84U
+* device instance $7 r0 *1 128.32,0.5 nfet
+M$7 ND1 RESETn VSS VSS nfet L=1U W=1U AS=0.42P AD=0.42P PS=2.84U PD=2.84U
+* device instance $8 r0 *1 47.1,1 nfet
+M$8 NDL NDL VSS VSS nfet L=10U W=2U AS=0.84P AD=0.84P PS=4.84U PD=4.84U
+* device instance $9 r0 *1 80.37,1 nfet
+M$9 PGDG NDG VSS VSS nfet L=0.5U W=2U AS=0.84P AD=0.84P PS=4.84U PD=4.84U
+* device instance $10 r0 *1 133.91,1 nfet
+M$10 NNAND PGDG VSS VSS nfet L=0.5U W=2U AS=0.84P AD=0.84P PS=4.84U PD=4.84U
+* device instance $11 r0 *1 142.25,1 nfet
+M$11 RSTB TRIP NNAND VSS nfet L=0.5U W=2U AS=0.84P AD=0.84P PS=4.84U PD=4.84U
+* device instance $12 r0 *1 2.42,2 nfet
+M$12 IBIAS IBIAS VSS VSS nfet L=4U W=4U AS=1.68P AD=1.68P PS=8.84U PD=8.84U
+* device instance $13 r0 *1 61.94,5 nfet
+M$13 NDGN NDL VSS VSS nfet L=10U W=10U AS=4.2P AD=4.2P PS=20.84U PD=20.84U
+* device instance $14 r0 *1 147.59,5 nfet
+M$14 RESETn RSTB VSS VSS nfet L=0.5U W=10U AS=4.2P AD=4.2P PS=20.84U PD=20.84U
+* device instance $15 r0 *1 43.32,46.06 pfet
+M$15 NTS PDN VDD VDD pfet L=10U W=0.5U AS=0.21P AD=0.21P PS=1.84U PD=1.84U
+* device instance $16 r0 *1 82.71,46.06 pfet
+M$16 PGDG NDG VDD VDD pfet L=2U W=0.5U AS=0.21P AD=0.21P PS=1.84U PD=1.84U
+* device instance $17 r0 *1 121.73,46.06 pfet
+M$17 TRIP PDN VDD VDD pfet L=10U W=0.5U AS=0.21P AD=0.21P PS=1.84U PD=1.84U
+* device instance $18 r0 *1 155.62,46.06 pfet
+M$18 RSTB RESETn VDD VDD pfet L=10U W=0.5U AS=0.21P AD=0.21P PS=1.84U PD=1.84U
+* device instance $19 r0 *1 73.83,46.31 pfet
+M$19 NDG POR_RAW NDGP VDD pfet L=0.5U W=1U AS=0.42P AD=0.42P PS=2.84U PD=2.84U
+* device instance $20 r0 *1 168.75,46.31 pfet
+M$20 RESETn RSTB VDD VDD pfet L=1U W=1U AS=0.42P AD=0.42P PS=2.84U PD=2.84U
+* device instance $21 r0 *1 8.06,46.81 pfet
+M$21 PDN PDN VDD VDD pfet L=10U W=2U AS=0.84P AD=0.84P PS=4.84U PD=4.84U
+* device instance $22 r0 *1 25.69,46.81 pfet
+M$22 NDL PDN VDD VDD pfet L=10U W=2U AS=0.84P AD=0.84P PS=4.84U PD=4.84U
+* device instance $23 r0 *1 91.59,46.81 pfet
+M$23 PGDGB PGDG VDD VDD pfet L=0.5U W=2U AS=0.84P AD=0.84P PS=4.84U PD=4.84U
+* device instance $24 r0 *1 99.97,46.81 pfet
+M$24 TIM PGDGB NTS VDD pfet L=1U W=2U AS=0.84P AD=0.84P PS=4.84U PD=4.84U
+* device instance $25 r0 *1 108.6,46.81 pfet
+M$25 ND1 TIM VDD VDD pfet L=1U W=2U AS=0.84P AD=0.84P PS=4.84U PD=4.84U
+* device instance $26 r0 *1 134.61,47.81 pfet
+M$26 RSTB PGDG VDD VDD pfet L=0.5U W=4U AS=1.68P AD=1.68P PS=8.84U PD=8.84U
+* device instance $27 r0 *1 142.74,47.81 pfet
+M$27 RSTB TRIP VDD VDD pfet L=0.5U W=4U AS=1.68P AD=1.68P PS=8.84U PD=8.84U
+* device instance $28 r0 *1 60.95,50.81 pfet
+M$28 NDGP PDN VDD VDD pfet L=10U W=10U AS=4.2P AD=4.2P PS=20.84U PD=20.84U
+* device instance $29 r0 *1 193.82,4 sky130_fd_pr__model__cap_mim
+C$29 VSS NDG 2.5036e-13
+* device instance $30 r0 *1 217.32,12.5 sky130_fd_pr__model__cap_mim
+C$30 VSS TIM 1.58928e-12
+* device instance $31 r0 *1 249.32,12.5 sky130_fd_pr__model__cap_mim
+C$31 VSS TIM 1.58928e-12
+* device instance $32 r0 *1 281.32,12.5 sky130_fd_pr__model__cap_mim
+C$32 VSS TIM 1.58928e-12
+* device instance $33 r0 *1 313.32,12.5 sky130_fd_pr__model__cap_mim
+C$33 VSS TIM 1.58928e-12
+.ENDS por_output_chain
