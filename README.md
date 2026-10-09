@@ -58,15 +58,18 @@ through the two-key path, per the operator ruling of 2026-10-02 on issue #31:
 **only** the operating-temperature and supply rows are final. Every other row
 is an explicit placeholder (`[TBD-n]`, numbering per DR-003) until measured;
 no T1 tier is awarded and no draft number below is a ratified target.
+The supply value follows [DR-001](spec/decision-records/DR-001-supply-flavor.md),
+which is itself still `proposed`; DR-003 is what ratifies the supply row.
+DR-001 and DR-002 remain `proposed`.
 
 | Parameter | Target | Stretch | Status |
 |---|---|---|---|
-| Operating temperature | −40…+125 °C | — | final |
+| Operating temperature | −40…+125 °C | — | ratified (DR-003) |
 | Temperature error, untrimmed | [TBD-1] | [TBD-1] | not ratified |
 | Sensor output | [TBD] (draft: analog PTAT + CTAT pads) | [TBD] (draft: digital out via SAR pairing) | not ratified |
 | POR thresholds VPOR↑ / VPOR↓ | [TBD-2] (re-derive against sky130 models) | — | not ratified |
 | POR hysteresis | [TBD-3] | — | not ratified |
-| Supply | 2.97–3.63 V (3.3 V ±10 %, DR-001) | — | final |
+| Supply | 2.97–3.63 V (3.3 V ±10 %) | — | ratified (DR-003) |
 | Iq (block total) | [TBD-4] por-iq / [TBD-5] temp-iq / [TBD-6] iq-total | [TBD-4..6] | not ratified |
 | Supply-ramp coverage | [TBD] (draft: ramp-rate sweep in the POR testbench matrix) | — | not ratified |
 
@@ -90,7 +93,7 @@ single ladder rung is complete yet.**
 ## Repo layout
 
 ```
-spec/          decision records + ratification process (target spec not yet ratified)
+spec/          decision records + ratification process (target spec partially ratified: rows 1 and 6 under DR-003)
 design/        schematics / netlists (xschem)
 sim/           testbenches + PVT corner results (ngspice)
 layout/        GDS + DRC/LVS reports (klayout-tools driven)
