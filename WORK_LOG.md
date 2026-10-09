@@ -4,6 +4,8 @@ Chronological record of recently merged pull requests and closed issues. This fi
 
 ### 2026-10-09
 
+- **PR #121**: sim(iq-top): assembled temp_por_top Iq campaign, por-iq / iq-total / temp-iq (#107)
+- **Issue #107** (closed): Block-assembly Iq characterization: por-iq, temp-iq, iq-total (DR-003 TBD-4/5/6)
 - **PR #119**: sim: record fleet refusal of as-drawn supply-ramp re-run (#101)
 - **PR #115**: refactor(sim): hoist duplicated campaign-runner helpers into sim_common (#114)
 - **PR #113**: sim: por_comparator VPOR-up/VPOR-down/hysteresis over PVT (por-comparator-thresholds campaign)
