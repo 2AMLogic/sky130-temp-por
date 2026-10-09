@@ -1,0 +1,101 @@
+# point: por-comparator-thresholds real-bias-core r50 ll_27c
+# process=ll temp=27C rate=50 V/s tstop=0.1452s klt status: pass
+
+# ==== klt sim deck ====
+| * klt sim -- generated corner deck, do not edit
+| .lib /opt/pdk/sky130A/libs.tech/combined/sky130.lib.spice ll
+| .include /var/tmp/eda-job-klt-sim-fdcda9473f5a/inputs/netlist.cir
+| .temp 27
+| .meas tran vdd_end FIND v(vdd) AT=0.145199
+| .meas tran por_raw_max MAX v(por_raw)
+| .control
+| alter vset=3.63
+| set filetype=ascii
+| tran 1u 0.1452 0 2e-05
+| write /var/tmp/eda-job-klt-sim-fdcda9473f5a/outputs/artifacts/ll_3p630V_27C/waveform.raw
+| quit
+| .endc
+| .end
+
+# ==== klt diagnostics ====
+
+# ==== ngspice stdout+stderr ====
+
+Note: No compatibility mode selected!
+
+
+Circuit: * klt sim -- generated corner deck, do not edit
+
+Doing analysis at TEMP = 27.000000 and TNOM = 27.000000
+
+Using SPARSE 1.3 as Direct Linear Solver
+
+Initial Transient Solution
+--------------------------
+
+Node                                   Voltage
+----                                   -------
+vsetn                                     3.63
+vdd                                          0
+xdut.bias_okb                     -2.89009e-18
+bias_ok                            9.90713e-19
+ibias                             -4.72476e-19
+xdut.nbg                           3.32835e-18
+xdut.sns                            5.2342e-92
+xdut.xrtop.t1                      5.23417e-92
+xdut.xrtop.t2                      3.71772e-97
+xdut.snsb                          9.72067e-92
+xdut.xrbot.t1                      9.72063e-92
+xdut.xrbot.t2                      5.23424e-92
+xdut.xrhys.t1                      7.03536e-96
+xdut.xrhys.t2                      9.71996e-92
+xdut.n1                           -1.78054e-16
+xdut.tn                           -3.22766e-20
+xdut.na                            1.04897e-20
+xdut.cmpo                          4.82192e-20
+vref                              -3.14228e-45
+xdut.vdda                         -1.62428e-23
+por_raw                           -1.56618e-16
+xbias.na                          -5.58608e-46
+xbias.pg                                     0
+xbias.nbtop                       -5.30362e-42
+xbias.nbg                          1.67414e-49
+xbias.xrt.t1                      -5.30362e-42
+xbias.xrt.t2                      -5.30362e-42
+xbias.nb                          -5.30362e-42
+xbias.xr1.t1                      -5.30362e-42
+xbias.xr1.t2                      -5.30363e-42
+xbias.ec                          -5.30363e-42
+xbias.xr2.t1                      -3.14228e-45
+xbias.xr2.t2                      -3.14229e-45
+xbias.er                          -3.14229e-45
+xbias.pb                          -2.89376e-43
+xbias.nt                          -3.53002e-50
+xbias.n1                            2.6347e-49
+xbias.n2                           9.11445e-50
+xbias.nz                           9.11445e-50
+xbias.xrz.t1                       9.11445e-50
+xbias.xrz.t2                       9.11445e-50
+xbias.ks1                          1.29484e-42
+xbias.ks2                         -7.02148e-41
+xbias.ks3                          2.99265e-39
+xbias.ks4                         -2.22358e-30
+xbias.nkg                         -7.11543e-19
+xbias.nkm                          1.09435e-45
+xbias.tok                          2.83325e-24
+xbias.noko                         -1.3995e-20
+xbias.nokl                        -8.67231e-28
+xbias.nokx                       -5.40706e-272
+bvdd#branch                       -3.63335e-28
+vset#branch                                  0
+
+
+No. of Data Rows : 7276
+
+  Measurements for Transient Analysis
+
+vdd_end             =  5.00000e-05
+por_raw_max         =  3.62998e+00 at=  7.26005e-02
+
+ASCII raw file "/var/tmp/eda-job-klt-sim-fdcda9473f5a/outputs/artifacts/ll_3p630V_27C/waveform.raw"
+ngspice-46 done

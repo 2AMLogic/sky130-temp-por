@@ -1,0 +1,388 @@
+{
+  "schema_version": 3,
+  "netlist": {
+    "path": "sim/build/por-comparator-thresholds/skew1/ideal-bias/r100/netlist.spice",
+    "scope": "repo"
+  },
+  "status": "pass",
+  "corner_count": 6,
+  "passed": 6,
+  "failed": 0,
+  "errored": 0,
+  "inconclusive": 0,
+  "diagnostic_counts": {
+    "by_code": {},
+    "by_severity": {},
+    "corners_with_diagnostics": 0
+  },
+  "metrics": {
+    "sim__corner__count": 6,
+    "sim__corner__passed_count": 6,
+    "sim__corner__failed_count": 0,
+    "sim__corner__errored_count": 0,
+    "sim__corner__inconclusive_count": 0
+  },
+  "environment": {
+    "engine": "ngspice",
+    "engine_version": "46",
+    "ngspice_binary": "/usr/bin/ngspice",
+    "models_lib": {
+      "path": null,
+      "scope": "external"
+    },
+    "models_lib_sha256": "48de7c677e2c6e7d09b2559279de9f818be71010a4aa933d728eb4db3b133c84",
+    "netlist_sha256": "cd02abd441f9dba8a1be8e4531b39486b7d1df571604e31433d911cf24819934",
+    "netlist_closure": [
+      {
+        "path": "sim/build/por-comparator-thresholds/skew1/ideal-bias/r100/netlist.spice",
+        "scope": "repo",
+        "sha256": "cd02abd441f9dba8a1be8e4531b39486b7d1df571604e31433d911cf24819934"
+      }
+    ],
+    "remote": {
+      "provider": "aws-batch-fleet",
+      "job_id": "klt-sim-878a92fb9e38",
+      "bucket": "2am-batch-jobs-221082181346",
+      "region": "us-east-1",
+      "instance_id": "i-0638ef5c07512f0c3",
+      "instance_type": "m7i.4xlarge",
+      "availability_zone": "us-east-1f",
+      "ami_id": "ami-0e40e3245f1923ac8",
+      "lifecycle": "spot",
+      "spot": true,
+      "state": "done",
+      "exit_code": "0",
+      "concurrency": "1",
+      "physical_cores": "8",
+      "elapsed_seconds": 102,
+      "runner_klt_version": "0.5.0",
+      "client_klt_version": "0.7.0+g4cbdfa769875",
+      "runner_compatibility": "mismatch",
+      "runner_compatibility_warning": "the fleet runner ran klt 0.5.0 but the submitting client is 0.7.0+g4cbdfa769875; request options the runner does not know may have been ignored -- update the runner image or use a compatible client"
+    }
+  },
+  "coverage": {
+    "corners_simulated": 6,
+    "measurements_declared": 2,
+    "measurements_with_limits": 0,
+    "unrecognized_limit_keys": [],
+    "schema_version": 1,
+    "known": true,
+    "checked": [
+      "measurement:[0,\"ll/3.630V/-40C\",\"por_raw_max\"]/observation",
+      "measurement:[0,\"ll/3.630V/-40C\",\"vdd_end\"]/observation",
+      "measurement:[1,\"ll/3.630V/27C\",\"por_raw_max\"]/observation",
+      "measurement:[1,\"ll/3.630V/27C\",\"vdd_end\"]/observation",
+      "measurement:[2,\"ll/3.630V/125C\",\"por_raw_max\"]/observation",
+      "measurement:[2,\"ll/3.630V/125C\",\"vdd_end\"]/observation",
+      "measurement:[3,\"hh/3.630V/-40C\",\"por_raw_max\"]/observation",
+      "measurement:[3,\"hh/3.630V/-40C\",\"vdd_end\"]/observation",
+      "measurement:[4,\"hh/3.630V/27C\",\"por_raw_max\"]/observation",
+      "measurement:[4,\"hh/3.630V/27C\",\"vdd_end\"]/observation",
+      "measurement:[5,\"hh/3.630V/125C\",\"por_raw_max\"]/observation",
+      "measurement:[5,\"hh/3.630V/125C\",\"vdd_end\"]/observation"
+    ],
+    "skipped": [],
+    "inapplicable": [
+      {
+        "id": "measurement:[0,\"ll/3.630V/-40C\",\"por_raw_max\"]/limits",
+        "reason": "characterization_without_limits"
+      },
+      {
+        "id": "measurement:[0,\"ll/3.630V/-40C\",\"vdd_end\"]/limits",
+        "reason": "characterization_without_limits"
+      },
+      {
+        "id": "measurement:[1,\"ll/3.630V/27C\",\"por_raw_max\"]/limits",
+        "reason": "characterization_without_limits"
+      },
+      {
+        "id": "measurement:[1,\"ll/3.630V/27C\",\"vdd_end\"]/limits",
+        "reason": "characterization_without_limits"
+      },
+      {
+        "id": "measurement:[2,\"ll/3.630V/125C\",\"por_raw_max\"]/limits",
+        "reason": "characterization_without_limits"
+      },
+      {
+        "id": "measurement:[2,\"ll/3.630V/125C\",\"vdd_end\"]/limits",
+        "reason": "characterization_without_limits"
+      },
+      {
+        "id": "measurement:[3,\"hh/3.630V/-40C\",\"por_raw_max\"]/limits",
+        "reason": "characterization_without_limits"
+      },
+      {
+        "id": "measurement:[3,\"hh/3.630V/-40C\",\"vdd_end\"]/limits",
+        "reason": "characterization_without_limits"
+      },
+      {
+        "id": "measurement:[4,\"hh/3.630V/27C\",\"por_raw_max\"]/limits",
+        "reason": "characterization_without_limits"
+      },
+      {
+        "id": "measurement:[4,\"hh/3.630V/27C\",\"vdd_end\"]/limits",
+        "reason": "characterization_without_limits"
+      },
+      {
+        "id": "measurement:[5,\"hh/3.630V/125C\",\"por_raw_max\"]/limits",
+        "reason": "characterization_without_limits"
+      },
+      {
+        "id": "measurement:[5,\"hh/3.630V/125C\",\"vdd_end\"]/limits",
+        "reason": "characterization_without_limits"
+      }
+    ],
+    "unknown": [],
+    "nothing_checked": false,
+    "nothing_checked_reasons": []
+  },
+  "provenance": {
+    "klt_version": "0.7.0+g4cbdfa769875",
+    "klayout_version": "0.30.12",
+    "pdk": {
+      "name": "sky130A",
+      "source": "search root: ~/.volare",
+      "version": "open_pdks c6d73a35f524070e85faff4a6a9eef49553ebc2b"
+    },
+    "deck": {
+      "name": "sky130.lib.spice",
+      "content_hash": "sha256:48de7c677e2c6e7d09b2559279de9f818be71010a4aa933d728eb4db3b133c84",
+      "released": false
+    },
+    "input": {
+      "content_hash": "sha256:cd02abd441f9dba8a1be8e4531b39486b7d1df571604e31433d911cf24819934",
+      "role": "netlist"
+    }
+  },
+  "measurements": [
+    {
+      "name": "vdd_end",
+      "unit": "V",
+      "limits": null,
+      "status": "pass",
+      "worst_case": {
+        "corner_id": "ll/3.630V/-40C",
+        "value": 0.0001,
+        "margin": null
+      }
+    },
+    {
+      "name": "por_raw_max",
+      "unit": "V",
+      "limits": null,
+      "status": "pass",
+      "worst_case": {
+        "corner_id": "ll/3.630V/-40C",
+        "value": 3.62995,
+        "margin": null
+      }
+    }
+  ],
+  "corners": [
+    {
+      "corner_id": "ll/3.630V/-40C",
+      "process": "ll",
+      "supply_v": {
+        "vset": 3.63
+      },
+      "temperature_c": -40,
+      "status": "pass",
+      "runtime_s": 94.594,
+      "measurements": [
+        {
+          "name": "vdd_end",
+          "value": 0.0001,
+          "unit": "V",
+          "status": "pass",
+          "margin": null
+        },
+        {
+          "name": "por_raw_max",
+          "value": 3.62995,
+          "unit": "V",
+          "status": "pass",
+          "margin": null
+        }
+      ],
+      "diagnostics": [],
+      "artifacts": {
+        "log": "<build>/ideal-bias/r100/out/ll_3p630V_n40C/ngspice.log",
+        "raw": "<build>/ideal-bias/r100/out/ll_3p630V_n40C/waveform.raw",
+        "waveform": "<build>/ideal-bias/r100/out/ll_3p630V_n40C/waveform.raw.json",
+        "deck": "<build>/ideal-bias/r100/out/ll_3p630V_n40C/corner.cir"
+      },
+      "monte_carlo": null
+    },
+    {
+      "corner_id": "ll/3.630V/27C",
+      "process": "ll",
+      "supply_v": {
+        "vset": 3.63
+      },
+      "temperature_c": 27,
+      "status": "pass",
+      "runtime_s": 94.666,
+      "measurements": [
+        {
+          "name": "vdd_end",
+          "value": 0.0001,
+          "unit": "V",
+          "status": "pass",
+          "margin": null
+        },
+        {
+          "name": "por_raw_max",
+          "value": 3.62995,
+          "unit": "V",
+          "status": "pass",
+          "margin": null
+        }
+      ],
+      "diagnostics": [],
+      "artifacts": {
+        "log": "<build>/ideal-bias/r100/out/ll_3p630V_27C/ngspice.log",
+        "raw": "<build>/ideal-bias/r100/out/ll_3p630V_27C/waveform.raw",
+        "waveform": "<build>/ideal-bias/r100/out/ll_3p630V_27C/waveform.raw.json",
+        "deck": "<build>/ideal-bias/r100/out/ll_3p630V_27C/corner.cir"
+      },
+      "monte_carlo": null
+    },
+    {
+      "corner_id": "ll/3.630V/125C",
+      "process": "ll",
+      "supply_v": {
+        "vset": 3.63
+      },
+      "temperature_c": 125,
+      "status": "pass",
+      "runtime_s": 72.953,
+      "measurements": [
+        {
+          "name": "vdd_end",
+          "value": 0.0001,
+          "unit": "V",
+          "status": "pass",
+          "margin": null
+        },
+        {
+          "name": "por_raw_max",
+          "value": 3.62995,
+          "unit": "V",
+          "status": "pass",
+          "margin": null
+        }
+      ],
+      "diagnostics": [],
+      "artifacts": {
+        "log": "<build>/ideal-bias/r100/out/ll_3p630V_125C/ngspice.log",
+        "raw": "<build>/ideal-bias/r100/out/ll_3p630V_125C/waveform.raw",
+        "waveform": "<build>/ideal-bias/r100/out/ll_3p630V_125C/waveform.raw.json",
+        "deck": "<build>/ideal-bias/r100/out/ll_3p630V_125C/corner.cir"
+      },
+      "monte_carlo": null
+    },
+    {
+      "corner_id": "hh/3.630V/-40C",
+      "process": "hh",
+      "supply_v": {
+        "vset": 3.63
+      },
+      "temperature_c": -40,
+      "status": "pass",
+      "runtime_s": 94.331,
+      "measurements": [
+        {
+          "name": "vdd_end",
+          "value": 0.0001,
+          "unit": "V",
+          "status": "pass",
+          "margin": null
+        },
+        {
+          "name": "por_raw_max",
+          "value": 3.62995,
+          "unit": "V",
+          "status": "pass",
+          "margin": null
+        }
+      ],
+      "diagnostics": [],
+      "artifacts": {
+        "log": "<build>/ideal-bias/r100/out/hh_3p630V_n40C/ngspice.log",
+        "raw": "<build>/ideal-bias/r100/out/hh_3p630V_n40C/waveform.raw",
+        "waveform": "<build>/ideal-bias/r100/out/hh_3p630V_n40C/waveform.raw.json",
+        "deck": "<build>/ideal-bias/r100/out/hh_3p630V_n40C/corner.cir"
+      },
+      "monte_carlo": null
+    },
+    {
+      "corner_id": "hh/3.630V/27C",
+      "process": "hh",
+      "supply_v": {
+        "vset": 3.63
+      },
+      "temperature_c": 27,
+      "status": "pass",
+      "runtime_s": 94.682,
+      "measurements": [
+        {
+          "name": "vdd_end",
+          "value": 0.0001,
+          "unit": "V",
+          "status": "pass",
+          "margin": null
+        },
+        {
+          "name": "por_raw_max",
+          "value": 3.62995,
+          "unit": "V",
+          "status": "pass",
+          "margin": null
+        }
+      ],
+      "diagnostics": [],
+      "artifacts": {
+        "log": "<build>/ideal-bias/r100/out/hh_3p630V_27C/ngspice.log",
+        "raw": "<build>/ideal-bias/r100/out/hh_3p630V_27C/waveform.raw",
+        "waveform": "<build>/ideal-bias/r100/out/hh_3p630V_27C/waveform.raw.json",
+        "deck": "<build>/ideal-bias/r100/out/hh_3p630V_27C/corner.cir"
+      },
+      "monte_carlo": null
+    },
+    {
+      "corner_id": "hh/3.630V/125C",
+      "process": "hh",
+      "supply_v": {
+        "vset": 3.63
+      },
+      "temperature_c": 125,
+      "status": "pass",
+      "runtime_s": 93.516,
+      "measurements": [
+        {
+          "name": "vdd_end",
+          "value": 0.0001,
+          "unit": "V",
+          "status": "pass",
+          "margin": null
+        },
+        {
+          "name": "por_raw_max",
+          "value": 3.62995,
+          "unit": "V",
+          "status": "pass",
+          "margin": null
+        }
+      ],
+      "diagnostics": [],
+      "artifacts": {
+        "log": "<build>/ideal-bias/r100/out/hh_3p630V_125C/ngspice.log",
+        "raw": "<build>/ideal-bias/r100/out/hh_3p630V_125C/waveform.raw",
+        "waveform": "<build>/ideal-bias/r100/out/hh_3p630V_125C/waveform.raw.json",
+        "deck": "<build>/ideal-bias/r100/out/hh_3p630V_125C/corner.cir"
+      },
+      "monte_carlo": null
+    }
+  ]
+}
