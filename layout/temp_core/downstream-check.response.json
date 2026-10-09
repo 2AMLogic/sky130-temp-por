@@ -1,0 +1,398 @@
+{
+  "schema_version": 1,
+  "generator": "gen-compose",
+  "cell_name": "temp_core_downstream_check",
+  "gds_path": "downstream-check.gds",
+  "pdk": {
+    "name": "sky130A",
+    "variant": "sky130A",
+    "version": "open_pdks c6d73a35f524070e85faff4a6a9eef49553ebc2b"
+  },
+  "dbu_um": 0.001,
+  "bbox_um": {
+    "x0": -50.0,
+    "y0": -17.0,
+    "x1": 2793.92,
+    "y1": 59.665
+  },
+  "ports": [],
+  "blocks": [
+    {
+      "id": "sub",
+      "source": "cell",
+      "generator": null,
+      "cell_name": "temp_core",
+      "source_path": "/home/ubuntu/GitHub/sky130-temp-por/.loom/worktrees/issue-104/layout/temp_core/temp_core.gds",
+      "source_digest": "sha256:7548dbf76a0d813394ab1991412d97cc49c355608ef5fd5ad2a65dab60b5f941",
+      "offset_um": {
+        "x": 0.0,
+        "y": 0.0
+      },
+      "bbox_um": {
+        "x0": -10.0,
+        "y0": -17.0,
+        "x1": 2793.92,
+        "y1": 59.665
+      },
+      "orientation": "none",
+      "abuts": []
+    },
+    {
+      "id": "dummy_VDD",
+      "source": "cell",
+      "generator": null,
+      "cell_name": "promo_stub",
+      "source_path": "/home/ubuntu/GitHub/sky130-temp-por/.loom/worktrees/issue-104/layout/temp_core/promo_stub.gds",
+      "source_digest": "sha256:902ff80454f309f31943b44b8a7f942a6d96817455a784cbefd7f85d019f84ab",
+      "offset_um": {
+        "x": -46.0,
+        "y": 59.495
+      },
+      "bbox_um": {
+        "x0": -46.0,
+        "y0": 59.495,
+        "x1": -44.5,
+        "y1": 59.665
+      },
+      "orientation": "none",
+      "abuts": []
+    },
+    {
+      "id": "dummy_VSS",
+      "source": "cell",
+      "generator": null,
+      "cell_name": "promo_stub",
+      "source_path": "/home/ubuntu/GitHub/sky130-temp-por/.loom/worktrees/issue-104/layout/temp_core/promo_stub.gds",
+      "source_digest": "sha256:902ff80454f309f31943b44b8a7f942a6d96817455a784cbefd7f85d019f84ab",
+      "offset_um": {
+        "x": -46.0,
+        "y": -6.085
+      },
+      "bbox_um": {
+        "x0": -46.0,
+        "y0": -6.085,
+        "x1": -44.5,
+        "y1": -5.915
+      },
+      "orientation": "none",
+      "abuts": []
+    },
+    {
+      "id": "dummy_IBIAS",
+      "source": "cell",
+      "generator": null,
+      "cell_name": "promo_stub",
+      "source_path": "/home/ubuntu/GitHub/sky130-temp-por/.loom/worktrees/issue-104/layout/temp_core/promo_stub.gds",
+      "source_digest": "sha256:902ff80454f309f31943b44b8a7f942a6d96817455a784cbefd7f85d019f84ab",
+      "offset_um": {
+        "x": -50.0,
+        "y": 14.135
+      },
+      "bbox_um": {
+        "x0": -50.0,
+        "y0": 14.135,
+        "x1": -48.5,
+        "y1": 14.305
+      },
+      "orientation": "none",
+      "abuts": []
+    },
+    {
+      "id": "dummy_EN",
+      "source": "cell",
+      "generator": null,
+      "cell_name": "promo_stub",
+      "source_path": "/home/ubuntu/GitHub/sky130-temp-por/.loom/worktrees/issue-104/layout/temp_core/promo_stub.gds",
+      "source_digest": "sha256:902ff80454f309f31943b44b8a7f942a6d96817455a784cbefd7f85d019f84ab",
+      "offset_um": {
+        "x": -50.0,
+        "y": 23.635
+      },
+      "bbox_um": {
+        "x0": -50.0,
+        "y0": 23.635,
+        "x1": -48.5,
+        "y1": 23.805000000000003
+      },
+      "orientation": "none",
+      "abuts": []
+    },
+    {
+      "id": "dummy_PTAT",
+      "source": "cell",
+      "generator": null,
+      "cell_name": "promo_stub",
+      "source_path": "/home/ubuntu/GitHub/sky130-temp-por/.loom/worktrees/issue-104/layout/temp_core/promo_stub.gds",
+      "source_digest": "sha256:902ff80454f309f31943b44b8a7f942a6d96817455a784cbefd7f85d019f84ab",
+      "offset_um": {
+        "x": -50.0,
+        "y": 24.635
+      },
+      "bbox_um": {
+        "x0": -50.0,
+        "y0": 24.635,
+        "x1": -48.5,
+        "y1": 24.805000000000003
+      },
+      "orientation": "none",
+      "abuts": []
+    },
+    {
+      "id": "dummy_CTAT",
+      "source": "cell",
+      "generator": null,
+      "cell_name": "promo_stub",
+      "source_path": "/home/ubuntu/GitHub/sky130-temp-por/.loom/worktrees/issue-104/layout/temp_core/promo_stub.gds",
+      "source_digest": "sha256:902ff80454f309f31943b44b8a7f942a6d96817455a784cbefd7f85d019f84ab",
+      "offset_um": {
+        "x": -50.0,
+        "y": 12.635
+      },
+      "bbox_um": {
+        "x0": -50.0,
+        "y0": 12.635,
+        "x1": -48.5,
+        "y1": 12.805
+      },
+      "orientation": "none",
+      "abuts": []
+    }
+  ],
+  "nets": [
+    {
+      "net": "VDD",
+      "pins": [
+        {
+          "block": "sub",
+          "port": "VDD"
+        },
+        {
+          "block": "dummy_VDD",
+          "port": "PAD"
+        }
+      ],
+      "routed": true,
+      "route_length_um": 40.0,
+      "status": "routed",
+      "landed_on_block": true,
+      "legs": [
+        {
+          "pins": [
+            {
+              "block": "sub",
+              "port": "VDD"
+            },
+            {
+              "block": "dummy_VDD",
+              "port": "PAD"
+            }
+          ],
+          "routed": true,
+          "route_length_um": 40.0,
+          "reason": null,
+          "channel_track": 0,
+          "landed_on_block": true
+        }
+      ]
+    },
+    {
+      "net": "VSS",
+      "pins": [
+        {
+          "block": "sub",
+          "port": "VSS"
+        },
+        {
+          "block": "dummy_VSS",
+          "port": "PAD"
+        }
+      ],
+      "routed": true,
+      "route_length_um": 40.0,
+      "status": "routed",
+      "landed_on_block": true,
+      "legs": [
+        {
+          "pins": [
+            {
+              "block": "sub",
+              "port": "VSS"
+            },
+            {
+              "block": "dummy_VSS",
+              "port": "PAD"
+            }
+          ],
+          "routed": true,
+          "route_length_um": 40.0,
+          "reason": null,
+          "channel_track": 0,
+          "landed_on_block": true
+        }
+      ]
+    },
+    {
+      "net": "IBIAS",
+      "pins": [
+        {
+          "block": "sub",
+          "port": "IBIAS"
+        },
+        {
+          "block": "dummy_IBIAS",
+          "port": "PAD"
+        }
+      ],
+      "routed": true,
+      "route_length_um": 40.0,
+      "status": "routed",
+      "landed_on_block": true,
+      "legs": [
+        {
+          "pins": [
+            {
+              "block": "sub",
+              "port": "IBIAS"
+            },
+            {
+              "block": "dummy_IBIAS",
+              "port": "PAD"
+            }
+          ],
+          "routed": true,
+          "route_length_um": 40.0,
+          "reason": null,
+          "channel_track": 0,
+          "landed_on_block": true
+        }
+      ]
+    },
+    {
+      "net": "EN",
+      "pins": [
+        {
+          "block": "sub",
+          "port": "EN"
+        },
+        {
+          "block": "dummy_EN",
+          "port": "PAD"
+        }
+      ],
+      "routed": true,
+      "route_length_um": 40.0,
+      "status": "routed",
+      "landed_on_block": true,
+      "legs": [
+        {
+          "pins": [
+            {
+              "block": "sub",
+              "port": "EN"
+            },
+            {
+              "block": "dummy_EN",
+              "port": "PAD"
+            }
+          ],
+          "routed": true,
+          "route_length_um": 40.0,
+          "reason": null,
+          "channel_track": 0,
+          "landed_on_block": true
+        }
+      ]
+    },
+    {
+      "net": "PTAT",
+      "pins": [
+        {
+          "block": "sub",
+          "port": "PTAT"
+        },
+        {
+          "block": "dummy_PTAT",
+          "port": "PAD"
+        }
+      ],
+      "routed": true,
+      "route_length_um": 40.0,
+      "status": "routed",
+      "landed_on_block": true,
+      "legs": [
+        {
+          "pins": [
+            {
+              "block": "sub",
+              "port": "PTAT"
+            },
+            {
+              "block": "dummy_PTAT",
+              "port": "PAD"
+            }
+          ],
+          "routed": true,
+          "route_length_um": 40.0,
+          "reason": null,
+          "channel_track": 0,
+          "landed_on_block": true
+        }
+      ]
+    },
+    {
+      "net": "CTAT",
+      "pins": [
+        {
+          "block": "sub",
+          "port": "CTAT"
+        },
+        {
+          "block": "dummy_CTAT",
+          "port": "PAD"
+        }
+      ],
+      "routed": true,
+      "route_length_um": 40.0,
+      "status": "routed",
+      "landed_on_block": true,
+      "legs": [
+        {
+          "pins": [
+            {
+              "block": "sub",
+              "port": "CTAT"
+            },
+            {
+              "block": "dummy_CTAT",
+              "port": "PAD"
+            }
+          ],
+          "routed": true,
+          "route_length_um": 40.0,
+          "reason": null,
+          "channel_track": 0,
+          "landed_on_block": true
+        }
+      ]
+    }
+  ],
+  "pins": [],
+  "unrouted_nets": [],
+  "drc_hints": {
+    "min_spacing_um": null,
+    "matched_groups": [],
+    "notes": []
+  },
+  "warnings": [],
+  "provenance": {
+    "klt_version": "0.6.0+g0ce8c64842d9",
+    "klayout_version": "0.30.12",
+    "pdk": {
+      "name": "sky130A",
+      "source": "search root: ~/.volare",
+      "version": "open_pdks c6d73a35f524070e85faff4a6a9eef49553ebc2b"
+    },
+    "deck": null,
+    "input": null
+  }
+}

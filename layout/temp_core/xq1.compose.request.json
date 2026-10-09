@@ -1,0 +1,53 @@
+{
+  "pdk": {
+    "variant": "sky130A"
+  },
+  "blocks": [
+    {
+      "id": "array",
+      "generator_report": "gen/array.gen.json"
+    }
+  ],
+  "placement": {
+    "strategy": "explicit",
+    "order": [
+      "array"
+    ],
+    "origins_um": {
+      "array": {
+        "x": 0.0,
+        "y": 0.0
+      }
+    }
+  },
+  "routing": {
+    "layer_role": "metal",
+    "width_um": 0.17
+  },
+  "connectivity": [
+    {
+      "net": "vss",
+      "pins": [
+        {
+          "block": "array",
+          "port": "Q0_B"
+        },
+        {
+          "block": "array",
+          "port": "COLL_E"
+        }
+      ]
+    }
+  ],
+  "pins": [
+    {
+      "net": "na",
+      "block": "array",
+      "port": "Q0_E"
+    }
+  ],
+  "options": {
+    "cell_name": "xq1",
+    "output": "xq1.gds"
+  }
+}

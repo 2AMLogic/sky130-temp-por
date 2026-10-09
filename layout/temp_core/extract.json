@@ -1,0 +1,1812 @@
+{
+  "schema_version": 3,
+  "file": "temp_core.gds",
+  "deck": "sky130",
+  "top": "temp_core",
+  "dbu_um": 0.001,
+  "netlist_path": "temp_core.spice",
+  "netlist_sha256": "b47ab0fd2b9d88b5d1f311b827006135e040db92757c472273ef8f42d9c498d2",
+  "status": "extracted",
+  "device_count": 48,
+  "net_count": 24,
+  "pin_count": 24,
+  "device_counts": {
+    "nfet": 17,
+    "pfet": 16,
+    "pnp": 9,
+    "res_xhigh_po": 5,
+    "sky130_fd_pr__model__cap_mim": 1
+  },
+  "dummy_devices_dropped": 0,
+  "ignored_layers": [],
+  "device_recognition_only_layers": [
+    {
+      "layer": 66,
+      "datatype": 13,
+      "shapes": 5
+    },
+    {
+      "layer": 79,
+      "datatype": 20,
+      "shapes": 5
+    },
+    {
+      "layer": 82,
+      "datatype": 44,
+      "shapes": 9
+    },
+    {
+      "layer": 89,
+      "datatype": 44,
+      "shapes": 1
+    },
+    {
+      "layer": 94,
+      "datatype": 20,
+      "shapes": 5
+    }
+  ],
+  "device_classes": [
+    "nfet",
+    "pfet",
+    "pnp",
+    "sky130_fd_pr__model__cap_mim",
+    "sky130_fd_pr__model__cap_mim_m4",
+    "resistor"
+  ],
+  "devices": [
+    {
+      "name": "$1",
+      "class": "nfet",
+      "nets": {
+        "s": "VSS|vss",
+        "g": "EN",
+        "d": "ENB",
+        "b": "VSS|vss"
+      },
+      "params": {
+        "l_um": 0.5,
+        "w_um": 1.0,
+        "as_um2": 0.42,
+        "ad_um2": 0.42,
+        "ps_um": 2.84,
+        "pd_um": 2.84
+      },
+      "instance_path": [
+        {
+          "cell": "minvn__minvn",
+          "array_index": null
+        },
+        {
+          "cell": "mos_array",
+          "array_index": null
+        }
+      ]
+    },
+    {
+      "name": "$10",
+      "class": "nfet",
+      "nets": {
+        "s": "VSS|vss",
+        "g": "ENB",
+        "d": "N2",
+        "b": "VSS|vss"
+      },
+      "params": {
+        "l_um": 1.0,
+        "w_um": 2.0,
+        "as_um2": 0.84,
+        "ad_um2": 0.84,
+        "ps_um": 4.84,
+        "pd_um": 4.84
+      },
+      "instance_path": [
+        {
+          "cell": "mdn2__mdn2",
+          "array_index": null
+        },
+        {
+          "cell": "mos_array$14",
+          "array_index": null
+        }
+      ]
+    },
+    {
+      "name": "$11",
+      "class": "nfet",
+      "nets": {
+        "s": "IBIAS",
+        "g": "NBG",
+        "d": "VSS|vss",
+        "b": "VSS|vss"
+      },
+      "params": {
+        "l_um": 2.0,
+        "w_um": 4.0,
+        "as_um2": 1.68,
+        "ad_um2": 1.68,
+        "ps_um": 8.84,
+        "pd_um": 8.84
+      },
+      "instance_path": [
+        {
+          "cell": "mbd__mbd",
+          "array_index": null
+        },
+        {
+          "cell": "mos_array$2",
+          "array_index": null
+        }
+      ]
+    },
+    {
+      "name": "$12",
+      "class": "nfet",
+      "nets": {
+        "s": "VSS|vss",
+        "g": "NBG",
+        "d": "PB",
+        "b": "VSS|vss"
+      },
+      "params": {
+        "l_um": 2.0,
+        "w_um": 4.0,
+        "as_um2": 1.68,
+        "ad_um2": 1.68,
+        "ps_um": 8.84,
+        "pd_um": 8.84
+      },
+      "instance_path": [
+        {
+          "cell": "mbn1__mbn1",
+          "array_index": null
+        },
+        {
+          "cell": "mos_array$4",
+          "array_index": null
+        }
+      ]
+    },
+    {
+      "name": "$13",
+      "class": "nfet",
+      "nets": {
+        "s": "VSS|vss",
+        "g": "NBG",
+        "d": "PCAS",
+        "b": "VSS|vss"
+      },
+      "params": {
+        "l_um": 2.0,
+        "w_um": 4.0,
+        "as_um2": 1.68,
+        "ad_um2": 1.68,
+        "ps_um": 8.84,
+        "pd_um": 8.84
+      },
+      "instance_path": [
+        {
+          "cell": "mbn2__mbn2",
+          "array_index": null
+        },
+        {
+          "cell": "mos_array$5",
+          "array_index": null
+        }
+      ]
+    },
+    {
+      "name": "$14",
+      "class": "nfet",
+      "nets": {
+        "s": "VSS|vss",
+        "g": "ND",
+        "d": "PG",
+        "b": "VSS|vss"
+      },
+      "params": {
+        "l_um": 1.0,
+        "w_um": 4.0,
+        "as_um2": 1.68,
+        "ad_um2": 1.68,
+        "ps_um": 8.84,
+        "pd_um": 8.84
+      },
+      "instance_path": [
+        {
+          "cell": "msu3__msu3",
+          "array_index": null
+        },
+        {
+          "cell": "mos_array$9",
+          "array_index": null
+        }
+      ]
+    },
+    {
+      "name": "$15",
+      "class": "nfet",
+      "nets": {
+        "s": "VSS|vss",
+        "g": "N1",
+        "d": "N1",
+        "b": "VSS|vss"
+      },
+      "params": {
+        "l_um": 8.0,
+        "w_um": 8.0,
+        "as_um2": 3.36,
+        "ad_um2": 3.36,
+        "ps_um": 16.84,
+        "pd_um": 16.84
+      },
+      "instance_path": [
+        {
+          "cell": "ml1__ml1",
+          "array_index": null
+        },
+        {
+          "cell": "mos_array$11",
+          "array_index": null
+        }
+      ]
+    },
+    {
+      "name": "$16",
+      "class": "nfet",
+      "nets": {
+        "s": "VSS|vss",
+        "g": "N1",
+        "d": "N2",
+        "b": "VSS|vss"
+      },
+      "params": {
+        "l_um": 8.0,
+        "w_um": 8.0,
+        "as_um2": 3.36,
+        "ad_um2": 3.36,
+        "ps_um": 16.84,
+        "pd_um": 16.84
+      },
+      "instance_path": [
+        {
+          "cell": "ml2__ml2",
+          "array_index": null
+        },
+        {
+          "cell": "mos_array$12",
+          "array_index": null
+        }
+      ]
+    },
+    {
+      "name": "$17",
+      "class": "nfet",
+      "nets": {
+        "s": "VSS|vss",
+        "g": "N2",
+        "d": "PG",
+        "b": "VSS|vss"
+      },
+      "params": {
+        "l_um": 8.0,
+        "w_um": 8.0,
+        "as_um2": 3.36,
+        "ad_um2": 3.36,
+        "ps_um": 16.84,
+        "pd_um": 16.84
+      },
+      "instance_path": [
+        {
+          "cell": "ms2n__ms2n",
+          "array_index": null
+        },
+        {
+          "cell": "mos_array$13",
+          "array_index": null
+        }
+      ]
+    },
+    {
+      "name": "$18",
+      "class": "pfet",
+      "nets": {
+        "s": "VDD",
+        "g": "PCAS",
+        "d": "PCAS",
+        "b": "VDD"
+      },
+      "params": {
+        "l_um": 8.0,
+        "w_um": 1.0,
+        "as_um2": 0.42,
+        "ad_um2": 0.42,
+        "ps_um": 2.84,
+        "pd_um": 2.84
+      },
+      "instance_path": [
+        {
+          "cell": "mcb__mcb",
+          "array_index": null
+        },
+        {
+          "cell": "mos_array$20",
+          "array_index": null
+        }
+      ]
+    },
+    {
+      "name": "$19",
+      "class": "pfet",
+      "nets": {
+        "s": "VDD",
+        "g": "PB",
+        "d": "ND",
+        "b": "VDD"
+      },
+      "params": {
+        "l_um": 8.0,
+        "w_um": 1.0,
+        "as_um2": 0.42,
+        "ad_um2": 0.42,
+        "ps_um": 2.84,
+        "pd_um": 2.84
+      },
+      "instance_path": [
+        {
+          "cell": "msu1__msu1",
+          "array_index": null
+        },
+        {
+          "cell": "mos_array$21",
+          "array_index": null
+        }
+      ]
+    },
+    {
+      "name": "$2",
+      "class": "nfet",
+      "nets": {
+        "s": "VSS|vss",
+        "g": "ENB",
+        "d": "PTAT",
+        "b": "VSS|vss"
+      },
+      "params": {
+        "l_um": 1.0,
+        "w_um": 1.0,
+        "as_um2": 0.42,
+        "ad_um2": 0.42,
+        "ps_um": 2.84,
+        "pd_um": 2.84
+      },
+      "instance_path": [
+        {
+          "cell": "menpt__menpt",
+          "array_index": null
+        },
+        {
+          "cell": "mos_array$15",
+          "array_index": null
+        }
+      ]
+    },
+    {
+      "name": "$20",
+      "class": "pfet",
+      "nets": {
+        "s": "VDD",
+        "g": "PG",
+        "d": "NR",
+        "b": "VDD"
+      },
+      "params": {
+        "l_um": 4.0,
+        "w_um": 1.0,
+        "as_um2": 0.42,
+        "ad_um2": 0.42,
+        "ps_um": 2.84,
+        "pd_um": 2.84
+      },
+      "instance_path": [
+        {
+          "cell": "msu4__msu4",
+          "array_index": null
+        },
+        {
+          "cell": "mos_array$22",
+          "array_index": null
+        }
+      ]
+    },
+    {
+      "name": "$21",
+      "class": "pfet",
+      "nets": {
+        "s": "VDD",
+        "g": "EN",
+        "d": "ENB",
+        "b": "VDD"
+      },
+      "params": {
+        "l_um": 0.5,
+        "w_um": 2.0,
+        "as_um2": 0.84,
+        "ad_um2": 0.84,
+        "ps_um": 4.84,
+        "pd_um": 4.84
+      },
+      "instance_path": [
+        {
+          "cell": "minvp__minvp",
+          "array_index": null
+        },
+        {
+          "cell": "mos_array$17",
+          "array_index": null
+        }
+      ]
+    },
+    {
+      "name": "$22",
+      "class": "pfet",
+      "nets": {
+        "s": "VDD",
+        "g": "EN",
+        "d": "PG",
+        "b": "VDD"
+      },
+      "params": {
+        "l_um": 0.5,
+        "w_um": 4.0,
+        "as_um2": 1.68,
+        "ad_um2": 1.68,
+        "ps_um": 8.84,
+        "pd_um": 8.84
+      },
+      "instance_path": [
+        {
+          "cell": "menpg__menpg",
+          "array_index": null
+        },
+        {
+          "cell": "mos_array$18",
+          "array_index": null
+        }
+      ]
+    },
+    {
+      "name": "$23",
+      "class": "pfet",
+      "nets": {
+        "s": "VDD",
+        "g": "PG",
+        "d": "M1D",
+        "b": "VDD"
+      },
+      "params": {
+        "l_um": 4.0,
+        "w_um": 8.0,
+        "as_um2": 3.36,
+        "ad_um2": 3.36,
+        "ps_um": 16.84,
+        "pd_um": 16.84
+      },
+      "instance_path": [
+        {
+          "cell": "mp1__mp1",
+          "array_index": null
+        },
+        {
+          "cell": "mos_array$27",
+          "array_index": null
+        }
+      ]
+    },
+    {
+      "name": "$24",
+      "class": "pfet",
+      "nets": {
+        "s": "M1D",
+        "g": "PCAS",
+        "d": "NA|na",
+        "b": "VDD"
+      },
+      "params": {
+        "l_um": 1.0,
+        "w_um": 8.0,
+        "as_um2": 3.36,
+        "ad_um2": 3.36,
+        "ps_um": 16.84,
+        "pd_um": 16.84
+      },
+      "instance_path": [
+        {
+          "cell": "mpc1__mpc1",
+          "array_index": null
+        },
+        {
+          "cell": "mos_array$28",
+          "array_index": null
+        }
+      ]
+    },
+    {
+      "name": "$25",
+      "class": "pfet",
+      "nets": {
+        "s": "VDD",
+        "g": "PG",
+        "d": "M2D",
+        "b": "VDD"
+      },
+      "params": {
+        "l_um": 4.0,
+        "w_um": 8.0,
+        "as_um2": 3.36,
+        "ad_um2": 3.36,
+        "ps_um": 16.84,
+        "pd_um": 16.84
+      },
+      "instance_path": [
+        {
+          "cell": "mp2__mp2",
+          "array_index": null
+        },
+        {
+          "cell": "mos_array$29",
+          "array_index": null
+        }
+      ]
+    },
+    {
+      "name": "$26",
+      "class": "pfet",
+      "nets": {
+        "s": "M2D",
+        "g": "PCAS",
+        "d": "NB",
+        "b": "VDD"
+      },
+      "params": {
+        "l_um": 1.0,
+        "w_um": 8.0,
+        "as_um2": 3.36,
+        "ad_um2": 3.36,
+        "ps_um": 16.84,
+        "pd_um": 16.84
+      },
+      "instance_path": [
+        {
+          "cell": "mpc2__mpc2",
+          "array_index": null
+        },
+        {
+          "cell": "mos_array$30",
+          "array_index": null
+        }
+      ]
+    },
+    {
+      "name": "$27",
+      "class": "pfet",
+      "nets": {
+        "s": "VDD",
+        "g": "PG",
+        "d": "M3D",
+        "b": "VDD"
+      },
+      "params": {
+        "l_um": 4.0,
+        "w_um": 8.0,
+        "as_um2": 3.36,
+        "ad_um2": 3.36,
+        "ps_um": 16.84,
+        "pd_um": 16.84
+      },
+      "instance_path": [
+        {
+          "cell": "mp3__mp3",
+          "array_index": null
+        },
+        {
+          "cell": "mos_array$31",
+          "array_index": null
+        }
+      ]
+    },
+    {
+      "name": "$28",
+      "class": "pfet",
+      "nets": {
+        "s": "M3D",
+        "g": "PCAS",
+        "d": "PTAT",
+        "b": "VDD"
+      },
+      "params": {
+        "l_um": 1.0,
+        "w_um": 8.0,
+        "as_um2": 3.36,
+        "ad_um2": 3.36,
+        "ps_um": 16.84,
+        "pd_um": 16.84
+      },
+      "instance_path": [
+        {
+          "cell": "mpc3__mpc3",
+          "array_index": null
+        },
+        {
+          "cell": "mos_array$32",
+          "array_index": null
+        }
+      ]
+    },
+    {
+      "name": "$29",
+      "class": "pfet",
+      "nets": {
+        "s": "VDD",
+        "g": "PB",
+        "d": "PB",
+        "b": "VDD"
+      },
+      "params": {
+        "l_um": 4.0,
+        "w_um": 10.0,
+        "as_um2": 4.2,
+        "ad_um2": 4.2,
+        "ps_um": 20.84,
+        "pd_um": 20.84
+      },
+      "instance_path": [
+        {
+          "cell": "mbp__mbp",
+          "array_index": null
+        },
+        {
+          "cell": "mos_array$19",
+          "array_index": null
+        }
+      ]
+    },
+    {
+      "name": "$3",
+      "class": "nfet",
+      "nets": {
+        "s": "VSS|vss",
+        "g": "ENB",
+        "d": "CTAT",
+        "b": "VSS|vss"
+      },
+      "params": {
+        "l_um": 1.0,
+        "w_um": 1.0,
+        "as_um2": 0.42,
+        "ad_um2": 0.42,
+        "ps_um": 2.84,
+        "pd_um": 2.84
+      },
+      "instance_path": [
+        {
+          "cell": "menct__menct",
+          "array_index": null
+        },
+        {
+          "cell": "mos_array$16",
+          "array_index": null
+        }
+      ]
+    },
+    {
+      "name": "$30",
+      "class": "pfet",
+      "nets": {
+        "s": "VDD",
+        "g": "PB",
+        "d": "PG",
+        "b": "VDD"
+      },
+      "params": {
+        "l_um": 4.0,
+        "w_um": 10.0,
+        "as_um2": 4.2,
+        "ad_um2": 4.2,
+        "ps_um": 20.84,
+        "pd_um": 20.84
+      },
+      "instance_path": [
+        {
+          "cell": "ms2p__ms2p",
+          "array_index": null
+        },
+        {
+          "cell": "mos_array$23",
+          "array_index": null
+        }
+      ]
+    },
+    {
+      "name": "$31",
+      "class": "pfet",
+      "nets": {
+        "s": "VDD",
+        "g": "PB",
+        "d": "NT",
+        "b": "VDD"
+      },
+      "params": {
+        "l_um": 4.0,
+        "w_um": 20.0,
+        "as_um2": 8.4,
+        "ad_um2": 8.4,
+        "ps_um": 40.84,
+        "pd_um": 40.84
+      },
+      "instance_path": [
+        {
+          "cell": "mt__mt",
+          "array_index": null
+        },
+        {
+          "cell": "mos_array$24",
+          "array_index": null
+        }
+      ]
+    },
+    {
+      "name": "$32",
+      "class": "pfet",
+      "nets": {
+        "s": "NT",
+        "g": "NA|na",
+        "d": "N1",
+        "b": "NT"
+      },
+      "params": {
+        "l_um": 4.0,
+        "w_um": 32.0,
+        "as_um2": 13.44,
+        "ad_um2": 13.44,
+        "ps_um": 64.84,
+        "pd_um": 64.84
+      },
+      "instance_path": [
+        {
+          "cell": "mi1__mi1",
+          "array_index": null
+        },
+        {
+          "cell": "mos_array$25",
+          "array_index": null
+        }
+      ]
+    },
+    {
+      "name": "$33",
+      "class": "pfet",
+      "nets": {
+        "s": "NT",
+        "g": "NB",
+        "d": "N2",
+        "b": "NT"
+      },
+      "params": {
+        "l_um": 4.0,
+        "w_um": 32.0,
+        "as_um2": 13.44,
+        "ad_um2": 13.44,
+        "ps_um": 64.84,
+        "pd_um": 64.84
+      },
+      "instance_path": [
+        {
+          "cell": "mi2__mi2",
+          "array_index": null
+        },
+        {
+          "cell": "mos_array$26",
+          "array_index": null
+        }
+      ]
+    },
+    {
+      "name": "$34",
+      "class": "pnp",
+      "nets": {
+        "c": "VSS|vss",
+        "b": "VSS|vss",
+        "e": "NC|ec"
+      },
+      "params": {},
+      "instance_path": [
+        {
+          "cell": "pnp8__bias_core_pnp8_leg",
+          "array_index": null
+        },
+        {
+          "cell": "array__pnp8",
+          "array_index": null
+        },
+        {
+          "cell": "bjt_array",
+          "array_index": null
+        }
+      ]
+    },
+    {
+      "name": "$35",
+      "class": "pnp",
+      "nets": {
+        "c": "VSS|vss",
+        "b": "VSS|vss",
+        "e": "NC|ec"
+      },
+      "params": {},
+      "instance_path": [
+        {
+          "cell": "pnp8__bias_core_pnp8_leg",
+          "array_index": null
+        },
+        {
+          "cell": "array__pnp8",
+          "array_index": null
+        },
+        {
+          "cell": "bjt_array",
+          "array_index": null
+        }
+      ]
+    },
+    {
+      "name": "$36",
+      "class": "pnp",
+      "nets": {
+        "c": "VSS|vss",
+        "b": "VSS|vss",
+        "e": "NC|ec"
+      },
+      "params": {},
+      "instance_path": [
+        {
+          "cell": "pnp8__bias_core_pnp8_leg",
+          "array_index": null
+        },
+        {
+          "cell": "array__pnp8",
+          "array_index": null
+        },
+        {
+          "cell": "bjt_array",
+          "array_index": null
+        }
+      ]
+    },
+    {
+      "name": "$37",
+      "class": "pnp",
+      "nets": {
+        "c": "VSS|vss",
+        "b": "VSS|vss",
+        "e": "NC|ec"
+      },
+      "params": {},
+      "instance_path": [
+        {
+          "cell": "pnp8__bias_core_pnp8_leg",
+          "array_index": null
+        },
+        {
+          "cell": "array__pnp8",
+          "array_index": null
+        },
+        {
+          "cell": "bjt_array",
+          "array_index": null
+        }
+      ]
+    },
+    {
+      "name": "$38",
+      "class": "pnp",
+      "nets": {
+        "c": "VSS|vss",
+        "b": "VSS|vss",
+        "e": "NA|na"
+      },
+      "params": {},
+      "instance_path": [
+        {
+          "cell": "xq1__xq1",
+          "array_index": null
+        },
+        {
+          "cell": "array__xq1_array",
+          "array_index": null
+        },
+        {
+          "cell": "bjt_array$1",
+          "array_index": null
+        }
+      ]
+    },
+    {
+      "name": "$39",
+      "class": "pnp",
+      "nets": {
+        "c": "VSS|vss",
+        "b": "VSS|vss",
+        "e": "NC|ec"
+      },
+      "params": {},
+      "instance_path": [
+        {
+          "cell": "pnp8__bias_core_pnp8_leg",
+          "array_index": null
+        },
+        {
+          "cell": "array__pnp8",
+          "array_index": null
+        },
+        {
+          "cell": "bjt_array",
+          "array_index": null
+        }
+      ]
+    },
+    {
+      "name": "$4",
+      "class": "nfet",
+      "nets": {
+        "s": "NBG",
+        "g": "EN",
+        "d": "IBIAS",
+        "b": "VSS|vss"
+      },
+      "params": {
+        "l_um": 0.5,
+        "w_um": 2.0,
+        "as_um2": 0.84,
+        "ad_um2": 0.84,
+        "ps_um": 4.84,
+        "pd_um": 4.84
+      },
+      "instance_path": [
+        {
+          "cell": "mpass__mpass",
+          "array_index": null
+        },
+        {
+          "cell": "mos_array$1",
+          "array_index": null
+        }
+      ]
+    },
+    {
+      "name": "$40",
+      "class": "pnp",
+      "nets": {
+        "c": "VSS|vss",
+        "b": "VSS|vss",
+        "e": "NC|ec"
+      },
+      "params": {},
+      "instance_path": [
+        {
+          "cell": "pnp8__bias_core_pnp8_leg",
+          "array_index": null
+        },
+        {
+          "cell": "array__pnp8",
+          "array_index": null
+        },
+        {
+          "cell": "bjt_array",
+          "array_index": null
+        }
+      ]
+    },
+    {
+      "name": "$41",
+      "class": "pnp",
+      "nets": {
+        "c": "VSS|vss",
+        "b": "VSS|vss",
+        "e": "NC|ec"
+      },
+      "params": {},
+      "instance_path": [
+        {
+          "cell": "pnp8__bias_core_pnp8_leg",
+          "array_index": null
+        },
+        {
+          "cell": "array__pnp8",
+          "array_index": null
+        },
+        {
+          "cell": "bjt_array",
+          "array_index": null
+        }
+      ]
+    },
+    {
+      "name": "$42",
+      "class": "pnp",
+      "nets": {
+        "c": "VSS|vss",
+        "b": "VSS|vss",
+        "e": "NC|ec"
+      },
+      "params": {},
+      "instance_path": [
+        {
+          "cell": "pnp8__bias_core_pnp8_leg",
+          "array_index": null
+        },
+        {
+          "cell": "array__pnp8",
+          "array_index": null
+        },
+        {
+          "cell": "bjt_array",
+          "array_index": null
+        }
+      ]
+    },
+    {
+      "name": "$43",
+      "class": "sky130_fd_pr__model__cap_mim",
+      "nets": {
+        "a": "NZ",
+        "b": "PG"
+      },
+      "params": {
+        "c_f": 2.9712e-13,
+        "area_um2": 144.0,
+        "perimeter_um": 48.0
+      },
+      "instance_path": [
+        {
+          "cell": "cc__cc",
+          "array_index": null
+        },
+        {
+          "cell": "cap_array",
+          "array_index": null
+        }
+      ]
+    },
+    {
+      "name": "$44",
+      "class": "res_xhigh_po",
+      "nets": {
+        "a": "VSS|vss",
+        "b": "PTAT_TRIM",
+        "w": "VSS|vss"
+      },
+      "params": {
+        "r_ohm": 450880.0,
+        "l_um": 450.88,
+        "w_um": 2.0,
+        "area_um2": 901.76,
+        "perimeter_um": 905.76
+      },
+      "instance_path": [
+        {
+          "cell": "r2trim__r2trim",
+          "array_index": null
+        },
+        {
+          "cell": "res_array$4",
+          "array_index": null
+        }
+      ]
+    },
+    {
+      "name": "$45",
+      "class": "res_xhigh_po",
+      "nets": {
+        "a": "PTAT",
+        "b": "PTAT_TRIM",
+        "w": "VSS|vss"
+      },
+      "params": {
+        "r_ohm": 2652600.0,
+        "l_um": 2652.6,
+        "w_um": 2.0,
+        "area_um2": 5305.2,
+        "perimeter_um": 5309.2
+      },
+      "instance_path": [
+        {
+          "cell": "r2__r2",
+          "array_index": null
+        },
+        {
+          "cell": "res_array$3",
+          "array_index": null
+        }
+      ]
+    },
+    {
+      "name": "$46",
+      "class": "res_xhigh_po",
+      "nets": {
+        "a": "N2",
+        "b": "NZ",
+        "w": "VSS|vss"
+      },
+      "params": {
+        "r_ohm": 1000000.0,
+        "l_um": 1000.0,
+        "w_um": 2.0,
+        "area_um2": 2000.0,
+        "perimeter_um": 2004.0
+      },
+      "instance_path": [
+        {
+          "cell": "rz__rz",
+          "array_index": null
+        },
+        {
+          "cell": "res_array$2",
+          "array_index": null
+        }
+      ]
+    },
+    {
+      "name": "$47",
+      "class": "res_xhigh_po",
+      "nets": {
+        "a": "NB",
+        "b": "NC|ec",
+        "w": "VSS|vss"
+      },
+      "params": {
+        "r_ohm": 119470.0,
+        "l_um": 119.47,
+        "w_um": 2.0,
+        "area_um2": 238.94,
+        "perimeter_um": 242.94
+      },
+      "instance_path": [
+        {
+          "cell": "r1__r1",
+          "array_index": null
+        },
+        {
+          "cell": "res_array$1",
+          "array_index": null
+        }
+      ]
+    },
+    {
+      "name": "$48",
+      "class": "res_xhigh_po",
+      "nets": {
+        "a": "NA|na",
+        "b": "CTAT",
+        "w": "VSS|vss"
+      },
+      "params": {
+        "r_ohm": 111050.0,
+        "l_um": 111.05,
+        "w_um": 2.0,
+        "area_um2": 222.1,
+        "perimeter_um": 226.1
+      },
+      "instance_path": [
+        {
+          "cell": "riso__riso",
+          "array_index": null
+        },
+        {
+          "cell": "res_array",
+          "array_index": null
+        }
+      ]
+    },
+    {
+      "name": "$5",
+      "class": "nfet",
+      "nets": {
+        "s": "VSS|vss",
+        "g": "ENB",
+        "d": "NBG",
+        "b": "VSS|vss"
+      },
+      "params": {
+        "l_um": 0.5,
+        "w_um": 2.0,
+        "as_um2": 0.84,
+        "ad_um2": 0.84,
+        "ps_um": 4.84,
+        "pd_um": 4.84
+      },
+      "instance_path": [
+        {
+          "cell": "mdnb__mdnb",
+          "array_index": null
+        },
+        {
+          "cell": "mos_array$3",
+          "array_index": null
+        }
+      ]
+    },
+    {
+      "name": "$6",
+      "class": "nfet",
+      "nets": {
+        "s": "VSS|vss",
+        "g": "NR",
+        "d": "NR",
+        "b": "VSS|vss"
+      },
+      "params": {
+        "l_um": 2.0,
+        "w_um": 2.0,
+        "as_um2": 0.84,
+        "ad_um2": 0.84,
+        "ps_um": 4.84,
+        "pd_um": 4.84
+      },
+      "instance_path": [
+        {
+          "cell": "msu5__msu5",
+          "array_index": null
+        },
+        {
+          "cell": "mos_array$6",
+          "array_index": null
+        }
+      ]
+    },
+    {
+      "name": "$7",
+      "class": "nfet",
+      "nets": {
+        "s": "VSS|vss",
+        "g": "NR",
+        "d": "ND",
+        "b": "VSS|vss"
+      },
+      "params": {
+        "l_um": 2.0,
+        "w_um": 2.0,
+        "as_um2": 0.84,
+        "ad_um2": 0.84,
+        "ps_um": 4.84,
+        "pd_um": 4.84
+      },
+      "instance_path": [
+        {
+          "cell": "msu2__msu2",
+          "array_index": null
+        },
+        {
+          "cell": "mos_array$7",
+          "array_index": null
+        }
+      ]
+    },
+    {
+      "name": "$8",
+      "class": "nfet",
+      "nets": {
+        "s": "VSS|vss",
+        "g": "ENB",
+        "d": "ND",
+        "b": "VSS|vss"
+      },
+      "params": {
+        "l_um": 0.5,
+        "w_um": 2.0,
+        "as_um2": 0.84,
+        "ad_um2": 0.84,
+        "ps_um": 4.84,
+        "pd_um": 4.84
+      },
+      "instance_path": [
+        {
+          "cell": "mdnd__mdnd",
+          "array_index": null
+        },
+        {
+          "cell": "mos_array$8",
+          "array_index": null
+        }
+      ]
+    },
+    {
+      "name": "$9",
+      "class": "nfet",
+      "nets": {
+        "s": "VSS|vss",
+        "g": "ENB",
+        "d": "NT",
+        "b": "VSS|vss"
+      },
+      "params": {
+        "l_um": 1.0,
+        "w_um": 2.0,
+        "as_um2": 0.84,
+        "ad_um2": 0.84,
+        "ps_um": 4.84,
+        "pd_um": 4.84
+      },
+      "instance_path": [
+        {
+          "cell": "mdnt__mdnt",
+          "array_index": null
+        },
+        {
+          "cell": "mos_array$10",
+          "array_index": null
+        }
+      ]
+    }
+  ],
+  "nets": [
+    {
+      "name": "CTAT",
+      "pin": true,
+      "device_count": 2,
+      "net_id": 15,
+      "pin_index": 0,
+      "label_positions_um": [
+        {
+          "text": "CTAT",
+          "x_um": -10.0,
+          "y_um": 12.72
+        },
+        {
+          "text": "CTAT",
+          "x_um": 90.27,
+          "y_um": 6.61
+        }
+      ]
+    },
+    {
+      "name": "EN",
+      "pin": true,
+      "device_count": 4,
+      "net_id": 5,
+      "pin_index": 1,
+      "label_positions_um": [
+        {
+          "text": "EN",
+          "x_um": -10.0,
+          "y_um": 23.72
+        },
+        {
+          "text": "EN",
+          "x_um": 0.67,
+          "y_um": 12.665
+        }
+      ]
+    },
+    {
+      "name": "ENB",
+      "pin": true,
+      "device_count": 8,
+      "net_id": 7,
+      "pin_index": 2,
+      "label_positions_um": [
+        {
+          "text": "ENB",
+          "x_um": 1.13,
+          "y_um": 8.11
+        }
+      ]
+    },
+    {
+      "name": "IBIAS",
+      "pin": true,
+      "device_count": 2,
+      "net_id": 9,
+      "pin_index": 3,
+      "label_positions_um": [
+        {
+          "text": "IBIAS",
+          "x_um": -10.0,
+          "y_um": 14.22
+        },
+        {
+          "text": "IBIAS",
+          "x_um": 4.67,
+          "y_um": 7.61
+        }
+      ]
+    },
+    {
+      "name": "M1D",
+      "pin": true,
+      "device_count": 2,
+      "net_id": 21,
+      "pin_index": 4,
+      "label_positions_um": [
+        {
+          "text": "M1D",
+          "x_um": 97.97,
+          "y_um": 22.975
+        }
+      ]
+    },
+    {
+      "name": "M2D",
+      "pin": true,
+      "device_count": 2,
+      "net_id": 18,
+      "pin_index": 5,
+      "label_positions_um": [
+        {
+          "text": "M2D",
+          "x_um": 112.23,
+          "y_um": 20.475
+        }
+      ]
+    },
+    {
+      "name": "M3D",
+      "pin": true,
+      "device_count": 2,
+      "net_id": 23,
+      "pin_index": 6,
+      "label_positions_um": [
+        {
+          "text": "M3D",
+          "x_um": 126.49,
+          "y_um": 25.975
+        }
+      ]
+    },
+    {
+      "name": "N1",
+      "pin": true,
+      "device_count": 4,
+      "net_id": 6,
+      "pin_index": 7,
+      "label_positions_um": [
+        {
+          "text": "N1",
+          "x_um": 51.86,
+          "y_um": 9.665
+        }
+      ]
+    },
+    {
+      "name": "N2",
+      "pin": true,
+      "device_count": 5,
+      "net_id": 17,
+      "pin_index": 8,
+      "label_positions_um": [
+        {
+          "text": "N2",
+          "x_um": 67.11,
+          "y_um": 7.86
+        }
+      ]
+    },
+    {
+      "name": "NA|na",
+      "pin": true,
+      "device_count": 4,
+      "net_id": 20,
+      "pin_index": 9,
+      "label_positions_um": [
+        {
+          "text": "NA",
+          "x_um": 76.5,
+          "y_um": 22.17
+        },
+        {
+          "text": "na",
+          "x_um": 308.08,
+          "y_um": -0.3
+        }
+      ]
+    },
+    {
+      "name": "NB",
+      "pin": true,
+      "device_count": 3,
+      "net_id": 22,
+      "pin_index": 10,
+      "label_positions_um": [
+        {
+          "text": "NB",
+          "x_um": 85.13,
+          "y_um": 22.92
+        }
+      ]
+    },
+    {
+      "name": "NBG",
+      "pin": true,
+      "device_count": 5,
+      "net_id": 8,
+      "pin_index": 11,
+      "label_positions_um": [
+        {
+          "text": "NBG",
+          "x_um": 3.75,
+          "y_um": 5.61
+        }
+      ]
+    },
+    {
+      "name": "NC|ec",
+      "pin": true,
+      "device_count": 9,
+      "net_id": 4,
+      "pin_index": 12,
+      "label_positions_um": [
+        {
+          "text": "NC",
+          "x_um": 266.58,
+          "y_um": 4.135
+        },
+        {
+          "text": "ec",
+          "x_um": 271.38,
+          "y_um": 5.97
+        },
+        {
+          "text": "ec",
+          "x_um": 282.7,
+          "y_um": -0.43
+        }
+      ]
+    },
+    {
+      "name": "ND",
+      "pin": true,
+      "device_count": 4,
+      "net_id": 11,
+      "pin_index": 13,
+      "label_positions_um": [
+        {
+          "text": "ND",
+          "x_um": 33.41,
+          "y_um": 11.61
+        }
+      ]
+    },
+    {
+      "name": "NR",
+      "pin": true,
+      "device_count": 4,
+      "net_id": 16,
+      "pin_index": 14,
+      "label_positions_um": [
+        {
+          "text": "NR",
+          "x_um": 27.16,
+          "y_um": 10.915
+        }
+      ]
+    },
+    {
+      "name": "NT",
+      "pin": true,
+      "device_count": 6,
+      "net_id": 13,
+      "pin_index": 15,
+      "label_positions_um": [
+        {
+          "text": "NT",
+          "x_um": 45.03,
+          "y_um": 11.11
+        }
+      ]
+    },
+    {
+      "name": "NZ",
+      "pin": true,
+      "device_count": 2,
+      "net_id": 2,
+      "pin_index": 16,
+      "label_positions_um": [
+        {
+          "text": "NZ",
+          "x_um": 1144.11,
+          "y_um": -1.0
+        }
+      ]
+    },
+    {
+      "name": "PB",
+      "pin": true,
+      "device_count": 6,
+      "net_id": 19,
+      "pin_index": 17,
+      "label_positions_um": [
+        {
+          "text": "PB",
+          "x_um": 18.29,
+          "y_um": 7.11
+        }
+      ]
+    },
+    {
+      "name": "PCAS",
+      "pin": true,
+      "device_count": 6,
+      "net_id": 10,
+      "pin_index": 18,
+      "label_positions_um": [
+        {
+          "text": "PCAS",
+          "x_um": 23.33,
+          "y_um": 11.36
+        }
+      ]
+    },
+    {
+      "name": "PG",
+      "pin": true,
+      "device_count": 9,
+      "net_id": 12,
+      "pin_index": 19,
+      "label_positions_um": [
+        {
+          "text": "PG",
+          "x_um": 40.99,
+          "y_um": 6.61
+        }
+      ]
+    },
+    {
+      "name": "PTAT",
+      "pin": true,
+      "device_count": 3,
+      "net_id": 14,
+      "pin_index": 20,
+      "label_positions_um": [
+        {
+          "text": "PTAT",
+          "x_um": -10.0,
+          "y_um": 24.72
+        },
+        {
+          "text": "PTAT",
+          "x_um": 86.23,
+          "y_um": 12.61
+        }
+      ]
+    },
+    {
+      "name": "PTAT_TRIM",
+      "pin": true,
+      "device_count": 2,
+      "net_id": 1,
+      "pin_index": 21,
+      "label_positions_um": [
+        {
+          "text": "PTAT_TRIM",
+          "x_um": 2793.71,
+          "y_um": -13.75
+        }
+      ]
+    },
+    {
+      "name": "VDD",
+      "pin": true,
+      "device_count": 25,
+      "net_id": 24,
+      "pin_index": 22,
+      "label_positions_um": [
+        {
+          "text": "VDD",
+          "x_um": -6.0,
+          "y_um": 59.58
+        },
+        {
+          "text": "VDD",
+          "x_um": 2.08,
+          "y_um": 46.61
+        }
+      ]
+    },
+    {
+      "name": "VSS|vss",
+      "pin": true,
+      "device_count": 57,
+      "net_id": 25,
+      "pin_index": 23,
+      "label_positions_um": [
+        {
+          "text": "VSS",
+          "x_um": -6.0,
+          "y_um": -6.0
+        },
+        {
+          "text": "VSS",
+          "x_um": 0.04,
+          "y_um": -4.935
+        },
+        {
+          "text": "vss",
+          "x_um": 294.25,
+          "y_um": 0.035
+        },
+        {
+          "text": "vss",
+          "x_um": 299.88,
+          "y_um": 4.97
+        },
+        {
+          "text": "vss",
+          "x_um": 310.875,
+          "y_um": -0.3
+        }
+      ]
+    }
+  ],
+  "warnings": [
+    "net 'NA|na' merges 2 distinct labels (NA, na) onto one net -- KLayout joins multiple labels found on the same electrical net (as '|' here and in the written netlist, matching NetlistSpiceWriter's own node-name escaping); this usually means two differently-named nets were shorted together in the layout -- see docs/cli/extract.md's 'Merged net labels' section.",
+    "net 'NC|ec' merges 2 distinct labels (NC, ec) onto one net -- KLayout joins multiple labels found on the same electrical net (as '|' here and in the written netlist, matching NetlistSpiceWriter's own node-name escaping); this usually means two differently-named nets were shorted together in the layout -- see docs/cli/extract.md's 'Merged net labels' section.",
+    "net 'VSS|vss' merges 2 distinct labels (VSS, vss) onto one net -- KLayout joins multiple labels found on the same electrical net (as '|' here and in the written netlist, matching NetlistSpiceWriter's own node-name escaping); this usually means two differently-named nets were shorted together in the layout -- see docs/cli/extract.md's 'Merged net labels' section."
+  ],
+  "black_box_regions": [],
+  "abstracted_cells": [],
+  "unmodelled_poly": [],
+  "merged_net_labels": [
+    {
+      "net": "NA|na",
+      "labels": [
+        "NA",
+        "na"
+      ]
+    },
+    {
+      "net": "NC|ec",
+      "labels": [
+        "NC",
+        "ec"
+      ]
+    },
+    {
+      "net": "VSS|vss",
+      "labels": [
+        "VSS",
+        "vss"
+      ]
+    }
+  ],
+  "voltage_domain_warnings": [],
+  "missing_flavour_markers": [],
+  "unbiased_pmos_body_nets": [],
+  "single_terminal_nets": [],
+  "dead_metal": [],
+  "matched_device_groups": [],
+  "def_pin_promotion": null,
+  "label_layers": null,
+  "pdk": null,
+  "provenance": {
+    "klt_version": "0.6.0+g0ce8c64842d9",
+    "klayout_version": "0.30.12",
+    "pdk": null,
+    "deck": {
+      "name": "sky130",
+      "content_hash": "sha256:f8f2c3f48eada473dc34a7a8926c0b04fef446fb351a70a636ce43a9ca9c70ba",
+      "released": false
+    },
+    "input": {
+      "content_hash": "sha256:ab590f2546b44d8c1c310ac88817430c84a93fefab3c12f1250c023d992d7d66",
+      "role": "layout"
+    }
+  },
+  "parasitics": null,
+  "spef_path": null,
+  "subcircuit": null,
+  "metrics": {
+    "extract__device__count": 48,
+    "extract__net__count": 24,
+    "extract__pin__count": 24
+  }
+}
