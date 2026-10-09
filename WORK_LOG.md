@@ -2,8 +2,22 @@
 
 Chronological record of recently merged pull requests and closed issues. This file is maintained by the Loom Guide role.
 
+### 2026-10-09
+
+- **PR #111**: fix: por_output_chain XMN1 to a legal nfet_g5v0d10v5 model bin (L=20 W=0.42) (#101)
+- **PR #109**: layout: add temp_core leaf cell (DRC clean, LVS match 48/48, no exclusions)
+- **PR #108**: ci: run repo self-checks on every push (#103)
+- **PR #100**: sim: assembled temp_por_top supply-ramp campaign across rates and PVT
+- **PR #99**: layout: por_output_chain leaf (DRC clean, LVS match minus native XMASSIST) (#97)
+- **PR #95**: layout: por_comparator leaf cell (21 devices), DRC clean, LVS match (#82)
+- **Issue #104** (closed): Lay out temp_core as a DRC/LVS-verified leaf (T1 item 2)
+- **Issue #103** (closed): CI: run the repo's existing self-checks (netlist export, checker selftests) on every push
+- **Issue #98** (closed): Record assembled temp_por_top supply-ramp behavior across rates and PVT
+- **Issue #82** (closed): T1 item 2: lay out por_comparator (21 devices) with the compose-cell recipe, DRC clean and LVS matched
+
 ### 2026-10-08
 
+- **Issue #34** (closed): T1 item 2/10 continued: remaining bias_core device groups + full-cell assembly
 - **PR #91**: bias_core: wire all cross-block nets on met3-met5, LVS match 50/50 devices, 27/27 nets (#81)
 - **PR #87**: docs: block-level characterization report (T1 item 8)
 - **PR #83**: spec: ratify DR-003 via the two-key ceremony (operating temperature + supply rows only)

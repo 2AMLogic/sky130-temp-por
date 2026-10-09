@@ -25,7 +25,8 @@ _None._
 
 Issues currently being built (`loom:building`).
 
-- **#82**: T1 item 2: lay out por_comparator (21 devices) with the compose-cell recipe, DRC clean and LVS matched
+- **#101**: por_output_chain: XMN1 (L=25) has no valid model bin in the pinned PDK, so as-drawn temp_por_top cannot be simulated
+- **#102**: Characterize por_comparator VPOR↑/VPOR↓ and hysteresis over PVT (resolves DR-003 TBD-2/TBD-3 evidence gap)
 
 ## PRs Awaiting Review
 
@@ -43,7 +44,7 @@ _None._
 
 Issues carrying `loom:curated`.
 
-- **#82**: T1 item 2: lay out por_comparator (21 devices) with the compose-cell recipe, DRC clean and LVS matched *(curated)*
+- **#102**: Characterize por_comparator VPOR↑/VPOR↓ and hysteresis over PVT (resolves DR-003 TBD-2/TBD-3 evidence gap) *(curated)*
 
 ## Proposed (Architect / Hermit)
 
@@ -60,7 +61,7 @@ _None._
 | Operator merge-risk holds | 0 |
 | Operator priority | 0 |
 | Ready (`loom:issue`) | 0 |
-| In Progress (`loom:building`) | 1 |
+| In Progress (`loom:building`) | 2 |
 | PRs awaiting review | 0 |
 | Approved PRs awaiting merge | 0 |
 | Curated | 1 |
