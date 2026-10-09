@@ -26,6 +26,7 @@ _None._
 Issues currently being built (`loom:building`).
 
 - **#101**: por_output_chain: XMN1 (L=25) has no valid model bin in the pinned PDK, so as-drawn temp_por_top cannot be simulated
+- **#107**: Block-assembly Iq characterization: por-iq, temp-iq, iq-total (DR-003 TBD-4/5/6)
 
 ## PRs Awaiting Review
 
@@ -63,7 +64,7 @@ Issues carrying `loom:curated`.
 | Operator merge-risk holds | 0 |
 | Operator priority | 0 |
 | Ready (`loom:issue`) | 0 |
-| In Progress (`loom:building`) | 1 |
+| In Progress (`loom:building`) | 2 |
 | PRs awaiting review | 0 |
 | Approved PRs awaiting merge | 0 |
 | Curated | 1 |

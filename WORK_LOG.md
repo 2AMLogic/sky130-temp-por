@@ -4,6 +4,7 @@ Chronological record of recently merged pull requests and closed issues. This fi
 
 ### 2026-10-09
 
+- **PR #119**: sim: record fleet refusal of as-drawn supply-ramp re-run (#101)
 - **PR #115**: refactor(sim): hoist duplicated campaign-runner helpers into sim_common (#114)
 - **PR #113**: sim: por_comparator VPOR-up/VPOR-down/hysteresis over PVT (por-comparator-thresholds campaign)
 - **Issue #114** (closed): Consolidate duplicated helpers across the two batch campaign runners into sim_common.py
