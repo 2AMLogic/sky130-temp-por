@@ -74,12 +74,12 @@ part of the claim and travel with it):
   envelope shape carries no `provenance.input.content_hash` a manifest pin
   could bind to.
 - **Item 2 — Layout: `unmet` (`no_evidence`)**, truthfully: the block has
-  no `temp_por_top` (or `temp_core` / `por_comparator` /
-  `por_output_chain`) layout yet, so no envelope can honestly back a
-  block-level layout claim. Partial progress exists — six `bias_core`
-  device-group sub-blocks and the `bias_core` full-cell assembly are
-  committed under `layout/` (see `layout/README.md`) — but that is a
-  sub-block increment, not the block's layout, and no citation is made.
+  no `temp_por_top` (nor `temp_core` / `por_output_chain`) layout yet, so
+  no envelope can honestly back a block-level layout claim. Partial
+  progress exists — six `bias_core` device-group sub-blocks, the `bias_core` full-cell assembly and the
+  `por_comparator` leaf cell (21 devices, DRC clean, LVS `match`, #82) are
+  committed under `layout/` (see `layout/README.md`) — but those are
+  sub-block increments, not the block's layout, and no citation is made.
 - **Item 3 — DRC clean: `met`** via `layout/bias_core/drc.json` (`status:
   clean`, 0 violations), pinned to
   `content_hash sha256:9c414f91…7ab68e`, the sha256 of the committed

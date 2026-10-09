@@ -1,0 +1,19 @@
+{
+  "layout": {
+    "netlist": "por_comparator.spice",
+    "deck": "sky130"
+  },
+  "reference": {
+    "netlist": "por_comparator.ref.spice",
+    "form": "subckt-call",
+    "deck": "sky130"
+  },
+  "options": {
+    "compare_parameters": {
+      "res_xhigh_po": [
+        "L",
+        "W"
+      ]
+    }
+  }
+}

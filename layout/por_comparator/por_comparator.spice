@@ -1,0 +1,65 @@
+* extracted by klt extract --deck sky130
+
+* cell por_comparator
+* pin BIAS_OK
+* pin BIAS_OKB
+* pin CMPO
+* pin IBIAS
+* pin N1
+* pin NA
+* pin NBG
+* pin POR_RAW
+* pin SNS
+* pin SNSB
+* pin TN
+* pin VDD
+* pin VDDA
+* pin VREF
+* pin VSS
+.SUBCKT por_comparator BIAS_OK BIAS_OKB CMPO IBIAS N1 NA NBG POR_RAW SNS SNSB
++ TN VDD VDDA VREF VSS
+* device instance $1 r0 *1 6879.33,-10 nfet
+M$1 VSS N1 SNSB VSS nfet L=0.5U W=10U AS=4.2P AD=4.2P PS=20.84U PD=20.84U
+* device instance $2 r0 *1 0.67,0.5 nfet
+M$2 BIAS_OKB BIAS_OK VSS VSS nfet L=0.5U W=1U AS=0.42P AD=0.42P PS=2.84U
++ PD=2.84U
+* device instance $3 r0 *1 28.92,0.5 nfet
+M$3 IBIAS BIAS_OKB VSS VSS nfet L=1U W=1U AS=0.42P AD=0.42P PS=2.84U PD=2.84U
+* device instance $4 r0 *1 41.42,0.5 nfet
+M$4 TN NBG VSS VSS nfet L=10U W=1U AS=0.42P AD=0.42P PS=2.84U PD=2.84U
+* device instance $5 r0 *1 70.67,0.5 nfet
+M$5 N1 CMPO VSS VSS nfet L=0.5U W=1U AS=0.42P AD=0.42P PS=2.84U PD=2.84U
+* device instance $6 r0 *1 78.67,0.5 nfet
+M$6 POR_RAW N1 VSS VSS nfet L=0.5U W=1U AS=0.42P AD=0.42P PS=2.84U PD=2.84U
+* device instance $7 r0 *1 8.67,1 nfet
+M$7 NBG BIAS_OKB VSS VSS nfet L=0.5U W=2U AS=0.84P AD=0.84P PS=4.84U PD=4.84U
+* device instance $8 r0 *1 15.42,1 nfet
+M$8 IBIAS NBG VSS VSS nfet L=2U W=2U AS=0.84P AD=0.84P PS=4.84U PD=4.84U
+* device instance $9 r0 *1 22.67,1 nfet
+M$9 IBIAS BIAS_OK NBG VSS nfet L=0.5U W=2U AS=0.84P AD=0.84P PS=4.84U PD=4.84U
+* device instance $10 r0 *1 52.92,1 nfet
+M$10 NA SNS TN VSS nfet L=1U W=2U AS=0.84P AD=0.84P PS=4.84U PD=4.84U
+* device instance $11 r0 *1 55.16,1 nfet
+M$11 CMPO VREF TN VSS nfet L=1U W=2U AS=0.84P AD=0.84P PS=4.84U PD=4.84U
+* device instance $12 r0 *1 64.92,1 nfet
+M$12 CMPO BIAS_OKB VSS VSS nfet L=1U W=2U AS=0.84P AD=0.84P PS=4.84U PD=4.84U
+* device instance $13 r0 *1 0.67,21.61 pfet
+M$13 BIAS_OKB BIAS_OK VDD VDD pfet L=0.5U W=2U AS=0.84P AD=0.84P PS=4.84U
++ PD=4.84U
+* device instance $14 r0 *1 70.67,21.61 pfet
+M$14 N1 CMPO VDD VDD pfet L=0.5U W=2U AS=0.84P AD=0.84P PS=4.84U PD=4.84U
+* device instance $15 r0 *1 78.67,21.61 pfet
+M$15 POR_RAW N1 VDD VDD pfet L=0.5U W=2U AS=0.84P AD=0.84P PS=4.84U PD=4.84U
+* device instance $16 r0 *1 40.67,22.61 pfet
+M$16 VDDA BIAS_OKB VDD VDD pfet L=0.5U W=4U AS=1.68P AD=1.68P PS=8.84U PD=8.84U
+* device instance $17 r0 *1 46.92,22.61 pfet
+M$17 NA NA VDDA VDD pfet L=1U W=4U AS=1.68P AD=1.68P PS=8.84U PD=8.84U
+* device instance $18 r0 *1 49.16,22.61 pfet
+M$18 CMPO NA VDDA VDD pfet L=1U W=4U AS=1.68P AD=1.68P PS=8.84U PD=8.84U
+* device instance $19 r0 *1 7257.57,5 res_xhigh_po
+X$19 SNSB VSS VSS res_xhigh_po r=775000 L=775U W=2U
+* device instance $20 r0 *1 3485.035,13 res_xhigh_po
+X$20 SNS SNSB VSS res_xhigh_po r=6769230 L=6769.23U W=2U
+* device instance $21 r0 *1 4049.14,21 res_xhigh_po
+X$21 SNS VDD VSS res_xhigh_po r=7897440 L=7897.44U W=2U
+.ENDS por_comparator
