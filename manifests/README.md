@@ -216,3 +216,26 @@ the same PR by construction.
 Provenance hygiene per `docs/design-evidence-tiers.md` ("Provenance hygiene
 in evidence records"): the committed report cites repo-relative paths only
 and embeds content hashes, never host or author identifiers.
+
+## What CI covers (and does not)
+
+Two workflows run on every push to `main` and every PR:
+
+- `signoff-manifest.yml` -- the signoff freshness gate described above.
+- `self-checks.yml` -- fast, deterministic, stdlib-only checks (no SPICE, no
+  layout composition, no klt, no xschem):
+  - `python3 -m unittest layout/bin/test_pad_island_census.py` (the three
+    `klayout.db`-dependent cases skip in CI; they need klt's interpreter);
+  - `python3 sim/supply-ramp-top/ramp_checker.py` (transition-checker selftest
+    fixtures; exits non-zero on any MISMATCH);
+  - `python3 design/check_committed_netlists.py` (pinout / cross-cell
+    invariants from `design/netlist.py` applied to the committed
+    `design/netlist/*.spice`);
+  - `python3 .github/scripts/check_json.py` (every `sim/*/experiment.json` and
+    `sim/*/records/*.json` parses).
+
+Not covered: `python3 design/netlist.py --check` (committed netlists match the
+schematics) needs xschem and the sky130 PDK, so it is not runnable on a stock
+runner -- run it locally after schematic edits. Also not covered: any SPICE
+campaign, `layout/bin/compose-cell.py --check` / layout composition, DRC/LVS,
+and JSON schema validation (only well-formedness is checked).

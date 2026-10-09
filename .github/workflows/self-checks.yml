@@ -1,0 +1,32 @@
+name: self-checks
+
+# Fast, deterministic, stdlib-only checks of the repo's own harness and
+# evidence formats. No SPICE, no layout composition, no klt, no xschem.
+# See manifests/README.md ("What CI covers") for what is and is not covered.
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+
+jobs:
+  self-checks:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+
+      - name: Pad-island census unit tests
+        run: python3 -m unittest layout/bin/test_pad_island_census.py
+
+      - name: Supply-ramp transition-checker selftest fixtures
+        run: python3 sim/supply-ramp-top/ramp_checker.py
+
+      - name: Committed netlists satisfy the pinout invariants
+        run: python3 design/check_committed_netlists.py
+
+      - name: Sim experiment.json and records JSON are well-formed
+        run: python3 .github/scripts/check_json.py
