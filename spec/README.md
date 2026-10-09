@@ -14,7 +14,10 @@
   gathered since. `DR-001` and `DR-002` are `proposed`; `DR-003` is
   `ratified` (two-key path, issue #78), scoped to row 1 (operating
   temperature, −40…+125 °C) and row 6 (supply, 2.97–3.63 V per `DR-001`)
-  only. All other rows stay `[TBD]` placeholders.
+  only. All other rows stay `[TBD]` placeholders. `DR-006` is `proposed`
+  (recommendation only, issue #136): it finds the Iq rows `[TBD-4..6]` not yet
+  recommendable from the committed `sim/iq-top` evidence (17 of 45 iq-total
+  points non-`ok`) and names the missing experiments.
 - [`ratification/`](../ratification/) — the two-key ratification process
   (`market-key`, `ee-key`) `DR-003`'s recommendation and any future
   `target-spec.md` ratification goes through.
