@@ -97,6 +97,10 @@ layout/        GDS + DRC/LVS reports (klayout-tools driven)
 measurements/  silicon characterization (empty until tape-out)
 ```
 
+## CI
+
+`signoff-manifest.yml` gates signoff-report freshness; `self-checks.yml` runs fast stdlib-only self-checks (census unit test, ramp-checker selftest, committed-netlist invariants, sim JSON well-formedness). No SPICE, layout composition, or xschem netlist-vs-schematic check runs in CI -- see [manifests/README.md](manifests/README.md#what-ci-covers-and-does-not).
+
 ## License
 
 Apache License 2.0 — see [LICENSE](LICENSE).
