@@ -1,0 +1,45 @@
+{
+  "slug": "iq-top",
+  "title": "Assembled temp_por_top supply current (Iq) in the por-iq, temp-iq (incremental) and iq-total states across the 45-point PVT grid",
+  "claim": "Issue #107 -- EVIDENCE ONLY, NOT a spec claim and NOT a proposed ceiling (DR-003 row 7 TBD-4/5/6 are owned by a follow-on decision record that would use this result). Records the settled VDD supply current of the unchanged assembled design/netlist/temp_por_top.spice (as drawn: bias_core + temp_core + por_comparator + por_output_chain with the real shared IBIAS node and the real RESETn -> temp_core.EN feedback) in two directly simulated states -- por-iq (RESETn asserted/low, which disables temp_core) and iq-total (natural released state) -- and the derived incremental temp-iq = iq-total - por-iq, over {tt, ss, ff, sf, fs} x {-40, 27, 125 C} x {2.97, 3.30, 3.63 V}. iq-total is measured in its own simulation and is NOT a sum; the per-sub-cell currents are attribution only, taken from the same runs, and the direct-vs-attribution-sum discrepancy is reported (spec/porting-plan.md Sec1.1). Every grid point carries an explicit status (ok / non-physical-branch / unsettled / nonconverged).",
+  "provenance": "schematic",
+  "provenance_source": "sim/iq-top/testbench/tb_temp_por_iq_{por,total}.sch (DUT: design/netlist/temp_por_top.spice, the committed export of design/temp_por_top.sch)",
+  "statistical_convention": "N/A (corner-matrix measurement, not a distribution claim)",
+  "corners": {
+    "process": ["tt", "ss", "ff", "sf", "fs"],
+    "temperature_c": [-40, 27, 125],
+    "supply_v": [2.97, 3.3, 3.63]
+  },
+  "states": {
+    "por-iq": {
+      "testbench": "testbench/tb_temp_por_iq_por.sch",
+      "description": "RESETn asserted (low). RESETn is a DUT output that releases by itself once VDD is above VPOR-rise, so it is held low by a 0 V forcing voltage source (VRST: RESETn -> VSS) added in the TESTBENCH; the DUT netlist is not altered. VRST's own current is not part of the VDD measurement. The contention current -- the output stage's pull-up (MOP/MAST) pushing RESETn high against the force -- flows VDD -> MOP -> RESETn -> VRST, is therefore INCLUDED in -i(BVDD), and is read separately as i(VRST) and reported; por-iq less that contention is also reported. temp_core.EN follows RESETn (low), so temp_core is disabled."
+    },
+    "iq-total": {
+      "testbench": "testbench/tb_temp_por_iq_total.sch",
+      "description": "Natural released state: RESETn left to the DUT (released after the one-shot, temp_core enabled by RESETn). Measured directly in its own simulation, never as por-iq + temp-iq."
+    }
+  },
+  "measurement": {
+    "status": "EXPLORATORY measurement definitions chosen for this campaign; none is a ratified bound.",
+    "method": "Transient from a physical 0 V start (the same branch-selecting method as sim/supply-ramp-top and sim/temp-core-startup, not a cold .op). V(VDD) = min(final_supply, rate*t) at a fast constant rate, then held constant. Supply current I = -i(BVDD). Ramp coverage is sim/supply-ramp-top; this campaign measures a SETTLED current at constant VDD.",
+    "rate_v_per_s": 10000,
+    "tstop_s": 0.03,
+    "tmax_s": 1e-5,
+    "prev_window_s": [0.02, 0.025],
+    "trail_window_s": [0.025, 0.03],
+    "settling": {
+      "max_window_to_window_drift": 0.01,
+      "max_trailing_window_pk_pk": 0.02,
+      "vdd_tolerance_v": 0.005,
+      "note": "A point is `ok` only if the mean current of the trailing window differs from the previous window's mean by <= max_window_to_window_drift (relative), the trailing window's peak-to-peak is <= max_trailing_window_pk_pk of its mean, VDD sits within vdd_tolerance_v of the target, and the state is the one asked for (iq-total: RESETn released > 0.8*VDD; por-iq: RESETn <= 0.05 V). Otherwise `unsettled` -- never PASS-by-default."
+    },
+    "non_physical_branch": {
+      "signature": "design/temp_core.md (issue #19 / #22 signature, about lines 145-172) and the issue #86 outcome: any saved node outside [-0.3 V, VDD+0.5 V] in the trailing window (e.g. PTAT/CTAT railed far outside every other corner's range), a settled total supply current <= 0, or a settled sub-cell supply current below -1 nA. #86 is still open at the time of writing; if it resolves differently the status rule here follows #86's result in a superseding record.",
+      "range_v": [-0.3, 0.5],
+      "min_subcell_current_a": -1e-9
+    },
+    "attribution_instrumentation": "Four 0 V voltage sources (vsbias, vscmp, vspor, vstemp) are inserted by the driver into the generated deck, in series with each sub-cell instance's VDD pin inside the temp_por_top subcircuit (text edit of the four instance lines, each asserted to match exactly once). A 0 V source adds no resistance, so the DUT circuit is electrically unchanged; the same instrumented deck is used for both states and the total is still the independent -i(BVDD). Attribution is per sub-cell (por_output_chain includes MASSIST); it is never summed into iq-total, only compared with it."
+  },
+  "ngspice_note": "The fleet runner (klt 0.5.0, ngspice 46) ignores options.ngspice_init and expr measurements, so the equivalent of sim/spiceinit's ng_nomodcheck is set by a .control block carried in the netlist body ('set ng_nomodcheck'). Local ngspice is 42; a single-point local cross-check is recorded."
+}
