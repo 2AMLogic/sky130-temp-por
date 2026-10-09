@@ -1,0 +1,147 @@
+{
+ "author": "unknown",
+ "cases": [
+  {
+   "case": "settled_constant_por",
+   "drift_rel": 0.0,
+   "expected": "ok",
+   "got": "ok",
+   "i_total_a": 2e-05,
+   "ok": true,
+   "pk_pk_rel": 0.0,
+   "reasons": [],
+   "state": "por-iq",
+   "sum_minus_direct_rel": 1.6940658945086004e-16
+  },
+  {
+   "case": "settled_constant_total",
+   "drift_rel": 0.0,
+   "expected": "ok",
+   "got": "ok",
+   "i_total_a": 2e-05,
+   "ok": true,
+   "pk_pk_rel": 0.0,
+   "reasons": [],
+   "state": "iq-total",
+   "sum_minus_direct_rel": 0.0
+  },
+  {
+   "case": "drifting_total",
+   "drift_rel": 0.05714285714285721,
+   "expected": "unsettled",
+   "got": "unsettled",
+   "i_total_a": 2.916666666666667e-05,
+   "ok": true,
+   "pk_pk_rel": 0.05714285714285709,
+   "reasons": [
+    "window-to-window drift 5.714% > 1%",
+    "trailing pk-pk 5.714% > 2%"
+   ],
+   "state": "iq-total",
+   "sum_minus_direct_rel": -1.1616451848058975e-16
+  },
+  {
+   "case": "drifting_por",
+   "drift_rel": 0.05714285714285721,
+   "expected": "unsettled",
+   "got": "unsettled",
+   "i_total_a": 2.916666666666667e-05,
+   "ok": true,
+   "pk_pk_rel": 0.05714285714285709,
+   "reasons": [
+    "window-to-window drift 5.714% > 1%",
+    "trailing pk-pk 5.714% > 2%"
+   ],
+   "state": "por-iq",
+   "sum_minus_direct_rel": 1.1616451848058975e-16
+  },
+  {
+   "case": "ripple_5pct_total",
+   "drift_rel": 0.0,
+   "expected": "unsettled",
+   "got": "unsettled",
+   "i_total_a": 2e-05,
+   "ok": true,
+   "pk_pk_rel": 0.10000000000000005,
+   "reasons": [
+    "trailing pk-pk 10.000% > 2%"
+   ],
+   "state": "iq-total",
+   "sum_minus_direct_rel": 0.0
+  },
+  {
+   "case": "not_released_total",
+   "drift_rel": 0.0,
+   "expected": "unsettled",
+   "got": "unsettled",
+   "i_total_a": 2e-05,
+   "ok": true,
+   "pk_pk_rel": 0.0,
+   "reasons": [
+    "RESETn not released (trailing mean 0.000 V <= 0.8*VDD)"
+   ],
+   "state": "iq-total",
+   "sum_minus_direct_rel": 0.0
+  },
+  {
+   "case": "negative_supply_current",
+   "drift_rel": 0.0,
+   "expected": "non-physical-branch",
+   "got": "non-physical-branch",
+   "i_total_a": -2e-05,
+   "ok": true,
+   "pk_pk_rel": 0.0,
+   "reasons": [
+    "settled total supply current -2e-05 A <= 0",
+    "sub-cell bias_core settled supply current -2e-06 A < -1e-09",
+    "sub-cell por_comparator settled supply current -4e-06 A < -1e-09",
+    "sub-cell por_output_chain settled supply current -6e-06 A < -1e-09",
+    "sub-cell temp_core settled supply current -8e-06 A < -1e-09"
+   ],
+   "state": "iq-total",
+   "sum_minus_direct_rel": 0.0
+  },
+  {
+   "case": "railed_ptat",
+   "drift_rel": 0.0,
+   "expected": "non-physical-branch",
+   "got": "non-physical-branch",
+   "i_total_a": 2e-05,
+   "ok": true,
+   "pk_pk_rel": 0.0,
+   "reasons": [
+    "v(ptat) in [5, 5] V outside [-0.30, 3.80]"
+   ],
+   "state": "iq-total",
+   "sum_minus_direct_rel": 0.0
+  },
+  {
+   "case": "ended_before_trailing_window",
+   "drift_rel": null,
+   "expected": "nonconverged",
+   "got": "nonconverged",
+   "i_total_a": null,
+   "ok": true,
+   "pk_pk_rel": null,
+   "reasons": [
+    "simulation ended at 0.01499 s, before the trailing window end 0.03 s"
+   ],
+   "state": "iq-total",
+   "sum_minus_direct_rel": null
+  }
+ ],
+ "fixtures_regraded_from_disk": {
+  "drifting_total": "unsettled",
+  "settled_constant_total": "ok"
+ },
+ "git": {
+  "branch": "feature/issue-107",
+  "dirty": true,
+  "sha": "cb8343e"
+ },
+ "kind": "settling/physicality checker self-test (synthetic currents, no simulation)",
+ "overall_pass": true,
+ "record_id": "20261009-191705-cb8343e-checker-selftest",
+ "supersedes": null,
+ "timestamp": "2026-10-09T19:17:05Z"
+}
