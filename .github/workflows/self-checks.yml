@@ -25,6 +25,9 @@ jobs:
       - name: Supply-ramp transition-checker selftest fixtures
         run: python3 sim/supply-ramp-top/ramp_checker.py
 
+      - name: POR-comparator threshold extractor selftest
+        run: python3 -I sim/por-comparator-thresholds/threshold_extractor.py
+
       - name: Committed netlists satisfy the pinout invariants
         run: python3 design/check_committed_netlists.py
 
