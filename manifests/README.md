@@ -123,15 +123,21 @@ part of the claim and travel with it):
   `power_connectivity` verdict, because that sub-check does not arise for
   an analog SPICE-reference compare.
 - **Items 5, 6, 7, 8 — `unmet` (`no_evidence`)**, each for a real reason:
-  the target spec is **not ratified** (`spec/decision-records/DR-003` is
-  `proposed`; no `target-spec.md` exists), so item 5's "vs a ratified spec"
-  has nothing to verify against yet, and this repo's PVT-corner and
-  mismatch Monte-Carlo records live under `sim/` as the sim harness's own
-  JSON records — which are not `klt sim`/`klt yield` envelopes, so no
-  passing envelope backs items 5/6; no `klt pex` report exists (item 7
-  rejects every other evidence kind, and none is cited pretend-adjacent);
-  no aggregated block-level characterization artifact exists yet (item 8 —
-  tracked by #31, blocked on spec ratification).
+  the target spec is only **partially ratified** (DR-003 is `ratified`, scoped,
+  issue #78: operating temperature and supply are final; six rows, including
+  POR thresholds, hysteresis, Iq and supply-ramp coverage, stay `[TBD]`;
+  no `target-spec.md` exists), so item 5's "vs a ratified spec" has nothing
+  complete to verify against, and this repo's PVT-corner and mismatch
+  Monte-Carlo records live under `sim/` as the sim harness's own JSON
+  records — which are not `klt sim`/`klt yield` envelopes, so no passing
+  envelope backs items 5/6; no `klt pex` report exists (item 7 rejects every
+  other evidence kind, and none is cited pretend-adjacent); the aggregated
+  block-level characterization artifact for item 8 exists
+  (`docs/characterization-report.md`, #31, refreshed in #122 and guarded by
+  `.github/scripts/check_characterization_coverage.py` so every `sim/`
+  experiment with records is cited), but it is a hand-aggregated report that
+  states FAILs and gaps as such, not a passing check, so item 8 stays
+  `unmet`.
 - **Items 9, 10 — `unmet` (`no_evidence`)** despite genuinely committed
   testbenches (`sim/` harnesses with recorded PVT-corner results, pinned
   PDK) and repo hygiene (README + LICENSE): no *passing klt envelope*
@@ -235,7 +241,11 @@ Two workflows run on every push to `main` and every PR:
     invariants from `design/netlist.py` applied to the committed
     `design/netlist/*.spice`);
   - `python3 .github/scripts/check_json.py` (every `sim/*/experiment.json` and
-    `sim/*/records/*.json` parses).
+    `sim/*/records/*.json` parses);
+  - `python3 -I .github/scripts/check_characterization_coverage.py --selftest`
+    and the real run (every `sim/<experiment>/` directory with records is cited
+    by `docs/characterization-report.md`; citation coverage only, the numbers
+    stay human-curated and are not checked).
 
 Not covered: `python3 design/netlist.py --check` (committed netlists match the
 schematics) needs xschem and the sky130 PDK, so it is not runnable on a stock

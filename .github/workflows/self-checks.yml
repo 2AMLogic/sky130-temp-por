@@ -33,3 +33,9 @@ jobs:
 
       - name: Sim experiment.json and records JSON are well-formed
         run: python3 .github/scripts/check_json.py
+
+      - name: Characterization-report coverage checker selftest
+        run: python3 -I .github/scripts/check_characterization_coverage.py --selftest
+
+      - name: Characterization report cites every sim experiment with records
+        run: python3 -I .github/scripts/check_characterization_coverage.py
