@@ -1,0 +1,49 @@
+{
+  "slug": "supply-ramp-top",
+  "title": "Assembled temp_por_top supply-ramp behavior across ramp rates and the PVT grid",
+  "claim": "Issue #98 -- NOT a spec claim (no ratified numeric ramp envelope exists: DR-003 Sec8; spec/porting-plan.md Sec3.3 defines only the SHAPE of the sweep). Records, for the unchanged assembled design/temp_por_top.sch (bias_core + temp_core + por_comparator + por_output_chain, real shared IBIAS node, real RESETn -> temp_core.EN feedback, nothing replaced by an ideal bias or ideal sensor load), whether RESETn is held low from 0 V and released once and only once across an exploratory set of constant-dVDD/dt ramp rates x {tt, ss, ff, sf, fs} x {-40, 27, 125 C} x {2.97, 3.30, 3.63 V}. Each rate is paired with a half-rate quasi-staticity guard segment. Grading is from the full-resolution RESETn/POR_RAW/IBIAS/VDD waveforms (sim/supply-ramp-top/ramp_checker.py), never from end-point measurements alone. This first increment is NOT the complete porting-plan grid: the orthogonal ll/hh passive-skew axis is not crossed in.",
+  "provenance": "schematic",
+  "provenance_source": "sim/supply-ramp-top/testbench/tb_temp_por_ramp.sch (DUT: design/netlist/temp_por_top.spice, the committed export of design/temp_por_top.sch)",
+  "schematic": "testbench/tb_temp_por_ramp.sch",
+  "statistical_convention": "N/A (corner-matrix check, not a distribution claim)",
+  "corners": {
+    "process": ["tt", "ss", "ff", "sf", "fs"],
+    "temperature_c": [-40, 27, 125],
+    "supply_v": [2.97, 3.3, 3.63]
+  },
+  "rates": {
+    "status": "EXPLORATORY -- chosen to bracket the nominal ~2 ms one-shot/release time scale observed in pilot runs; NOT a specification envelope, and NOT derived from any gf180mcu figure.",
+    "primary_v_per_s": [1000000.0, 100000.0, 10000.0, 1000.0],
+    "half_rate_guard_factor": 0.5,
+    "construction": "V(VDD) = min(final_supply, rate*t) from a physical 0 V start; ramp duration = final_supply/rate, so each rate is independent of the swept final supply (no fixed-duration confound, gf180 DR-021).",
+    "observation_window": "tstop = 3.63 V / rate + 15 ms hold after the longest ramp of the request. Pilot runs (tt/27C/3.3V and ss/ff/fs/sf at -40 and 125 C, 2.97 V) released 1.7-3.0 ms after POR_RAW rose, so 15 ms of hold is ~5x the slowest pilot release. A point that does not release within the window is reported as 'no_release within window', not as a proven non-release.",
+    "not_covered": "Rates slower than 500 V/s (half of the slowest primary rate) and faster than 1 MV/s are NOT simulated: transient cost grows linearly with ramp duration and the sub-microsecond edge needs a different time-step strategy. The gf180 1 V/s .. 1 V/us envelope is deliberately not imported."
+  },
+  "variants": {
+    "as-drawn": {
+      "description": "Unchanged assembled circuit exactly as committed in design/netlist/temp_por_top.spice.",
+      "netlist_edit": null
+    },
+    "diag-mn1-l20": {
+      "description": "DIAGNOSTIC ONLY, not the unchanged circuit. Identical to as-drawn except por_output_chain.XMN1 (sky130_fd_pr__nfet_g5v0d10v5, drawn L=25 W=0.5) is netlisted at L=20: the as-drawn geometry has no valid model bin in the pinned PDK (ngspice: 'could not find a valid modelname', reproduced on ngspice 42 and 46, with and without ng_nomodcheck), so the as-drawn circuit cannot be simulated at all. L=20 is the largest drawn length for which the pinned model resolves; it is used only to make the rest of the assembled behavior observable. Nothing here edits design/.",
+      "netlist_edit": {
+        "find": "XMN1 PDN IBIAS VSS VSS sky130_fd_pr__nfet_g5v0d10v5 L=25 W=0.5",
+        "replace": "XMN1 PDN IBIAS VSS VSS sky130_fd_pr__nfet_g5v0d10v5 L=20 W=0.5"
+      }
+    }
+  },
+  "grading": {
+    "status": "EXPLORATORY -- fractions of the final supply and tolerances below are measurement definitions chosen for this campaign; none is a ratified bound.",
+    "levels": "V_IL=0.2*vf, V_IH=0.8*vf, V_RUNT=0.1*vf, V_MID=0.5*vf",
+    "release": "rising V_IH crossing of RESETn (Schmitt, starts LOW); re-assert = falling V_IL crossing while HIGH; runt = excursion above V_RUNT that returns without reaching V_IH; independent V_MID up/down crossing counters",
+    "premature": "first release precedes POR_RAW's first V_MID rise (or POR_RAW never rises)",
+    "resolution": "max sample gap <= 20 us (= minimum detectable glitch width) and sampled VDD within 20 mV of min(vf, rate*t); otherwise a point with no detected failure is UNRESOLVED, not PASS",
+    "physicality": "every saved node within [-0.3 V, vf+0.5 V] for t>0 and settled supply current -i(BVDD) > 0; the t=0 sample (degenerate all-zero-supply solve) is reported separately",
+    "quasi_static": {
+      "vdd_at_por_raw_rise_tolerance_v": 0.05,
+      "release_delay_ratio_band": [0.8, 1.25],
+      "note": "Half-rate paired segment. 'consistent' when the VDD at which POR_RAW rises agrees within the tolerance (threshold-style measurement); 'censored' when POR_RAW rises after the ramp has ended (VDD already at its final value, so no VDD threshold is measured); 'rate-dependent' otherwise. The POR_RAW->RESETn release DELAY is a time-domain quantity (one-shot), so it is graded on the full/half ratio, not on VDD."
+    }
+  },
+  "ngspice_note": "The fleet runner (klt 0.5.0, ngspice 46) ignores options.ngspice_init and expr measurements, so the equivalent of sim/spiceinit's ng_nomodcheck is set by a .control block carried in the netlist body ('set ng_nomodcheck'); without it the fleet aborts on the nvt native device's BSIM4 parameter check. Local ngspice is 42; a single-point local cross-check is recorded."
+}
