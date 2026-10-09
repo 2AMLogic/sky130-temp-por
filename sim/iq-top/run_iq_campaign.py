@@ -428,6 +428,7 @@ def render_md(rec: dict) -> str:
     for st in STATES:
         d = S[st]["sum_vs_direct_max_abs_rel"]
         L.append(f"- {st}: max |sum - direct| / direct over `ok` points = {('%.3e' % d) if d is not None else 'n/a'}. The deck has no other VDD consumer at the top level, so a small value confirms the instrumentation (KCL), it is not an independent physical result.")
+    L += ["- NOTE on temp-iq sign: por-iq includes the forced-reset contention current (see below), which is absent in the released iq-total state, so the incremental temp-iq = iq-total - por-iq is NEGATIVE at every `ok` point. It is reported as measured and is NOT the sensor's own current; the temp_core attribution delta and the por-iq-less-contention figure are the meaningful comparisons.", ""]
     L += ["- temp-iq = iq-total - por-iq is the incremental difference of the two direct measurements, so `por-iq + temp-iq = iq-total` holds by construction for that row; the temp_core attribution delta (temp_core current in iq-total minus in por-iq) is in the JSON twin for comparison.", ""]
     L += ["## How RESETn was held low for por-iq, and the contention current"]
     L.append(rec["definitions"]["por-iq hold"])
@@ -527,7 +528,7 @@ def cmd_record(args) -> int:
             continue
         xcor = (xrep.get("corners") or [None])[0]
         if not xcor or not (xcor.get("artifacts") or {}).get("waveform"):
-            parts.append(f"{st}: local probe returned no waveform ({xcor and xcor.get('status')}).")
+            parts.append(f"{st}: local probe returned no waveform ({xcor and xcor.get('status')}); UNRESOLVED -- the single local ngspice-42 run was stopped by the operator after ~33 min / ~64 CPU-min without finishing (shared host), so this state has NO local cross-check and the fleet value for tt/27C/3.30V is not cross-checked.")
             continue
         g = qc.grade(qc.load_wave(Path(xcor["artifacts"]["waveform"])), st, 3.3, man)
         fl = per[st]["points"].get("tt_27c_3.30v", {})
@@ -540,8 +541,7 @@ def cmd_record(args) -> int:
         else:
             txt += "; no fleet value for this point to compare with (fleet did not return it), so this probe is the only value for the typical corner and is NOT a cross-check of anything"
         parts.append(txt + ".")
-        xc = {"text": " ".join(parts)}
-    if parts and xc is None:
+    if parts:
         xc = {"text": " ".join(parts)}
     all_pts = [p for st in STATES for p in per[st]["points"].values()]
     ngs = sorted({p["ngspice"] for p in all_pts if p.get("ngspice")})
