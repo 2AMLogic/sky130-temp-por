@@ -4,6 +4,11 @@ Chronological record of recently merged pull requests and closed issues. This fi
 
 ### 2026-10-09
 
+- **PR #115**: refactor(sim): hoist duplicated campaign-runner helpers into sim_common (#114)
+- **PR #113**: sim: por_comparator VPOR-up/VPOR-down/hysteresis over PVT (por-comparator-thresholds campaign)
+- **Issue #114** (closed): Consolidate duplicated helpers across the two batch campaign runners into sim_common.py
+- **Issue #102** (closed): Characterize por_comparator VPOR↑/VPOR↓ and hysteresis over PVT (resolves DR-003 TBD-2/TBD-3 evidence gap)
+- **Issue #96** (closed): Guard decision: retain confirmation for untracked layout cleanup
 - **PR #111**: fix: por_output_chain XMN1 to a legal nfet_g5v0d10v5 model bin (L=20 W=0.42) (#101)
 - **PR #109**: layout: add temp_core leaf cell (DRC clean, LVS match 48/48, no exclusions)
 - **PR #108**: ci: run repo self-checks on every push (#103)
