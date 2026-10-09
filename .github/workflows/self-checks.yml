@@ -31,6 +31,9 @@ jobs:
       - name: Iq checker selftest (invalid-waveform rejection, irregular sampling)
         run: python3 -I sim/iq-top/iq_checker.py
 
+      - name: Iq campaign isolation (one bad waveform does not lose the matrix)
+        run: python3 -I sim/iq-top/test_campaign_isolation.py
+
       - name: Committed netlists satisfy the pinout invariants
         run: python3 design/check_committed_netlists.py
 

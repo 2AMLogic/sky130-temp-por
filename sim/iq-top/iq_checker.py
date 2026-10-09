@@ -247,6 +247,43 @@ def irregular_wave(state="iq-total"):
     return {k: [v[i] for i in keep] for k, v in w.items()}
 
 
+def weighted_wave(cfg: dict, state="iq-total", vf=3.3, i0=20e-6, a=0.012):
+    """Non-constant current on a non-uniform grid with an exactly known time-weighted mean.
+
+    Grid: 10 us spacing everywhere, plus 0.5 us spacing in [25.0, 27.5] ms (dense where the
+    current ramps).  Current: I0 up to 25.0 ms, a linear ramp to I0*(1+a) at 27.5 ms, then
+    constant to 30 ms.  Both breakpoints are grid points and the window edges are hit exactly,
+    so the trapezoid integral over the trailing window [25, 30] ms is exact:
+        mean = I0 * (1 + a * (0.5*0.5 + 0.5)) = I0 * (1 + 0.75*a).
+    The dense ramp samples pull a plain arithmetic mean of the window samples well below that
+    (~I0*(1 + 0.53*a)), so the fixture discriminates time weighting from sample averaging.
+    Returns (wave, exact_trailing_mean_a, arithmetic_trailing_mean_a).
+    """
+    tw = cfg["measurement"]["trail_window_s"]
+    # integer grid in units of 0.5 us; k / 2e6 is the correctly rounded value, so it equals the
+    # float literals 0.025 / 0.0275 / 0.03 used for the window edges exactly
+    k0, k1, kend = round(tw[0] * 2e6), round((tw[0] + tw[1]) / 2 * 2e6), round(tw[1] * 2e6)
+    ks = sorted(set(range(0, kend + 1, 20)) | set(range(k0, k1 + 1)))
+    t = [k / 2e6 for k in ks]
+    assert t[0] == 0.0 and tw[0] in t and tw[1] == t[-1]
+
+    def shape(k):
+        return 1.0 if k <= k0 else (1.0 + a * (k - k0) / (k1 - k0) if k <= k1 else 1.0 + a)
+
+    n = len(t)
+    fr = {"bias_core": 0.1, "por_comparator": 0.2, "por_output_chain": 0.3, "temp_core": 0.4 if state == "iq-total" else 0.0}
+    tot = sum(fr.values())
+    w = {"time": t, "v(vdd)": [vf] * n, "v(ptat)": [1.4] * n, "v(ctat)": [0.6] * n,
+         "v(resetn)": [(vf if state == "iq-total" else 0.0)] * n, "i(bvdd)": [-i0 * shape(k) for k in ks]}
+    for name, vec in SUBCELLS.items():
+        w[vec] = [i0 * fr[name] / tot * shape(k) for k in ks]
+    if state == "por-iq":
+        w["i(vrst)"] = [0.0] * n
+    exact = i0 * (1 + 0.75 * a)
+    _, yy = window(t, [-x for x in w["i(bvdd)"]], tw[0], tw[1])
+    return w, exact, sum(yy) / len(yy)
+
+
 def run_selftest(cfg: dict, fixture_dir: Path | None = None):
     rows = []
     for name, wave, state, vf, want in selftest_cases(cfg):
@@ -307,6 +344,16 @@ def main() -> int:
     print(f"{'PASS' if good else 'FAIL'} irregular_sampling_time_weighted: {g['status']} i={g.get('i_total_a')} ref={ref['i_total_a']}")
     if not good:
         fails.append("irregular_sampling")
+    # non-constant current on a non-uniform grid: must equal the exact trapezoid mean, which is
+    # chosen to differ from the arithmetic sample mean (otherwise the check is not discriminating)
+    ww, exact, arith = weighted_wave(cfg)
+    gw = grade(ww, "iq-total", 3.3, cfg)
+    discriminating = abs(exact - arith) > 1e-3 * abs(exact)
+    good = (gw["status"] == "ok" and not gw.get("invalid_input") and discriminating
+            and abs(gw["i_total_a"] - exact) <= 1e-9 * abs(exact) and abs(gw["i_total_a"] - arith) > 1e-3 * abs(exact))
+    print(f"{'PASS' if good else 'FAIL'} irregular_nonconstant_time_weighted: {gw['status']} i={gw.get('i_total_a')} exact={exact} arith_mean={arith}")
+    if not good:
+        fails.append("irregular_nonconstant_time_weighted")
     # drifting irregular grid: time-weighting must still detect the drift
     wd = synth("iq-total", drift=0.5)
     keep = sorted(set(list(range(0, 3001, 7)) + list(range(2000, 3001)) + [3000]))

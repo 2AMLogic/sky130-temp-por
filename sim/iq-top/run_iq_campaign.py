@@ -301,6 +301,8 @@ def analyze_state(state: str, run_dir: Path, man: dict, traces: dict) -> dict:
         if g["status"] != "nonconverged":
             iq_meas = pt["meas"].get("iq_trail_neg")
             pt["meas_agree_rel"] = (abs((-iq_meas) - g["i_total_a"]) / abs(g["i_total_a"])) if iq_meas is not None and g.get("i_total_a") else None
+        if g.get("invalid_input"):  # NaN/inf/ragged samples: no trace, so no NaN/Infinity tokens reach the trace JSON
+            continue
         keep = ["v(vdd)", "v(resetn)", "i(bvdd)", *qc.SUBCELLS.values(), "i(vrst)", "v(ptat)", "v(ctat)"]
         traces.setdefault(state, {})[cid] = decimate(wave, keep)
     return {"requests": req, "points": pts}
