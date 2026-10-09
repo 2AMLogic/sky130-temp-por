@@ -26,7 +26,6 @@ _None._
 Issues currently being built (`loom:building`).
 
 - **#101**: por_output_chain: XMN1 (L=25) has no valid model bin in the pinned PDK, so as-drawn temp_por_top cannot be simulated
-- **#102**: Characterize por_comparator VPOR↑/VPOR↓ and hysteresis over PVT (resolves DR-003 TBD-2/TBD-3 evidence gap)
 
 ## PRs Awaiting Review
 
@@ -44,11 +43,14 @@ _None._
 
 Issues carrying `loom:curated`.
 
-- **#102**: Characterize por_comparator VPOR↑/VPOR↓ and hysteresis over PVT (resolves DR-003 TBD-2/TBD-3 evidence gap) *(curated)*
+- **#97**: Lay out por_output_chain as the next DRC/LVS-verified POR leaf *(curated)*
 
 ## Proposed (Architect / Hermit)
 
-_None._
+- **#105**: Full-signal-path mismatch Monte Carlo for temp_core accuracy (DR-003 TBD-1, T1 item 6) *(architect)*
+- **#106**: Brown-out and glitch-immunity matrix for assembled temp_por_top (porting-plan §3.4/§3.5) *(architect)*
+- **#107**: Block-assembly Iq characterization: por-iq, temp-iq, iq-total (DR-003 TBD-4/5/6) *(architect)*
+- **#110**: Remove unused LVS dependency-variant support from compose-cell.py *(hermit)*
 
 ## Epics
 
@@ -61,10 +63,10 @@ _None._
 | Operator merge-risk holds | 0 |
 | Operator priority | 0 |
 | Ready (`loom:issue`) | 0 |
-| In Progress (`loom:building`) | 2 |
+| In Progress (`loom:building`) | 1 |
 | PRs awaiting review | 0 |
 | Approved PRs awaiting merge | 0 |
 | Curated | 1 |
-| Architect / Hermit proposals | 0 |
+| Architect / Hermit proposals | 4 |
 | Active epics | 1 |
 <!-- guide:plan-body:end -->
