@@ -17,12 +17,12 @@
   },
   "sweep": {
     "peak_v": 3.63,
-    "tmax_s": 5e-6,
-    "construction": "V(VDD) = min(peak, rate*t, max(0, 2*peak - rate*t)): UP from a physical 0 V start at +rate V/s to the 3.63 V peak (the DR-001 high rail), then DOWN at -rate V/s to 0 V. Total sweep time 2*peak/rate is derived from the rate, never a fixed duration (gf180 DR-021 confound). VDD is the swept variable, so there is no separate supply axis; the klt corners.supply_v axis carries only the single sweep-peak value. Maximum time step 5 us = 5 mV of VDD at 1 kV/s (2.5 mV at the half-rate guard)."
+    "tmax_s": 2e-5,
+    "construction": "V(VDD) = min(peak, rate*t, max(0, 2*peak - rate*t)): UP from a physical 0 V start at +rate V/s to the 3.63 V peak (the DR-001 high rail), then DOWN at -rate V/s to 0 V. Total sweep time 2*peak/rate is derived from the rate, never a fixed duration (gf180 DR-021 confound). VDD is the swept variable, so there is no separate supply axis; the klt corners.supply_v axis carries only the single sweep-peak value. Maximum time step 20 us = 2 mV of VDD at 100 V/s (1 mV at the 50 V/s half-rate guard)."
   },
   "rates": {
-    "status": "EXPLORATORY quasi-static choice: 1 kV/s is slow against the comparator's expected microsecond-scale internal time constants (megaohm-class divider on xhigh_po with fF-class loading); the half-rate guard decides whether that is true at every corner. Not a specification envelope.",
-    "primary_v_per_s": [1000.0],
+    "status": "EXPLORATORY quasi-static choice, not a specification envelope. An uncommitted pilot at 1 kV/s (primary) / 500 V/s (guard) showed the extracted edges shifting with rate by several mV (VPOR-up later, VPOR-down earlier: a response lag of order 10 us, larger with the real bias_core), enough to trip the 10 mV guard on the real-bias variant; the primary rate was therefore lowered to 100 V/s so the lag is ~10x smaller than the guard tolerance. The half-rate guard still decides, per corner, whether the result is quasi-static.",
+    "primary_v_per_s": [100.0],
     "half_rate_guard_factor": 0.5,
     "construction": "dVDD/dt is constant and derived from the rate; each rate gets one klt request covering all 15 process x temperature points."
   },
@@ -59,7 +59,7 @@
   "absent_coverage": [
     "The passive-skew (ll/hh) resistor/capacitor axis is NOT covered: klt corners here are tt/ss/ff/sf/fs only, so the xhigh_po divider ratio spread beyond what those sections carry is not exercised.",
     "Mismatch Monte Carlo (comparator input offset, divider ratio mismatch) is NOT run; the numbers are corner values of the nominal drawn circuit, not a distribution.",
-    "Supply-ramp rates other than 1 kV/s (and its 500 V/s guard) are not simulated; supply-ramp-rate sensitivity of the assembled block is covered by sim/supply-ramp-top.",
+    "Sweep rates other than 100 V/s (and its 50 V/s guard) are not simulated; supply-ramp-rate sensitivity of the assembled block is covered by sim/supply-ramp-top.",
     "Post-layout parasitics are not included (schematic-level netlist).",
     "The ideal-bias variant uses a constant 1 uA IBIAS and a 1.25 V VREF at every corner; real bias_core spread is only shown by the separately-reported real-bias-core variant."
   ],
