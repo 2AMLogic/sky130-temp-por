@@ -56,15 +56,23 @@ and/or `corner-run.py` itself):
     mean()/stdev()/mv()     small numeric/formatting helpers
     seed_stability_checks() the paired same-point/different-seed sigma-drift
                           and worst-sample-changed check pair
+    say()/rate_tag()/scrub()/report_usable()/submit_request()
+                          batch-fleet campaign-runner helpers shared by
+                          por-comparator-thresholds and supply-ramp-top
 """
 
 from __future__ import annotations
 
 import argparse
 import importlib.util
+import json
 import math
+import os
 import re
+import shutil
+import subprocess
 import sys
+import threading
 from dataclasses import dataclass
 from pathlib import Path
 from types import ModuleType
@@ -352,3 +360,76 @@ def seed_stability_checks(
             ),
         },
     ]
+
+
+# --------------------------------------------------------------------------
+# batch-fleet campaign helpers (sim/por-comparator-thresholds, sim/supply-ramp-top)
+# --------------------------------------------------------------------------
+
+_print_lock = threading.Lock()
+
+
+def say(msg: str) -> None:
+    """Print one line atomically (campaign runners submit from a thread pool)."""
+    with _print_lock:
+        print(msg, flush=True)
+
+
+def rate_tag(rate: float) -> str:
+    return "r" + f"{rate:g}".replace("+", "")
+
+
+def scrub(text: str, run_dir: Path, repo_root: Path) -> str:
+    """Make a build-tree log portable: build dir -> <build>, repo prefix dropped, home -> <home>."""
+    text = text.replace(str(run_dir), "<build>")
+    text = text.replace(str(repo_root) + os.sep, "")
+    return re.sub(r"/home/[^/\s]+", "<home>", text)
+
+
+def report_usable(report_path: Path) -> bool:
+    """True when a klt report.json exists and carries per-corner results (the retry-failed predicate)."""
+    try:
+        return report_path.is_file() and "corners" in json.loads(report_path.read_text())
+    except json.JSONDecodeError:
+        return False
+
+
+def submit_request(
+    variant_name: str,
+    rate: float,
+    run_dir: Path,
+    netlist: str,
+    request: dict,
+    label: str,
+    points: int,
+) -> dict:
+    """Write netlist.spice + request.json under run_dir/variant/rate_tag and run `klt sim --backend batch`.
+
+    An earlier attempt's report.json/klt.stderr is archived to attemptN/, never
+    overwritten. `label` is the text after the rate tag in the [submit] log
+    line (e.g. "" or " (axis)"); `points` is the caller's own point count.
+    """
+    tag = rate_tag(rate)
+    d = run_dir / variant_name / tag
+    d.mkdir(parents=True, exist_ok=True)
+    if (d / "report.json").is_file():  # archive an earlier attempt, never overwrite
+        n = 1
+        while (d / f"attempt{n}").exists():
+            n += 1
+        (d / f"attempt{n}").mkdir()
+        for name in ("report.json", "klt.stderr"):
+            if (d / name).is_file():
+                shutil.move(str(d / name), str(d / f"attempt{n}" / name))
+    (d / "netlist.spice").write_text(netlist)
+    (d / "request.json").write_text(json.dumps(request, indent=2) + "\n")
+    cmd = ["klt", "sim", str(d / "request.json"), "--backend", "batch", "-o", str(d / "out"), "--format", "json"]
+    say(f"[submit] {variant_name} {tag}{label}: {points} points -> batch fleet")
+    p = subprocess.run(cmd, capture_output=True, text=True, timeout=4 * 3600)
+    (d / "report.json").write_text(p.stdout)
+    (d / "klt.stderr").write_text(p.stderr)
+    try:
+        status = json.loads(p.stdout).get("status", "?")
+    except json.JSONDecodeError:
+        status = "NO-JSON"
+    say(f"[done]   {variant_name} {tag}: exit {p.returncode}, report status {status}")
+    return {"variant": variant_name, "rate": rate, "tag": tag, "exit": p.returncode, "status": status}
