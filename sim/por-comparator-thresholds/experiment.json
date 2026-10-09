@@ -8,7 +8,11 @@
   "statistical_convention": "N/A (corner-matrix check, not a distribution claim; no mismatch Monte Carlo)",
   "corners": {
     "process": ["tt", "ss", "ff", "sf", "fs"],
-    "temperature_c": [-40, 27, 125]
+    "temperature_c": [-40, 27, 125],
+    "passive_skew": {
+      "process": ["ll", "hh"],
+      "note": "SUPPLEMENT, recorded separately (run --axis passive-skew; record ids end in -passive-skew). sky130's ll/hh .lib sections are tt MOS/BJT with parameters_res_low/high + cap_low/high; per sim/pdk.json they are the ONLY sections that move sky130_fd_pr__res_xhigh_po sheet resistance (tt/ss/ff/sf/fs all include parameters_res_nom). klt passes a bare process string through as `.lib <models.lib> <process>`, so the axis is reachable. The divider (XRTOP/XRBOT/XRHYS) is all xhigh_po, so a ratio cancellation is expected to first order; this axis measures it rather than assuming it."
+    }
   },
   "rails": {
     "low_v": 2.97,
@@ -57,7 +61,7 @@
     }
   },
   "absent_coverage": [
-    "The passive-skew (ll/hh) resistor/capacitor axis is NOT covered: klt corners here are tt/ss/ff/sf/fs only, so the xhigh_po divider ratio spread beyond what those sections carry is not exercised.",
+    "The passive-skew (ll/hh) axis is covered only as a separately-recorded supplement on tt MOS (ll/hh x 3 temperatures); combined MOS-corner x resistor-skew points (e.g. ss MOS with res_high) are NOT run -- sky130.lib.spice has no such combined section and no multi-section bundle was built for this campaign.",
     "Mismatch Monte Carlo (comparator input offset, divider ratio mismatch) is NOT run; the numbers are corner values of the nominal drawn circuit, not a distribution.",
     "Sweep rates other than 100 V/s (and its 50 V/s guard) are not simulated; supply-ramp-rate sensitivity of the assembled block is covered by sim/supply-ramp-top.",
     "Post-layout parasitics are not included (schematic-level netlist).",

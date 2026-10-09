@@ -70,6 +70,15 @@ def corner_id(proc: str, temp: float) -> str:
     return f"{proc}_{cr.fmt_temp(temp)}c"
 
 
+AXES = ("main", "passive-skew")
+
+
+def processes(man: dict, axis: str) -> list[str]:
+    """Process sections of one corner axis.  'main' = the 5 MOS corners (the issue's 5x3 grid);
+    'passive-skew' = the ll/hh resistor/capacitor sections (tt MOS), a separately-recorded supplement."""
+    return man["corners"]["process"] if axis == "main" else man["corners"]["passive_skew"]["process"]
+
+
 def all_rates(man: dict) -> list[tuple[float, float | None]]:
     """[(rate, primary_or_None)]: each primary rate followed by its half-rate guard."""
     f = man["rates"]["half_rate_guard_factor"]
@@ -112,7 +121,7 @@ def build_netlist(head: str, variant: dict, rate: float) -> str:
     return banner + head + "\n" + dut
 
 
-def build_request(rate: float, man: dict, backend: str, corners: dict | None = None, capacity_wait_s: float = 0) -> dict:
+def build_request(rate: float, man: dict, backend: str, corners: dict | None = None, capacity_wait_s: float = 0, axis: str = "main") -> dict:
     sw = man["sweep"]
     tstop = tstop_for(rate, man)
     c = man["corners"]
@@ -122,7 +131,7 @@ def build_request(rate: float, man: dict, backend: str, corners: dict | None = N
         "models": {"pdk": "sky130A", "lib": MODEL_LIB},
         "corners": corners
         or {
-            "process": c["process"],
+            "process": processes(man, axis),
             "supply_v": {"vset": [sw["peak_v"]]},
             "temperature_c": c["temperature_c"],
         },
@@ -145,7 +154,7 @@ def klt_version() -> str:
     return p.stdout.strip() or p.stderr.strip()
 
 
-def submit(variant_name: str, rate: float, head: str, man: dict, run_dir: Path, capacity_wait_s: float) -> dict:
+def submit(variant_name: str, rate: float, head: str, man: dict, run_dir: Path, capacity_wait_s: float, axis: str = "main") -> dict:
     tag = rate_tag(rate)
     d = run_dir / variant_name / tag
     d.mkdir(parents=True, exist_ok=True)
@@ -158,10 +167,10 @@ def submit(variant_name: str, rate: float, head: str, man: dict, run_dir: Path, 
             if (d / name).is_file():
                 shutil.move(str(d / name), str(d / f"attempt{n}" / name))
     (d / "netlist.spice").write_text(build_netlist(head, man["variants"][variant_name], rate))
-    req = build_request(rate, man, "batch", capacity_wait_s=capacity_wait_s)
+    req = build_request(rate, man, "batch", capacity_wait_s=capacity_wait_s, axis=axis)
     (d / "request.json").write_text(json.dumps(req, indent=2) + "\n")
     cmd = ["klt", "sim", str(d / "request.json"), "--backend", "batch", "-o", str(d / "out"), "--format", "json"]
-    say(f"[submit] {variant_name} {tag}: {len(man['corners']['process']) * len(man['corners']['temperature_c'])} points -> batch fleet")
+    say(f"[submit] {variant_name} {tag} ({axis}): {len(processes(man, axis)) * len(man['corners']['temperature_c'])} points -> batch fleet")
     p = subprocess.run(cmd, capture_output=True, text=True, timeout=4 * 3600)
     (d / "report.json").write_text(p.stdout)
     (d / "klt.stderr").write_text(p.stderr)
@@ -184,6 +193,9 @@ def cmd_run(args) -> int:
     run_dir = BUILD / run_id
     if run_dir.exists() and not args.retry_failed:
         raise SystemExit(f"{run_dir} exists; refusing to reuse a run id")
+    axis = args.axis
+    if args.retry_failed and (run_dir / "run.json").is_file():
+        axis = json.loads((run_dir / "run.json").read_text()).get("axis", "main")  # a retry keeps the run's own axis
     run_dir.mkdir(parents=True, exist_ok=True)
     variants = args.variant or list(man["variants"])
     work = [(v, r) for v in variants for r, _ in all_rates(man)]
@@ -200,6 +212,8 @@ def cmd_run(args) -> int:
         "run_id": run_id,
         "started_utc": now.strftime("%Y-%m-%dT%H:%M:%SZ"),
         "variants": variants,
+        "axis": axis,
+        "process": processes(man, axis),
         "git": git_info,
         "klt_client": klt_version(),
         "klt_sim_backend_env": os.environ.get("KLT_SIM_BACKEND"),
@@ -208,7 +222,7 @@ def cmd_run(args) -> int:
     say(f"run id {run_id}: {len(work)} request(s)")
     results = []
     with concurrent.futures.ThreadPoolExecutor(max_workers=min(2, args.jobs)) as ex:
-        futs = [ex.submit(submit, v, r, heads[v], man, run_dir, args.capacity_wait) for v, r in work]
+        futs = [ex.submit(submit, v, r, heads[v], man, run_dir, args.capacity_wait, axis) for v, r in work]
         for f in futs:
             try:
                 results.append(f.result())
@@ -370,14 +384,14 @@ def f3(x, spec=".4f"):
     return "n/a" if x is None else f"{x:{spec}}"
 
 
-def point_table(man: dict, points: list[dict]) -> list[dict]:
+def point_table(man: dict, points: list[dict], procs: list[str] | None = None) -> list[dict]:
     """One row per (process, temperature): primary-rate edges + guard grade. Never drops a corner."""
     prim = man["rates"]["primary_v_per_s"][0]
     half = prim * man["rates"]["half_rate_guard_factor"]
     tol = man["grading"]["rate_guard_tolerance_v"]
     by = {(p["rate_v_per_s"], p["id"]): p for p in points}
     rows = []
-    for proc in man["corners"]["process"]:
+    for proc in procs or man["corners"]["process"]:
         for temp in man["corners"]["temperature_c"]:
             cid = corner_id(proc, temp)
             a, b = by.get((prim, cid)), by.get((half, cid))
@@ -398,6 +412,9 @@ def point_table(man: dict, points: list[dict]) -> list[dict]:
                         row["status"] = "RATE-DEPENDENT (not graded as a quasi-static result)"
                 else:
                     row["guard"] = {"grade": "n/a (no half-rate waveform)"}
+                    if row["status"] == "OK":
+                        # no guard evidence -> not a graded quasi-static result (kept in the table, out of the binding set)
+                        row["status"] = "UNGUARDED (half-rate sweep missing; not graded as a quasi-static result)"
             rows.append(row)
     return rows
 
@@ -423,8 +440,14 @@ def render_md(rec: dict) -> str:
     L.append(f"- **Bias treatment**: {rec['variant']['bias_treatment']}")
     L.append(f"- **Netlist provenance**: schematic (`{rec['variant']['schematic']}`; DUT spliced from {', '.join('`design/netlist/' + n + '`' for n in rec['variant']['dut_netlists'])})")
     L += sim_common.render_pdk_tools_repo_state(rec)
+    rg = rec.get("run_git") or {}
+    if rg:
+        L.append(f"- **Repo state at fleet-submit time**: `{rg.get('sha')}` on `{rg.get('branch')}`"
+                 + (" (working tree DIRTY at submit time)" if rg.get("dirty") else " (clean working tree)")
+                 + " -- the commit whose netlists the fleet simulated; the line above is the commit that extracted and wrote this record")
     t = rec["tools"]
     L.append(f"- **Fleet runner**: klt `{t['fleet_runner_klt']}` / `{t['fleet_ngspice']}` (client klt `{t['klt_client']}`); {t['fleet_note']}")
+    L.append(f"- **Corner axis**: `{rec['matrix'].get('axis', 'main')}` -- {rec['matrix'].get('axis_note', '')}. Never merged with the other axis's table.")
     L.append("- **Corner matrix run**: process " + ", ".join(rec["matrix"]["process"]) + "; temperature " + ", ".join(f"{cr.fmt_temp(x)} C" for x in rec["matrix"]["temperature_c"]) +
              f"; VDD is the swept variable (0 -> {rec['matrix']['peak_v']} V -> 0), no separate supply axis; sweep rates {', '.join(f'{r:g}' for r in rec['matrix']['rates_v_per_s'])} V/s (primary + half-rate guard). " +
              f"{rec['matrix']['n_corners']} process x temperature points; full matrix, no subset.")
@@ -498,16 +521,18 @@ def cmd_record(args) -> int:
     if git_info["dirty"] and not args.allow_dirty:
         raise SystemExit("working tree is dirty: commit first so the record carries a clean-tree SHA")
     now = datetime.now(timezone.utc)
+    axis = meta.get("axis", "main")
+    procs = processes(man, axis)
     ids = []
     for idx, variant in enumerate(args.variant or meta["variants"]):
         stamp = now if idx == 0 else datetime.now(timezone.utc)
-        record_id = f"{stamp:%Y%m%d}-{stamp:%H%M%S}-{git_info['sha']}-{variant}"
+        record_id = f"{stamp:%Y%m%d}-{stamp:%H%M%S}-{git_info['sha']}-{variant}" + ("" if axis == "main" else f"-{axis}")
         rec_dir, corners_dir, snap_dir = HERE / "records", HERE / "corners" / record_id, HERE / "netlist-snapshots" / record_id
         for pth in (rec_dir / f"{record_id}.md", rec_dir / f"{record_id}.json", corners_dir, snap_dir):
             if pth.exists():
                 raise SystemExit(f"{pth} exists -- sim/ is append-only")
         res = analyze_variant(variant, run_dir, man, corners_dir)
-        table = point_table(man, res["points"])
+        table = point_table(man, res["points"], procs)
         b = binding(table)
         margin = None
         if "vpor_up" in b:
@@ -542,7 +567,8 @@ def cmd_record(args) -> int:
             "supersedes": args.supersedes,
             "manifest_excerpt": {"title": man["title"], "claim": man["claim"], "primary_rate": man["rates"]["primary_v_per_s"][0]},
             "variant": {"name": variant, "description": v["description"], "bias_treatment": v["bias_treatment"], "schematic": "sim/" + SLUG + "/" + v["schematic"], "dut_netlists": v["dut_netlists"]},
-            "pdk": {"root": "<host $PDK_ROOT>", "variant": pdk.variant, "installed_commit": pdk.installed_commit, "pinned_commit": pin["open_pdks_commit"], "matches_pin": pdk.matches_pin},
+            "pdk": {"root": "<host $PDK_ROOT>", "variant": pdk.variant, "installed_commit": pdk.installed_commit, "pinned_commit": pin["open_pdks_commit"], "matches_pin": pdk.matches_pin,
+                    "lib_file": f"$PDK_ROOT/{pdk.variant}/{pin['ngspice_lib']} (fleet: models.pdk={pdk.variant}, models.lib={MODEL_LIB})"},
             "tools": {
                 "ngspice": f"{cr.first_line(['ngspice', '-v'])} (host; the grid ran on the fleet)",
                 "xschem": cr.first_line(["xschem", "--version"]),
@@ -552,8 +578,9 @@ def cmd_record(args) -> int:
             },
             "git": git_info,
             "run_git": meta.get("git"),
-            "matrix": {"process": man["corners"]["process"], "temperature_c": man["corners"]["temperature_c"], "peak_v": man["sweep"]["peak_v"],
-                       "rates_v_per_s": [r for r, _ in all_rates(man)], "n_corners": len(man["corners"]["process"]) * len(man["corners"]["temperature_c"]), "is_subset": False},
+            "matrix": {"axis": axis, "process": procs, "temperature_c": man["corners"]["temperature_c"], "peak_v": man["sweep"]["peak_v"],
+                       "rates_v_per_s": [r for r, _ in all_rates(man)], "n_corners": len(procs) * len(man["corners"]["temperature_c"]), "is_subset": False,
+                       "axis_note": "main = the 5 MOS process corners (the issue's 5x3 grid)" if axis == "main" else man["corners"]["passive_skew"]["note"]},
             "definitions": {**man["grading"]["definitions"], "sweep": man["sweep"]["construction"], "rates": man["rates"]["construction"], "edge extraction": f"VDD sample step <= {tx.MAX_BRACKET_V * 1e3:g} mV around an edge, linear interpolation inside the bracket; POR_RAW state evaluated for VDD >= {tx.V_VALID:g} V only"},
             "requests": res["requests"],
             "points": res["points"],
@@ -586,6 +613,7 @@ def main(argv: list[str]) -> int:
     variants = ["ideal-bias", "real-bias-core"]
     r = sub.add_parser("run")
     r.add_argument("--variant", action="append", choices=variants)
+    r.add_argument("--axis", choices=AXES, default="main", help="main = tt/ss/ff/sf/fs (the 5x3 grid); passive-skew = ll/hh resistor/cap sections (separate records)")
     r.add_argument("--jobs", type=int, default=2, help="concurrent fleet submissions (max 2)")
     r.add_argument("--run-id")
     r.add_argument("--retry-failed", action="store_true")
