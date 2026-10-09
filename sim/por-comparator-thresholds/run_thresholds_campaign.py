@@ -26,6 +26,7 @@ from __future__ import annotations
 
 import argparse
 import concurrent.futures
+import functools
 import gzip
 import json
 import os
@@ -54,16 +55,13 @@ NETLIST_DIR = REPO_ROOT / "design" / "netlist"
 MODEL_LIB = "libs.tech/combined/sky130.lib.spice"
 
 
-def say(msg: str) -> None:
-    print(msg, flush=True)
+say = sim_common.say
+rate_tag = sim_common.rate_tag
+scrub = functools.partial(sim_common.scrub, repo_root=REPO_ROOT)
 
 
 def load_manifest() -> dict:
     return json.loads(MANIFEST.read_text())
-
-
-def rate_tag(rate: float) -> str:
-    return "r" + f"{rate:g}".replace("+", "")
 
 
 def corner_id(proc: str, temp: float) -> str:
@@ -155,31 +153,10 @@ def klt_version() -> str:
 
 
 def submit(variant_name: str, rate: float, head: str, man: dict, run_dir: Path, capacity_wait_s: float, axis: str = "main") -> dict:
-    tag = rate_tag(rate)
-    d = run_dir / variant_name / tag
-    d.mkdir(parents=True, exist_ok=True)
-    if (d / "report.json").is_file():  # archive an earlier attempt, never overwrite
-        n = 1
-        while (d / f"attempt{n}").exists():
-            n += 1
-        (d / f"attempt{n}").mkdir()
-        for name in ("report.json", "klt.stderr"):
-            if (d / name).is_file():
-                shutil.move(str(d / name), str(d / f"attempt{n}" / name))
-    (d / "netlist.spice").write_text(build_netlist(head, man["variants"][variant_name], rate))
+    netlist = build_netlist(head, man["variants"][variant_name], rate)
     req = build_request(rate, man, "batch", capacity_wait_s=capacity_wait_s, axis=axis)
-    (d / "request.json").write_text(json.dumps(req, indent=2) + "\n")
-    cmd = ["klt", "sim", str(d / "request.json"), "--backend", "batch", "-o", str(d / "out"), "--format", "json"]
-    say(f"[submit] {variant_name} {tag} ({axis}): {len(processes(man, axis)) * len(man['corners']['temperature_c'])} points -> batch fleet")
-    p = subprocess.run(cmd, capture_output=True, text=True, timeout=4 * 3600)
-    (d / "report.json").write_text(p.stdout)
-    (d / "klt.stderr").write_text(p.stderr)
-    try:
-        status = json.loads(p.stdout).get("status", "?")
-    except json.JSONDecodeError:
-        status = "NO-JSON"
-    say(f"[done]   {variant_name} {tag}: exit {p.returncode}, report status {status}")
-    return {"variant": variant_name, "rate": rate, "tag": tag, "exit": p.returncode, "status": status}
+    points = len(processes(man, axis)) * len(man["corners"]["temperature_c"])
+    return sim_common.submit_request(variant_name, rate, run_dir, netlist, req, f" ({axis})", points)
 
 
 def cmd_run(args) -> int:
@@ -200,13 +177,7 @@ def cmd_run(args) -> int:
     variants = args.variant or list(man["variants"])
     work = [(v, r) for v in variants for r, _ in all_rates(man)]
     if args.retry_failed:
-        def usable(v, r):
-            rp = run_dir / v / rate_tag(r) / "report.json"
-            try:
-                return rp.is_file() and "corners" in json.loads(rp.read_text())
-            except json.JSONDecodeError:
-                return False
-        work = [(v, r) for v, r in work if not usable(v, r)]
+        work = [(v, r) for v, r in work if not sim_common.report_usable(run_dir / v / rate_tag(r) / "report.json")]
     heads = {v: tb_netlist_head(man["variants"][v], run_dir / ("retry" if args.retry_failed else "."), pdk) for v in variants}
     meta = {
         "run_id": run_id,
@@ -287,11 +258,6 @@ def load_wave(path: Path) -> dict[str, list[float]]:
         for n, x in zip(names, row):
             cols[n].append(float(x))
     return cols
-
-
-def scrub(text: str, run_dir: Path) -> str:
-    text = text.replace(str(run_dir), "<build>").replace(str(REPO_ROOT) + os.sep, "")
-    return re.sub(r"/home/[^/\s]+", "<home>", text)
 
 
 def write_trace(path: Path, wave: dict, dv: float = 0.002, anchor_s: float = 0.2e-3) -> int:
