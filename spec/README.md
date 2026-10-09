@@ -11,7 +11,10 @@
   the two decisions the porting plan above required (supply flavor,
   architecture carryover); `DR-003` recommends the values for a future
   ratified `target-spec.md`, reconciled against the `sim/` evidence
-  gathered since. All three are `proposed`, not yet ratified.
+  gathered since. `DR-001` and `DR-002` are `proposed`; `DR-003` is
+  `ratified` (two-key path, issue #78), scoped to row 1 (operating
+  temperature, −40…+125 °C) and row 6 (supply, 2.97–3.63 V per `DR-001`)
+  only. All other rows stay `[TBD]` placeholders.
 - [`ratification/`](../ratification/) — the two-key ratification process
   (`market-key`, `ee-key`) `DR-003`'s recommendation and any future
   `target-spec.md` ratification goes through.
