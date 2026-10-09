@@ -25,7 +25,7 @@ _None._
 
 Issues currently being built (`loom:building`).
 
-_None._
+- **#82**: T1 item 2: lay out por_comparator (21 devices) with the compose-cell recipe, DRC clean and LVS matched
 
 ## PRs Awaiting Review
 
@@ -43,7 +43,7 @@ _None._
 
 Issues carrying `loom:curated`.
 
-_None._
+- **#82**: T1 item 2: lay out por_comparator (21 devices) with the compose-cell recipe, DRC clean and LVS matched *(curated)*
 
 ## Proposed (Architect / Hermit)
 
@@ -52,7 +52,6 @@ _None._
 ## Epics
 
 - **#4**: Track the gap to T1 sim-validated / bronze (klayout-tools design-evidence tiers)
-- **#34**: T1 item 2/10 continued: remaining bias_core device groups + full-cell assembly
 
 ## Backlog Balance
 
@@ -61,10 +60,10 @@ _None._
 | Operator merge-risk holds | 0 |
 | Operator priority | 0 |
 | Ready (`loom:issue`) | 0 |
-| In Progress (`loom:building`) | 0 |
+| In Progress (`loom:building`) | 1 |
 | PRs awaiting review | 0 |
 | Approved PRs awaiting merge | 0 |
-| Curated | 0 |
+| Curated | 1 |
 | Architect / Hermit proposals | 0 |
-| Active epics | 2 |
+| Active epics | 1 |
 <!-- guide:plan-body:end -->
