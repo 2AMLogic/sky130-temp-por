@@ -1,0 +1,142 @@
+{
+ "author": "unknown",
+ "cases": [
+  {
+   "case": "single_release",
+   "expected_codes_subset": [],
+   "expected_verdict": "PASS",
+   "fail_codes": [],
+   "max_dt_s": 5.000000000000664e-06,
+   "n_reassert": 0,
+   "n_release": 1,
+   "ok": true,
+   "verdict": "PASS"
+  },
+  {
+   "case": "double_release",
+   "expected_codes_subset": [
+    "repeated_release",
+    "reassert_after_release"
+   ],
+   "expected_verdict": "FAIL",
+   "fail_codes": [
+    "repeated_release",
+    "reassert_after_release"
+   ],
+   "max_dt_s": 5.000000000000664e-06,
+   "n_reassert": 1,
+   "n_release": 2,
+   "ok": true,
+   "verdict": "FAIL"
+  },
+  {
+   "case": "reassert_only",
+   "expected_codes_subset": [
+    "reassert_after_release"
+   ],
+   "expected_verdict": "FAIL",
+   "fail_codes": [
+    "reassert_after_release",
+    "extra_mid_crossings"
+   ],
+   "max_dt_s": 5.000000000000664e-06,
+   "n_reassert": 1,
+   "n_release": 1,
+   "ok": true,
+   "verdict": "FAIL"
+  },
+  {
+   "case": "no_release",
+   "expected_codes_subset": [
+    "no_release"
+   ],
+   "expected_verdict": "FAIL",
+   "fail_codes": [
+    "no_release"
+   ],
+   "max_dt_s": 5.000000000000664e-06,
+   "n_reassert": 0,
+   "n_release": 0,
+   "ok": true,
+   "verdict": "FAIL"
+  },
+  {
+   "case": "premature_release",
+   "expected_codes_subset": [
+    "premature_release"
+   ],
+   "expected_verdict": "FAIL",
+   "fail_codes": [
+    "premature_release"
+   ],
+   "max_dt_s": 5.000000000000664e-06,
+   "n_reassert": 0,
+   "n_release": 1,
+   "ok": true,
+   "verdict": "FAIL"
+  },
+  {
+   "case": "runt_glitch",
+   "expected_codes_subset": [
+    "runt_glitch"
+   ],
+   "expected_verdict": "FAIL",
+   "fail_codes": [
+    "runt_glitch"
+   ],
+   "max_dt_s": 5.000000000000664e-06,
+   "n_reassert": 0,
+   "n_release": 1,
+   "ok": true,
+   "verdict": "FAIL"
+  },
+  {
+   "case": "nonphysical_node",
+   "expected_codes_subset": [
+    "nonphysical"
+   ],
+   "expected_verdict": "FAIL",
+   "fail_codes": [
+    "nonphysical"
+   ],
+   "max_dt_s": 5.000000000000664e-06,
+   "n_reassert": 0,
+   "n_release": 1,
+   "ok": true,
+   "verdict": "FAIL"
+  },
+  {
+   "case": "coarse_sampling",
+   "expected_codes_subset": [],
+   "expected_verdict": "UNRESOLVED",
+   "fail_codes": [],
+   "max_dt_s": 0.00010000000000000026,
+   "n_reassert": 0,
+   "n_release": 1,
+   "ok": true,
+   "verdict": "UNRESOLVED"
+  }
+ ],
+ "double_release_fixture": {
+  "path": "sim/supply-ramp-top/selftest/double_release.wave.json",
+  "regraded_from_disk": {
+   "fail_codes": [
+    "repeated_release",
+    "reassert_after_release"
+   ],
+   "n_reassert": 1,
+   "n_release": 2,
+   "verdict": "FAIL"
+  }
+ },
+ "git": {
+  "branch": "feature/issue-98",
+  "dirty": true,
+  "sha": "285dd08"
+ },
+ "kind": "transition-checker self-test (controlled waveforms, no simulation)",
+ "overall_pass": true,
+ "record_id": "20261009-012246-285dd08-checker-selftest",
+ "supersedes": null,
+ "timestamp": "2026-10-09T01:22:46Z"
+}

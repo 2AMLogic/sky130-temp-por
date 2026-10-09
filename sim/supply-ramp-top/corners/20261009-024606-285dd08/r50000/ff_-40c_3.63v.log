@@ -1,0 +1,41 @@
+# point: supply-ramp-top as-drawn r50000 ff_-40c_3.63v
+# process=ff temp=-40C final_supply=3.63V rate=50000 V/s tstop=0.0150726s
+# klt status: error   runtime on runner: 14.49 s   outcome: ERROR
+
+# ==== klt sim deck (exact input given to ngspice on the runner) ====
+| * klt sim -- generated corner deck, do not edit
+| .lib /opt/pdk/sky130A/libs.tech/combined/sky130.lib.spice ff
+| .include /var/tmp/eda-job-klt-sim-65ff6c3214e7/inputs/netlist.cir
+| .temp -40
+| .meas tran vdd_end FIND v(vdd) AT=0.0149726
+| .meas tran resetn_end FIND v(resetn) AT=0.0149726
+| .meas tran resetn_max MAX v(resetn)
+| .meas tran por_raw_max MAX v(xdut.por_raw)
+| .meas tran ibias_end FIND v(xdut.ibias) AT=0.0149726
+| .control
+| alter vset=3.63
+| set filetype=ascii
+| tran 1u 0.0150726 0 5e-06
+| write /var/tmp/eda-job-klt-sim-65ff6c3214e7/outputs/artifacts/ff_3p630V_n40C/waveform.raw
+| quit
+| .endc
+| .end
+
+# ==== klt diagnostics ====
+| error/measurement: measurement 'vdd_end' produced no value
+| error/measurement: measurement 'resetn_end' produced no value
+| error/measurement: measurement 'resetn_max' produced no value
+| error/measurement: measurement 'por_raw_max' produced no value
+| error/measurement: measurement 'ibias_end' produced no value
+
+# ==== ngspice stdout+stderr ====
+
+Note: No compatibility mode selected!
+
+
+Circuit: * klt sim -- generated corner deck, do not edit
+
+Error on line 12436 or its substitute:
+  m.xdut.xpor.xmn1.msky130_fd_pr__nfet_g5v0d10v5 xdut.xpor.pdn xdut.ibias 0 0 xdut.xpor.xmn1:nhv_model l=    2.500000000000000e+01     w=    5.000000000000000e-01     ad=    1.450000000000000e-01     as=    1.450000000000000e-01     pd=    1.580000000000000e+00     ps=    1.580000000000000e+00     nrd=    5.800000000000000e-01     nrs=    5.800000000000000e-01     sa=    0.000000000000000e+00     sb=    0.000000000000000e+00     sd=    0.000000000000000e+00     nf=    1.000000000000000e+00     delvto=   -2.947242984160000e-02     m=    1.000000000000000e+00   
+could not find a valid modelname
+    Simulation interrupted due to error!
