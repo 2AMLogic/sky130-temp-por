@@ -1,0 +1,194 @@
+{
+ "absent_coverage": [
+  "The orthogonal passive-skew (`ll`/`hh`) resistor/capacitor axis is NOT crossed with the ramp-rate axis: this first increment is not the complete spec/porting-plan.md Sec3.1 x Sec3.3 grid.",
+  "Rates below 500 V/s and above 1 MV/s are not simulated; the primary rate set is exploratory and no numeric ramp envelope is claimed or ratified (DR-003 Sec8).",
+  "Brownout / dip behavior (Sec3.4) and mismatch Monte Carlo statistics are separate follow-on scopes and are not exercised here.",
+  "PTAT/CTAT are left open-circuit; the temp_core startup artifacts of issue #86 are not solved here -- any affected point shows up as a 'nonphysical' node, a klt diagnostic, or a missing result in the per-point tables."
+ ],
+ "author": "Claude Sonnet 5.5 (builder, issue #101)",
+ "crosscheck": null,
+ "definitions": {
+  "levels": "V_IL=0.2*vf, V_IH=0.8*vf, V_RUNT=0.1*vf, V_MID=0.5*vf",
+  "physicality": "every saved node within [-0.3 V, vf+0.5 V] for t>0 and settled supply current -i(BVDD) > 0; the t=0 sample (degenerate all-zero-supply solve) is reported separately",
+  "premature": "first release precedes POR_RAW's first V_MID rise (or POR_RAW never rises)",
+  "quasi-static": "Half-rate paired segment. 'consistent' when the VDD at which POR_RAW rises agrees within the tolerance (threshold-style measurement); 'censored' when POR_RAW rises after the ramp has ended (VDD already at its final value, so no VDD threshold is measured); 'rate-dependent' otherwise. The POR_RAW->RESETn release DELAY is a time-domain quantity (one-shot), so it is graded on the full/half ratio, not on VDD. Tolerances: VDD@POR_RAW within 0.05 V; delay ratio in [0.8, 1.25].",
+  "rate/window": "V(VDD) = min(final_supply, rate*t) from a physical 0 V start; ramp duration = final_supply/rate, so each rate is independent of the swept final supply (no fixed-duration confound, gf180 DR-021). tstop = 3.63 V / rate + 15 ms hold after the longest ramp of the request. Pilot runs (tt/27C/3.3V and ss/ff/fs/sf at -40 and 125 C, 2.97 V) released 1.7-3.0 ms after POR_RAW rose, so 15 ms of hold is ~5x the slowest pilot release. A point that does not release within the window is reported as 'no_release within window', not as a proven non-release.",
+  "release/re-assert/runt": "rising V_IH crossing of RESETn (Schmitt, starts LOW); re-assert = falling V_IL crossing while HIGH; runt = excursion above V_RUNT that returns without reaching V_IH; independent V_MID up/down crossing counters",
+  "resolution": "max sample gap <= 20 us (= minimum detectable glitch width) and sampled VDD within 20 mV of min(vf, rate*t); otherwise a point with no detected failure is UNRESOLVED, not PASS",
+  "trace storage": "committed traces are change-triggered (dV>=2 mV on any of VDD/RESETn/POR_RAW/IBIAS, or 1 ms anchor); the transition counts are re-derived from the stored trace and compared with the full-resolution result per point (`stored_trace.agrees_with_full_resolution`)."
+ },
+ "experiment": {
+  "claim": "Issue #98 -- NOT a spec claim (no ratified numeric ramp envelope exists: DR-003 Sec8; spec/porting-plan.md Sec3.3 defines only the SHAPE of the sweep). Records, for the unchanged assembled design/temp_por_top.sch (bias_core + temp_core + por_comparator + por_output_chain, real shared IBIAS node, real RESETn -> temp_core.EN feedback, nothing replaced by an ideal bias or ideal sensor load), whether RESETn is held low from 0 V and released once and only once across an exploratory set of constant-dVDD/dt ramp rates x {tt, ss, ff, sf, fs} x {-40, 27, 125 C} x {2.97, 3.30, 3.63 V}. Each rate is paired with a half-rate quasi-staticity guard segment. Grading is from the full-resolution RESETn/POR_RAW/IBIAS/VDD waveforms (sim/supply-ramp-top/ramp_checker.py), never from end-point measurements alone. This first increment is NOT the complete porting-plan grid: the orthogonal ll/hh passive-skew axis is not crossed in.",
+  "provenance": "schematic",
+  "provenance_source": "sim/supply-ramp-top/testbench/tb_temp_por_ramp.sch (DUT: design/netlist/temp_por_top.spice, the committed export of design/temp_por_top.sch)",
+  "slug": "supply-ramp-top",
+  "statistical_convention": "N/A (corner-matrix check, not a distribution claim)",
+  "title": "Assembled temp_por_top supply-ramp behavior across ramp rates and the PVT grid"
+ },
+ "follow_on": "",
+ "git": {
+  "branch": "feature/issue-101",
+  "dirty": false,
+  "sha": "5346c37"
+ },
+ "links": {
+  "checker": "sim/supply-ramp-top/ramp_checker.py",
+  "corners_dir": "sim/supply-ramp-top/corners/20261009-055755-5346c37/",
+  "driver": "sim/supply-ramp-top/run_ramp_campaign.py",
+  "json": "sim/supply-ramp-top/records/20261009-055755-5346c37.json",
+  "manifest": "sim/supply-ramp-top/experiment.json",
+  "netlist_snapshots": "sim/supply-ramp-top/netlist-snapshots/20261009-055755-5346c37/",
+  "record": "sim/supply-ramp-top/records/20261009-055755-5346c37.md",
+  "testbench": "sim/supply-ramp-top/testbench/tb_temp_por_ramp.sch"
+ },
+ "matrix": {
+  "is_subset": false,
+  "n_points": 360,
+  "n_points_error": 360,
+  "n_points_with_waveform": 0,
+  "process": [
+   "tt",
+   "ss",
+   "ff",
+   "sf",
+   "fs"
+  ],
+  "rates_v_per_s": [
+   1000000.0,
+   500000.0,
+   100000.0,
+   50000.0,
+   10000.0,
+   5000.0,
+   1000.0,
+   500.0
+  ],
+  "subset_reason": null,
+  "supply_v": [
+   2.97,
+   3.3,
+   3.63
+  ],
+  "temperature_c": [
+   -40,
+   27,
+   125
+  ]
+ },
+ "pairs": [],
+ "pdk": {
+  "installed_commit": "c6d73a35f524070e85faff4a6a9eef49553ebc2b",
+  "lib_file": "libs.tech/combined/sky130.lib.spice (resolved on the runner as /opt/pdk/sky130A/...)",
+  "matches_pin": true,
+  "pinned_commit": "c6d73a35f524070e85faff4a6a9eef49553ebc2b",
+  "root": "<host $PDK_ROOT>",
+  "variant": "sky130A"
+ },
+ "points": [],
+ "record_id": "20261009-055755-5346c37",
+ "requests": [
+  {
+   "failed_earlier_attempts": [
+    "unparseable report",
+    "unparseable report"
+   ],
+   "outcome": "NOT SUBMITTED / no report",
+   "primary_rate": null,
+   "rate_v_per_s": 1000000.0,
+   "tag": "r1e06",
+   "tstop_s": 0.015003629999999999
+  },
+  {
+   "failed_earlier_attempts": [
+    "unparseable report",
+    "unparseable report"
+   ],
+   "outcome": "NO JSON (klt failed before a report existed): {\n  \"schema_version\": 1,\n  \"error\": {\n    \"command\": \"sim\",\n    \"message\": \"batch backend failed: batch-fleet-provision.sh launch failed (exit 1): error: 8 instance(s) already running + 1 requested exceeds BATCH_MAX_CONCURRENT_INSTANCES=8\"\n  }\n}\n",
+   "primary_rate": 1000000.0,
+   "rate_v_per_s": 500000.0,
+   "tag": "r500000",
+   "tstop_s": 0.01500726
+  },
+  {
+   "failed_earlier_attempts": [
+    "unparseable report",
+    "unparseable report"
+   ],
+   "outcome": "NO JSON (klt failed before a report existed): {\n  \"schema_version\": 1,\n  \"error\": {\n    \"command\": \"sim\",\n    \"message\": \"batch backend failed: batch-fleet-provision.sh launch failed (exit 1): error: 8 instance(s) already running + 1 requested exceeds BATCH_MAX_CONCURRENT_INSTANCES=8\"\n  }\n}\n",
+   "primary_rate": null,
+   "rate_v_per_s": 100000.0,
+   "tag": "r100000",
+   "tstop_s": 0.015036299999999999
+  },
+  {
+   "failed_earlier_attempts": [
+    "unparseable report",
+    "unparseable report"
+   ],
+   "outcome": "NO JSON (klt failed before a report existed): {\n  \"schema_version\": 1,\n  \"error\": {\n    \"command\": \"sim\",\n    \"message\": \"batch backend failed: batch-fleet-provision.sh launch failed (exit 1): error: 8 instance(s) already running + 1 requested exceeds BATCH_MAX_CONCURRENT_INSTANCES=8\"\n  }\n}\n",
+   "primary_rate": 100000.0,
+   "rate_v_per_s": 50000.0,
+   "tag": "r50000",
+   "tstop_s": 0.0150726
+  },
+  {
+   "failed_earlier_attempts": [
+    "unparseable report"
+   ],
+   "outcome": "NO JSON (klt failed before a report existed): {\n  \"schema_version\": 1,\n  \"error\": {\n    \"command\": \"sim\",\n    \"message\": \"batch backend failed: batch-fleet-provision.sh launch failed (exit 1): error: 9 instance(s) already running + 1 requested exceeds BATCH_MAX_CONCURRENT_INSTANCES=8\"\n  }\n}\n",
+   "primary_rate": null,
+   "rate_v_per_s": 10000.0,
+   "tag": "r10000",
+   "tstop_s": 0.015363
+  },
+  {
+   "failed_earlier_attempts": [
+    "unparseable report"
+   ],
+   "outcome": "NO JSON (klt failed before a report existed): {\n  \"schema_version\": 1,\n  \"error\": {\n    \"command\": \"sim\",\n    \"message\": \"batch backend failed: batch-fleet-provision.sh launch failed (exit 1): error: 9 instance(s) already running + 1 requested exceeds BATCH_MAX_CONCURRENT_INSTANCES=8\"\n  }\n}\n",
+   "primary_rate": 10000.0,
+   "rate_v_per_s": 5000.0,
+   "tag": "r5000",
+   "tstop_s": 0.015726
+  },
+  {
+   "failed_earlier_attempts": [
+    "unparseable report"
+   ],
+   "outcome": "NO JSON (klt failed before a report existed): {\n  \"schema_version\": 1,\n  \"error\": {\n    \"command\": \"sim\",\n    \"message\": \"batch backend failed: batch-fleet-provision.sh launch failed (exit 1): error: 9 instance(s) already running + 1 requested exceeds BATCH_MAX_CONCURRENT_INSTANCES=8\"\n  }\n}\n",
+   "primary_rate": null,
+   "rate_v_per_s": 1000.0,
+   "tag": "r1000",
+   "tstop_s": 0.01863
+  },
+  {
+   "failed_earlier_attempts": [
+    "unparseable report"
+   ],
+   "outcome": "NO JSON (klt failed before a report existed): {\n  \"schema_version\": 1,\n  \"error\": {\n    \"command\": \"sim\",\n    \"message\": \"batch backend failed: batch-fleet-provision.sh launch failed (exit 1): error: 9 instance(s) already running + 1 requested exceeds BATCH_MAX_CONCURRENT_INSTANCES=8\"\n  }\n}\n",
+   "primary_rate": 1000.0,
+   "rate_v_per_s": 500.0,
+   "tag": "r500",
+   "tstop_s": 0.02226
+  }
+ ],
+ "summary": {},
+ "supersedes": null,
+ "timestamp": "2026-10-09T05:57:55Z",
+ "tools": {
+  "fleet_ngspice": "unknown",
+  "fleet_note": "client/runner klt version skew accepted with batch.runner_version_check=warn; the 0.5.0 runner ignores options.ngspice_init and expr measurements, so only .meas cards and a netlist-carried `set ng_nomodcheck` are used",
+  "fleet_runner_klt": "unknown",
+  "klt_client": "klt 0.7.0+g4cbdfa769875",
+  "ngspice": "ngspice-42 : Circuit level simulation program (host; the grid ran on the fleet)",
+  "platform": "Linux 6.17.0-1019-aws x86_64",
+  "python": "3.12.3",
+  "xschem": "XSCHEM V3.4.4",
+  "xschem_note": "host xschem is 3.4.4 and leaves expr() device parameters unevaluated (the committed design/netlist export was made with 3.4.7), so only the testbench is netlisted by xschem here and the DUT is spliced from the committed design/netlist/temp_por_top.spice"
+ },
+ "variant": {
+  "description": "Unchanged assembled circuit exactly as committed in design/netlist/temp_por_top.spice. Since issue #101 that export carries por_output_chain.XMN1 at L=20 W=0.42, a legal sky130 nfet_g5v0d10v5 bin; #98 records of this variant predate that change and show model_not_found for the old L=25 W=0.5 card.",
+  "name": "as-drawn",
+  "netlist_edit": null
+ }
+}

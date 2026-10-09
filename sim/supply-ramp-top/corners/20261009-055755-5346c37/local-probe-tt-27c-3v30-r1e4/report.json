@@ -1,0 +1,226 @@
+{
+  "schema_version": 3,
+  "netlist": {
+    "path": "sim/build/supply-ramp-top/20261009-052740-5346c37/crosscheck/netlist.spice",
+    "scope": "repo"
+  },
+  "status": "pass",
+  "corner_count": 1,
+  "passed": 1,
+  "failed": 0,
+  "errored": 0,
+  "inconclusive": 0,
+  "diagnostic_counts": {
+    "by_code": {
+      "singular_matrix": 1
+    },
+    "by_severity": {
+      "warning": 1
+    },
+    "corners_with_diagnostics": 1
+  },
+  "metrics": {
+    "sim__corner__count": 1,
+    "sim__corner__passed_count": 1,
+    "sim__corner__failed_count": 0,
+    "sim__corner__errored_count": 0,
+    "sim__corner__inconclusive_count": 0
+  },
+  "environment": {
+    "engine": "ngspice",
+    "engine_version": "42",
+    "ngspice_binary": "/usr/bin/ngspice",
+    "models_lib": {
+      "path": null,
+      "scope": "external"
+    },
+    "models_lib_sha256": "48de7c677e2c6e7d09b2559279de9f818be71010a4aa933d728eb4db3b133c84",
+    "netlist_sha256": "215cd5b32e9464bf09eecc89d4a18061ebfdbaab9753e67e29dcb28ec5da1ee5",
+    "netlist_closure": [
+      {
+        "path": "sim/build/supply-ramp-top/20261009-052740-5346c37/crosscheck/netlist.spice",
+        "scope": "repo",
+        "sha256": "215cd5b32e9464bf09eecc89d4a18061ebfdbaab9753e67e29dcb28ec5da1ee5"
+      }
+    ]
+  },
+  "coverage": {
+    "corners_simulated": 1,
+    "measurements_declared": 5,
+    "measurements_with_limits": 0,
+    "unrecognized_limit_keys": [],
+    "schema_version": 1,
+    "known": true,
+    "checked": [
+      "measurement:[0,\"tt/3.300V/27C\",\"ibias_end\"]/observation",
+      "measurement:[0,\"tt/3.300V/27C\",\"por_raw_max\"]/observation",
+      "measurement:[0,\"tt/3.300V/27C\",\"resetn_end\"]/observation",
+      "measurement:[0,\"tt/3.300V/27C\",\"resetn_max\"]/observation",
+      "measurement:[0,\"tt/3.300V/27C\",\"vdd_end\"]/observation"
+    ],
+    "skipped": [],
+    "inapplicable": [
+      {
+        "id": "measurement:[0,\"tt/3.300V/27C\",\"ibias_end\"]/limits",
+        "reason": "characterization_without_limits"
+      },
+      {
+        "id": "measurement:[0,\"tt/3.300V/27C\",\"por_raw_max\"]/limits",
+        "reason": "characterization_without_limits"
+      },
+      {
+        "id": "measurement:[0,\"tt/3.300V/27C\",\"resetn_end\"]/limits",
+        "reason": "characterization_without_limits"
+      },
+      {
+        "id": "measurement:[0,\"tt/3.300V/27C\",\"resetn_max\"]/limits",
+        "reason": "characterization_without_limits"
+      },
+      {
+        "id": "measurement:[0,\"tt/3.300V/27C\",\"vdd_end\"]/limits",
+        "reason": "characterization_without_limits"
+      }
+    ],
+    "unknown": [],
+    "nothing_checked": false,
+    "nothing_checked_reasons": []
+  },
+  "provenance": {
+    "klt_version": "0.7.0+g4cbdfa769875",
+    "klayout_version": "0.30.12",
+    "pdk": {
+      "name": "sky130A",
+      "source": "search root: ~/.volare",
+      "version": "open_pdks c6d73a35f524070e85faff4a6a9eef49553ebc2b"
+    },
+    "deck": {
+      "name": "sky130.lib.spice",
+      "content_hash": "sha256:48de7c677e2c6e7d09b2559279de9f818be71010a4aa933d728eb4db3b133c84",
+      "released": false
+    },
+    "input": {
+      "content_hash": "sha256:215cd5b32e9464bf09eecc89d4a18061ebfdbaab9753e67e29dcb28ec5da1ee5",
+      "role": "netlist"
+    }
+  },
+  "measurements": [
+    {
+      "name": "vdd_end",
+      "unit": "V",
+      "limits": null,
+      "status": "pass",
+      "worst_case": {
+        "corner_id": "tt/3.300V/27C",
+        "value": 3.3,
+        "margin": null
+      }
+    },
+    {
+      "name": "resetn_end",
+      "unit": "V",
+      "limits": null,
+      "status": "pass",
+      "worst_case": {
+        "corner_id": "tt/3.300V/27C",
+        "value": 3.013852,
+        "margin": null
+      }
+    },
+    {
+      "name": "resetn_max",
+      "unit": "V",
+      "limits": null,
+      "status": "pass",
+      "worst_case": {
+        "corner_id": "tt/3.300V/27C",
+        "value": 3.013852,
+        "margin": null
+      }
+    },
+    {
+      "name": "por_raw_max",
+      "unit": "V",
+      "limits": null,
+      "status": "pass",
+      "worst_case": {
+        "corner_id": "tt/3.300V/27C",
+        "value": 3.3,
+        "margin": null
+      }
+    },
+    {
+      "name": "ibias_end",
+      "unit": "V",
+      "limits": null,
+      "status": "pass",
+      "worst_case": {
+        "corner_id": "tt/3.300V/27C",
+        "value": 0.8082693,
+        "margin": null
+      }
+    }
+  ],
+  "corners": [
+    {
+      "corner_id": "tt/3.300V/27C",
+      "process": "tt",
+      "supply_v": {
+        "vset": 3.3
+      },
+      "temperature_c": 27,
+      "status": "pass",
+      "runtime_s": 9.44,
+      "measurements": [
+        {
+          "name": "vdd_end",
+          "value": 3.3,
+          "unit": "V",
+          "status": "pass",
+          "margin": null
+        },
+        {
+          "name": "resetn_end",
+          "value": 3.013852,
+          "unit": "V",
+          "status": "pass",
+          "margin": null
+        },
+        {
+          "name": "resetn_max",
+          "value": 3.013852,
+          "unit": "V",
+          "status": "pass",
+          "margin": null
+        },
+        {
+          "name": "por_raw_max",
+          "value": 3.3,
+          "unit": "V",
+          "status": "pass",
+          "margin": null
+        },
+        {
+          "name": "ibias_end",
+          "value": 0.8082693,
+          "unit": "V",
+          "status": "pass",
+          "margin": null
+        }
+      ],
+      "diagnostics": [
+        {
+          "severity": "warning",
+          "code": "singular_matrix",
+          "message": "Warning: singular matrix:  check node q.xdut.xtemp.xq8b.qsky130_fd_pr__pnp_05v5_w3p40l3p40#emitter"
+        }
+      ],
+      "artifacts": {
+        "log": "/home/ubuntu/GitHub/sky130-temp-por/.loom/worktrees/issue-101/sim/build/supply-ramp-top/20261009-052740-5346c37/crosscheck/out/tt_3p300V_27C/ngspice.log",
+        "raw": "/home/ubuntu/GitHub/sky130-temp-por/.loom/worktrees/issue-101/sim/build/supply-ramp-top/20261009-052740-5346c37/crosscheck/out/tt_3p300V_27C/waveform.raw",
+        "waveform": "/home/ubuntu/GitHub/sky130-temp-por/.loom/worktrees/issue-101/sim/build/supply-ramp-top/20261009-052740-5346c37/crosscheck/out/tt_3p300V_27C/waveform.raw.json",
+        "deck": "/home/ubuntu/GitHub/sky130-temp-por/.loom/worktrees/issue-101/sim/build/supply-ramp-top/20261009-052740-5346c37/crosscheck/out/tt_3p300V_27C/corner.cir"
+      },
+      "monte_carlo": null
+    }
+  ]
+}

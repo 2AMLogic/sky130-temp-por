@@ -1,0 +1,31 @@
+hspice-ish: no such command available in ngspice
+
+Note: Compatibility modes selected: hs a
+
+
+Circuit: * klt sim -- generated corner deck, do not edit
+
+option SCALE: Scale is set to 1e-06 for instance and model parameters
+option SCALE: Scale is set to 1e-06 for instance and model parameters
+option SCALE: Scale is set to 1e-06 for instance and model parameters
+option SCALE: Scale is set to 1e-06 for instance and model parameters
+Doing analysis at TEMP = 27.000000 and TNOM = 27.000000
+
+Using KLU as Direct Linear Solver
+Warning: singular matrix:  check node q.xdut.xtemp.xq8b.qsky130_fd_pr__pnp_05v5_w3p40l3p40#emitter
+
+Note: Starting dynamic gmin stepping
+Note: Dynamic gmin stepping completed
+
+No. of Data Rows : 3461
+
+  Measurements for Transient Analysis
+
+vdd_end             =  3.300000e+00
+resetn_end          =  3.013852e+00
+resetn_max          =  3.013852e+00 at=  2.716081e-03
+por_raw_max         =  3.300000e+00 at=  2.711312e-03
+ibias_end           =  8.082693e-01
+
+ASCII raw file "/home/ubuntu/GitHub/sky130-temp-por/.loom/worktrees/issue-101/sim/build/supply-ramp-top/20261009-052740-5346c37/crosscheck/out/tt_3p300V_27C/waveform.raw"
+ngspice-42 done
