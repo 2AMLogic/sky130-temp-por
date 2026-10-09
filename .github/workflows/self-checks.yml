@@ -28,6 +28,9 @@ jobs:
       - name: POR-comparator threshold extractor selftest
         run: python3 -I sim/por-comparator-thresholds/threshold_extractor.py
 
+      - name: Iq checker selftest (invalid-waveform rejection, irregular sampling)
+        run: python3 -I sim/iq-top/iq_checker.py
+
       - name: Committed netlists satisfy the pinout invariants
         run: python3 design/check_committed_netlists.py
 

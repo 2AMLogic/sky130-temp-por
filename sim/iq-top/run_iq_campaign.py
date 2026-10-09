@@ -290,7 +290,11 @@ def analyze_state(state: str, run_dir: Path, man: dict, traces: dict) -> dict:
         if wp is None or not wp.is_file():
             pt.update({"status": "nonconverged", "reason": "no waveform retrieved: " + classify_failure(c, log_text)})
             continue
-        wave = qc.load_wave(wp)
+        try:
+            wave = qc.load_wave(wp)
+        except (ValueError, OSError, EOFError) as e:  # malformed/unreadable waveform: fail this point only
+            pt.update({"status": "nonconverged", "invalid_input": True, "reason": f"invalid input: waveform unreadable: {e}"})
+            continue
         g = qc.grade(wave, state, c["supply_v"]["vset"], man)
         pt.pop("reason", None)
         pt.update(g)
@@ -530,7 +534,11 @@ def cmd_record(args) -> int:
         if not xcor or not (xcor.get("artifacts") or {}).get("waveform"):
             parts.append(f"{st}: local probe returned no waveform ({xcor and xcor.get('status')}); UNRESOLVED -- the single local ngspice-42 run was stopped by the operator after ~33 min / ~64 CPU-min without finishing (shared host), so this state has NO local cross-check and the fleet value for tt/27C/3.30V is not cross-checked.")
             continue
-        g = qc.grade(qc.load_wave(Path(xcor["artifacts"]["waveform"])), st, 3.3, man)
+        try:
+            g = qc.grade(qc.load_wave(Path(xcor["artifacts"]["waveform"])), st, 3.3, man)
+        except (ValueError, OSError, EOFError) as e:
+            parts.append(f"{st}: local probe waveform invalid ({e}); no cross-check.")
+            continue
         fl = per[st]["points"].get("tt_27c_3.30v", {})
         txt = f"{st}: local ngspice-42 status **{g['status']}**, I = {ua(g.get('i_total_a'))} uA"
         if "contention_a" in g:
