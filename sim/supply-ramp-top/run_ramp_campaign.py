@@ -268,19 +268,20 @@ def cmd_crosscheck(args) -> int:
     run_dir = BUILD / args.run_id
     if not run_dir.exists():
         raise SystemExit(f"no such run: {run_dir}")
-    variant = "diag-mn1-l20"
+    variant = args.variant
     rate = 1e4
     head = tb_netlist_head(run_dir / "xc", pdk)
     d = run_dir / "crosscheck"
     d.mkdir(exist_ok=True)
     (d / "netlist.spice").write_text(build_netlist(head, man["variants"][variant], rate))
+    (d / "variant.txt").write_text(variant + "\n")
     req = build_request("netlist.spice", rate, man, "local")
     req["corners"] = {"process": ["tt"], "supply_v": {"vset": [3.3]}, "temperature_c": [27]}
     req["options"]["ngspice_init"] = [
         ln.strip() for ln in (SIM_DIR / "spiceinit").read_text().splitlines() if ln.strip() and not ln.startswith("*")
     ]
     (d / "request.json").write_text(json.dumps(req, indent=2) + "\n")
-    say("[crosscheck] one local corner (tt/27C/3.30V, 10 kV/s, diag-mn1-l20) on local ngspice")
+    say(f"[crosscheck] one local corner (tt/27C/3.30V, 10 kV/s, {variant}) on local ngspice")
     p = subprocess.run(
         ["klt", "sim", str(d / "request.json"), "--backend", "local", "-o", str(d / "out"), "--format", "json"],
         capture_output=True,
@@ -641,7 +642,7 @@ def cmd_record(args) -> int:
             if rp.is_file():
                 (corners_dir / rate_tag(rate)).mkdir(parents=True, exist_ok=True)
                 (corners_dir / rate_tag(rate) / "klt-report.json").write_text(scrub(rp.read_text(), run_dir))
-        if xcp.is_file() and variant == "diag-mn1-l20":
+        if xcp.is_file() and (xcp.parent / "variant.txt").is_file() and (xcp.parent / "variant.txt").read_text().strip() == variant:
             xrep = json.loads(xcp.read_text())
             xcor = (xrep.get("corners") or [None])[0]
             if xcor and xcor.get("artifacts", {}).get("waveform"):
@@ -655,7 +656,7 @@ def cmd_record(args) -> int:
                         "fleet": {"ngspice": fl["ngspice"], "t_release_s": fc["resetn"]["t_release_s"], "end_v": fc["resetn"]["end_v"], "por_raw_vdd_v": fc["por_raw"]["vdd_at_rise_v"], "verdict": fc["transition_verdict"]},
                     }
                     xc["text"] = (
-                        f"tt / 27 C / 3.30 V / 10 kV/s, variant diag-mn1-l20: local {xc['local']['ngspice']} released at {xc['local']['t_release_s'] * 1e3:.5g} ms "
+                        f"tt / 27 C / 3.30 V / 10 kV/s, variant {variant}: local {xc['local']['ngspice']} released at {xc['local']['t_release_s'] * 1e3:.5g} ms "
                         f"(RESETn end {xc['local']['end_v']:.5g} V, POR_RAW rose at VDD={xc['local']['por_raw_vdd_v']:.4g} V); fleet {xc['fleet']['ngspice']} released at "
                         f"{xc['fleet']['t_release_s'] * 1e3:.5g} ms (end {xc['fleet']['end_v']:.5g} V, VDD={xc['fleet']['por_raw_vdd_v']:.4g} V). "
                         "The fleet PDK commit is not reported by runner klt 0.5.0; agreement of the two engines here is the only evidence that the fleet model library matches the pin."
@@ -788,6 +789,7 @@ def main(argv: list[str]) -> int:
     r.add_argument("--capacity-wait", type=float, default=0, help="batch.capacity_wait_s: seconds to wait out a Spot/fleet capacity refusal")
     x = sub.add_parser("crosscheck")
     x.add_argument("--run-id", required=True)
+    x.add_argument("--variant", choices=["as-drawn", "diag-mn1-l20"], default="as-drawn")
     c = sub.add_parser("record")
     c.add_argument("--run-id", required=True)
     c.add_argument("--variant", action="append", choices=["as-drawn", "diag-mn1-l20"])

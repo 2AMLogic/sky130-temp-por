@@ -5,7 +5,7 @@
   "top": "por_output_chain",
   "dbu_um": 0.001,
   "netlist_path": "por_output_chain.spice",
-  "netlist_sha256": "55fa6a4be28cb2a94da934d64979bbb4047671ff30cb1d1b22319fa305e88340",
+  "netlist_sha256": "ed9cb90f3c150de5c0351566cd044a69fea5c335a4f986989aa0a738e026ef77",
   "status": "extracted",
   "device_count": 33,
   "net_count": 18,
@@ -43,12 +43,12 @@
         "b": "VSS"
       },
       "params": {
-        "l_um": 25.0,
-        "w_um": 0.5,
-        "as_um2": 0.21,
-        "ad_um2": 0.21,
-        "ps_um": 1.84,
-        "pd_um": 1.84
+        "l_um": 20.0,
+        "w_um": 0.42,
+        "as_um2": 0.1764,
+        "ad_um2": 0.1764,
+        "ps_um": 1.68,
+        "pd_um": 1.68
       },
       "instance_path": [
         {
@@ -938,7 +938,7 @@
       "name": "IBIAS",
       "pin": true,
       "device_count": 3,
-      "net_id": 13,
+      "net_id": 12,
       "pin_index": 0,
       "label_positions_um": [
         {
@@ -948,7 +948,7 @@
         },
         {
           "text": "IBIAS",
-          "x_um": 13.64,
+          "x_um": 14.93,
           "y_um": 13.0
         }
       ]
@@ -957,7 +957,7 @@
       "name": "ND1",
       "pin": true,
       "device_count": 4,
-      "net_id": 6,
+      "net_id": 7,
       "pin_index": 1,
       "label_positions_um": [
         {
@@ -1013,7 +1013,7 @@
       "name": "NDL",
       "pin": true,
       "device_count": 5,
-      "net_id": 7,
+      "net_id": 13,
       "pin_index": 5,
       "label_positions_um": [
         {
@@ -1027,7 +1027,7 @@
       "name": "NNAND",
       "pin": true,
       "device_count": 2,
-      "net_id": 11,
+      "net_id": 8,
       "pin_index": 6,
       "label_positions_um": [
         {
@@ -1055,12 +1055,12 @@
       "name": "PDN",
       "pin": true,
       "device_count": 7,
-      "net_id": 3,
+      "net_id": 2,
       "pin_index": 8,
       "label_positions_um": [
         {
           "text": "PDN",
-          "x_um": 66.225,
+          "x_um": 63.705,
           "y_um": 34.6
         }
       ]
@@ -1069,7 +1069,7 @@
       "name": "PGDG",
       "pin": true,
       "device_count": 6,
-      "net_id": 9,
+      "net_id": 5,
       "pin_index": 9,
       "label_positions_um": [
         {
@@ -1083,7 +1083,7 @@
       "name": "PGDGB",
       "pin": true,
       "device_count": 4,
-      "net_id": 5,
+      "net_id": 6,
       "pin_index": 10,
       "label_positions_um": [
         {
@@ -1097,7 +1097,7 @@
       "name": "POR_RAW",
       "pin": true,
       "device_count": 2,
-      "net_id": 8,
+      "net_id": 10,
       "pin_index": 11,
       "label_positions_um": [
         {
@@ -1116,7 +1116,7 @@
       "name": "RESETn",
       "pin": true,
       "device_count": 4,
-      "net_id": 10,
+      "net_id": 11,
       "pin_index": 12,
       "label_positions_um": [
         {
@@ -1135,7 +1135,7 @@
       "name": "RSTB",
       "pin": true,
       "device_count": 6,
-      "net_id": 12,
+      "net_id": 9,
       "pin_index": 13,
       "label_positions_um": [
         {
@@ -1163,7 +1163,7 @@
       "name": "TRIP",
       "pin": true,
       "device_count": 4,
-      "net_id": 2,
+      "net_id": 3,
       "pin_index": 15,
       "label_positions_um": [
         {
@@ -1236,7 +1236,7 @@
       "released": false
     },
     "input": {
-      "content_hash": "sha256:730252804b767aa37c67a517606a793a08ee15cb9a87b36b24e58e02bcece58a",
+      "content_hash": "sha256:4139c5aeee30990ef3eec60024f25df9640122d44449671c5a379ea59637134a",
       "role": "layout"
     }
   },

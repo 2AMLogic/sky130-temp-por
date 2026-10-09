@@ -21,11 +21,11 @@
   },
   "variants": {
     "as-drawn": {
-      "description": "Unchanged assembled circuit exactly as committed in design/netlist/temp_por_top.spice.",
+      "description": "Unchanged assembled circuit exactly as committed in design/netlist/temp_por_top.spice. Since issue #101 that export carries por_output_chain.XMN1 at L=20 W=0.42, a legal sky130 nfet_g5v0d10v5 bin; #98 records of this variant predate that change and show model_not_found for the old L=25 W=0.5 card.",
       "netlist_edit": null
     },
     "diag-mn1-l20": {
-      "description": "DIAGNOSTIC ONLY, not the unchanged circuit. Identical to as-drawn except por_output_chain.XMN1 (sky130_fd_pr__nfet_g5v0d10v5, drawn L=25 W=0.5) is netlisted at L=20: the as-drawn geometry has no valid model bin in the pinned PDK (ngspice: 'could not find a valid modelname', reproduced on ngspice 42 and 46, with and without ng_nomodcheck), so the as-drawn circuit cannot be simulated at all. L=20 is the largest drawn length for which the pinned model resolves; it is used only to make the rest of the assembled behavior observable. Nothing here edits design/.",
+      "description": "RETIRED by issue #101 (as-drawn XMN1 is now the legal L=20 W=0.42; the committed export no longer contains the L=25 card this edit targets, so this variant cannot be rebuilt; kept only so the append-only #98 records that used it stay interpretable). Original text: DIAGNOSTIC ONLY, not the unchanged circuit. Identical to as-drawn except por_output_chain.XMN1 (sky130_fd_pr__nfet_g5v0d10v5, drawn L=25 W=0.5) is netlisted at L=20: the as-drawn geometry has no valid model bin in the pinned PDK (ngspice: 'could not find a valid modelname', reproduced on ngspice 42 and 46, with and without ng_nomodcheck), so the as-drawn circuit cannot be simulated at all. L=20 is the largest drawn length for which the pinned model resolves; it is used only to make the rest of the assembled behavior observable. Nothing here edits design/.",
       "netlist_edit": {
         "find": "XMN1 PDN IBIAS VSS VSS sky130_fd_pr__nfet_g5v0d10v5 L=25 W=0.5",
         "replace": "XMN1 PDN IBIAS VSS VSS sky130_fd_pr__nfet_g5v0d10v5 L=20 W=0.5"

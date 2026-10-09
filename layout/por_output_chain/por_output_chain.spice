@@ -21,8 +21,8 @@
 * pin VSS
 .SUBCKT por_output_chain IBIAS ND1 NDG NDGN NDGP NDL NNAND NTS PDN PGDG PGDGB
 + POR_RAW RESETn RSTB TIM TRIP VDD VSS
-* device instance $1 r0 *1 21.76,0.25 nfet
-M$1 PDN IBIAS VSS VSS nfet L=25U W=0.5U AS=0.21P AD=0.21P PS=1.84U PD=1.84U
+* device instance $1 r0 *1 19.26,0.21 nfet
+M$1 PDN IBIAS VSS VSS nfet L=20U W=0.42U AS=0.1764P AD=0.1764P PS=1.68U PD=1.68U
 * device instance $2 r0 *1 89.46,0.25 nfet
 M$2 PGDGB PGDG VSS VSS nfet L=2U W=0.5U AS=0.21P AD=0.21P PS=1.84U PD=1.84U
 * device instance $3 r0 *1 109.14,0.25 nfet

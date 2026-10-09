@@ -12,6 +12,13 @@ schematic's devices could not be drawn (next section).
 
 ## Result
 
+Issue #101 re-drew `XMN1` from the unsimulatable `L=25 W=0.5` (no model bin in
+the pinned PDK) to `L=20 W=0.42`; the table below is the re-run after that
+change (rationale in `design/por_output_chain.md`, "`XMN1` model-bin
+legality"). `cell.json`'s `mn1` block changed; every other block and the
+placement are unchanged, and the cell recomposed and routed with no other edit.
+The `mn1` drawn width fell from 25.84 to 20.84 um; the overall extent did not change.
+
 Generated and checked with the `klt` build `layout/pdk.json` pins,
 `0.6.0+g0ce8c64842d9` (see "Tool build").
 
@@ -200,7 +207,7 @@ unchanged. Other cards differ from the source only by `u` unit suffixes
 (`compose-cell.py`'s known rewrite).
 
 Negative controls (scratch copies of the generated reference, not
-committed): `XMN1` `L` 25 -> 24 gives `mismatch` (5 `device.property`
+committed): `XMN1` `L` 20 -> 19 gives `mismatch` (5 `device.property`
 errors); `XMDIS`'s gate moved from `PGDGB` to `PGDG` gives `mismatch`
 (`device.unmatched`); dropping `XCTIM_3` gives `mismatch` (32 of 33 devices).
 So `L`, the topology and the capacitor count are really compared.
@@ -216,7 +223,7 @@ So `L`, the topology and the capacitor count are really compared.
    redrawing belongs to the pin bump that regenerates every `layout/*/`
    directory together). **This cell is not 5 V sign-off.**
 3. **Capacitor values not LVS-compared** (placeholder `C`, secondary `A`/`P`).
-4. **Long-channel devices** (`L` 10 and 25 um) are single-finger, as in
+4. **Long-channel devices** (`L` 10 and 20 um) are single-finger, as in
    `por_comparator`; area is not optimized (336 um wide, mostly the
    capacitors and the long devices). No density or matching work.
 5. **No ERC, no parasitic extraction, no simulation** of the laid-out cell.
