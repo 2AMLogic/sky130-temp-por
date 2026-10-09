@@ -1,0 +1,18 @@
+{
+  "layout": {
+    "netlist": "temp_core.spice",
+    "deck": "sky130"
+  },
+  "reference": {
+    "netlist": "temp_core.ref.spice",
+    "form": "subckt-call",
+    "deck": "sky130"
+  },
+  "options": {
+    "compare_parameters": {
+      "pnp": [
+        "NE"
+      ]
+    }
+  }
+}

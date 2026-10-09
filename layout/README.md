@@ -416,13 +416,35 @@ calls against its own `design/netlist/*.spice` subckt:
 Neither is a block-level layout claim: whole-block item 2 stays `unmet`
 (`manifests/README.md`).
 
+## `temp_core`: the PTAT/CTAT sensing core leaf (issue #104)
+
+[`layout/temp_core/`](temp_core/README.md) lays out the whole `.subckt
+temp_core` of `design/netlist/temp_core.spice`: 48 devices (17 NMOS, 16
+PMOS, 9 PNP, 5 `res_xhigh_po`, 1 MiM). **`klt drc`: clean, 0 violations.**
+**`klt lvs`: `match`, 48/48 devices, 24/24 nets, no exclusions.** The five
+warnings limit the match the same way they do for `bias_core`: PNP `AE`,
+resistor and MiM values, and secondary geometry are not compared. MOS
+`L`/`W` and all four terminals are compared, including the separate `NT`
+n-well of the input pair `XMI1`/`XMI2`.
+
+`XQ8A..XQ8H` reuse `layout/bias_core_pnp8_leg/`'s stream unchanged. `XQ1`
+is its own one-unit `bjt_array` stage with a closed ring. The resistors are
+fresh straight `res_array` bars, because no device in `bias_core_passives`
+matches a `temp_core` size, and the longest (`XR2`, 2652.6 um) makes the
+cell 2.8 mm wide. Signal nets are routed as a two-layer channel route: met1
+verticals and met2 tracks, joined at small hand-made junction blocks
+(`jct_m1.gds`). That technique was needed because a `gen-compose` leg cannot
+change plane at a waypoint, filed as
+[klayout-tools#2930](https://github.com/2AMLogic/klayout-tools/issues/2930).
+The 5 V `hvi` marker caveat (#1912) applies here too.
+
 ## What's next
 
 Per issue #36, this fleet prefers landing DRC-clean/LVS-blocked increments
 (isolated to a known, upstream-filed gap) over waiting on the upstream fix.
 As of issue #81, all six `bias_core_*` sub-blocks and the `bias_core`
 full-cell assembly are DRC-clean and LVS `match` at the `0ce8c64842d9` pin.
-`por_comparator` (#82) and `por_output_chain` (#97, minus the native device it
-cannot yet draw) are DRC-clean and LVS `match` as well. `temp_core` and
-`temp_por_top` are tracked from
+`por_comparator` (#82), `por_output_chain` (#97, minus the native device it
+cannot yet draw) and `temp_core` (#104) are DRC-clean and LVS `match` as
+well. With every leaf laid out, `temp_por_top` is what remains, tracked from
 [#4](https://github.com/2AMLogic/sky130-temp-por/issues/4).

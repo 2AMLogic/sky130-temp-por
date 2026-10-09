@@ -1,0 +1,339 @@
+{
+  "pdk": {
+    "variant": "sky130A"
+  },
+  "blocks": [
+    {
+      "id": "sub",
+      "cell": {
+        "gds_path": "temp_core.gds",
+        "cell_name": "temp_core",
+        "ports": [
+          {
+            "name": "VDD",
+            "x_um": -6.0,
+            "y_um": 59.58,
+            "layer": {
+              "layer": 67,
+              "datatype": 20
+            },
+            "width_um": 0.17,
+            "direction_deg": 180
+          },
+          {
+            "name": "VSS",
+            "x_um": -6.0,
+            "y_um": -6.0,
+            "layer": {
+              "layer": 67,
+              "datatype": 20
+            },
+            "width_um": 0.17,
+            "direction_deg": 180
+          },
+          {
+            "name": "IBIAS",
+            "x_um": -10.0,
+            "y_um": 14.22,
+            "layer": {
+              "layer": 67,
+              "datatype": 20
+            },
+            "width_um": 0.17,
+            "direction_deg": 180
+          },
+          {
+            "name": "EN",
+            "x_um": -10.0,
+            "y_um": 23.720000000000002,
+            "layer": {
+              "layer": 67,
+              "datatype": 20
+            },
+            "width_um": 0.17,
+            "direction_deg": 180
+          },
+          {
+            "name": "PTAT",
+            "x_um": -10.0,
+            "y_um": 24.720000000000002,
+            "layer": {
+              "layer": 67,
+              "datatype": 20
+            },
+            "width_um": 0.17,
+            "direction_deg": 180
+          },
+          {
+            "name": "CTAT",
+            "x_um": -10.0,
+            "y_um": 12.72,
+            "layer": {
+              "layer": 67,
+              "datatype": 20
+            },
+            "width_um": 0.17,
+            "direction_deg": 180
+          }
+        ],
+        "bbox_um": {
+          "x0": -10.0,
+          "y0": -17.0,
+          "x1": 2793.92,
+          "y1": 59.665
+        }
+      }
+    },
+    {
+      "id": "dummy_VDD",
+      "cell": {
+        "gds_path": "promo_stub.gds",
+        "cell_name": "promo_stub",
+        "ports": [
+          {
+            "name": "PAD",
+            "x_um": 0.0,
+            "y_um": 0.085,
+            "layer": {
+              "layer": 67,
+              "datatype": 20
+            },
+            "width_um": 0.17,
+            "direction_deg": 0
+          }
+        ]
+      }
+    },
+    {
+      "id": "dummy_VSS",
+      "cell": {
+        "gds_path": "promo_stub.gds",
+        "cell_name": "promo_stub",
+        "ports": [
+          {
+            "name": "PAD",
+            "x_um": 0.0,
+            "y_um": 0.085,
+            "layer": {
+              "layer": 67,
+              "datatype": 20
+            },
+            "width_um": 0.17,
+            "direction_deg": 0
+          }
+        ]
+      }
+    },
+    {
+      "id": "dummy_IBIAS",
+      "cell": {
+        "gds_path": "promo_stub.gds",
+        "cell_name": "promo_stub",
+        "ports": [
+          {
+            "name": "PAD",
+            "x_um": 0.0,
+            "y_um": 0.085,
+            "layer": {
+              "layer": 67,
+              "datatype": 20
+            },
+            "width_um": 0.17,
+            "direction_deg": 0
+          }
+        ]
+      }
+    },
+    {
+      "id": "dummy_EN",
+      "cell": {
+        "gds_path": "promo_stub.gds",
+        "cell_name": "promo_stub",
+        "ports": [
+          {
+            "name": "PAD",
+            "x_um": 0.0,
+            "y_um": 0.085,
+            "layer": {
+              "layer": 67,
+              "datatype": 20
+            },
+            "width_um": 0.17,
+            "direction_deg": 0
+          }
+        ]
+      }
+    },
+    {
+      "id": "dummy_PTAT",
+      "cell": {
+        "gds_path": "promo_stub.gds",
+        "cell_name": "promo_stub",
+        "ports": [
+          {
+            "name": "PAD",
+            "x_um": 0.0,
+            "y_um": 0.085,
+            "layer": {
+              "layer": 67,
+              "datatype": 20
+            },
+            "width_um": 0.17,
+            "direction_deg": 0
+          }
+        ]
+      }
+    },
+    {
+      "id": "dummy_CTAT",
+      "cell": {
+        "gds_path": "promo_stub.gds",
+        "cell_name": "promo_stub",
+        "ports": [
+          {
+            "name": "PAD",
+            "x_um": 0.0,
+            "y_um": 0.085,
+            "layer": {
+              "layer": 67,
+              "datatype": 20
+            },
+            "width_um": 0.17,
+            "direction_deg": 0
+          }
+        ]
+      }
+    }
+  ],
+  "placement": {
+    "strategy": "explicit",
+    "order": [
+      "sub",
+      "dummy_VDD",
+      "dummy_VSS",
+      "dummy_IBIAS",
+      "dummy_EN",
+      "dummy_PTAT",
+      "dummy_CTAT"
+    ],
+    "origins_um": {
+      "sub": {
+        "x": 0.0,
+        "y": 0.0
+      },
+      "dummy_VDD": {
+        "x": -46.0,
+        "y": 59.495
+      },
+      "dummy_VSS": {
+        "x": -46.0,
+        "y": -6.085
+      },
+      "dummy_IBIAS": {
+        "x": -50.0,
+        "y": 14.135
+      },
+      "dummy_EN": {
+        "x": -50.0,
+        "y": 23.635
+      },
+      "dummy_PTAT": {
+        "x": -50.0,
+        "y": 24.635
+      },
+      "dummy_CTAT": {
+        "x": -50.0,
+        "y": 12.635
+      }
+    }
+  },
+  "connectivity": [
+    {
+      "net": "VDD",
+      "pins": [
+        {
+          "block": "sub",
+          "port": "VDD"
+        },
+        {
+          "block": "dummy_VDD",
+          "port": "PAD"
+        }
+      ]
+    },
+    {
+      "net": "VSS",
+      "pins": [
+        {
+          "block": "sub",
+          "port": "VSS"
+        },
+        {
+          "block": "dummy_VSS",
+          "port": "PAD"
+        }
+      ]
+    },
+    {
+      "net": "IBIAS",
+      "pins": [
+        {
+          "block": "sub",
+          "port": "IBIAS"
+        },
+        {
+          "block": "dummy_IBIAS",
+          "port": "PAD"
+        }
+      ]
+    },
+    {
+      "net": "EN",
+      "pins": [
+        {
+          "block": "sub",
+          "port": "EN"
+        },
+        {
+          "block": "dummy_EN",
+          "port": "PAD"
+        }
+      ]
+    },
+    {
+      "net": "PTAT",
+      "pins": [
+        {
+          "block": "sub",
+          "port": "PTAT"
+        },
+        {
+          "block": "dummy_PTAT",
+          "port": "PAD"
+        }
+      ]
+    },
+    {
+      "net": "CTAT",
+      "pins": [
+        {
+          "block": "sub",
+          "port": "CTAT"
+        },
+        {
+          "block": "dummy_CTAT",
+          "port": "PAD"
+        }
+      ]
+    }
+  ],
+  "routing": {
+    "layer_role": "metal",
+    "width_um": 0.17,
+    "cross_block_layer_role": "metal2"
+  },
+  "options": {
+    "cell_name": "temp_core_downstream_check",
+    "output": "downstream-check.gds"
+  }
+}
