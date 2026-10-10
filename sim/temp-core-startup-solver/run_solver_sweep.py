@@ -334,10 +334,10 @@ def repeats_across_combos(res):
 
 def base_caveat(res):
     st = "ran" if res["en-high__base"]["report"] is not None else "was NOT run (fleet refusal)"
-    return ("`base` re-expresses the original deck's supply source (behavioural `BVDD` = swept `VSET` x unit PWL ramp instead "
-            "of the original `V1` PWL source), so the six points not recurring under this deck is also consistent with a "
-            "deck/supply-source difference and is not by itself proof of a solver artifact; the control that would tie the "
-            f"original failures to the old deck is the EN-high `base` combo, which {st}")
+    return ("`base`, and with it every variant in this sweep, re-expresses the original deck's supply source (behavioural "
+            "`BVDD` = swept `VSET` x unit PWL ramp instead of the original `V1` PWL source), so the six points not recurring here "
+            "is also consistent with a deck/supply-source difference and is not by itself proof of a solver artifact; the control "
+            f"that would tie the original failures to the old deck is the EN-high `base` combo, which {st}")
 
 
 def verdict_for_point(cid, scen, res, ctx=None):
@@ -379,10 +379,9 @@ def verdict_for_point(cid, scen, res, ctx=None):
             else:
                 mtx += "physical-branch agreement at this point is not assessed (fewer than 2 landings)"
         else:
-            mtx = (f"only {nrun} {scen} variant ran ({', '.join(sc['variants_run'])}), so cross-variant checks (whether the failing set "
-                   "moves with the setting, physical-branch agreement) are not assessed for this scenario; the only matrix-level "
-                   "evidence is that " + ("every failure in that variant is non-physical" if sc["all_failures_nonphysical"]
-                                          else "some failures in that variant are NOT non-physical"))
+            mtx = ("the observation that " + ("every failure" if sc["all_failures_nonphysical"] else "NOT every failure")
+                   + f" in the {nrun} {scen} variant run ({', '.join(sc['variants_run'])}) is non-physical; cross-variant checks "
+                   f"(whether the failing set moves with the setting, physical-branch agreement) are not assessed ({nrun} variant)")
         why = (f"passes on the physical branch in all {len(ran)} variant(s) run ({', '.join(ran)}); the `base` deck "
                + ("was among them" if "base" in ran else "was NOT run for this scenario (fleet refusal)")
                + ". The original non-physical landing did not recur at this point, so the artifact explanation is NOT demonstrated at this point itself. "

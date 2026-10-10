@@ -55,7 +55,7 @@ Both records have `Overall: FAIL` with three failing corner entries each. The
 solver artifact, but that attribution is a **hypothesis** carried by those documents;
 issue #86 owns the investigation. This report records the outcome as FAIL.
 
-Update (issue #86, [E5c](#e5c)): a solver/ramp sweep of the full grid on the current netlist did not re-land any of these six points and produced other, equally non-physical failures that move with every setting; no real failure was found. The attribution is better supported but still not demonstrated at the six points themselves, and the sweep is incomplete (5 of 10 combos, fleet capacity refusals). The recorded outcome of E5a/E5b stays FAIL.
+Update (issue #86, [E5c](#e5c)): a solver/ramp sweep of the full grid on the current netlist did not re-land any of these six points. It produced other failures, all non-physical, whose set differs between the variants run within each scenario; no real failure was found. This does not demonstrate the attribution at the six points themselves. Every sweep variant uses a re-expressed supply source, so the non-recurrence is also consistent with a deck difference, and the EN-high `base` control did not run. The sweep is incomplete (6 of 10 combos, fleet capacity refusals). The recorded outcome of E5a/E5b stays FAIL.
 
 | Record | Failing corners (process_temp_supply) |
 |---|---|
@@ -151,7 +151,7 @@ ngspice-46 / XSCHEM V3.4.7 on Linux, except where noted. E8-E10 are fleet batch 
 - Outcome: **Overall FAIL**, 42/45 PASS; failing points listed in 3.1.1
 - Limitations: startup behaviour only (PTAT/CTAT in harness windows), not temperature accuracy; failure cause not established (#86)
 - **Provenance-weak**: taken on a dirty working tree (the frozen netlist snapshot is what pins what ran); superseded as the cause evidence by [E5c](#e5c) (issue #86), which does not replace this record
-- Follow-up: [E5c](#e5c) did not reproduce these three FAILs on the current netlist (3/3 points pass in all four variants run); see the E5c outcome for what that does and does not show
+- Follow-up: [E5c](#e5c) did not reproduce these three FAILs on the current netlist (3/3 points pass in all four EN-high variants run; the EN-high `base` control did not run); see the E5c outcome for what that does and does not show
 
 <a id="e5b"></a>
 ### E5b - `temp-core-startup-en-delayed`, record `20260826-054047-ee63b45`
@@ -163,16 +163,16 @@ ngspice-46 / XSCHEM V3.4.7 on Linux, except where noted. E8-E10 are fleet batch 
 - Outcome: **Overall FAIL**, 42/45 PASS; failing points listed in 3.1.1
 - Limitations: as E5a
 - **Provenance-weak**: taken on a dirty working tree (as E5a)
-- Follow-up: [E5c](#e5c) did not reproduce these three FAILs on the current netlist (3/3 points pass in the one variant run for this scenario); see E5c
+- Follow-up: [E5c](#e5c) did not reproduce these three FAILs on the current netlist (3/3 points pass in both EN-delayed variants run, `base` and the 2 ms ramp); see E5c
 
 <a id="e5c"></a>
-### E5c - `temp-core-startup-solver`, record `20261010-095316-292949a` (issue #86)
+### E5c - `temp-core-startup-solver`, record `20261010-100955-292949a` (issue #86)
 
-- Record: [md](../sim/temp-core-startup-solver/records/20261010-095316-292949a.md), [json](../sim/temp-core-startup-solver/records/20261010-095316-292949a.json); driver [run_solver_sweep.py](../sim/temp-core-startup-solver/run_solver_sweep.py); netlists [snapshots](../sim/temp-core-startup-solver/netlist-snapshots/20261010-095316-292949a/)
-- Revision: `292949a` on `feature/issue-86` (resolves); **clean tree** at run time; `klt sim --backend batch` (fleet ngspice-46, same PDK pin); job ids in the record
+- Record: [md](../sim/temp-core-startup-solver/records/20261010-100955-292949a.md), [json](../sim/temp-core-startup-solver/records/20261010-100955-292949a.json); driver [run_solver_sweep.py](../sim/temp-core-startup-solver/run_solver_sweep.py); netlists [snapshots](../sim/temp-core-startup-solver/netlist-snapshots/20261010-100955-292949a/)
+- Revision: `292949a` on `feature/issue-86` (resolves); **clean tree** at run time; the EN-delayed 2 ms ramp combo came from a `--resume` resubmission at `3bbcac3` (clean tree, same generated netlist); `klt sim --backend batch` (fleet ngspice-46, same PDK pin); job ids in the record
 - Level: leaf cells (`temp_core` + `bias_core`), transient from 0 V, full 45-point PVT grid per (EN scenario, variant); the E5a/E5b measurement windows copied unchanged
-- Conditions: EN-high x {trtol7, reltol 2e-4, 1 us ramp, 2 ms ramp} and EN-delayed x {base} ran (5 of 10 combos); EN-high x base and EN-delayed x {trtol7, reltol 2e-4, 1 us ramp, 2 ms ramp} were refused by the fleet (`batch_no_capacity`, three submit rounds) and are NOT-RUN, not substituted locally
-- Outcome: none of the six E5a/E5b points failed again (so none is shown to be an artifact at that point itself, and none is a real failure). Failures moved to other points: 1-5 per combo (44/45, 40/45, 44/45, 44/45 EN-high; 40/45 EN-delayed base), 13 failures in total, every one non-physical (negative supply current or a loop node/PTAT outside the rails), no point failing in more than one combo, and the points that landed on the physical branch agree to ~1e-9 V across variants. This supports the solver-artifact class for the deck as a whole and finds no real failure; the specific six remain "not reproduced". The missing EN-high base control and the four EN-delayed variants are open evidence
+- Conditions: EN-high x {trtol7, reltol 2e-4, 1 us ramp, 2 ms ramp} and EN-delayed x {base, 2 ms ramp} ran (6 of 10 combos); EN-high x base and EN-delayed x {trtol7, reltol 2e-4, 1 us ramp} were refused by the fleet (`batch_no_capacity`, four submit rounds) and are NOT-RUN, not substituted locally
+- Outcome: none of the six E5a/E5b points failed again in any variant run, so none is shown to be an artifact at that point itself and none is a real failure. Failures appeared at other points: 1-5 per combo (EN-high 44/45, 40/45, 44/45, 44/45; EN-delayed base 40/45, 2 ms ramp 40/45), 18 in total, every one non-physical (negative supply current or a loop node/PTAT outside the rails). Within each scenario, across the variants run (four EN-high, two EN-delayed), the failing sets are pairwise disjoint. Across scenarios three corners fail in two combos each: `tt_-40c_3.63v` (EN-high trtol7, EN-delayed base), `ff_-40c_3.63v` (EN-high reltol 2e-4, EN-delayed base) and `fs_-40c_2.97v` (EN-high reltol 2e-4, EN-delayed 2 ms ramp), all at -40 C and all non-physical. Points that landed on the physical branch agree to ~1e-9 V across the variants run in each scenario. No real failure was found and the six specific points remain "not reproduced". The sweep does not by itself prove the solver-artifact class. Every variant, including `base`, re-expresses the supply source, so the six not recurring is also consistent with a deck/supply-source difference, and the EN-high `base` control that would test this did not run. The NOT-RUN combos are open evidence
 - Limitations: `base` is a re-expression of the E5 deck for `klt sim` (behavioural supply source), not a bit-identical reproduction; ngspice version of the original records vs. fleet unverified beyond both being "46"
 
 <a id="e6"></a>
@@ -226,7 +226,7 @@ ngspice-46 / XSCHEM V3.4.7 on Linux, except where noted. E8-E10 are fleet batch 
 ## 6. Gaps summary
 
 1. Whole-block (`temp_por_top`) simulation: records exist (E9, E10) but the as-drawn supply-ramp PVT matrix has no result (E9: first run all ERROR on a model-bin failure, re-run refused by the fleet); the diagnostic-variant ramp run is 209 PASS / 151 FAIL of 360 points; Iq iq-total has 17/45 non-physical-branch points.
-2. `temp_core` startup: both leaf records FAIL (3 corners each) and the same non-physical signature recurs in E9 and E10; cause not established; owned by #86. Update: [E5c](#e5c) did not reproduce the six points, found 13 other non-physical failures that move with solver/ramp settings and no real failure, but covers only 5 of the 10 planned (scenario, variant) combos.
+2. `temp_core` startup: both leaf records FAIL (3 corners each) and the same non-physical signature recurs in E9 and E10; cause not established; owned by #86. Update: [E5c](#e5c) did not reproduce the six points, found 18 other non-physical failures (failing sets disjoint between variants within each scenario, three -40 C corners repeating across scenarios) and no real failure, but covers only 6 of the 10 planned (scenario, variant) combos, lacks the EN-high `base` control, and every variant re-expresses the supply source, so non-recurrence is not by itself proof of an artifact.
 3. POR comparator thresholds (E8) are measured on the cell only, with no mismatch Monte Carlo; `por_output_chain` has no cell-level record (only E6 devices and the whole-block runs).
 4. Continuous temperature and supply coverage: only three points each (plus the narrow diagnostic E4); E8 sweeps VDD continuously but only for the comparator.
 5. Brown-out behaviour: no record. Supply-ramp-rate coverage: exploratory, diagnostic variant only (E9).
