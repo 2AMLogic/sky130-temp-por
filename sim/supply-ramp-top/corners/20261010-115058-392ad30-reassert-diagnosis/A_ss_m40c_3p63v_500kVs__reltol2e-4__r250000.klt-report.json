@@ -1,0 +1,237 @@
+{
+  "schema_version": 3,
+  "netlist": {
+    "path": "sim/build/supply-ramp-top/diag142/A_ss_m40c_3p63v_500kVs__reltol2e-4__r250000/netlist.spice",
+    "scope": "repo"
+  },
+  "status": "pass",
+  "corner_count": 1,
+  "passed": 1,
+  "failed": 0,
+  "errored": 0,
+  "inconclusive": 0,
+  "diagnostic_counts": {
+    "by_code": {},
+    "by_severity": {},
+    "corners_with_diagnostics": 0
+  },
+  "metrics": {
+    "sim__corner__count": 1,
+    "sim__corner__passed_count": 1,
+    "sim__corner__failed_count": 0,
+    "sim__corner__errored_count": 0,
+    "sim__corner__inconclusive_count": 0
+  },
+  "environment": {
+    "engine": "ngspice",
+    "engine_version": "46",
+    "ngspice_binary": "/usr/bin/ngspice",
+    "models_lib": {
+      "path": null,
+      "scope": "external"
+    },
+    "models_lib_sha256": "48de7c677e2c6e7d09b2559279de9f818be71010a4aa933d728eb4db3b133c84",
+    "netlist_sha256": "685c9b1bac905e15aaa8be7557acba7755fb4fe61a8b464ad51031ccec63497b",
+    "netlist_closure": [
+      {
+        "path": "sim/build/supply-ramp-top/diag142/A_ss_m40c_3p63v_500kVs__reltol2e-4__r250000/netlist.spice",
+        "scope": "repo",
+        "sha256": "685c9b1bac905e15aaa8be7557acba7755fb4fe61a8b464ad51031ccec63497b"
+      }
+    ],
+    "remote": {
+      "provider": "aws-batch-fleet",
+      "job_id": "klt-sim-916694eaa2c2",
+      "bucket": "2am-batch-jobs-221082181346",
+      "region": "us-east-1",
+      "instance_id": "i-0ae6b2f2f9e37de1a",
+      "instance_type": "c7i.4xlarge",
+      "availability_zone": "us-east-1d",
+      "ami_id": "ami-0e40e3245f1923ac8",
+      "lifecycle": "spot",
+      "spot": true,
+      "state": "done",
+      "exit_code": "0",
+      "concurrency": "1",
+      "physical_cores": "8",
+      "elapsed_seconds": 19,
+      "runner_klt_version": "0.5.0",
+      "client_klt_version": "0.7.0+gca3089cd4b9f",
+      "runner_compatibility": "mismatch",
+      "runner_compatibility_warning": "the fleet runner ran klt 0.5.0 but the submitting client is 0.7.0+gca3089cd4b9f; request options the runner does not know may have been ignored -- update the runner image or use a compatible client"
+    }
+  },
+  "coverage": {
+    "corners_simulated": 1,
+    "measurements_declared": 5,
+    "measurements_with_limits": 0,
+    "unrecognized_limit_keys": [],
+    "schema_version": 1,
+    "known": true,
+    "checked": [
+      "measurement:[0,\"ss/3.630V/-40C\",\"ibias_end\"]/observation",
+      "measurement:[0,\"ss/3.630V/-40C\",\"por_raw_max\"]/observation",
+      "measurement:[0,\"ss/3.630V/-40C\",\"resetn_end\"]/observation",
+      "measurement:[0,\"ss/3.630V/-40C\",\"resetn_max\"]/observation",
+      "measurement:[0,\"ss/3.630V/-40C\",\"vdd_end\"]/observation"
+    ],
+    "skipped": [],
+    "inapplicable": [
+      {
+        "id": "measurement:[0,\"ss/3.630V/-40C\",\"ibias_end\"]/limits",
+        "reason": "characterization_without_limits"
+      },
+      {
+        "id": "measurement:[0,\"ss/3.630V/-40C\",\"por_raw_max\"]/limits",
+        "reason": "characterization_without_limits"
+      },
+      {
+        "id": "measurement:[0,\"ss/3.630V/-40C\",\"resetn_end\"]/limits",
+        "reason": "characterization_without_limits"
+      },
+      {
+        "id": "measurement:[0,\"ss/3.630V/-40C\",\"resetn_max\"]/limits",
+        "reason": "characterization_without_limits"
+      },
+      {
+        "id": "measurement:[0,\"ss/3.630V/-40C\",\"vdd_end\"]/limits",
+        "reason": "characterization_without_limits"
+      }
+    ],
+    "unknown": [],
+    "nothing_checked": false,
+    "nothing_checked_reasons": []
+  },
+  "provenance": {
+    "klt_version": "0.7.0+gca3089cd4b9f",
+    "klayout_version": "0.30.12",
+    "pdk": {
+      "name": "sky130A",
+      "source": "search root: ~/.volare",
+      "version": "open_pdks c6d73a35f524070e85faff4a6a9eef49553ebc2b"
+    },
+    "deck": {
+      "name": "sky130.lib.spice",
+      "content_hash": "sha256:48de7c677e2c6e7d09b2559279de9f818be71010a4aa933d728eb4db3b133c84",
+      "released": false
+    },
+    "input": {
+      "content_hash": "sha256:685c9b1bac905e15aaa8be7557acba7755fb4fe61a8b464ad51031ccec63497b",
+      "role": "netlist"
+    }
+  },
+  "measurements": [
+    {
+      "name": "vdd_end",
+      "unit": "V",
+      "limits": null,
+      "status": "pass",
+      "worst_case": {
+        "corner_id": "ss/3.630V/-40C",
+        "value": 3.63,
+        "margin": null
+      }
+    },
+    {
+      "name": "resetn_end",
+      "unit": "V",
+      "limits": null,
+      "status": "pass",
+      "worst_case": {
+        "corner_id": "ss/3.630V/-40C",
+        "value": 3.26137,
+        "margin": null
+      }
+    },
+    {
+      "name": "resetn_max",
+      "unit": "V",
+      "limits": null,
+      "status": "pass",
+      "worst_case": {
+        "corner_id": "ss/3.630V/-40C",
+        "value": 3.26139,
+        "margin": null
+      }
+    },
+    {
+      "name": "por_raw_max",
+      "unit": "V",
+      "limits": null,
+      "status": "pass",
+      "worst_case": {
+        "corner_id": "ss/3.630V/-40C",
+        "value": 3.63002,
+        "margin": null
+      }
+    },
+    {
+      "name": "ibias_end",
+      "unit": "V",
+      "limits": null,
+      "status": "pass",
+      "worst_case": {
+        "corner_id": "ss/3.630V/-40C",
+        "value": 0.910667,
+        "margin": null
+      }
+    }
+  ],
+  "corners": [
+    {
+      "corner_id": "ss/3.630V/-40C",
+      "process": "ss",
+      "supply_v": {
+        "vset": 3.63
+      },
+      "temperature_c": -40,
+      "status": "pass",
+      "runtime_s": 13.146,
+      "measurements": [
+        {
+          "name": "vdd_end",
+          "value": 3.63,
+          "unit": "V",
+          "status": "pass",
+          "margin": null
+        },
+        {
+          "name": "resetn_end",
+          "value": 3.26137,
+          "unit": "V",
+          "status": "pass",
+          "margin": null
+        },
+        {
+          "name": "resetn_max",
+          "value": 3.26139,
+          "unit": "V",
+          "status": "pass",
+          "margin": null
+        },
+        {
+          "name": "por_raw_max",
+          "value": 3.63002,
+          "unit": "V",
+          "status": "pass",
+          "margin": null
+        },
+        {
+          "name": "ibias_end",
+          "value": 0.910667,
+          "unit": "V",
+          "status": "pass",
+          "margin": null
+        }
+      ],
+      "diagnostics": [],
+      "artifacts": {
+        "log": "<build>/A_ss_m40c_3p63v_500kVs__reltol2e-4__r250000/out/ss_3p630V_n40C/ngspice.log",
+        "raw": "<build>/A_ss_m40c_3p63v_500kVs__reltol2e-4__r250000/out/ss_3p630V_n40C/waveform.raw",
+        "waveform": "<build>/A_ss_m40c_3p63v_500kVs__reltol2e-4__r250000/out/ss_3p630V_n40C/waveform.raw.json",
+        "deck": "<build>/A_ss_m40c_3p63v_500kVs__reltol2e-4__r250000/out/ss_3p630V_n40C/corner.cir"
+      },
+      "monte_carlo": null
+    }
+  ]
+}

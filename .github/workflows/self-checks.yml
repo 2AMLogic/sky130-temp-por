@@ -34,6 +34,9 @@ jobs:
       - name: Iq campaign isolation (one bad waveform does not lose the matrix)
         run: python3 -I sim/iq-top/test_campaign_isolation.py
 
+      - name: Re-assertion diagnosis matrix and verdict rules (issue #142)
+        run: python3 -I sim/supply-ramp-top/test_reassert_diagnosis.py
+
       - name: Committed netlists satisfy the pinout invariants
         run: python3 design/check_committed_netlists.py
 

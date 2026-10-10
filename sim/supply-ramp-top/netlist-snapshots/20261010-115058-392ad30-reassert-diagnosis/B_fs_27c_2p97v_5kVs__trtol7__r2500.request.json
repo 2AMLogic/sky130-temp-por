@@ -1,0 +1,60 @@
+{
+  "netlist": "netlist.spice",
+  "backend": "batch",
+  "models": {
+    "pdk": "sky130A",
+    "lib": "libs.tech/combined/sky130.lib.spice"
+  },
+  "corners": {
+    "process": [
+      "fs"
+    ],
+    "supply_v": {
+      "vset": [
+        2.97
+      ]
+    },
+    "temperature_c": [
+      27
+    ]
+  },
+  "analysis": {
+    "kind": "tran",
+    "args": "1u 0.016452 0 5e-06"
+  },
+  "measurements": [
+    {
+      "name": "vdd_end",
+      "spice": ".meas tran vdd_end FIND v(vdd) AT=0.016352",
+      "unit": "V"
+    },
+    {
+      "name": "resetn_end",
+      "spice": ".meas tran resetn_end FIND v(resetn) AT=0.016352",
+      "unit": "V"
+    },
+    {
+      "name": "resetn_max",
+      "spice": ".meas tran resetn_max MAX v(resetn)",
+      "unit": "V"
+    },
+    {
+      "name": "por_raw_max",
+      "spice": ".meas tran por_raw_max MAX v(xdut.por_raw)",
+      "unit": "V"
+    },
+    {
+      "name": "ibias_end",
+      "spice": ".meas tran ibias_end FIND v(xdut.ibias) AT=0.016352",
+      "unit": "V"
+    }
+  ],
+  "options": {
+    "timeout_s": 2400,
+    "keep_artifacts": true,
+    "waveforms": true
+  },
+  "batch": {
+    "runner_version_check": "warn"
+  }
+}

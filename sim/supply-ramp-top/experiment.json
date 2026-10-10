@@ -7,13 +7,32 @@
   "schematic": "testbench/tb_temp_por_ramp.sch",
   "statistical_convention": "N/A (corner-matrix check, not a distribution claim)",
   "corners": {
-    "process": ["tt", "ss", "ff", "sf", "fs"],
-    "temperature_c": [-40, 27, 125],
-    "supply_v": [2.97, 3.3, 3.63]
+    "process": [
+      "tt",
+      "ss",
+      "ff",
+      "sf",
+      "fs"
+    ],
+    "temperature_c": [
+      -40,
+      27,
+      125
+    ],
+    "supply_v": [
+      2.97,
+      3.3,
+      3.63
+    ]
   },
   "rates": {
     "status": "EXPLORATORY -- chosen to bracket the nominal ~2 ms one-shot/release time scale observed in pilot runs; NOT a specification envelope, and NOT derived from any gf180mcu figure.",
-    "primary_v_per_s": [1000000.0, 100000.0, 10000.0, 1000.0],
+    "primary_v_per_s": [
+      1000000.0,
+      100000.0,
+      10000.0,
+      1000.0
+    ],
     "half_rate_guard_factor": 0.5,
     "construction": "V(VDD) = min(final_supply, rate*t) from a physical 0 V start; ramp duration = final_supply/rate, so each rate is independent of the swept final supply (no fixed-duration confound, gf180 DR-021).",
     "observation_window": "tstop = 3.63 V / rate + 15 ms hold after the longest ramp of the request. Pilot runs (tt/27C/3.3V and ss/ff/fs/sf at -40 and 125 C, 2.97 V) released 1.7-3.0 ms after POR_RAW rose, so 15 ms of hold is ~5x the slowest pilot release. A point that does not release within the window is reported as 'no_release within window', not as a proven non-release.",
@@ -41,9 +60,91 @@
     "physicality": "every saved node within [-0.3 V, vf+0.5 V] for t>0 and settled supply current -i(BVDD) > 0; the t=0 sample (degenerate all-zero-supply solve) is reported separately",
     "quasi_static": {
       "vdd_at_por_raw_rise_tolerance_v": 0.05,
-      "release_delay_ratio_band": [0.8, 1.25],
+      "release_delay_ratio_band": [
+        0.8,
+        1.25
+      ],
       "note": "Half-rate paired segment. 'consistent' when the VDD at which POR_RAW rises agrees within the tolerance (threshold-style measurement); 'censored' when POR_RAW rises after the ramp has ended (VDD already at its final value, so no VDD threshold is measured); 'rate-dependent' otherwise. The POR_RAW->RESETn release DELAY is a time-domain quantity (one-shot), so it is graded on the full/half ratio, not on VDD."
     }
   },
-  "ngspice_note": "The fleet runner (klt 0.5.0, ngspice 46) ignores options.ngspice_init and expr measurements, so the equivalent of sim/spiceinit's ng_nomodcheck is set by a .control block carried in the netlist body ('set ng_nomodcheck'); without it the fleet aborts on the nvt native device's BSIM4 parameter check. Local ngspice is 42; a single-point local cross-check is recorded."
+  "ngspice_note": "The fleet runner (klt 0.5.0, ngspice 46) ignores options.ngspice_init and expr measurements, so the equivalent of sim/spiceinit's ng_nomodcheck is set by a .control block carried in the netlist body ('set ng_nomodcheck'); without it the fleet aborts on the nvt native device's BSIM4 parameter check. Local ngspice is 42; a single-point local cross-check is recorded.",
+  "reassert_diagnosis": {
+    "claim": "Issue #142 -- NOT a spec claim and NOT a ratified ramp envelope (DR-003 Sec8). Diagnoses the two RESETn re-assertions recorded in 20261010-015905-fbd6329 (as-drawn, 360 points) by re-running exactly those two PVT/rate points on the unchanged assembled temp_por_top netlist with solver discriminators and adjacent-rate controls, as single-corner klt sim requests on the Spot batch fleet, graded from full-resolution waveforms with extra internal nodes saved for event ordering. A per-point verdict (solver/nonphysical artifact | physical design-level re-assertion | unresolved) is assigned mechanically by run_reassert_diagnosis.py under the issue's evidence rules.",
+    "source_record": "20261010-015905-fbd6329",
+    "points": {
+      "A_ss_m40c_3p63v_500kVs": {
+        "process": "ss",
+        "temperature_c": -40,
+        "supply_v": 3.63,
+        "rate_v_per_s": 500000.0,
+        "adjacent_rates_v_per_s": [
+          250000.0,
+          1000000.0
+        ]
+      },
+      "B_fs_27c_2p97v_5kVs": {
+        "process": "fs",
+        "temperature_c": 27,
+        "supply_v": 2.97,
+        "rate_v_per_s": 5000.0,
+        "adjacent_rates_v_per_s": [
+          2500.0,
+          10000.0
+        ]
+      }
+    },
+    "solver_variants_at_exact_rate": [
+      "base",
+      "trtol7",
+      "reltol2e-4",
+      "trap",
+      "tmax1u",
+      "reltol1e-4",
+      "reltol2e-4-tmax1u"
+    ],
+    "adjacent_rate_variants": [
+      "base",
+      "trtol7",
+      "reltol2e-4"
+    ],
+    "variants": {
+      "base": {
+        "description": "Same solver settings as the source campaign (testbench `.options method=gear trtol=50`, tmax 5 us); only extra .save cards for internal nodes are added. Reproduction control for the original case."
+      },
+      "trtol7": {
+        "description": "Trailing `.options method=gear trtol=7` (tighter local-truncation-error acceptance; the #86 discriminator of the same name).",
+        "options": "method=gear trtol=7"
+      },
+      "reltol2e-4": {
+        "description": "Trailing `.options method=gear trtol=50 reltol=2e-4` (tighter relative tolerance; the #86 discriminator of the same name). Also used as an adjacent-rate control (variant use ADDED AFTER the first batch, so that adjacent-rate controls include a physical-branch candidate).",
+        "options": "method=gear trtol=50 reltol=2e-4"
+      },
+      "trap": {
+        "description": "Trailing `.options method=trap trtol=7` (trapezoidal integration instead of gear).",
+        "options": "method=trap trtol=7"
+      },
+      "tmax1u": {
+        "description": "Same options as base but maximum time step 1 us (5x finer than the source campaign).",
+        "tmax_s": 1e-06
+      },
+      "reltol1e-4": {
+        "description": "ADDED AFTER the first 18-case batch was inspected (that batch gave only one physical, resolved exact-rate run for point A, too few to judge physical-branch stability): trailing `.options method=gear trtol=50 reltol=1e-4`.",
+        "options": "method=gear trtol=50 reltol=1e-4",
+        "added_after_first_batch": true
+      },
+      "reltol2e-4-tmax1u": {
+        "description": "ADDED AFTER the first batch (same reason): `reltol2e-4` options combined with maximum time step 1 us.",
+        "options": "method=gear trtol=50 reltol=2e-4",
+        "tmax_s": 1e-06,
+        "added_after_first_batch": true
+      }
+    },
+    "absent_coverage": [
+      "Only two PVT points (and their listed solver/rate neighbours) are simulated; this is a focused diagnosis, not a re-run of the 360-point campaign, and it does not re-grade any other point.",
+      "The orthogonal ll/hh passive-skew axis and mismatch Monte Carlo are not exercised.",
+      "No ratified ramp envelope exists (DR-003 Sec8); adjacent rates are a factor of 2 either side of each target and are exploratory controls only.",
+      "Solver variants change integration settings only; none changes the circuit, and none removes the temp_core startup nonphysical-branch behaviour of #86 by construction, so a 'no physical-branch run exists' outcome is possible and is reported as unresolved."
+    ],
+    "post_hoc_note": "The first batch (18 cases: base, trtol7, reltol2e-4, trap, tmax1u at the exact rate; base and trtol7 at the adjacent rates) was submitted at 124894f. After inspecting it the matrix was extended with reltol1e-4, reltol2e-4-tmax1u (exact rate) and reltol2e-4 (adjacent rates), submitted as a second batch into the same run directory. The extension was chosen to obtain more physical-branch runs, not to change the verdict rules, which were fixed before any result."
+  }
 }
