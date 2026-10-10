@@ -350,6 +350,38 @@ def verdict_for_point(runs):
         "no physical+resolved run in the matrix re-asserts"), flags
 
 
+def ordering_summary(runs):
+    out = []
+    phys = [r for r in runs if r.get("check") and "resetn" in r["check"] and r["check"]["physical"]["ok"] and r["role"] in ("exact", "solver")]
+    for r in runs:
+        c = r.get("check")
+        if not c or "resetn" not in c or not c["resetn"]["n_reassert"]:
+            continue
+        tl = r["timeline"]
+        rel = c["resetn"]["t_release_s"]
+        mid = c["resetn"]["t_release_mid_s"]
+        first = min(tl["viol"].items(), key=lambda kv: kv[1]["t_s"]) if tl["viol"] else None
+        ev = [e for a in tl["anchors"] for e in a["events_pm_200us"]]
+        pf = [e["t_s"] for e in ev if e["node"] == "v(xdut.por_raw)" and e["event"] == "V_MID fall"]
+        trip = [e["t_s"] for e in ev if e["node"] == "v(xdut.xpor.trip)" and e["event"] == "V_MID rise"]
+        ra = [a["t_s"] for a in tl["anchors"] if a["kind"] == "reassert"]
+        bits = [f"`{r['id']}`: RESETn V_MID rise at {mid * 1e3:.6g} ms (release V_IH at {rel * 1e3:.6g} ms)"]
+        if trip:
+            bits.append(f"TRIP V_MID rise {(trip[0] - mid) * 1e6:+.3g} us")
+        if first:
+            bits.append(f"first out-of-window sample ({first[0]}, {first[1]['v']:.3g} V) {(first[1]['t_s'] - mid) * 1e6:+.3g} us")
+        if pf:
+            bits.append(f"POR_RAW V_MID fall {(pf[0] - mid) * 1e6:+.3g} us")
+        if ra:
+            bits.append(f"RE-ASSERT (V_IL fall) {(ra[0] - mid) * 1e6:+.3g} us (all offsets relative to the release V_MID crossing)")
+        bits.append(f"IBIAS release step {c['ibias']['release_step_v'] * 1e3:.4g} mV")
+        out.append("; ".join(bits))
+    if phys:
+        steps = ", ".join(f"{x['variant']}: {x['check']['ibias']['release_step_v'] * 1e3:.4g} mV" for x in phys)
+        out.append(f"physical-branch exact-rate runs, IBIAS step across the release: {steps}")
+    return out
+
+
 def load_case(case, run_dir, man, corners_dir, write):
     d = run_dir / case["id"]
     rec = dict(case)
@@ -463,7 +495,8 @@ def render_md(rec):
         c = r.get("check")
         if not c or "resetn" not in c or not r["timeline"]["anchors"]:
             continue
-        if not (c["resetn"]["n_reassert"] or c["resetn"]["n_release"] > 1) and r["role"] != "exact":
+        ref = r["id"] in rec.get("reference_physical_cases", [])
+        if not (c["resetn"]["n_reassert"] or c["resetn"]["n_release"] > 1) and r["role"] != "exact" and not ref:
             continue
         L += ["", f"### {r['id']}"]
         for a in r["timeline"]["anchors"]:
@@ -474,8 +507,14 @@ def render_md(rec):
         if viol:
             L.append("- first out-of-window sample per node: " + "; ".join(f"{k} @ {v['t_s'] * 1e3:.4g} ms ({v['v']:.3g} V)" for k, v in sorted(viol.items(), key=lambda kv: kv[1]["t_s"])))
     L += ["", "## Per-point verdicts", ""]
+    if rec.get("post_hoc_note"):
+        L += ["**Disclosure (matrix extension)**: " + rec["post_hoc_note"], ""]
     for pname, v in rec["verdicts"].items():
         L += [f"### {pname}: **{v['verdict']}**", "", v["basis"], ""]
+        for line in v.get("ordering_summary", []):
+            L.append("- " + line)
+        L.append("")
+    L += ["Mechanism statement (UNVERIFIED beyond the measured orderings above): the traces show WHEN the out-of-window state appears relative to the release; they do not by themselves prove which element of the RESETn -> temp_core.EN -> IBIAS path is responsible, and no per-device current attribution was done.", ""]
     L += ["Verdict rules (issue #142, applied mechanically by `run_reassert_diagnosis.py`):", "",
           "- `physical design-level re-assertion`: a re-assertion (or repeated release / runt) on a run that passes both the physicality guard and the resolution guard.",
           f"- `solver/nonphysical artifact`: re-assertion appears only on nonphysical run(s); at least two physical+resolved exact-rate runs show one clean release agreeing within {REL_SPREAD_TOL:.0%}; no physical+resolved run in the point's matrix (adjacent rates included) re-asserts.",
@@ -522,7 +561,7 @@ def cmd_record(args) -> int:
     for pname in man["reassert_diagnosis"]["points"]:
         runs = [c for c in cases if c["point"] == pname]
         v, basis, flags = verdict_for_point(runs)
-        verdicts[pname] = {"verdict": v, "basis": basis, "per_case_flags": flags}
+        verdicts[pname] = {"verdict": v, "basis": basis, "per_case_flags": flags, "ordering_summary": ordering_summary(runs)}
     ngs = sorted({x for c in cases for x in [c.get("runner_klt_version")] if x})
     d = man["reassert_diagnosis"]
     record = {
@@ -533,7 +572,8 @@ def cmd_record(args) -> int:
         "tools": {"klt_client": meta["klt_client"], "fleet_runner_klt": ", ".join(ngs) or "unknown", "fleet_ngspice": "ngspice-46 (per fleet log)",
                   "klt_sim_backend_env": meta.get("klt_sim_backend_env"), "python": cr.tool_versions()["python"], "platform": cr.tool_versions()["platform"]},
         "run_meta": meta, "variants": d["variants"], "points": d["points"],
-        "cases": cases, "verdicts": verdicts,
+        "cases": cases, "verdicts": verdicts, "post_hoc_note": d.get("post_hoc_note"),
+        "reference_physical_cases": [c["id"] for pname in d["points"] for c in [next((x for x in cases if x["point"] == pname and x["role"] == "solver" and x.get("check") and "resetn" in x["check"] and x["check"]["physical"]["ok"]), None)] if c],
         "absent_coverage": d["absent_coverage"],
         "links": {"manifest": "sim/supply-ramp-top/experiment.json", "driver": "sim/supply-ramp-top/run_reassert_diagnosis.py",
                   "source_record": f"sim/supply-ramp-top/records/{SOURCE_RECORD}.md",
