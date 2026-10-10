@@ -100,3 +100,20 @@ record (`records/<id>.md` + `.json`), per-point logs with the exact input deck
 the fleet reports and the request/netlist pairs (`netlist-snapshots/<id>/`).
 
 Spec/design are never edited to improve results; a failing cell is evidence.
+
+## Records
+
+| Record | What it is |
+|---|---|
+| `records/20261010-130609-db29746-fleet-timeout.md` | First submission (`fleet1`, the 30-request manifest at `db29746`). Two jobs hit the 3600 s timeout with 0/45 usable corners each, and the attempt was abandoned. Not a result. |
+| `records/20261010-222529-41bde9f.md` (+ `.json`) | Declared 945-point grid, simulated at `bcf00bf` (21 fleet jobs) and graded at `41bde9f`. Deck inputs are identical between the two commits, and every submitted netlist's sha256 matches its fleet report. **PASS 267, FAIL 5, NONPHYSICAL 673, ERROR 0, UNRESOLVED 0, NOT_COVERED 0.** |
+| `records/20261010-222928-0265c45-checker-selftest.md` | Checker self-test: 16/16 synthetic cases give the expected verdict. |
+
+How to read the graded record:
+
+* **NONPHYSICAL is the majority.** It mostly comes from temp_core-side nodes at impossible voltages and the supply current reversing, the same signature as the as-drawn supply-ramp record. The grid used the default solver tolerances, so those cells are **unknown**, not passing. The 50 kV/s falls to 1.2 V and 0.4 V have **no physical point at all** (270/270 NONPHYSICAL). A tightened-solver fleet re-run is #153.
+* **The five FAILs are physical and kept with traces.**
+  * Fast 100 kV/s recovery at -40 C (tt 2.97 V, tt 3.30 V, ff 2.97 V): RESETn rides VDD above V_IH for a few microseconds while POR_RAW is still low, then re-asserts.
+  * Shallow 2.0 V dip at 50 kV/s, tt/27 C/2.97 V (two holds): the first assertion begins only after VDD has recovered.
+* Across the 221 physical points where RESETn asserted, VDD at assertion ranged from 0.36 to 1.00 x the starting supply (median 0.74), and no assertion was rail-limited. Release came a median 2.3 ms after VDD recovered (max 4.0 ms).
+* None of this is a ratified bound, and no gf180mcu number is used.
