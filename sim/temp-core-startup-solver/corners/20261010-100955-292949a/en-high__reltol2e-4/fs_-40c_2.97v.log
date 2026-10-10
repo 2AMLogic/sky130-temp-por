@@ -1,0 +1,39 @@
+corner fs_-40c_2.97v  combo en-high__reltol2e-4  verdict-input status=fail
+graded: ptat=-2.09767; ctat=0.783341; na=0.783341; nb=0.783339; isup=5.63249e-06; bias_ok=2.97; ptat_settled=2.68452e-12; ctat_settled=8.73923e-12  fails=['ptat']
+--- deck ---
+* klt sim -- generated corner deck, do not edit
+.lib /opt/pdk/sky130A/libs.tech/combined/sky130.lib.spice fs
+.include /var/tmp/eda-job-klt-sim-9eb63e66de1a/inputs/netlist.cir
+.temp -40
+.meas tran vdd_end FIND v(vdd) AT=0.01
+.control
+alter vset=2.97
+set filetype=ascii
+tran 1e-05 0.01 uic
+write /var/tmp/eda-job-klt-sim-9eb63e66de1a/outputs/artifacts/fs_2p970V_n40C/waveform.raw
+quit
+.endc
+.end
+
+--- ngspice log ---
+
+Note: No compatibility mode selected!
+
+
+Circuit: * klt sim -- generated corner deck, do not edit
+
+Doing analysis at TEMP = -40.000000 and TNOM = 27.000000
+
+Using SPARSE 1.3 as Direct Linear Solver
+Operating point simulation skipped by 'uic',
+  now using transient initial conditions.
+
+No. of Data Rows : 1069
+
+  Measurements for Transient Analysis
+
+vdd_end             =  2.97000e+00
+
+ASCII raw file "/var/tmp/eda-job-klt-sim-9eb63e66de1a/outputs/artifacts/fs_2p970V_n40C/waveform.raw"
+ngspice-46 done
+
