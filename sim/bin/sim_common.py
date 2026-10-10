@@ -64,6 +64,7 @@ and/or `corner-run.py` itself):
 from __future__ import annotations
 
 import argparse
+import gzip
 import importlib.util
 import json
 import math
@@ -433,3 +434,39 @@ def submit_request(
         status = "NO-JSON"
     say(f"[done]   {variant_name} {tag}: exit {p.returncode}, report status {status}")
     return {"variant": variant_name, "rate": rate, "tag": tag, "exit": p.returncode, "status": status}
+
+
+def klt_version() -> str:
+    p = subprocess.run(["klt", "--version"], capture_output=True, text=True)
+    return p.stdout.strip() or p.stderr.strip()
+
+
+def load_manifest(path: Path) -> dict:
+    return json.loads(Path(path).read_text())
+
+
+def load_wave(path: Path) -> dict[str, list[float]]:
+    """Load a klt waveform JSON (optionally gzip) into {lowercased name: samples}.
+
+    Raises ValueError on a malformed document, ragged row or non-numeric value.
+    """
+    opener = gzip.open if str(path).endswith(".gz") else open
+    with opener(path, "rt") as fh:
+        doc = json.load(fh)
+    try:
+        names = [v["name"].lower() for v in doc["variables"]]
+        rows = doc["points"]
+    except (KeyError, TypeError, AttributeError) as e:
+        raise ValueError(f"malformed waveform document: {e!r}") from e
+    if not names or not isinstance(rows, list):
+        raise ValueError("malformed waveform document: no variables or points not a list")
+    cols: dict[str, list[float]] = {n: [] for n in names}
+    for i, row in enumerate(rows):
+        if not isinstance(row, (list, tuple)) or len(row) != len(names):
+            raise ValueError(f"malformed waveform row {i}: expected {len(names)} values, got {len(row) if isinstance(row, (list, tuple)) else type(row).__name__}")
+        for n, x in zip(names, row):
+            try:
+                cols[n].append(float(x))
+            except (TypeError, ValueError) as e:
+                raise ValueError(f"malformed waveform row {i}: non-numeric value {x!r} for {n}") from e
+    return cols

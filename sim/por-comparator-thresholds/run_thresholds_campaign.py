@@ -60,10 +60,6 @@ rate_tag = sim_common.rate_tag
 scrub = functools.partial(sim_common.scrub, repo_root=REPO_ROOT)
 
 
-def load_manifest() -> dict:
-    return json.loads(MANIFEST.read_text())
-
-
 def corner_id(proc: str, temp: float) -> str:
     return f"{proc}_{cr.fmt_temp(temp)}c"
 
@@ -148,11 +144,6 @@ def build_request(rate: float, man: dict, backend: str, corners: dict | None = N
     return req
 
 
-def klt_version() -> str:
-    p = subprocess.run(["klt", "--version"], capture_output=True, text=True)
-    return p.stdout.strip() or p.stderr.strip()
-
-
 def submit(variant_name: str, rate: float, head: str, man: dict, run_dir: Path, capacity_wait_s: float, axis: str = "main") -> dict:
     netlist = build_netlist(head, man["variants"][variant_name], rate)
     req = build_request(rate, man, "batch", capacity_wait_s=capacity_wait_s, axis=axis)
@@ -161,7 +152,7 @@ def submit(variant_name: str, rate: float, head: str, man: dict, run_dir: Path, 
 
 
 def cmd_run(args) -> int:
-    man = load_manifest()
+    man = sim_common.load_manifest(MANIFEST)
     pdk = cr.resolve_pdk(cr.load_pin())
     git_info = cr.git_state()
     if git_info["dirty"] and not args.allow_dirty:
@@ -187,7 +178,7 @@ def cmd_run(args) -> int:
         "axis": axis,
         "process": processes(man, axis),
         "git": git_info,
-        "klt_client": klt_version(),
+        "klt_client": sim_common.klt_version(),
         "klt_sim_backend_env": os.environ.get("KLT_SIM_BACKEND"),
         "work": [[v, r] for v, r in work],
     }
@@ -210,7 +201,7 @@ def cmd_run(args) -> int:
 
 def cmd_probe(args) -> int:
     """One single-corner LOCAL run (debug probe / cross-check)."""
-    man = load_manifest()
+    man = sim_common.load_manifest(MANIFEST)
     pdk = cr.resolve_pdk(cr.load_pin())
     variant = args.variant
     rate = args.rate or man["rates"]["primary_v_per_s"][0]
@@ -235,7 +226,7 @@ def cmd_probe(args) -> int:
         for c in rep.get("corners", []):
             art = c.get("artifacts") or {}
             if art.get("waveform"):
-                res = tx.analyze(load_wave(Path(art["waveform"])), man["polarity"]["up"], man["polarity"]["down"])
+                res = tx.analyze(sim_common.load_wave(Path(art["waveform"])), man["polarity"]["up"], man["polarity"]["down"])
                 print(json.dumps({k: res.get(k) for k in ("verdict", "hysteresis_v", "max_vdd_step_v")}, indent=1))
                 print("up:", {k: v for k, v in res["up"].items() if k != "edges"})
                 print("down:", {k: v for k, v in res["down"].items() if k != "edges"})
@@ -247,18 +238,6 @@ def cmd_probe(args) -> int:
 # --------------------------------------------------------------------------
 # record
 # --------------------------------------------------------------------------
-
-
-def load_wave(path: Path) -> dict[str, list[float]]:
-    opener = gzip.open if str(path).endswith(".gz") else open
-    with opener(path, "rt") as fh:
-        doc = json.load(fh)
-    names = [v["name"] for v in doc["variables"]]
-    cols: dict[str, list[float]] = {n: [] for n in names}
-    for row in doc["points"]:
-        for n, x in zip(names, row):
-            cols[n].append(float(x))
-    return cols
 
 
 def write_trace(path: Path, wave: dict, dv: float = 0.002, anchor_s: float = 0.2e-3) -> int:
@@ -336,7 +315,7 @@ def analyze_variant(variant: str, run_dir: Path, man: dict, corners_dir: Path) -
             }
             wp = Path(art["waveform"]) if art.get("waveform") else None
             if wp is not None and wp.is_file():
-                wave = load_wave(wp)
+                wave = sim_common.load_wave(wp)
                 pt["extract"] = tx.analyze(wave, man["polarity"]["up"], man["polarity"]["down"])
                 pt["trace_rows"] = write_trace(corners_dir / tag / f"{cid}.trace.csv.gz", wave)
                 pt["vref_end_v"] = wave.get("v(vref)", [None])[-1]
@@ -487,7 +466,7 @@ def render_md(rec: dict) -> str:
 
 
 def cmd_record(args) -> int:
-    man = load_manifest()
+    man = sim_common.load_manifest(MANIFEST)
     run_dir = BUILD / args.run_id
     meta = json.loads((run_dir / "run.json").read_text())
     pin = cr.load_pin()
