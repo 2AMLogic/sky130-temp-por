@@ -246,12 +246,15 @@ def timeline(w, vf, res, window=200e-6):
         for d in ("rise", "fall"):
             for tc in rc.crossings(t, col, v_mid, d):
                 ev.append({"t_s": tc, "node": node, "event": f"V_MID {d}"})
+    viol_all = first_violation(w, vf)
+    for node, vv in viol_all.items():
+        ev.append({"t_s": vv["t_s"], "node": node, "event": f"FIRST out-of-window sample ({vv['v']:.3g} V)"})
     for tc in rel:
         ev.append({"t_s": tc, "node": "v(resetn)", "event": "RELEASE (V_IH rise)"})
     for tc in fall:
         ev.append({"t_s": tc, "node": "v(resetn)", "event": "RE-ASSERT (V_IL fall)"})
     ev.sort(key=lambda e: e["t_s"])
-    out = {"anchors": [], "viol": first_violation(w, vf)}
+    out = {"anchors": [], "viol": viol_all}
     anchors = [("release", x) for x in rel] + [("reassert", x) for x in fall]
     for kind, ta in sorted(anchors, key=lambda a: a[1]):
         win = [e for e in ev if ta - window <= e["t_s"] <= ta + window]
@@ -267,16 +270,24 @@ def timeline(w, vf, res, window=200e-6):
     return out
 
 
-def compress_ext(w):
-    cols = [w[c] if c in w else None for c in TRACE_COLS]
-    names = [c for c, x in zip(TRACE_COLS, cols) if x is not None]
-    cols = [x for x in cols if x is not None]
-    n = len(cols[0])
+TRIGGER_COLS = ("v(vdd)", "v(resetn)", "v(xdut.por_raw)", "v(xdut.ibias)", "v(ptat)", "v(ctat)")
+WINDOW_S = 100e-6  # every sample within +-WINDOW_S of a RESETn release/re-assert is kept (all columns)
+
+
+def compress_ext(w, vf):
+    names = [c for c in TRACE_COLS if c in w]
+    cols = [w[c] for c in names]
+    t = w["time"]
+    n = len(t)
+    rel, fall = rc.schmitt(t, w["v(resetn)"], rc.FRAC_IL * vf, rc.FRAC_IH * vf)
+    anchors = rel + fall
+    trig = [names.index(c) for c in TRIGGER_COLS if c in names]
     rows = [[c[0] for c in cols]]
     last = rows[0]
     for i in range(1, n - 1):
         cur = [c[i] for c in cols]
-        if cur[0] - last[0] >= TRACE_DT or any(abs(cur[k] - last[k]) >= TRACE_DV for k in range(1, len(cols)) if names[k] != "i(bvdd)"):
+        in_win = any(abs(t[i] - a) <= WINDOW_S for a in anchors)
+        if in_win or cur[0] - last[0] >= TRACE_DT or any(abs(cur[k] - last[k]) >= TRACE_DV for k in trig):
             rows.append(cur)
             last = cur
     rows.append([c[n - 1] for c in cols])
@@ -285,7 +296,7 @@ def compress_ext(w):
 
 def write_ext_trace(path, names, rows):
     path.parent.mkdir(parents=True, exist_ok=True)
-    lines = [f"# {','.join(names)}  (change-triggered: dV>={TRACE_DV * 1e3:g} mV on any voltage column or dt>={TRACE_DT * 1e3:g} ms)"]
+    lines = [f"# {','.join(names)}  (change-triggered: dV>={TRACE_DV * 1e3:g} mV on vdd/resetn/por_raw/ibias/ptat/ctat or dt>={TRACE_DT * 1e3:g} ms; every sample within +-100 us of a RESETn release/re-assert is kept)"]
     lines += [",".join(f"{x:.6g}" for x in r) for r in rows]
     with gzip.open(path, "wt", compresslevel=9) as fh:
         fh.write("\n".join(lines) + "\n")
@@ -399,7 +410,7 @@ def load_case(case, run_dir, man, corners_dir, write):
         rec["timeline"] = timeline(w, vf, res)
         rec["missing_extra_saves"] = [n for n in EXTRA_SAVES if n not in w]
         if write:
-            names, erows = compress_ext(w)
+            names, erows = compress_ext(w, vf)
             write_ext_trace(corners_dir / f"{case['id']}.trace.csv.gz", names, erows)
             rec["trace_file"] = f"{case['id']}.trace.csv.gz"
             rec["trace_rows"] = len(erows)

@@ -98,11 +98,14 @@
       "trtol7",
       "reltol2e-4",
       "trap",
-      "tmax1u"
+      "tmax1u",
+      "reltol1e-4",
+      "reltol2e-4-tmax1u"
     ],
     "adjacent_rate_variants": [
       "base",
-      "trtol7"
+      "trtol7",
+      "reltol2e-4"
     ],
     "variants": {
       "base": {
@@ -113,7 +116,7 @@
         "options": "method=gear trtol=7"
       },
       "reltol2e-4": {
-        "description": "Trailing `.options method=gear trtol=50 reltol=2e-4` (tighter relative tolerance; the #86 discriminator of the same name).",
+        "description": "Trailing `.options method=gear trtol=50 reltol=2e-4` (tighter relative tolerance; the #86 discriminator of the same name). Also used as an adjacent-rate control (variant use ADDED AFTER the first batch, so that adjacent-rate controls include a physical-branch candidate).",
         "options": "method=gear trtol=50 reltol=2e-4"
       },
       "trap": {
@@ -123,6 +126,17 @@
       "tmax1u": {
         "description": "Same options as base but maximum time step 1 us (5x finer than the source campaign).",
         "tmax_s": 1e-06
+      },
+      "reltol1e-4": {
+        "description": "ADDED AFTER the first 18-case batch was inspected (that batch gave only one physical, resolved exact-rate run for point A, too few to judge physical-branch stability): trailing `.options method=gear trtol=50 reltol=1e-4`.",
+        "options": "method=gear trtol=50 reltol=1e-4",
+        "added_after_first_batch": true
+      },
+      "reltol2e-4-tmax1u": {
+        "description": "ADDED AFTER the first batch (same reason): `reltol2e-4` options combined with maximum time step 1 us.",
+        "options": "method=gear trtol=50 reltol=2e-4",
+        "tmax_s": 1e-06,
+        "added_after_first_batch": true
       }
     },
     "absent_coverage": [
@@ -130,6 +144,7 @@
       "The orthogonal ll/hh passive-skew axis and mismatch Monte Carlo are not exercised.",
       "No ratified ramp envelope exists (DR-003 Sec8); adjacent rates are a factor of 2 either side of each target and are exploratory controls only.",
       "Solver variants change integration settings only; none changes the circuit, and none removes the temp_core startup nonphysical-branch behaviour of #86 by construction, so a 'no physical-branch run exists' outcome is possible and is reported as unresolved."
-    ]
+    ],
+    "post_hoc_note": "The first batch (18 cases: base, trtol7, reltol2e-4, trap, tmax1u at the exact rate; base and trtol7 at the adjacent rates) was submitted at 124894f. After inspecting it the matrix was extended with reltol1e-4, reltol2e-4-tmax1u (exact rate) and reltol2e-4 (adjacent rates), submitted as a second batch into the same run directory. The extension was chosen to obtain more physical-branch runs, not to change the verdict rules, which were fixed before any result."
   }
 }
