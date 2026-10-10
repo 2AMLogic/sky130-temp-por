@@ -2,8 +2,22 @@
 
 Chronological record of recently merged pull requests and closed issues. This file is maintained by the Loom Guide role.
 
+### 2026-10-10
+
+- **PR #145**: pad-island-census: cross-net merge check, gated sibling fallback, 3-state frame (#92)
+- **PR #144**: bias_core: declare nwell->VDD tie, disclose p_substrate; T1 item 11 met (#90)
+- **PR #143**: sim(supply-ramp-top): as-drawn 360-point fleet campaign after XMN1 fix (#101)
+- **PR #141**: Post-layout (klt extract/pex) re-run of the por_comparator threshold campaign (T1 item 7)
+- **Issue #92** (closed): pad-island-census: fail on cross-net island merges and gate the unpromoted-sibling-port fallback
+- **Issue #90** (closed): bias_core ERC: declare (or disclose) well/substrate ties so T1 item 11 grades past supply_spec_incomplete
+- **Issue #101** (closed): por_output_chain: XMN1 (L=25) has no valid model bin in the pinned PDK, so as-drawn temp_por_top cannot be simulated
+- **Issue #124** (closed): Post-layout (klt pex) re-run of the por_comparator threshold campaign (T1 item 7)
+- **Issue #132** (closed): Guard decision: retain main-checkout write confinement for sweep checkpoint writes
+
 ### 2026-10-09
 
+- **PR #139**: docs(spec): DR-006 proposed Iq rows recommendation (TBD-4/5/6)
+- **Issue #136** (closed): Draft DR recommending sky130 Iq rows (TBD-4/5/6) from committed iq-top evidence
 - **PR #135**: Reject non-finite and malformed waveforms before Iq grading
 - **PR #131**: docs(spec): align spec/README.md with DR-003 ratification (#127)
 - **PR #134**: docs(spec): DR-005 proposed temp_buffer scope and PTAT/CTAT load assumption (#125)
