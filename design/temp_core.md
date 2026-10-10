@@ -177,10 +177,14 @@ real second equilibrium for this class of self-biased ΔVBE cell, and the set
 of affected corners is not stable across reasonable changes to the
 transient's own numerical settings — the same "solver-dependent, not
 circuit" pattern `sim/bias-core-op-branch/` measured directly for `bias_core`.
-Confirming that conclusively for `temp_core` too (a `bias-core-op-branch`-style
-numerics sweep) is a natural follow-up but is out of issue #22's own scope,
-which asks for the full-PVT record with physicality guards, not a
-numerics-variant diagnosis.
+The follow-up numerics sweep has since been run as
+`sim/temp-core-startup-solver/` (issue #86): none of the six FAIL points
+re-landed on the current netlist under any solver/ramp variant tested —
+including the `base` deck control, which removes the deck-difference
+alternative — every failure the sweep did produce is non-physical, and no
+real failure was found anywhere in the matrix (record
+[`20261010-192722-47b96e5`](../sim/temp-core-startup-solver/records/20261010-192722-47b96e5.md),
+superseding `20261010-100955-292949a`).
 
 ## Scope and what this is not
 
