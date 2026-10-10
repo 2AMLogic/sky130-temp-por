@@ -26,7 +26,7 @@ _None._
 Issues currently being built (`loom:building`).
 
 - **#86**: temp_core startup records fail at six points inside the ratified envelope; demonstrate or record the cause
-- **#140**: Consolidate duplicated klt_version/load_manifest/load_wave helpers into sim_common.py (load_wave has drifted)
+- **#116**: As-drawn brown-out campaign: independent depth, duration and falling-slew matrix
 
 ## PRs Awaiting Review
 
@@ -46,6 +46,7 @@ Issues carrying `loom:curated`.
 
 - **#86**: temp_core startup records fail at six points inside the ratified envelope; demonstrate or record the cause *(curated)*
 - **#97**: Lay out por_output_chain as the next DRC/LVS-verified POR leaf *(curated)*
+- **#116**: As-drawn brown-out campaign: independent depth, duration and falling-slew matrix *(curated)*
 
 ## Proposed (Architect / Hermit)
 
@@ -68,7 +69,7 @@ Issues carrying `loom:curated`.
 | In Progress (`loom:building`) | 2 |
 | PRs awaiting review | 0 |
 | Approved PRs awaiting merge | 0 |
-| Curated | 2 |
+| Curated | 3 |
 | Architect / Hermit proposals | 4 |
 | Active epics | 1 |
 <!-- guide:plan-body:end -->
