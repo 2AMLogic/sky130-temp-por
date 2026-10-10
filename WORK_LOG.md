@@ -4,6 +4,8 @@ Chronological record of recently merged pull requests and closed issues. This fi
 
 ### 2026-10-10
 
+- **PR #147**: refactor(sim): consolidate klt_version/load_manifest/load_wave into sim_common
+- **Issue #140** (closed): Consolidate duplicated klt_version/load_manifest/load_wave helpers into sim_common.py (load_wave has drifted)
 - **PR #145**: pad-island-census: cross-net merge check, gated sibling fallback, 3-state frame (#92)
 - **PR #144**: bias_core: declare nwell->VDD tie, disclose p_substrate; T1 item 11 met (#90)
 - **PR #143**: sim(supply-ramp-top): as-drawn 360-point fleet campaign after XMN1 fix (#101)
