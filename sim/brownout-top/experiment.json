@@ -1,0 +1,96 @@
+{
+  "slug": "brownout-top",
+  "title": "Assembled temp_por_top brown-out behavior across dip depth, hold duration, falling slew and recovery slew over the PVT grid",
+  "claim": "Issue #116 (child of #106) -- NOT a spec claim: no ratified numeric brown-out envelope exists (DR-003 Sec8; spec/porting-plan.md Sec3.4 defines only the SHAPE of the three-axis sweep). Records, for the unchanged assembled design/temp_por_top.sch as committed in design/netlist/temp_por_top.spice (bias_core + temp_core + por_comparator + por_output_chain, real shared IBIAS node, real RESETn -> temp_core.EN feedback, no ideal bias or sensor substitution, PTAT/CTAT open), what RESETn does across an exploratory set of single supply dips (floor x hold x falling slew, plus recovery-slew variants and a no-dip control) x {tt,ss,ff,sf,fs} x {-40,27,125 C} x {2.97,3.30,3.63 V} starting supplies, graded from full-resolution RESETn/POR_RAW/VDD/IBIAS waveforms and the explicit delivered bias branch current (sim/brownout-top/brownout_checker.py). A completed simulation is not a behavioural PASS. gf180mcu numbers are not used anywhere; failed cells are evidence.",
+  "provenance": "schematic",
+  "provenance_source": "sim/brownout-top/testbench/tb_temp_por_brownout.sch (DUT: design/netlist/temp_por_top.spice, the committed export of design/temp_por_top.sch)",
+  "schematic": "testbench/tb_temp_por_brownout.sch",
+  "statistical_convention": "N/A (corner-matrix check, not a distribution claim)",
+  "corners": {
+    "process": [
+      "tt",
+      "ss",
+      "ff",
+      "sf",
+      "fs"
+    ],
+    "temperature_c": [
+      -40,
+      27,
+      125
+    ],
+    "supply_v": [
+      2.97,
+      3.3,
+      3.63
+    ],
+    "supply_v_meaning": "STARTING supply (VSET); the dip floor is absolute, so the excursion vf - vlow grows with the starting supply and every edge duration is derived from it"
+  },
+  "dut_loading": {
+    "PTAT": "open (no output buffer exists in the design)",
+    "CTAT": "open",
+    "RESETn": "unloaded (no external load); drives only temp_core.EN internally",
+    "substitutions": "none -- no ideal bias, no ideal sensor, no retired diagnostic XMN1 edit (the committed XMN1 is L=20 W=0.42 since #101/#111)"
+  },
+  "stimulus": {
+    "construction": "V(VDD) = min(vf, rup*t) - ex*( clip01((t-t0)*sf/ex) - clip01((t-t0-ex/sf-th)*sr/ex) ), ex = max(vf - vlow, 0).  Four independent axes: floor vlow, falling slew sf, hold th, recovery slew sr (+ t0).  The fall lasts ex/sf and the recovery ex/sr: durations are DERIVED from voltage excursion / slew, never a fixed duration, so the swept starting supply does not couple into either slew.  Implemented in the testbench BVDD source (SPICE twin of brownout_checker.vdd_expected, which the checker uses to verify the sampled VDD).",
+    "power_up_rate_v_per_s": 10000.0,
+    "power_up_note": "same constant 10 kV/s power-up as the supply-ramp-top primary rate that the #98 records exercised; chosen only so the baseline is a known-quantity start, not a claim about power-up behaviour",
+    "t0_s": 0.02,
+    "t0_rationale": "dip starts 20 ms after power-up begins: pilot releases occurred 1.7-3.0 ms after POR_RAW rose (supply-ramp-top experiment.json), so >6x settling margin; the checker additionally REQUIRES a viable baseline (exactly one release, RESETn settled high and delivered bias settled over the last 2 ms before t0) or the point is UNRESOLVED",
+    "observation_after_recovery_s": 0.02,
+    "observation_rationale": "20 ms after the recovery edge ends (tstop = t0 + fall + hold + recovery + 20 ms, taken at the largest starting supply): ~6x the pilot release delay.  A shorter record is truncated -> UNRESOLVED unless a failure is already detected.",
+    "no_dip_control": "vlow = 99 V (>= every starting supply, ex = 0): same power-up, baseline and window with no dip.  Any RESETn assertion is FAIL spurious_assertion_control; it also validates the baseline/observation windows per corner.",
+    "tmax_rule": "tmax = min(5 us, hold/10, shortest derived edge at the smallest starting supply / 20); recorded in each request.  The checker separately enforces a sample-gap limit in the dip window."
+  },
+  "grid": {
+    "status": "EXPLORATORY initial grid -- chosen to bracket, not to bound; NOT a specification envelope and NOT derived from any gf180mcu figure.",
+    "floors_v": [
+      2.0,
+      1.2,
+      0.4
+    ],
+    "holds_s": [
+      1e-05,
+      0.0001,
+      0.001
+    ],
+    "fall_slews_v_per_s": [
+      1000.0,
+      10000.0,
+      100000.0
+    ],
+    "recovery_slew_default_v_per_s": 10000.0,
+    "recovery_variants_v_per_s": [
+      1000.0,
+      100000.0
+    ],
+    "recovery_variant_center": {
+      "vlow": 1.2,
+      "th": 0.0001,
+      "sf": 10000.0
+    },
+    "rationale": "Floors: 2.0 V is a shallow brown-out above half supply (never 'required-to-assert' under the declared detectability rule), 1.2 V is below half supply, 0.4 V is below V_IL at every starting supply (rail collapse).  Holds span 10 us - 1 ms (two decades).  Falling slews 1 kV/s - 100 kV/s (a ~2 V excursion in 2 ms ... 20 us).  The 1 MV/s class is NOT in the initial grid: it needs tmax <= 50 ns (about 10x the step count) and is the first declared expansion (policy b).  Recovery slew is held at 10 kV/s for the full floor x hold x fall cube and varied one-at-a-time (1 kV/s, 100 kV/s) around the center point only -- a declared one-factor-at-a-time treatment of the fourth axis, not a full 4-D cube.",
+    "request_count": "27 cube + 2 recovery variants + 1 no-dip control = 30 requests x 45 PVT points = 1350 declared points",
+    "expansion_policy": "No envelope is claimed.  Expansion is a NEW record, never an edit: (a) if a boundary (PASS<->FAIL) appears between adjacent grid levels on any axis, add the midpoint level on that axis only at the affected corners; (b) falling or recovery slews above 100 kV/s (first: 1 MV/s) need tmax <= 50 ns and a per-request cost estimate before they are added; (c) holds above 1 ms or below 10 us and floors between the three levels are added only with a stated reason; (d) the passive-skew (ll/hh) and mismatch axes are not in this increment.  Any post-hoc addition is labelled as such in its record, as in the #142 diagnosis.",
+    "not_covered": "dips below 0.4 V, above 2.0 V floor, holds outside 10 us - 1 ms, fall slews outside 1 kV/s - 100 kV/s and recovery slews outside 1 kV/s - 100 kV/s, dips starting from an unreleased state, repeated dips, ll/hh passive skew, mismatch Monte Carlo, PTAT/CTAT loading, post-layout parasitics."
+  },
+  "grading": {
+    "status": "EXPLORATORY -- every number below is a measurement definition chosen for this campaign; none is a ratified bound, and none is a gf180mcu figure.",
+    "levels": "V_IL = 0.2 vf, V_IH = 0.8 vf, V_MID = 0.5 vf, V_MUST = 0.5 vf (vf = the point's starting supply)",
+    "assertion": "RESETn falls through V_IL starting from HIGH at t0 (Schmitt).  assertion_rail_limited is recorded when VDD itself was <= V_IL at that instant (the output could not stay high regardless of the comparator).  Release = RESETn rises through V_IH.",
+    "detectability": "a dip is 'required-to-assert' when VDD spends >= 50 us below V_MUST (piecewise-linear dwell from the full-resolution VDD).  Dips that are not required may assert or not -- both are recorded, neither fails -- but an assertion must still recover.",
+    "baseline": "viable when, before t0: exactly one RESETn release and no re-assert, RESETn >= V_IH over the 2 ms before t0, delivered bias branch current > 0 with peak-to-peak <= 5 % of its mean over that window.  Otherwise UNRESOLVED (the dip response cannot be attributed to the dip); detected codes are kept in 'detected_codes_ungraded'.",
+    "failure_codes": "missed_assertion; no_recovery; premature_release; reassert_after_recovery; reassert_chatter; not_high_at_end; bias_not_recovered; spurious_assertion_control (definitions in brownout_checker.py docstring).",
+    "recovery": "VDD recovered when >= 0.98 vf after the recovery edge starts; an assertion beginning later is reassert_after_recovery; two or more assertions are reassert_chatter; RESETn must be >= V_IH over the last 1 ms.",
+    "delivered_bias": "explicit measurement: drain current [id] of bias_core XMPIB (PMOS whose drain IS the IBIAS node), saved by the testbench as .save @m.xdut.xbias.xmpib.msky130_fd_pr__pfet_g5v0d10v5[id] and appearing in the klt waveform as i(@m.xdut.xbias.xmpib.msky130_fd_pr__pfet_g5v0d10v5[id]).  Sign: ngspice BSIM4 reports id POSITIVE for normal conduction in both polarities (verified by a local single-corner probe: XMPIB id ~0.78 uA equals the sum of the comparator, output-chain and temp_core diode devices' ids ~0.39+0.39+0 uA at 1.5 ms), so the delivered branch current is +id and must be positive at baseline (else NONPHYSICAL).  The consumer-side diode devices (comparator, output chain, temp_core XMBD [id]) are saved; their sum over the delivered current at the end is recorded (sink_sum_over_delivered_end).  The IBIAS NODE voltage v(xdut.ibias) is recorded separately and never used as a current.  End/baseline ratio band [0.8, 1.25] else FAIL bias_not_recovered.",
+    "resolution": "max sample gap from t0-10 us to VDD-recovery+100 us must be <= min(20 us, hold/5, shortest derived edge/10), AND sampled VDD must match the declared stimulus within 20 mV; otherwise a point with no detected failure is UNRESOLVED, not PASS.",
+    "physicality": "every saved node within [-0.3 V, vf+0.5 V] for t>0, settled supply current -i(BVDD) > 0, delivered bias positive at baseline.  Violation -> NONPHYSICAL (cannot PASS; behavioural verdict not graded).",
+    "verdicts": "ERROR (missing waveform / channel / non-finite data / convergence, model or backend error) > NONPHYSICAL > UNRESOLVED (unviable baseline, truncated, sparse, stimulus mismatch) > FAIL (resolved physical failure, with trace evidence) > PASS.  NOT_COVERED marks points whose request was never submitted, was refused by the fleet, or has no report; they are counted as uncovered, never as PASS.",
+    "trace_storage": "committed traces are change-triggered (dV >= 2 mV on any of VDD/RESETn/POR_RAW/IBIAS node, delivered bias moved >= 2 % of its maximum, or a 1 ms anchor); RESETn assertion/release counts are re-derived from the stored trace and compared with the full-resolution result per point."
+  },
+  "fleet": {
+    "backend": "batch (Spot fleet) via klt sim --backend batch, one request per dip point = 45 PVT corners; no local grid execution.  A single local corner probe (--backend local) is permitted for netlist validation only.",
+    "ngspice_note": "The fleet runner ignores options.ngspice_init, so ng_nomodcheck is carried in the netlist body as in supply-ramp-top."
+  }
+}
