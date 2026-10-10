@@ -270,7 +270,7 @@ def timeline(w, vf, res, window=200e-6):
     return out
 
 
-TRIGGER_COLS = ("v(vdd)", "v(resetn)", "v(xdut.por_raw)", "v(xdut.ibias)", "v(ptat)", "v(ctat)")
+TRIGGER_COLS = ("v(vdd)", "v(resetn)", "v(xdut.por_raw)", "v(xdut.ibias)")  # PTAT/CTAT ride along (they chatter by volts on the nonphysical branch)
 WINDOW_S = 100e-6  # every sample within +-WINDOW_S of a RESETn release/re-assert is kept (all columns)
 
 
@@ -296,7 +296,7 @@ def compress_ext(w, vf):
 
 def write_ext_trace(path, names, rows):
     path.parent.mkdir(parents=True, exist_ok=True)
-    lines = [f"# {','.join(names)}  (change-triggered: dV>={TRACE_DV * 1e3:g} mV on vdd/resetn/por_raw/ibias/ptat/ctat or dt>={TRACE_DT * 1e3:g} ms; every sample within +-100 us of a RESETn release/re-assert is kept)"]
+    lines = [f"# {','.join(names)}  (change-triggered: dV>={TRACE_DV * 1e3:g} mV on vdd/resetn/por_raw/ibias or dt>={TRACE_DT * 1e3:g} ms; every sample within +-100 us of a RESETn release/re-assert is kept)"]
     lines += [",".join(f"{x:.6g}" for x in r) for r in rows]
     with gzip.open(path, "wt", compresslevel=9) as fh:
         fh.write("\n".join(lines) + "\n")
