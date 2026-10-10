@@ -64,10 +64,6 @@ rate_tag = sim_common.rate_tag
 scrub = functools.partial(sim_common.scrub, repo_root=REPO_ROOT)
 
 
-def load_manifest() -> dict:
-    return json.loads(MANIFEST.read_text())
-
-
 def corner_id(proc: str, temp: float, vf: float) -> str:
     return f"{proc}_{cr.fmt_temp(temp)}c_{vf:.2f}v"
 
@@ -154,11 +150,6 @@ def build_request(netlist_name: str, rate: float, man: dict, backend: str, capac
     return req
 
 
-def klt_version() -> str:
-    p = subprocess.run(["klt", "--version"], capture_output=True, text=True)
-    return p.stdout.strip() or p.stderr.strip()
-
-
 def submit(variant_name: str, rate: float, head: str, man: dict, run_dir: Path, capacity_wait_s: float = 0) -> dict:
     netlist = build_netlist(head, man["variants"][variant_name], rate)
     req = build_request("netlist.spice", rate, man, "batch", capacity_wait_s)
@@ -167,7 +158,7 @@ def submit(variant_name: str, rate: float, head: str, man: dict, run_dir: Path, 
 
 
 def cmd_run(args) -> int:
-    man = load_manifest()
+    man = sim_common.load_manifest(MANIFEST)
     pdk = cr.resolve_pdk(cr.load_pin())
     git_info = cr.git_state()
     now = datetime.now(timezone.utc)
@@ -190,7 +181,7 @@ def cmd_run(args) -> int:
         "run_id": run_id,
         "started_utc": now.strftime("%Y-%m-%dT%H:%M:%SZ"),
         "variants": variants,
-        "klt_client": klt_version(),
+        "klt_client": sim_common.klt_version(),
         "klt_sim_backend_env": os.environ.get("KLT_SIM_BACKEND"),
         "work": [[v, r] for v, r in work],
     }
@@ -222,7 +213,7 @@ def cmd_run(args) -> int:
 
 
 def cmd_crosscheck(args) -> int:
-    man = load_manifest()
+    man = sim_common.load_manifest(MANIFEST)
     pdk = cr.resolve_pdk(cr.load_pin())
     run_dir = BUILD / args.run_id
     if not run_dir.exists():
@@ -559,7 +550,7 @@ ABSENT = [
 
 
 def cmd_record(args) -> int:
-    man = load_manifest()
+    man = sim_common.load_manifest(MANIFEST)
     run_dir = BUILD / args.run_id
     meta = json.loads((run_dir / "run.json").read_text())
     pin = cr.load_pin()

@@ -38,7 +38,7 @@ def wave_doc(wave: dict) -> dict:
 
 class CampaignIsolation(unittest.TestCase):
     def setUp(self):
-        self.man = copy.deepcopy(rc.load_manifest())
+        self.man = copy.deepcopy(rc.sim_common.load_manifest(rc.MANIFEST))
         self.man["corners"] = {"process": ["tt"], "temperature_c": TEMPS, "supply_v": [VF]}
         self.td = tempfile.TemporaryDirectory()
         self.run_dir = Path(self.td.name)

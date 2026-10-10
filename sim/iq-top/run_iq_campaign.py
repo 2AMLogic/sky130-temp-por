@@ -66,10 +66,6 @@ INSTRUMENT = [
 ]
 
 
-def load_manifest() -> dict:
-    return json.loads(MANIFEST.read_text())
-
-
 def corner_id(proc: str, temp: float, vf: float) -> str:
     return f"{proc}_{cr.fmt_temp(temp)}c_{vf:.2f}v"
 
@@ -140,13 +136,8 @@ def build_request(netlist_name: str, man: dict, backend: str, capacity_wait_s: f
     return req
 
 
-def klt_version() -> str:
-    p = subprocess.run(["klt", "--version"], capture_output=True, text=True)
-    return p.stdout.strip() or p.stderr.strip()
-
-
 def cmd_run(args) -> int:
-    man = load_manifest()
+    man = sim_common.load_manifest(MANIFEST)
     pdk = cr.resolve_pdk(cr.load_pin())
     git_info = cr.git_state()
     now = datetime.now(timezone.utc)
@@ -166,7 +157,7 @@ def cmd_run(args) -> int:
         work = [s for s in states if not sim_common.report_usable(run_dir / s / sim_common.rate_tag(rate) / "report.json")]
         say(f"retrying {len(work)} request(s) without a usable report, capacity_wait_s={args.capacity_wait}")
     heads = {s: tb_netlist_head(s, run_dir if not args.retry_failed else run_dir / "retry", pdk) for s in work}
-    meta = {"run_id": run_id, "started_utc": now.strftime("%Y-%m-%dT%H:%M:%SZ"), "states": states, "klt_client": klt_version(),
+    meta = {"run_id": run_id, "started_utc": now.strftime("%Y-%m-%dT%H:%M:%SZ"), "states": states, "klt_client": sim_common.klt_version(),
             "klt_sim_backend_env": os.environ.get("KLT_SIM_BACKEND"), "git": git_info}
     if not args.retry_failed:
         (run_dir / "run.json").write_text(json.dumps(meta, indent=2) + "\n")
@@ -194,7 +185,7 @@ def cmd_run(args) -> int:
 
 
 def cmd_crosscheck(args) -> int:
-    man = load_manifest()
+    man = sim_common.load_manifest(MANIFEST)
     pdk = cr.resolve_pdk(cr.load_pin())
     run_dir = BUILD / args.run_id
     run_dir.mkdir(parents=True, exist_ok=True)
@@ -489,7 +480,7 @@ DEFS = {
 
 
 def cmd_record(args) -> int:
-    man = load_manifest()
+    man = sim_common.load_manifest(MANIFEST)
     run_dir = BUILD / args.run_id
     meta = json.loads((run_dir / "run.json").read_text())
     pin = cr.load_pin()
@@ -585,7 +576,7 @@ def cmd_record(args) -> int:
 
 
 def cmd_selftest(args) -> int:
-    man = load_manifest()
+    man = sim_common.load_manifest(MANIFEST)
     git_info = cr.git_state()
     now = datetime.now(timezone.utc)
     record_id = f"{now:%Y%m%d}-{now:%H%M%S}-{git_info['sha']}-checker-selftest"

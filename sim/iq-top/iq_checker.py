@@ -21,6 +21,9 @@ import math
 import sys
 from pathlib import Path
 
+sys.path.insert(0, str(Path(__file__).resolve().parents[1] / "bin"))
+from sim_common import load_wave  # noqa: E402,F401  (shared hardened loader)
+
 SUBCELLS = {
     "bias_core": "i(v.xdut.vsbias)",
     "por_comparator": "i(v.xdut.vscmp)",
@@ -29,29 +32,6 @@ SUBCELLS = {
 }
 TOTAL_VEC = "i(bvdd)"  # supply current = -i(BVDD)
 FORCE_VEC = "i(vrst)"  # por-iq only: current into the RESETn forcing source
-
-
-def load_wave(path: Path) -> dict[str, list[float]]:
-    opener = gzip.open if str(path).endswith(".gz") else open
-    with opener(path, "rt") as fh:
-        doc = json.load(fh)
-    try:
-        names = [v["name"].lower() for v in doc["variables"]]
-        rows = doc["points"]
-    except (KeyError, TypeError, AttributeError) as e:
-        raise ValueError(f"malformed waveform document: {e!r}") from e
-    if not names or not isinstance(rows, list):
-        raise ValueError("malformed waveform document: no variables or points not a list")
-    cols: dict[str, list[float]] = {n: [] for n in names}
-    for i, row in enumerate(rows):
-        if not isinstance(row, (list, tuple)) or len(row) != len(names):
-            raise ValueError(f"malformed waveform row {i}: expected {len(names)} values, got {len(row) if isinstance(row, (list, tuple)) else type(row).__name__}")
-        for n, x in zip(names, row):
-            try:
-                cols[n].append(float(x))
-            except (TypeError, ValueError) as e:
-                raise ValueError(f"malformed waveform row {i}: non-numeric value {x!r} for {n}") from e
-    return cols
 
 
 def validate_wave(wave: dict) -> str | None:
