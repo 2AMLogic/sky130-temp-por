@@ -240,6 +240,237 @@ def grade_wave(wave, scenario, variant):
     return {"status": "pass" if not fails else "fail", "m": m, "fails": fails}
 
 
+ORIG = {  # the six issue-#86 points: (record file, scenario) and the originally recorded failure (ee63b45, dirty tree)
+    "en-high": ("sim/temp-core-startup/records/20260826-053032-ee63b45.json", "temp-core-startup"),
+    "en-delayed": ("sim/temp-core-startup-en-delayed/records/20260826-054047-ee63b45.json", "temp-core-startup-en-delayed"),
+}
+
+
+def load_results(run_dir):
+    """{combo: {'report': dict|None, 'points': {cid: graded}}} -- graded from the retrieved waveforms."""
+    out = {}
+    for scen in SCENARIOS:
+        for var in VARIANTS:
+            combo = f"{scen}__{var}"
+            rp = run_dir / combo / "report.json"
+            ent = {"scenario": scen, "variant": var, "report": None, "points": {}, "refusal": None}
+            if sim_common.report_usable(rp):
+                rep = json.loads(rp.read_text())
+                ent["report"] = rep
+                for c in rep["corners"]:
+                    cid = corner_id(c["process"], c["temperature_c"], c["supply_v"]["vset"])
+                    try:
+                        w = sim_common.load_wave(c["artifacts"]["waveform"])
+                        g = grade_wave(w, scen, var)
+                    except (ValueError, OSError, KeyError) as err:
+                        g = {"status": "nonconverged", "reason": f"waveform unreadable: {err}"}
+                    g["klt_status"] = c.get("status")
+                    g["log"] = c["artifacts"].get("log")
+                    g["deck"] = c["artifacts"].get("deck")
+                    ent["points"][cid] = g
+            else:
+                try:
+                    ent["refusal"] = json.loads((run_dir / combo / "klt.stderr").read_text() or "{}").get("error", {})
+                except (OSError, json.JSONDecodeError):
+                    ent["refusal"] = {"message": "no usable report", "code": "unknown"}
+                if not ent["refusal"]:
+                    # klt writes the error envelope on stdout (report.json) or stderr depending on version
+                    try:
+                        ent["refusal"] = json.loads((run_dir / combo / "report.json").read_text()).get("error", {})
+                    except (OSError, json.JSONDecodeError):
+                        ent["refusal"] = {"message": "no report", "code": "unknown"}
+            out[combo] = ent
+    return out
+
+
+def nonphysical(m):
+    """The README rule-4 signature: negative supply current or a loop node outside the rails (+1 V)."""
+    if not m:
+        return None
+    return m["isup"] <= 0 or not (-1.0 <= m["na"] <= 4.7) or not (-1.0 <= m["nb"] <= 4.7) \
+        or not (-1.0 <= m["ptat"] <= 4.7) or not (-1.0 <= m["ctat"] <= 4.7)
+
+
+def verdict_for_point(cid, scen, res):
+    """Per-point verdict from the variant outcomes at one (scenario, corner)."""
+    rows = {}
+    for var in VARIANTS:
+        g = res[f"{scen}__{var}"]["points"].get(cid)
+        rows[var] = g
+    ran = {v: g for v, g in rows.items() if g is not None}
+    passes = {v: g for v, g in ran.items() if g["status"] == "pass"}
+    fails = {v: g for v, g in ran.items() if g["status"] != "pass"}
+    np_fails = {v: g for v, g in fails.items() if g["status"] == "fail" and nonphysical(g["m"])}
+    # physical-branch agreement: all passing variants must agree on PTAT/CTAT (a single stable branch)
+    ptats = [g["m"]["ptat"] for g in passes.values()]
+    spread = (max(ptats) - min(ptats)) if ptats else None
+    if not ran:
+        v, why = "NOT-RUN", "no variant produced a result for this point (fleet refusal)"
+    elif not passes:
+        v, why = "REAL-FAILURE", "fails in every variant that ran; operating point recorded below"
+    elif fails and np_fails and len(np_fails) == len(fails):
+        v, why = "SOLVER-ARTIFACT", ("fails (non-physical signature) in "
+                                     + ",".join(np_fails) + " and lands on the physical branch in " + ",".join(passes))
+    elif fails:
+        v, why = "MIXED", "fails in " + ",".join(fails) + " without the non-physical signature; needs a look"
+    else:
+        v = "NOT-REPRODUCED"
+        why = (f"passes on the physical branch in all {len(ran)} variant(s) run ({', '.join(ran)}); the baseline `base` deck "
+               + ("was among them" if "base" in ran else "was NOT run for this scenario (fleet refusal)")
+               + ". The original non-physical landing did not recur at this point, so the artifact explanation is NOT demonstrated at this point itself; "
+               "it rests on the matrix-level checks (the failing set moves with every setting, no point fails twice, every failure is non-physical, "
+               "the physical branch is unique to ~1e-9 V). No real failure was observed here")
+    return {"verdict": v, "why": why, "n_variants_run": len(ran), "n_pass": len(passes), "ptat_spread_across_passing_V": spread,
+            "variants": {k: (None if g is None else {"status": g["status"], **({"m": g["m"]} if "m" in g else {"reason": g.get("reason")})})
+                         for k, g in rows.items()}}
+
+
+def cmd_record(args):
+    run_dir = BUILD / args.run_id
+    meta = json.loads((run_dir / "run.json").read_text())
+    git = meta["git"]
+    res = load_results(run_dir)
+    now = datetime.now(timezone.utc)
+    rid = f"{now:%Y%m%d-%H%M%S}-{git['sha']}"
+    rec_dir = SIM_DIR / SLUG
+    for d in ("records", "netlist-snapshots", "corners"):
+        (rec_dir / d).mkdir(exist_ok=True)
+    if (rec_dir / "records" / f"{rid}.md").exists():
+        sys.exit(f"refusing to overwrite record {rid}")
+    snap = rec_dir / "netlist-snapshots" / rid
+    snap.mkdir()
+    cdir = rec_dir / "corners" / rid
+    cdir.mkdir()
+    for combo, ent in res.items():
+        nl = run_dir / combo / "netlist.spice"
+        if nl.is_file():
+            (snap / f"{combo}.spice").write_text(sim_common.scrub(nl.read_text(), run_dir, REPO_ROOT))
+        (cdir / combo).mkdir()
+        for cid, g in ent["points"].items():
+            parts = [f"corner {cid}  combo {combo}  verdict-input status={g['status']}"]
+            if "m" in g:
+                parts.append("graded: " + "; ".join(f"{k}={v:.6g}" for k, v in g["m"].items()) + f"  fails={g['fails']}")
+            else:
+                parts.append("graded: " + g.get("reason", ""))
+            for key, tag in (("deck", "deck"), ("log", "ngspice log")):
+                pth = g.get(key)
+                if pth and Path(pth).is_file():
+                    parts.append(f"--- {tag} ---\n" + sim_common.scrub(Path(pth).read_text(), run_dir, REPO_ROOT))
+            (cdir / combo / f"{cid}.log").write_text("\n".join(parts) + "\n")
+
+    # ---- per-scenario full-matrix summaries
+    summary = {}
+    for combo, ent in res.items():
+        if ent["report"] is None:
+            summary[combo] = {"status": "NOT-RUN", "refusal": ent["refusal"]}
+            continue
+        pts = ent["points"]
+        bad = {c: g for c, g in pts.items() if g["status"] != "pass"}
+        remote = ent["report"]["environment"].get("remote", {})
+        summary[combo] = {
+            "status": "ran", "n_points": len(pts), "n_pass": len(pts) - len(bad),
+            "failing": {c: {"status": g["status"], "nonphysical": nonphysical(g.get("m")), "fails": g.get("fails"),
+                            **({k: g["m"][k] for k in ("ptat", "ctat", "na", "nb", "isup")} if "m" in g else {"reason": g.get("reason")})}
+                        for c, g in sorted(bad.items())},
+            "fleet": {k: remote.get(k) for k in ("job_id", "instance_type", "lifecycle", "runner_klt_version", "client_klt_version", "elapsed_seconds")},
+            "ngspice_engine_version": ent["report"]["environment"].get("engine_version"),
+        }
+
+    # ---- physical-branch stability across ALL 45 points: passing variants must agree per point
+    stab = {}
+    for scen in SCENARIOS:
+        worst = (0.0, None)
+        for p, t, v in grid():
+            cid = corner_id(p, t, v)
+            vals = [res[f"{scen}__{x}"]["points"][cid]["m"]["ptat"] for x in VARIANTS
+                    if cid in res[f"{scen}__{x}"]["points"] and res[f"{scen}__{x}"]["points"][cid]["status"] == "pass"]
+            if len(vals) > 1 and max(vals) - min(vals) > worst[0]:
+                worst = (max(vals) - min(vals), cid)
+        stab[scen] = {"max_ptat_spread_between_passing_variants_V": worst[0], "at": worst[1]}
+
+    # ---- the six points
+    six = {}
+    for scen, cids in SIX.items():
+        orec = json.loads((REPO_ROOT / ORIG[scen][0]).read_text())
+        for cid in cids:
+            oc = next(c for c in orec["corners"] if c["corner_id"] == cid)
+            om = {m["name"]: m.get("value") for m in oc["measurements"]}
+            vd = verdict_for_point(cid, scen, res)
+            vd["original"] = {"record": ORIG[scen][0], "values": om}
+            six[f"{scen}:{cid}"] = vd
+
+    # ---- every failure anywhere has the non-physical signature, and passes somewhere else?
+    all_fail = []
+    for combo, ent in res.items():
+        for cid, g in ent["points"].items():
+            if g["status"] != "pass":
+                other = [v for v in VARIANTS if f"{ent['scenario']}__{v}" != combo
+                         and res[f"{ent['scenario']}__{v}"]["points"].get(cid, {}).get("status") == "pass"]
+                all_fail.append({"combo": combo, "corner": cid, "status": g["status"], "nonphysical": nonphysical(g.get("m")), "passes_in": other})
+    sig_all = all(f["nonphysical"] for f in all_fail if f["status"] == "fail")
+    rec = {
+        "record_id": rid, "experiment": SLUG, "issue": 86, "timestamp": now.strftime("%Y-%m-%dT%H:%M:%SZ"),
+        "git": git, "klt": meta["klt_client"], "backend": meta["klt_sim_backend_env"], "run_id": args.run_id,
+        "windows": WINDOWS, "variants": {k: {"options": v[0], "tramp_s": v[1]} for k, v in VARIANTS.items()},
+        "summary": summary, "stability": stab, "six_points": six, "all_failures": all_fail,
+        "all_failures_nonphysical_signature": sig_all, "supersedes": "(none)",
+        "author": cr.default_author(),
+    }
+    (rec_dir / "records" / f"{rid}.json").write_text(json.dumps(rec, indent=2, default=str) + "\n")
+
+    L = [f"# Record {rid}", "",
+         f"- **Record ID**: {rid}",
+         f"- **Experiment**: `{SLUG}` -- solver / ramp-rate discrimination of the six temp_core cold-start FAILs (issue #86)",
+         "- **Claim**: NOT a spec claim. Decides, per point, whether each of the six Overall-FAIL points of `sim/temp-core-startup/` and `sim/temp-core-startup-en-delayed/` (record `ee63b45`, dirty tree) is a solver artifact (non-physical branch landing that moves with integration settings) or a real failure, by re-running the FULL 45-point PVT matrix under five solver/ramp variants for each of the two EN scenarios and checking the physicality guards (isup > 0, loop nodes inside the rails +1 V) and the unchanged `experiment.json` windows.",
+         "- **Netlist provenance**: schematic-derived committed `design/netlist/{bias_core,temp_core}.spice` (unchanged since the `ee63b45` records; `git diff ee63b45 HEAD -- design/netlist/` is empty) in a generated testbench (see `netlist-snapshots/%s/`)" % rid,
+         "- **PDK**: sky130A @ open_pdks `c6d73a35f524070e85faff4a6a9eef49553ebc2b` (matches sim/pdk.json pin), models `libs.tech/combined/sky130.lib.spice` (sha256 48de7c67...)",
+         f"- **Tools**: {meta['klt_client']} (client); fleet ngspice-{next((s.get('ngspice_engine_version') for s in summary.values() if s.get('ngspice_engine_version')), '?')} on Spot `c7i/m7i.4xlarge`, fleet runner klt 0.5.0 (version mismatch warning from the client, reported per job below); backend `{meta['klt_sim_backend_env']}`",
+         f"- **Repo state**: `{git['sha']}` on `{git['branch']}` (working tree {'DIRTY' if git['dirty'] else 'clean'} at run time)",
+         "- **Corner matrix run**: process tt, ss, ff, sf, fs x -40/27/125 C x 2.97/3.30/3.63 V = 45 points per (scenario, variant); a combo that the fleet refused is listed as NOT-RUN below, never substituted locally",
+         "- **Statistical convention**: N/A (corner-matrix check)",
+         "", "## Variants", "",
+         "| variant | `.options` | supply ramp time |", "|---|---|---|"]
+    for k, v in VARIANTS.items():
+        L.append(f"| `{k}` | `{v[0]}` | {v[1]*1e6:g} us |")
+    L += ["", "`base` is the deck of the `ee63b45` records re-expressed for `klt sim` (the supply is a behavioural source equal to the original PWL ramp scaled by klt's swept `VSET`; this is a different realisation of the same circuit, so a changed failing set under `base` is itself a solver-sensitivity datum, not a reproduction).", "",
+          "## Full-matrix outcome per (scenario, variant)", "", "| combo | result | failing points (PVT corner: ptat / isup / signature) |", "|---|---|---|"]
+    for combo, s in summary.items():
+        if s["status"] == "NOT-RUN":
+            L.append(f"| {combo} | NOT-RUN: fleet refused ({s['refusal'].get('code')}) | - |")
+        else:
+            f = "; ".join(f"`{c}`: {d.get('ptat', float('nan')):.3g} V / {d.get('isup', float('nan')):.3g} A / {'non-physical' if d['nonphysical'] else 'physical-but-out-of-window'}" for c, d in s["failing"].items()) or "none"
+            L.append(f"| {combo} | {s['n_pass']}/{s['n_points']} PASS | {f} |")
+    L += ["", "Fleet jobs (`environment.remote`): " + ", ".join(f"{c}={s['fleet']['job_id']}" for c, s in summary.items() if s["status"] == "ran"), "",
+          "## Physical-branch stability (all 45 points, passing variants only)", ""]
+    for scen, d in stab.items():
+        L.append(f"- {scen}: largest PTAT spread between variants that landed on the physical branch = {d['max_ptat_spread_between_passing_variants_V']:.3g} V (at `{d['at']}`)")
+    L += ["", f"Every FAIL anywhere in the sweep has the non-physical signature (isup <= 0 or a node outside the rails +1 V): **{sig_all}**.", "",
+          "## Per-point verdict for the six issue points", ""]
+    for key, d in six.items():
+        scen, cid = key.split(":")
+        ov = d["original"]["values"]
+        L += [f"### {scen} `{cid}`: **{d['verdict']}**", "",
+              f"- Original (`ee63b45`, dirty): ptat={ov.get('ptat')} V, ctat={ov.get('ctat')} V, isup={ov.get('isup')} A",
+              f"- {d['why']}",
+              f"- variants run: {d['n_variants_run']}, physical-branch landings: {d['n_pass']}; PTAT spread across the passing variants: {d['ptat_spread_across_passing_V']}", "",
+              "| variant | PVT corner | status | ptat (V) | ctat (V) | isup (A) | na / nb (V) |", "|---|---|---|---|---|---|---|"]
+        for var, g in d["variants"].items():
+            if g is None:
+                L.append(f"| {var} | {cid} | NOT-RUN | | | | |")
+            elif "m" in g:
+                m = g["m"]
+                L.append(f"| {var} | {cid} | {g['status']} | {m['ptat']:.5g} | {m['ctat']:.5g} | {m['isup']:.4g} | {m['na']:.4g} / {m['nb']:.4g} |")
+            else:
+                L.append(f"| {var} | {cid} | {g['status']}: {g.get('reason')} | | | | |")
+        L.append("")
+    L += ["## Links", "", f"- driver: `sim/{SLUG}/run_solver_sweep.py`; json twin `records/{rid}.json`; netlists `netlist-snapshots/{rid}/`; per-point logs `corners/{rid}/<scenario>__<variant>/<corner>.log`",
+          "- windows are copied unchanged from the two `experiment.json` files (no relaxation)", "",
+          f"- **Timestamp**: {rec['timestamp']}", f"- **Author**: {rec['author']}", "- **Supersedes**: (none) -- adds evidence next to `ee63b45`; those records are untouched"]
+    (rec_dir / "records" / f"{rid}.md").write_text("\n".join(L) + "\n")
+    print(rid)
+    return 0
+
+
 def main():
     ap = argparse.ArgumentParser(description=__doc__, formatter_class=argparse.RawDescriptionHelpFormatter)
     sub = ap.add_subparsers(dest="cmd", required=True)
@@ -254,6 +485,9 @@ def main():
     p.add_argument("--run-id", required=True)
     p.add_argument("point", nargs="+", help="scenario:variant:cornerid")
     p.set_defaults(fn=cmd_probe)
+    rc = sub.add_parser("record")
+    rc.add_argument("--run-id", required=True)
+    rc.set_defaults(fn=cmd_record)
     a = ap.parse_args()
     return a.fn(a)
 

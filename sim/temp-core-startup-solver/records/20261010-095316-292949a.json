@@ -1,0 +1,848 @@
+{
+  "record_id": "20261010-095316-292949a",
+  "experiment": "temp-core-startup-solver",
+  "issue": 86,
+  "timestamp": "2026-10-10T09:53:16Z",
+  "git": {
+    "sha": "292949a",
+    "branch": "feature/issue-86",
+    "dirty": false
+  },
+  "klt": "klt 0.7.0+g8eec069c7576",
+  "backend": "batch",
+  "run_id": "sweep1",
+  "windows": {
+    "ptat": [
+      0.3,
+      2.6
+    ],
+    "ctat": [
+      0.2,
+      1.1
+    ],
+    "na": [
+      -1.0,
+      4.7
+    ],
+    "nb": [
+      -1.0,
+      4.7
+    ],
+    "isup": [
+      1e-08,
+      5e-05
+    ],
+    "bias_ok": [
+      2.0,
+      3.7
+    ],
+    "ptat_settled": [
+      0.0,
+      0.001
+    ],
+    "ctat_settled": [
+      0.0,
+      0.001
+    ]
+  },
+  "variants": {
+    "base": {
+      "options": "method=gear trtol=50",
+      "tramp_s": 0.0001
+    },
+    "trtol7": {
+      "options": "method=gear trtol=7",
+      "tramp_s": 0.0001
+    },
+    "reltol2e-4": {
+      "options": "method=gear trtol=50 reltol=2e-4",
+      "tramp_s": 0.0001
+    },
+    "ramp1u": {
+      "options": "method=gear trtol=50",
+      "tramp_s": 1e-06
+    },
+    "ramp2m": {
+      "options": "method=gear trtol=50",
+      "tramp_s": 0.002
+    }
+  },
+  "summary": {
+    "en-high__base": {
+      "status": "NOT-RUN",
+      "refusal": {
+        "command": "sim",
+        "message": "batch backend failed: batch-fleet-provision.sh launch failed (exit 1): error: no capacity in any of the 30 pools after 3 attempt(s) \u2014 this is the capacity-refusal case, and it is now visible instead of silent",
+        "code": "batch_no_capacity"
+      }
+    },
+    "en-high__trtol7": {
+      "status": "ran",
+      "n_points": 45,
+      "n_pass": 44,
+      "failing": {
+        "tt_-40c_3.63v": {
+          "status": "fail",
+          "nonphysical": true,
+          "fails": [
+            "ptat",
+            "isup",
+            "ctat_settled"
+          ],
+          "ptat": 0.002166467117077461,
+          "ctat": 0.6528138797648567,
+          "na": 0.6528139519310694,
+          "nb": 0.6075793967929086,
+          "isup": -0.005540299904080215
+        }
+      },
+      "fleet": {
+        "job_id": "klt-sim-ac9e922b1e7e",
+        "instance_type": "c7i.4xlarge",
+        "lifecycle": "spot",
+        "runner_klt_version": "0.5.0",
+        "client_klt_version": "0.7.0+g8eec069c7576",
+        "elapsed_seconds": 180
+      },
+      "ngspice_engine_version": "46"
+    },
+    "en-high__reltol2e-4": {
+      "status": "ran",
+      "n_points": 45,
+      "n_pass": 40,
+      "failing": {
+        "ff_-40c_3.63v": {
+          "status": "fail",
+          "nonphysical": true,
+          "fails": [
+            "ptat",
+            "ctat",
+            "na",
+            "nb",
+            "isup"
+          ],
+          "ptat": -2.097468105886988,
+          "ctat": 32684.79724912744,
+          "na": -2688.833515922397,
+          "nb": 5.225448097221063,
+          "isup": -0.0008066648046089588
+        },
+        "fs_-40c_2.97v": {
+          "status": "fail",
+          "nonphysical": true,
+          "fails": [
+            "ptat"
+          ],
+          "ptat": -2.097669608738781,
+          "ctat": 0.7833406393500417,
+          "na": 0.7833407288570907,
+          "nb": 0.7833394180643247,
+          "isup": 5.632485465288835e-06
+        },
+        "fs_-40c_3.63v": {
+          "status": "fail",
+          "nonphysical": true,
+          "fails": [
+            "ptat",
+            "nb",
+            "isup"
+          ],
+          "ptat": -2.097703050880955,
+          "ctat": 0.7684033303433607,
+          "na": 0.7684034181452024,
+          "nb": 5.225051820822386,
+          "isup": -0.004688244490464896
+        },
+        "sf_-40c_3.30v": {
+          "status": "fail",
+          "nonphysical": true,
+          "fails": [
+            "ptat"
+          ],
+          "ptat": -2.097340172681372,
+          "ctat": 0.780208636582241,
+          "na": 0.7802087263052062,
+          "nb": 0.780206957307501,
+          "isup": 5.711645041056417e-06
+        },
+        "ss_27c_2.97v": {
+          "status": "fail",
+          "nonphysical": true,
+          "fails": [
+            "ptat",
+            "isup"
+          ],
+          "ptat": 1.505772299420304e-05,
+          "ctat": 0.3361412785641733,
+          "na": 0.336141329688309,
+          "nb": 0.2544077314445662,
+          "isup": -0.001747328999315715
+        }
+      },
+      "fleet": {
+        "job_id": "klt-sim-9eb63e66de1a",
+        "instance_type": "m7i.4xlarge",
+        "lifecycle": "spot",
+        "runner_klt_version": "0.5.0",
+        "client_klt_version": "0.7.0+g8eec069c7576",
+        "elapsed_seconds": 403
+      },
+      "ngspice_engine_version": "46"
+    },
+    "en-high__ramp1u": {
+      "status": "ran",
+      "n_points": 45,
+      "n_pass": 44,
+      "failing": {
+        "fs_27c_2.97v": {
+          "status": "fail",
+          "nonphysical": true,
+          "fails": [
+            "ptat",
+            "isup"
+          ],
+          "ptat": 2.959683485246881,
+          "ctat": 0.7686313725823518,
+          "na": 0.7686314658435482,
+          "nb": 2.74105470806539,
+          "isup": -0.003333887799470957
+        }
+      },
+      "fleet": {
+        "job_id": "klt-sim-c96980ddbcde",
+        "instance_type": "c7i.4xlarge",
+        "lifecycle": "spot",
+        "runner_klt_version": "0.5.0",
+        "client_klt_version": "0.7.0+g8eec069c7576",
+        "elapsed_seconds": 227
+      },
+      "ngspice_engine_version": "46"
+    },
+    "en-high__ramp2m": {
+      "status": "ran",
+      "n_points": 45,
+      "n_pass": 44,
+      "failing": {
+        "sf_27c_3.30v": {
+          "status": "fail",
+          "nonphysical": true,
+          "fails": [
+            "ptat",
+            "isup"
+          ],
+          "ptat": -1.596996017091542,
+          "ctat": 0.3292213123436655,
+          "na": 0.3292214642430591,
+          "nb": 0.257659580656447,
+          "isup": -0.001521467304376112
+        }
+      },
+      "fleet": {
+        "job_id": "klt-sim-646278cd4131",
+        "instance_type": "c7i.4xlarge",
+        "lifecycle": "spot",
+        "runner_klt_version": "0.5.0",
+        "client_klt_version": "0.7.0+g8eec069c7576",
+        "elapsed_seconds": 176
+      },
+      "ngspice_engine_version": "46"
+    },
+    "en-delayed__base": {
+      "status": "ran",
+      "n_points": 45,
+      "n_pass": 40,
+      "failing": {
+        "ff_-40c_3.63v": {
+          "status": "fail",
+          "nonphysical": true,
+          "fails": [
+            "ptat",
+            "nb",
+            "isup"
+          ],
+          "ptat": 3.619438602929658,
+          "ctat": 0.8689281036281002,
+          "na": 0.8689282030969785,
+          "nb": 5.221521945031884,
+          "isup": -0.007404962641582737
+        },
+        "fs_125c_3.63v": {
+          "status": "fail",
+          "nonphysical": true,
+          "fails": [
+            "ptat",
+            "isup"
+          ],
+          "ptat": 5.186965082863016,
+          "ctat": 0.4667267911322718,
+          "na": 0.4667287128714007,
+          "nb": 0.4667441413356574,
+          "isup": -0.006217748765796964
+        },
+        "ss_-40c_3.30v": {
+          "status": "fail",
+          "nonphysical": true,
+          "fails": [
+            "ptat",
+            "isup",
+            "bias_ok"
+          ],
+          "ptat": 0.0001693790981113187,
+          "ctat": 0.6023130172762198,
+          "na": 0.6023128448255544,
+          "nb": 0.5516169968907499,
+          "isup": -2.827919899221418e-06
+        },
+        "ss_-40c_3.63v": {
+          "status": "fail",
+          "nonphysical": true,
+          "fails": [
+            "ptat",
+            "isup"
+          ],
+          "ptat": 5.36533775647382,
+          "ctat": 0.7828861534717648,
+          "na": 0.7828862429491665,
+          "nb": 0.7828870048170953,
+          "isup": -0.006221346333623695
+        },
+        "tt_-40c_3.63v": {
+          "status": "fail",
+          "nonphysical": true,
+          "fails": [
+            "ptat",
+            "isup"
+          ],
+          "ptat": 1.581501966634703e-05,
+          "ctat": 0.5288872088630648,
+          "na": 0.5288872708741167,
+          "nb": 0.4412737733674544,
+          "isup": -0.001217817659693155
+        }
+      },
+      "fleet": {
+        "job_id": "klt-sim-550d9ad1ae03",
+        "instance_type": "c7i.4xlarge",
+        "lifecycle": "spot",
+        "runner_klt_version": "0.5.0",
+        "client_klt_version": "0.7.0+g8eec069c7576",
+        "elapsed_seconds": 222
+      },
+      "ngspice_engine_version": "46"
+    },
+    "en-delayed__trtol7": {
+      "status": "NOT-RUN",
+      "refusal": {
+        "command": "sim",
+        "message": "batch backend failed: batch-fleet-provision.sh launch failed (exit 1): error: no capacity in any of the 30 pools after 3 attempt(s) \u2014 this is the capacity-refusal case, and it is now visible instead of silent",
+        "code": "batch_no_capacity"
+      }
+    },
+    "en-delayed__reltol2e-4": {
+      "status": "NOT-RUN",
+      "refusal": {
+        "command": "sim",
+        "message": "batch backend failed: batch-fleet-provision.sh launch failed (exit 1): error: no capacity in any of the 30 pools after 3 attempt(s) \u2014 this is the capacity-refusal case, and it is now visible instead of silent",
+        "code": "batch_no_capacity"
+      }
+    },
+    "en-delayed__ramp1u": {
+      "status": "NOT-RUN",
+      "refusal": {
+        "command": "sim",
+        "message": "batch backend failed: batch-fleet-provision.sh launch failed (exit 1): error: no capacity in any of the 30 pools after 3 attempt(s) \u2014 this is the capacity-refusal case, and it is now visible instead of silent",
+        "code": "batch_no_capacity"
+      }
+    },
+    "en-delayed__ramp2m": {
+      "status": "NOT-RUN",
+      "refusal": {
+        "command": "sim",
+        "message": "batch backend failed: batch-fleet-provision.sh launch failed (exit 1): error: no capacity in any of the 30 pools after 3 attempt(s) \u2014 this is the capacity-refusal case, and it is now visible instead of silent",
+        "code": "batch_no_capacity"
+      }
+    }
+  },
+  "stability": {
+    "en-high": {
+      "max_ptat_spread_between_passing_variants_V": 1.0163530017592848e-09,
+      "at": "tt_-40c_3.63v"
+    },
+    "en-delayed": {
+      "max_ptat_spread_between_passing_variants_V": 0.0,
+      "at": null
+    }
+  },
+  "six_points": {
+    "en-high:tt_-40c_3.30v": {
+      "verdict": "NOT-REPRODUCED",
+      "why": "passes on the physical branch in all 4 variant(s) run (trtol7, reltol2e-4, ramp1u, ramp2m); the baseline `base` deck was NOT run for this scenario (fleet refusal). The original non-physical landing did not recur at this point, so the artifact explanation is NOT demonstrated at this point itself; it rests on the matrix-level checks (the failing set moves with every setting, no point fails twice, every failure is non-physical, the physical branch is unique to ~1e-9 V). No real failure was observed here",
+      "n_variants_run": 4,
+      "n_pass": 4,
+      "ptat_spread_across_passing_V": 4.595470670665236e-10,
+      "variants": {
+        "base": null,
+        "trtol7": {
+          "status": "pass",
+          "m": {
+            "ptat": 1.099417289264418,
+            "ctat": 0.7824687559512935,
+            "na": 0.7824688454277153,
+            "nb": 0.7824682079706298,
+            "isup": 5.719267550695524e-06,
+            "bias_ok": 3.299999848265238,
+            "ptat_settled": 2.98472579984832e-10,
+            "ctat_settled": 1.695088513997689e-12
+          }
+        },
+        "reltol2e-4": {
+          "status": "pass",
+          "m": {
+            "ptat": 1.099417289558273,
+            "ctat": 0.782468755957031,
+            "na": 0.7824688454336003,
+            "nb": 0.7824682079748966,
+            "isup": 5.719267554023591e-06,
+            "bias_ok": 3.29999984826534,
+            "ptat_settled": 8.119258598782153e-10,
+            "ctat_settled": 1.5362711103250604e-11
+          }
+        },
+        "ramp1u": {
+          "status": "pass",
+          "m": {
+            "ptat": 1.099417289542975,
+            "ctat": 0.7824687559585274,
+            "na": 0.782468845435129,
+            "nb": 0.7824682079795937,
+            "isup": 5.719267557313494e-06,
+            "bias_ok": 3.299999848265392,
+            "ptat_settled": 8.468257206573071e-10,
+            "ctat_settled": 1.9107049276101407e-11
+          }
+        },
+        "ramp2m": {
+          "status": "pass",
+          "m": {
+            "ptat": 1.099417289098726,
+            "ctat": 0.7824687559497281,
+            "na": 0.7824688454260924,
+            "nb": 0.7824682079692704,
+            "isup": 5.719267554158899e-06,
+            "bias_ok": 3.299999848265629,
+            "ptat_settled": 2.662434717137785e-10,
+            "ctat_settled": 5.512923451078677e-12
+          }
+        }
+      },
+      "original": {
+        "record": "sim/temp-core-startup/records/20260826-053032-ee63b45.json",
+        "values": {
+          "ptat": 5.035215,
+          "ptat_settled": 1.71152e-12,
+          "ctat": 0.7824688,
+          "ctat_settled": 6.602607e-12,
+          "na": 0.7824688,
+          "nb": 0.7824682,
+          "isup": -0.00622153,
+          "bias_ok": 3.3
+        }
+      }
+    },
+    "en-high:tt_125c_3.30v": {
+      "verdict": "NOT-REPRODUCED",
+      "why": "passes on the physical branch in all 4 variant(s) run (trtol7, reltol2e-4, ramp1u, ramp2m); the baseline `base` deck was NOT run for this scenario (fleet refusal). The original non-physical landing did not recur at this point, so the artifact explanation is NOT demonstrated at this point itself; it rests on the matrix-level checks (the failing set moves with every setting, no point fails twice, every failure is non-physical, the physical branch is unique to ~1e-9 V). No real failure was observed here",
+      "n_variants_run": 4,
+      "n_pass": 4,
+      "ptat_spread_across_passing_V": 1.2799716841982445e-10,
+      "variants": {
+        "base": null,
+        "trtol7": {
+          "status": "pass",
+          "m": {
+            "ptat": 1.87658060601144,
+            "ctat": 0.4661304583123831,
+            "na": 0.4661349067484429,
+            "nb": 0.4661392212750202,
+            "isup": 9.635435026792392e-06,
+            "bias_ok": 3.299935925808613,
+            "ptat_settled": 1.39422251521637e-10,
+            "ctat_settled": 4.1737724387758135e-12
+          }
+        },
+        "reltol2e-4": {
+          "status": "pass",
+          "m": {
+            "ptat": 1.876580606081386,
+            "ctat": 0.4661304583136405,
+            "na": 0.4661349067498113,
+            "nb": 0.4661392212769884,
+            "isup": 9.635435022465992e-06,
+            "bias_ok": 3.299935925808977,
+            "ptat_settled": 4.6453729751760875e-11,
+            "ctat_settled": 2.144895372424571e-12
+          }
+        },
+        "ramp1u": {
+          "status": "pass",
+          "m": {
+            "ptat": 1.87658060601046,
+            "ctat": 0.4661304583121954,
+            "na": 0.466134906748275,
+            "nb": 0.4661392212781306,
+            "isup": 9.635435017740605e-06,
+            "bias_ok": 3.299935925809669,
+            "ptat_settled": 9.409406587224112e-11,
+            "ctat_settled": 3.288980199300795e-12
+          }
+        },
+        "ramp2m": {
+          "status": "pass",
+          "m": {
+            "ptat": 1.876580605953389,
+            "ctat": 0.4661304583118823,
+            "na": 0.4661349067479316,
+            "nb": 0.4661392212738957,
+            "isup": 9.635435020020032e-06,
+            "bias_ok": 3.299935925808382,
+            "ptat_settled": 8.012057683970397e-11,
+            "ctat_settled": 2.9291014058685505e-12
+          }
+        }
+      },
+      "original": {
+        "record": "sim/temp-core-startup/records/20260826-053032-ee63b45.json",
+        "values": {
+          "ptat": -1.91045,
+          "ptat_settled": 7.30771e-12,
+          "ctat": 0.4661305,
+          "ctat_settled": 1.389128e-11,
+          "na": 0.4661349,
+          "nb": 0.4661392,
+          "isup": 9.638317e-06,
+          "bias_ok": 3.299936
+        }
+      }
+    },
+    "en-high:ff_-40c_3.30v": {
+      "verdict": "NOT-REPRODUCED",
+      "why": "passes on the physical branch in all 4 variant(s) run (trtol7, reltol2e-4, ramp1u, ramp2m); the baseline `base` deck was NOT run for this scenario (fleet refusal). The original non-physical landing did not recur at this point, so the artifact explanation is NOT demonstrated at this point itself; it rests on the matrix-level checks (the failing set moves with every setting, no point fails twice, every failure is non-physical, the physical branch is unique to ~1e-9 V). No real failure was observed here",
+      "n_variants_run": 4,
+      "n_pass": 4,
+      "ptat_spread_across_passing_V": 5.513960399383677e-10,
+      "variants": {
+        "base": null,
+        "trtol7": {
+          "status": "pass",
+          "m": {
+            "ptat": 1.099192137101898,
+            "ctat": 0.7820323247476023,
+            "na": 0.7820324142906344,
+            "nb": 0.782032122888678,
+            "isup": 5.792817592450462e-06,
+            "bias_ok": 3.29999985599019,
+            "ptat_settled": 5.29948529504054e-10,
+            "ctat_settled": 9.390044297674649e-12
+          }
+        },
+        "reltol2e-4": {
+          "status": "pass",
+          "m": {
+            "ptat": 1.099192136731289,
+            "ctat": 0.7820323247475672,
+            "na": 0.7820324142905885,
+            "nb": 0.7820321228841243,
+            "isup": 5.792817602783343e-06,
+            "bias_ok": 3.299999855990344,
+            "ptat_settled": 2.268452092835105e-11,
+            "ctat_settled": 2.903122187092322e-12
+          }
+        },
+        "ramp1u": {
+          "status": "pass",
+          "m": {
+            "ptat": 1.099192136708015,
+            "ctat": 0.7820323247437664,
+            "na": 0.7820324142867815,
+            "nb": 0.7820321228821849,
+            "isup": 5.792817596202669e-06,
+            "bias_ok": 3.299999855990135,
+            "ptat_settled": 1.9426016351076214e-10,
+            "ctat_settled": 1.698308160769102e-12
+          }
+        },
+        "ramp2m": {
+          "status": "pass",
+          "m": {
+            "ptat": 1.099192136550502,
+            "ctat": 0.7820323247367651,
+            "na": 0.7820324142798379,
+            "nb": 0.7820321228721565,
+            "isup": 5.792817593813088e-06,
+            "bias_ok": 3.299999855990477,
+            "ptat_settled": 3.689599736844684e-10,
+            "ctat_settled": 9.441780690622181e-12
+          }
+        }
+      },
+      "original": {
+        "record": "sim/temp-core-startup/records/20260826-053032-ee63b45.json",
+        "values": {
+          "ptat": -1.67295,
+          "ptat_settled": 3.78325e-06,
+          "ctat": 0.7820323,
+          "ctat_settled": 1.74627e-11,
+          "na": 0.7820324,
+          "nb": 0.7820321,
+          "isup": 5.758326e-06,
+          "bias_ok": 3.3
+        }
+      }
+    },
+    "en-delayed:tt_27c_3.63v": {
+      "verdict": "NOT-REPRODUCED",
+      "why": "passes on the physical branch in all 1 variant(s) run (base); the baseline `base` deck was among them. The original non-physical landing did not recur at this point, so the artifact explanation is NOT demonstrated at this point itself; it rests on the matrix-level checks (the failing set moves with every setting, no point fails twice, every failure is non-physical, the physical branch is unique to ~1e-9 V). No real failure was observed here",
+      "n_variants_run": 1,
+      "n_pass": 1,
+      "ptat_spread_across_passing_V": 0.0,
+      "variants": {
+        "base": {
+          "status": "pass",
+          "m": {
+            "ptat": 1.414166265437618,
+            "ctat": 0.658262448641315,
+            "na": 0.6582625492538867,
+            "nb": 0.6582661082043202,
+            "isup": 7.393519061866041e-06,
+            "bias_ok": 3.629999474979619,
+            "ptat_settled": 3.363165301806248e-10,
+            "ctat_settled": 7.83217934952063e-12
+          }
+        },
+        "trtol7": null,
+        "reltol2e-4": null,
+        "ramp1u": null,
+        "ramp2m": null
+      },
+      "original": {
+        "record": "sim/temp-core-startup-en-delayed/records/20260826-054047-ee63b45.json",
+        "values": {
+          "ptat": -2.02427,
+          "ptat_settled": 3.816059e-12,
+          "ctat": 0.6582624,
+          "ctat_settled": 6.863399e-13,
+          "na": 0.6582625,
+          "nb": 0.6582661,
+          "isup": 7.403127e-06,
+          "bias_ok": 3.629999
+        }
+      }
+    },
+    "en-delayed:tt_125c_3.63v": {
+      "verdict": "NOT-REPRODUCED",
+      "why": "passes on the physical branch in all 1 variant(s) run (base); the baseline `base` deck was among them. The original non-physical landing did not recur at this point, so the artifact explanation is NOT demonstrated at this point itself; it rests on the matrix-level checks (the failing set moves with every setting, no point fails twice, every failure is non-physical, the physical branch is unique to ~1e-9 V). No real failure was observed here",
+      "n_variants_run": 1,
+      "n_pass": 1,
+      "ptat_spread_across_passing_V": 0.0,
+      "variants": {
+        "base": {
+          "status": "pass",
+          "m": {
+            "ptat": 1.876736494047875,
+            "ctat": 0.4661322657982435,
+            "na": 0.4661367142361436,
+            "nb": 0.4661447856121279,
+            "isup": 9.754052618817996e-06,
+            "bias_ok": 3.629936377142571,
+            "ptat_settled": 1.7874701718767483e-10,
+            "ctat_settled": 2.044975300208307e-12
+          }
+        },
+        "trtol7": null,
+        "reltol2e-4": null,
+        "ramp1u": null,
+        "ramp2m": null
+      },
+      "original": {
+        "record": "sim/temp-core-startup-en-delayed/records/20260826-054047-ee63b45.json",
+        "values": {
+          "ptat": 3.798212e-05,
+          "ptat_settled": 9.473304e-12,
+          "ctat": 0.01394175,
+          "ctat_settled": 1.758536e-09,
+          "na": 0.01394304,
+          "nb": 0.02846532,
+          "isup": -0.00222319,
+          "bias_ok": 3.629936
+        }
+      }
+    },
+    "en-delayed:sf_-40c_2.97v": {
+      "verdict": "NOT-REPRODUCED",
+      "why": "passes on the physical branch in all 1 variant(s) run (base); the baseline `base` deck was among them. The original non-physical landing did not recur at this point, so the artifact explanation is NOT demonstrated at this point itself; it rests on the matrix-level checks (the failing set moves with every setting, no point fails twice, every failure is non-physical, the physical branch is unique to ~1e-9 V). No real failure was observed here",
+      "n_variants_run": 1,
+      "n_pass": 1,
+      "ptat_spread_across_passing_V": 0.0,
+      "variants": {
+        "base": {
+          "status": "pass",
+          "m": {
+            "ptat": 1.098218001698226,
+            "ctat": 0.780207748804269,
+            "na": 0.7802078385272819,
+            "nb": 0.7802042161629065,
+            "isup": 5.604156122723455e-06,
+            "bias_ok": 2.969999828096079,
+            "ptat_settled": 4.083207105765041e-10,
+            "ctat_settled": 8.982259380729829e-12
+          }
+        },
+        "trtol7": null,
+        "reltol2e-4": null,
+        "ramp1u": null,
+        "ramp2m": null
+      },
+      "original": {
+        "record": "sim/temp-core-startup-en-delayed/records/20260826-054047-ee63b45.json",
+        "values": {
+          "ptat": 2.958725,
+          "ptat_settled": 9.493295e-12,
+          "ctat": 0.8782884,
+          "ctat_settled": 4.478462e-11,
+          "na": 0.8782885,
+          "nb": 2.754031,
+          "isup": -0.00299883,
+          "bias_ok": 2.97
+        }
+      }
+    }
+  },
+  "all_failures": [
+    {
+      "combo": "en-high__trtol7",
+      "corner": "tt_-40c_3.63v",
+      "status": "fail",
+      "nonphysical": true,
+      "passes_in": [
+        "reltol2e-4",
+        "ramp1u",
+        "ramp2m"
+      ]
+    },
+    {
+      "combo": "en-high__reltol2e-4",
+      "corner": "ss_27c_2.97v",
+      "status": "fail",
+      "nonphysical": true,
+      "passes_in": [
+        "trtol7",
+        "ramp1u",
+        "ramp2m"
+      ]
+    },
+    {
+      "combo": "en-high__reltol2e-4",
+      "corner": "ff_-40c_3.63v",
+      "status": "fail",
+      "nonphysical": true,
+      "passes_in": [
+        "trtol7",
+        "ramp1u",
+        "ramp2m"
+      ]
+    },
+    {
+      "combo": "en-high__reltol2e-4",
+      "corner": "sf_-40c_3.30v",
+      "status": "fail",
+      "nonphysical": true,
+      "passes_in": [
+        "trtol7",
+        "ramp1u",
+        "ramp2m"
+      ]
+    },
+    {
+      "combo": "en-high__reltol2e-4",
+      "corner": "fs_-40c_2.97v",
+      "status": "fail",
+      "nonphysical": true,
+      "passes_in": [
+        "trtol7",
+        "ramp1u",
+        "ramp2m"
+      ]
+    },
+    {
+      "combo": "en-high__reltol2e-4",
+      "corner": "fs_-40c_3.63v",
+      "status": "fail",
+      "nonphysical": true,
+      "passes_in": [
+        "trtol7",
+        "ramp1u",
+        "ramp2m"
+      ]
+    },
+    {
+      "combo": "en-high__ramp1u",
+      "corner": "fs_27c_2.97v",
+      "status": "fail",
+      "nonphysical": true,
+      "passes_in": [
+        "trtol7",
+        "reltol2e-4",
+        "ramp2m"
+      ]
+    },
+    {
+      "combo": "en-high__ramp2m",
+      "corner": "sf_27c_3.30v",
+      "status": "fail",
+      "nonphysical": true,
+      "passes_in": [
+        "trtol7",
+        "reltol2e-4",
+        "ramp1u"
+      ]
+    },
+    {
+      "combo": "en-delayed__base",
+      "corner": "tt_-40c_3.63v",
+      "status": "fail",
+      "nonphysical": true,
+      "passes_in": []
+    },
+    {
+      "combo": "en-delayed__base",
+      "corner": "ss_-40c_3.30v",
+      "status": "fail",
+      "nonphysical": true,
+      "passes_in": []
+    },
+    {
+      "combo": "en-delayed__base",
+      "corner": "ss_-40c_3.63v",
+      "status": "fail",
+      "nonphysical": true,
+      "passes_in": []
+    },
+    {
+      "combo": "en-delayed__base",
+      "corner": "ff_-40c_3.63v",
+      "status": "fail",
+      "nonphysical": true,
+      "passes_in": []
+    },
+    {
+      "combo": "en-delayed__base",
+      "corner": "fs_125c_3.63v",
+      "status": "fail",
+      "nonphysical": true,
+      "passes_in": []
+    }
+  ],
+  "all_failures_nonphysical_signature": true,
+  "supersedes": "(none)",
+  "author": "Loom Builder (Claude Sonnet 5.5)"
+}
