@@ -254,16 +254,22 @@ def analyze(w, vf: float, st: dict, t_obs: float) -> dict:
         col = w.get(name)
         if col is None:
             continue
-        bad = [x for tt, x in zip(t, col) if tt > 0 and not (PHYS_LO <= x <= hi)]
-        if bad:
-            viol[name] = {"count": len(bad), "min": min(bad), "max": max(bad)}
+        badi = [i for i in range(n) if t[i] > 0 and not (PHYS_LO <= col[i] <= hi)]
+        if badi:
+            bad = [col[i] for i in badi]
+            viol[name] = {"count": len(bad), "min": min(bad), "max": max(bad), "t_first_s": t[badi[0]]}
     last = [i for i in range(n) if t[i] >= t[-1] - SETTLE_WINDOW]
     isup_end = _mean([-w["i(bvdd)"][i] for i in last])
     base_i = [i for i in range(n) if t0 - BASE_WIN <= t[i] <= t0]
     ibase = _mean([idel[i] for i in base_i]) if base_i else float("nan")
     sign_ok = (not base_i) or (math.isfinite(ibase) and ibase > 0.0)  # no baseline samples = unknowable here, reported by the baseline check
     physical = (not viol) and math.isfinite(isup_end) and isup_end > 0.0 and sign_ok
-    phys = {"ok": physical, "isup_end_a": isup_end, "violations_after_t0": viol, "delivered_bias_sign_ok": sign_ok}
+    onset = min([v["t_first_s"] for v in viol.values()], default=None)
+    isup_base = _mean([-w["i(bvdd)"][i] for i in base_i]) if base_i else None
+    phys = {"ok": physical, "isup_end_a": isup_end, "isup_baseline_a": isup_base, "violations_after_t0": viol, "delivered_bias_sign_ok": sign_ok,
+            "node_violation_onset_s": onset, "node_violation_phase": (None if onset is None else ("pre-dip" if onset < t0 else "post-dip")),
+            "supply_current_reversed_at_end": bool(math.isfinite(isup_end) and isup_end <= 0.0),
+            "supply_current_reversed_at_baseline": (None if isup_base is None else bool(isup_base <= 0.0))}
 
     # --- baseline viability (before t0) ---
     rel_b, fall_b = schmitt(t, rst, v_il, v_ih, False, 0.0)

@@ -415,10 +415,21 @@ def summarize(points: list[dict]) -> dict:
         s[p["outcome"]] += 1
     total = {o: sum(s[o] for s in by_req.values()) for o in OUTCOMES}
     codes: dict = {}
+    nonphys = {"pre-dip node violation": 0, "post-dip node violation": 0, "supply current reversed at end": 0, "supply current reversed at baseline": 0, "NONPHYSICAL total": 0}
+    for p in points:
+        ph = (p.get("check") or {}).get("physical")
+        if p["outcome"] == "NONPHYSICAL" and ph:
+            nonphys["NONPHYSICAL total"] += 1
+            if ph.get("node_violation_phase") == "pre-dip":
+                nonphys["pre-dip node violation"] += 1
+            elif ph.get("node_violation_phase") == "post-dip":
+                nonphys["post-dip node violation"] += 1
+            nonphys["supply current reversed at end"] += bool(ph.get("supply_current_reversed_at_end"))
+            nonphys["supply current reversed at baseline"] += bool(ph.get("supply_current_reversed_at_baseline"))
     for p in points:
         for c in (p.get("check") or {}).get("fail_codes", []):
             codes[c] = codes.get(c, 0) + 1
-    return {"by_request": by_req, "total": total, "fail_codes": codes}
+    return {"by_request": by_req, "total": total, "fail_codes": codes, "nonphysical_breakdown": nonphys}
 
 
 def fmt(x, spec=".4g"):
@@ -451,6 +462,7 @@ def render_md(rec: dict) -> str:
     L.append("|" + "---|" * len(OUTCOMES))
     L.append("| " + " | ".join(str(s["total"][o]) for o in OUTCOMES) + " |")
     L.append(f"\nFailure codes (graded points): {s['fail_codes'] or 'none'}")
+    L.append(f"\nNONPHYSICAL breakdown (a point may count in several rows): {s['nonphysical_breakdown']}")
     L.append("")
     L.append("## Per-request fleet submissions and outcome counts")
     L.append("| request | kind | floor V | hold | fall V/s | recov V/s | tstop ms | tmax us | fleet outcome | job id | " + " | ".join(OUTCOMES) + " |")
@@ -477,8 +489,12 @@ def render_md(rec: dict) -> str:
                 continue
             rs, db, ibn, rz = c["resetn"], c["delivered_bias"], c["ibias_node"], c["resolution"]
             note = ",".join(c["fail_codes"]) or "; ".join(c["unresolved_reasons"])[:90] or ("NONPHYSICAL: " + ",".join(c["physical"]["violations_after_t0"]) if p["outcome"] == "NONPHYSICAL" else "")
-            if p["outcome"] == "NONPHYSICAL" and not note.startswith("NONPHYS"):
-                note = "NONPHYSICAL " + note
+            if p["outcome"] == "NONPHYSICAL":
+                ph = c["physical"]
+                note = (f"NONPHYSICAL {ph['node_violation_phase'] or 'no node violation'}"
+                        + (f" [{','.join(sorted(ph['violations_after_t0']))}]" if ph["violations_after_t0"] else "")
+                        + (" supply-current-reversed(end)" if ph["supply_current_reversed_at_end"] else "")
+                        + (" delivered-bias-sign" if not ph["delivered_bias_sign_ok"] else ""))[:140]
             u = lambda x: "n/a" if x is None else f"{x * 1e6:.3g}"  # noqa: E731
             ms = lambda x: "n/a" if x is None else f"{x * 1e3:.5g}"  # noqa: E731
             L.append(f"| {p['id']} | {p['outcome']} | {rs['n_assert']} | {'y' if c['detectability']['required_to_assert'] else 'n'} | {fmt(rs['vdd_at_assert_v'], '.3f')}{'*' if rs['assertion_rail_limited'] else ''} | {ms(rs['t_assert_s'])} | {ms(rs['t_release_s'])} | "
