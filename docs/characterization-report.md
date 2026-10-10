@@ -169,7 +169,7 @@ ngspice-46 / XSCHEM V3.4.7 on Linux, except where noted. E8-E10 are fleet batch 
 ### E5c - `temp-core-startup-solver`, record `20261010-100955-292949a` (issue #86, superseded by E5d)
 
 - Record: [md](../sim/temp-core-startup-solver/records/20261010-100955-292949a.md), [json](../sim/temp-core-startup-solver/records/20261010-100955-292949a.json); driver [run_solver_sweep.py](../sim/temp-core-startup-solver/run_solver_sweep.py); netlists [snapshots](../sim/temp-core-startup-solver/netlist-snapshots/20261010-100955-292949a/)
-- **Superseded** by [E5d](#e5d) (`20261010-192722-47b96e5`), which re-runs the sweep on this host with the EN-high `base` control included; this record is untouched append-only evidence and remains the only run with an EN-delayed variant beyond `base` (the 2 ms ramp)
+- **Superseded** by [E5d](#e5d) (`20261010-200708-47b96e5`), which re-runs the sweep on this host with the EN-high `base` control included; this record is untouched append-only evidence and remains the only run with an EN-delayed variant beyond `base` (the 2 ms ramp)
 - Revision: `292949a` on `feature/issue-86` (resolves); **clean tree** at run time; the EN-delayed 2 ms ramp combo came from a `--resume` resubmission at `3bbcac3` (clean tree, same generated netlist); `klt sim --backend batch` (fleet ngspice-46, same PDK pin); job ids in the record
 - Level: leaf cells (`temp_core` + `bias_core`), transient from 0 V, full 45-point PVT grid per (EN scenario, variant); the E5a/E5b measurement windows copied unchanged
 - Conditions: EN-high x {trtol7, reltol 2e-4, 1 us ramp, 2 ms ramp} and EN-delayed x {base, 2 ms ramp} ran (6 of 10 combos); EN-high x base and EN-delayed x {trtol7, reltol 2e-4, 1 us ramp} were refused by the fleet (`batch_no_capacity`, four submit rounds) and are NOT-RUN, not substituted locally
@@ -177,9 +177,9 @@ ngspice-46 / XSCHEM V3.4.7 on Linux, except where noted. E8-E10 are fleet batch 
 - Limitations: `base` is a re-expression of the E5 deck for `klt sim` (behavioural supply source), not a bit-identical reproduction; ngspice version of the original records vs. fleet unverified beyond both being "46"
 
 <a id="e5d"></a>
-### E5d - `temp-core-startup-solver`, record `20261010-192722-47b96e5` (issue #86)
+### E5d - `temp-core-startup-solver`, record `20261010-200708-47b96e5` (issue #86)
 
-- Record: [md](../sim/temp-core-startup-solver/records/20261010-192722-47b96e5.md), [json](../sim/temp-core-startup-solver/records/20261010-192722-47b96e5.json); driver [run_solver_sweep.py](../sim/temp-core-startup-solver/run_solver_sweep.py); netlists [snapshots](../sim/temp-core-startup-solver/netlist-snapshots/20261010-192722-47b96e5/); per-point logs `corners/20261010-192722-47b96e5/`
+- Record: [md](../sim/temp-core-startup-solver/records/20261010-200708-47b96e5.md), [json](../sim/temp-core-startup-solver/records/20261010-200708-47b96e5.json); driver [run_solver_sweep.py](../sim/temp-core-startup-solver/run_solver_sweep.py); netlists [snapshots](../sim/temp-core-startup-solver/netlist-snapshots/20261010-200708-47b96e5/); per-point logs `corners/20261010-200708-47b96e5/`
 - Supersedes [E5c](#e5c) (its 6-of-10 coverage is re-achieved on this host with the previously-refused EN-high `base` control included; E5c remains the evidence for its own EN-delayed 2 ms ramp combo)
 - Revision: `47b96e5` on `feature/issue-86` (resolves; committed design netlists unchanged since `ee63b45` — `git diff ee63b45 HEAD -- design/netlist/` is empty, so the DUT is the current netlist); **clean tree** at the recorded (latest) invocation; the run's earlier submit invocations are individually listed in the record and were taken with the driver's own `--supersedes` edit uncommitted (the only dirty file; no design file was dirty at any point); `klt sim --backend batch`, client klt 0.7.0, fleet ngspice-46 on Spot, same PDK pin; job ids in the record
 - Level: leaf cells (`temp_core` + `bias_core`), transient from 0 V, full 45-point PVT grid per (EN scenario, variant); the E5a/E5b measurement windows copied unchanged (no relaxation)

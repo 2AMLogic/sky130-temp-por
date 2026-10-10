@@ -183,7 +183,7 @@ re-landed on the current netlist under any solver/ramp variant tested —
 including the `base` deck control, which removes the deck-difference
 alternative — every failure the sweep did produce is non-physical, and no
 real failure was found anywhere in the matrix (record
-[`20261010-192722-47b96e5`](../sim/temp-core-startup-solver/records/20261010-192722-47b96e5.md),
+[`20261010-200708-47b96e5`](../sim/temp-core-startup-solver/records/20261010-200708-47b96e5.md),
 superseding `20261010-100955-292949a`).
 
 ## Scope and what this is not

@@ -577,8 +577,8 @@ def cmd_record(args):
     L += ["## Links", "", f"- driver: `sim/{SLUG}/run_solver_sweep.py`; json twin `records/{rid}.json`; netlists `netlist-snapshots/{rid}/`; per-point logs `corners/{rid}/<scenario>__<variant>/<corner>.log`",
           "- windows are copied unchanged from the two `experiment.json` files (no relaxation)", "",
           f"- **Timestamp**: {rec['timestamp']}", f"- **Author**: {rec['author']}",
-          f"- **Supersedes**: {rec['supersedes'] if rec['supersedes'] != '(none)' else '(none)'}"
-          + (f" -- completes its 10-of-10 combo coverage; that record is untouched and remains the evidence for its own run" if args.supersedes else " -- adds evidence next to `ee63b45`; those records are untouched")]
+          f"- **Supersedes**: {rec['supersedes']}"
+          + (f" -- re-runs that record's coverage on this host at {10 - len(not_run)} of 10 combos ({'including' if not 'en-high__base' in not_run else 'without'} the EN-high `base` control); the superseded record is untouched and remains the evidence for its own run" if args.supersedes else " -- adds evidence next to `ee63b45`; those records are untouched")]
     (rec_dir / "records" / f"{rid}.md").write_text("\n".join(L) + "\n")
     print(rid)
     return 0
