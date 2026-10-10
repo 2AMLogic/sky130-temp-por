@@ -85,28 +85,47 @@ zero matching islands **and** on more than one, so zero findings of that
 rule is exactly the "one island per supply" verdict. A short between the
 two would report as `erc.supply_short`.
 
-## No `ties[]`, and why
+## `ties[]` and `ties_disclosure` (added in #90)
 
-`erc.missing_tie` is therefore **not computed** (klayout-tools
-`docs/cli/erc.md`: "Omitted entirely -> erc.missing_tie is never
-computed"). Its zero count in `erc.json` is an absence of evidence, not
-evidence of absence.
+Declared: one nwell -> `VDD` tie.
 
-- sky130's p-type substrate is a native substrate with no drawn well
-  layer, so a substrate (VSS) tie cannot be declared in `klt erc` today
-  (klayout-tools#2186's documented remaining limitation).
-- A blanket `nwell → VDD` tie probe was run at #66 and re-run after #69:
-  18 findings pre-#69, then exactly 2 post-#69. The 2 remaining findings
-  are on the two PNP device-group blocks' tubs (`bias_core_pnp8_leg`,
-  `bias_core_xq1_xqr`), whose wells tie to their own nodes by design.
-  Declaring `ties[]` would commit those findings rather than evidence.
-  **This probe was not re-run for #81.**
-- The historical reason for omitting ties (klayout-tools#2169's false
-  `supply_short`) is fixed upstream by #2186 and no longer applies by
-  itself.
+    "ties": [{ "name": "nwell_vdd", "well_layer": "64/20",
+               "well_excludes": ["82/44"], "tap_layer": "65/44",
+               "tap_is_dedicated": true, "connect_to": "li1", "net": "VDD" }]
 
-The well-tie/supply evidence that does exist is named in
-`manifests/README.md`'s item-11 row.
+- `well_layer` 64/20 is sky130 `nwell.drawing`; `tap_layer` 65/44 is
+  sky130's own dedicated `tap` marker, hence `tap_is_dedicated` (no
+  `tap_requires`: this stream draws no `nsdm` 93/44, and a probe with
+  `tap_requires: ["93/44"]` gave 19 findings for that reason alone).
+- `well_excludes: ["82/44"]` (klayout-tools#2339, well-side class
+  selector) drops the wells that interact with the PNP marker. The
+  marker distinguishes them, so `well_excludes_boxes` (literal geometry,
+  #2540) is not used.
+- Measured at `klt 0.6.0+g0ce8c64842d9` against the committed GDS
+  (sha256 `9c414f91...7ab68e`). Blanket probe, no exclusion: 2
+  `erc.missing_tie` findings, "tap is not connected to declared net
+  'VDD'", on exactly the merged nwell shapes that interact with 82/44:
+  `bias_core_xq1_xqr` (149.85, 99.85)-(158.99, 103.55) um and
+  `bias_core_pnp8_leg` (199.85, 99.85)-(218.23, 107.35) um (18 merged
+  nwell shapes in total, 2 with the marker). Their wells tie to their own
+  nodes (PNP bases) by design. With the exclusion: 0 findings; the
+  selection keeps 16 of 18 shapes, so it is neither degenerate nor
+  hides ordinary wells. Removing `well_excludes` reproduces the 2
+  findings.
+- The excluded PNP tubs are not tie-graded by this run.
+
+Disclosed, not declared: `ties_disclosure.kind: "unexpressible"`,
+`undeclared_classes: ["p_substrate"]` (klayout-tools#2541). sky130's
+p-type substrate is native with no drawn well layer, so a VSS substrate
+tie cannot be declared (klayout-tools#2186's documented limitation). The
+report records `erc.missing_tie:["p_substrate"]` under
+`erc_coverage.inapplicable` (`ties_disclosed_unexpressible`). That is the
+caller's word, not a check: the substrate tie was **not** verified.
+
+`erc_status` stays `clean` (VDD/VSS still one island each; no
+`erc.unconnected_net` or `erc.supply_short`). `klt signoff` now grades
+item 11 `met`, with the p_substrate class carried in the citation's
+`power_delivery.disclosed_undeclared_tie_classes`.
 
 ## Provenance
 

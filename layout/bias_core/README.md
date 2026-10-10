@@ -62,8 +62,10 @@ Reproduce from the repo root:
 `erc.unconnected_net`, zero `erc.supply_short`) over 18 gate nets. The run
 omits `--pdk` on purpose, so the top-level `status` is `not_checked` and
 the command **exits 4**. The structural verdict is `erc_status`, not the
-exit code. No `ties[]` are declared, so `erc.missing_tie` is **not
-computed**. The spec rationale, including why it has no ties and what its
+exit code. One nwell -> `VDD` tie is declared (PNP-marker tubs excluded) and
+checked with 0 findings; the native p-substrate tie class is disclosed as
+undeclarable, not checked (#90). The spec rationale, including the tie
+measurement and what its
 `devices[]` cuts do, is in
 [`erc-supply-spec.md`](erc-supply-spec.md). The spec cannot carry it
 inline because klt at this pin rejects unknown keys such as `_comment`.
