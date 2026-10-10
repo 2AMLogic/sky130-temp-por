@@ -192,6 +192,14 @@ the divider-ratio cancellation holds. With real `bias_core`, hh widens the
 hysteresis by about 2-4 mV compared with tt. Neither changes the binding
 corners or the margin of the main grid.
 
+### Post-layout variants (issue #124)
+
+`ideal-bias-postlayout` and `real-bias-core-postlayout` re-run the same 5x3 grid at both rates with the `por_comparator` DUT
+replaced by the klt-extracted lumped-RC netlist (`layout/por_comparator/pex/`). New record ids; the schematic records above are
+untouched. Delta table, extraction model, and the `klt pex` blocker (pin order, MOS flavour) are in
+[`layout/por_comparator/pex/README.md`](../../layout/por_comparator/pex/README.md). Run with `run --variant <name>-postlayout`
+(post-layout variants are never part of the default `run`).
+
 ### Fleet friction (reported, not worked around locally)
 
 25 batch launches were refused before a request ran: 22 by the shared

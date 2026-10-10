@@ -289,8 +289,8 @@ verdict to `mismatch` with `device.property` errors on `l_um` and `w_um`, so
    ties all three resistors' substrate terminal to `VSS`.
 4. **Long single-plane lanes** (above) and the 8 mm footprint: uncompacted,
    unextracted, unsimulated.
-5. **Not run:** `klt erc`, a parasitic extraction, a simulation of the laid-out
-   cell. `sim/` is untouched.
+5. **Not run:** `klt erc`. Parasitic extraction and a post-layout threshold
+   campaign were added later (issue #124): see [`pex/README.md`](pex/README.md).
 6. **Not a signoff citation.** `manifests/` is unchanged apart from the
    item-2 explanation in `manifests/README.md`; no citation points at this
    directory.

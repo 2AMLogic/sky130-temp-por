@@ -47,6 +47,22 @@
       "bias_treatment": "REAL bias_core (design/netlist/bias_core.spice) on the same VDD supplies IBIAS, VREF and BIAS_OK, so the actual VREF(P,T,VDD) and delivered IBIAS move the edges. Never mixed with the ideal-bias table; shows how far the real reference dependence displaces the thresholds.",
       "schematic": "testbench/tb_por_comparator_thresholds_realbias.sch",
       "dut_netlists": ["por_comparator.spice", "bias_core.spice"]
+    },
+    "ideal-bias-postlayout": {
+      "description": "POST-LAYOUT (issue #124, T1 item 7) counterpart of ideal-bias: identical testbench, stimulus, corner grid and rates; only the por_comparator DUT is replaced by the klt-extracted (lumped RC) netlist of layout/por_comparator/por_comparator.gds.",
+      "bias_treatment": "IDEAL, identical to ideal-bias (1 uA IBIAS, min(1.25 V, v(VDD)) VREF, BIAS_OK = v(VDD)).",
+      "schematic": "testbench/tb_por_comparator_thresholds.sch",
+      "provenance": "post-layout extraction (klt extract --parasitics --deck sky130, lumped RC), derived by layout/por_comparator/pex/make_sim_netlist.py (pin-order wrapper + 01v8->g5v0d10v5 MOS model rewrite; see that script and layout/por_comparator/pex/README.md)",
+      "dut_netlists": ["layout/por_comparator/pex/por_comparator.pex.sim.spice"],
+      "baseline_variant": "ideal-bias"
+    },
+    "real-bias-core-postlayout": {
+      "description": "POST-LAYOUT counterpart of real-bias-core: the por_comparator DUT is the klt-extracted netlist; bias_core stays the schematic export (bias_core layout is a separate cell and is not extracted here).",
+      "bias_treatment": "REAL bias_core schematic export drives IBIAS, VREF and BIAS_OK, identical to real-bias-core.",
+      "schematic": "testbench/tb_por_comparator_thresholds_realbias.sch",
+      "provenance": "post-layout extraction of por_comparator only (see ideal-bias-postlayout); bias_core is schematic-level",
+      "dut_netlists": ["layout/por_comparator/pex/por_comparator.pex.sim.spice", "design/netlist/bias_core.spice"],
+      "baseline_variant": "real-bias-core"
     }
   },
   "grading": {
