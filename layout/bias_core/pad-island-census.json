@@ -13,8 +13,12 @@
       "role": "cell-descriptor"
     },
     "erc_spec": {
-      "content_hash": "sha256:2617d869558c5234b1b2f80a1b2461122d27c9033b19b415109dcfed81c4dd73",
+      "content_hash": "sha256:3a7e42def72757dbff28db10a85359ada42d4127c5e4f2cb574b9b92ffb0f132",
       "role": "stackup"
+    },
+    "policy": {
+      "content_hash": "sha256:021c16bb68028d569c6f41dec45920f96a1e87f6b0f56c74c27a027f3769a4d0",
+      "role": "census-policy"
     },
     "klayout_version": "0.30.12"
   },
@@ -757,7 +761,7 @@
       "island_names": [
         "VDD,vdd"
       ],
-      "declared_frame_matches_source": true,
+      "declared_frame_matches_source": null,
       "same_island": true
     },
     {
@@ -781,7 +785,7 @@
       "island_names": [
         "VSS,vss"
       ],
-      "declared_frame_matches_source": true,
+      "declared_frame_matches_source": null,
       "same_island": true
     },
     {
@@ -841,7 +845,7 @@
       "island_names": [
         "nb"
       ],
-      "declared_frame_matches_source": true,
+      "declared_frame_matches_source": null,
       "same_island": true
     },
     {
@@ -909,6 +913,17 @@
     "probe_count": 39,
     "net_count": 15,
     "nets_one_island": 15,
-    "status": "ok"
+    "status": "ok",
+    "split_island_nets": [],
+    "cross_net_merges": [],
+    "frame_mismatch_nets": [],
+    "frame_unverified_nets": [
+      "VDD",
+      "VSS",
+      "nb"
+    ],
+    "unpromoted_sibling_ports_opted_in": [
+      "passives.nb"
+    ]
   }
 }

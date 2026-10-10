@@ -85,8 +85,21 @@ on a port that its `connectivity[]` already wires. That block's
 recorded as `assembly_declaration_unpromoted_sibling_port`, and the #69
 frame check cannot run for it. The landing is still independently
 confirmed by the LVS match on `NB`. The census proves same-net
-connectivity. Cross-net shorts are excluded by extract/LVS (27 separate
-nets matched one-to-one), not by the census.
+connectivity and, since #92, that no two declared nets share an
+extracted cluster (a cross-net merge exits 1; checked on cluster ids,
+case-folding label aliases such as `VDD`/`vdd`). Running with a spec that
+drops `devices[]` demonstrably fails this check (`n2`/`pg`, `VREF`/`er`,
+`VDD`/`nokx` and `ec`/`nb`/`nbtop` merge). Extract/LVS (27 separate nets
+matched one-to-one) remains the independent check on cross-net shorts.
+
+The `passives.nb` fallback is an explicit, census-owned opt-in in
+`pad-island-census-spec.json` (keyed by block and port; `cell.json` cannot
+carry it because klt rejects unknown keys). Any other sibling port missing
+from its `compose.response.json` fails the census. Group
+`declared_frame_matches_source` is `true` only when every pad's frame was
+verified, `false` if any mismatches, and `null` when unverified: in the
+committed evidence `nb` and the declare-only `VDD`/`VSS` stub groups are
+`null` (listed in `summary.frame_unverified_nets`).
 
 ## Placement
 

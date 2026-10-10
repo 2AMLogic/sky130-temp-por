@@ -192,7 +192,60 @@ def _texts(kdb, layout, cell, layer):
     return kdb.Texts(cell.begin_shapes_rec(index))
 
 
-def _probe_points(spec: dict, spec_dir: Path) -> list[dict]:
+def _load_policy(path: Path | None) -> set[tuple[str, str]]:
+    """Census-owned allowlist of (block, port) sibling-internal ports.
+
+    Lives outside cell.json because the pinned klt rejects unknown keys
+    there. Absent file == empty allowlist (fail closed).
+    """
+    if path is None or not path.exists():
+        return set()
+    try:
+        data = json.loads(path.read_text())
+        return {
+            (e["block"], e["port"]) for e in data.get("unpromoted_sibling_ports", [])
+        }
+    except (ValueError, KeyError, TypeError, AttributeError):
+        _fail(f"unparseable census policy: {path}")
+        raise SystemExit(1)
+
+
+def _frame_status(members: list[dict]) -> bool | None:
+    """Three-state group frame check: True only if every member is verified
+    true; False if any member is false; None if none false but at least one
+    is unverified (declared_matches_source is None)."""
+    values = [m.get("declared_matches_source") for m in members]
+    if any(v is False for v in values):
+        return False
+    if values and all(v is True for v in values):
+        return True
+    return None
+
+
+def _cross_net_merges(groups: list[dict]) -> list[dict]:
+    """Clusters claimed by more than one distinct (case-folded) declared net.
+    Keyed on cluster ids, never on the display-only island names."""
+    owners: dict[int, dict[str, set[str]]] = {}
+    for group in groups:
+        for cid in group["island_cluster_ids"]:
+            owners.setdefault(cid, {}).setdefault(group["net"].casefold(), set()).add(
+                group["net"]
+            )
+    return [
+        {
+            "island_cluster_id": cid,
+            "nets": sorted(n for names in by_net.values() for n in names),
+        }
+        for cid, by_net in sorted(owners.items())
+        if len(by_net) > 1
+    ]
+
+
+def _probe_points(
+    spec: dict,
+    spec_dir: Path,
+    unpromoted_allowed: set[tuple[str, str]] | frozenset = frozenset(),
+) -> list[dict]:
     """Every (net, block, port) pin a connectivity net declares, resolved
     to its in-assembly probe position.
 
@@ -207,7 +260,9 @@ def _probe_points(spec: dict, spec_dir: Path) -> list[dict]:
     response (the declare-only promo-stub external pins) fall back to the
     assembly's own declaration and are recorded as such. So does a port a
     sibling wires internally but cannot promote (gen-compose refuses
-    ``pins[]`` on a port its own ``connectivity[]`` already labels): its
+    ``pins[]`` on a port its own ``connectivity[]`` already labels) is
+    accepted ONLY if (block, port) is in ``unpromoted_allowed`` (the
+    census-owned policy file); otherwise it fails. Its
     probe is recorded as ``assembly_declaration_unpromoted_sibling_port``
     with ``declared_matches_source: null`` -- island membership is still
     probed, but no frame check is possible for it.
@@ -275,6 +330,14 @@ def _probe_points(spec: dict, spec_dir: Path) -> list[dict]:
                         f"reports no port {port_name!r} the assembly pins"
                     )
                     raise SystemExit(1)
+                if (block_id, port_name) not in unpromoted_allowed:
+                    _fail(
+                        f"block {block_id!r}'s sibling compose.response.json "
+                        f"has no port {port_name!r} and the census policy does "
+                        f"not opt it in as sibling-internal (renamed/dropped "
+                        f"port?)"
+                    )
+                    raise SystemExit(1)
                 # A sibling-internal net the sibling cannot promote (klt
                 # gen-compose refuses pins[] on a port its own connectivity[]
                 # already wires, e.g. bias_core_passives' `nb` strap): the
@@ -331,6 +394,7 @@ def run_census(
     erc_spec_path: Path,
     erc_spec: dict,
     window_um: float,
+    policy_path: Path | None = None,
 ) -> tuple[dict, bool]:
     layout = kdb.Layout()
     layout.read(str(gds_path))
@@ -397,7 +461,8 @@ def run_census(
         for _, register_index in conductor_layers:
             net_regions[(net, register_index)] = l2n.polygons_of_net(net, register_index)
 
-    probes = _probe_points(json.loads(spec_path.read_text()), spec_path.parent)
+    allowed = _load_policy(policy_path)
+    probes = _probe_points(json.loads(spec_path.read_text()), spec_path.parent, allowed)
     probe_reports: list[dict] = []
     half_dbu = window_um / 2.0
     for probe in probes:
@@ -442,7 +507,7 @@ def run_census(
         members = [p for p in probe_reports if p["net"] == net]
         cluster_ids = sorted({p["island_cluster_id"] for p in members if p["island_cluster_id"] is not None})
         names = sorted({p["island_name"] for p in members if p["island_name"] is not None})
-        frame_ok = all(p.get("declared_matches_source") is not False for p in members)
+        frame = _frame_status(members)
         one_island = (
             len(members) > 0
             and all(p["island_cluster_id"] is not None for p in members)
@@ -454,10 +519,26 @@ def run_census(
                 "probe_count": len(members),
                 "island_cluster_ids": cluster_ids,
                 "island_names": names,
-                "declared_frame_matches_source": frame_ok,
-                "same_island": one_island and frame_ok,
+                "declared_frame_matches_source": frame,
+                "same_island": one_island and frame is not False,
             }
         )
+
+    merges = _cross_net_merges(groups)
+    split = [g["net"] for g in groups if not (
+        len(g["island_cluster_ids"]) == 1 and g["probe_count"] > 0
+        and all(p["island_cluster_id"] is not None for p in probe_reports if p["net"] == g["net"])
+    )]
+    frame_mismatch = [g["net"] for g in groups if g["declared_frame_matches_source"] is False]
+    frame_unverified = [g["net"] for g in groups if g["declared_frame_matches_source"] is None]
+    failing = []
+    if split:
+        failing.append("split_islands")
+    if merges:
+        failing.append("cross_net_merge")
+    if frame_mismatch:
+        failing.append("frame_mismatch")
+    ok = not failing
 
     klayout_version = getattr(kdb, "__version__", None)
     report = {
@@ -472,6 +553,11 @@ def run_census(
             "input": {"content_hash": _sha256(gds_path), "role": "layout"},
             "spec": {"content_hash": _sha256(spec_path), "role": "cell-descriptor"},
             "erc_spec": {"content_hash": _sha256(erc_spec_path), "role": "stackup"},
+            "policy": (
+                {"content_hash": _sha256(policy_path), "role": "census-policy"}
+                if policy_path is not None and policy_path.exists()
+                else None
+            ),
             "klayout_version": klayout_version,
         },
         "probe_window_um": window_um,
@@ -481,10 +567,17 @@ def run_census(
             "probe_count": len(probe_reports),
             "net_count": len(groups),
             "nets_one_island": sum(1 for g in groups if g["same_island"]),
-            "status": "ok" if all(g["same_island"] for g in groups) else "split_islands",
+            "status": "ok" if ok else "+".join(failing),
+            "split_island_nets": split,
+            "cross_net_merges": merges,
+            "frame_mismatch_nets": frame_mismatch,
+            "frame_unverified_nets": frame_unverified,
+            "unpromoted_sibling_ports_opted_in": sorted(
+                f"{b}.{p}" for b, p in allowed
+            ),
         },
     }
-    return report, all(g["same_island"] for g in groups)
+    return report, ok
 
 
 def main(argv=None) -> int:
@@ -497,6 +590,16 @@ def main(argv=None) -> int:
         help=(
             "the klt erc supply spec to borrow the stackup/vias graph from "
             "(default: the sibling erc-supply-spec.json)"
+        ),
+    )
+    parser.add_argument(
+        "--policy",
+        type=Path,
+        default=None,
+        help=(
+            "census-owned policy allowlisting sibling-internal ports "
+            "(default: the sibling pad-island-census-spec.json; absent = "
+            "no port is allowed to fall back)"
         ),
     )
     parser.add_argument(
@@ -540,6 +643,7 @@ def main(argv=None) -> int:
         erc_spec_path=Path(erc_spec_path).resolve(),
         erc_spec=json.loads(Path(erc_spec_path).resolve().read_text()),
         window_um=args.window_um,
+        policy_path=(args.policy or (cell_dir / "pad-island-census-spec.json")).resolve(),
     )
     out_path.write_text(json.dumps(report, indent=2) + "\n")
 
@@ -550,9 +654,12 @@ def main(argv=None) -> int:
         print(f"{state} {group['net']}: {group['probe_count']} pads -> islands {ids} {names}")
     print(f"census evidence written to {out_path}")
     if not ok:
-        print("status: split_islands (see report)", file=sys.stderr)
+        print(f"status: {report['summary']['status']} (see report)", file=sys.stderr)
         return 1
-    print("status: ok (every probed net is one electrical island)")
+    print(
+        "status: ok (every probed net is one electrical island, no two "
+        "declared nets share one)"
+    )
     return 0
 
 
