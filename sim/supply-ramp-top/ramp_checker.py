@@ -50,6 +50,9 @@ import math
 import sys
 from pathlib import Path
 
+sys.path.insert(0, str(Path(__file__).resolve().parents[1] / "bin"))
+from sim_common import load_wave  # noqa: E402,F401  (shared hardened loader)
+
 # --- exploratory grading constants (NOT ratified bounds) -------------------
 FRAC_IL = 0.2
 FRAC_IH = 0.8
@@ -85,19 +88,6 @@ PHYS_NODES = (
 # --------------------------------------------------------------------------
 # loading
 # --------------------------------------------------------------------------
-
-
-def load_wave(path: Path) -> dict[str, list[float]]:
-    """Load a klt waveform JSON (optionally gzip) into {name: samples}."""
-    opener = gzip.open if str(path).endswith(".gz") else open
-    with opener(path, "rt") as fh:
-        doc = json.load(fh)
-    names = [v["name"] for v in doc["variables"]]
-    cols: dict[str, list[float]] = {n: [] for n in names}
-    for row in doc["points"]:
-        for n, x in zip(names, row):
-            cols[n].append(float(x))
-    return cols
 
 
 # --------------------------------------------------------------------------
