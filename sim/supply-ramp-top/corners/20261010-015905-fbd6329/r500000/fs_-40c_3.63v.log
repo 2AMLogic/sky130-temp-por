@@ -1,0 +1,158 @@
+# point: supply-ramp-top as-drawn r500000 fs_-40c_3.63v
+# process=fs temp=-40C final_supply=3.63V rate=500000 V/s tstop=0.0150073s
+# klt status: pass   runtime on runner: 43.873 s   outcome: PASS
+
+# ==== klt sim deck (exact input given to ngspice on the runner) ====
+| * klt sim -- generated corner deck, do not edit
+| .lib /opt/pdk/sky130A/libs.tech/combined/sky130.lib.spice fs
+| .include /var/tmp/eda-job-klt-sim-7bcaa6122bc0/inputs/netlist.cir
+| .temp -40
+| .meas tran vdd_end FIND v(vdd) AT=0.01490726
+| .meas tran resetn_end FIND v(resetn) AT=0.01490726
+| .meas tran resetn_max MAX v(resetn)
+| .meas tran por_raw_max MAX v(xdut.por_raw)
+| .meas tran ibias_end FIND v(xdut.ibias) AT=0.01490726
+| .control
+| alter vset=3.63
+| set filetype=ascii
+| tran 1u 0.01500726 0 5e-06
+| write /var/tmp/eda-job-klt-sim-7bcaa6122bc0/outputs/artifacts/fs_3p630V_n40C/waveform.raw
+| quit
+| .endc
+| .end
+
+# ==== klt diagnostics ====
+
+# ==== ngspice stdout+stderr ====
+
+Note: No compatibility mode selected!
+
+
+Circuit: * klt sim -- generated corner deck, do not edit
+
+Doing analysis at TEMP = -40.000000 and TNOM = 27.000000
+
+Using SPARSE 1.3 as Direct Linear Solver
+
+Error: 1.1086e+212, 2 out of range for ^
+    in line b.xdut.xtemp.xr2trim.brbody
+
+Note: Starting dynamic gmin stepping
+Note: Dynamic gmin stepping completed
+
+Initial Transient Solution
+--------------------------
+
+Node                                   Voltage
+----                                   -------
+vsetn                                     3.63
+vdd                                          0
+xdut.xbias.na                     1.60384e-130
+xdut.xbias.pg                     6.27519e-174
+xdut.xbias.nbtop                  1.14152e-116
+xdut.vref                         3.60086e-132
+xdut.xbias.nbg                    5.27958e-174
+xdut.xbias.xrt.t1                 1.14152e-116
+xdut.xbias.xrt.t2                 1.14152e-116
+xdut.xbias.nb                     1.14152e-116
+xdut.xbias.xr1.t1                 1.14152e-116
+xdut.xbias.xr1.t2                 1.14152e-116
+xdut.xbias.ec                     1.14152e-116
+xdut.xbias.xr2.t1                 3.60086e-132
+xdut.xbias.xr2.t2                 3.60087e-132
+xdut.xbias.er                     3.60087e-132
+xdut.xbias.pb                     5.49563e-174
+xdut.ibias                       -6.23336e-115
+xdut.xbias.nt                    -1.69027e-173
+xdut.xbias.n1                     2.04539e-174
+xdut.xbias.n2                     3.31073e-174
+xdut.xbias.nz                     3.31073e-174
+xdut.xbias.xrz.t1                 3.31073e-174
+xdut.xbias.xrz.t2                 3.31073e-174
+xdut.xbias.ks1                   -1.38774e-169
+xdut.xbias.ks2                    8.07572e-168
+xdut.xbias.ks3                   -4.69816e-166
+xdut.xbias.ks4                    2.73322e-164
+xdut.xbias.nkg                   -1.59009e-162
+xdut.xbias.nkm                    1.39633e-166
+xdut.xbias.tok                   -2.10573e-124
+xdut.xbias.noko                   4.99809e-121
+xdut.xbias.nokl                   1.33039e-127
+xdut.xbias.nokx                   2.33748e-167
+xdut.bias_ok                     -6.23807e-121
+xdut.xcmp.bias_okb               -1.57233e-118
+xdut.xcmp.nbg                     3.44991e-114
+xdut.xcmp.sns                     6.79337e-164
+xdut.xcmp.xrtop.t1                6.79342e-164
+xdut.xcmp.xrtop.t2               -4.47682e-169
+xdut.xcmp.snsb                    1.08299e-164
+xdut.xcmp.xrbot.t1                1.08303e-164
+xdut.xcmp.xrbot.t2                6.79333e-164
+xdut.xcmp.xrhys.t1                3.91406e-169
+xdut.xcmp.xrhys.t2                1.08295e-164
+xdut.xcmp.n1                     -1.91801e-117
+xdut.xcmp.tn                     -7.51551e-110
+xdut.xcmp.na                      5.59663e-110
+xdut.xcmp.cmpo                    5.37013e-110
+xdut.xcmp.vdda                   -3.34191e-113
+xdut.por_raw                      6.53254e-119
+xdut.xpor.pdn                    -1.37878e-177
+xdut.xpor.ndl                     7.83597e-177
+xdut.xpor.ndgp                   -1.58956e-116
+xdut.xpor.ndg                     8.06188e-115
+xdut.xpor.ndgn                    -7.9033e-115
+xdut.xpor.pgdg                    1.94301e-121
+xdut.xpor.pgdgb                  -1.10129e-166
+xdut.xpor.nts                     -9.02913e-25
+xdut.xpor.tim                     -1.10256e-30
+xdut.xpor.nd1                    -5.79529e-167
+xdut.xpor.trip                    -9.02143e-25
+resetn                            -7.66483e-70
+xdut.xpor.rstb                    -4.51194e-25
+xdut.xpor.nnand                   -4.65158e-28
+xdut.xtemp.nbg                    3.41339e-117
+xdut.xtemp.enb                    6.02519e-221
+xdut.xtemp.pb                    -1.35229e-136
+xdut.xtemp.pcas                  -3.13537e-137
+xdut.xtemp.nt                     3.52841e-119
+xdut.xtemp.n1                     1.76424e-119
+xdut.xtemp.na                    -1.24969e-102
+xdut.xtemp.n2                     9.52992e-119
+xdut.xtemp.nb                     4.57195e-115
+xdut.xtemp.pg                    -5.01538e-117
+xdut.xtemp.nz                     9.52992e-119
+xdut.xtemp.xrz.t1                 9.52992e-119
+xdut.xtemp.xrz.t2                 9.52992e-119
+xdut.xtemp.m1d                    2.81202e-105
+xdut.xtemp.m2d                   -2.91742e-115
+xdut.xtemp.m3d                    1.03407e-137
+ptat                             -6.62825e-143
+xdut.xtemp.nd                    -6.13462e-121
+xdut.xtemp.nr                     1.47062e-138
+ctat                             -1.24969e-102
+xdut.xtemp.nc                     4.57195e-115
+xdut.xtemp.xr1.t1                 4.57195e-115
+xdut.xtemp.xr1.t2                 4.57195e-115
+xdut.xtemp.xr2.t1                -6.62813e-143
+xdut.xtemp.xr2.t2                 -9.6315e-144
+xdut.xtemp.ptat_trim             -9.63037e-144
+xdut.xtemp.xr2trim.t1            -9.62923e-144
+xdut.xtemp.xr2trim.t2             -1.1334e-147
+xdut.xtemp.xriso.t1              -1.24969e-102
+xdut.xtemp.xriso.t2              -1.24969e-102
+bvdd#branch                        1.35581e-36
+vset#branch                                  0
+
+
+No. of Data Rows : 3048
+
+  Measurements for Transient Analysis
+
+vdd_end             =  3.63000e+00
+resetn_end          =  3.29176e+00
+resetn_max          =  3.29176e+00 at=  4.19608e-03
+por_raw_max         =  3.63001e+00 at=  1.97228e-04
+ibias_end           =  9.43013e-01
+
+ASCII raw file "/var/tmp/eda-job-klt-sim-7bcaa6122bc0/outputs/artifacts/fs_3p630V_n40C/waveform.raw"
+ngspice-46 done
