@@ -4,6 +4,9 @@ Chronological record of recently merged pull requests and closed issues. This fi
 
 ### 2026-10-10
 
+- **PR #150**: sim: diagnose the two RESETn re-assertions in the as-drawn ramp campaign (#142)
+- **PR #149**: sim: solver/ramp discrimination sweep of temp_core cold-start FAILs (partial; fleet capacity)
+- **Issue #142** (closed): supply-ramp-top: RESETn re-asserts after release at 2 of 360 as-drawn PVT/ramp points
 - **PR #147**: refactor(sim): consolidate klt_version/load_manifest/load_wave into sim_common
 - **Issue #140** (closed): Consolidate duplicated klt_version/load_manifest/load_wave helpers into sim_common.py (load_wave has drifted)
 - **PR #145**: pad-island-census: cross-net merge check, gated sibling fallback, 3-state frame (#92)
