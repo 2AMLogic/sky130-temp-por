@@ -35,6 +35,16 @@ class CheckerCases(unittest.TestCase):
                      "missing_current_channel", "nodip_control_ok", "unready_baseline"):
             self.assertIn(need, names)
 
+    def test_committed_fixtures_regrade_from_disk(self):
+        import gzip
+        for name, want in (("recovery_ok", "PASS"), ("missed_assertion", "FAIL")):
+            with gzip.open(HERE / f"{name}.wave.json.gz", "rt") as fh:
+                doc = json.load(fh)
+            cols = {v["name"]: [row[i] for row in doc["points"]] for i, v in enumerate(doc["variables"])}
+            for n in bc.PHYS_NODES:
+                cols.setdefault(n, [0.5] * len(cols["time"]))
+            self.assertEqual(bc.analyze(cols, 3.3, doc["stimulus"], bc.T_OBS_REF)["verdict"], want)
+
     def test_no_waveform_is_error_and_nonphysical_cannot_pass(self):
         self.assertEqual(bc.analyze(None, 3.3, bc.REF_ST, bc.T_OBS_REF)["verdict"], "ERROR")
         w, st = bc.synth(bad_node=("v(xdut.xtemp.nb)", -50.0))
