@@ -141,8 +141,16 @@ def cmd_run(args):
     run_dir = BUILD / run_id
     run_dir.mkdir(parents=True, exist_ok=args.resume)
     combos = [(s, v) for s in (args.scenario or SCENARIOS) for v in (args.variant or list(VARIANTS))]
-    meta = {"run_id": run_id, "started_utc": now.strftime("%Y-%m-%dT%H:%M:%SZ"), "klt_client": klt_version(),
+    this = {"started_utc": now.strftime("%Y-%m-%dT%H:%M:%SZ"), "klt_client": klt_version(),
             "klt_sim_backend_env": os.environ.get("KLT_SIM_BACKEND"), "git": git, "combos": combos}
+    if args.resume and (run_dir / "run.json").is_file():
+        # keep the original run's provenance; a resume is appended, never overwrites it
+        meta = json.loads((run_dir / "run.json").read_text())
+        meta.setdefault("resumes", []).append(this)
+        cur = this
+    else:
+        meta = {"run_id": run_id, **this}
+        cur = meta
     (run_dir / "run.json").write_text(json.dumps(meta, indent=2) + "\n")
 
     def one(sv):
@@ -174,7 +182,7 @@ def cmd_run(args):
             except Exception as err:  # noqa: BLE001 -- recorded
                 results.append({"error": repr(err)})
                 say(f"[error] {err!r}")
-    meta["submit_results"] = results
+    cur["submit_results"] = results
     (run_dir / "run.json").write_text(json.dumps(meta, indent=2) + "\n")
     print(f"raw outputs: {run_dir}")
     return 0
@@ -291,8 +299,50 @@ def nonphysical(m):
         or not (-1.0 <= m["ptat"] <= 4.7) or not (-1.0 <= m["ctat"] <= 4.7)
 
 
-def verdict_for_point(cid, scen, res):
+def matrix_context(res):
+    """Matrix-level evidence per scenario, stated only as far as the variants that actually ran support it."""
+    ctx = {}
+    for scen in SCENARIOS:
+        ran = [v for v in VARIANTS if res[f"{scen}__{v}"]["report"] is not None]
+        failsets = {v: sorted(c for c, g in res[f"{scen}__{v}"]["points"].items() if g["status"] != "pass") for v in ran}
+        count = {}
+        for v, cs in failsets.items():
+            for c in cs:
+                count.setdefault(c, []).append(v)
+        ctx[scen] = {
+            "variants_run": ran,
+            "failing_sets": failsets,
+            # only meaningful with >= 2 variants run
+            "failing_sets_pairwise_disjoint": (all(len(vs) == 1 for vs in count.values()) if len(ran) >= 2 else None),
+            "repeats_within_scenario": {c: vs for c, vs in sorted(count.items()) if len(vs) > 1},
+            "all_failures_nonphysical": all(nonphysical(g.get("m")) for v in ran for g in res[f"{scen}__{v}"]["points"].values()
+                                            if g["status"] == "fail") and not any(
+                g["status"] == "nonconverged" for v in ran for g in res[f"{scen}__{v}"]["points"].values()),
+        }
+    return ctx
+
+
+def repeats_across_combos(res):
+    """{corner: [combo, ...]} for every PVT corner that fails in more than one combo (any scenario)."""
+    seen = {}
+    for combo, ent in res.items():
+        for cid, g in ent["points"].items():
+            if g["status"] != "pass":
+                seen.setdefault(cid, []).append(combo)
+    return {c: cs for c, cs in sorted(seen.items()) if len(cs) > 1}
+
+
+def base_caveat(res):
+    st = "ran" if res["en-high__base"]["report"] is not None else "was NOT run (fleet refusal)"
+    return ("`base` re-expresses the original deck's supply source (behavioural `BVDD` = swept `VSET` x unit PWL ramp instead "
+            "of the original `V1` PWL source), so the six points not recurring under this deck is also consistent with a "
+            "deck/supply-source difference and is not by itself proof of a solver artifact; the control that would tie the "
+            f"original failures to the old deck is the EN-high `base` combo, which {st}")
+
+
+def verdict_for_point(cid, scen, res, ctx=None):
     """Per-point verdict from the variant outcomes at one (scenario, corner)."""
+    ctx = ctx or matrix_context(res)
     rows = {}
     for var in VARIANTS:
         g = res[f"{scen}__{var}"]["points"].get(cid)
@@ -303,7 +353,7 @@ def verdict_for_point(cid, scen, res):
     np_fails = {v: g for v, g in fails.items() if g["status"] == "fail" and nonphysical(g["m"])}
     # physical-branch agreement: all passing variants must agree on PTAT/CTAT (a single stable branch)
     ptats = [g["m"]["ptat"] for g in passes.values()]
-    spread = (max(ptats) - min(ptats)) if ptats else None
+    spread = (max(ptats) - min(ptats)) if len(ptats) >= 2 else None  # None = not assessed (< 2 physical landings)
     if not ran:
         v, why = "NOT-RUN", "no variant produced a result for this point (fleet refusal)"
     elif not passes:
@@ -315,11 +365,28 @@ def verdict_for_point(cid, scen, res):
         v, why = "MIXED", "fails in " + ",".join(fails) + " without the non-physical signature; needs a look"
     else:
         v = "NOT-REPRODUCED"
-        why = (f"passes on the physical branch in all {len(ran)} variant(s) run ({', '.join(ran)}); the baseline `base` deck "
+        sc = ctx[scen]
+        nrun = len(sc["variants_run"])
+        if nrun >= 2:
+            disj = sc["failing_sets_pairwise_disjoint"]
+            mtx = (f"the matrix-level checks across the {nrun} {scen} variants run ({', '.join(sc['variants_run'])}): the failing sets "
+                   + ("differ between those variants and no point fails in more than one of them"
+                      if disj else "differ between those variants, but some points fail in more than one of them (listed under Repeats)")
+                   + (", every failure is non-physical, and " if sc["all_failures_nonphysical"]
+                      else ", NOT every failure is non-physical (see the matrix table), and "))
+            if len(passes) >= 2:
+                mtx += f"physical-branch landings at this point agree to {spread:.2g} V"
+            else:
+                mtx += "physical-branch agreement at this point is not assessed (fewer than 2 landings)"
+        else:
+            mtx = (f"only {nrun} {scen} variant ran ({', '.join(sc['variants_run'])}), so cross-variant checks (whether the failing set "
+                   "moves with the setting, physical-branch agreement) are not assessed for this scenario; the only matrix-level "
+                   "evidence is that " + ("every failure in that variant is non-physical" if sc["all_failures_nonphysical"]
+                                          else "some failures in that variant are NOT non-physical"))
+        why = (f"passes on the physical branch in all {len(ran)} variant(s) run ({', '.join(ran)}); the `base` deck "
                + ("was among them" if "base" in ran else "was NOT run for this scenario (fleet refusal)")
-               + ". The original non-physical landing did not recur at this point, so the artifact explanation is NOT demonstrated at this point itself; "
-               "it rests on the matrix-level checks (the failing set moves with every setting, no point fails twice, every failure is non-physical, "
-               "the physical branch is unique to ~1e-9 V). No real failure was observed here")
+               + ". The original non-physical landing did not recur at this point, so the artifact explanation is NOT demonstrated at this point itself. "
+               "What supports it is limited to " + mtx + ". Caveat: " + base_caveat(res) + ". No real failure was observed here")
     return {"verdict": v, "why": why, "n_variants_run": len(ran), "n_pass": len(passes), "ptat_spread_across_passing_V": spread,
             "variants": {k: (None if g is None else {"status": g["status"], **({"m": g["m"]} if "m" in g else {"reason": g.get("reason")})})
                          for k, g in rows.items()}}
@@ -379,23 +446,29 @@ def cmd_record(args):
     # ---- physical-branch stability across ALL 45 points: passing variants must agree per point
     stab = {}
     for scen in SCENARIOS:
-        worst = (0.0, None)
+        worst, n_cmp = (0.0, None), 0
         for p, t, v in grid():
             cid = corner_id(p, t, v)
             vals = [res[f"{scen}__{x}"]["points"][cid]["m"]["ptat"] for x in VARIANTS
                     if cid in res[f"{scen}__{x}"]["points"] and res[f"{scen}__{x}"]["points"][cid]["status"] == "pass"]
-            if len(vals) > 1 and max(vals) - min(vals) > worst[0]:
+            n_cmp += len(vals) > 1
+            if len(vals) > 1 and max(vals) - min(vals) >= worst[0]:
                 worst = (max(vals) - min(vals), cid)
-        stab[scen] = {"max_ptat_spread_between_passing_variants_V": worst[0], "at": worst[1]}
+        # None = not assessed: no point had >= 2 variants landing on the physical branch (e.g. only 1 variant ran)
+        stab[scen] = {"max_ptat_spread_between_passing_variants_V": worst[0] if n_cmp else None, "at": worst[1],
+                      "n_points_compared": n_cmp}
 
     # ---- the six points
+    ctx = matrix_context(res)
+    repeats = repeats_across_combos(res)
+    not_run = [c for c, s_ in summary.items() if s_["status"] == "NOT-RUN"]
     six = {}
     for scen, cids in SIX.items():
         orec = json.loads((REPO_ROOT / ORIG[scen][0]).read_text())
         for cid in cids:
             oc = next(c for c in orec["corners"] if c["corner_id"] == cid)
             om = {m["name"]: m.get("value") for m in oc["measurements"]}
-            vd = verdict_for_point(cid, scen, res)
+            vd = verdict_for_point(cid, scen, res, ctx)
             vd["original"] = {"record": ORIG[scen][0], "values": om}
             six[f"{scen}:{cid}"] = vd
 
@@ -413,7 +486,11 @@ def cmd_record(args):
         "git": git, "klt": meta["klt_client"], "backend": meta["klt_sim_backend_env"], "run_id": args.run_id,
         "windows": WINDOWS, "variants": {k: {"options": v[0], "tramp_s": v[1]} for k, v in VARIANTS.items()},
         "summary": summary, "stability": stab, "six_points": six, "all_failures": all_fail,
-        "all_failures_nonphysical_signature": sig_all, "supersedes": "(none)",
+        "all_failures_nonphysical_signature": sig_all,
+        "matrix_context": ctx, "repeats_across_combos": repeats,
+        "repeats_cross_scenario": {c: cs for c, cs in repeats.items() if len({x.split("__")[0] for x in cs}) > 1},
+        "not_run_combos": not_run, "acceptance": "partial" if not_run else "complete",
+        "caveats": [base_caveat(res)], "resumes": meta.get("resumes", []), "supersedes": "(none)",
         "author": cr.default_author(),
     }
     (rec_dir / "records" / f"{rid}.json").write_text(json.dumps(rec, indent=2, default=str) + "\n")
@@ -425,7 +502,9 @@ def cmd_record(args):
          "- **Netlist provenance**: schematic-derived committed `design/netlist/{bias_core,temp_core}.spice` (unchanged since the `ee63b45` records; `git diff ee63b45 HEAD -- design/netlist/` is empty) in a generated testbench (see `netlist-snapshots/%s/`)" % rid,
          "- **PDK**: sky130A @ open_pdks `c6d73a35f524070e85faff4a6a9eef49553ebc2b` (matches sim/pdk.json pin), models `libs.tech/combined/sky130.lib.spice` (sha256 48de7c67...)",
          f"- **Tools**: {meta['klt_client']} (client); fleet ngspice-{next((s.get('ngspice_engine_version') for s in summary.values() if s.get('ngspice_engine_version')), '?')} on Spot `c7i/m7i.4xlarge`, fleet runner klt 0.5.0 (version mismatch warning from the client, reported per job below); backend `{meta['klt_sim_backend_env']}`",
-         f"- **Repo state**: `{git['sha']}` on `{git['branch']}` (working tree {'DIRTY' if git['dirty'] else 'clean'} at run time)",
+         f"- **Repo state**: `{git['sha']}` on `{git['branch']}` (working tree {'DIRTY' if git['dirty'] else 'clean'} at run time)"
+         + "".join(f"; resumed {r['started_utc']} at `{r['git']['sha']}` (working tree {'DIRTY' if r['git']['dirty'] else 'clean'})" for r in meta.get("resumes", [])),
+         f"- **Coverage**: {10 - len(not_run)} of 10 (scenario, variant) combos ran" + (f"; NOT-RUN (fleet refusal): {', '.join(not_run)}. This record is PARTIAL and does not by itself complete issue #86" if not_run else ""),
          "- **Corner matrix run**: process tt, ss, ff, sf, fs x -40/27/125 C x 2.97/3.30/3.63 V = 45 points per (scenario, variant); a combo that the fleet refused is listed as NOT-RUN below, never substituted locally",
          "- **Statistical convention**: N/A (corner-matrix check)",
          "", "## Variants", "",
@@ -433,6 +512,7 @@ def cmd_record(args):
     for k, v in VARIANTS.items():
         L.append(f"| `{k}` | `{v[0]}` | {v[1]*1e6:g} us |")
     L += ["", "`base` is the deck of the `ee63b45` records re-expressed for `klt sim` (the supply is a behavioural source equal to the original PWL ramp scaled by klt's swept `VSET`; this is a different realisation of the same circuit, so a changed failing set under `base` is itself a solver-sensitivity datum, not a reproduction).", "",
+          "Caveat: " + base_caveat(res) + ".", "",
           "## Full-matrix outcome per (scenario, variant)", "", "| combo | result | failing points (PVT corner: ptat / isup / signature) |", "|---|---|---|"]
     for combo, s in summary.items():
         if s["status"] == "NOT-RUN":
@@ -443,8 +523,33 @@ def cmd_record(args):
     L += ["", "Fleet jobs (`environment.remote`): " + ", ".join(f"{c}={s['fleet']['job_id']}" for c, s in summary.items() if s["status"] == "ran"), "",
           "## Physical-branch stability (all 45 points, passing variants only)", ""]
     for scen, d in stab.items():
-        L.append(f"- {scen}: largest PTAT spread between variants that landed on the physical branch = {d['max_ptat_spread_between_passing_variants_V']:.3g} V (at `{d['at']}`)")
+        if d["max_ptat_spread_between_passing_variants_V"] is None:
+            L.append(f"- {scen}: not assessed ({len(ctx[scen]['variants_run'])} variant run; no point has two physical-branch landings to compare)")
+        else:
+            L.append(f"- {scen}: largest PTAT spread between variants that landed on the physical branch = {d['max_ptat_spread_between_passing_variants_V']:.3g} V (at `{d['at']}`, over {d['n_points_compared']} points with >= 2 landings)")
     L += ["", f"Every FAIL anywhere in the sweep has the non-physical signature (isup <= 0 or a node outside the rails +1 V): **{sig_all}**.", "",
+          "## Does the failing set move with the setting?", ""]
+    for scen in SCENARIOS:
+        sc = ctx[scen]
+        if len(sc["variants_run"]) < 2:
+            L.append(f"- {scen}: not assessed ({len(sc['variants_run'])} variant run: {', '.join(sc['variants_run']) or 'none'})")
+        else:
+            L.append(f"- {scen} (across the {len(sc['variants_run'])} variants run: {', '.join(sc['variants_run'])}): failing sets "
+                     + ("are pairwise disjoint (no point fails in more than one of these variants)" if sc["failing_sets_pairwise_disjoint"]
+                        else "overlap at " + ", ".join(f"`{c}` ({', '.join(v)})" for c, v in sc["repeats_within_scenario"].items())))
+    L += ["", "## Repeats (PVT corners failing in more than one combo)", ""]
+    if repeats:
+        for c, cs in repeats.items():
+            scens = sorted({x.split("__")[0] for x in cs})
+            L.append(f"- `{c}`: fails in {', '.join(cs)} ({'cross-scenario' if len(scens) > 1 else 'within ' + scens[0]})")
+        rep_np = all(nonphysical(res[x]["points"][c].get("m")) for c, cs in repeats.items() for x in cs)
+        L.append("- Recorded as observed. " + ("Every repeated failure carries the non-physical signature, so the repeats do not "
+                 "by themselves indicate a real failure; they do mean the failures are not fully scattered at random across the matrix "
+                 "and should be rechecked when the NOT-RUN combos run." if rep_np else
+                 "Some repeated failures do NOT carry the non-physical signature; those points need a look."))
+    else:
+        L.append("- none")
+    L += ["",
           "## Per-point verdict for the six issue points", ""]
     for key, d in six.items():
         scen, cid = key.split(":")
@@ -452,7 +557,7 @@ def cmd_record(args):
         L += [f"### {scen} `{cid}`: **{d['verdict']}**", "",
               f"- Original (`ee63b45`, dirty): ptat={ov.get('ptat')} V, ctat={ov.get('ctat')} V, isup={ov.get('isup')} A",
               f"- {d['why']}",
-              f"- variants run: {d['n_variants_run']}, physical-branch landings: {d['n_pass']}; PTAT spread across the passing variants: {d['ptat_spread_across_passing_V']}", "",
+              f"- variants run: {d['n_variants_run']}, physical-branch landings: {d['n_pass']}; PTAT spread across the passing variants: {('%.3g V' % d['ptat_spread_across_passing_V']) if d['ptat_spread_across_passing_V'] is not None else 'not assessed (' + str(d['n_pass']) + ' landing)'}", "",
               "| variant | PVT corner | status | ptat (V) | ctat (V) | isup (A) | na / nb (V) |", "|---|---|---|---|---|---|---|"]
         for var, g in d["variants"].items():
             if g is None:
