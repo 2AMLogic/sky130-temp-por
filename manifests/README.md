@@ -145,14 +145,15 @@ part of the claim and travel with it):
   the rows green is exactly the failure mode the contract names. These
   rows are the machine-honest statement "no check backs this claim", not
   statements that the testbenches or hygiene are absent.
-- **Item 11 — Power delivery (structural): `unmet`
-  (`supply_spec_incomplete`)**. Before #81 this row rendered
-  `check_failed` because its LVS half (item 4) was a mismatch. That half
-  now passes (item 4 above), and the grader stops at the ERC half
-  instead. Reason `supply_spec_incomplete` here means that the cited spec
-  declares no `ties[]` and no `ties_disclosure`, so `erc.missing_tie` is
-  never computed (klayout-tools `docs/cli/signoff.md` reason table). The
-  follow-up is tracked in #90.
+- **Item 11 — Power delivery (structural): `met`** (`reason: null`, #90).
+  Through #81 this row rendered `unmet` / `supply_spec_incomplete`
+  because the cited spec declared no `ties[]` and no `ties_disclosure`, so
+  `erc.missing_tie` was never computed. #90 declares the one expressible
+  tie class and discloses the other (below); the row now grades `met` at
+  the pinned build, and its citation carries
+  `power_delivery.disclosed_undeclared_tie_classes:
+  [{class: p_substrate, reason: ties_disclosed_unexpressible}]`, so the
+  verdict is visibly a *disclosed-partial* one, not a full tie sweep.
   Cited: `layout/bias_core/erc-supply-spec.json` (rationale in
   `layout/bias_core/erc-supply-spec.md`, because klt at this pin rejects
   an inline `_comment`) and `layout/bias_core/erc.json`, pinned to the
@@ -173,17 +174,30 @@ part of the claim and travel with it):
   `VDD,nokx` appeared, which LVS shows are not shorts. The run omits
   `--pdk` deliberately, so the top-level `status` is `not_checked` and the
   command exits `4`. The item grades `erc_status`, not the exit code.
+  **Tie evidence added by #90 (measured at `klt 0.6.0+g0ce8c64842d9`):**
+  `ties[0]` (`nwell_vdd`) grades every drawn `nwell` (64/20) shape,
+  except those touching the sky130 PNP marker (`82/44`,
+  `well_excludes`), for a `tap` (65/44, `tap_is_dedicated`) contact wired
+  through `li1` to `VDD`. A blanket probe (no exclusion) re-run at this
+  GDS gave **2** `erc.missing_tie` findings of the 18 merged nwell shapes,
+  exactly the PNP device-group tubs of `bias_core_xq1_xqr` (bbox
+  (149.85, 99.85)-(158.99, 103.55) um) and `bias_core_pnp8_leg`
+  ((199.85, 99.85)-(218.23, 107.35) um), the only two merged nwell shapes
+  that interact with `82/44`. With the exclusion: 0 findings,
+  `erc_status: clean`, `erc.missing_tie:["nwell_vdd"]` under
+  `erc_coverage.checked`, no `skipped`. (A first probe with
+  `tap_requires: ["93/44"]` gave 19 findings only because the stream draws
+  no nsdm; it is not the committed declaration.)
   **What it does not establish:**
-  1. `erc.missing_tie` is **not computed** (no `ties[]`). sky130's native
-     p-substrate has no drawn well layer, so a VSS substrate tie is
-     undeclarable in `klt erc` today (klayout-tools#2186's documented
-     limitation). A blanket `nwell → VDD` probe after #69 left exactly 2
-     findings, both on the PNP device-group tubs, which tie to their own
-     nodes by design. That probe was **not** re-run for #81. Zero
-     `erc.missing_tie` in the committed report is an **absence of
-     evidence, not evidence of absence**. #90 tracks declaring the
-     nwell tie with the PNP tubs excluded and disclosing the substrate
-     class.
+  1. The native p-substrate (VSS) tie class is **disclosed, not checked**:
+     `ties_disclosure.undeclared_classes: ["p_substrate"]` renders as
+     `erc_coverage.inapplicable: erc.missing_tie:["p_substrate"]`
+     (`ties_disclosed_unexpressible`), because sky130's substrate has no
+     drawn well layer to name (klayout-tools#2186's documented
+     limitation). The two excluded PNP tubs are likewise **not** tie-graded
+     (they tie to their own nodes by design); the item is silent on them.
+     The `nwell_vdd` zero-finding result covers the other 16 nwell shapes
+     only.
   2. The LVS half rests on item 4's topology match. The supplies
      appear in its `net_correspondence` paired to the reference's
      `VDD`/`VSS`, but device values are not compared (see item 4).

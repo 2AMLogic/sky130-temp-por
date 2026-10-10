@@ -23,5 +23,21 @@
   "nets": [
     { "name": "VDD", "kind": "supply" },
     { "name": "VSS", "kind": "supply" }
-  ]
+  ],
+  "ties": [
+    {
+      "name": "nwell_vdd",
+      "well_layer": "64/20",
+      "well_excludes": ["82/44"],
+      "tap_layer": "65/44",
+      "tap_is_dedicated": true,
+      "connect_to": "li1",
+      "net": "VDD"
+    }
+  ],
+  "ties_disclosure": {
+    "kind": "unexpressible",
+    "reason": "The native p-substrate (VSS) tie class is deliberately not declared and was NOT checked: sky130's p-type substrate is a native substrate with no drawn pwell/tub layer in this stream, so there is no well geometry to name for erc.missing_tie (klayout-tools#2186's documented remaining limitation). Only the nwell -> VDD class is graded; see erc-supply-spec.md.",
+    "undeclared_classes": ["p_substrate"]
+  }
 }
