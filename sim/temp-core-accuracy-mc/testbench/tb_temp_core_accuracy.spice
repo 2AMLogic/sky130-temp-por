@@ -1,0 +1,46 @@
+* tb_temp_core_accuracy.spice -- temp_core full-signal-path mismatch Monte Carlo testbench TEMPLATE
+* (issue #105; DR-003 row 2 [TBD-1]).  Rendered by run_accuracy_mc.py; the rendered decks are
+* committed under netlist-snapshots/<record-id>/.  The @@...@@ markers are substituted by the runner.
+*
+* Circuit: identical stimulus to sim/temp-core-startup-solver/ (VDD = VSET x unit PWL ramp over tramp,
+* EN tied to VDD, XBIAS = committed bias_core feeding IBIAS, XDUT = committed temp_core).  The
+* operating point is reached by a power-up `tran ... uic` (sim/README.md "Branch selection"), never
+* a cold .op; the end-of-run values are the DC outputs.
+*
+* ---------------------------------------------------------------------------------------------
+* Per-term mismatch switches (this is the "per-term switchable mismatch" of the issue)
+* ---------------------------------------------------------------------------------------------
+* NATIVE terms use the PDK's own per-instance AGAUSS() mismatch, selected by the `<proc>_mm` lib
+* section (MC_MM_SWITCH=1).  A family is switched OFF by overriding its PDK coefficient `.param`
+* AFTER the .lib card (the netlist body is .include'd after .lib; verified by the control run):
+*     PNP  : sw_mm_sky130_fd_pr__pnp_05v5_W0p68L0p68_is / _bf   (Q1, Q8A..H, bias_core Q's)
+*     RES  : sw_mm_sky130_fd_pr__res_xhigh_po                   (R1, R2, R2TRIM, RISO, RZ)
+*     MOS  : sw_mm_vth0_sky130_fd_pr__{nfet,pfet}_g5v0d10v5     (every MOS in bias_core and temp_core)
+*     CAP  : sw_mm_cmim                                         (CC; DC-neutral)
+* EXPLICIT terms split the MOS family into two ROLES, which the PDK switch cannot do (it is global
+* per family).  The library's own MOS mismatch is a threshold shift delvto = A_VT*mismatch_factor/
+* sqrt(W*L*mult)*AGAUSS(0,1,1) (models_fet.spice, A_VT: nfet 8.2e-3, pfet 1.2e-2).  A threshold
+* shift is electrically a series gate-voltage source, so the runner inserts, in a copy of the
+* committed temp_core text, one 0-V-nominal source per device whose gate carries that same draw:
+*     AMP    (sw_amp): MI1, MI2 (input pair), ML1, ML2 (mirror load)   -- input-referred offset
+*     MIRROR (sw_mir): MP1, MP2, MP3 (PTAT/CTAT/third-leg mirror) and cascodes MPC1..3 -- ratio
+* The explicit sigma uses the SAME A_VT/sqrt(W*L) as the library; the runner asserts the A_VT values
+* against the installed models_global.spice.  The `combined` variant (native PNP+RES, explicit
+* AMP+MIRROR) is cross-checked against the `all` variant (everything native, incl. bias_core).
+*
+* @@HEADER@@
+@@PARAMS@@
+.options wnflag=1 @@OPTIONS@@
+* ng_nomodcheck: same as sim/spiceinit; carried in the netlist because the fleet runner ignores options.ngspice_init
+.control
+set ng_nomodcheck
+.endc
+VSET vsetn 0 3.3
+VRAMP rampn 0 PWL(0 0 {tramp} 1 {tstop} 1)
+BVDD VDD 0 V = v(vsetn)*v(rampn)
+XBIAS VDD 0 IBIAS VREF BIAS_OK bias_core
+XDUT VDD 0 IBIAS VDD PTAT CTAT temp_core
+
+@@BIAS_CORE@@
+@@TEMP_CORE@@
+.end

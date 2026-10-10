@@ -1,0 +1,51 @@
+{
+  "slug": "temp-core-accuracy-mc",
+  "title": "temp_core full-signal-path mismatch Monte Carlo: PTAT temperature error (degC), untrimmed and 1-point trimmed, with per-term attribution",
+  "claim": "Issue #105 -- evidence for DR-003 row 2 [TBD-1], NOT a spec claim and NOT an edit of the ratified spec. Measures the temperature error, in degC, of the PTAT readout of temp_core under local device mismatch across -40/27/125 C, untrimmed and with an ideal 27 C single-point gain trim, attributed to four terms: PNP ratio pair, amplifier input offset, resistor ratio (R2/R1), PMOS mirror ratio. Terms not measured are listed in every record; no complete aggregate is claimed beyond what the record states.",
+  "driver": "run_accuracy_mc.py (bespoke: the claim is a distribution per (variant, temperature) with paired draws across temperature, not one scalar per PVT point, so sim/bin/corner-run.py's experiment.json flow does not apply; this file is the manifest the driver reads its conventions from by documentation, as in sim/pnp-mismatch/)",
+  "provenance": "schematic-derived committed netlists",
+  "provenance_source": "design/netlist/bias_core.spice, design/netlist/temp_core.spice",
+  "statistical_convention": "3 sigma = 3 x Bessel-corrected sample standard deviation of the per-sample temperature error (spec/porting-plan.md section 3.2 [3sigma]); empirical max |error| and 99.7th percentile reported alongside",
+  "temperature_error_definition": "e(T) = (PTAT_sample(T) - PTAT_nominal(T)) / (dPTAT_nominal/dT at T), PTAT_nominal and its slope taken from the mismatch-free transfer function of the SAME process corner and supply (quadratic through -40/27/125 C). 1-point trim: PTAT_sample is multiplied by PTAT_nominal(27)/PTAT_sample(27) of the same sample (an ideal continuous gain trim, as DR-005 'single-point 25 C gain trim'), then e(T) as above; e(27) is 0 by construction",
+  "monte_carlo": {
+    "vary": "mismatch",
+    "n_attribution": 100,
+    "n_extension": 50,
+    "n_control": 10,
+    "seed": 20261011,
+    "pairing": "one klt sim request per temperature, so corner_index and therefore the per-sample seed is identical across temperatures; validated by the cross-temperature correlation reported in each record"
+  },
+  "corners": {
+    "nominal_reference": {
+      "process": ["tt", "ss", "ff", "sf", "fs"],
+      "temperature_c": [-40, 27, 125],
+      "supply_v": [2.97, 3.3, 3.63]
+    },
+    "attribution": {"process": ["tt"], "temperature_c": [-40, 27, 125], "supply_v": [3.3]},
+    "aggregate_extension": {"process": ["ss", "ff", "sf", "fs"], "temperature_c": [-40, 27, 125], "supply_v": [3.3], "plus": {"process": ["tt"], "supply_v": [2.97, 3.63]}}
+  },
+  "terms": {
+    "pnp": "native PDK Is/Bf mismatch of the PNP devices (sw_mm_sky130_fd_pr__pnp_05v5_W0p68L0p68_{is,bf}, scaled by the PDK for W3p40L3p40)",
+    "res": "native PDK xhigh_po body-resistance mismatch (sw_mm_sky130_fd_pr__res_xhigh_po / sqrt(W*L))",
+    "amp": "explicit series gate-voltage sources on MI1, MI2, ML1, ML2 with the PDK's own Vth mismatch sigma A_VT/sqrt(W*L)",
+    "mirror": "explicit series gate-voltage sources on MP1-3 and MPC1-3 with the same sigma law",
+    "combined": "the four above jointly",
+    "all": "everything the PDK mismatches, native (adds bias_core, tail/startup/enable MOS, MIM cap)"
+  },
+  "operating_point_guards": {
+    "windows": "copied unrelaxed from sim/temp-core-startup/experiment.json (ptat 0.3-2.6 V, ctat 0.2-1.1 V, na/nb -1..4.7 V, isup 1e-8..5e-5 A, bias_ok 2.0..3.7 V)",
+    "settled": "PTAT and CTAT move < 1 mV over the last 1 ms",
+    "invalid_samples": "excluded from every statistic, counted per (group, temperature, reason) in the record, never replaced"
+  },
+  "deck": {
+    "options": ["wnflag=1", "method=gear", "trtol=7"],
+    "params": {"tramp": "100u", "tstop": "10m"},
+    "analysis": "tran 10u 10m uic (power-up from 0 V, EN tied to VDD)"
+  },
+  "negative_controls": ["control-off (sampler on, all terms off: sigma must be 0)", "control-zeroed (_mm section with every native coefficient overridden to 0: sigma must be 0)"],
+  "execution": "every request is `klt sim --backend batch` (Spot fleet); no local grid, no local fallback",
+  "cites": [
+    "sim/temp-core-startup-solver/records/20261010-200708-47b96e5 (issue #86: partial solver sweep; justifies the operating-point guards)",
+    "sim/pnp-mismatch/records/20260825-220116-a9cac4b (PNP pair dVBE mismatch only)"
+  ]
+}
