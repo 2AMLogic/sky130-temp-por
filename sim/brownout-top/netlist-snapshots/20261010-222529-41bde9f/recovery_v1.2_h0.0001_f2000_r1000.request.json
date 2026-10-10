@@ -1,0 +1,58 @@
+{
+  "netlist": "netlist.spice",
+  "backend": "batch",
+  "models": {
+    "pdk": "sky130A",
+    "lib": "libs.tech/combined/sky130.lib.spice"
+  },
+  "corners": {
+    "process": [
+      "tt",
+      "ss",
+      "ff",
+      "sf",
+      "fs"
+    ],
+    "supply_v": {
+      "vset": [
+        2.97,
+        3.3,
+        3.63
+      ]
+    },
+    "temperature_c": [
+      -40,
+      27,
+      125
+    ]
+  },
+  "analysis": {
+    "kind": "tran",
+    "args": "1e-06 0.023745 0 1e-05"
+  },
+  "measurements": [
+    {
+      "name": "vdd_min",
+      "spice": ".meas tran vdd_min MIN v(vdd)",
+      "unit": "V"
+    },
+    {
+      "name": "resetn_end",
+      "spice": ".meas tran resetn_end FIND v(resetn) AT=0.023645",
+      "unit": "V"
+    },
+    {
+      "name": "resetn_min_after_t0",
+      "spice": ".meas tran resetn_min_after_t0 MIN v(resetn) FROM=0.01 TO=0.023745",
+      "unit": "V"
+    }
+  ],
+  "options": {
+    "timeout_s": 7200,
+    "keep_artifacts": true,
+    "waveforms": true
+  },
+  "batch": {
+    "runner_version_check": "warn"
+  }
+}

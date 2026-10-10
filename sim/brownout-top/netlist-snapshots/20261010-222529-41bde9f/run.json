@@ -1,0 +1,130 @@
+{
+  "run_id": "fleet2",
+  "started_utc": "2026-10-10T14:09:07Z",
+  "source": {
+    "sha": "bcf00bf",
+    "branch": "feature/issue-116",
+    "dirty": false,
+    "sha_full": "bcf00bf9eb07e9861e53e04e1af5202de6d9b84b",
+    "pushed_to_remote": true,
+    "remote_branches": [
+      "origin/feature/issue-116"
+    ]
+  },
+  "klt_client": "klt 0.7.0+g8eec069c7576",
+  "klt_sim_backend_env": "batch",
+  "declared": {
+    "requests": 21,
+    "points_per_request": 45,
+    "points": 945
+  },
+  "submitted_tags": [
+    "cube_v2_h1em05_f2000_r10000",
+    "cube_v2_h1em05_f50000_r10000",
+    "cube_v2_h0.0001_f2000_r10000",
+    "cube_v2_h0.0001_f50000_r10000",
+    "cube_v2_h0.001_f2000_r10000",
+    "cube_v2_h0.001_f50000_r10000",
+    "cube_v1.2_h1em05_f2000_r10000",
+    "cube_v1.2_h1em05_f50000_r10000",
+    "cube_v1.2_h0.0001_f2000_r10000",
+    "cube_v1.2_h0.0001_f50000_r10000",
+    "cube_v1.2_h0.001_f2000_r10000",
+    "cube_v1.2_h0.001_f50000_r10000",
+    "cube_v0.4_h1em05_f2000_r10000",
+    "cube_v0.4_h1em05_f50000_r10000",
+    "cube_v0.4_h0.0001_f2000_r10000",
+    "cube_v0.4_h0.0001_f50000_r10000",
+    "cube_v0.4_h0.001_f2000_r10000",
+    "cube_v0.4_h0.001_f50000_r10000",
+    "recovery_v1.2_h0.0001_f2000_r1000",
+    "recovery_v1.2_h0.0001_f2000_r100000",
+    "control"
+  ],
+  "retries": [
+    {
+      "at_utc": "2026-10-10T20:36:19Z",
+      "capacity_wait_s": 900.0,
+      "results": [
+        {
+          "tag": "cube_v0.4_h1em05_f2000_r10000",
+          "exit": 1,
+          "status": "NO-JSON"
+        },
+        {
+          "tag": "recovery_v1.2_h0.0001_f2000_r100000",
+          "exit": 1,
+          "status": "NO-JSON"
+        },
+        {
+          "tag": "control",
+          "exit": 1,
+          "status": "NO-JSON"
+        }
+      ]
+    },
+    {
+      "at_utc": "2026-10-10T20:40:42Z",
+      "capacity_wait_s": 0,
+      "results": [
+        {
+          "tag": "cube_v0.4_h1em05_f2000_r10000",
+          "exit": 1,
+          "status": "NO-JSON"
+        },
+        {
+          "tag": "recovery_v1.2_h0.0001_f2000_r100000",
+          "exit": 1,
+          "status": "NO-JSON"
+        },
+        {
+          "tag": "control",
+          "exit": 1,
+          "status": "NO-JSON"
+        }
+      ]
+    },
+    {
+      "at_utc": "2026-10-10T20:48:02Z",
+      "capacity_wait_s": 0,
+      "results": [
+        {
+          "tag": "cube_v0.4_h1em05_f2000_r10000",
+          "exit": 1,
+          "status": "NO-JSON"
+        },
+        {
+          "tag": "recovery_v1.2_h0.0001_f2000_r100000",
+          "exit": 1,
+          "status": "NO-JSON"
+        },
+        {
+          "tag": "control",
+          "exit": 1,
+          "status": "NO-JSON"
+        }
+      ]
+    },
+    {
+      "at_utc": "2026-10-10T21:47:06Z",
+      "capacity_wait_s": 0,
+      "results": [
+        {
+          "tag": "cube_v0.4_h1em05_f2000_r10000",
+          "exit": 0,
+          "status": "pass"
+        },
+        {
+          "tag": "recovery_v1.2_h0.0001_f2000_r100000",
+          "exit": 0,
+          "status": "pass"
+        },
+        {
+          "tag": "control",
+          "exit": 0,
+          "status": "pass"
+        }
+      ]
+    }
+  ]
+}
