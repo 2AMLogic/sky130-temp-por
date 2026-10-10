@@ -1,0 +1,10 @@
+{
+  "schema_version": 1,
+  "unpromoted_sibling_ports": [
+    {
+      "block": "passives",
+      "port": "nb",
+      "reason": "sibling-internal strap net klt gen-compose cannot promote (its own connectivity[] already labels it); island membership is probed at the assembly-declared coordinate, frame is unverified, LVS NB pairing confirms it"
+    }
+  ]
+}

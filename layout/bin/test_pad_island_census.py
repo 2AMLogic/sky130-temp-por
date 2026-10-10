@@ -66,16 +66,58 @@ class ProbePointsTest(unittest.TestCase):
         # promote): use the assembly's declaration, translated once, and say so.
         with tempfile.TemporaryDirectory() as d:
             spec, top = self._assembly(Path(d), [_port("other", 0.0, 0.0)], [_port("p", 3.0, 4.0)])
-            (probe,) = census._probe_points(spec, top)
+            (probe,) = census._probe_points(spec, top, {("b", "p")})
         self.assertEqual(probe["probe_source"], "assembly_declaration_unpromoted_sibling_port")
         self.assertIsNone(probe["declared_matches_source"])
         self.assertEqual((probe["x_um"], probe["y_um"]), (13.0, -1.0))
+
+    def test_unpromoted_sibling_port_without_opt_in_fails(self):
+        with tempfile.TemporaryDirectory() as d:
+            spec, top = self._assembly(Path(d), [_port("other", 0.0, 0.0)], [_port("p", 3.0, 4.0)])
+            with self.assertRaises(SystemExit):
+                census._probe_points(spec, top)
+            with self.assertRaises(SystemExit):  # opt-in for a different port
+                census._probe_points(spec, top, {("b", "q")})
 
     def test_port_missing_from_both_sources_still_fails(self):
         with tempfile.TemporaryDirectory() as d:
             spec, top = self._assembly(Path(d), [_port("other", 0.0, 0.0)], [])
             with self.assertRaises(SystemExit):
                 census._probe_points(spec, top)
+
+
+class AggregationTest(unittest.TestCase):
+    def test_frame_status_three_state(self):
+        t, f, n = {"declared_matches_source": True}, {"declared_matches_source": False}, {"declared_matches_source": None}
+        self.assertIs(census._frame_status([t, t]), True)
+        self.assertIs(census._frame_status([t, f, n]), False)
+        self.assertIsNone(census._frame_status([t, n]))
+        self.assertIsNone(census._frame_status([n]))
+
+    def test_cross_net_shared_cluster_is_reported(self):
+        groups = [
+            {"net": "A", "island_cluster_ids": [1]},
+            {"net": "B", "island_cluster_ids": [1]},
+            {"net": "C", "island_cluster_ids": [2]},
+        ]
+        (merge,) = census._cross_net_merges(groups)
+        self.assertEqual(merge["nets"], ["A", "B"])
+        self.assertEqual(merge["island_cluster_id"], 1)
+
+    def test_case_alias_and_same_net_share_cluster_without_merge(self):
+        groups = [
+            {"net": "VDD", "island_cluster_ids": [1]},
+            {"net": "vdd", "island_cluster_ids": [1]},
+            {"net": "X", "island_cluster_ids": [2]},
+        ]
+        self.assertEqual(census._cross_net_merges(groups), [])
+
+    def test_policy_loading(self):
+        with tempfile.TemporaryDirectory() as d:
+            f = Path(d) / "p.json"
+            f.write_text(json.dumps({"unpromoted_sibling_ports": [{"block": "b", "port": "p"}]}))
+            self.assertEqual(census._load_policy(f), {("b", "p")})
+            self.assertEqual(census._load_policy(Path(d) / "none.json"), set())
 
 
 @unittest.skipUnless(HAVE_KLAYOUT, "klayout.db not importable on this interpreter")
