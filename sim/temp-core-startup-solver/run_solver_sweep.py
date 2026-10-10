@@ -394,7 +394,13 @@ def verdict_for_point(cid, scen, res, ctx=None):
 def cmd_record(args):
     run_dir = BUILD / args.run_id
     meta = json.loads((run_dir / "run.json").read_text())
-    git = meta["git"]
+    # Headline provenance = the LATEST invocation of this run (a run.json whose first
+    # invocation predates a client upgrade or carried an uncommitted driver edit would
+    # otherwise headline a state that submitted nothing). Every invocation's own state
+    # is still rendered in the resume list below -- nothing is dropped or rewritten.
+    last = meta.get("resumes", [None])[-1] or meta
+    git = last["git"]
+    klt_client = last.get("klt_client", meta["klt_client"])
     res = load_results(run_dir)
     now = datetime.now(timezone.utc)
     rid = f"{now:%Y%m%d-%H%M%S}-{git['sha']}"
@@ -482,14 +488,15 @@ def cmd_record(args):
     sig_all = all(f["nonphysical"] for f in all_fail if f["status"] == "fail")
     rec = {
         "record_id": rid, "experiment": SLUG, "issue": 86, "timestamp": now.strftime("%Y-%m-%dT%H:%M:%SZ"),
-        "git": git, "klt": meta["klt_client"], "backend": meta["klt_sim_backend_env"], "run_id": args.run_id,
+        "git": git, "klt": klt_client, "backend": meta["klt_sim_backend_env"], "run_id": args.run_id,
         "windows": WINDOWS, "variants": {k: {"options": v[0], "tramp_s": v[1]} for k, v in VARIANTS.items()},
         "summary": summary, "stability": stab, "six_points": six, "all_failures": all_fail,
         "all_failures_nonphysical_signature": sig_all,
         "matrix_context": ctx, "repeats_across_combos": repeats,
         "repeats_cross_scenario": {c: cs for c, cs in repeats.items() if len({x.split("__")[0] for x in cs}) > 1},
         "not_run_combos": not_run, "acceptance": "partial" if not_run else "complete",
-        "caveats": [base_caveat(res)], "resumes": meta.get("resumes", []), "supersedes": "(none)",
+        "caveats": [base_caveat(res)], "resumes": meta.get("resumes", []),
+        "supersedes": args.supersedes or "(none)",
         "author": cr.default_author(),
     }
     (rec_dir / "records" / f"{rid}.json").write_text(json.dumps(rec, indent=2, default=str) + "\n")
@@ -500,7 +507,7 @@ def cmd_record(args):
          "- **Claim**: NOT a spec claim. Decides, per point, whether each of the six Overall-FAIL points of `sim/temp-core-startup/` and `sim/temp-core-startup-en-delayed/` (record `ee63b45`, dirty tree) is a solver artifact (non-physical branch landing that moves with integration settings) or a real failure, by re-running the FULL 45-point PVT matrix under five solver/ramp variants for each of the two EN scenarios and checking the physicality guards (isup > 0, loop nodes inside the rails +1 V) and the unchanged `experiment.json` windows.",
          "- **Netlist provenance**: schematic-derived committed `design/netlist/{bias_core,temp_core}.spice` (unchanged since the `ee63b45` records; `git diff ee63b45 HEAD -- design/netlist/` is empty) in a generated testbench (see `netlist-snapshots/%s/`)" % rid,
          "- **PDK**: sky130A @ open_pdks `c6d73a35f524070e85faff4a6a9eef49553ebc2b` (matches sim/pdk.json pin), models `libs.tech/combined/sky130.lib.spice` (sha256 48de7c67...)",
-         f"- **Tools**: {meta['klt_client']} (client); fleet ngspice-{next((s.get('ngspice_engine_version') for s in summary.values() if s.get('ngspice_engine_version')), '?')} on Spot `c7i/m7i.4xlarge`, fleet runner klt 0.5.0 (version mismatch warning from the client, reported per job below); backend `{meta['klt_sim_backend_env']}`",
+         f"- **Tools**: {klt_client} (client); fleet ngspice-{next((s.get('ngspice_engine_version') for s in summary.values() if s.get('ngspice_engine_version')), '?')} on Spot `c7i/m7i.4xlarge`, fleet runner klt 0.5.0 (version mismatch warning from the client, reported per job below); backend `{meta['klt_sim_backend_env']}`",
          f"- **Repo state**: `{git['sha']}` on `{git['branch']}` (working tree {'DIRTY' if git['dirty'] else 'clean'} at run time)"
          + "".join(f"; resumed {r['started_utc']} at `{r['git']['sha']}` (working tree {'DIRTY' if r['git']['dirty'] else 'clean'})" for r in meta.get("resumes", [])),
          f"- **Coverage**: {10 - len(not_run)} of 10 (scenario, variant) combos ran" + (f"; NOT-RUN (fleet refusal): {', '.join(not_run)}. This record is PARTIAL and does not by itself complete issue #86" if not_run else ""),
@@ -569,7 +576,9 @@ def cmd_record(args):
         L.append("")
     L += ["## Links", "", f"- driver: `sim/{SLUG}/run_solver_sweep.py`; json twin `records/{rid}.json`; netlists `netlist-snapshots/{rid}/`; per-point logs `corners/{rid}/<scenario>__<variant>/<corner>.log`",
           "- windows are copied unchanged from the two `experiment.json` files (no relaxation)", "",
-          f"- **Timestamp**: {rec['timestamp']}", f"- **Author**: {rec['author']}", "- **Supersedes**: (none) -- adds evidence next to `ee63b45`; those records are untouched"]
+          f"- **Timestamp**: {rec['timestamp']}", f"- **Author**: {rec['author']}",
+          f"- **Supersedes**: {rec['supersedes']}"
+          + (f" -- re-runs that record's coverage on this host at {10 - len(not_run)} of 10 combos ({'including' if not 'en-high__base' in not_run else 'without'} the EN-high `base` control); the superseded record is untouched and remains the evidence for its own run" if args.supersedes else " -- adds evidence next to `ee63b45`; those records are untouched")]
     (rec_dir / "records" / f"{rid}.md").write_text("\n".join(L) + "\n")
     print(rid)
     return 0
@@ -591,6 +600,7 @@ def main():
     p.set_defaults(fn=cmd_probe)
     rc = sub.add_parser("record")
     rc.add_argument("--run-id", required=True)
+    rc.add_argument("--supersedes", default=None, help="record id this record replaces (append-only: the old record is untouched)")
     rc.set_defaults(fn=cmd_record)
     a = ap.parse_args()
     return a.fn(a)
