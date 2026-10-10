@@ -1,0 +1,4983 @@
+{
+ "absent_coverage": [
+  "Only two PVT points (and their listed solver/rate neighbours) are simulated; this is a focused diagnosis, not a re-run of the 360-point campaign, and it does not re-grade any other point.",
+  "The orthogonal ll/hh passive-skew axis and mismatch Monte Carlo are not exercised.",
+  "No ratified ramp envelope exists (DR-003 Sec8); adjacent rates are a factor of 2 either side of each target and are exploratory controls only.",
+  "Solver variants change integration settings only; none changes the circuit, and none removes the temp_core startup nonphysical-branch behaviour of #86 by construction, so a 'no physical-branch run exists' outcome is possible and is reported as unresolved."
+ ],
+ "author": "Loom Builder (claude-sonnet-5-5)",
+ "cases": [
+  {
+   "check": {
+    "end": {
+     "bias_ok_v": 3.629999838786529,
+     "ctat_v": 1.225045705991513e-08,
+     "ptat_v": 1.236780878558437e-08,
+     "vdd_v": 3.63,
+     "vref_v": 0.5552392615177247
+    },
+    "fail_codes": [
+     "reassert_after_release",
+     "extra_mid_crossings",
+     "nonphysical"
+    ],
+    "ibias": {
+     "end_v": 0.5307052804581932,
+     "max_v": 1.337500018397881,
+     "min_v": -7.228607363264732e-05,
+     "post_release_p2p_v": 0.10610132239005077,
+     "release_step_v": -0.26576396570595506,
+     "swings_gt_5mV": 5
+    },
+    "levels_v": {
+     "V_IH": 2.904,
+     "V_IL": 0.726,
+     "V_MID": 1.815,
+     "V_RUNT": 0.363
+    },
+    "max_dt_s": 5.000000000003266e-06,
+    "n_samples": 3089,
+    "physical": {
+     "isup_end_a": -0.010210856133021211,
+     "isup_positive": false,
+     "ok": false,
+     "violations_after_t0": {
+      "v(xdut.xbias.na)": {
+       "count": 1,
+       "max": -0.5960844700947358,
+       "min": -0.5960844700947358
+      },
+      "v(xdut.xbias.nb)": {
+       "count": 2413,
+       "max": -3966.965168066855,
+       "min": -438624642.5053712
+      },
+      "v(xdut.xtemp.nb)": {
+       "count": 2413,
+       "max": 5.251371926343428,
+       "min": 5.225151970306632
+      }
+     },
+     "violations_at_t0": {}
+    },
+    "por_raw": {
+     "n_fall": 2,
+     "n_rise": 3,
+     "rise_after_ramp_end_censored": true,
+     "t_rise_mid_s": 6.308860360152662e-05,
+     "vdd_at_rise_resolved": false,
+     "vdd_at_rise_v": 3.63
+    },
+    "ramp_error_v": 4.440892098500626e-16,
+    "ramp_ok": true,
+    "ramp_samples": 19,
+    "release_delay_s": 0.0031237987207434854,
+    "resetn": {
+     "end_v": 6.507798746566455e-10,
+     "max_during_ramp_v": 0.08919055148794074,
+     "max_v": 3.261570541260054,
+     "n_episodes_returned": 1,
+     "n_mid_down": 1,
+     "n_mid_up": 1,
+     "n_reassert": 1,
+     "n_release": 1,
+     "n_runt": 0,
+     "premature": false,
+     "released_during_ramp": false,
+     "t_release_mid_s": 0.003186887324345012,
+     "t_release_s": 0.0031869030531835774,
+     "vdd_at_release_v": 3.63
+    },
+    "resolution_ok": true,
+    "stored_trace": {
+     "agrees_with_full_resolution": true,
+     "full_samples": 3089,
+     "n_reassert": 1,
+     "n_release": 1,
+     "n_runt": 0,
+     "premature": false,
+     "rows": 190
+    },
+    "t_end_s": 0.01500726,
+    "tramp_s": 7.26e-06,
+    "transition_fail_codes": [
+     "reassert_after_release",
+     "extra_mid_crossings"
+    ],
+    "transition_verdict": "FAIL",
+    "unresolved_reasons": [],
+    "verdict": "FAIL"
+   },
+   "diagnostics": [],
+   "elapsed_seconds": 19,
+   "id": "A_ss_m40c_3p63v_500kVs__base__r500000",
+   "instance_type": "c7i.4xlarge",
+   "job_id": "klt-sim-cd2da264d43f",
+   "klt_status": "pass",
+   "lifecycle": "spot",
+   "missing_extra_saves": [],
+   "outcome": "FAIL",
+   "point": "A_ss_m40c_3p63v_500kVs",
+   "rate": 500000.0,
+   "role": "exact",
+   "runner_klt_version": "0.5.0",
+   "runtime_s": 13.505,
+   "state": "done",
+   "timeline": {
+    "anchors": [
+     {
+      "events_pm_200us": [
+       {
+        "event": "V_MID fall",
+        "node": "v(xdut.xpor.nd1)",
+        "t_s": 0.0031758992033093757
+       },
+       {
+        "event": "FIRST out-of-window sample (-0.596 V)",
+        "node": "v(xdut.xbias.na)",
+        "t_s": 0.003186388193276294
+       },
+       {
+        "event": "FIRST out-of-window sample (-3.97e+03 V)",
+        "node": "v(xdut.xbias.nb)",
+        "t_s": 0.003186388193276294
+       },
+       {
+        "event": "FIRST out-of-window sample (5.25 V)",
+        "node": "v(xdut.xtemp.nb)",
+        "t_s": 0.003186388193276294
+       },
+       {
+        "event": "V_MID fall",
+        "node": "v(xdut.por_raw)",
+        "t_s": 0.0031864663274919994
+       },
+       {
+        "event": "V_MID rise",
+        "node": "v(xdut.xcmp.n1)",
+        "t_s": 0.0031864663944796987
+       },
+       {
+        "event": "V_MID fall",
+        "node": "v(xdut.xcmp.cmpo)",
+        "t_s": 0.0031864839993413965
+       },
+       {
+        "event": "V_MID fall",
+        "node": "v(xdut.xpor.rstb)",
+        "t_s": 0.003186865330762751
+       },
+       {
+        "event": "V_MID rise",
+        "node": "v(resetn)",
+        "t_s": 0.003186887324345012
+       },
+       {
+        "event": "RELEASE (V_IH rise)",
+        "node": "v(resetn)",
+        "t_s": 0.0031869030531835774
+       },
+       {
+        "event": "V_MID rise",
+        "node": "v(xdut.xpor.trip)",
+        "t_s": 0.0031869100669591963
+       },
+       {
+        "event": "V_MID fall",
+        "node": "v(resetn)",
+        "t_s": 0.0031876196477205053
+       },
+       {
+        "event": "V_MID fall",
+        "node": "v(xdut.xpor.tim)",
+        "t_s": 0.0031876202392935858
+       },
+       {
+        "event": "V_MID fall",
+        "node": "v(xdut.xpor.pgdg)",
+        "t_s": 0.003187622382323269
+       },
+       {
+        "event": "V_MID rise",
+        "node": "v(xdut.xpor.pgdgb)",
+        "t_s": 0.0031876265046583757
+       },
+       {
+        "event": "V_MID rise",
+        "node": "v(xdut.xpor.rstb)",
+        "t_s": 0.0031876265542214567
+       },
+       {
+        "event": "V_MID rise",
+        "node": "v(xdut.xpor.nd1)",
+        "t_s": 0.0031876265873022522
+       },
+       {
+        "event": "V_MID fall",
+        "node": "v(xdut.xpor.trip)",
+        "t_s": 0.003187626599544958
+       },
+       {
+        "event": "RE-ASSERT (V_IL fall)",
+        "node": "v(resetn)",
+        "t_s": 0.0031876603947507626
+       },
+       {
+        "event": "V_MID rise",
+        "node": "v(xdut.xpor.ndg)",
+        "t_s": 0.0031905467014821734
+       },
+       {
+        "event": "V_MID fall",
+        "node": "v(xdut.xpor.ndg)",
+        "t_s": 0.0031951030740408506
+       },
+       {
+        "event": "V_MID rise",
+        "node": "v(xdut.por_raw)",
+        "t_s": 0.003195692483846559
+       },
+       {
+        "event": "V_MID fall",
+        "node": "v(xdut.xcmp.n1)",
+        "t_s": 0.003195741291657457
+       },
+       {
+        "event": "V_MID rise",
+        "node": "v(xdut.xcmp.cmpo)",
+        "t_s": 0.0031968403277613713
+       },
+       {
+        "event": "V_MID fall",
+        "node": "v(xdut.xpor.pgdgb)",
+        "t_s": 0.0032027563347497164
+       },
+       {
+        "event": "V_MID rise",
+        "node": "v(xdut.xpor.pgdg)",
+        "t_s": 0.003202896468043691
+       }
+      ],
+      "ibias_v": {
+       "-0.0002": 0.9437730139099576,
+       "-2e-05": 0.9437730138691932,
+       "0.0": 1.121506556114675,
+       "2e-05": 0.7872873492456234,
+       "0.0002": 0.6780053951886901
+      },
+      "kind": "release",
+      "t_s": 0.0031869030531835774
+     },
+     {
+      "events_pm_200us": [
+       {
+        "event": "V_MID fall",
+        "node": "v(xdut.xpor.nd1)",
+        "t_s": 0.0031758992033093757
+       },
+       {
+        "event": "FIRST out-of-window sample (-0.596 V)",
+        "node": "v(xdut.xbias.na)",
+        "t_s": 0.003186388193276294
+       },
+       {
+        "event": "FIRST out-of-window sample (-3.97e+03 V)",
+        "node": "v(xdut.xbias.nb)",
+        "t_s": 0.003186388193276294
+       },
+       {
+        "event": "FIRST out-of-window sample (5.25 V)",
+        "node": "v(xdut.xtemp.nb)",
+        "t_s": 0.003186388193276294
+       },
+       {
+        "event": "V_MID fall",
+        "node": "v(xdut.por_raw)",
+        "t_s": 0.0031864663274919994
+       },
+       {
+        "event": "V_MID rise",
+        "node": "v(xdut.xcmp.n1)",
+        "t_s": 0.0031864663944796987
+       },
+       {
+        "event": "V_MID fall",
+        "node": "v(xdut.xcmp.cmpo)",
+        "t_s": 0.0031864839993413965
+       },
+       {
+        "event": "V_MID fall",
+        "node": "v(xdut.xpor.rstb)",
+        "t_s": 0.003186865330762751
+       },
+       {
+        "event": "V_MID rise",
+        "node": "v(resetn)",
+        "t_s": 0.003186887324345012
+       },
+       {
+        "event": "RELEASE (V_IH rise)",
+        "node": "v(resetn)",
+        "t_s": 0.0031869030531835774
+       },
+       {
+        "event": "V_MID rise",
+        "node": "v(xdut.xpor.trip)",
+        "t_s": 0.0031869100669591963
+       },
+       {
+        "event": "V_MID fall",
+        "node": "v(resetn)",
+        "t_s": 0.0031876196477205053
+       },
+       {
+        "event": "V_MID fall",
+        "node": "v(xdut.xpor.tim)",
+        "t_s": 0.0031876202392935858
+       },
+       {
+        "event": "V_MID fall",
+        "node": "v(xdut.xpor.pgdg)",
+        "t_s": 0.003187622382323269
+       },
+       {
+        "event": "V_MID rise",
+        "node": "v(xdut.xpor.pgdgb)",
+        "t_s": 0.0031876265046583757
+       },
+       {
+        "event": "V_MID rise",
+        "node": "v(xdut.xpor.rstb)",
+        "t_s": 0.0031876265542214567
+       },
+       {
+        "event": "V_MID rise",
+        "node": "v(xdut.xpor.nd1)",
+        "t_s": 0.0031876265873022522
+       },
+       {
+        "event": "V_MID fall",
+        "node": "v(xdut.xpor.trip)",
+        "t_s": 0.003187626599544958
+       },
+       {
+        "event": "RE-ASSERT (V_IL fall)",
+        "node": "v(resetn)",
+        "t_s": 0.0031876603947507626
+       },
+       {
+        "event": "V_MID rise",
+        "node": "v(xdut.xpor.ndg)",
+        "t_s": 0.0031905467014821734
+       },
+       {
+        "event": "V_MID fall",
+        "node": "v(xdut.xpor.ndg)",
+        "t_s": 0.0031951030740408506
+       },
+       {
+        "event": "V_MID rise",
+        "node": "v(xdut.por_raw)",
+        "t_s": 0.003195692483846559
+       },
+       {
+        "event": "V_MID fall",
+        "node": "v(xdut.xcmp.n1)",
+        "t_s": 0.003195741291657457
+       },
+       {
+        "event": "V_MID rise",
+        "node": "v(xdut.xcmp.cmpo)",
+        "t_s": 0.0031968403277613713
+       },
+       {
+        "event": "V_MID fall",
+        "node": "v(xdut.xpor.pgdgb)",
+        "t_s": 0.0032027563347497164
+       },
+       {
+        "event": "V_MID rise",
+        "node": "v(xdut.xpor.pgdg)",
+        "t_s": 0.003202896468043691
+       }
+      ],
+      "ibias_v": {
+       "-0.0002": 0.9437730139070349,
+       "-2e-05": 0.943773013869585,
+       "0.0": 1.1094949134020045,
+       "2e-05": 0.7850288909365455,
+       "0.0002": 0.6778295049313501
+      },
+      "kind": "reassert",
+      "t_s": 0.0031876603947507626
+     }
+    ],
+    "first_negative_isup_s": 0.003186388193276294,
+    "viol": {
+     "v(xdut.xbias.na)": {
+      "t_s": 0.003186388193276294,
+      "v": -0.5960844700947358
+     },
+     "v(xdut.xbias.nb)": {
+      "t_s": 0.003186388193276294,
+      "v": -3966.965168066855
+     },
+     "v(xdut.xtemp.nb)": {
+      "t_s": 0.003186388193276294,
+      "v": 5.251371926343428
+     }
+    }
+   },
+   "trace_file": "A_ss_m40c_3p63v_500kVs__base__r500000.trace.csv.gz",
+   "trace_rows": 165,
+   "tstop_s": 0.01500726,
+   "variant": "base"
+  },
+  {
+   "check": {
+    "end": {
+     "bias_ok_v": 3.62999983890882,
+     "ctat_v": 0.5295240763783257,
+     "ptat_v": 1.513722690163311e-05,
+     "vdd_v": 3.63,
+     "vref_v": 1.249237905257254
+    },
+    "fail_codes": [
+     "nonphysical"
+    ],
+    "ibias": {
+     "end_v": 0.9106670415494391,
+     "max_v": 1.096167760351143,
+     "min_v": -0.001533060456880869,
+     "post_release_p2p_v": 1.4333312314818158e-10,
+     "release_step_v": -0.03310597231892487,
+     "swings_gt_5mV": 4
+    },
+    "levels_v": {
+     "V_IH": 2.904,
+     "V_IL": 0.726,
+     "V_MID": 1.815,
+     "V_RUNT": 0.363
+    },
+    "max_dt_s": 5.000000000001531e-06,
+    "n_samples": 3225,
+    "physical": {
+     "isup_end_a": -0.005925651215337489,
+     "isup_positive": false,
+     "ok": false,
+     "violations_after_t0": {
+      "v(xdut.xtemp.nb)": {
+       "count": 3073,
+       "max": 5.290622618642519,
+       "min": 5.2259527959549
+      }
+     },
+     "violations_at_t0": {}
+    },
+    "por_raw": {
+     "n_fall": 1,
+     "n_rise": 2,
+     "rise_after_ramp_end_censored": true,
+     "t_rise_mid_s": 2.3959519769111617e-05,
+     "vdd_at_rise_resolved": false,
+     "vdd_at_rise_v": 3.63
+    },
+    "ramp_error_v": 4.440892098500626e-16,
+    "ramp_ok": true,
+    "ramp_samples": 77,
+    "release_delay_s": 0.002933225900558097,
+    "resetn": {
+     "end_v": 3.261370241354596,
+     "max_during_ramp_v": 0.1014289320384853,
+     "max_v": 3.261370245655967,
+     "n_episodes_returned": 0,
+     "n_mid_down": 0,
+     "n_mid_up": 1,
+     "n_reassert": 0,
+     "n_release": 1,
+     "n_runt": 0,
+     "premature": false,
+     "released_during_ramp": false,
+     "t_release_mid_s": 0.0029571854203272086,
+     "t_release_s": 0.002957234369795368,
+     "vdd_at_release_v": 3.63
+    },
+    "resolution_ok": true,
+    "stored_trace": {
+     "agrees_with_full_resolution": true,
+     "full_samples": 3225,
+     "n_reassert": 0,
+     "n_release": 1,
+     "n_runt": 0,
+     "premature": false,
+     "rows": 154
+    },
+    "t_end_s": 0.01500726,
+    "tramp_s": 7.26e-06,
+    "transition_fail_codes": [],
+    "transition_verdict": "PASS",
+    "unresolved_reasons": [],
+    "verdict": "FAIL"
+   },
+   "diagnostics": [],
+   "elapsed_seconds": 19,
+   "id": "A_ss_m40c_3p63v_500kVs__trtol7__r500000",
+   "instance_type": "c7i.4xlarge",
+   "job_id": "klt-sim-bcc307996485",
+   "klt_status": "pass",
+   "lifecycle": "spot",
+   "missing_extra_saves": [],
+   "outcome": "FAIL",
+   "point": "A_ss_m40c_3p63v_500kVs",
+   "rate": 500000.0,
+   "role": "solver",
+   "runner_klt_version": "0.5.0",
+   "runtime_s": 13.69,
+   "state": "done",
+   "timeline": {
+    "anchors": [
+     {
+      "events_pm_200us": [
+       {
+        "event": "V_MID fall",
+        "node": "v(xdut.xpor.nd1)",
+        "t_s": 0.002942955206159158
+       },
+       {
+        "event": "V_MID fall",
+        "node": "v(xdut.xpor.rstb)",
+        "t_s": 0.0029568804095600953
+       },
+       {
+        "event": "V_MID rise",
+        "node": "v(resetn)",
+        "t_s": 0.0029571854203272086
+       },
+       {
+        "event": "RELEASE (V_IH rise)",
+        "node": "v(resetn)",
+        "t_s": 0.002957234369795368
+       },
+       {
+        "event": "V_MID rise",
+        "node": "v(xdut.xpor.trip)",
+        "t_s": 0.0029573234122896837
+       }
+      ],
+      "ibias_v": {
+       "-0.0002": 0.9437730138823063,
+       "-2e-05": 0.9437730138896485,
+       "0.0": 0.8762468714538134,
+       "2e-05": 0.9106668032146725,
+       "0.0002": 0.9106670415703931
+      },
+      "kind": "release",
+      "t_s": 0.002957234369795368
+     }
+    ],
+    "first_negative_isup_s": 6.602515178115303e-05,
+    "viol": {
+     "v(xdut.xtemp.nb)": {
+      "t_s": 6.602515178115303e-05,
+      "v": 5.290622618642519
+     }
+    }
+   },
+   "trace_file": "A_ss_m40c_3p63v_500kVs__trtol7__r500000.trace.csv.gz",
+   "trace_rows": 200,
+   "tstop_s": 0.01500726,
+   "variant": "trtol7"
+  },
+  {
+   "check": {
+    "end": {
+     "bias_ok_v": 3.62999983890891,
+     "ctat_v": 0.7828862120596307,
+     "ptat_v": 1.099650297963152,
+     "vdd_v": 3.63,
+     "vref_v": 1.24923790477594
+    },
+    "fail_codes": [],
+    "ibias": {
+     "end_v": 0.9106670415467656,
+     "max_v": 1.097708532001016,
+     "min_v": -0.02319099739105418,
+     "post_release_p2p_v": 1.261135640362454e-10,
+     "release_step_v": -0.033105972343121404,
+     "swings_gt_5mV": 4
+    },
+    "levels_v": {
+     "V_IH": 2.904,
+     "V_IL": 0.726,
+     "V_MID": 1.815,
+     "V_RUNT": 0.363
+    },
+    "max_dt_s": 5.000000000001531e-06,
+    "n_samples": 3292,
+    "physical": {
+     "isup_end_a": 3.262871333869954e-05,
+     "isup_positive": true,
+     "ok": true,
+     "violations_after_t0": {},
+     "violations_at_t0": {}
+    },
+    "por_raw": {
+     "n_fall": 1,
+     "n_rise": 2,
+     "rise_after_ramp_end_censored": true,
+     "t_rise_mid_s": 2.3858391843030182e-05,
+     "vdd_at_rise_resolved": false,
+     "vdd_at_rise_v": 3.63
+    },
+    "ramp_error_v": 8.881784197001252e-16,
+    "ramp_ok": true,
+    "ramp_samples": 56,
+    "release_delay_s": 0.0029353015120448336,
+    "resetn": {
+     "end_v": 3.261370241355325,
+     "max_during_ramp_v": 0.08747515660551416,
+     "max_v": 3.261386657872603,
+     "n_episodes_returned": 0,
+     "n_mid_down": 0,
+     "n_mid_up": 1,
+     "n_reassert": 0,
+     "n_release": 1,
+     "n_runt": 0,
+     "premature": false,
+     "released_during_ramp": false,
+     "t_release_mid_s": 0.0029591599038878637,
+     "t_release_s": 0.002959176502843051,
+     "vdd_at_release_v": 3.63
+    },
+    "resolution_ok": true,
+    "stored_trace": {
+     "agrees_with_full_resolution": true,
+     "full_samples": 3292,
+     "n_reassert": 0,
+     "n_release": 1,
+     "n_runt": 0,
+     "premature": false,
+     "rows": 135
+    },
+    "t_end_s": 0.01500726,
+    "tramp_s": 7.26e-06,
+    "transition_fail_codes": [],
+    "transition_verdict": "PASS",
+    "unresolved_reasons": [],
+    "verdict": "PASS"
+   },
+   "diagnostics": [],
+   "elapsed_seconds": 20,
+   "id": "A_ss_m40c_3p63v_500kVs__reltol2e-4__r500000",
+   "instance_type": "c7i.4xlarge",
+   "job_id": "klt-sim-4909f41c1064",
+   "klt_status": "pass",
+   "lifecycle": "spot",
+   "missing_extra_saves": [],
+   "outcome": "PASS",
+   "point": "A_ss_m40c_3p63v_500kVs",
+   "rate": 500000.0,
+   "role": "solver",
+   "runner_klt_version": "0.5.0",
+   "runtime_s": 13.525,
+   "state": "done",
+   "timeline": {
+    "anchors": [
+     {
+      "events_pm_200us": [
+       {
+        "event": "V_MID fall",
+        "node": "v(xdut.xpor.nd1)",
+        "t_s": 0.002945840560418915
+       },
+       {
+        "event": "V_MID fall",
+        "node": "v(xdut.xpor.rstb)",
+        "t_s": 0.002958864116135609
+       },
+       {
+        "event": "V_MID rise",
+        "node": "v(resetn)",
+        "t_s": 0.0029591599038878637
+       },
+       {
+        "event": "RELEASE (V_IH rise)",
+        "node": "v(resetn)",
+        "t_s": 0.002959176502843051
+       },
+       {
+        "event": "V_MID rise",
+        "node": "v(xdut.xpor.trip)",
+        "t_s": 0.002959288713057794
+       }
+      ],
+      "ibias_v": {
+       "-0.0002": 0.9437730138576367,
+       "-2e-05": 0.9437730138625607,
+       "0.0": 0.10164366271928553,
+       "2e-05": 0.9106671141357536,
+       "0.0002": 0.9106670415195618
+      },
+      "kind": "release",
+      "t_s": 0.002959176502843051
+     }
+    ],
+    "first_negative_isup_s": null,
+    "viol": {}
+   },
+   "trace_file": "A_ss_m40c_3p63v_500kVs__reltol2e-4__r500000.trace.csv.gz",
+   "trace_rows": 295,
+   "tstop_s": 0.01500726,
+   "variant": "reltol2e-4"
+  },
+  {
+   "check": {
+    "end": {
+     "bias_ok_v": 3.629982491039764,
+     "ctat_v": 0.52947634980315,
+     "ptat_v": 1.533083454941363e-05,
+     "vdd_v": 3.63,
+     "vref_v": 1.249237913444239
+    },
+    "fail_codes": [
+     "nonphysical"
+    ],
+    "ibias": {
+     "end_v": 0.9106669800549259,
+     "max_v": 1.173725788097703,
+     "min_v": -0.00682019782206429,
+     "post_release_p2p_v": 0.0036557515490720505,
+     "release_step_v": -0.03305232285983606,
+     "swings_gt_5mV": 235
+    },
+    "levels_v": {
+     "V_IH": 2.904,
+     "V_IL": 0.726,
+     "V_MID": 1.815,
+     "V_RUNT": 0.363
+    },
+    "max_dt_s": 5.0000000000050004e-06,
+    "n_samples": 14907,
+    "physical": {
+     "isup_end_a": -0.005925856120487328,
+     "isup_positive": false,
+     "ok": false,
+     "violations_after_t0": {
+      "v(xdut.xtemp.na)": {
+       "count": 1,
+       "max": -0.3732522956725726,
+       "min": -0.3732522956725726
+      },
+      "v(xdut.xtemp.nb)": {
+       "count": 3450,
+       "max": 5.268529369129146,
+       "min": 5.225253168413072
+      }
+     },
+     "violations_at_t0": {}
+    },
+    "por_raw": {
+     "n_fall": 1,
+     "n_rise": 2,
+     "rise_after_ramp_end_censored": true,
+     "t_rise_mid_s": 2.2485729144055805e-05,
+     "vdd_at_rise_resolved": false,
+     "vdd_at_rise_v": 3.63
+    },
+    "ramp_error_v": 4.440892098500626e-16,
+    "ramp_ok": true,
+    "ramp_samples": 29,
+    "release_delay_s": 0.0029278983069695283,
+    "resetn": {
+     "end_v": 3.259657070180299,
+     "max_during_ramp_v": 0.08951239961274156,
+     "max_v": 3.266702751525433,
+     "n_episodes_returned": 0,
+     "n_mid_down": 0,
+     "n_mid_up": 1,
+     "n_reassert": 0,
+     "n_release": 1,
+     "n_runt": 0,
+     "premature": false,
+     "released_during_ramp": false,
+     "t_release_mid_s": 0.0029503840361135843,
+     "t_release_s": 0.0029520758247803622,
+     "vdd_at_release_v": 3.63
+    },
+    "resolution_ok": true,
+    "stored_trace": {
+     "agrees_with_full_resolution": true,
+     "full_samples": 14907,
+     "n_reassert": 0,
+     "n_release": 1,
+     "n_runt": 0,
+     "premature": false,
+     "rows": 2698
+    },
+    "t_end_s": 0.01500726,
+    "tramp_s": 7.26e-06,
+    "transition_fail_codes": [],
+    "transition_verdict": "PASS",
+    "unresolved_reasons": [],
+    "verdict": "FAIL"
+   },
+   "diagnostics": [],
+   "elapsed_seconds": 43,
+   "id": "A_ss_m40c_3p63v_500kVs__trap__r500000",
+   "instance_type": "c7i.4xlarge",
+   "job_id": "klt-sim-a7b3a97f05c9",
+   "klt_status": "pass",
+   "lifecycle": "spot",
+   "missing_extra_saves": [],
+   "outcome": "FAIL",
+   "point": "A_ss_m40c_3p63v_500kVs",
+   "rate": 500000.0,
+   "role": "solver",
+   "runner_klt_version": "0.5.0",
+   "runtime_s": 35.86,
+   "state": "done",
+   "timeline": {
+    "anchors": [
+     {
+      "events_pm_200us": [
+       {
+        "event": "V_MID fall",
+        "node": "v(xdut.xpor.nd1)",
+        "t_s": 0.0029369393503874204
+       },
+       {
+        "event": "V_MID fall",
+        "node": "v(xdut.xpor.rstb)",
+        "t_s": 0.002950292388165873
+       },
+       {
+        "event": "V_MID rise",
+        "node": "v(resetn)",
+        "t_s": 0.0029503840361135843
+       },
+       {
+        "event": "RELEASE (V_IH rise)",
+        "node": "v(resetn)",
+        "t_s": 0.0029520758247803622
+       },
+       {
+        "event": "V_MID rise",
+        "node": "v(xdut.xpor.trip)",
+        "t_s": 0.0029520846464884923
+       }
+      ],
+      "ibias_v": {
+       "-0.0002": 0.9434297643334622,
+       "-2e-05": 0.9434812907620489,
+       "0.0": 0.9128188269435638,
+       "2e-05": 0.9106769461504056,
+       "0.0002": 0.9106501215598245
+      },
+      "kind": "release",
+      "t_s": 0.0029520758247803622
+     }
+    ],
+    "first_negative_isup_s": 9.373021268457207e-06,
+    "viol": {
+     "v(xdut.xtemp.na)": {
+      "t_s": 0.003770637323957228,
+      "v": -0.3732522956725726
+     },
+     "v(xdut.xtemp.nb)": {
+      "t_s": 0.003770575769198285,
+      "v": 5.268529369129146
+     }
+    }
+   },
+   "trace_file": "A_ss_m40c_3p63v_500kVs__trap__r500000.trace.csv.gz",
+   "trace_rows": 2918,
+   "tstop_s": 0.01500726,
+   "variant": "trap"
+  },
+  {
+   "check": {
+    "end": {
+     "bias_ok_v": 3.629999838908647,
+     "ctat_v": 0.7555900826777927,
+     "ptat_v": -2.097661025640933,
+     "vdd_v": 3.63,
+     "vref_v": 1.249237905050809
+    },
+    "fail_codes": [
+     "nonphysical"
+    ],
+    "ibias": {
+     "end_v": 0.9106670415762134,
+     "max_v": 1.096786248587091,
+     "min_v": -7.066823555933791e-05,
+     "post_release_p2p_v": 1.1122691656595407e-10,
+     "release_step_v": -0.0331059723346655,
+     "swings_gt_5mV": 3
+    },
+    "levels_v": {
+     "V_IH": 2.904,
+     "V_IL": 0.726,
+     "V_MID": 1.815,
+     "V_RUNT": 0.363
+    },
+    "max_dt_s": 1.0000000000027348e-06,
+    "n_samples": 15049,
+    "physical": {
+     "isup_end_a": -0.004661623734649189,
+     "isup_positive": false,
+     "ok": false,
+     "violations_after_t0": {
+      "v(ptat)": {
+       "count": 14969,
+       "max": -1.265481939582138,
+       "min": -2.116015751396171
+      },
+      "v(xdut.xtemp.nb)": {
+       "count": 14969,
+       "max": 5.235147981784718,
+       "min": 5.22550130900354
+      }
+     },
+     "violations_at_t0": {}
+    },
+    "por_raw": {
+     "n_fall": 1,
+     "n_rise": 2,
+     "rise_after_ramp_end_censored": true,
+     "t_rise_mid_s": 3.633442489781222e-05,
+     "vdd_at_rise_resolved": false,
+     "vdd_at_rise_v": 3.63
+    },
+    "ramp_error_v": 4.440892098500626e-16,
+    "ramp_ok": true,
+    "ramp_samples": 19,
+    "release_delay_s": 0.0030145558847431003,
+    "resetn": {
+     "end_v": 3.261370241355726,
+     "max_during_ramp_v": 0.08919055148794074,
+     "max_v": 3.261387113707602,
+     "n_episodes_returned": 0,
+     "n_mid_down": 0,
+     "n_mid_up": 1,
+     "n_reassert": 0,
+     "n_release": 1,
+     "n_runt": 0,
+     "premature": false,
+     "released_during_ramp": false,
+     "t_release_mid_s": 0.0030508903096409124,
+     "t_release_s": 0.0030513204859340575,
+     "vdd_at_release_v": 3.63
+    },
+    "resolution_ok": true,
+    "stored_trace": {
+     "agrees_with_full_resolution": true,
+     "full_samples": 15049,
+     "n_reassert": 0,
+     "n_release": 1,
+     "n_runt": 0,
+     "premature": false,
+     "rows": 72
+    },
+    "t_end_s": 0.01500726,
+    "tramp_s": 7.26e-06,
+    "transition_fail_codes": [],
+    "transition_verdict": "PASS",
+    "unresolved_reasons": [],
+    "verdict": "FAIL"
+   },
+   "diagnostics": [],
+   "elapsed_seconds": 25,
+   "id": "A_ss_m40c_3p63v_500kVs__tmax1u__r500000",
+   "instance_type": "c7i.4xlarge",
+   "job_id": "klt-sim-7d77293b1fe1",
+   "klt_status": "pass",
+   "lifecycle": "spot",
+   "missing_extra_saves": [],
+   "outcome": "FAIL",
+   "point": "A_ss_m40c_3p63v_500kVs",
+   "rate": 500000.0,
+   "role": "solver",
+   "runner_klt_version": "0.5.0",
+   "runtime_s": 18.365,
+   "state": "done",
+   "timeline": {
+    "anchors": [
+     {
+      "events_pm_200us": [
+       {
+        "event": "V_MID fall",
+        "node": "v(xdut.xpor.nd1)",
+        "t_s": 0.003036682034844784
+       },
+       {
+        "event": "V_MID fall",
+        "node": "v(xdut.xpor.rstb)",
+        "t_s": 0.0030501112568878308
+       },
+       {
+        "event": "V_MID rise",
+        "node": "v(xdut.xpor.trip)",
+        "t_s": 0.003050552648000388
+       },
+       {
+        "event": "V_MID rise",
+        "node": "v(resetn)",
+        "t_s": 0.0030508903096409124
+       },
+       {
+        "event": "RELEASE (V_IH rise)",
+        "node": "v(resetn)",
+        "t_s": 0.0030513204859340575
+       }
+      ],
+      "ibias_v": {
+       "-0.0002": 0.943773013901934,
+       "-2e-05": 0.9437730139385172,
+       "0.0": 0.911736850804121,
+       "2e-05": 0.9106670431541809,
+       "0.0002": 0.9106670415940558
+      },
+      "kind": "release",
+      "t_s": 0.0030513204859340575
+     }
+    ],
+    "first_negative_isup_s": 6.57297474850817e-05,
+    "viol": {
+     "v(ptat)": {
+      "t_s": 6.57297474850817e-05,
+      "v": -1.265481939582138
+     },
+     "v(xdut.xtemp.nb)": {
+      "t_s": 6.57297474850817e-05,
+      "v": 5.235147981784718
+     }
+    }
+   },
+   "trace_file": "A_ss_m40c_3p63v_500kVs__tmax1u__r500000.trace.csv.gz",
+   "trace_rows": 280,
+   "tstop_s": 0.01500726,
+   "variant": "tmax1u"
+  },
+  {
+   "check": {
+    "end": {
+     "bias_ok_v": 3.629999966117658,
+     "ctat_v": 0.7564532036086458,
+     "ptat_v": -2.097615452433127,
+     "vdd_v": 3.63,
+     "vref_v": 1.249237903163757
+    },
+    "fail_codes": [
+     "nonphysical"
+    ],
+    "ibias": {
+     "end_v": 0.9106648815915098,
+     "max_v": 1.096345377073059,
+     "min_v": -0.0007540503494239686,
+     "post_release_p2p_v": 8.560256755774098e-05,
+     "release_step_v": -0.033103952110030255,
+     "swings_gt_5mV": 4
+    },
+    "levels_v": {
+     "V_IH": 2.904,
+     "V_IL": 0.726,
+     "V_MID": 1.815,
+     "V_RUNT": 0.363
+    },
+    "max_dt_s": 5.0000000000008805e-06,
+    "n_samples": 235635,
+    "physical": {
+     "isup_end_a": 3.2967142772387396e-05,
+     "isup_positive": true,
+     "ok": false,
+     "violations_after_t0": {
+      "v(ptat)": {
+       "count": 234814,
+       "max": -1.663138689769581,
+       "min": -2.125733338111058
+      }
+     },
+     "violations_at_t0": {}
+    },
+    "por_raw": {
+     "n_fall": 1,
+     "n_rise": 2,
+     "rise_after_ramp_end_censored": true,
+     "t_rise_mid_s": 2.3905013181034286e-05,
+     "vdd_at_rise_resolved": false,
+     "vdd_at_rise_v": 3.63
+    },
+    "ramp_error_v": 8.881784197001252e-16,
+    "ramp_ok": true,
+    "ramp_samples": 104,
+    "release_delay_s": 0.002933672099573827,
+    "resetn": {
+     "end_v": 3.261331417832884,
+     "max_during_ramp_v": 0.1093804910814877,
+     "max_v": 3.261387253154343,
+     "n_episodes_returned": 0,
+     "n_mid_down": 0,
+     "n_mid_up": 1,
+     "n_reassert": 0,
+     "n_release": 1,
+     "n_runt": 0,
+     "premature": false,
+     "released_during_ramp": false,
+     "t_release_mid_s": 0.0029575771127548613,
+     "t_release_s": 0.0029576172472957113,
+     "vdd_at_release_v": 3.63
+    },
+    "resolution_ok": true,
+    "stored_trace": {
+     "agrees_with_full_resolution": true,
+     "full_samples": 235635,
+     "n_reassert": 0,
+     "n_release": 1,
+     "n_runt": 0,
+     "premature": false,
+     "rows": 203
+    },
+    "t_end_s": 0.01500726,
+    "tramp_s": 7.26e-06,
+    "transition_fail_codes": [],
+    "transition_verdict": "PASS",
+    "unresolved_reasons": [],
+    "verdict": "FAIL"
+   },
+   "diagnostics": [],
+   "elapsed_seconds": 301,
+   "id": "A_ss_m40c_3p63v_500kVs__reltol1e-4__r500000",
+   "instance_type": "c7i.4xlarge",
+   "job_id": "klt-sim-eeb2ffff189b",
+   "klt_status": "pass",
+   "lifecycle": "spot",
+   "missing_extra_saves": [],
+   "outcome": "FAIL",
+   "point": "A_ss_m40c_3p63v_500kVs",
+   "rate": 500000.0,
+   "role": "solver",
+   "runner_klt_version": "0.5.0",
+   "runtime_s": 285.43,
+   "state": "done",
+   "timeline": {
+    "anchors": [
+     {
+      "events_pm_200us": [
+       {
+        "event": "V_MID fall",
+        "node": "v(xdut.xpor.nd1)",
+        "t_s": 0.0029437349477522854
+       },
+       {
+        "event": "FIRST out-of-window sample (-1.66 V)",
+        "node": "v(ptat)",
+        "t_s": 0.002952534697328586
+       },
+       {
+        "event": "V_MID fall",
+        "node": "v(xdut.xpor.rstb)",
+        "t_s": 0.002957304814126524
+       },
+       {
+        "event": "V_MID rise",
+        "node": "v(resetn)",
+        "t_s": 0.0029575771127548613
+       },
+       {
+        "event": "RELEASE (V_IH rise)",
+        "node": "v(resetn)",
+        "t_s": 0.0029576172472957113
+       },
+       {
+        "event": "V_MID rise",
+        "node": "v(xdut.xpor.trip)",
+        "t_s": 0.0029577480243655322
+       }
+      ],
+      "ibias_v": {
+       "-0.0002": 0.9437730138540842,
+       "-2e-05": 0.9437730138416146,
+       "0.0": 0.9044443935784346,
+       "2e-05": 0.9106694066545821,
+       "0.0002": 0.9106699643718975
+      },
+      "kind": "release",
+      "t_s": 0.0029576172472957113
+     }
+    ],
+    "first_negative_isup_s": null,
+    "viol": {
+     "v(ptat)": {
+      "t_s": 0.002952534697328586,
+      "v": -1.663138689769581
+     }
+    }
+   },
+   "trace_file": "A_ss_m40c_3p63v_500kVs__reltol1e-4__r500000.trace.csv.gz",
+   "trace_rows": 3533,
+   "tstop_s": 0.01500726,
+   "variant": "reltol1e-4"
+  },
+  {
+   "check": {
+    "end": {
+     "bias_ok_v": 3.629999838907808,
+     "ctat_v": 0.782886212043822,
+     "ptat_v": 1.09965029770513,
+     "vdd_v": 3.63,
+     "vref_v": 1.249237905088635
+    },
+    "fail_codes": [],
+    "ibias": {
+     "end_v": 0.9106670415756032,
+     "max_v": 1.097708532001016,
+     "min_v": -0.002601604008012171,
+     "post_release_p2p_v": 1.0439404896089854e-10,
+     "release_step_v": -0.033105972345350065,
+     "swings_gt_5mV": 4
+    },
+    "levels_v": {
+     "V_IH": 2.904,
+     "V_IL": 0.726,
+     "V_MID": 1.815,
+     "V_RUNT": 0.363
+    },
+    "max_dt_s": 1.000000000001e-06,
+    "n_samples": 15237,
+    "physical": {
+     "isup_end_a": 3.262871334390943e-05,
+     "isup_positive": true,
+     "ok": true,
+     "violations_after_t0": {},
+     "violations_at_t0": {}
+    },
+    "por_raw": {
+     "n_fall": 1,
+     "n_rise": 2,
+     "rise_after_ramp_end_censored": true,
+     "t_rise_mid_s": 2.4106712747145337e-05,
+     "vdd_at_rise_resolved": false,
+     "vdd_at_rise_v": 3.63
+    },
+    "ramp_error_v": 8.881784197001252e-16,
+    "ramp_ok": true,
+    "ramp_samples": 56,
+    "release_delay_s": 0.002936918444674454,
+    "resetn": {
+     "end_v": 3.261370241356438,
+     "max_during_ramp_v": 0.08747515660551416,
+     "max_v": 3.26138693776582,
+     "n_episodes_returned": 0,
+     "n_mid_down": 0,
+     "n_mid_up": 1,
+     "n_reassert": 0,
+     "n_release": 1,
+     "n_runt": 0,
+     "premature": false,
+     "released_during_ramp": false,
+     "t_release_mid_s": 0.0029610251574215996,
+     "t_release_s": 0.0029612058839177326,
+     "vdd_at_release_v": 3.63
+    },
+    "resolution_ok": true,
+    "stored_trace": {
+     "agrees_with_full_resolution": true,
+     "full_samples": 15237,
+     "n_reassert": 0,
+     "n_release": 1,
+     "n_runt": 0,
+     "premature": false,
+     "rows": 114
+    },
+    "t_end_s": 0.01500726,
+    "tramp_s": 7.26e-06,
+    "transition_fail_codes": [],
+    "transition_verdict": "PASS",
+    "unresolved_reasons": [],
+    "verdict": "PASS"
+   },
+   "diagnostics": [],
+   "elapsed_seconds": 27,
+   "id": "A_ss_m40c_3p63v_500kVs__reltol2e-4-tmax1u__r500000",
+   "instance_type": "c7i.4xlarge",
+   "job_id": "klt-sim-1421b9999a94",
+   "klt_status": "pass",
+   "lifecycle": "spot",
+   "missing_extra_saves": [],
+   "outcome": "PASS",
+   "point": "A_ss_m40c_3p63v_500kVs",
+   "rate": 500000.0,
+   "role": "solver",
+   "runner_klt_version": "0.5.0",
+   "runtime_s": 20.042,
+   "state": "done",
+   "timeline": {
+    "anchors": [
+     {
+      "events_pm_200us": [
+       {
+        "event": "V_MID fall",
+        "node": "v(xdut.xpor.nd1)",
+        "t_s": 0.0029470509499367474
+       },
+       {
+        "event": "V_MID fall",
+        "node": "v(xdut.xpor.rstb)",
+        "t_s": 0.0029605825733609063
+       },
+       {
+        "event": "V_MID rise",
+        "node": "v(xdut.xpor.trip)",
+        "t_s": 0.0029609814900726276
+       },
+       {
+        "event": "V_MID rise",
+        "node": "v(resetn)",
+        "t_s": 0.0029610251574215996
+       },
+       {
+        "event": "RELEASE (V_IH rise)",
+        "node": "v(resetn)",
+        "t_s": 0.0029612058839177326
+       }
+      ],
+      "ibias_v": {
+       "-0.0002": 0.943773013902894,
+       "-2e-05": 0.9437730139183563,
+       "0.0": 0.9067634071299092,
+       "2e-05": 0.9106670455059614,
+       "0.0002": 0.9106670415702396
+      },
+      "kind": "release",
+      "t_s": 0.0029612058839177326
+     }
+    ],
+    "first_negative_isup_s": null,
+    "viol": {}
+   },
+   "trace_file": "A_ss_m40c_3p63v_500kVs__reltol2e-4-tmax1u__r500000.trace.csv.gz",
+   "trace_rows": 429,
+   "tstop_s": 0.01500726,
+   "variant": "reltol2e-4-tmax1u"
+  },
+  {
+   "check": {
+    "end": {
+     "bias_ok_v": 3.629999838909026,
+     "ctat_v": 0.8560688425395987,
+     "ptat_v": 3.615663595859671,
+     "vdd_v": 3.63,
+     "vref_v": 1.249237904709275
+    },
+    "fail_codes": [
+     "nonphysical"
+    ],
+    "ibias": {
+     "end_v": 0.9106670415531106,
+     "max_v": 1.031501089337091,
+     "min_v": 8.279381456219093e-06,
+     "post_release_p2p_v": 1.5193268865232312e-10,
+     "release_step_v": -0.033105972330718325,
+     "swings_gt_5mV": 0
+    },
+    "levels_v": {
+     "V_IH": 2.904,
+     "V_IL": 0.726,
+     "V_MID": 1.815,
+     "V_RUNT": 0.363
+    },
+    "max_dt_s": 5.000000000001531e-06,
+    "n_samples": 3032,
+    "physical": {
+     "isup_end_a": -0.002740981973954258,
+     "isup_positive": false,
+     "ok": false,
+     "violations_after_t0": {},
+     "violations_at_t0": {}
+    },
+    "por_raw": {
+     "n_fall": 0,
+     "n_rise": 1,
+     "rise_after_ramp_end_censored": true,
+     "t_rise_mid_s": 4.1315686519079385e-05,
+     "vdd_at_rise_resolved": false,
+     "vdd_at_rise_v": 3.63
+    },
+    "ramp_error_v": 8.881784197001252e-16,
+    "ramp_ok": true,
+    "ramp_samples": 20,
+    "release_delay_s": 0.0028815733780292933,
+    "resetn": {
+     "end_v": 3.261370241355043,
+     "max_during_ramp_v": 0.08672301439906707,
+     "max_v": 3.26137570010745,
+     "n_episodes_returned": 0,
+     "n_mid_down": 0,
+     "n_mid_up": 1,
+     "n_reassert": 0,
+     "n_release": 1,
+     "n_runt": 0,
+     "premature": false,
+     "released_during_ramp": false,
+     "t_release_mid_s": 0.002922889064548373,
+     "t_release_s": 0.0029233240976210707,
+     "vdd_at_release_v": 3.63
+    },
+    "resolution_ok": true,
+    "stored_trace": {
+     "agrees_with_full_resolution": true,
+     "full_samples": 3032,
+     "n_reassert": 0,
+     "n_release": 1,
+     "n_runt": 0,
+     "premature": false,
+     "rows": 46
+    },
+    "t_end_s": 0.01501452,
+    "tramp_s": 1.452e-05,
+    "transition_fail_codes": [],
+    "transition_verdict": "PASS",
+    "unresolved_reasons": [],
+    "verdict": "FAIL"
+   },
+   "diagnostics": [],
+   "elapsed_seconds": 22,
+   "id": "A_ss_m40c_3p63v_500kVs__base__r250000",
+   "instance_type": "c7i.4xlarge",
+   "job_id": "klt-sim-887b7bed7587",
+   "klt_status": "pass",
+   "lifecycle": "spot",
+   "missing_extra_saves": [],
+   "outcome": "FAIL",
+   "point": "A_ss_m40c_3p63v_500kVs",
+   "rate": 250000.0,
+   "role": "adjacent-rate",
+   "runner_klt_version": "0.5.0",
+   "runtime_s": 16.084,
+   "state": "done",
+   "timeline": {
+    "anchors": [
+     {
+      "events_pm_200us": [
+       {
+        "event": "V_MID fall",
+        "node": "v(xdut.xpor.nd1)",
+        "t_s": 0.0029103686533642715
+       },
+       {
+        "event": "V_MID fall",
+        "node": "v(xdut.xpor.rstb)",
+        "t_s": 0.002922875432565083
+       },
+       {
+        "event": "V_MID rise",
+        "node": "v(resetn)",
+        "t_s": 0.002922889064548373
+       },
+       {
+        "event": "RELEASE (V_IH rise)",
+        "node": "v(resetn)",
+        "t_s": 0.0029233240976210707
+       },
+       {
+        "event": "V_MID rise",
+        "node": "v(xdut.xpor.trip)",
+        "t_s": 0.002923453569612082
+       }
+      ],
+      "ibias_v": {
+       "-0.0002": 0.9437730138716928,
+       "-2e-05": 0.9437730138593297,
+       "0.0": 0.910052239418299,
+       "2e-05": 0.9106666762665748,
+       "0.0002": 0.9106670415293038
+      },
+      "kind": "release",
+      "t_s": 0.0029233240976210707
+     }
+    ],
+    "first_negative_isup_s": 0.002922164008268839,
+    "viol": {}
+   },
+   "trace_file": "A_ss_m40c_3p63v_500kVs__base__r250000.trace.csv.gz",
+   "trace_rows": 86,
+   "tstop_s": 0.01501452,
+   "variant": "base"
+  },
+  {
+   "check": {
+    "end": {
+     "bias_ok_v": 3.629999838909696,
+     "ctat_v": 0.5295239028474301,
+     "ptat_v": 1.513722748054632e-05,
+     "vdd_v": 3.63,
+     "vref_v": 1.249237904762732
+    },
+    "fail_codes": [
+     "nonphysical"
+    ],
+    "ibias": {
+     "end_v": 0.9106670415456153,
+     "max_v": 1.034393058232223,
+     "min_v": -0.001526582307535971,
+     "post_release_p2p_v": 0.005638314517835807,
+     "release_step_v": -0.03310494583106427,
+     "swings_gt_5mV": 2
+    },
+    "levels_v": {
+     "V_IH": 2.904,
+     "V_IL": 0.726,
+     "V_MID": 1.815,
+     "V_RUNT": 0.363
+    },
+    "max_dt_s": 5.000000000001531e-06,
+    "n_samples": 28547,
+    "physical": {
+     "isup_end_a": -0.005925660264742785,
+     "isup_positive": false,
+     "ok": false,
+     "violations_after_t0": {
+      "v(ctat)": {
+       "count": 14,
+       "max": -0.3007449206032518,
+       "min": -0.4011802569687591
+      },
+      "v(xdut.xtemp.na)": {
+       "count": 15,
+       "max": -0.3004863842226059,
+       "min": -0.401136639272386
+      },
+      "v(xdut.xtemp.nb)": {
+       "count": 27855,
+       "max": 5.32579893379268,
+       "min": 5.225306491472005
+      }
+     },
+     "violations_at_t0": {}
+    },
+    "por_raw": {
+     "n_fall": 0,
+     "n_rise": 1,
+     "rise_after_ramp_end_censored": true,
+     "t_rise_mid_s": 2.6313129434988068e-05,
+     "vdd_at_rise_resolved": false,
+     "vdd_at_rise_v": 3.63
+    },
+    "ramp_error_v": 8.881784197001252e-16,
+    "ramp_ok": true,
+    "ramp_samples": 74,
+    "release_delay_s": 0.0028832772499214035,
+    "resetn": {
+     "end_v": 3.261370241354974,
+     "max_during_ramp_v": 0.0838048734849337,
+     "max_v": 3.27252224126641,
+     "n_episodes_returned": 0,
+     "n_mid_down": 0,
+     "n_mid_up": 1,
+     "n_reassert": 0,
+     "n_release": 1,
+     "n_runt": 0,
+     "premature": false,
+     "released_during_ramp": false,
+     "t_release_mid_s": 0.0029095903793563914,
+     "t_release_s": 0.002909613808282721,
+     "vdd_at_release_v": 3.63
+    },
+    "resolution_ok": true,
+    "stored_trace": {
+     "agrees_with_full_resolution": true,
+     "full_samples": 28547,
+     "n_reassert": 0,
+     "n_release": 1,
+     "n_runt": 0,
+     "premature": false,
+     "rows": 133
+    },
+    "t_end_s": 0.01501452,
+    "tramp_s": 1.452e-05,
+    "transition_fail_codes": [],
+    "transition_verdict": "PASS",
+    "unresolved_reasons": [],
+    "verdict": "FAIL"
+   },
+   "diagnostics": [],
+   "elapsed_seconds": 52,
+   "id": "A_ss_m40c_3p63v_500kVs__trtol7__r250000",
+   "instance_type": "c7i.4xlarge",
+   "job_id": "klt-sim-c2bf6e60e1aa",
+   "klt_status": "pass",
+   "lifecycle": "spot",
+   "missing_extra_saves": [],
+   "outcome": "FAIL",
+   "point": "A_ss_m40c_3p63v_500kVs",
+   "rate": 250000.0,
+   "role": "adjacent-rate",
+   "runner_klt_version": "0.5.0",
+   "runtime_s": 45.389,
+   "state": "done",
+   "timeline": {
+    "anchors": [
+     {
+      "events_pm_200us": [
+       {
+        "event": "V_MID fall",
+        "node": "v(xdut.xpor.nd1)",
+        "t_s": 0.002895775877012596
+       },
+       {
+        "event": "V_MID fall",
+        "node": "v(xdut.xpor.rstb)",
+        "t_s": 0.0029093079966807053
+       },
+       {
+        "event": "V_MID rise",
+        "node": "v(resetn)",
+        "t_s": 0.0029095903793563914
+       },
+       {
+        "event": "FIRST out-of-window sample (5.33 V)",
+        "node": "v(xdut.xtemp.nb)",
+        "t_s": 0.002909601657152066
+       },
+       {
+        "event": "RELEASE (V_IH rise)",
+        "node": "v(resetn)",
+        "t_s": 0.002909613808282721
+       },
+       {
+        "event": "FIRST out-of-window sample (-0.301 V)",
+        "node": "v(xdut.xtemp.na)",
+        "t_s": 0.002909706756315172
+       },
+       {
+        "event": "FIRST out-of-window sample (-0.327 V)",
+        "node": "v(ctat)",
+        "t_s": 0.002909740647713533
+       },
+       {
+        "event": "V_MID rise",
+        "node": "v(xdut.xpor.trip)",
+        "t_s": 0.0029097473068194868
+       }
+      ],
+      "ibias_v": {
+       "-0.0002": 0.9437730138720759,
+       "-2e-05": 0.9437730138721644,
+       "0.0": 0.789263567037514,
+       "2e-05": 0.9106284673563606,
+       "0.0002": 0.9106689593960163
+      },
+      "kind": "release",
+      "t_s": 0.002909613808282721
+     }
+    ],
+    "first_negative_isup_s": 0.002909601657152066,
+    "viol": {
+     "v(ctat)": {
+      "t_s": 0.002909740647713533,
+      "v": -0.3272236650621603
+     },
+     "v(xdut.xtemp.na)": {
+      "t_s": 0.002909706756315172,
+      "v": -0.3007356328920731
+     },
+     "v(xdut.xtemp.nb)": {
+      "t_s": 0.002909601657152066,
+      "v": 5.32579893379268
+     }
+    }
+   },
+   "trace_file": "A_ss_m40c_3p63v_500kVs__trtol7__r250000.trace.csv.gz",
+   "trace_rows": 3118,
+   "tstop_s": 0.01501452,
+   "variant": "trtol7"
+  },
+  {
+   "check": {
+    "end": {
+     "bias_ok_v": 3.629999838909343,
+     "ctat_v": 0.782886212049423,
+     "ptat_v": 1.099650297619842,
+     "vdd_v": 3.63,
+     "vref_v": 1.24923790497305
+    },
+    "fail_codes": [],
+    "ibias": {
+     "end_v": 0.9106670415465901,
+     "max_v": 1.033121618883063,
+     "min_v": -0.01078373810734594,
+     "post_release_p2p_v": 1.3085288408376528e-10,
+     "release_step_v": -0.03310597229079737,
+     "swings_gt_5mV": 1
+    },
+    "levels_v": {
+     "V_IH": 2.904,
+     "V_IL": 0.726,
+     "V_MID": 1.815,
+     "V_RUNT": 0.363
+    },
+    "max_dt_s": 5.000000000001531e-06,
+    "n_samples": 3228,
+    "physical": {
+     "isup_end_a": 3.2628713338556755e-05,
+     "isup_positive": true,
+     "ok": true,
+     "violations_after_t0": {},
+     "violations_at_t0": {}
+    },
+    "por_raw": {
+     "n_fall": 0,
+     "n_rise": 1,
+     "rise_after_ramp_end_censored": true,
+     "t_rise_mid_s": 2.635321922596586e-05,
+     "vdd_at_rise_resolved": false,
+     "vdd_at_rise_v": 3.63
+    },
+    "ramp_error_v": 1.3322676295501878e-15,
+    "ramp_ok": true,
+    "ramp_samples": 53,
+    "release_delay_s": 0.002882214378198298,
+    "resetn": {
+     "end_v": 3.2613702413549,
+     "max_during_ramp_v": 0.0853850940780616,
+     "max_v": 3.261386992615172,
+     "n_episodes_returned": 0,
+     "n_mid_down": 0,
+     "n_mid_up": 1,
+     "n_reassert": 0,
+     "n_release": 1,
+     "n_runt": 0,
+     "premature": false,
+     "released_during_ramp": false,
+     "t_release_mid_s": 0.0029085675974242636,
+     "t_release_s": 0.0029085836702335385,
+     "vdd_at_release_v": 3.63
+    },
+    "resolution_ok": true,
+    "stored_trace": {
+     "agrees_with_full_resolution": true,
+     "full_samples": 3228,
+     "n_reassert": 0,
+     "n_release": 1,
+     "n_runt": 0,
+     "premature": false,
+     "rows": 117
+    },
+    "t_end_s": 0.01501452,
+    "tramp_s": 1.452e-05,
+    "transition_fail_codes": [],
+    "transition_verdict": "PASS",
+    "unresolved_reasons": [],
+    "verdict": "PASS"
+   },
+   "diagnostics": [],
+   "elapsed_seconds": 19,
+   "id": "A_ss_m40c_3p63v_500kVs__reltol2e-4__r250000",
+   "instance_type": "c7i.4xlarge",
+   "job_id": "klt-sim-916694eaa2c2",
+   "klt_status": "pass",
+   "lifecycle": "spot",
+   "missing_extra_saves": [],
+   "outcome": "PASS",
+   "point": "A_ss_m40c_3p63v_500kVs",
+   "rate": 250000.0,
+   "role": "adjacent-rate",
+   "runner_klt_version": "0.5.0",
+   "runtime_s": 13.146,
+   "state": "done",
+   "timeline": {
+    "anchors": [
+     {
+      "events_pm_200us": [
+       {
+        "event": "V_MID fall",
+        "node": "v(xdut.xpor.nd1)",
+        "t_s": 0.002895760117707468
+       },
+       {
+        "event": "V_MID fall",
+        "node": "v(xdut.xpor.rstb)",
+        "t_s": 0.0029082638083399604
+       },
+       {
+        "event": "V_MID rise",
+        "node": "v(resetn)",
+        "t_s": 0.0029085675974242636
+       },
+       {
+        "event": "RELEASE (V_IH rise)",
+        "node": "v(resetn)",
+        "t_s": 0.0029085836702335385
+       },
+       {
+        "event": "V_MID rise",
+        "node": "v(xdut.xpor.trip)",
+        "t_s": 0.002908696522555253
+       }
+      ],
+      "ibias_v": {
+       "-0.0002": 0.9437730138901036,
+       "-2e-05": 0.9437730138340061,
+       "0.0": 0.1398064840142254,
+       "2e-05": 0.910667120276909,
+       "0.0002": 0.9106670415432182
+      },
+      "kind": "release",
+      "t_s": 0.0029085836702335385
+     }
+    ],
+    "first_negative_isup_s": null,
+    "viol": {}
+   },
+   "trace_file": "A_ss_m40c_3p63v_500kVs__reltol2e-4__r250000.trace.csv.gz",
+   "trace_rows": 267,
+   "tstop_s": 0.01501452,
+   "variant": "reltol2e-4"
+  },
+  {
+   "check": {
+    "end": {
+     "bias_ok_v": 3.629999838909186,
+     "ctat_v": 0.5275870843132952,
+     "ptat_v": -2.097678703976801,
+     "vdd_v": 3.63,
+     "vref_v": 1.249237904868676
+    },
+    "fail_codes": [
+     "nonphysical"
+    ],
+    "ibias": {
+     "end_v": 0.9106670415508437,
+     "max_v": 1.174285224977162,
+     "min_v": -0.000121322991822836,
+     "post_release_p2p_v": 1.366017299275768e-10,
+     "release_step_v": -0.0331059723501107,
+     "swings_gt_5mV": 4
+    },
+    "levels_v": {
+     "V_IH": 2.904,
+     "V_IL": 0.726,
+     "V_MID": 1.815,
+     "V_RUNT": 0.363
+    },
+    "max_dt_s": 5.000000000003266e-06,
+    "n_samples": 3033,
+    "physical": {
+     "isup_end_a": -0.0012323281392755576,
+     "isup_positive": false,
+     "ok": false,
+     "violations_after_t0": {
+      "v(ptat)": {
+       "count": 2401,
+       "max": -1.453389954525727,
+       "min": -2.276850849001032
+      }
+     },
+     "violations_at_t0": {}
+    },
+    "por_raw": {
+     "n_fall": 1,
+     "n_rise": 2,
+     "rise_after_ramp_end_censored": true,
+     "t_rise_mid_s": 3.585217615890095e-05,
+     "vdd_at_rise_resolved": false,
+     "vdd_at_rise_v": 3.63
+    },
+    "ramp_error_v": 1.3322676295501878e-15,
+    "ramp_ok": true,
+    "ramp_samples": 18,
+    "release_delay_s": 0.002992765035049135,
+    "resetn": {
+     "end_v": 3.26137024135482,
+     "max_during_ramp_v": 0.09047375076272195,
+     "max_v": 3.261383764292257,
+     "n_episodes_returned": 0,
+     "n_mid_down": 0,
+     "n_mid_up": 1,
+     "n_reassert": 0,
+     "n_release": 1,
+     "n_runt": 0,
+     "premature": false,
+     "released_during_ramp": false,
+     "t_release_mid_s": 0.0030286172112080362,
+     "t_release_s": 0.0030288321027454276,
+     "vdd_at_release_v": 3.63
+    },
+    "resolution_ok": true,
+    "stored_trace": {
+     "agrees_with_full_resolution": true,
+     "full_samples": 3033,
+     "n_reassert": 0,
+     "n_release": 1,
+     "n_runt": 0,
+     "premature": false,
+     "rows": 55
+    },
+    "t_end_s": 0.01500363,
+    "tramp_s": 3.63e-06,
+    "transition_fail_codes": [],
+    "transition_verdict": "PASS",
+    "unresolved_reasons": [],
+    "verdict": "FAIL"
+   },
+   "diagnostics": [],
+   "elapsed_seconds": 20,
+   "id": "A_ss_m40c_3p63v_500kVs__base__r1e06",
+   "instance_type": "c7i.4xlarge",
+   "job_id": "klt-sim-99292dca166c",
+   "klt_status": "pass",
+   "lifecycle": "spot",
+   "missing_extra_saves": [],
+   "outcome": "FAIL",
+   "point": "A_ss_m40c_3p63v_500kVs",
+   "rate": 1000000.0,
+   "role": "adjacent-rate",
+   "runner_klt_version": "0.5.0",
+   "runtime_s": 13.788,
+   "state": "done",
+   "timeline": {
+    "anchors": [
+     {
+      "events_pm_200us": [
+       {
+        "event": "V_MID fall",
+        "node": "v(xdut.xpor.nd1)",
+        "t_s": 0.0030145258371873486
+       },
+       {
+        "event": "V_MID fall",
+        "node": "v(xdut.xpor.rstb)",
+        "t_s": 0.003028378919097725
+       },
+       {
+        "event": "V_MID rise",
+        "node": "v(resetn)",
+        "t_s": 0.0030286172112080362
+       },
+       {
+        "event": "V_MID rise",
+        "node": "v(xdut.xpor.trip)",
+        "t_s": 0.003028822416178894
+       },
+       {
+        "event": "RELEASE (V_IH rise)",
+        "node": "v(resetn)",
+        "t_s": 0.0030288321027454276
+       },
+       {
+        "event": "FIRST out-of-window sample (-1.45 V)",
+        "node": "v(ptat)",
+        "t_s": 0.00302888431956058
+       }
+      ],
+      "ibias_v": {
+       "-0.0002": 0.9437730138776754,
+       "-2e-05": 0.9437730138818967,
+       "0.0": 0.9099465728802372,
+       "2e-05": 0.9106667190852533,
+       "0.0002": 0.9106670415320439
+      },
+      "kind": "release",
+      "t_s": 0.0030288321027454276
+     }
+    ],
+    "first_negative_isup_s": 0.00302888431956058,
+    "viol": {
+     "v(ptat)": {
+      "t_s": 0.00302888431956058,
+      "v": -1.453389954525727
+     }
+    }
+   },
+   "trace_file": "A_ss_m40c_3p63v_500kVs__base__r1e06.trace.csv.gz",
+   "trace_rows": 94,
+   "tstop_s": 0.015003629999999999,
+   "variant": "base"
+  },
+  {
+   "check": {
+    "end": {
+     "bias_ok_v": 3.629999838908658,
+     "ctat_v": 47350.69226413819,
+     "ptat_v": 1.513722642967901e-05,
+     "vdd_v": 3.63,
+     "vref_v": 1.249237904660749
+    },
+    "fail_codes": [
+     "nonphysical"
+    ],
+    "ibias": {
+     "end_v": 0.9106670415458592,
+     "max_v": 1.194468119632975,
+     "min_v": -0.00273199082565759,
+     "post_release_p2p_v": 0.035347163955191774,
+     "release_step_v": -0.033109729472650784,
+     "swings_gt_5mV": 1157
+    },
+    "levels_v": {
+     "V_IH": 2.904,
+     "V_IL": 0.726,
+     "V_MID": 1.815,
+     "V_RUNT": 0.363
+    },
+    "max_dt_s": 5.000000000001531e-06,
+    "n_samples": 78968,
+    "physical": {
+     "isup_end_a": -0.0008900085750787081,
+     "isup_positive": false,
+     "ok": false,
+     "violations_after_t0": {
+      "v(ctat)": {
+       "count": 37724,
+       "max": 47375.38629559116,
+       "min": 4888.892599939259
+      },
+      "v(xdut.xtemp.na)": {
+       "count": 37724,
+       "max": -192.1678834318849,
+       "min": -2757.449903836524
+      },
+      "v(xdut.xtemp.nb)": {
+       "count": 78209,
+       "max": 5.311382922627377,
+       "min": 5.212822198414435
+      }
+     },
+     "violations_at_t0": {}
+    },
+    "por_raw": {
+     "n_fall": 1,
+     "n_rise": 2,
+     "rise_after_ramp_end_censored": true,
+     "t_rise_mid_s": 3.206384566338066e-05,
+     "vdd_at_rise_resolved": false,
+     "vdd_at_rise_v": 3.63
+    },
+    "ramp_error_v": 1.3322676295501878e-15,
+    "ramp_ok": true,
+    "ramp_samples": 76,
+    "release_delay_s": 0.002979854052479348,
+    "resetn": {
+     "end_v": 3.261370241354911,
+     "max_during_ramp_v": 0.1221646280155628,
+     "max_v": 3.267193486293976,
+     "n_episodes_returned": 0,
+     "n_mid_down": 0,
+     "n_mid_up": 1,
+     "n_reassert": 0,
+     "n_release": 1,
+     "n_runt": 0,
+     "premature": false,
+     "released_during_ramp": false,
+     "t_release_mid_s": 0.0030119178981427284,
+     "t_release_s": 0.0030119339287726565,
+     "vdd_at_release_v": 3.63
+    },
+    "resolution_ok": true,
+    "stored_trace": {
+     "agrees_with_full_resolution": true,
+     "full_samples": 78968,
+     "n_reassert": 0,
+     "n_release": 1,
+     "n_runt": 0,
+     "premature": false,
+     "rows": 3378
+    },
+    "t_end_s": 0.01500363,
+    "tramp_s": 3.63e-06,
+    "transition_fail_codes": [],
+    "transition_verdict": "PASS",
+    "unresolved_reasons": [],
+    "verdict": "FAIL"
+   },
+   "diagnostics": [],
+   "elapsed_seconds": 114,
+   "id": "A_ss_m40c_3p63v_500kVs__trtol7__r1e06",
+   "instance_type": "c7i.4xlarge",
+   "job_id": "klt-sim-105848ee3a12",
+   "klt_status": "pass",
+   "lifecycle": "spot",
+   "missing_extra_saves": [],
+   "outcome": "FAIL",
+   "point": "A_ss_m40c_3p63v_500kVs",
+   "rate": 1000000.0,
+   "role": "adjacent-rate",
+   "runner_klt_version": "0.5.0",
+   "runtime_s": 103.529,
+   "state": "done",
+   "timeline": {
+    "anchors": [
+     {
+      "events_pm_200us": [
+       {
+        "event": "V_MID fall",
+        "node": "v(xdut.xpor.nd1)",
+        "t_s": 0.0029983751494962094
+       },
+       {
+        "event": "FIRST out-of-window sample (5.28 V)",
+        "node": "v(xdut.xtemp.nb)",
+        "t_s": 0.003010270403796108
+       },
+       {
+        "event": "V_MID fall",
+        "node": "v(xdut.xpor.rstb)",
+        "t_s": 0.0030116240204159867
+       },
+       {
+        "event": "V_MID rise",
+        "node": "v(resetn)",
+        "t_s": 0.0030119178981427284
+       },
+       {
+        "event": "RELEASE (V_IH rise)",
+        "node": "v(resetn)",
+        "t_s": 0.0030119339287726565
+       },
+       {
+        "event": "V_MID rise",
+        "node": "v(xdut.xpor.trip)",
+        "t_s": 0.0030120468763304396
+       }
+      ],
+      "ibias_v": {
+       "-0.0002": 0.9437730138696144,
+       "-2e-05": 0.9437730138513193,
+       "0.0": 0.15623726287067094,
+       "2e-05": 0.9106674172883084,
+       "0.0002": 0.9106648562790688
+      },
+      "kind": "release",
+      "t_s": 0.0030119339287726565
+     }
+    ],
+    "first_negative_isup_s": 0.003010270403796108,
+    "viol": {
+     "v(ctat)": {
+      "t_s": 0.004383350718342133,
+      "v": 4888.892599939259
+     },
+     "v(xdut.xtemp.na)": {
+      "t_s": 0.004383350718342133,
+      "v": -192.1678834318849
+     },
+     "v(xdut.xtemp.nb)": {
+      "t_s": 0.003010270403796108,
+      "v": 5.278271389895024
+     }
+    }
+   },
+   "trace_file": "A_ss_m40c_3p63v_500kVs__trtol7__r1e06.trace.csv.gz",
+   "trace_rows": 4224,
+   "tstop_s": 0.015003629999999999,
+   "variant": "trtol7"
+  },
+  {
+   "check": {
+    "end": {
+     "bias_ok_v": 3.629999838908792,
+     "ctat_v": 0.7828862120426932,
+     "ptat_v": 1.099650297661857,
+     "vdd_v": 3.63,
+     "vref_v": 1.249237905101081
+    },
+    "fail_codes": [],
+    "ibias": {
+     "end_v": 0.910667041546509,
+     "max_v": 1.21639725571025,
+     "min_v": -0.003408748872670173,
+     "post_release_p2p_v": 1.1489087459182201e-10,
+     "release_step_v": -0.033105972302759246,
+     "swings_gt_5mV": 4
+    },
+    "levels_v": {
+     "V_IH": 2.904,
+     "V_IL": 0.726,
+     "V_MID": 1.815,
+     "V_RUNT": 0.363
+    },
+    "max_dt_s": 5.000000000001531e-06,
+    "n_samples": 3243,
+    "physical": {
+     "isup_end_a": 3.262871333868973e-05,
+     "isup_positive": true,
+     "ok": true,
+     "violations_after_t0": {},
+     "violations_at_t0": {}
+    },
+    "por_raw": {
+     "n_fall": 1,
+     "n_rise": 2,
+     "rise_after_ramp_end_censored": true,
+     "t_rise_mid_s": 3.293413343234506e-05,
+     "vdd_at_rise_resolved": false,
+     "vdd_at_rise_v": 3.63
+    },
+    "ramp_error_v": 1.1102230246251565e-15,
+    "ramp_ok": true,
+    "ramp_samples": 48,
+    "release_delay_s": 0.002988251137553913,
+    "resetn": {
+     "end_v": 3.261370241355031,
+     "max_during_ramp_v": 0.1124761978474191,
+     "max_v": 3.261386932831119,
+     "n_episodes_returned": 0,
+     "n_mid_down": 0,
+     "n_mid_up": 1,
+     "n_reassert": 0,
+     "n_release": 1,
+     "n_runt": 0,
+     "premature": false,
+     "released_during_ramp": false,
+     "t_release_mid_s": 0.003021185270986258,
+     "t_release_s": 0.0030212012269626174,
+     "vdd_at_release_v": 3.63
+    },
+    "resolution_ok": true,
+    "stored_trace": {
+     "agrees_with_full_resolution": true,
+     "full_samples": 3243,
+     "n_reassert": 0,
+     "n_release": 1,
+     "n_runt": 0,
+     "premature": false,
+     "rows": 138
+    },
+    "t_end_s": 0.01500363,
+    "tramp_s": 3.63e-06,
+    "transition_fail_codes": [],
+    "transition_verdict": "PASS",
+    "unresolved_reasons": [],
+    "verdict": "PASS"
+   },
+   "diagnostics": [],
+   "elapsed_seconds": 21,
+   "id": "A_ss_m40c_3p63v_500kVs__reltol2e-4__r1e06",
+   "instance_type": "c7i.4xlarge",
+   "job_id": "klt-sim-dc7a077b8bec",
+   "klt_status": "pass",
+   "lifecycle": "spot",
+   "missing_extra_saves": [],
+   "outcome": "PASS",
+   "point": "A_ss_m40c_3p63v_500kVs",
+   "rate": 1000000.0,
+   "role": "adjacent-rate",
+   "runner_klt_version": "0.5.0",
+   "runtime_s": 15.303,
+   "state": "done",
+   "timeline": {
+    "anchors": [
+     {
+      "events_pm_200us": [
+       {
+        "event": "V_MID fall",
+        "node": "v(xdut.xpor.nd1)",
+        "t_s": 0.00300846020094997
+       },
+       {
+        "event": "V_MID fall",
+        "node": "v(xdut.xpor.rstb)",
+        "t_s": 0.0030208765846797257
+       },
+       {
+        "event": "V_MID rise",
+        "node": "v(resetn)",
+        "t_s": 0.003021185270986258
+       },
+       {
+        "event": "RELEASE (V_IH rise)",
+        "node": "v(resetn)",
+        "t_s": 0.0030212012269626174
+       },
+       {
+        "event": "V_MID rise",
+        "node": "v(xdut.xpor.trip)",
+        "t_s": 0.003021314196803379
+       }
+      ],
+      "ibias_v": {
+       "-0.0002": 0.9437730138925028,
+       "-2e-05": 0.9437730138782793,
+       "0.0": 0.1427872235384702,
+       "2e-05": 0.9106671284251229,
+       "0.0002": 0.9106670415755425
+      },
+      "kind": "release",
+      "t_s": 0.0030212012269626174
+     }
+    ],
+    "first_negative_isup_s": null,
+    "viol": {}
+   },
+   "trace_file": "A_ss_m40c_3p63v_500kVs__reltol2e-4__r1e06.trace.csv.gz",
+   "trace_rows": 267,
+   "tstop_s": 0.015003629999999999,
+   "variant": "reltol2e-4"
+  },
+  {
+   "check": {
+    "end": {
+     "bias_ok_v": 2.969999774121058,
+     "ctat_v": 1.627462075253009e-08,
+     "ptat_v": 1.644381955001095e-08,
+     "vdd_v": 2.97,
+     "vref_v": 0.3663132491661747
+    },
+    "fail_codes": [
+     "reassert_after_release",
+     "extra_mid_crossings",
+     "nonphysical"
+    ],
+    "ibias": {
+     "end_v": 0.37708623730852686,
+     "max_v": 1.302315906888318,
+     "min_v": -1.362296718760572e-05,
+     "post_release_p2p_v": 0.14899285608417245,
+     "release_step_v": -0.3276466502194286,
+     "swings_gt_5mV": 4
+    },
+    "levels_v": {
+     "V_IH": 2.3760000000000003,
+     "V_IL": 0.5940000000000001,
+     "V_MID": 1.485,
+     "V_RUNT": 0.29700000000000004
+    },
+    "max_dt_s": 5.00000000000847e-06,
+    "n_samples": 3200,
+    "physical": {
+     "isup_end_a": -0.005568202821864807,
+     "isup_positive": false,
+     "ok": false,
+     "violations_after_t0": {
+      "v(xdut.xbias.nb)": {
+       "count": 2461,
+       "max": -797.3474570269996,
+       "min": -172333154.8658606
+      }
+     },
+     "violations_at_t0": {}
+    },
+    "por_raw": {
+     "n_fall": 1,
+     "n_rise": 2,
+     "rise_after_ramp_end_censored": false,
+     "t_rise_mid_s": 0.0005776798341872843,
+     "vdd_at_rise_resolved": true,
+     "vdd_at_rise_v": 2.888399170936422
+    },
+    "ramp_error_v": 8.881784197001252e-16,
+    "ramp_ok": true,
+    "ramp_samples": 127,
+    "release_delay_s": 0.0030511596702774858,
+    "resetn": {
+     "end_v": 7.427530591181863e-10,
+     "max_during_ramp_v": 0.01187853279249735,
+     "max_v": 2.733271173199621,
+     "n_episodes_returned": 1,
+     "n_mid_down": 1,
+     "n_mid_up": 1,
+     "n_reassert": 1,
+     "n_release": 1,
+     "n_runt": 0,
+     "premature": false,
+     "released_during_ramp": false,
+     "t_release_mid_s": 0.00362883950446477,
+     "t_release_s": 0.0036288578990180077,
+     "vdd_at_release_v": 2.97
+    },
+    "resolution_ok": true,
+    "stored_trace": {
+     "agrees_with_full_resolution": true,
+     "full_samples": 3200,
+     "n_reassert": 1,
+     "n_release": 1,
+     "n_runt": 0,
+     "premature": false,
+     "rows": 295
+    },
+    "t_end_s": 0.015726,
+    "tramp_s": 0.000594,
+    "transition_fail_codes": [
+     "reassert_after_release",
+     "extra_mid_crossings"
+    ],
+    "transition_verdict": "FAIL",
+    "unresolved_reasons": [],
+    "verdict": "FAIL"
+   },
+   "diagnostics": [],
+   "elapsed_seconds": 19,
+   "id": "B_fs_27c_2p97v_5kVs__base__r5000",
+   "instance_type": "c7i.4xlarge",
+   "job_id": "klt-sim-48255c667fba",
+   "klt_status": "pass",
+   "lifecycle": "spot",
+   "missing_extra_saves": [],
+   "outcome": "FAIL",
+   "point": "B_fs_27c_2p97v_5kVs",
+   "rate": 5000.0,
+   "role": "exact",
+   "runner_klt_version": "0.5.0",
+   "runtime_s": 13.048,
+   "state": "done",
+   "timeline": {
+    "anchors": [
+     {
+      "events_pm_200us": [
+       {
+        "event": "V_MID fall",
+        "node": "v(xdut.xpor.nd1)",
+        "t_s": 0.003614997094542234
+       },
+       {
+        "event": "V_MID rise",
+        "node": "v(xdut.xpor.trip)",
+        "t_s": 0.0036284675763243804
+       },
+       {
+        "event": "FIRST out-of-window sample (-797 V)",
+        "node": "v(xdut.xbias.nb)",
+        "t_s": 0.003628552735497421
+       },
+       {
+        "event": "V_MID fall",
+        "node": "v(xdut.por_raw)",
+        "t_s": 0.0036287169991710195
+       },
+       {
+        "event": "V_MID rise",
+        "node": "v(xdut.xcmp.n1)",
+        "t_s": 0.003628717125424469
+       },
+       {
+        "event": "V_MID fall",
+        "node": "v(xdut.xcmp.cmpo)",
+        "t_s": 0.003628725365706192
+       },
+       {
+        "event": "V_MID fall",
+        "node": "v(xdut.xpor.rstb)",
+        "t_s": 0.003628759273729734
+       },
+       {
+        "event": "V_MID rise",
+        "node": "v(resetn)",
+        "t_s": 0.00362883950446477
+       },
+       {
+        "event": "RELEASE (V_IH rise)",
+        "node": "v(resetn)",
+        "t_s": 0.0036288578990180077
+       },
+       {
+        "event": "V_MID fall",
+        "node": "v(xdut.xpor.tim)",
+        "t_s": 0.0036307328211643707
+       },
+       {
+        "event": "V_MID fall",
+        "node": "v(xdut.xpor.pgdg)",
+        "t_s": 0.0036307543748444896
+       },
+       {
+        "event": "V_MID fall",
+        "node": "v(resetn)",
+        "t_s": 0.003630768334051088
+       },
+       {
+        "event": "V_MID rise",
+        "node": "v(xdut.xpor.rstb)",
+        "t_s": 0.003630795217448929
+       },
+       {
+        "event": "V_MID rise",
+        "node": "v(xdut.xpor.pgdgb)",
+        "t_s": 0.003630795224444849
+       },
+       {
+        "event": "V_MID rise",
+        "node": "v(xdut.xpor.nd1)",
+        "t_s": 0.0036307952494167104
+       },
+       {
+        "event": "V_MID fall",
+        "node": "v(xdut.xpor.trip)",
+        "t_s": 0.003630795572806097
+       },
+       {
+        "event": "RE-ASSERT (V_IL fall)",
+        "node": "v(resetn)",
+        "t_s": 0.0036309705608109566
+       },
+       {
+        "event": "V_MID rise",
+        "node": "v(xdut.xpor.ndg)",
+        "t_s": 0.003634037156878554
+       },
+       {
+        "event": "V_MID rise",
+        "node": "v(xdut.xcmp.cmpo)",
+        "t_s": 0.003638423436728837
+       },
+       {
+        "event": "V_MID fall",
+        "node": "v(xdut.xpor.ndg)",
+        "t_s": 0.0036394427997393556
+       },
+       {
+        "event": "V_MID fall",
+        "node": "v(xdut.xcmp.n1)",
+        "t_s": 0.0036395994012501523
+       },
+       {
+        "event": "V_MID rise",
+        "node": "v(xdut.por_raw)",
+        "t_s": 0.003639838619120409
+       },
+       {
+        "event": "V_MID fall",
+        "node": "v(xdut.xpor.pgdgb)",
+        "t_s": 0.003643410246407402
+       },
+       {
+        "event": "V_MID rise",
+        "node": "v(xdut.xpor.pgdg)",
+        "t_s": 0.0036435250393702574
+       }
+      ],
+      "ibias_v": {
+       "-0.0002": 0.9076194521868388,
+       "-2e-05": 0.907619452167721,
+       "0.0": 1.1841249403466017,
+       "2e-05": 0.7283436793483931,
+       "0.0002": 0.5799671796922261
+      },
+      "kind": "release",
+      "t_s": 0.0036288578990180077
+     },
+     {
+      "events_pm_200us": [
+       {
+        "event": "V_MID fall",
+        "node": "v(xdut.xpor.nd1)",
+        "t_s": 0.003614997094542234
+       },
+       {
+        "event": "V_MID rise",
+        "node": "v(xdut.xpor.trip)",
+        "t_s": 0.0036284675763243804
+       },
+       {
+        "event": "FIRST out-of-window sample (-797 V)",
+        "node": "v(xdut.xbias.nb)",
+        "t_s": 0.003628552735497421
+       },
+       {
+        "event": "V_MID fall",
+        "node": "v(xdut.por_raw)",
+        "t_s": 0.0036287169991710195
+       },
+       {
+        "event": "V_MID rise",
+        "node": "v(xdut.xcmp.n1)",
+        "t_s": 0.003628717125424469
+       },
+       {
+        "event": "V_MID fall",
+        "node": "v(xdut.xcmp.cmpo)",
+        "t_s": 0.003628725365706192
+       },
+       {
+        "event": "V_MID fall",
+        "node": "v(xdut.xpor.rstb)",
+        "t_s": 0.003628759273729734
+       },
+       {
+        "event": "V_MID rise",
+        "node": "v(resetn)",
+        "t_s": 0.00362883950446477
+       },
+       {
+        "event": "RELEASE (V_IH rise)",
+        "node": "v(resetn)",
+        "t_s": 0.0036288578990180077
+       },
+       {
+        "event": "V_MID fall",
+        "node": "v(xdut.xpor.tim)",
+        "t_s": 0.0036307328211643707
+       },
+       {
+        "event": "V_MID fall",
+        "node": "v(xdut.xpor.pgdg)",
+        "t_s": 0.0036307543748444896
+       },
+       {
+        "event": "V_MID fall",
+        "node": "v(resetn)",
+        "t_s": 0.003630768334051088
+       },
+       {
+        "event": "V_MID rise",
+        "node": "v(xdut.xpor.rstb)",
+        "t_s": 0.003630795217448929
+       },
+       {
+        "event": "V_MID rise",
+        "node": "v(xdut.xpor.pgdgb)",
+        "t_s": 0.003630795224444849
+       },
+       {
+        "event": "V_MID rise",
+        "node": "v(xdut.xpor.nd1)",
+        "t_s": 0.0036307952494167104
+       },
+       {
+        "event": "V_MID fall",
+        "node": "v(xdut.xpor.trip)",
+        "t_s": 0.003630795572806097
+       },
+       {
+        "event": "RE-ASSERT (V_IL fall)",
+        "node": "v(resetn)",
+        "t_s": 0.0036309705608109566
+       },
+       {
+        "event": "V_MID rise",
+        "node": "v(xdut.xpor.ndg)",
+        "t_s": 0.003634037156878554
+       },
+       {
+        "event": "V_MID rise",
+        "node": "v(xdut.xcmp.cmpo)",
+        "t_s": 0.003638423436728837
+       },
+       {
+        "event": "V_MID fall",
+        "node": "v(xdut.xpor.ndg)",
+        "t_s": 0.0036394427997393556
+       },
+       {
+        "event": "V_MID fall",
+        "node": "v(xdut.xcmp.n1)",
+        "t_s": 0.0036395994012501523
+       },
+       {
+        "event": "V_MID rise",
+        "node": "v(xdut.por_raw)",
+        "t_s": 0.003639838619120409
+       },
+       {
+        "event": "V_MID fall",
+        "node": "v(xdut.xpor.pgdgb)",
+        "t_s": 0.003643410246407402
+       },
+       {
+        "event": "V_MID rise",
+        "node": "v(xdut.xpor.pgdg)",
+        "t_s": 0.0036435250393702574
+       }
+      ],
+      "ibias_v": {
+       "-0.0002": 0.9076194521892015,
+       "-2e-05": 0.9076194521737955,
+       "0.0": 0.9729433354272166,
+       "2e-05": 0.7210397291769831,
+       "0.0002": 0.5793254641484684
+      },
+      "kind": "reassert",
+      "t_s": 0.0036309705608109566
+     }
+    ],
+    "first_negative_isup_s": 0.003628552735497421,
+    "viol": {
+     "v(xdut.xbias.nb)": {
+      "t_s": 0.003628552735497421,
+      "v": -797.3474570269996
+     }
+    }
+   },
+   "trace_file": "B_fs_27c_2p97v_5kVs__base__r5000.trace.csv.gz",
+   "trace_rows": 257,
+   "tstop_s": 0.015726,
+   "variant": "base"
+  },
+  {
+   "check": {
+    "end": {
+     "bias_ok_v": 2.969999773023229,
+     "ctat_v": 0.3346174155436503,
+     "ptat_v": 1.411200608560505e-05,
+     "vdd_v": 2.97,
+     "vref_v": 1.256906394952903
+    },
+    "fail_codes": [
+     "nonphysical"
+    ],
+    "ibias": {
+     "end_v": 0.8666867049696638,
+     "max_v": 0.9131316056769132,
+     "min_v": -1.380443930390808e-05,
+     "post_release_p2p_v": 0.0022780976620534465,
+     "release_step_v": -0.040954332583411523,
+     "swings_gt_5mV": 1
+    },
+    "levels_v": {
+     "V_IH": 2.3760000000000003,
+     "V_IL": 0.5940000000000001,
+     "V_MID": 1.485,
+     "V_RUNT": 0.29700000000000004
+    },
+    "max_dt_s": 5.00000000000847e-06,
+    "n_samples": 14915,
+    "physical": {
+     "isup_end_a": -0.001743252168430496,
+     "isup_positive": false,
+     "ok": false,
+     "violations_after_t0": {},
+     "violations_at_t0": {}
+    },
+    "por_raw": {
+     "n_fall": 0,
+     "n_rise": 1,
+     "rise_after_ramp_end_censored": false,
+     "t_rise_mid_s": 0.0005797936151537201,
+     "vdd_at_rise_resolved": true,
+     "vdd_at_rise_v": 2.8989680757686007
+    },
+    "ramp_error_v": 8.881784197001252e-16,
+    "ramp_ok": true,
+    "ramp_samples": 194,
+    "release_delay_s": 0.0030528952025004777,
+    "resetn": {
+     "end_v": 2.733271414758309,
+     "max_during_ramp_v": 0.01187853279249735,
+     "max_v": 2.737017564393655,
+     "n_episodes_returned": 0,
+     "n_mid_down": 0,
+     "n_mid_up": 1,
+     "n_reassert": 0,
+     "n_release": 1,
+     "n_runt": 0,
+     "premature": false,
+     "released_during_ramp": false,
+     "t_release_mid_s": 0.0036326888176541976,
+     "t_release_s": 0.003632735039461297,
+     "vdd_at_release_v": 2.97
+    },
+    "resolution_ok": true,
+    "stored_trace": {
+     "agrees_with_full_resolution": true,
+     "full_samples": 14915,
+     "n_reassert": 0,
+     "n_release": 1,
+     "n_runt": 0,
+     "premature": false,
+     "rows": 218
+    },
+    "t_end_s": 0.015726,
+    "tramp_s": 0.000594,
+    "transition_fail_codes": [],
+    "transition_verdict": "PASS",
+    "unresolved_reasons": [],
+    "verdict": "FAIL"
+   },
+   "diagnostics": [],
+   "elapsed_seconds": 33,
+   "id": "B_fs_27c_2p97v_5kVs__trtol7__r5000",
+   "instance_type": "c7i.4xlarge",
+   "job_id": "klt-sim-ddb40755707f",
+   "klt_status": "pass",
+   "lifecycle": "spot",
+   "missing_extra_saves": [],
+   "outcome": "FAIL",
+   "point": "B_fs_27c_2p97v_5kVs",
+   "rate": 5000.0,
+   "role": "solver",
+   "runner_klt_version": "0.5.0",
+   "runtime_s": 26.698,
+   "state": "done",
+   "timeline": {
+    "anchors": [
+     {
+      "events_pm_200us": [
+       {
+        "event": "V_MID fall",
+        "node": "v(xdut.xpor.nd1)",
+        "t_s": 0.0036183618500609986
+       },
+       {
+        "event": "V_MID rise",
+        "node": "v(xdut.xpor.trip)",
+        "t_s": 0.0036320942810207533
+       },
+       {
+        "event": "V_MID fall",
+        "node": "v(xdut.xpor.rstb)",
+        "t_s": 0.003632448575553484
+       },
+       {
+        "event": "V_MID rise",
+        "node": "v(resetn)",
+        "t_s": 0.0036326888176541976
+       },
+       {
+        "event": "RELEASE (V_IH rise)",
+        "node": "v(resetn)",
+        "t_s": 0.003632735039461297
+       }
+      ],
+      "ibias_v": {
+       "-0.0002": 0.9076194521691748,
+       "-2e-05": 0.9076194521814477,
+       "0.0": 0.8609023401975867,
+       "2e-05": 0.8666669907862924,
+       "0.0002": 0.8666742540578659
+      },
+      "kind": "release",
+      "t_s": 0.003632735039461297
+     }
+    ],
+    "first_negative_isup_s": 0.004350048427861945,
+    "viol": {}
+   },
+   "trace_file": "B_fs_27c_2p97v_5kVs__trtol7__r5000.trace.csv.gz",
+   "trace_rows": 1919,
+   "tstop_s": 0.015726,
+   "variant": "trtol7"
+  },
+  {
+   "check": {
+    "end": {
+     "bias_ok_v": 2.969999773022032,
+     "ctat_v": 0.6589922615719482,
+     "ptat_v": 1.414360739120155,
+     "vdd_v": 2.97,
+     "vref_v": 1.256906394656506
+    },
+    "fail_codes": [],
+    "ibias": {
+     "end_v": 0.8666867049670486,
+     "max_v": 0.913126416308597,
+     "min_v": -1.362236355614805e-05,
+     "post_release_p2p_v": 8.209000146308654e-11,
+     "release_step_v": -0.040932747223954125,
+     "swings_gt_5mV": 1
+    },
+    "levels_v": {
+     "V_IH": 2.3760000000000003,
+     "V_IL": 0.5940000000000001,
+     "V_MID": 1.485,
+     "V_RUNT": 0.29700000000000004
+    },
+    "max_dt_s": 5.00000000000847e-06,
+    "n_samples": 3306,
+    "physical": {
+     "isup_end_a": 1.934388116845242e-05,
+     "isup_positive": true,
+     "ok": true,
+     "violations_after_t0": {},
+     "violations_at_t0": {}
+    },
+    "por_raw": {
+     "n_fall": 0,
+     "n_rise": 1,
+     "rise_after_ramp_end_censored": false,
+     "t_rise_mid_s": 0.0005796615261106933,
+     "vdd_at_rise_resolved": true,
+     "vdd_at_rise_v": 2.8983076305534663
+    },
+    "ramp_error_v": 6.661338147750939e-16,
+    "ramp_ok": true,
+    "ramp_samples": 154,
+    "release_delay_s": 0.003052324558002797,
+    "resetn": {
+     "end_v": 2.733271414758969,
+     "max_during_ramp_v": 0.01188543996522925,
+     "max_v": 2.733297874779686,
+     "n_episodes_returned": 0,
+     "n_mid_down": 0,
+     "n_mid_up": 1,
+     "n_reassert": 0,
+     "n_release": 1,
+     "n_runt": 0,
+     "premature": false,
+     "released_during_ramp": false,
+     "t_release_mid_s": 0.0036319860841134903,
+     "t_release_s": 0.003632188358669985,
+     "vdd_at_release_v": 2.97
+    },
+    "resolution_ok": true,
+    "stored_trace": {
+     "agrees_with_full_resolution": true,
+     "full_samples": 3306,
+     "n_reassert": 0,
+     "n_release": 1,
+     "n_runt": 0,
+     "premature": false,
+     "rows": 183
+    },
+    "t_end_s": 0.015726,
+    "tramp_s": 0.000594,
+    "transition_fail_codes": [],
+    "transition_verdict": "PASS",
+    "unresolved_reasons": [],
+    "verdict": "PASS"
+   },
+   "diagnostics": [],
+   "elapsed_seconds": 21,
+   "id": "B_fs_27c_2p97v_5kVs__reltol2e-4__r5000",
+   "instance_type": "c7i.4xlarge",
+   "job_id": "klt-sim-f433e65aac9c",
+   "klt_status": "pass",
+   "lifecycle": "spot",
+   "missing_extra_saves": [],
+   "outcome": "PASS",
+   "point": "B_fs_27c_2p97v_5kVs",
+   "rate": 5000.0,
+   "role": "solver",
+   "runner_klt_version": "0.5.0",
+   "runtime_s": 14.708,
+   "state": "done",
+   "timeline": {
+    "anchors": [
+     {
+      "events_pm_200us": [
+       {
+        "event": "V_MID fall",
+        "node": "v(xdut.xpor.nd1)",
+        "t_s": 0.003617962325684136
+       },
+       {
+        "event": "V_MID rise",
+        "node": "v(xdut.xpor.trip)",
+        "t_s": 0.003631519411352738
+       },
+       {
+        "event": "V_MID fall",
+        "node": "v(xdut.xpor.rstb)",
+        "t_s": 0.003631882199814284
+       },
+       {
+        "event": "V_MID rise",
+        "node": "v(resetn)",
+        "t_s": 0.0036319860841134903
+       },
+       {
+        "event": "RELEASE (V_IH rise)",
+        "node": "v(resetn)",
+        "t_s": 0.003632188358669985
+       }
+      ],
+      "ibias_v": {
+       "-0.0002": 0.9076194521865661,
+       "-2e-05": 0.9076194522052545,
+       "0.0": 0.8644013205217919,
+       "2e-05": 0.8666865986665544,
+       "0.0002": 0.8666867049823987
+      },
+      "kind": "release",
+      "t_s": 0.003632188358669985
+     }
+    ],
+    "first_negative_isup_s": null,
+    "viol": {}
+   },
+   "trace_file": "B_fs_27c_2p97v_5kVs__reltol2e-4__r5000.trace.csv.gz",
+   "trace_rows": 314,
+   "tstop_s": 0.015726,
+   "variant": "reltol2e-4"
+  },
+  {
+   "check": {
+    "end": {
+     "bias_ok_v": 2.969999775899645,
+     "ctat_v": 0.6557946812169025,
+     "ptat_v": 1.414124472192194,
+     "vdd_v": 2.97,
+     "vref_v": 1.256906394381845
+    },
+    "fail_codes": [],
+    "ibias": {
+     "end_v": 0.866686723345886,
+     "max_v": 0.9147984375286948,
+     "min_v": -1.330082999874853e-05,
+     "post_release_p2p_v": 0.0008264249976591698,
+     "release_step_v": -0.0409365807372537,
+     "swings_gt_5mV": 1
+    },
+    "levels_v": {
+     "V_IH": 2.3760000000000003,
+     "V_IL": 0.5940000000000001,
+     "V_MID": 1.485,
+     "V_RUNT": 0.29700000000000004
+    },
+    "max_dt_s": 5.00000000000847e-06,
+    "n_samples": 55256,
+    "physical": {
+     "isup_end_a": 1.9338274234682113e-05,
+     "isup_positive": true,
+     "ok": true,
+     "violations_after_t0": {},
+     "violations_at_t0": {}
+    },
+    "por_raw": {
+     "n_fall": 0,
+     "n_rise": 1,
+     "rise_after_ramp_end_censored": false,
+     "t_rise_mid_s": 0.000580823679810662,
+     "vdd_at_rise_resolved": true,
+     "vdd_at_rise_v": 2.90411839905331
+    },
+    "ramp_error_v": 6.661338147750939e-16,
+    "ramp_ok": true,
+    "ramp_samples": 133,
+    "release_delay_s": 0.003055438662144124,
+    "resetn": {
+     "end_v": 2.733272823456823,
+     "max_during_ramp_v": 0.01201910690200461,
+     "max_v": 2.733354026257437,
+     "n_episodes_returned": 0,
+     "n_mid_down": 0,
+     "n_mid_up": 1,
+     "n_reassert": 0,
+     "n_release": 1,
+     "n_runt": 0,
+     "premature": false,
+     "released_during_ramp": false,
+     "t_release_mid_s": 0.003636262341954786,
+     "t_release_s": 0.0036366092430054,
+     "vdd_at_release_v": 2.97
+    },
+    "resolution_ok": true,
+    "stored_trace": {
+     "agrees_with_full_resolution": true,
+     "full_samples": 55256,
+     "n_reassert": 0,
+     "n_release": 1,
+     "n_runt": 0,
+     "premature": false,
+     "rows": 241
+    },
+    "t_end_s": 0.015726,
+    "tramp_s": 0.000594,
+    "transition_fail_codes": [],
+    "transition_verdict": "PASS",
+    "unresolved_reasons": [],
+    "verdict": "PASS"
+   },
+   "diagnostics": [],
+   "elapsed_seconds": 133,
+   "id": "B_fs_27c_2p97v_5kVs__trap__r5000",
+   "instance_type": "c7i.4xlarge",
+   "job_id": "klt-sim-7cba0be075a7",
+   "klt_status": "pass",
+   "lifecycle": "spot",
+   "missing_extra_saves": [],
+   "outcome": "PASS",
+   "point": "B_fs_27c_2p97v_5kVs",
+   "rate": 5000.0,
+   "role": "solver",
+   "runner_klt_version": "0.5.0",
+   "runtime_s": 112.082,
+   "state": "done",
+   "timeline": {
+    "anchors": [
+     {
+      "events_pm_200us": [
+       {
+        "event": "V_MID fall",
+        "node": "v(xdut.xpor.nd1)",
+        "t_s": 0.0036211984813309993
+       },
+       {
+        "event": "V_MID rise",
+        "node": "v(xdut.xpor.trip)",
+        "t_s": 0.003636035187031533
+       },
+       {
+        "event": "V_MID fall",
+        "node": "v(xdut.xpor.rstb)",
+        "t_s": 0.0036362453289435813
+       },
+       {
+        "event": "V_MID rise",
+        "node": "v(resetn)",
+        "t_s": 0.003636262341954786
+       },
+       {
+        "event": "RELEASE (V_IH rise)",
+        "node": "v(resetn)",
+        "t_s": 0.0036366092430054
+       }
+      ],
+      "ibias_v": {
+       "-0.0002": 0.9076442088095541,
+       "-2e-05": 0.9076401534013738,
+       "0.0": 0.86700824528931,
+       "2e-05": 0.8666701556166011,
+       "0.0002": 0.8666869362927275
+      },
+      "kind": "release",
+      "t_s": 0.0036366092430054
+     }
+    ],
+    "first_negative_isup_s": null,
+    "viol": {}
+   },
+   "trace_file": "B_fs_27c_2p97v_5kVs__trap__r5000.trace.csv.gz",
+   "trace_rows": 1389,
+   "tstop_s": 0.015726,
+   "variant": "trap"
+  },
+  {
+   "check": {
+    "end": {
+     "bias_ok_v": 2.969999773024733,
+     "ctat_v": 0.6589922615721252,
+     "ptat_v": 1.414360739245831,
+     "vdd_v": 2.97,
+     "vref_v": 1.25690639493661
+    },
+    "fail_codes": [],
+    "ibias": {
+     "end_v": 0.8666867049650384,
+     "max_v": 0.9131273944933582,
+     "min_v": -1.887371466525136e-05,
+     "post_release_p2p_v": 8.276812568652758e-11,
+     "release_step_v": -0.040932747213533016,
+     "swings_gt_5mV": 0
+    },
+    "levels_v": {
+     "V_IH": 2.3760000000000003,
+     "V_IL": 0.5940000000000001,
+     "V_MID": 1.485,
+     "V_RUNT": 0.29700000000000004
+    },
+    "max_dt_s": 1.000000000007939e-06,
+    "n_samples": 15757,
+    "physical": {
+     "isup_end_a": 1.9343881167359264e-05,
+     "isup_positive": true,
+     "ok": true,
+     "violations_after_t0": {},
+     "violations_at_t0": {}
+    },
+    "por_raw": {
+     "n_fall": 0,
+     "n_rise": 1,
+     "rise_after_ramp_end_censored": false,
+     "t_rise_mid_s": 0.0005799545057065866,
+     "vdd_at_rise_resolved": true,
+     "vdd_at_rise_v": 2.899772528532933
+    },
+    "ramp_error_v": 8.881784197001252e-16,
+    "ramp_ok": true,
+    "ramp_samples": 608,
+    "release_delay_s": 0.00305381822871242,
+    "resetn": {
+     "end_v": 2.733271414758699,
+     "max_during_ramp_v": 0.01213699249530541,
+     "max_v": 2.733271749023339,
+     "n_episodes_returned": 0,
+     "n_mid_down": 0,
+     "n_mid_up": 1,
+     "n_reassert": 0,
+     "n_release": 1,
+     "n_runt": 0,
+     "premature": false,
+     "released_during_ramp": false,
+     "t_release_mid_s": 0.0036337727344190065,
+     "t_release_s": 0.00363423875192444,
+     "vdd_at_release_v": 2.97
+    },
+    "resolution_ok": true,
+    "stored_trace": {
+     "agrees_with_full_resolution": true,
+     "full_samples": 15757,
+     "n_reassert": 0,
+     "n_release": 1,
+     "n_runt": 0,
+     "premature": false,
+     "rows": 626
+    },
+    "t_end_s": 0.015726,
+    "tramp_s": 0.000594,
+    "transition_fail_codes": [],
+    "transition_verdict": "PASS",
+    "unresolved_reasons": [],
+    "verdict": "PASS"
+   },
+   "diagnostics": [],
+   "elapsed_seconds": 25,
+   "id": "B_fs_27c_2p97v_5kVs__tmax1u__r5000",
+   "instance_type": "c7i.4xlarge",
+   "job_id": "klt-sim-f5482f8353c0",
+   "klt_status": "pass",
+   "lifecycle": "spot",
+   "missing_extra_saves": [],
+   "outcome": "PASS",
+   "point": "B_fs_27c_2p97v_5kVs",
+   "rate": 5000.0,
+   "role": "solver",
+   "runner_klt_version": "0.5.0",
+   "runtime_s": 18.081,
+   "state": "done",
+   "timeline": {
+    "anchors": [
+     {
+      "events_pm_200us": [
+       {
+        "event": "V_MID fall",
+        "node": "v(xdut.xpor.nd1)",
+        "t_s": 0.0036186226957201323
+       },
+       {
+        "event": "V_MID rise",
+        "node": "v(xdut.xpor.trip)",
+        "t_s": 0.0036330046667383147
+       },
+       {
+        "event": "V_MID fall",
+        "node": "v(xdut.xpor.rstb)",
+        "t_s": 0.0036331252317431243
+       },
+       {
+        "event": "V_MID rise",
+        "node": "v(resetn)",
+        "t_s": 0.0036337727344190065
+       },
+       {
+        "event": "RELEASE (V_IH rise)",
+        "node": "v(resetn)",
+        "t_s": 0.00363423875192444
+       }
+      ],
+      "ibias_v": {
+       "-0.0002": 0.9076194521817742,
+       "-2e-05": 0.9076194521877968,
+       "0.0": 0.8679234975689775,
+       "2e-05": 0.8666867091738155,
+       "0.0002": 0.8666867049783875
+      },
+      "kind": "release",
+      "t_s": 0.00363423875192444
+     }
+    ],
+    "first_negative_isup_s": null,
+    "viol": {}
+   },
+   "trace_file": "B_fs_27c_2p97v_5kVs__tmax1u__r5000.trace.csv.gz",
+   "trace_rows": 632,
+   "tstop_s": 0.015726,
+   "variant": "tmax1u"
+  },
+  {
+   "check": {
+    "end": {
+     "bias_ok_v": 2.969999773022542,
+     "ctat_v": 0.334211168163438,
+     "ptat_v": 1.411200136334607e-05,
+     "vdd_v": 2.97,
+     "vref_v": 1.256906394892269
+    },
+    "fail_codes": [
+     "nonphysical"
+    ],
+    "ibias": {
+     "end_v": 0.8666867049715904,
+     "max_v": 0.913131338088633,
+     "min_v": -1.362235609946018e-05,
+     "post_release_p2p_v": 0.00417482154252391,
+     "release_step_v": -0.04093525048900892,
+     "swings_gt_5mV": 1
+    },
+    "levels_v": {
+     "V_IH": 2.3760000000000003,
+     "V_IL": 0.5940000000000001,
+     "V_MID": 1.485,
+     "V_RUNT": 0.29700000000000004
+    },
+    "max_dt_s": 5.00000000000847e-06,
+    "n_samples": 40823,
+    "physical": {
+     "isup_end_a": -0.0017432674734154834,
+     "isup_positive": false,
+     "ok": false,
+     "violations_after_t0": {},
+     "violations_at_t0": {}
+    },
+    "por_raw": {
+     "n_fall": 0,
+     "n_rise": 1,
+     "rise_after_ramp_end_censored": false,
+     "t_rise_mid_s": 0.0005797302198855181,
+     "vdd_at_rise_resolved": true,
+     "vdd_at_rise_v": 2.8986510994275907
+    },
+    "ramp_error_v": 6.661338147750939e-16,
+    "ramp_ok": true,
+    "ramp_samples": 178,
+    "release_delay_s": 0.0030517233970457002,
+    "resetn": {
+     "end_v": 2.733271414758596,
+     "max_during_ramp_v": 0.01188543996522925,
+     "max_v": 2.741016028838846,
+     "n_episodes_returned": 0,
+     "n_mid_down": 0,
+     "n_mid_up": 1,
+     "n_reassert": 0,
+     "n_release": 1,
+     "n_runt": 0,
+     "premature": false,
+     "released_during_ramp": false,
+     "t_release_mid_s": 0.003631453616931218,
+     "t_release_s": 0.0036314724867745063,
+     "vdd_at_release_v": 2.97
+    },
+    "resolution_ok": true,
+    "stored_trace": {
+     "agrees_with_full_resolution": true,
+     "full_samples": 40823,
+     "n_reassert": 0,
+     "n_release": 1,
+     "n_runt": 0,
+     "premature": false,
+     "rows": 226
+    },
+    "t_end_s": 0.015726,
+    "tramp_s": 0.000594,
+    "transition_fail_codes": [],
+    "transition_verdict": "PASS",
+    "unresolved_reasons": [],
+    "verdict": "FAIL"
+   },
+   "diagnostics": [],
+   "elapsed_seconds": 66,
+   "id": "B_fs_27c_2p97v_5kVs__reltol1e-4__r5000",
+   "instance_type": "c7i.4xlarge",
+   "job_id": "klt-sim-63f1d2d22eba",
+   "klt_status": "pass",
+   "lifecycle": "spot",
+   "missing_extra_saves": [],
+   "outcome": "FAIL",
+   "point": "B_fs_27c_2p97v_5kVs",
+   "rate": 5000.0,
+   "role": "solver",
+   "runner_klt_version": "0.5.0",
+   "runtime_s": 58.618,
+   "state": "done",
+   "timeline": {
+    "anchors": [
+     {
+      "events_pm_200us": [
+       {
+        "event": "V_MID fall",
+        "node": "v(xdut.xpor.nd1)",
+        "t_s": 0.0036177118474632077
+       },
+       {
+        "event": "V_MID rise",
+        "node": "v(xdut.xpor.trip)",
+        "t_s": 0.0036308933719274516
+       },
+       {
+        "event": "V_MID fall",
+        "node": "v(xdut.xpor.rstb)",
+        "t_s": 0.003631186388853543
+       },
+       {
+        "event": "V_MID rise",
+        "node": "v(resetn)",
+        "t_s": 0.003631453616931218
+       },
+       {
+        "event": "RELEASE (V_IH rise)",
+        "node": "v(resetn)",
+        "t_s": 0.0036314724867745063
+       }
+      ],
+      "ibias_v": {
+       "-0.0002": 0.9076194521907109,
+       "-2e-05": 0.9076194521544254,
+       "0.0": 0.1774659099094397,
+       "2e-05": 0.8666909894072377,
+       "0.0002": 0.8666818522325472
+      },
+      "kind": "release",
+      "t_s": 0.0036314724867745063
+     }
+    ],
+    "first_negative_isup_s": 0.005525400565135593,
+    "viol": {}
+   },
+   "trace_file": "B_fs_27c_2p97v_5kVs__reltol1e-4__r5000.trace.csv.gz",
+   "trace_rows": 2417,
+   "tstop_s": 0.015726,
+   "variant": "reltol1e-4"
+  },
+  {
+   "check": {
+    "end": {
+     "bias_ok_v": 2.969999773022952,
+     "ctat_v": 0.658992261578995,
+     "ptat_v": 1.414360739305765,
+     "vdd_v": 2.97,
+     "vref_v": 1.256906394803568
+    },
+    "fail_codes": [],
+    "ibias": {
+     "end_v": 0.8666867049647505,
+     "max_v": 0.9139500679953647,
+     "min_v": -1.88737146211847e-05,
+     "post_release_p2p_v": 8.264666728763359e-11,
+     "release_step_v": -0.04093274720505158,
+     "swings_gt_5mV": 1
+    },
+    "levels_v": {
+     "V_IH": 2.3760000000000003,
+     "V_IL": 0.5940000000000001,
+     "V_MID": 1.485,
+     "V_RUNT": 0.29700000000000004
+    },
+    "max_dt_s": 1.000000000007939e-06,
+    "n_samples": 15895,
+    "physical": {
+     "isup_end_a": 1.9343881167560618e-05,
+     "isup_positive": true,
+     "ok": true,
+     "violations_after_t0": {},
+     "violations_at_t0": {}
+    },
+    "por_raw": {
+     "n_fall": 0,
+     "n_rise": 1,
+     "rise_after_ramp_end_censored": false,
+     "t_rise_mid_s": 0.0005799052650880701,
+     "vdd_at_rise_resolved": true,
+     "vdd_at_rise_v": 2.899526325440351
+    },
+    "ramp_error_v": 8.881784197001252e-16,
+    "ramp_ok": true,
+    "ramp_samples": 629,
+    "release_delay_s": 0.0030534469075899568,
+    "resetn": {
+     "end_v": 2.733271414759286,
+     "max_during_ramp_v": 0.01213699249530541,
+     "max_v": 2.733297812516579,
+     "n_episodes_returned": 0,
+     "n_mid_down": 0,
+     "n_mid_up": 1,
+     "n_reassert": 0,
+     "n_release": 1,
+     "n_runt": 0,
+     "premature": false,
+     "released_during_ramp": false,
+     "t_release_mid_s": 0.003633352172678027,
+     "t_release_s": 0.0036333720194567784,
+     "vdd_at_release_v": 2.97
+    },
+    "resolution_ok": true,
+    "stored_trace": {
+     "agrees_with_full_resolution": true,
+     "full_samples": 15895,
+     "n_reassert": 0,
+     "n_release": 1,
+     "n_runt": 0,
+     "premature": false,
+     "rows": 666
+    },
+    "t_end_s": 0.015726,
+    "tramp_s": 0.000594,
+    "transition_fail_codes": [],
+    "transition_verdict": "PASS",
+    "unresolved_reasons": [],
+    "verdict": "PASS"
+   },
+   "diagnostics": [],
+   "elapsed_seconds": 25,
+   "id": "B_fs_27c_2p97v_5kVs__reltol2e-4-tmax1u__r5000",
+   "instance_type": "c7i.4xlarge",
+   "job_id": "klt-sim-a5495fe7835a",
+   "klt_status": "pass",
+   "lifecycle": "spot",
+   "missing_extra_saves": [],
+   "outcome": "PASS",
+   "point": "B_fs_27c_2p97v_5kVs",
+   "rate": 5000.0,
+   "role": "solver",
+   "runner_klt_version": "0.5.0",
+   "runtime_s": 18.795,
+   "state": "done",
+   "timeline": {
+    "anchors": [
+     {
+      "events_pm_200us": [
+       {
+        "event": "V_MID fall",
+        "node": "v(xdut.xpor.nd1)",
+        "t_s": 0.003618551326309005
+       },
+       {
+        "event": "V_MID rise",
+        "node": "v(xdut.xpor.trip)",
+        "t_s": 0.0036328214218440714
+       },
+       {
+        "event": "V_MID fall",
+        "node": "v(xdut.xpor.rstb)",
+        "t_s": 0.0036331048101547175
+       },
+       {
+        "event": "V_MID rise",
+        "node": "v(resetn)",
+        "t_s": 0.003633352172678027
+       },
+       {
+        "event": "RELEASE (V_IH rise)",
+        "node": "v(resetn)",
+        "t_s": 0.0036333720194567784
+       }
+      ],
+      "ibias_v": {
+       "-0.0002": 0.9076194521616838,
+       "-2e-05": 0.9076194521547587,
+       "0.0": 0.150973359191248,
+       "2e-05": 0.8666866959692106,
+       "0.0002": 0.8666867049491942
+      },
+      "kind": "release",
+      "t_s": 0.0036333720194567784
+     }
+    ],
+    "first_negative_isup_s": null,
+    "viol": {}
+   },
+   "trace_file": "B_fs_27c_2p97v_5kVs__reltol2e-4-tmax1u__r5000.trace.csv.gz",
+   "trace_rows": 755,
+   "tstop_s": 0.015726,
+   "variant": "reltol2e-4-tmax1u"
+  },
+  {
+   "check": {
+    "end": {
+     "bias_ok_v": 2.969999773025738,
+     "ctat_v": 0.6589922615744287,
+     "ptat_v": 1.414360739216658,
+     "vdd_v": 2.97,
+     "vref_v": 1.256906394880994
+    },
+    "fail_codes": [],
+    "ibias": {
+     "end_v": 0.8666867049688433,
+     "max_v": 0.921703586192246,
+     "min_v": -8.941990768331299e-06,
+     "post_release_p2p_v": 8.727740752334512e-11,
+     "release_step_v": -0.04093274720241513,
+     "swings_gt_5mV": 1
+    },
+    "levels_v": {
+     "V_IH": 2.3760000000000003,
+     "V_IL": 0.5940000000000001,
+     "V_MID": 1.485,
+     "V_RUNT": 0.29700000000000004
+    },
+    "max_dt_s": 5.00000000000847e-06,
+    "n_samples": 3328,
+    "physical": {
+     "isup_end_a": 1.934388116865023e-05,
+     "isup_positive": true,
+     "ok": true,
+     "violations_after_t0": {},
+     "violations_at_t0": {}
+    },
+    "por_raw": {
+     "n_fall": 0,
+     "n_rise": 1,
+     "rise_after_ramp_end_censored": false,
+     "t_rise_mid_s": 0.0011227597382822193,
+     "vdd_at_rise_resolved": true,
+     "vdd_at_rise_v": 2.806899345705549
+    },
+    "ramp_error_v": 1.3322676295501878e-15,
+    "ramp_ok": true,
+    "ramp_samples": 247,
+    "release_delay_s": 0.0030500522474984837,
+    "resetn": {
+     "end_v": 2.733271414757797,
+     "max_during_ramp_v": 0.007936376102894766,
+     "max_v": 2.733272102517375,
+     "n_episodes_returned": 0,
+     "n_mid_down": 0,
+     "n_mid_up": 1,
+     "n_reassert": 0,
+     "n_release": 1,
+     "n_runt": 0,
+     "premature": false,
+     "released_during_ramp": false,
+     "t_release_mid_s": 0.004172811985780703,
+     "t_release_s": 0.004172919005297391,
+     "vdd_at_release_v": 2.97
+    },
+    "resolution_ok": true,
+    "stored_trace": {
+     "agrees_with_full_resolution": true,
+     "full_samples": 3328,
+     "n_reassert": 0,
+     "n_release": 1,
+     "n_runt": 0,
+     "premature": false,
+     "rows": 268
+    },
+    "t_end_s": 0.016452,
+    "tramp_s": 0.001188,
+    "transition_fail_codes": [],
+    "transition_verdict": "PASS",
+    "unresolved_reasons": [],
+    "verdict": "PASS"
+   },
+   "diagnostics": [],
+   "elapsed_seconds": 23,
+   "id": "B_fs_27c_2p97v_5kVs__base__r2500",
+   "instance_type": "c7i.4xlarge",
+   "job_id": "klt-sim-dc907973fcfa",
+   "klt_status": "pass",
+   "lifecycle": "spot",
+   "missing_extra_saves": [],
+   "outcome": "PASS",
+   "point": "B_fs_27c_2p97v_5kVs",
+   "rate": 2500.0,
+   "role": "adjacent-rate",
+   "runner_klt_version": "0.5.0",
+   "runtime_s": 16.232,
+   "state": "done",
+   "timeline": {
+    "anchors": [
+     {
+      "events_pm_200us": [
+       {
+        "event": "V_MID fall",
+        "node": "v(xdut.xpor.nd1)",
+        "t_s": 0.004159017848292561
+       },
+       {
+        "event": "V_MID rise",
+        "node": "v(xdut.xpor.trip)",
+        "t_s": 0.004172085661312398
+       },
+       {
+        "event": "V_MID fall",
+        "node": "v(xdut.xpor.rstb)",
+        "t_s": 0.0041724740565864055
+       },
+       {
+        "event": "V_MID rise",
+        "node": "v(resetn)",
+        "t_s": 0.004172811985780703
+       },
+       {
+        "event": "RELEASE (V_IH rise)",
+        "node": "v(resetn)",
+        "t_s": 0.004172919005297391
+       }
+      ],
+      "ibias_v": {
+       "-0.0002": 0.9076194521736406,
+       "-2e-05": 0.9076194521890073,
+       "0.0": 0.8599804720255682,
+       "2e-05": 0.8666863691462872,
+       "0.0002": 0.8666867049870006
+      },
+      "kind": "release",
+      "t_s": 0.004172919005297391
+     }
+    ],
+    "first_negative_isup_s": null,
+    "viol": {}
+   },
+   "trace_file": "B_fs_27c_2p97v_5kVs__base__r2500.trace.csv.gz",
+   "trace_rows": 321,
+   "tstop_s": 0.016451999999999998,
+   "variant": "base"
+  },
+  {
+   "check": {
+    "end": {
+     "bias_ok_v": 2.969999773023469,
+     "ctat_v": 0.3359253794438808,
+     "ptat_v": 4.644879775121219,
+     "vdd_v": 2.97,
+     "vref_v": 1.256906394871089
+    },
+    "fail_codes": [
+     "nonphysical"
+    ],
+    "ibias": {
+     "end_v": 0.8666867049689235,
+     "max_v": 0.9247830522021746,
+     "min_v": -0.0002500666142956731,
+     "post_release_p2p_v": 0.002438888132382133,
+     "release_step_v": -0.04093146326862518,
+     "swings_gt_5mV": 1
+    },
+    "levels_v": {
+     "V_IH": 2.3760000000000003,
+     "V_IL": 0.5940000000000001,
+     "V_MID": 1.485,
+     "V_RUNT": 0.29700000000000004
+    },
+    "max_dt_s": 5.00000000000847e-06,
+    "n_samples": 201851,
+    "physical": {
+     "isup_end_a": -0.012664162124921174,
+     "isup_positive": false,
+     "ok": false,
+     "violations_after_t0": {
+      "v(ptat)": {
+       "count": 9113,
+       "max": 4.644895327358092,
+       "min": 4.126217304927182
+      },
+      "v(xdut.xtemp.nb)": {
+       "count": 99024,
+       "max": 4.57421404650311,
+       "min": 4.502083716174278
+      }
+     },
+     "violations_at_t0": {}
+    },
+    "por_raw": {
+     "n_fall": 0,
+     "n_rise": 1,
+     "rise_after_ramp_end_censored": false,
+     "t_rise_mid_s": 0.0011227963266086207,
+     "vdd_at_rise_resolved": true,
+     "vdd_at_rise_v": 2.806990816521551
+    },
+    "ramp_error_v": 1.7763568394002505e-15,
+    "ramp_ok": true,
+    "ramp_samples": 311,
+    "release_delay_s": 0.0030518205740080444,
+    "resetn": {
+     "end_v": 2.733271414756976,
+     "max_during_ramp_v": 0.007936376102894766,
+     "max_v": 2.737613104022004,
+     "n_episodes_returned": 0,
+     "n_mid_down": 0,
+     "n_mid_up": 1,
+     "n_reassert": 0,
+     "n_release": 1,
+     "n_runt": 0,
+     "premature": false,
+     "released_during_ramp": false,
+     "t_release_mid_s": 0.004174616900616665,
+     "t_release_s": 0.004174635978961259,
+     "vdd_at_release_v": 2.97
+    },
+    "resolution_ok": true,
+    "stored_trace": {
+     "agrees_with_full_resolution": true,
+     "full_samples": 201851,
+     "n_reassert": 0,
+     "n_release": 1,
+     "n_runt": 0,
+     "premature": false,
+     "rows": 349
+    },
+    "t_end_s": 0.016452,
+    "tramp_s": 0.001188,
+    "transition_fail_codes": [],
+    "transition_verdict": "PASS",
+    "unresolved_reasons": [],
+    "verdict": "FAIL"
+   },
+   "diagnostics": [],
+   "elapsed_seconds": 309,
+   "id": "B_fs_27c_2p97v_5kVs__trtol7__r2500",
+   "instance_type": "c7i.4xlarge",
+   "job_id": "klt-sim-11f768ae212b",
+   "klt_status": "pass",
+   "lifecycle": "spot",
+   "missing_extra_saves": [],
+   "outcome": "FAIL",
+   "point": "B_fs_27c_2p97v_5kVs",
+   "rate": 2500.0,
+   "role": "adjacent-rate",
+   "runner_klt_version": "0.5.0",
+   "runtime_s": 293.558,
+   "state": "done",
+   "timeline": {
+    "anchors": [
+     {
+      "events_pm_200us": [
+       {
+        "event": "V_MID fall",
+        "node": "v(xdut.xpor.nd1)",
+        "t_s": 0.004160304102172681
+       },
+       {
+        "event": "V_MID rise",
+        "node": "v(xdut.xpor.trip)",
+        "t_s": 0.004174001763741378
+       },
+       {
+        "event": "V_MID fall",
+        "node": "v(xdut.xpor.rstb)",
+        "t_s": 0.004174361496228433
+       },
+       {
+        "event": "V_MID rise",
+        "node": "v(resetn)",
+        "t_s": 0.004174616900616665
+       },
+       {
+        "event": "RELEASE (V_IH rise)",
+        "node": "v(resetn)",
+        "t_s": 0.004174635978961259
+       }
+      ],
+      "ibias_v": {
+       "-0.0002": 0.907619452150906,
+       "-2e-05": 0.9076194521634748,
+       "0.0": 0.1629312959828193,
+       "2e-05": 0.8666811044694462,
+       "0.0002": 0.8666887189780078
+      },
+      "kind": "release",
+      "t_s": 0.004174635978961259
+     }
+    ],
+    "first_negative_isup_s": 0.01041653459729424,
+    "viol": {
+     "v(ptat)": {
+      "t_s": 0.0135843212838697,
+      "v": 4.126217304927182
+     },
+     "v(xdut.xtemp.nb)": {
+      "t_s": 0.01041653459729424,
+      "v": 4.57421404650311
+     }
+    }
+   },
+   "trace_file": "B_fs_27c_2p97v_5kVs__trtol7__r2500.trace.csv.gz",
+   "trace_rows": 2030,
+   "tstop_s": 0.016451999999999998,
+   "variant": "trtol7"
+  },
+  {
+   "check": {
+    "end": {
+     "bias_ok_v": 2.96999977302165,
+     "ctat_v": 0.6589922615721919,
+     "ptat_v": 1.4143607392627,
+     "vdd_v": 2.97,
+     "vref_v": 1.25690639496716
+    },
+    "fail_codes": [],
+    "ibias": {
+     "end_v": 0.8666867049698307,
+     "max_v": 0.9250063700007033,
+     "min_v": -8.936195670055871e-06,
+     "post_release_p2p_v": 8.834999398743548e-11,
+     "release_step_v": -0.040932747196135266,
+     "swings_gt_5mV": 1
+    },
+    "levels_v": {
+     "V_IH": 2.3760000000000003,
+     "V_IL": 0.5940000000000001,
+     "V_MID": 1.485,
+     "V_RUNT": 0.29700000000000004
+    },
+    "max_dt_s": 5.00000000000847e-06,
+    "n_samples": 3436,
+    "physical": {
+     "isup_end_a": 1.9343881168639287e-05,
+     "isup_positive": true,
+     "ok": true,
+     "violations_after_t0": {},
+     "violations_at_t0": {}
+    },
+    "por_raw": {
+     "n_fall": 0,
+     "n_rise": 1,
+     "rise_after_ramp_end_censored": false,
+     "t_rise_mid_s": 0.0011235097473553874,
+     "vdd_at_rise_resolved": true,
+     "vdd_at_rise_v": 2.808774368388469
+    },
+    "ramp_error_v": 1.7763568394002505e-15,
+    "ramp_ok": true,
+    "ramp_samples": 269,
+    "release_delay_s": 0.003051994389073202,
+    "resetn": {
+     "end_v": 2.733271414758649,
+     "max_during_ramp_v": 0.007936376102894766,
+     "max_v": 2.733297839370924,
+     "n_episodes_returned": 0,
+     "n_mid_down": 0,
+     "n_mid_up": 1,
+     "n_reassert": 0,
+     "n_release": 1,
+     "n_runt": 0,
+     "premature": false,
+     "released_during_ramp": false,
+     "t_release_mid_s": 0.00417550413642859,
+     "t_release_s": 0.004175549210306175,
+     "vdd_at_release_v": 2.97
+    },
+    "resolution_ok": true,
+    "stored_trace": {
+     "agrees_with_full_resolution": true,
+     "full_samples": 3436,
+     "n_reassert": 0,
+     "n_release": 1,
+     "n_runt": 0,
+     "premature": false,
+     "rows": 295
+    },
+    "t_end_s": 0.016452,
+    "tramp_s": 0.001188,
+    "transition_fail_codes": [],
+    "transition_verdict": "PASS",
+    "unresolved_reasons": [],
+    "verdict": "PASS"
+   },
+   "diagnostics": [],
+   "elapsed_seconds": 21,
+   "id": "B_fs_27c_2p97v_5kVs__reltol2e-4__r2500",
+   "instance_type": "c7i.4xlarge",
+   "job_id": "klt-sim-346c4e3f4622",
+   "klt_status": "pass",
+   "lifecycle": "spot",
+   "missing_extra_saves": [],
+   "outcome": "PASS",
+   "point": "B_fs_27c_2p97v_5kVs",
+   "rate": 2500.0,
+   "role": "adjacent-rate",
+   "runner_klt_version": "0.5.0",
+   "runtime_s": 14.017,
+   "state": "done",
+   "timeline": {
+    "anchors": [
+     {
+      "events_pm_200us": [
+       {
+        "event": "V_MID fall",
+        "node": "v(xdut.xpor.nd1)",
+        "t_s": 0.004160184749611445
+       },
+       {
+        "event": "V_MID rise",
+        "node": "v(xdut.xpor.trip)",
+        "t_s": 0.004174891400079094
+       },
+       {
+        "event": "V_MID fall",
+        "node": "v(xdut.xpor.rstb)",
+        "t_s": 0.004175255666493961
+       },
+       {
+        "event": "V_MID rise",
+        "node": "v(resetn)",
+        "t_s": 0.00417550413642859
+       },
+       {
+        "event": "RELEASE (V_IH rise)",
+        "node": "v(resetn)",
+        "t_s": 0.004175549210306175
+       }
+      ],
+      "ibias_v": {
+       "-0.0002": 0.9076194521603954,
+       "-2e-05": 0.9076194521519663,
+       "0.0": 0.8431858078781655,
+       "2e-05": 0.8666865739440656,
+       "0.0002": 0.8666867049557977
+      },
+      "kind": "release",
+      "t_s": 0.004175549210306175
+     }
+    ],
+    "first_negative_isup_s": null,
+    "viol": {}
+   },
+   "trace_file": "B_fs_27c_2p97v_5kVs__reltol2e-4__r2500.trace.csv.gz",
+   "trace_rows": 416,
+   "tstop_s": 0.016451999999999998,
+   "variant": "reltol2e-4"
+  },
+  {
+   "check": {
+    "end": {
+     "bias_ok_v": 2.969999773020876,
+     "ctat_v": 0.6589922615648857,
+     "ptat_v": 1.414360739188049,
+     "vdd_v": 2.97,
+     "vref_v": 1.25690639464057
+    },
+    "fail_codes": [],
+    "ibias": {
+     "end_v": 0.8666867049697689,
+     "max_v": 0.9176993472911107,
+     "min_v": -8.75107777528398e-05,
+     "post_release_p2p_v": 7.715028615962183e-11,
+     "release_step_v": -0.04093274716580875,
+     "swings_gt_5mV": 2
+    },
+    "levels_v": {
+     "V_IH": 2.3760000000000003,
+     "V_IL": 0.5940000000000001,
+     "V_MID": 1.485,
+     "V_RUNT": 0.29700000000000004
+    },
+    "max_dt_s": 5.000000000003266e-06,
+    "n_samples": 3131,
+    "physical": {
+     "isup_end_a": 1.9343881168713856e-05,
+     "isup_positive": true,
+     "ok": true,
+     "violations_after_t0": {},
+     "violations_at_t0": {}
+    },
+    "por_raw": {
+     "n_fall": 0,
+     "n_rise": 1,
+     "rise_after_ramp_end_censored": true,
+     "t_rise_mid_s": 0.0003026200180921569,
+     "vdd_at_rise_resolved": false,
+     "vdd_at_rise_v": 2.97
+    },
+    "ramp_error_v": 8.881784197001252e-16,
+    "ramp_ok": true,
+    "ramp_samples": 68,
+    "release_delay_s": 0.003053298689193962,
+    "resetn": {
+     "end_v": 2.733271414757411,
+     "max_during_ramp_v": 0.01662919077732714,
+     "max_v": 2.733297006870026,
+     "n_episodes_returned": 0,
+     "n_mid_down": 0,
+     "n_mid_up": 1,
+     "n_reassert": 0,
+     "n_release": 1,
+     "n_runt": 0,
+     "premature": false,
+     "released_during_ramp": false,
+     "t_release_mid_s": 0.0033559187072861193,
+     "t_release_s": 0.003355959159327425,
+     "vdd_at_release_v": 2.97
+    },
+    "resolution_ok": true,
+    "stored_trace": {
+     "agrees_with_full_resolution": true,
+     "full_samples": 3131,
+     "n_reassert": 0,
+     "n_release": 1,
+     "n_runt": 0,
+     "premature": false,
+     "rows": 95
+    },
+    "t_end_s": 0.015363,
+    "tramp_s": 0.000297,
+    "transition_fail_codes": [],
+    "transition_verdict": "PASS",
+    "unresolved_reasons": [],
+    "verdict": "PASS"
+   },
+   "diagnostics": [],
+   "elapsed_seconds": 19,
+   "id": "B_fs_27c_2p97v_5kVs__base__r10000",
+   "instance_type": "c7i.4xlarge",
+   "job_id": "klt-sim-a1d942d0d026",
+   "klt_status": "pass",
+   "lifecycle": "spot",
+   "missing_extra_saves": [],
+   "outcome": "PASS",
+   "point": "B_fs_27c_2p97v_5kVs",
+   "rate": 10000.0,
+   "role": "adjacent-rate",
+   "runner_klt_version": "0.5.0",
+   "runtime_s": 13.109,
+   "state": "done",
+   "timeline": {
+    "anchors": [
+     {
+      "events_pm_200us": [
+       {
+        "event": "V_MID fall",
+        "node": "v(xdut.xpor.nd1)",
+        "t_s": 0.0033412602981572515
+       },
+       {
+        "event": "V_MID rise",
+        "node": "v(xdut.xpor.trip)",
+        "t_s": 0.0033552970500722156
+       },
+       {
+        "event": "V_MID fall",
+        "node": "v(xdut.xpor.rstb)",
+        "t_s": 0.0033556595550833465
+       },
+       {
+        "event": "V_MID rise",
+        "node": "v(resetn)",
+        "t_s": 0.0033559187072861193
+       },
+       {
+        "event": "RELEASE (V_IH rise)",
+        "node": "v(resetn)",
+        "t_s": 0.003355959159327425
+       }
+      ],
+      "ibias_v": {
+       "-0.0002": 0.9076194521789318,
+       "-2e-05": 0.9076194521533059,
+       "0.0": 0.8402731456299785,
+       "2e-05": 0.8666863107050624,
+       "0.0002": 0.8666867049876662
+      },
+      "kind": "release",
+      "t_s": 0.003355959159327425
+     }
+    ],
+    "first_negative_isup_s": null,
+    "viol": {}
+   },
+   "trace_file": "B_fs_27c_2p97v_5kVs__base__r10000.trace.csv.gz",
+   "trace_rows": 165,
+   "tstop_s": 0.015363,
+   "variant": "base"
+  },
+  {
+   "check": {
+    "end": {
+     "bias_ok_v": 2.969999766548945,
+     "ctat_v": 0.5698206381541284,
+     "ptat_v": 4.644727146402416,
+     "vdd_v": 2.97,
+     "vref_v": 1.256906378926751
+    },
+    "fail_codes": [
+     "nonphysical"
+    ],
+    "ibias": {
+     "end_v": 0.8666854605145503,
+     "max_v": 0.9177197998906592,
+     "min_v": -1.587889774519112e-05,
+     "post_release_p2p_v": 0.0013846578083531735,
+     "release_step_v": -0.040929127097766194,
+     "swings_gt_5mV": 1
+    },
+    "levels_v": {
+     "V_IH": 2.3760000000000003,
+     "V_IL": 0.5940000000000001,
+     "V_MID": 1.485,
+     "V_RUNT": 0.29700000000000004
+    },
+    "max_dt_s": 5.0000000000008805e-06,
+    "n_samples": 194918,
+    "physical": {
+     "isup_end_a": -0.0062078363350896145,
+     "isup_positive": false,
+     "ok": false,
+     "violations_after_t0": {
+      "v(ptat)": {
+       "count": 43762,
+       "max": 4.644731923916051,
+       "min": 4.12767137288026
+      }
+     },
+     "violations_at_t0": {}
+    },
+    "por_raw": {
+     "n_fall": 0,
+     "n_rise": 1,
+     "rise_after_ramp_end_censored": true,
+     "t_rise_mid_s": 0.0003010731084375334,
+     "vdd_at_rise_resolved": false,
+     "vdd_at_rise_v": 2.97
+    },
+    "ramp_error_v": 1.3322676295501878e-15,
+    "ramp_ok": true,
+    "ramp_samples": 120,
+    "release_delay_s": 0.003054872451801644,
+    "resetn": {
+     "end_v": 2.733277148861128,
+     "max_during_ramp_v": 0.01662919077732714,
+     "max_v": 2.733297624342805,
+     "n_episodes_returned": 0,
+     "n_mid_down": 0,
+     "n_mid_up": 1,
+     "n_reassert": 0,
+     "n_release": 1,
+     "n_runt": 0,
+     "premature": false,
+     "released_during_ramp": false,
+     "t_release_mid_s": 0.0033559455602391775,
+     "t_release_s": 0.003355974651295884,
+     "vdd_at_release_v": 2.97
+    },
+    "resolution_ok": true,
+    "stored_trace": {
+     "agrees_with_full_resolution": true,
+     "full_samples": 194918,
+     "n_reassert": 0,
+     "n_release": 1,
+     "n_runt": 0,
+     "premature": false,
+     "rows": 170
+    },
+    "t_end_s": 0.015363,
+    "tramp_s": 0.000297,
+    "transition_fail_codes": [],
+    "transition_verdict": "PASS",
+    "unresolved_reasons": [],
+    "verdict": "FAIL"
+   },
+   "diagnostics": [],
+   "elapsed_seconds": 258,
+   "id": "B_fs_27c_2p97v_5kVs__trtol7__r10000",
+   "instance_type": "c7i.4xlarge",
+   "job_id": "klt-sim-79321d148de3",
+   "klt_status": "pass",
+   "lifecycle": "spot",
+   "missing_extra_saves": [],
+   "outcome": "FAIL",
+   "point": "B_fs_27c_2p97v_5kVs",
+   "rate": 10000.0,
+   "role": "adjacent-rate",
+   "runner_klt_version": "0.5.0",
+   "runtime_s": 244.068,
+   "state": "done",
+   "timeline": {
+    "anchors": [
+     {
+      "events_pm_200us": [
+       {
+        "event": "V_MID fall",
+        "node": "v(xdut.xpor.nd1)",
+        "t_s": 0.00334097787027178
+       },
+       {
+        "event": "V_MID rise",
+        "node": "v(xdut.xpor.trip)",
+        "t_s": 0.003355341773336205
+       },
+       {
+        "event": "V_MID fall",
+        "node": "v(xdut.xpor.rstb)",
+        "t_s": 0.00335570622847528
+       },
+       {
+        "event": "V_MID rise",
+        "node": "v(resetn)",
+        "t_s": 0.0033559455602391775
+       },
+       {
+        "event": "RELEASE (V_IH rise)",
+        "node": "v(resetn)",
+        "t_s": 0.003355974651295884
+       }
+      ],
+      "ibias_v": {
+       "-0.0002": 0.9076194521741635,
+       "-2e-05": 0.9076194521781477,
+       "0.0": 0.8202608879994362,
+       "2e-05": 0.8666907083933606,
+       "0.0002": 0.8666903088162707
+      },
+      "kind": "release",
+      "t_s": 0.003355974651295884
+     }
+    ],
+    "first_negative_isup_s": 0.01257505642943559,
+    "viol": {
+     "v(ptat)": {
+      "t_s": 0.01257505642943559,
+      "v": 4.12767137288026
+     }
+    }
+   },
+   "trace_file": "B_fs_27c_2p97v_5kVs__trtol7__r10000.trace.csv.gz",
+   "trace_rows": 1879,
+   "tstop_s": 0.015363,
+   "variant": "trtol7"
+  },
+  {
+   "check": {
+    "end": {
+     "bias_ok_v": 2.96999977302236,
+     "ctat_v": 0.6589922615800774,
+     "ptat_v": 1.414360739530992,
+     "vdd_v": 2.97,
+     "vref_v": 1.256906394888329
+    },
+    "fail_codes": [],
+    "ibias": {
+     "end_v": 0.8666867049710583,
+     "max_v": 0.9176281405087391,
+     "min_v": -4.96593745142556e-05,
+     "post_release_p2p_v": 8.647282889739927e-11,
+     "release_step_v": -0.040932747199346364,
+     "swings_gt_5mV": 1
+    },
+    "levels_v": {
+     "V_IH": 2.3760000000000003,
+     "V_IL": 0.5940000000000001,
+     "V_MID": 1.485,
+     "V_RUNT": 0.29700000000000004
+    },
+    "max_dt_s": 5.000000000001531e-06,
+    "n_samples": 3299,
+    "physical": {
+     "isup_end_a": 1.9343881168738434e-05,
+     "isup_positive": true,
+     "ok": true,
+     "violations_after_t0": {},
+     "violations_at_t0": {}
+    },
+    "por_raw": {
+     "n_fall": 0,
+     "n_rise": 1,
+     "rise_after_ramp_end_censored": true,
+     "t_rise_mid_s": 0.0003008822266515594,
+     "vdd_at_rise_resolved": false,
+     "vdd_at_rise_v": 2.97
+    },
+    "ramp_error_v": 1.1102230246251565e-15,
+    "ramp_ok": true,
+    "ramp_samples": 82,
+    "release_delay_s": 0.0030538958808341253,
+    "resetn": {
+     "end_v": 2.733271414758917,
+     "max_during_ramp_v": 0.01662919077732714,
+     "max_v": 2.733297768201577,
+     "n_episodes_returned": 0,
+     "n_mid_down": 0,
+     "n_mid_up": 1,
+     "n_reassert": 0,
+     "n_release": 1,
+     "n_runt": 0,
+     "premature": false,
+     "released_during_ramp": false,
+     "t_release_mid_s": 0.0033547781074856845,
+     "t_release_s": 0.0033547989717179756,
+     "vdd_at_release_v": 2.97
+    },
+    "resolution_ok": true,
+    "stored_trace": {
+     "agrees_with_full_resolution": true,
+     "full_samples": 3299,
+     "n_reassert": 0,
+     "n_release": 1,
+     "n_runt": 0,
+     "premature": false,
+     "rows": 140
+    },
+    "t_end_s": 0.015363,
+    "tramp_s": 0.000297,
+    "transition_fail_codes": [],
+    "transition_verdict": "PASS",
+    "unresolved_reasons": [],
+    "verdict": "PASS"
+   },
+   "diagnostics": [],
+   "elapsed_seconds": 20,
+   "id": "B_fs_27c_2p97v_5kVs__reltol2e-4__r10000",
+   "instance_type": "c7i.4xlarge",
+   "job_id": "klt-sim-f40374bc3043",
+   "klt_status": "pass",
+   "lifecycle": "spot",
+   "missing_extra_saves": [],
+   "outcome": "PASS",
+   "point": "B_fs_27c_2p97v_5kVs",
+   "rate": 10000.0,
+   "role": "adjacent-rate",
+   "runner_klt_version": "0.5.0",
+   "runtime_s": 13.9,
+   "state": "done",
+   "timeline": {
+    "anchors": [
+     {
+      "events_pm_200us": [
+       {
+        "event": "V_MID fall",
+        "node": "v(xdut.xpor.nd1)",
+        "t_s": 0.003340797560309686
+       },
+       {
+        "event": "V_MID rise",
+        "node": "v(xdut.xpor.trip)",
+        "t_s": 0.0033541398144238586
+       },
+       {
+        "event": "V_MID fall",
+        "node": "v(xdut.xpor.rstb)",
+        "t_s": 0.003354514704516021
+       },
+       {
+        "event": "V_MID rise",
+        "node": "v(resetn)",
+        "t_s": 0.0033547781074856845
+       },
+       {
+        "event": "RELEASE (V_IH rise)",
+        "node": "v(resetn)",
+        "t_s": 0.0033547989717179756
+       }
+      ],
+      "ibias_v": {
+       "-0.0002": 0.9076194521564901,
+       "-2e-05": 0.9076194521663535,
+       "0.0": 0.14939076908973262,
+       "2e-05": 0.8666867459657079,
+       "0.0002": 0.8666867049670322
+      },
+      "kind": "release",
+      "t_s": 0.0033547989717179756
+     }
+    ],
+    "first_negative_isup_s": null,
+    "viol": {}
+   },
+   "trace_file": "B_fs_27c_2p97v_5kVs__reltol2e-4__r10000.trace.csv.gz",
+   "trace_rows": 314,
+   "tstop_s": 0.015363,
+   "variant": "reltol2e-4"
+  }
+ ],
+ "cites": "20261010-015905-fbd6329",
+ "claim": "Issue #142 -- NOT a spec claim and NOT a ratified ramp envelope (DR-003 Sec8). Diagnoses the two RESETn re-assertions recorded in 20261010-015905-fbd6329 (as-drawn, 360 points) by re-running exactly those two PVT/rate points on the unchanged assembled temp_por_top netlist with solver discriminators and adjacent-rate controls, as single-corner klt sim requests on the Spot batch fleet, graded from full-resolution waveforms with extra internal nodes saved for event ordering. A per-point verdict (solver/nonphysical artifact | physical design-level re-assertion | unresolved) is assigned mechanically by run_reassert_diagnosis.py under the issue's evidence rules.",
+ "git": {
+  "branch": "feature/issue-142",
+  "dirty": false,
+  "sha": "392ad30"
+ },
+ "links": {
+  "corners_dir": "sim/supply-ramp-top/corners/20261010-115058-392ad30-reassert-diagnosis/",
+  "driver": "sim/supply-ramp-top/run_reassert_diagnosis.py",
+  "json": "sim/supply-ramp-top/records/20261010-115058-392ad30-reassert-diagnosis.json",
+  "manifest": "sim/supply-ramp-top/experiment.json",
+  "netlist_snapshots": "sim/supply-ramp-top/netlist-snapshots/20261010-115058-392ad30-reassert-diagnosis/",
+  "record": "sim/supply-ramp-top/records/20261010-115058-392ad30-reassert-diagnosis.md",
+  "source_record": "sim/supply-ramp-top/records/20261010-015905-fbd6329.md"
+ },
+ "pdk": {
+  "installed_commit": "c6d73a35f524070e85faff4a6a9eef49553ebc2b",
+  "matches_pin": true,
+  "pinned_commit": "c6d73a35f524070e85faff4a6a9eef49553ebc2b",
+  "variant": "sky130A"
+ },
+ "points": {
+  "A_ss_m40c_3p63v_500kVs": {
+   "adjacent_rates_v_per_s": [
+    250000.0,
+    1000000.0
+   ],
+   "process": "ss",
+   "rate_v_per_s": 500000.0,
+   "supply_v": 3.63,
+   "temperature_c": -40
+  },
+  "B_fs_27c_2p97v_5kVs": {
+   "adjacent_rates_v_per_s": [
+    2500.0,
+    10000.0
+   ],
+   "process": "fs",
+   "rate_v_per_s": 5000.0,
+   "supply_v": 2.97,
+   "temperature_c": 27
+  }
+ },
+ "post_hoc_note": "The first batch (18 cases: base, trtol7, reltol2e-4, trap, tmax1u at the exact rate; base and trtol7 at the adjacent rates) was submitted at 124894f. After inspecting it the matrix was extended with reltol1e-4, reltol2e-4-tmax1u (exact rate) and reltol2e-4 (adjacent rates), submitted as a second batch into the same run directory. The extension was chosen to obtain more physical-branch runs, not to change the verdict rules, which were fixed before any result.",
+ "record_id": "20261010-115058-392ad30-reassert-diagnosis",
+ "reference_physical_cases": [
+  "A_ss_m40c_3p63v_500kVs__reltol2e-4__r500000",
+  "B_fs_27c_2p97v_5kVs__reltol2e-4__r5000"
+ ],
+ "run_id": "diag142",
+ "run_meta": {
+  "cases": [
+   "A_ss_m40c_3p63v_500kVs__base__r500000",
+   "A_ss_m40c_3p63v_500kVs__trtol7__r500000",
+   "A_ss_m40c_3p63v_500kVs__reltol2e-4__r500000",
+   "A_ss_m40c_3p63v_500kVs__trap__r500000",
+   "A_ss_m40c_3p63v_500kVs__tmax1u__r500000",
+   "A_ss_m40c_3p63v_500kVs__base__r250000",
+   "A_ss_m40c_3p63v_500kVs__trtol7__r250000",
+   "A_ss_m40c_3p63v_500kVs__base__r1e06",
+   "A_ss_m40c_3p63v_500kVs__trtol7__r1e06",
+   "B_fs_27c_2p97v_5kVs__base__r5000",
+   "B_fs_27c_2p97v_5kVs__trtol7__r5000",
+   "B_fs_27c_2p97v_5kVs__reltol2e-4__r5000",
+   "B_fs_27c_2p97v_5kVs__trap__r5000",
+   "B_fs_27c_2p97v_5kVs__tmax1u__r5000",
+   "B_fs_27c_2p97v_5kVs__base__r2500",
+   "B_fs_27c_2p97v_5kVs__trtol7__r2500",
+   "B_fs_27c_2p97v_5kVs__base__r10000",
+   "B_fs_27c_2p97v_5kVs__trtol7__r10000"
+  ],
+  "git": {
+   "branch": "feature/issue-142",
+   "dirty": false,
+   "sha": "124894f"
+  },
+  "klt_client": "klt 0.7.0+gca3089cd4b9f",
+  "klt_sim_backend_env": "batch",
+  "retries": [
+   {
+    "at_utc": "2026-10-10T11:41:33Z",
+    "cases": [
+     "A_ss_m40c_3p63v_500kVs__reltol1e-4__r500000",
+     "A_ss_m40c_3p63v_500kVs__reltol2e-4-tmax1u__r500000",
+     "A_ss_m40c_3p63v_500kVs__reltol2e-4__r250000",
+     "A_ss_m40c_3p63v_500kVs__reltol2e-4__r1e06",
+     "B_fs_27c_2p97v_5kVs__reltol1e-4__r5000",
+     "B_fs_27c_2p97v_5kVs__reltol2e-4-tmax1u__r5000",
+     "B_fs_27c_2p97v_5kVs__reltol2e-4__r2500",
+     "B_fs_27c_2p97v_5kVs__reltol2e-4__r10000"
+    ],
+    "git": {
+     "branch": "feature/issue-142",
+     "dirty": false,
+     "sha": "a2e9145"
+    }
+   }
+  ],
+  "retry_results": [
+   {
+    "case": "A_ss_m40c_3p63v_500kVs__reltol1e-4__r500000",
+    "exit": 0,
+    "status": "pass"
+   },
+   {
+    "case": "A_ss_m40c_3p63v_500kVs__reltol2e-4-tmax1u__r500000",
+    "exit": 0,
+    "status": "pass"
+   },
+   {
+    "case": "A_ss_m40c_3p63v_500kVs__reltol2e-4__r250000",
+    "exit": 0,
+    "status": "pass"
+   },
+   {
+    "case": "A_ss_m40c_3p63v_500kVs__reltol2e-4__r1e06",
+    "exit": 0,
+    "status": "pass"
+   },
+   {
+    "case": "B_fs_27c_2p97v_5kVs__reltol1e-4__r5000",
+    "exit": 0,
+    "status": "pass"
+   },
+   {
+    "case": "B_fs_27c_2p97v_5kVs__reltol2e-4-tmax1u__r5000",
+    "exit": 0,
+    "status": "pass"
+   },
+   {
+    "case": "B_fs_27c_2p97v_5kVs__reltol2e-4__r2500",
+    "exit": 0,
+    "status": "pass"
+   },
+   {
+    "case": "B_fs_27c_2p97v_5kVs__reltol2e-4__r10000",
+    "exit": 0,
+    "status": "pass"
+   }
+  ],
+  "run_id": "diag142",
+  "started_utc": "2026-10-10T11:23:16Z",
+  "submit_results": [
+   {
+    "case": "A_ss_m40c_3p63v_500kVs__base__r500000",
+    "exit": 0,
+    "status": "pass"
+   },
+   {
+    "case": "A_ss_m40c_3p63v_500kVs__trtol7__r500000",
+    "exit": 0,
+    "status": "pass"
+   },
+   {
+    "case": "A_ss_m40c_3p63v_500kVs__reltol2e-4__r500000",
+    "exit": 0,
+    "status": "pass"
+   },
+   {
+    "case": "A_ss_m40c_3p63v_500kVs__trap__r500000",
+    "exit": 0,
+    "status": "pass"
+   },
+   {
+    "case": "A_ss_m40c_3p63v_500kVs__tmax1u__r500000",
+    "exit": 0,
+    "status": "pass"
+   },
+   {
+    "case": "A_ss_m40c_3p63v_500kVs__base__r250000",
+    "exit": 0,
+    "status": "pass"
+   },
+   {
+    "case": "A_ss_m40c_3p63v_500kVs__trtol7__r250000",
+    "exit": 0,
+    "status": "pass"
+   },
+   {
+    "case": "A_ss_m40c_3p63v_500kVs__base__r1e06",
+    "exit": 0,
+    "status": "pass"
+   },
+   {
+    "case": "A_ss_m40c_3p63v_500kVs__trtol7__r1e06",
+    "exit": 0,
+    "status": "pass"
+   },
+   {
+    "case": "B_fs_27c_2p97v_5kVs__base__r5000",
+    "exit": 0,
+    "status": "pass"
+   },
+   {
+    "case": "B_fs_27c_2p97v_5kVs__trtol7__r5000",
+    "exit": 0,
+    "status": "pass"
+   },
+   {
+    "case": "B_fs_27c_2p97v_5kVs__reltol2e-4__r5000",
+    "exit": 0,
+    "status": "pass"
+   },
+   {
+    "case": "B_fs_27c_2p97v_5kVs__trap__r5000",
+    "exit": 0,
+    "status": "pass"
+   },
+   {
+    "case": "B_fs_27c_2p97v_5kVs__tmax1u__r5000",
+    "exit": 0,
+    "status": "pass"
+   },
+   {
+    "case": "B_fs_27c_2p97v_5kVs__base__r2500",
+    "exit": 0,
+    "status": "pass"
+   },
+   {
+    "case": "B_fs_27c_2p97v_5kVs__trtol7__r2500",
+    "exit": 0,
+    "status": "pass"
+   },
+   {
+    "case": "B_fs_27c_2p97v_5kVs__base__r10000",
+    "exit": 0,
+    "status": "pass"
+   },
+   {
+    "case": "B_fs_27c_2p97v_5kVs__trtol7__r10000",
+    "exit": 0,
+    "status": "pass"
+   }
+  ]
+ },
+ "supersedes": null,
+ "timestamp": "2026-10-10T11:50:58Z",
+ "tools": {
+  "fleet_ngspice": "ngspice-46 (per fleet log)",
+  "fleet_runner_klt": "0.5.0",
+  "klt_client": "klt 0.7.0+gca3089cd4b9f",
+  "klt_sim_backend_env": "batch",
+  "platform": "Linux 7.0.0-1013-aws x86_64",
+  "python": "3.12.3"
+ },
+ "variants": {
+  "base": {
+   "description": "Same solver settings as the source campaign (testbench `.options method=gear trtol=50`, tmax 5 us); only extra .save cards for internal nodes are added. Reproduction control for the original case."
+  },
+  "reltol1e-4": {
+   "added_after_first_batch": true,
+   "description": "ADDED AFTER the first 18-case batch was inspected (that batch gave only one physical, resolved exact-rate run for point A, too few to judge physical-branch stability): trailing `.options method=gear trtol=50 reltol=1e-4`.",
+   "options": "method=gear trtol=50 reltol=1e-4"
+  },
+  "reltol2e-4": {
+   "description": "Trailing `.options method=gear trtol=50 reltol=2e-4` (tighter relative tolerance; the #86 discriminator of the same name). Also used as an adjacent-rate control (variant use ADDED AFTER the first batch, so that adjacent-rate controls include a physical-branch candidate).",
+   "options": "method=gear trtol=50 reltol=2e-4"
+  },
+  "reltol2e-4-tmax1u": {
+   "added_after_first_batch": true,
+   "description": "ADDED AFTER the first batch (same reason): `reltol2e-4` options combined with maximum time step 1 us.",
+   "options": "method=gear trtol=50 reltol=2e-4",
+   "tmax_s": 1e-06
+  },
+  "tmax1u": {
+   "description": "Same options as base but maximum time step 1 us (5x finer than the source campaign).",
+   "tmax_s": 1e-06
+  },
+  "trap": {
+   "description": "Trailing `.options method=trap trtol=7` (trapezoidal integration instead of gear).",
+   "options": "method=trap trtol=7"
+  },
+  "trtol7": {
+   "description": "Trailing `.options method=gear trtol=7` (tighter local-truncation-error acceptance; the #86 discriminator of the same name).",
+   "options": "method=gear trtol=7"
+  }
+ },
+ "verdicts": {
+  "A_ss_m40c_3p63v_500kVs": {
+   "basis": "re-assertion exhibited only on nonphysical run(s) A_ss_m40c_3p63v_500kVs__base__r500000; 2 physical+resolved exact-rate runs (A_ss_m40c_3p63v_500kVs__reltol2e-4__r500000, A_ss_m40c_3p63v_500kVs__reltol2e-4-tmax1u__r500000) show one clean release with release-time spread 0.07%; no physical+resolved run in the matrix re-asserts",
+   "ordering_summary": [
+    "`A_ss_m40c_3p63v_500kVs__base__r500000`: RESETn V_MID rise at 3.18689 ms (release V_IH at 3.1869 ms); TRIP V_MID rise +0.0227 us; first out-of-window sample (v(xdut.xbias.na), -0.596 V) -0.499 us; POR_RAW V_MID fall -0.421 us; RE-ASSERT (V_IL fall) +0.773 us (all offsets relative to the release V_MID crossing); IBIAS release step -265.8 mV",
+    "physical-branch exact-rate runs, IBIAS step across the release: reltol2e-4: -33.11 mV, reltol2e-4-tmax1u: -33.11 mV"
+   ],
+   "per_case_flags": {
+    "A_ss_m40c_3p63v_500kVs__base__r1e06": {
+     "n_reassert": 0,
+     "n_release": 1,
+     "physical": false,
+     "reasserts": false,
+     "resolved": true,
+     "t_release_s": 0.0030288321027454276,
+     "usable": true
+    },
+    "A_ss_m40c_3p63v_500kVs__base__r250000": {
+     "n_reassert": 0,
+     "n_release": 1,
+     "physical": false,
+     "reasserts": false,
+     "resolved": true,
+     "t_release_s": 0.0029233240976210707,
+     "usable": true
+    },
+    "A_ss_m40c_3p63v_500kVs__base__r500000": {
+     "n_reassert": 1,
+     "n_release": 1,
+     "physical": false,
+     "reasserts": true,
+     "resolved": true,
+     "t_release_s": 0.0031869030531835774,
+     "usable": true
+    },
+    "A_ss_m40c_3p63v_500kVs__reltol1e-4__r500000": {
+     "n_reassert": 0,
+     "n_release": 1,
+     "physical": false,
+     "reasserts": false,
+     "resolved": true,
+     "t_release_s": 0.0029576172472957113,
+     "usable": true
+    },
+    "A_ss_m40c_3p63v_500kVs__reltol2e-4-tmax1u__r500000": {
+     "n_reassert": 0,
+     "n_release": 1,
+     "physical": true,
+     "reasserts": false,
+     "resolved": true,
+     "t_release_s": 0.0029612058839177326,
+     "usable": true
+    },
+    "A_ss_m40c_3p63v_500kVs__reltol2e-4__r1e06": {
+     "n_reassert": 0,
+     "n_release": 1,
+     "physical": true,
+     "reasserts": false,
+     "resolved": true,
+     "t_release_s": 0.0030212012269626174,
+     "usable": true
+    },
+    "A_ss_m40c_3p63v_500kVs__reltol2e-4__r250000": {
+     "n_reassert": 0,
+     "n_release": 1,
+     "physical": true,
+     "reasserts": false,
+     "resolved": true,
+     "t_release_s": 0.0029085836702335385,
+     "usable": true
+    },
+    "A_ss_m40c_3p63v_500kVs__reltol2e-4__r500000": {
+     "n_reassert": 0,
+     "n_release": 1,
+     "physical": true,
+     "reasserts": false,
+     "resolved": true,
+     "t_release_s": 0.002959176502843051,
+     "usable": true
+    },
+    "A_ss_m40c_3p63v_500kVs__tmax1u__r500000": {
+     "n_reassert": 0,
+     "n_release": 1,
+     "physical": false,
+     "reasserts": false,
+     "resolved": true,
+     "t_release_s": 0.0030513204859340575,
+     "usable": true
+    },
+    "A_ss_m40c_3p63v_500kVs__trap__r500000": {
+     "n_reassert": 0,
+     "n_release": 1,
+     "physical": false,
+     "reasserts": false,
+     "resolved": true,
+     "t_release_s": 0.0029520758247803622,
+     "usable": true
+    },
+    "A_ss_m40c_3p63v_500kVs__trtol7__r1e06": {
+     "n_reassert": 0,
+     "n_release": 1,
+     "physical": false,
+     "reasserts": false,
+     "resolved": true,
+     "t_release_s": 0.0030119339287726565,
+     "usable": true
+    },
+    "A_ss_m40c_3p63v_500kVs__trtol7__r250000": {
+     "n_reassert": 0,
+     "n_release": 1,
+     "physical": false,
+     "reasserts": false,
+     "resolved": true,
+     "t_release_s": 0.002909613808282721,
+     "usable": true
+    },
+    "A_ss_m40c_3p63v_500kVs__trtol7__r500000": {
+     "n_reassert": 0,
+     "n_release": 1,
+     "physical": false,
+     "reasserts": false,
+     "resolved": true,
+     "t_release_s": 0.002957234369795368,
+     "usable": true
+    }
+   },
+   "verdict": "solver/nonphysical artifact"
+  },
+  "B_fs_27c_2p97v_5kVs": {
+   "basis": "re-assertion exhibited only on nonphysical run(s) B_fs_27c_2p97v_5kVs__base__r5000; 4 physical+resolved exact-rate runs (B_fs_27c_2p97v_5kVs__reltol2e-4__r5000, B_fs_27c_2p97v_5kVs__trap__r5000, B_fs_27c_2p97v_5kVs__tmax1u__r5000, B_fs_27c_2p97v_5kVs__reltol2e-4-tmax1u__r5000) show one clean release with release-time spread 0.12%; no physical+resolved run in the matrix re-asserts",
+   "ordering_summary": [
+    "`B_fs_27c_2p97v_5kVs__base__r5000`: RESETn V_MID rise at 3.62884 ms (release V_IH at 3.62886 ms); TRIP V_MID rise -0.372 us; first out-of-window sample (v(xdut.xbias.nb), -797 V) -0.287 us; POR_RAW V_MID fall -0.123 us; RE-ASSERT (V_IL fall) +2.13 us (all offsets relative to the release V_MID crossing); IBIAS release step -327.6 mV",
+    "physical-branch exact-rate runs, IBIAS step across the release: reltol2e-4: -40.93 mV, trap: -40.94 mV, tmax1u: -40.93 mV, reltol2e-4-tmax1u: -40.93 mV"
+   ],
+   "per_case_flags": {
+    "B_fs_27c_2p97v_5kVs__base__r10000": {
+     "n_reassert": 0,
+     "n_release": 1,
+     "physical": true,
+     "reasserts": false,
+     "resolved": true,
+     "t_release_s": 0.003355959159327425,
+     "usable": true
+    },
+    "B_fs_27c_2p97v_5kVs__base__r2500": {
+     "n_reassert": 0,
+     "n_release": 1,
+     "physical": true,
+     "reasserts": false,
+     "resolved": true,
+     "t_release_s": 0.004172919005297391,
+     "usable": true
+    },
+    "B_fs_27c_2p97v_5kVs__base__r5000": {
+     "n_reassert": 1,
+     "n_release": 1,
+     "physical": false,
+     "reasserts": true,
+     "resolved": true,
+     "t_release_s": 0.0036288578990180077,
+     "usable": true
+    },
+    "B_fs_27c_2p97v_5kVs__reltol1e-4__r5000": {
+     "n_reassert": 0,
+     "n_release": 1,
+     "physical": false,
+     "reasserts": false,
+     "resolved": true,
+     "t_release_s": 0.0036314724867745063,
+     "usable": true
+    },
+    "B_fs_27c_2p97v_5kVs__reltol2e-4-tmax1u__r5000": {
+     "n_reassert": 0,
+     "n_release": 1,
+     "physical": true,
+     "reasserts": false,
+     "resolved": true,
+     "t_release_s": 0.0036333720194567784,
+     "usable": true
+    },
+    "B_fs_27c_2p97v_5kVs__reltol2e-4__r10000": {
+     "n_reassert": 0,
+     "n_release": 1,
+     "physical": true,
+     "reasserts": false,
+     "resolved": true,
+     "t_release_s": 0.0033547989717179756,
+     "usable": true
+    },
+    "B_fs_27c_2p97v_5kVs__reltol2e-4__r2500": {
+     "n_reassert": 0,
+     "n_release": 1,
+     "physical": true,
+     "reasserts": false,
+     "resolved": true,
+     "t_release_s": 0.004175549210306175,
+     "usable": true
+    },
+    "B_fs_27c_2p97v_5kVs__reltol2e-4__r5000": {
+     "n_reassert": 0,
+     "n_release": 1,
+     "physical": true,
+     "reasserts": false,
+     "resolved": true,
+     "t_release_s": 0.003632188358669985,
+     "usable": true
+    },
+    "B_fs_27c_2p97v_5kVs__tmax1u__r5000": {
+     "n_reassert": 0,
+     "n_release": 1,
+     "physical": true,
+     "reasserts": false,
+     "resolved": true,
+     "t_release_s": 0.00363423875192444,
+     "usable": true
+    },
+    "B_fs_27c_2p97v_5kVs__trap__r5000": {
+     "n_reassert": 0,
+     "n_release": 1,
+     "physical": true,
+     "reasserts": false,
+     "resolved": true,
+     "t_release_s": 0.0036366092430054,
+     "usable": true
+    },
+    "B_fs_27c_2p97v_5kVs__trtol7__r10000": {
+     "n_reassert": 0,
+     "n_release": 1,
+     "physical": false,
+     "reasserts": false,
+     "resolved": true,
+     "t_release_s": 0.003355974651295884,
+     "usable": true
+    },
+    "B_fs_27c_2p97v_5kVs__trtol7__r2500": {
+     "n_reassert": 0,
+     "n_release": 1,
+     "physical": false,
+     "reasserts": false,
+     "resolved": true,
+     "t_release_s": 0.004174635978961259,
+     "usable": true
+    },
+    "B_fs_27c_2p97v_5kVs__trtol7__r5000": {
+     "n_reassert": 0,
+     "n_release": 1,
+     "physical": false,
+     "reasserts": false,
+     "resolved": true,
+     "t_release_s": 0.003632735039461297,
+     "usable": true
+    }
+   },
+   "verdict": "solver/nonphysical artifact"
+  }
+ }
+}
