@@ -4,6 +4,18 @@ Chronological record of recently merged pull requests and closed issues. This fi
 
 ### 2026-10-09
 
+- **PR #135**: Reject non-finite and malformed waveforms before Iq grading
+- **PR #131**: docs(spec): align spec/README.md with DR-003 ratification (#127)
+- **PR #134**: docs(spec): DR-005 proposed temp_buffer scope and PTAT/CTAT load assumption (#125)
+- **PR #130**: docs(spec): DR-004 proposed sky130 POR threshold/hysteresis/ramp recommendation
+- **PR #128**: Refresh characterization report and add coverage guard (#122)
+- **PR #126**: docs(readme): align ratification-status statements with DR-003
+- **Issue #133** (closed): Reject non-finite and malformed waveforms before Iq grading
+- **Issue #127** (closed): spec/README.md: decision-records bullet says DR-003 is still proposed (ratified scoped to rows 1 and 6)
+- **Issue #125** (closed): Decide temp_buffer scope and the Sensor-output row via a decision record
+- **Issue #123** (closed): Draft DR recommending sky130 VPOR↑/VPOR↓, hysteresis and supply-ramp rows from committed #98/#102 evidence (T1 item 5)
+- **Issue #122** (closed): Refresh the stale characterization report and add coverage guard so it cannot silently rot (T1 item 8)
+- **Issue #85** (closed): README: ratification-status paragraphs outside the target table are stale after DR-003 rows 1 and 6 were ratified
 - **PR #121**: sim(iq-top): assembled temp_por_top Iq campaign, por-iq / iq-total / temp-iq (#107)
 - **Issue #107** (closed): Block-assembly Iq characterization: por-iq, temp-iq, iq-total (DR-003 TBD-4/5/6)
 - **PR #119**: sim: record fleet refusal of as-drawn supply-ramp re-run (#101)
