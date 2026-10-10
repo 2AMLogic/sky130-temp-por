@@ -28,6 +28,7 @@ from __future__ import annotations
 import argparse
 import concurrent.futures
 import functools
+import hashlib
 import json
 import os
 import re
@@ -203,6 +204,24 @@ def submit_one(req: dict, head: str, man: dict, run_dir: Path, capacity_wait_s: 
 # --------------------------------------------------------------------------
 
 
+def file_sha256(path: Path) -> str | None:
+    return hashlib.sha256(path.read_bytes()).hexdigest() if path.is_file() else None
+
+
+# Inputs that shape the simulated deck.  If any of them differs between the
+# commit the grid was SUBMITTED from and the commit that GRADES it, the record
+# would mis-attribute the evidence, so ``record`` refuses.
+DECK_INPUTS = ("design/netlist", "sim/brownout-top/testbench", "sim/spiceinit", "sim/pdk.json")
+
+
+def deck_drift(run_sha: str | None, grade_sha: str | None) -> list[str] | None:
+    """Deck-affecting paths changed between the submit and grading commits (None = not determinable)."""
+    if not run_sha or not grade_sha:
+        return None
+    p = subprocess.run(["git", "-C", str(REPO_ROOT), "diff", "--name-only", run_sha, grade_sha, "--", *DECK_INPUTS], capture_output=True, text=True)
+    return None if p.returncode != 0 else [ln for ln in p.stdout.splitlines() if ln.strip()]
+
+
 def source_state() -> dict:
     g = cr.git_state()
     sha_full = cr.git("rev-parse", "HEAD")
@@ -357,6 +376,9 @@ def analyze_request(req: dict, run_dir: Path, man: dict, corners_dir: Path, writ
             pts.append({"id": corner_id(p, t, v), "tag": req["tag"], "process": p, "temperature_c": t, "supply_v": v, "outcome": "NOT_COVERED", "reason": why})
         return {"info": info, "points": pts, "pdk_report": {}}
     remote = (rep.get("environment") or {}).get("remote") or {}
+    info["netlist_sha256_submitted"] = file_sha256(d / "netlist.spice")
+    info["netlist_sha256_reported"] = (rep.get("environment") or {}).get("netlist_sha256")
+    info["netlist_matches_report"] = info["netlist_sha256_submitted"] is not None and info["netlist_sha256_submitted"] == info["netlist_sha256_reported"]
     info.update({"outcome": rep.get("status"), "job_id": remote.get("job_id"), "instance_type": remote.get("instance_type"), "lifecycle": remote.get("lifecycle"),
                  "runner_klt_version": remote.get("runner_klt_version"), "client_klt_version": remote.get("client_klt_version"),
                  "elapsed_seconds": remote.get("elapsed_seconds"), "state": remote.get("state"), "corner_count": rep.get("corner_count")})
@@ -443,7 +465,14 @@ def render_md(rec: dict) -> str:
     L.append(f"- **Netlist provenance**: {rec['experiment']['provenance']} (`{rec['experiment']['provenance_source']}`)")
     L += sim_common.render_pdk_tools_repo_state(rec)
     t, g = rec["tools"], rec["git"]
-    L.append(f"- **Source commit**: `{g['sha_full']}` (pushed to a remote branch: {g['pushed_to_remote']}; dirty at submit: {rec['run_source']['dirty']})")
+    rs = rec["run_source"]
+    L.append(f"- **Simulation source commit** (grid submitted from): `{rs.get('sha_full')}` (dirty at submit: {rs.get('dirty')}; pushed to a remote branch at submit: {rs.get('pushed_to_remote')})")
+    L.append(f"- **Grading source commit** (checker/record written from): `{g['sha_full']}` (dirty at grading: {g['dirty']}; pushed: {g['pushed_to_remote']})")
+    dd = rec["deck_drift"]
+    L.append("- **Deck inputs between the two commits** (" + ", ".join(f"`{x}`" for x in DECK_INPUTS) + "): "
+             + ("identical (the submitted decks are the ones a checkout of either commit regenerates)" if dd == [] else f"CHANGED {dd}" if dd else "not determinable"))
+    nm = [q["tag"] for q in rec["requests"] if q.get("job_id") and not q.get("netlist_matches_report")]
+    L.append(f"- **Submitted netlist vs fleet report sha256**: " + ("all match" if not nm else f"MISMATCH for {nm}"))
     L.append(f"- **Fleet runner**: klt `{t['fleet_runner_klt']}` / `{t['fleet_ngspice']}` (client klt `{t['klt_client']}`); {t['fleet_note']}")
     L.append(f"- **Host tool caveat**: {t['xschem_note']}")
     m = rec["matrix"]
@@ -541,6 +570,11 @@ def cmd_record(args) -> int:
     pin = cr.load_pin()
     pdk = cr.resolve_pdk(pin)
     gi = source_state()
+    if gi["dirty"] and not args.allow_dirty:
+        raise SystemExit("refusing to record from a dirty tree (commit first, or --allow-dirty; the state is recorded either way)")
+    drift = deck_drift((meta.get("source") or {}).get("sha_full"), gi.get("sha_full"))
+    if drift and not args.allow_deck_drift:
+        raise SystemExit(f"deck inputs changed between the submit commit and HEAD: {drift} -- the record would mis-attribute the evidence")
     now = datetime.now(timezone.utc)
     record_id = f"{now:%Y%m%d}-{now:%H%M%S}-{gi['sha']}"
     rec_dir = HERE / "records"
@@ -583,7 +617,7 @@ def cmd_record(args) -> int:
                   "fleet_runner_klt": ", ".join(runners) or "unknown", "fleet_ngspice": ", ".join(ngs) or "unknown",
                   "fleet_note": "client/runner klt skew accepted with batch.runner_version_check=warn; the runner ignores options.ngspice_init so a netlist-carried `set ng_nomodcheck` is used",
                   "xschem_note": "only the testbench is netlisted by xschem here; the DUT is spliced from the committed design/netlist/temp_por_top.spice (host xschem leaves expr() parameters unevaluated)"},
-        "git": gi, "run_source": meta.get("source", {}),
+        "git": gi, "run_source": meta.get("source", {}), "deck_drift": drift, "run_meta": {k: meta.get(k) for k in ("run_id", "started_utc", "submitted_tags", "retries")},
         "matrix": {"process": man["corners"]["process"], "temperature_c": man["corners"]["temperature_c"], "supply_v": man["corners"]["supply_v"],
                    "n_requests": cnt["requests"], "points_per_request": cnt["points_per_request"], "n_points": cnt["points"],
                    "n_requests_submitted": sum(1 for q in requests if q.get("job_id")), "n_points_graded": n_graded, "n_points_not_covered": cnt["points"] - n_graded,
@@ -657,6 +691,8 @@ def main(argv: list[str]) -> int:
     c.add_argument("--notes-file")
     c.add_argument("--author")
     c.add_argument("--supersedes")
+    c.add_argument("--allow-dirty", action="store_true")
+    c.add_argument("--allow-deck-drift", action="store_true", help="record even though deck inputs changed since the submit commit (stated in the record)")
     s = sub.add_parser("selftest")
     s.add_argument("--author")
     s.add_argument("--supersedes")

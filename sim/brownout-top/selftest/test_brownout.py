@@ -8,6 +8,7 @@ from __future__ import annotations
 
 import datetime as _dt
 import json
+import subprocess
 import sys
 import tempfile
 import unittest
@@ -183,7 +184,7 @@ class Accounting(unittest.TestCase):
             (here).mkdir()
             (build / "run1" / "run.json").write_text(json.dumps({"klt_client": "test", "source": {"dirty": False}}))
             gi = {"sha": "abc1234", "sha_full": "abc1234" + "0" * 33, "branch": "t", "dirty": False, "pushed_to_remote": True, "remote_branches": []}
-            ns = mock.Mock(run_id="run1", notes_file=None, author="t", supersedes=None)
+            ns = mock.Mock(run_id="run1", notes_file=None, author="t", supersedes=None, allow_dirty=False, allow_deck_drift=False)
             with mock.patch.object(rb, "BUILD", build), mock.patch.object(rb, "HERE", here), mock.patch.object(rb, "datetime", FixedDT), mock.patch.object(rb, "source_state", return_value=gi):
                 self.assertEqual(rb.cmd_record(ns), 0)
                 rec = json.loads(next((here / "records").glob("*.json")).read_text())
@@ -194,6 +195,39 @@ class Accounting(unittest.TestCase):
                 with self.assertRaises(SystemExit):
                     rb.cmd_record(ns)
                 self.assertEqual(before, {p: p.read_text() for p in (here / "records").glob("*")})
+
+    def _record_env(self, td, gi):
+        build, here = td / "build", td / "here"
+        (build / "run1").mkdir(parents=True)
+        here.mkdir()
+        (build / "run1" / "run.json").write_text(json.dumps({"klt_client": "test", "source": {"dirty": False, "sha_full": "a" * 40}}))
+        return build, here
+
+    def test_record_refuses_dirty_tree(self):
+        with tempfile.TemporaryDirectory() as td:
+            gi = {"sha": "abc1234", "sha_full": "b" * 40, "branch": "t", "dirty": True, "pushed_to_remote": True, "remote_branches": []}
+            build, here = self._record_env(Path(td), gi)
+            ns = mock.Mock(run_id="run1", notes_file=None, author="t", supersedes=None, allow_dirty=False, allow_deck_drift=False)
+            with mock.patch.object(rb, "BUILD", build), mock.patch.object(rb, "HERE", here), mock.patch.object(rb, "source_state", return_value=gi):
+                with self.assertRaises(SystemExit):
+                    rb.cmd_record(ns)
+            self.assertFalse((here / "records").exists())
+
+    def test_record_refuses_deck_drift_between_submit_and_grading(self):
+        with tempfile.TemporaryDirectory() as td:
+            gi = {"sha": "abc1234", "sha_full": "b" * 40, "branch": "t", "dirty": False, "pushed_to_remote": True, "remote_branches": []}
+            build, here = self._record_env(Path(td), gi)
+            ns = mock.Mock(run_id="run1", notes_file=None, author="t", supersedes=None, allow_dirty=False, allow_deck_drift=False)
+            with mock.patch.object(rb, "BUILD", build), mock.patch.object(rb, "HERE", here), mock.patch.object(rb, "source_state", return_value=gi), \
+                    mock.patch.object(rb, "deck_drift", return_value=["design/netlist/temp_por_top.spice"]):
+                with self.assertRaises(SystemExit):
+                    rb.cmd_record(ns)
+            self.assertFalse((here / "records").exists())
+
+    def test_deck_drift_is_empty_for_identical_commits(self):
+        head = subprocess.run(["git", "-C", str(rb.REPO_ROOT), "rev-parse", "HEAD"], capture_output=True, text=True).stdout.strip()
+        self.assertEqual(rb.deck_drift(head, head), [])
+        self.assertIsNone(rb.deck_drift(None, head))
 
 
 if __name__ == "__main__":

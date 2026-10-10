@@ -549,8 +549,9 @@ def run_selftest(fixture_dir: Path | None = None) -> list[dict]:
             doc = {"plotname": "Synthetic (controlled) -- sim/brownout-top/brownout_checker.py", "stimulus": st,
                    "variables": [{"index": i, "name": c} for i, c in enumerate(names)],
                    "points": [[wave[c][k] for c in names] for k in range(len(wave["time"]))]}
-            with gzip.open(fixture_dir / f"{name}.wave.json.gz", "wt", compresslevel=9) as fh:
-                json.dump(doc, fh, separators=(",", ":"))
+            # mtime=0: byte-identical on every run, so a self-test never dirties the committed fixtures
+            with open(fixture_dir / f"{name}.wave.json.gz", "wb") as raw, gzip.GzipFile(fileobj=raw, mode="wb", compresslevel=9, mtime=0) as gz:
+                gz.write(json.dumps(doc, separators=(",", ":")).encode())
     return out
 
 
