@@ -124,13 +124,13 @@ def tstop_for(vf: float, st: dict, t_obs: float) -> float:
     return timeline(vf, st)["t_rec_end"] + t_obs
 
 
-def tmax_for(st: dict, vf_min: float, th_cap: float = 5e-6) -> float:
-    """Max time step: <= 5 us, <= hold/10, <= 1/20 of the shortest derived edge (smallest start supply)."""
+def tmax_for(st: dict, vf_min: float, th_cap: float = 10e-6) -> float:
+    """Max time step: <= 10 us, <= hold/6, <= 1/12 of the shortest derived edge (smallest start supply)."""
     ex_min = max(vf_min - st["vlow"], 0.0)
     if ex_min <= 0:
         return th_cap
     edges = min(ex_min / st["sf"], ex_min / st["sr"])
-    return min(th_cap, st["th"] / 10.0, edges / 20.0)
+    return min(th_cap, st["th"] / 6.0, edges / 12.0)
 
 
 def required_max_dt(vf: float, st: dict) -> float:
@@ -424,8 +424,8 @@ def write_trace(path: Path, rows) -> None:
 # synthetic waveforms with known answers (self-test)
 # --------------------------------------------------------------------------
 
-REF_ST = {"rup": 1e4, "t0": 20e-3, "vlow": 1.2, "sf": 1e5, "th": 100e-6, "sr": 1e5}
-T_OBS_REF = 20e-3
+REF_ST = {"rup": 1e5, "t0": 10e-3, "vlow": 1.2, "sf": 5e4, "th": 100e-6, "sr": 1e5}
+T_OBS_REF = 10e-3
 
 
 def _grid(vf, st, t_obs, dt_base=50e-6, dt_dip=1e-6, coarse=None, tstop=None):
@@ -473,7 +473,7 @@ def synth(vf=3.3, st=None, t_obs=T_OBS_REF, behavior="ok", coarse=None, tstop=No
                         rs = v
         if behavior == "chatter" and t_release is not None and t_release + 0.5e-3 <= x < t_release + 1.0e-3:
             rs = 0.0
-        if behavior == "control_assert" and 25e-3 <= x < 26e-3:
+        if behavior == "control_assert" and st["t0"] + 3e-3 <= x < st["t0"] + 4e-3:
             rs = 0.0
         pr = v if (x >= t_raw0) else 0.0
         if t_assert is not None and behavior not in ("missed",) and st["vlow"] < vf and x >= t_assert:

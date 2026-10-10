@@ -113,7 +113,7 @@ class Matrix(unittest.TestCase):
         g = MAN["grid"]
         cube = len(g["floors_v"]) * len(g["holds_s"]) * len(g["fall_slews_v_per_s"])
         self.assertEqual(len(reqs), cube + len(g["recovery_variants_v_per_s"]) + 1)
-        self.assertEqual(rb.declared_counts(MAN), {"requests": 30, "points_per_request": 45, "points": 1350})
+        self.assertEqual(rb.declared_counts(MAN), {"requests": 21, "points_per_request": 45, "points": 945})
         self.assertEqual(len(rb.corners_of(MAN)), 45)
         self.assertEqual(sum(1 for r in reqs if r["kind"] == "control"), 1)
         self.assertEqual(len({r["tag"] for r in reqs}), len(reqs))
@@ -131,9 +131,9 @@ class Matrix(unittest.TestCase):
             req = rb.build_request(r, MAN, "batch")
             self.assertEqual(req["backend"], "batch")
             self.assertEqual(len(req["corners"]["process"]) * len(req["corners"]["supply_v"]["vset"]) * len(req["corners"]["temperature_c"]), 45)
-            self.assertLessEqual(rb.tmax_of(r, MAN), 5e-6)
+            self.assertLessEqual(rb.tmax_of(r, MAN), 10e-6)
             if r["kind"] != "control":
-                self.assertLessEqual(rb.tmax_of(r, MAN), r["th"] / 10 + 1e-15)
+                self.assertLessEqual(rb.tmax_of(r, MAN), r["th"] / 6 + 1e-15)
                 # the simulator step bound must satisfy the checker's sample-gap requirement at every supply
                 for vf in MAN["corners"]["supply_v"]:
                     self.assertLess(rb.tmax_of(r, MAN), bc.required_max_dt(vf, rb.stim_of(r)) + 1e-15)
@@ -188,7 +188,7 @@ class Accounting(unittest.TestCase):
                 self.assertEqual(rb.cmd_record(ns), 0)
                 rec = json.loads(next((here / "records").glob("*.json")).read_text())
                 self.assertEqual(rec["matrix"]["n_points_graded"], 0)
-                self.assertEqual(rec["matrix"]["n_points_not_covered"], 1350)
+                self.assertEqual(rec["matrix"]["n_points_not_covered"], 945)
                 self.assertEqual(rec["summary"]["total"]["PASS"], 0)
                 before = {p: p.read_text() for p in (here / "records").glob("*")}
                 with self.assertRaises(SystemExit):

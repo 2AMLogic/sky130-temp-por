@@ -34,21 +34,24 @@ ex = max(vf - vlow, 0)
 ```
 
 * `vf` = **starting supply** (klt `supply_v`, 2.97/3.30/3.63 V); power-up is a
-  10 kV/s ramp from a physical 0 V; `t0` = 20 ms (>6x the pilot release time).
+  100 kV/s ramp from a physical 0 V; `t0` = 10 ms (>2.3x the slowest RESETn release, 4.3 ms, in the #98 as-drawn record).
 * `vlow` dip floor (absolute V), `sf` falling slew, `th` hold at the floor,
   `sr` recovery slew — four separate parameters. Fall time is `ex/sf` and
   recovery time is `ex/sr`: durations are **derived** from voltage excursion /
   slew, never a fixed duration, so the swept supply cannot couple into a slew.
 * No-dip control: `vlow = 99` (ex = 0). Same windows, no dip.
-* Observation: 20 ms after the recovery edge ends. `tmax` = min(5 µs, hold/10,
-  shortest edge/20); the checker independently enforces a sample-gap limit.
+* Observation: 10 ms after the recovery edge ends. `tmax` = min(10 µs, hold/6,
+  shortest edge/12); the checker independently enforces a sample-gap limit
+  (min(20 µs, hold/5, shortest edge/10)).
 
 Grid (exploratory, bounded; see `experiment.json` `grid`): floors {2.0, 1.2, 0.4}
-V × holds {10 µs, 100 µs, 1 ms} × fall slews {1, 10, 100} kV/s at recovery
-10 kV/s (27 requests), + recovery 1 and 100 kV/s at the center point (2), + the
-control (1) = **30 requests × 45 PVT points = 1350 declared points**. The
-expansion policy (add midpoints where a PASS/FAIL boundary appears, 1 MV/s
-slews with finer `tmax`, …) is in the manifest; expansion is always a new record.
+V × holds {10 µs, 100 µs, 1 ms} × fall slews {2, 50} kV/s at recovery
+10 kV/s (18 requests), + recovery 1 and 100 kV/s at the center point (2), + the
+control (1) = **21 requests × 45 PVT points = 945 declared points**. Cost is
+binding: a first 3-slew/40 ms grid timed out on the fleet (see
+`stimulus.cost_note`). The
+expansion policy (add midpoints where a PASS/FAIL boundary appears, 10 kV/s and
+100 kV/s slews, then 1 MV/s with finer `tmax`, …) is in the manifest; expansion is always a new record.
 
 ## Verdicts
 
@@ -76,7 +79,7 @@ python3 sim/brownout-top/brownout_checker.py
 python3 sim/brownout-top/run_brownout_campaign.py plan
 
 # 1. (optional) ONE local single-corner probe: netlist / channel-name validation only
-python3 sim/brownout-top/run_brownout_campaign.py probe --tag cube_v1.2_h0.0001_f10000_r10000
+python3 sim/brownout-top/run_brownout_campaign.py probe --tag cube_v1.2_h0.0001_f2000_r10000 --tstop 3e-3
 
 # 2. commit + push the source first (run refuses a dirty or unpushed tree), then submit the grid
 KLT_SIM_BACKEND=batch python3 sim/brownout-top/run_brownout_campaign.py run --run-id <id>

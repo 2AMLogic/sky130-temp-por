@@ -162,7 +162,7 @@ def build_request(req: dict, man: dict, backend: str, capacity_wait_s: float = 0
             {"name": "resetn_end", "spice": f".meas tran resetn_end FIND v(resetn) AT={(tstop - 0.1e-3):.9g}", "unit": "V"},
             {"name": "resetn_min_after_t0", "spice": f".meas tran resetn_min_after_t0 MIN v(resetn) FROM={req['t0']:g} TO={tstop:.9g}", "unit": "V"},
         ],
-        "options": {"timeout_s": 3600, "keep_artifacts": True, "waveforms": True},
+        "options": {"timeout_s": 7200, "keep_artifacts": True, "waveforms": True},
     }
     if backend == "batch":
         r["batch"] = {"runner_version_check": "warn"}
