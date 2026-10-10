@@ -1,0 +1,183 @@
+# point: por-comparator-thresholds real-bias-core-postlayout r50 tt_27c
+# process=tt temp=27C rate=50 V/s tstop=0.1452s klt status: pass
+
+# ==== klt sim deck ====
+| * klt sim -- generated corner deck, do not edit
+| .lib /opt/pdk/sky130A/libs.tech/combined/sky130.lib.spice tt
+| .include /var/tmp/eda-job-klt-sim-7356c0a842ae/inputs/netlist.cir
+| .temp 27
+| .meas tran vdd_end FIND v(vdd) AT=0.145199
+| .meas tran por_raw_max MAX v(por_raw)
+| .control
+| alter vset=3.63
+| set filetype=ascii
+| tran 1u 0.1452 0 2e-05
+| write /var/tmp/eda-job-klt-sim-7356c0a842ae/outputs/artifacts/tt_3p630V_27C/waveform.raw
+| quit
+| .endc
+| .end
+
+# ==== klt diagnostics ====
+
+# ==== ngspice stdout+stderr ====
+
+Note: No compatibility mode selected!
+
+
+Circuit: * klt sim -- generated corner deck, do not edit
+
+Doing analysis at TEMP = 27.000000 and TNOM = 27.000000
+
+Using SPARSE 1.3 as Direct Linear Solver
+
+Initial Transient Solution
+--------------------------
+
+Node                                   Voltage
+----                                   -------
+vsetn                                     3.63
+vdd                                          0
+xdut.xpex.vss__t0                 1.12774e-169
+xdut.xpex.n1__t0                   1.41035e-18
+xdut.xpex.snsb__t2                1.15555e-166
+xdut.xpex.vss__t13               -2.25542e-169
+xdut.xpex.bias_okb__t3            -1.59248e-19
+xdut.xpex.bias_ok__t0              -3.1205e-19
+xdut.xpex.vss__t2                  6.35375e-29
+xdut.xpex.vss__t14                 -3.1818e-29
+xdut.xpex.ibias__t0                1.36384e-19
+xdut.xpex.bias_okb__t1            -1.59248e-19
+xdut.xpex.vss__t3                 -2.82191e-29
+xdut.xpex.vss__t17                 2.67134e-29
+xdut.xpex.tn__t0                  -6.75651e-19
+xdut.xpex.nbg__t0                 -1.54369e-19
+xdut.xpex.vss__t7                  1.78761e-32
+xdut.xpex.vss__t18                -1.31256e-28
+xdut.xpex.n1__t3                   1.41035e-18
+xdut.xpex.cmpo__t1                -6.89307e-19
+xdut.xpex.vss__t9                 -5.39385e-28
+xdut.xpex.vss__t15                  2.7193e-28
+xdut.xpex.por_raw__t0             -5.31317e-18
+xdut.xpex.n1__t1                   1.41035e-18
+xdut.xpex.vss__t8                  2.03672e-27
+xdut.xpex.vss__t16                -1.00954e-27
+xdut.xpex.nbg__t3                 -1.54369e-19
+xdut.xpex.bias_okb__t4            -1.59248e-19
+xdut.xpex.vss__t4                 -8.86032e-30
+xdut.xpex.vss__t19                 -3.0702e-29
+xdut.xpex.ibias__t1                1.36384e-19
+xdut.xpex.nbg__t1                 -1.54369e-19
+xdut.xpex.vss__t5                 -9.34372e-30
+xdut.xpex.vss__t21                 2.69415e-29
+xdut.xpex.ibias__t2                1.36384e-19
+xdut.xpex.bias_ok__t2              -3.1205e-19
+xdut.xpex.nbg__t2                 -1.54369e-19
+xdut.xpex.vss__t20                -3.59981e-30
+xdut.xpex.na__t0                    1.3964e-18
+xdut.xpex.sns__t2                 6.21834e-167
+xdut.xpex.tn__t1                  -6.75651e-19
+xdut.xpex.vss__t22                  1.4514e-28
+xdut.xpex.cmpo__t4                -6.89307e-19
+xdut.xpex.vref__t0                -7.98613e-64
+xdut.xpex.tn__t2                  -6.75651e-19
+xdut.xpex.vss__t23                -2.62279e-28
+xdut.xpex.cmpo__t3                -6.89307e-19
+xdut.xpex.bias_okb__t5            -1.59248e-19
+xdut.xpex.vss__t6                  2.42042e-28
+xdut.xpex.vss__t24                 -1.3143e-28
+xdut.xpex.bias_okb__t2            -1.59248e-19
+xdut.xpex.bias_ok__t1              -3.1205e-19
+xdut.xpex.vdd__t0                  2.40523e-31
+xdut.xpex.vdd__t1                 -6.42555e-29
+xdut.xpex.n1__t4                   1.41035e-18
+xdut.xpex.cmpo__t0                -6.89307e-19
+xdut.xpex.vdd__t10                -1.77917e-30
+xdut.xpex.vdd__t8                  4.72106e-28
+xdut.xpex.por_raw__t1             -5.31317e-18
+xdut.xpex.n1__t2                   1.41035e-18
+xdut.xpex.vdd__t9                 -3.59895e-29
+xdut.xpex.vdd__t7                 -1.73814e-27
+xdut.xpex.vdda__t0                -2.15055e-22
+xdut.xpex.bias_okb__t0            -1.59248e-19
+xdut.xpex.vdd__t2                  3.16769e-33
+xdut.xpex.vdd__t3                 -7.82655e-32
+xdut.xpex.na__t1                    1.3964e-18
+xdut.xpex.na__t2                    1.3964e-18
+xdut.xpex.vdda__t1                -2.15055e-22
+xdut.xpex.vdd__t4                  4.99856e-28
+xdut.xpex.cmpo__t2                -6.89307e-19
+xdut.xpex.na__t3                    1.3964e-18
+xdut.xpex.vdda__t2                -2.15055e-22
+xdut.xpex.vdd__t6                 -2.45338e-28
+xdut.xpex.snsb__t0                1.15359e-166
+xdut.xpex.x$19.t1                 1.15351e-166
+xdut.xpex.x$19.t2                  1.2268e-169
+xdut.xpex.vss__t1                 1.14577e-169
+xdut.xpex.vss__t10                           0
+xdut.xpex.sns__t0                 6.21843e-167
+xdut.xpex.x$20.t1                 6.21847e-167
+xdut.xpex.x$20.t2                 1.15459e-166
+xdut.xpex.snsb__t1                 1.1546e-166
+xdut.xpex.vss__t11                           0
+xdut.xpex.sns__t1                 6.21821e-167
+xdut.xpex.x$21.t1                 6.21816e-167
+xdut.xpex.x$21.t2                 2.77604e-170
+xdut.xpex.vdd__t5                 2.73316e-170
+xdut.xpex.vss__t12                           0
+bias_ok                            -3.1205e-19
+vsubs                                        0
+xdut.xpex.bias_okb                -1.59248e-19
+xdut.xpex.cmpo                    -6.89307e-19
+ibias                              1.36384e-19
+xdut.xpex.n1                       1.41035e-18
+xdut.xpex.na                        1.3964e-18
+xdut.xpex.nbg                     -1.54369e-19
+por_raw                           -5.31317e-18
+xdut.xpex.sns                     6.21834e-167
+xdut.xpex.snsb                     1.1547e-166
+xdut.xpex.tn                      -6.75651e-19
+xdut.xpex.vdda                    -2.15055e-22
+vref                              -7.98613e-64
+xbias.na                           3.54556e-64
+xbias.pg                                     0
+xbias.nbtop                        1.95981e-58
+xbias.nbg                          6.58042e-66
+xbias.xrt.t1                       1.95981e-58
+xbias.xrt.t2                       1.95981e-58
+xbias.nb                           1.95981e-58
+xbias.xr1.t1                       1.95981e-58
+xbias.xr1.t2                       1.95982e-58
+xbias.ec                           1.95982e-58
+xbias.xr2.t1                      -7.98613e-64
+xbias.xr2.t2                      -7.98615e-64
+xbias.er                          -7.98615e-64
+xbias.pb                           1.11192e-58
+xbias.nt                          -1.75891e-66
+xbias.n1                            1.5159e-65
+xbias.n2                           2.51033e-66
+xbias.nz                           2.51033e-66
+xbias.xrz.t1                       2.51033e-66
+xbias.xrz.t2                       2.51033e-66
+xbias.ks1                         -5.30063e-55
+xbias.ks2                         -2.08342e-53
+xbias.ks3                         -6.94868e-42
+xbias.ks4                         -2.22358e-30
+xbias.nkg                         -7.11545e-19
+xbias.nkm                          6.95806e-61
+xbias.tok                         -3.72807e-25
+xbias.noko                         1.84149e-21
+xbias.nokl                         1.14112e-28
+xbias.nokx                                   0
+bvdd#branch                       -3.64891e-30
+vset#branch                                  0
+
+
+No. of Data Rows : 7287
+
+  Measurements for Transient Analysis
+
+vdd_end             =  5.00000e-05
+por_raw_max         =  3.62955e+00 at=  7.26090e-02
+
+ASCII raw file "/var/tmp/eda-job-klt-sim-7356c0a842ae/outputs/artifacts/tt_3p630V_27C/waveform.raw"
+ngspice-46 done
