@@ -41,5 +41,43 @@
     },
     "attribution_instrumentation": "Four 0 V voltage sources (vsbias, vscmp, vspor, vstemp) are inserted by the driver into the generated deck, in series with each sub-cell instance's VDD pin inside the temp_por_top subcircuit (text edit of the four instance lines, each asserted to match exactly once). A 0 V source adds no resistance, so the DUT circuit is electrically unchanged; the same instrumented deck is used for both states and the total is still the independent -i(BVDD). Attribution is per sub-cell (por_output_chain includes MASSIST); it is never summed into iq-total, only compared with it."
   },
-  "ngspice_note": "The fleet runner (klt 0.5.0, ngspice 46) ignores options.ngspice_init and expr measurements, so the equivalent of sim/spiceinit's ng_nomodcheck is set by a .control block carried in the netlist body ('set ng_nomodcheck'). Local ngspice is 42; a single-point local cross-check is recorded."
+  "ngspice_note": "The fleet runner (klt 0.5.0, ngspice 46) ignores options.ngspice_init and expr measurements, so the equivalent of sim/spiceinit's ng_nomodcheck is set by a .control block carried in the netlist body ('set ng_nomodcheck'). Local ngspice is 42; a single-point local cross-check is recorded.",
+  "solver_sensitivity": {
+    "issue": 160,
+    "scope": "iq-total (natural release) only, full 45-point grid per variant. Forced-low por-iq contention and the definition of incremental temp-iq are separate DR-006 blockers and are not addressed. Evidence only: no Iq ceiling is proposed and no ratified row changes.",
+    "options_line_in_testbench": ".options method=gear trtol=50",
+    "variants": {
+      "baseline": {
+        "description": "Control: the unchanged generated deck of record 20261009-191705-df85523 (testbench `.options method=gear trtol=50`, tmax 10 us, default reltol). Re-run in this campaign so every variant is compared against a same-campaign control as well as against the original record.",
+        "options": null
+      },
+      "trtol7": {
+        "description": "Tighter local-truncation-error acceptance: `.options method=gear trtol=7` (the #86 / #142 discriminator of the same name). Replaces only the testbench options line.",
+        "options": "method=gear trtol=7"
+      },
+      "reltol2e-4": {
+        "description": "Tighter relative tolerance: `.options method=gear trtol=50 reltol=2e-4` (the #86 / #142 discriminator of the same name). Replaces only the testbench options line.",
+        "options": "method=gear trtol=50 reltol=2e-4"
+      }
+    },
+    "unchanged_across_variants": "DUT, testbench, supply source, analysis card (1u step, 30 ms, tmax 10 us), measurement windows, all settling/physicality thresholds (the `measurement` block above), and the grid grading code (iq_checker.grade on the full-resolution waveform).",
+    "comparison_criterion": {
+      "predeclared": true,
+      "agreement_rel_tol": 0.01,
+      "rule": "Two physical (`ok`) settled currents at the same corner AGREE iff |I_a - I_b| / min(I_a, I_b) <= 0.01 (1 %). A corner with >= 2 `ok` landings among {baseline, trtol7, reltol2e-4} AGREES iff the max pairwise relative difference is <= 0.01.",
+      "rationale": "Fixed before any result was seen and independent of observed outcomes: 0.01 is the existing `settling.max_window_to_window_drift`, i.e. the repo's own definition of 'the same settled current' for one run; two solver settings that land on the same physical branch should reproduce a settled current at least as well as one run reproduces itself between adjacent windows. It is a measurement-equivalence band, not a spec limit. The smallest current is never selected and no variant is treated as authoritative."
+    },
+    "classification_of_original_exclusions": {
+      "population": "the points with status != ok for iq-total in record 20261009-191705-df85523 (17 of 45)",
+      "rules_in_order": [
+        "unresolved: any of the three runs has no graded result (fleet refusal, missing waveform, invalid waveform -> nonconverged) AND no run is `ok`.",
+        "unresolved (physical-disagreement): >= 2 `ok` runs whose currents do not all agree within agreement_rel_tol.",
+        "recovered-solver-sensitive: >= 1 run is `ok` and all `ok` runs agree within agreement_rel_tol. This records that a physical settled landing EXISTS under that setting; it does not prove the original artifact's cause, and any non-ok run at the same point is listed beside it.",
+        "reproduced-non-physical: all three runs returned a graded result and every one is non-physical-branch.",
+        "physical-failure: all three runs returned a graded result, none is non-physical-branch, none is ok (physical landing that fails the unchanged settling/state checks).",
+        "unresolved (mixed): anything else (e.g. non-physical in some runs and unsettled in others, no ok run)."
+      ]
+    },
+    "new_failure_rule": "A point that was `ok` in the original record and is not `ok` in any run of this campaign is reported as newly failing, with the run(s) and status."
+  }
 }
