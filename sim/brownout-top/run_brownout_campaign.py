@@ -253,9 +253,10 @@ def submit_one(req: dict, head: str, man: dict, run_dir: Path, capacity_wait_s: 
     start = clock()
     while True:
         res = _submit_once(req, head, man, run_dir, capacity_wait_s, variant_key)
-        rp = run_dir / req["tag"] / "report.json"
-        text = rp.read_text() if rp.is_file() else ""
-        if not (slot_wait_s > 0 and concurrency_capped(text) and clock() - start + slot_poll_s <= slot_wait_s):
+        d = run_dir / req["tag"]
+        # klt writes its --format json error envelope to stderr, not stdout: check both
+        capped = any(concurrency_capped((d / n).read_text()) for n in ("report.json", "klt.stderr") if (d / n).is_file())
+        if not (slot_wait_s > 0 and capped and clock() - start + slot_poll_s <= slot_wait_s):
             return res
         say(f"[wait]   {req['tag']}: fleet concurrency cap reached; resubmitting in {slot_poll_s:.0f} s")
         sleep(slot_poll_s)
@@ -517,6 +518,22 @@ def point_log(corner: dict, header: list[str], run_dir: Path) -> str:
     return scrub("\n".join(lines), run_dir)
 
 
+def attempt_message(ad: Path) -> str:
+    """One archived attempt's outcome: the report's error/status, else klt's stderr error envelope."""
+    for name in ("report.json", "klt.stderr"):
+        f = ad / name
+        if not f.is_file():
+            continue
+        try:
+            body = json.loads(f.read_text())
+        except json.JSONDecodeError:
+            continue
+        if isinstance(body, dict) and (body.get("error") or body.get("status")):
+            return (body.get("error") or {}).get("message") or ("report status " + str(body.get("status")))
+    tail = (ad / "klt.stderr").read_text()[-300:].strip() if (ad / "klt.stderr").is_file() else ""
+    return "unparseable report" + (f": {tail}" if tail else "")
+
+
 def analyze_request(req: dict, run_dir: Path, man: dict, corners_dir: Path, write: bool) -> dict:
     """All 45 declared points of one request.  Every declared point appears, covered or not."""
     d = run_dir / req["tag"]
@@ -524,13 +541,8 @@ def analyze_request(req: dict, run_dir: Path, man: dict, corners_dir: Path, writ
     declared = corners_of(man)
     info = {"tag": req["tag"], "kind": req["kind"], "stimulus": st, "tstop_s": tstop_of(req, man), "tmax_s": tmax_of(req, man)}
     attempts = []
-    for ad in sorted(d.glob("attempt*")):
-        try:
-            body = json.loads((ad / "report.json").read_text()) if (ad / "report.json").is_file() else {}
-            msg = (body.get("error") or {}).get("message") or ("report status " + str(body.get("status")))
-        except json.JSONDecodeError:
-            msg = "unparseable report"
-        attempts.append(scrub(msg, run_dir)[:400])
+    for ad in sorted(d.glob("attempt*"), key=lambda x: int(x.name[7:]) if x.name[7:].isdigit() else 0):
+        attempts.append(scrub(attempt_message(ad), run_dir)[:400])
     if attempts:
         info["failed_earlier_attempts"] = attempts
     rep, why = None, None

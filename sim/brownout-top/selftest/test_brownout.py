@@ -487,8 +487,13 @@ class TightenedRerunRunner(unittest.TestCase):
             if (d / "report.json").is_file():  # same archiving contract as the real submit
                 n = len(list(d.glob("attempt*"))) + 1
                 (d / f"attempt{n}").mkdir()
-                (d / "report.json").rename(d / f"attempt{n}" / "report.json")
-            (d / "report.json").write_text(bodies[len(calls)])
+                for name in ("report.json", "klt.stderr"):
+                    (d / name).rename(d / f"attempt{n}" / name)
+            body = bodies[len(calls)]
+            refused = "corners" not in body
+            # as real klt does: an error envelope goes to stderr and stdout (report.json) stays empty
+            (d / "report.json").write_text("" if refused else body)
+            (d / "klt.stderr").write_text(body if refused else "")
             calls.append(1)
             return {"tag": req["tag"], "n": len(calls)}
         return once, calls
@@ -503,6 +508,9 @@ class TightenedRerunRunner(unittest.TestCase):
                                     _sleep=lambda s: t.__setitem__(0, t[0] + s), _clock=lambda: t[0])
             self.assertEqual((len(calls), res["n"]), (3, 3))
             self.assertEqual(len(list((run_dir / req["tag"]).glob("attempt*/report.json"))), 2)
+            info = rb.analyze_request(req, run_dir, MAN, run_dir / "corners", write=False)["info"]
+            self.assertEqual(len(info["failed_earlier_attempts"]), 2)  # refusals stay in the accounting
+            self.assertTrue(all("BATCH_MAX_CONCURRENT_INSTANCES" in m for m in info["failed_earlier_attempts"]))
 
     def test_slot_wait_gives_up_after_budget_and_without_opt_in(self):
         with tempfile.TemporaryDirectory() as td:
