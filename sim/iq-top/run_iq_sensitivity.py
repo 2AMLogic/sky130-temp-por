@@ -222,7 +222,7 @@ def cmd_run(args) -> int:
     if args.retry_failed:
         if not run_dir.exists():
             raise SystemExit(f"{run_dir} does not exist")
-        work = [n for n in names if not sim_common.report_usable(run_dir / n / STATE / sim_common.rate_tag(man["measurement"]["rate_v_per_s"]) / "report.json")]
+        work = [n for n in names if args.split_process or not sim_common.report_usable(run_dir / n / STATE / sim_common.rate_tag(man["measurement"]["rate_v_per_s"]) / "report.json")]
         say = sim_common.say
         say(f"retrying {len(work)} variant request(s) without a usable report, capacity_wait_s={args.capacity_wait}")
     else:
