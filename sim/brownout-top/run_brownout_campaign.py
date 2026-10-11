@@ -593,7 +593,8 @@ def analyze_request(req: dict, run_dir: Path, man: dict, corners_dir: Path, writ
         log_text = Path(art["log"]).read_text() if art.get("log") and Path(art["log"]).is_file() else ""
         ngv = re.findall(r"(ngspice-\d+) done", log_text)
         pt = {"id": cid, "tag": req["tag"], "process": proc, "temperature_c": temp, "supply_v": vf, "klt_status": c.get("status"), "runtime_s": c.get("runtime_s"),
-              "ngspice": ngv[0] if ngv else None, "measurements": {m["name"]: m.get("value") for m in c.get("measurements", [])},
+              "ngspice": ngv[0] if ngv else None,
+              "netlist_klu_announced": True if "Using KLU as Direct Linear Solver" in log_text else (False if log_text else None), "measurements": {m["name"]: m.get("value") for m in c.get("measurements", [])},
               "diagnostics": [{"severity": dg.get("severity"), "code": dg.get("code"), "message": scrub(dg.get("message", ""), run_dir)[:400]} for dg in c.get("diagnostics", [])]}
         wave, load_err = None, None
         if wave_path is not None and wave_path.is_file():
@@ -848,6 +849,9 @@ def render_md(rec: dict) -> str:
     nm = [q["tag"] for q in rec["requests"] if q.get("job_id") and not q.get("netlist_matches_report")]
     L.append(f"- **Submitted netlist vs fleet report sha256**: " + ("all match" if not nm else f"MISMATCH for {nm}"))
     L.append(f"- **Fleet runner**: klt `{t['fleet_runner_klt']}` / `{t['fleet_ngspice']}` (client klt `{t['klt_client']}`); {t['fleet_note']}")
+    klu_n = t.get("fleet_klu_points")
+    if klu_n is not None and (klu_n or "klu" in (rec.get("solver_variant") or {}).get("options_extra", [])):
+        L.append(f"- **Netlist-carried KLU on the runner**: ngspice announced `Using KLU as Direct Linear Solver` in {klu_n} of {rec['matrix']['n_points_graded']} graded point log(s); absence on a graded point means the SPARSE default solver ran there.")
     L.append(f"- **Host tool caveat**: {t['xschem_note']}")
     m = rec["matrix"]
     L.append("- **Corner matrix**: process " + ", ".join(m["process"]) + "; temperature " + ", ".join(f"{cr.fmt_temp(x)} C" for x in m["temperature_c"]) + "; starting supply " + ", ".join(f"{v:.2f} V" for v in m["supply_v"]))
@@ -1029,6 +1033,7 @@ def cmd_record(args) -> int:
                   "platform": cr.tool_versions()["platform"], "python": cr.tool_versions()["python"], "klt_client": meta.get("klt_client"),
                   "fleet_runner_klt": ", ".join(runners) or "unknown", "fleet_ngspice": ", ".join(ngs) or "unknown",
                   "fleet_note": "client/runner klt skew accepted with batch.runner_version_check=warn; the runner ignores options.ngspice_init so a netlist-carried `set ng_nomodcheck` is used",
+                  "fleet_klu_points": sum(1 for p in points if p.get("netlist_klu_announced")),
                   "xschem_note": "only the testbench is netlisted by xschem here; the DUT is spliced from the committed design/netlist/temp_por_top.spice (host xschem leaves expr() parameters unevaluated)"},
         "git": gi, "run_source": meta.get("source", {}), "deck_drift": drift, "run_meta": {k: meta.get(k) for k in ("run_id", "started_utc", "submitted_tags", "retries")},
         "matrix": {"process": man["corners"]["process"], "temperature_c": man["corners"]["temperature_c"], "supply_v": man["corners"]["supply_v"],
