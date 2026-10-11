@@ -2,7 +2,16 @@
 
 Chronological record of recently merged pull requests and closed issues. This file is maintained by the Loom Guide role.
 
+### 2026-10-11
+
+- **Issue #155** (closed): Guard decision: retain confirmation for main-checkout stash
+
 ### 2026-10-10
+
+- **PR #154**: sim: as-drawn brown-out campaign over independent dip axes x PVT (#116)
+- **PR #152**: sim: EN-high base control lands; six temp_core cold-start FAILs not reproduced on any variant
+- **Issue #116** (closed): As-drawn brown-out campaign: independent depth, duration and falling-slew matrix
+- **Issue #86** (closed): temp_core startup records fail at six points inside the ratified envelope; demonstrate or record the cause
 
 - **PR #150**: sim: diagnose the two RESETn re-assertions in the as-drawn ramp campaign (#142)
 - **PR #149**: sim: solver/ramp discrimination sweep of temp_core cold-start FAILs (partial; fleet capacity)
