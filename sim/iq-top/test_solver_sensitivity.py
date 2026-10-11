@@ -90,6 +90,38 @@ class VariantSelection(unittest.TestCase):
             rs.variant_head(head, "nope", MAN)
 
 
+class SplitResubmission(unittest.TestCase):
+    def test_split_request_only_restricts_process_axis(self):
+        full = rs.build_variant_request(MAN)
+        one = rs.build_variant_request(MAN, process="ss")
+        self.assertEqual(one["corners"]["process"], ["ss"])
+        a, b = copy.deepcopy(full), copy.deepcopy(one)
+        a["corners"].pop("process")
+        b["corners"].pop("process")
+        self.assertEqual(a, b)
+        with self.assertRaises(SystemExit):
+            rs.build_variant_request(MAN, process="zz")
+
+    def test_split_results_merge_into_full_grid_with_unknowns_kept(self):
+        with tempfile.TemporaryDirectory() as td:
+            rd = Path(td)
+            tag = rc.sim_common.rate_tag(MAN["measurement"]["rate_v_per_s"])
+            wv = qc.synth(rs.STATE, 3.3)
+            names = list(wv)
+            for proc in ("tt", "ss"):  # ff/sf/fs never resubmitted -> must stay unknown
+                d = rd / "trtol7" / f"split-{proc}" / rs.STATE / tag
+                d.mkdir(parents=True)
+                (d / "w.json").write_text(json.dumps({"variables": [{"name": n} for n in names], "points": [[wv[n][i] for n in names] for i in range(len(wv["time"]))]}))
+                cors = [{"process": proc, "temperature_c": T, "supply_v": {"vset": V}, "status": "ok", "measurements": [], "diagnostics": [], "artifacts": {"waveform": str(d / "w.json")}}
+                        for T in MAN["corners"]["temperature_c"] for V in MAN["corners"]["supply_v"]]
+                (d / "report.json").write_text(json.dumps({"status": "ok", "corner_count": 9, "corners": cors}))
+            res = rs.analyze_variant("trtol7", rd, MAN, {})
+            self.assertEqual(len(res["points"]), 45)
+            st = [p["status"] for p in res["points"].values()]
+            self.assertEqual(st.count("ok"), 6)  # synthetic wave sits at 3.3 V: the 2.97/3.63 V points are (correctly) not ok
+            self.assertEqual(sum(1 for p in res["points"].values() if "NOT SUBMITTED" in p.get("reason", "")), 27)
+
+
 class InvalidWaveforms(unittest.TestCase):
     """Invalid, non-physical and unsettled full-resolution waveforms never become usable."""
 

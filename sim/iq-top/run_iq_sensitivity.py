@@ -20,6 +20,7 @@ from __future__ import annotations
 
 import argparse
 import concurrent.futures
+import copy
 import gzip
 import hashlib
 import json
@@ -81,9 +82,19 @@ def build_variant_netlist(head: str, variant: str, man: dict) -> str:
     return rc.build_netlist(variant_head(head, variant, man), STATE, man)
 
 
-def build_variant_request(man: dict, capacity_wait_s: float = 0) -> dict:
-    """The request is identical for every variant: the solver setting lives in the deck."""
-    return rc.build_request("netlist.spice", man, "batch", capacity_wait_s)
+def build_variant_request(man: dict, capacity_wait_s: float = 0, process: str | None = None) -> dict:
+    """The request is identical for every variant: the solver setting lives in the deck.
+
+    ``process`` restricts the corner axes to one MOS corner (9 of the 45 points): used only to fit a
+    variant under the fleet's per-job wall-clock ceiling by SPLITTING the grid into several fleet
+    requests; the deck, analysis card and every other request field are unchanged.
+    """
+    req = rc.build_request("netlist.spice", man, "batch", capacity_wait_s)
+    if process is not None:
+        if process not in req["corners"]["process"]:
+            raise SystemExit(f"unknown process corner {process!r}")
+        req["corners"]["process"] = [process]
+    return req
 
 
 # --------------------------------------------------------------------------
@@ -223,9 +234,11 @@ def cmd_run(args) -> int:
     rate = man["measurement"]["rate_v_per_s"]
     hashes = {}
     decks = {n: build_variant_netlist(head, n, man) for n in work}
-    req = build_variant_request(man, args.capacity_wait)
+    procs = list(man["corners"]["process"]) if args.split_process else [None]
     for n in work:
-        hashes[n] = {"deck_sha256": sha256(decks[n]), "request_sha256": sha256(json.dumps(req, indent=2, sort_keys=True))}
+        for pr in procs:
+            req = build_variant_request(man, args.capacity_wait, pr)
+            hashes[n if pr is None else f"{n}/split-{pr}"] = {"deck_sha256": sha256(decks[n]), "request_sha256": sha256(json.dumps(req, indent=2, sort_keys=True))}
     meta_path = run_dir / "run.json"
     meta = json.loads(meta_path.read_text()) if args.retry_failed else {
         "run_id": run_id, "started_utc": now.strftime("%Y-%m-%dT%H:%M:%SZ"), "variants": names, "klt_client": sim_common.klt_version(),
@@ -234,12 +247,16 @@ def cmd_run(args) -> int:
     meta.setdefault("hashes", {}).update(hashes)
     meta_path.write_text(json.dumps(meta, indent=2) + "\n")
 
-    def one(n):
-        return sim_common.submit_request(f"{n}/{STATE}", rate, run_dir, decks[n], build_variant_request(man, args.capacity_wait), f" [{n}]", len(rc.grid(man)))
+    def one(item):
+        n, pr = item
+        if pr is None:
+            return sim_common.submit_request(f"{n}/{STATE}", rate, run_dir, decks[n], build_variant_request(man, args.capacity_wait), f" [{n}]", len(rc.grid(man)))
+        npts = len(man["corners"]["temperature_c"]) * len(man["corners"]["supply_v"])
+        return sim_common.submit_request(f"{n}/split-{pr}/{STATE}", rate, run_dir, decks[n], build_variant_request(man, args.capacity_wait, pr), f" [{n} process {pr}]", npts)
 
     results = []
     with concurrent.futures.ThreadPoolExecutor(max_workers=min(2, args.jobs)) as ex:
-        futs = {n: ex.submit(one, n) for n in work}
+        futs = {(n if pr is None else f"{n}/split-{pr}"): ex.submit(one, (n, pr)) for n in work for pr in procs}
         for n, f in futs.items():
             try:
                 results.append({"variant": n, **f.result()})
@@ -258,8 +275,36 @@ def cmd_run(args) -> int:
 
 
 def analyze_variant(n: str, run_dir: Path, man: dict, traces: dict) -> dict:
-    """Same grading as the original campaign: run_iq_campaign.analyze_state over this variant's subtree."""
-    return rc.analyze_state(STATE, run_dir / n, man, traces.setdefault(n, {}))
+    """Same grading as the original campaign: run_iq_campaign.analyze_state over this variant's subtree.
+
+    If the variant was resubmitted split by MOS corner (``<variant>/split-<proc>/``), each split is
+    graded with the same code and the points are merged back into the full 45-point grid; the earlier
+    whole-grid attempt (if any) is kept in the request's ``failed_earlier_attempts``.
+    """
+    splits = {pr: run_dir / n / f"split-{pr}" for pr in man["corners"]["process"] if (run_dir / n / f"split-{pr}").is_dir()}
+    tr = traces.setdefault(n, {})
+    if not splits:
+        return rc.analyze_state(STATE, run_dir / n, man, tr)
+    whole = rc.analyze_state(STATE, run_dir / n, man, {})
+    pts, reqs = {}, {}
+    for pr in man["corners"]["process"]:
+        if pr not in splits:
+            continue
+        sub = copy.deepcopy(man)
+        sub["corners"]["process"] = [pr]
+        res = rc.analyze_state(STATE, splits[pr], sub, tr)
+        pts.update(res["points"])
+        reqs[pr] = res["requests"]
+    full = {}
+    for p, t, v in rc.grid(man):
+        cid = rc.corner_id(p, t, v)
+        full[cid] = pts.get(cid) or {"id": cid, "process": p, "temperature_c": t, "supply_v": v, "status": "nonconverged", "reason": "NOT SUBMITTED in the split resubmission"}
+    outcomes = {pr: r.get("outcome") for pr, r in reqs.items()}
+    req = {"split_by_process": reqs, "outcome": outcomes, "job_id": {pr: r.get("job_id") for pr, r in reqs.items()},
+           "instance_type": sorted({r.get("instance_type") for r in reqs.values() if r.get("instance_type")}),
+           "runner_klt_version": next((r.get("runner_klt_version") for r in reqs.values() if r.get("runner_klt_version")), None),
+           "first_whole_grid_attempt": whole["requests"]}
+    return {"requests": req, "points": full}
 
 
 def f_ua(x):
@@ -283,7 +328,15 @@ def render_md(rec: dict) -> str:
     for n in names:
         r = rec["requests"][n]
         h = rec["provenance"]["hashes"].get(n, {})
-        L.append(f"| {n} | `{rec['variant_options'][n] or 'method=gear trtol=50 (unchanged control)'}` | `{h.get('deck_sha256', '-')}` | `{h.get('request_sha256', '-')}` | {r.get('outcome')} | {r.get('job_id')} |")
+        outcome, job = r.get("outcome"), r.get("job_id")
+        if "split_by_process" in r:
+            first = r.get("first_whole_grid_attempt", {})
+            outcome = f"whole-grid attempt: {first.get('outcome')} ({(first.get('failed_earlier_attempts') or [''])[0][:160]}); resubmitted split by MOS corner: {r['outcome']}"
+            job = f"whole-grid {first.get('job_id')}; split {r['job_id']}"
+        L.append(f"| {n} | `{rec['variant_options'][n] or 'method=gear trtol=50 (unchanged control)'}` | `{h.get('deck_sha256', '-')}` | `{h.get('request_sha256', '-')}` | {outcome} | {job} |")
+        for k, hh in sorted(rec["provenance"]["hashes"].items()):
+            if k.startswith(n + "/"):
+                L.append(f"|  | {k} (45-point grid split into one request per MOS corner) | `{hh['deck_sha256']}` | `{hh['request_sha256']}` | | |")
         for a in r.get("failed_earlier_attempts", []):
             L.append(f"|  | earlier attempt: {a} | | | | |")
     L += ["", f"Unchanged across variants: {man['unchanged_across_variants']}", ""]
@@ -402,6 +455,7 @@ def main(argv: list[str]) -> int:
     r.add_argument("--retry-failed", action="store_true")
     r.add_argument("--capacity-wait", type=float, default=0)
     r.add_argument("--allow-dirty", action="store_true")
+    r.add_argument("--split-process", action="store_true", help="one fleet request per MOS corner (9 points each) for a variant whose single 45-corner job exceeds the fleet wall-clock ceiling")
     c = sub.add_parser("record")
     c.add_argument("--run-id", required=True)
     c.add_argument("--author")
