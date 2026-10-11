@@ -484,7 +484,7 @@ def cmd_probe(args) -> int:
     proc, temp, vf = args.process or "tt", 27.0 if args.temp is None else args.temp, 3.3 if args.supply is None else args.supply
     if (proc, temp, vf) not in corners_of(man):
         raise SystemExit(f"probe corner {proc}/{temp:g}C/{vf:g}V is not in the declared corner matrix")
-    d = BUILD / "probe" / f"{args.tag}{'-' + args.variant if args.variant else ''}-{corner_id(proc, temp, vf)}"
+    d = BUILD / "probe" / f"{args.tag}{'-' + args.variant if args.variant else ''}-{corner_id(proc, temp, vf)}{'-fleeteq' if args.fleet_equivalent else ''}"
     d.mkdir(parents=True, exist_ok=True)
     (d / "netlist.spice").write_text(build_netlist(tb_netlist_head(d, pdk), req, man, args.variant))
     r = build_request(req, man, "local")
@@ -492,7 +492,10 @@ def cmd_probe(args) -> int:
     if args.tstop:  # channel/netlist validation only: a truncated record is never graded or recorded
         r["analysis"]["args"] = f"1e-6 {args.tstop:g} 0 5e-6"
         r["measurements"] = []
-    r["options"]["ngspice_init"] = [ln.strip() for ln in (SIM_DIR / "spiceinit").read_text().splitlines() if ln.strip() and not ln.startswith("*")]
+    if not args.fleet_equivalent:
+        r["options"]["ngspice_init"] = [ln.strip() for ln in (SIM_DIR / "spiceinit").read_text().splitlines() if ln.strip() and not ln.startswith("*")]
+    # --fleet-equivalent: no ngspice_init, exactly as the fleet runner executes the deck (it ignores
+    # options.ngspice_init, so ngspice falls back to its default SPARSE solver) -- for like-for-like timing
     (d / "request.json").write_text(json.dumps(r, indent=2) + "\n")
     say(f"[probe] one LOCAL corner {corner_id(proc, temp, vf)} for {args.tag} (variant {args.variant or 'default'})")
     p = subprocess.run(["klt", "sim", str(d / "request.json"), "--backend", "local", "-o", str(d / "out"), "--format", "json"], capture_output=True, text=True, timeout=3600)
@@ -1098,6 +1101,7 @@ def main(argv: list[str]) -> int:
     x.add_argument("--tag", required=True)
     x.add_argument("--variant", help="declared solver variant key (experiment.json solver_variants); default deck if omitted")
     x.add_argument("--process", help="one declared process corner (default tt)")
+    x.add_argument("--fleet-equivalent", action="store_true", help="omit ngspice_init, as the fleet runner does (default SPARSE solver), for like-for-like single-corner timing")
     x.add_argument("--temp", type=float, help="one declared temperature in C (default 27)")
     x.add_argument("--supply", type=float, help="one declared starting supply in V (default 3.3)")
     x.add_argument("--tstop", type=float, help="shortened stop time (s) for a quick channel-name validation; such a probe is never graded")
