@@ -1,0 +1,53 @@
+{
+  "run_id": "fleet1",
+  "started_utc": "2026-10-10T13:06:09Z",
+  "source": {
+    "sha": "db29746",
+    "branch": "feature/issue-116",
+    "dirty": false,
+    "sha_full": "db297463ddae1eea60938db4cfe9eaf089534851",
+    "pushed_to_remote": true,
+    "remote_branches": [
+      "origin/feature/issue-116"
+    ]
+  },
+  "klt_client": "klt 0.7.0+g8eec069c7576",
+  "klt_sim_backend_env": "batch",
+  "declared": {
+    "requests": 30,
+    "points_per_request": 45,
+    "points": 1350
+  },
+  "submitted_tags": [
+    "cube_v2_h1em05_f1000_r10000",
+    "cube_v2_h1em05_f10000_r10000",
+    "cube_v2_h1em05_f100000_r10000",
+    "cube_v2_h0.0001_f1000_r10000",
+    "cube_v2_h0.0001_f10000_r10000",
+    "cube_v2_h0.0001_f100000_r10000",
+    "cube_v2_h0.001_f1000_r10000",
+    "cube_v2_h0.001_f10000_r10000",
+    "cube_v2_h0.001_f100000_r10000",
+    "cube_v1.2_h1em05_f1000_r10000",
+    "cube_v1.2_h1em05_f10000_r10000",
+    "cube_v1.2_h1em05_f100000_r10000",
+    "cube_v1.2_h0.0001_f1000_r10000",
+    "cube_v1.2_h0.0001_f10000_r10000",
+    "cube_v1.2_h0.0001_f100000_r10000",
+    "cube_v1.2_h0.001_f1000_r10000",
+    "cube_v1.2_h0.001_f10000_r10000",
+    "cube_v1.2_h0.001_f100000_r10000",
+    "cube_v0.4_h1em05_f1000_r10000",
+    "cube_v0.4_h1em05_f10000_r10000",
+    "cube_v0.4_h1em05_f100000_r10000",
+    "cube_v0.4_h0.0001_f1000_r10000",
+    "cube_v0.4_h0.0001_f10000_r10000",
+    "cube_v0.4_h0.0001_f100000_r10000",
+    "cube_v0.4_h0.001_f1000_r10000",
+    "cube_v0.4_h0.001_f10000_r10000",
+    "cube_v0.4_h0.001_f100000_r10000",
+    "recovery_v1.2_h0.0001_f10000_r1000",
+    "recovery_v1.2_h0.0001_f10000_r100000",
+    "control"
+  ]
+}

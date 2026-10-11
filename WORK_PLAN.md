@@ -25,8 +25,8 @@ _None._
 
 Issues currently being built (`loom:building`).
 
-- **#86**: temp_core startup records fail at six points inside the ratified envelope; demonstrate or record the cause
-- **#116**: As-drawn brown-out campaign: independent depth, duration and falling-slew matrix
+- **#105**: Full-signal-path mismatch Monte Carlo for temp_core accuracy (DR-003 TBD-1, T1 item 6)
+- **#156**: CI: gate the brown-out checker synthetic verdict cases
 
 ## PRs Awaiting Review
 
@@ -44,13 +44,11 @@ _None._
 
 Issues carrying `loom:curated`.
 
-- **#86**: temp_core startup records fail at six points inside the ratified envelope; demonstrate or record the cause *(curated)*
 - **#97**: Lay out por_output_chain as the next DRC/LVS-verified POR leaf *(curated)*
-- **#116**: As-drawn brown-out campaign: independent depth, duration and falling-slew matrix *(curated)*
+- **#105**: Full-signal-path mismatch Monte Carlo for temp_core accuracy (DR-003 TBD-1, T1 item 6) *(curated)*
 
 ## Proposed (Architect / Hermit)
 
-- **#105**: Full-signal-path mismatch Monte Carlo for temp_core accuracy (DR-003 TBD-1, T1 item 6) *(architect)*
 - **#106**: Brown-out and glitch-immunity matrix for assembled temp_por_top (porting-plan §3.4/§3.5) *(architect)*
 - **#137**: Run the two-key ratification ceremony on DR-004 and DR-005 *(architect)*
 - **#110**: Remove unused LVS dependency-variant support from compose-cell.py *(hermit)*
@@ -69,7 +67,7 @@ Issues carrying `loom:curated`.
 | In Progress (`loom:building`) | 2 |
 | PRs awaiting review | 0 |
 | Approved PRs awaiting merge | 0 |
-| Curated | 3 |
-| Architect / Hermit proposals | 4 |
+| Curated | 2 |
+| Architect / Hermit proposals | 3 |
 | Active epics | 1 |
 <!-- guide:plan-body:end -->
