@@ -251,6 +251,10 @@ Two workflows run on every push to `main` and every PR:
     `klayout.db`-dependent cases skip in CI; they need klt's interpreter);
   - `python3 sim/supply-ramp-top/ramp_checker.py` (transition-checker selftest
     fixtures; exits non-zero on any MISMATCH);
+  - `python3 -I sim/brownout-top/brownout_checker.py` (brown-out waveform
+    checker's 16 synthetic verdict cases; exits non-zero on any expected
+    verdict or required failure-code MISMATCH; run directly, not via the
+    campaign runner's selftest, so it writes no append-only record);
   - `python3 design/check_committed_netlists.py` (pinout / cross-cell
     invariants from `design/netlist.py` applied to the committed
     `design/netlist/*.spice`);
