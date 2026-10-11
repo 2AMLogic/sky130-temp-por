@@ -14,10 +14,33 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
+        with:
+          # Full history so the append-only records check can diff protected
+          # sim/*/records/* blobs against the pull_request merge base or the
+          # push event's before commit; a depth-1 clone cannot resolve either.
+          fetch-depth: 0
 
       - uses: actions/setup-python@v5
         with:
           python-version: "3.12"
+
+      - name: Fetch push-event baseline commit (best effort, force-push edge)
+        if: github.event_name == 'push'
+        run: |
+          # An ordinary push already has its before commit under fetch-depth: 0.
+          # This covers a force push whose discarded baseline may have been
+          # pruned upstream; if it cannot be fetched, the append-only check
+          # below fails visibly with guidance instead of silently passing.
+          if [ -n "${GITHUB_EVENT_BEFORE:-}" ] && [ "${GITHUB_EVENT_BEFORE}" != "0000000000000000000000000000000000000000" ]; then
+            git fetch --no-tags --force origin "${GITHUB_EVENT_BEFORE}" || \
+              echo "::warning::could not fetch baseline ${GITHUB_EVENT_BEFORE}; the append-only check will report it as unresolvable"
+          fi
+
+      - name: Append-only records checker selftest (add, modify, delete, rename, missing-baseline fixtures)
+        run: python3 -I .github/scripts/check_records_append_only.py --selftest
+
+      - name: Simulation records are append-only against the Git baseline
+        run: python3 -I .github/scripts/check_records_append_only.py
 
       - name: Pad-island census unit tests
         run: python3 -m unittest layout/bin/test_pad_island_census.py
