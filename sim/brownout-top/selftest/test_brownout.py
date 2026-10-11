@@ -352,6 +352,8 @@ class Comparison(unittest.TestCase):
         self.assertEqual(cmp["transition_matrix"]["NONPHYSICAL"]["NOT_COVERED"], 1)
         self.assertIsNone(cmp["rows"][0]["tightened_physical"])
         self.assertIn("refused", cmp["rows"][0]["tightened_note"])
+        ctl = rb.build_comparison({"record_id": "s", "points": [_cpt("a", "p1", "PASS", 10.0, phys=True)]}, [_cpt("a", "p1", "ERROR", runtime=None)])
+        self.assertEqual((ctl["controls"]["n_changed"], ctl["controls"]["n_error"]), (0, 1))  # a timed-out control is not a changed verdict
         rerun2 = [_cpt("a", "p1", "ERROR", runtime=None)]
         cmp2 = rb.build_comparison({"record_id": "s", "points": [_cpt("a", "p1", "NONPHYSICAL", 10.0)]}, rerun2)
         self.assertEqual(cmp2["transition_matrix"]["NONPHYSICAL"]["ERROR"], 1)

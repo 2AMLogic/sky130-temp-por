@@ -730,9 +730,11 @@ def build_comparison(src_rec: dict, points: list[dict], requests: list[dict] | N
         matrix[r["default_outcome"]][r["tightened_outcome"]] += 1
     targets = [r for r in rows if r["role"] == "target"]
     controls = [r for r in rows if r["role"] == "control"]
-    # an uncovered control is not a changed verdict: it is counted separately, never as agreement either
-    changed = [r for r in controls if r["tightened_outcome"] not in (r["default_outcome"], "NOT_COVERED")]
+    # an uncovered or ERROR control (no waveform: never graded) is not a changed verdict: it is counted
+    # separately, never as agreement either
+    changed = [r for r in controls if r["tightened_outcome"] not in (r["default_outcome"], "NOT_COVERED", "ERROR")]
     ctl_uncovered = sum(1 for r in controls if r["tightened_outcome"] == "NOT_COVERED")
+    ctl_error = sum(1 for r in controls if r["tightened_outcome"] == "ERROR")
     tgt: dict = {}
     for r in targets:
         tgt[r["tightened_outcome"]] = tgt.get(r["tightened_outcome"], 0) + 1
@@ -764,7 +766,7 @@ def build_comparison(src_rec: dict, points: list[dict], requests: list[dict] | N
                   "tightened": {"key": variant.get("key"), "options_extra": list(variant.get("options_extra") or [])}}
     return {"source_record": src_rec.get("record_id"), "solver": solver, "points_compared": len(rows), "transition_matrix": matrix,
             "targets": {"n": len(targets), "transitions": tgt},
-            "controls": {"n": len(controls), "n_changed": len(changed), "n_not_covered": ctl_uncovered, "changed": changed},
+            "controls": {"n": len(controls), "n_changed": len(changed), "n_not_covered": ctl_uncovered, "n_error": ctl_error, "changed": changed},
             "accounting": accounting, "requests": req_rows,
             "runtime_ratio": runtime, "rows": rows}
 
@@ -782,7 +784,7 @@ def render_comparison_md(cmp: dict) -> list[str]:
     L.append("")
     t, c = cmp["targets"], cmp["controls"]
     L.append(f"- **Targets (source NONPHYSICAL, {t['n']} points)**: " + (", ".join(f"{o} {n}" for o, n in sorted(t["transitions"].items())) or "none") + ".")
-    L.append(f"- **Controls (source PASS/FAIL, {c['n']} points)**: {c['n'] - c['n_changed'] - c.get('n_not_covered', 0)} unchanged, {c['n_changed']} changed, {c.get('n_not_covered', 0)} not covered by the tightened run. Changed control verdicts are retained below as evidence, not discarded; control agreement is not a precondition for this record.")
+    L.append(f"- **Controls (source PASS/FAIL, {c['n']} points)**: {c['n'] - c['n_changed'] - c.get('n_not_covered', 0) - c.get('n_error', 0)} unchanged, {c['n_changed']} changed, {c.get('n_error', 0)} ERROR and {c.get('n_not_covered', 0)} NOT_COVERED in the tightened run (not graded, so neither agreement nor change). Changed control verdicts are retained below as evidence, not discarded; control agreement is not a precondition for this record.")
     a = cmp.get("accounting") or {}
     if a:
         L.append(f"- **Accounting**: {a['selected_points']} selected point(s) ({a['selected_targets']} source-NONPHYSICAL targets), {a['excluded_points']} excluded "
@@ -1014,7 +1016,7 @@ def cmd_record(args) -> int:
         src_rec = json.loads(src_path.read_text())
         comparison = build_comparison(src_rec, points, requests, variant, selected_rerun_tags(man) if rerun.get("variant") == variant["key"] else None)
         t, c = comparison["targets"], comparison["controls"]
-        say(f"comparison vs {comparison['source_record']}: {comparison['points_compared']} points; targets {t['n']} -> {t['transitions']}; controls {c['n']} with {c['n_changed']} changed")
+        say(f"comparison vs {comparison['source_record']}: {comparison['points_compared']} points; targets {t['n']} -> {t['transitions']}; controls {c['n']} with {c['n_changed']} changed, {c.get('n_error', 0)} ERROR, {c.get('n_not_covered', 0)} NOT_COVERED")
     ph = man["grading"]
     record = {
         "record_id": record_id, "timestamp": now.strftime("%Y-%m-%dT%H:%M:%SZ"), "author": args.author or cr.default_author(), "supersedes": args.supersedes,
