@@ -87,9 +87,11 @@ I_DELIVERED, I_SINKS, PHYS_NODES = bc.I_DELIVERED, bc.I_SINKS, bc.PHYS_NODES
 D_REJ = 50e-6  # s: POR_RAW dwell below V_MID under which a class-A pulse calls for REJECTION
 D_REQ = 1e-3  # s: POR_RAW dwell below V_MID at/above which a class-A pulse calls for ASSERTION
 G_TOL = 0.02  # tolerance of the sampled injection drive GINJ against the declared trapezoid (0..1)
-EDGE_DIV = 8.0  # tmax and the checker's sample-gap limit are both <= edge/EDGE_DIV
-WIDTH_DIV_TMAX = 8.0  # tmax <= width/8
-WIDTH_DIV_GAP = 5.0  # sample-gap limit <= width/5
+EDGE_DIV = 8.0  # class A: the checker's sample-gap limit is <= edge/EDGE_DIV
+WIDTH_DIV_GAP = 5.0  # class A: sample-gap limit <= width/5
+TMAX_EDGE_DIV = 10.0  # class A: the simulator step bound tmax <= edge/10 (strictly tighter than the gap limit: a step AT the limit would be rejected)
+TMAX_WIDTH_DIV = 10.0  # class A: tmax <= width/10
+GAP_RTOL = 1e-3  # relative float tolerance on the gap comparison (step sizes are rounded by the simulator)
 
 V_GINJ = "v(ginj)"
 I_INJ = "i(@r.xdut.rinj[i])"  # current through RINJ (A); ngspice sign: positive = INJD -> POR_RAW, so a pull-down injection reads NEGATIVE (verified in a local probe); only the magnitude is graded
@@ -132,7 +134,7 @@ def tstop_a(st: dict, t_obs: float) -> float:
 
 
 def tmax_a(st: dict, th_cap: float = 10e-6) -> float:
-    return min(th_cap, st["tw"] / WIDTH_DIV_TMAX, max(st["te"], 1e-9) / EDGE_DIV)
+    return min(th_cap, st["tw"] / TMAX_WIDTH_DIV, max(st["te"], 1e-9) / TMAX_EDGE_DIV)
 
 
 def required_max_dt_a(st: dict) -> float:
@@ -153,20 +155,13 @@ def tstop_b(vf: float, st: dict, t_obs: float) -> float:
 
 
 def tmax_b(st: dict, vf_min: float, th_cap: float = 10e-6) -> float:
-    """<= 10 us, <= hold/8, <= edge/8 at the smallest starting supply."""
-    s = b_stim(st)
-    ex_min = max(vf_min - s["vlow"], 0.0)
-    if ex_min <= 0:
-        return th_cap
-    return min(th_cap, s["th"] / WIDTH_DIV_TMAX, ex_min / s["sf"] / EDGE_DIV)
+    """Brown-out step bound (<= 10 us, <= hold/6, <= edge/12 at the smallest starting supply) with sf = sr."""
+    return bc.tmax_for(b_stim(st), vf_min, th_cap)
 
 
 def required_max_dt_b(vf: float, st: dict) -> float:
-    s = b_stim(st)
-    tl = bc.timeline(vf, s)
-    if tl["control"]:
-        return MAX_DT_CAP
-    return min(MAX_DT_CAP, s["th"] / WIDTH_DIV_GAP, tl["t_fall"] / EDGE_DIV)
+    """Brown-out sample-gap rule (<= 20 us, <= hold/5, <= edge/10); the glitch holds here are 20-200 us."""
+    return bc.required_max_dt(vf, b_stim(st))
 
 
 # --------------------------------------------------------------------------
@@ -304,7 +299,7 @@ def analyze_a(w, vf: float, st: dict, t_obs: float) -> dict:
     max_dt = max((t[i] - t[i - 1] for i in wi if i > 0), default=float("inf"))
     need_dt = required_max_dt_a(st)
     issues = []
-    if max_dt > need_dt:
+    if max_dt > need_dt * (1 + GAP_RTOL):
         issues.append(f"max sample gap {max_dt:.3g} s in the glitch window > {need_dt:.3g} s (requested width/edge not resolvable)")
     if g_err > G_TOL:
         issues.append(f"sampled injection drive deviates from the declared trapezoid by {g_err:.3g}")
@@ -369,13 +364,7 @@ def analyze_b(w, vf: float, st: dict, t_obs: float) -> dict:
     res["class"] = CLASS_B
     if res["verdict"] == "ERROR":
         return res
-    # the brown-out core uses its own (brown-out) sample-gap rule; the glitch rule is tighter (hold/5, edge/EDGE_DIV)
-    need = required_max_dt_b(vf, st)
-    rz = res["resolution"]
-    rz["required_max_dt_s"] = need
-    if rz["max_dt_dip_window_s"] > need and res["verdict"] == "PASS":
-        res["verdict"] = "UNRESOLVED"
-        res["unresolved_reasons"] = res["unresolved_reasons"] + [f"max sample gap {rz['max_dt_dip_window_s']:.3g} s > glitch limit {need:.3g} s"]
+    # the sample-gap rule is the brown-out core's (bc.required_max_dt), unchanged: hold/5, edge/10, 20 us
     res["detectability"]["call"] = "no_glitch" if res["control"] else ("assertion_required" if res["detectability"]["required_to_assert"] else "assertion_optional")
     vmin = res["vdd"]["min_after_t0_v"]
     asserted = res["resetn"]["n_assert"] > 0
