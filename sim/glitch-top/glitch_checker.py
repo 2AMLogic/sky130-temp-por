@@ -92,7 +92,7 @@ WIDTH_DIV_TMAX = 8.0  # tmax <= width/8
 WIDTH_DIV_GAP = 5.0  # sample-gap limit <= width/5
 
 V_GINJ = "v(ginj)"
-I_INJ = "i(@r.xdut.rinj[i])"  # current through the injection resistor RINJ (A), positive POR_RAW -> source
+I_INJ = "i(@r.xdut.rinj[i])"  # current through RINJ (A); ngspice sign: positive = INJD -> POR_RAW, so a pull-down injection reads NEGATIVE (verified in a local probe); only the magnitude is graded
 CORE_A = bc.CORE + (V_GINJ,)
 CORE_B = bc.CORE
 
