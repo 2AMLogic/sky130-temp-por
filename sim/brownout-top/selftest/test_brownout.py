@@ -169,6 +169,24 @@ class Accounting(unittest.TestCase):
             self.assertEqual({p["outcome"] for p in res["points"]}, {"NOT_COVERED"})
             self.assertIn("capacity", res["info"]["outcome"])
 
+    def test_klu_announcement_captured_from_runner_log(self):
+        with tempfile.TemporaryDirectory() as td:
+            run_dir = Path(td)
+            r = rb.plan_requests(MAN)[0]
+            d = run_dir / r["tag"]
+            d.mkdir()
+            log = d / "ng.log"
+            log.write_text("Circuit: tb\nUsing KLU as Direct Linear Solver\nngspice-46 done\n")
+            (d / "report.json").write_text(json.dumps({
+                "status": "ok", "environment": {"remote": {"job_id": "j1", "elapsed_seconds": 1.0}},
+                "corners": [{"process": "tt", "supply_v": {"vset": 3.3}, "temperature_c": 27, "status": "error", "runtime_s": 1.0,
+                             "artifacts": {"log": str(log)}, "diagnostics": [], "measurements": []}]}))
+            res = rb.analyze_request(r, run_dir, MAN, run_dir / "corners", write=False)
+            graded = [p for p in res["points"] if p["id"] == "tt_27c_3.30v"]
+            self.assertEqual(len(graded), 1)
+            self.assertEqual(graded[0]["outcome"], "ERROR")  # no waveform: never graded
+            self.assertTrue(graded[0]["netlist_klu_announced"])
+
     def test_record_id_collision_refuses_overwrite(self):
         fixed = _dt.datetime(2030, 1, 2, 3, 4, 5, tzinfo=_dt.timezone.utc)
 
@@ -242,26 +260,28 @@ class SolverVariantDeck(unittest.TestCase):
         self.assertEqual(rb.build_netlist(self.head, r), rb.build_netlist(self.head, r, MAN, None))
 
     def test_variant_changes_only_options_line_and_banner(self):
-        r = rb.plan_requests(MAN)[0]
-        a = rb.build_netlist(self.head, r)
-        b = rb.build_netlist(self.head, r, MAN, "reltol2e-4")
-        self.assertIn(".options method=gear trtol=50 reltol=2e-4", b)
-        added = [ln for ln in b.splitlines() if ln not in a.splitlines()]
-        self.assertTrue(all(ln.startswith(("*", ".options")) for ln in added), added)
-        self.assertIn(f".param rup={r['rup']:g} t0={r['t0']:g} vlow={r['vlow']:g} th={r['th']:g} sf={r['sf']:g} sr={r['sr']:g}", b)
-        a_code = [ln for ln in a.splitlines() if not ln.startswith("*")]
-        b_code = [ln for ln in b.splitlines() if not ln.startswith("*")]
-        self.assertEqual(len(a_code), len(b_code))
-        for la, lb in zip(a_code, b_code):
-            if la.startswith(".options"):
-                self.assertEqual(lb, la + " reltol=2e-4")
-            else:
-                self.assertEqual(la, lb)
+        for key, suffix in (("reltol2e-4", " reltol=2e-4"), ("reltol2e-4-klu", " reltol=2e-4 klu")):
+            r = rb.plan_requests(MAN)[0]
+            a = rb.build_netlist(self.head, r)
+            b = rb.build_netlist(self.head, r, MAN, key)
+            self.assertIn(".options method=gear trtol=50" + suffix, b)
+            added = [ln for ln in b.splitlines() if ln not in a.splitlines()]
+            self.assertTrue(all(ln.startswith(("*", ".options")) for ln in added), added)
+            self.assertIn(f".param rup={r['rup']:g} t0={r['t0']:g} vlow={r['vlow']:g} th={r['th']:g} sf={r['sf']:g} sr={r['sr']:g}", b)
+            a_code = [ln for ln in a.splitlines() if not ln.startswith("*")]
+            b_code = [ln for ln in b.splitlines() if not ln.startswith("*")]
+            self.assertEqual(len(a_code), len(b_code))
+            for la, lb in zip(a_code, b_code):
+                if la.startswith(".options"):
+                    self.assertEqual(lb, la + suffix)
+                else:
+                    self.assertEqual(la, lb)
 
     def test_variant_keeps_method_and_trtol(self):
         r = rb.plan_requests(MAN)[0]
-        b = rb.build_netlist(self.head, r, MAN, "reltol2e-4")
-        self.assertIn("method=gear trtol=50", b)
+        for key in ("reltol2e-4", "reltol2e-4-klu"):
+            b = rb.build_netlist(self.head, r, MAN, key)
+            self.assertIn("method=gear trtol=50", b)
 
     def test_undeclared_variant_refuses(self):
         with self.assertRaises(SystemExit):
@@ -270,8 +290,9 @@ class SolverVariantDeck(unittest.TestCase):
             rb.build_netlist(self.head, rb.plan_requests(MAN)[0], MAN, "trtol7")
 
     def test_head_without_declared_options_line_refuses(self):
-        with self.assertRaises(SystemExit):
-            rb.build_netlist("* head\n", rb.plan_requests(MAN)[0], MAN, "reltol2e-4")
+        for key in ("reltol2e-4", "reltol2e-4-klu"):
+            with self.assertRaises(SystemExit):
+                rb.build_netlist("* head\n", rb.plan_requests(MAN)[0], MAN, key)
 
     def test_fleet_request_is_variant_independent(self):
         r = rb.plan_requests(MAN)[0]
@@ -293,11 +314,25 @@ class TightenedRerunDeclared(unittest.TestCase):
         self.assertEqual(MAN["solver_variants"]["default"]["options_extra"], [])
         v = MAN["solver_variants"]["reltol2e-4"]
         self.assertEqual(v["options_extra"], ["reltol=2e-4"])
+        vk = MAN["solver_variants"]["reltol2e-4-klu"]
+        self.assertEqual(vk["options_extra"], ["reltol=2e-4", "klu"])
+        self.assertIn("sim/spiceinit", vk["rationale"])
         rr = MAN["tightened_rerun"]
-        self.assertEqual(rr["variant"], "reltol2e-4")
+        self.assertEqual(rr["variant"], "reltol2e-4-klu")
         self.assertIn("20261010-222529-41bde9f", rr["source_record"])
         self.assertIn("UNCHANGED", rr["physicality_bounds"])
         self.assertIn("STAYS NONPHYSICAL", rr["physicality_bounds"])
+
+    def test_variant_decision_is_predeclared_and_limit_is_observed(self):
+        rr = MAN["tightened_rerun"]
+        d = rr["variant_decision"]
+        self.assertIn("2026-10-12", d)  # declared date, before any reltol2e-4-klu submission
+        self.assertIn("before any submission", d)
+        for rejected in ("one corner per job", "longer job limit", "looser tolerance"):
+            self.assertIn(rejected, d)
+        self.assertEqual(rr["job_limit_s"], 3600)  # the runner-enforced limit, not the declared 7200
+        self.assertIn("timeout 3600s", rr["job_limit_note"])
+        self.assertIn("ignored", rr["job_limit_note"])
 
     @unittest.skipUnless(SRC.is_file(), "source record not on disk")
     def test_rerun_set_covers_every_source_nonphysical_point(self):
@@ -414,7 +449,8 @@ class TightenedRerunRunner(unittest.TestCase):
         self.assertEqual(rr["expected_selected_points"], len(tags) * 45)
         self.assertEqual(rr["expected_target_points"] + rr["expected_control_points"], rr["expected_selected_points"])
         self.assertTrue(set(rr["pilot_tags"]) <= set(tags))
-        self.assertEqual(rr["job_limit_s"], 7200)
+        self.assertEqual(rr["job_limit_s"], 3600)  # the runner-enforced limit (variant_decision), not the declared 7200
+        self.assertIn("timeout 3600s", rr["job_limit_note"])
 
     def test_bad_rerun_tags_refuse(self):
         for bad in ([], ["nope"], ["control", "control"]):
@@ -434,7 +470,7 @@ class TightenedRerunRunner(unittest.TestCase):
         man["tightened_rerun"]["rerun_tags"] = ["control"]
         with tempfile.TemporaryDirectory() as td:
             with self.assertRaises(SystemExit):
-                self._run(td, man, ["run", "--variant", "reltol2e-4", "--run-id", "r1", "--only", "cube_v2_h1em05_f2000_r10000"])
+                self._run(td, man, ["run", "--variant", "reltol2e-4-klu", "--run-id", "r1", "--only", "cube_v2_h1em05_f2000_r10000"])
             self.assertFalse((Path(td) / "r1").exists())  # a refused run leaves no run directory behind
 
     def test_undeclared_variant_refuses_before_submit(self):
@@ -544,12 +580,12 @@ class TightenedRerunRunner(unittest.TestCase):
             build, here = td / "build", td / "here"
             (build / "run1").mkdir(parents=True)
             here.mkdir()
-            (build / "run1" / "run.json").write_text(json.dumps({"klt_client": "test", "solver_variant": "reltol2e-4", "source": {"dirty": False, "sha_full": "c" * 40}}))
+            (build / "run1" / "run.json").write_text(json.dumps({"klt_client": "test", "solver_variant": "reltol2e-4-klu", "source": {"dirty": False, "sha_full": "c" * 40}}))
             (build / "run1" / "cost-projection-20300101-000000.json").write_text(json.dumps(
-                {"at_utc": "2030-01-01T00:00:00Z", "limit_s": 7200, "worst_ratio": 2.0, "n_over_limit": 0,
+                {"at_utc": "2030-01-01T00:00:00Z", "limit_s": 3600, "worst_ratio": 2.0, "n_over_limit": 0,
                  "pilots": [{"tag": "control", "job_id": "klt-sim-x", "default_elapsed_s": 450, "tightened_elapsed_s": 900, "elapsed_ratio": 2.0, "corner_sum_ratio": 1.9}],
                  "projection": [{"tag": "control", "projected_tightened_elapsed_s": 900}]}))
-            ns = mock.Mock(run_id="run1", variant="reltol2e-4", compare_source=None, notes_file=None, author="t", supersedes=None, allow_dirty=False, allow_deck_drift=False)
+            ns = mock.Mock(run_id="run1", variant="reltol2e-4-klu", compare_source=None, notes_file=None, author="t", supersedes=None, allow_dirty=False, allow_deck_drift=False)
             with mock.patch.object(rb, "BUILD", build), mock.patch.object(rb, "HERE", here), mock.patch.object(rb, "source_state", return_value=self.GI), \
                     mock.patch.object(rb, "deck_drift", return_value=[]):
                 self.assertEqual(rb.cmd_record(ns), 0)
@@ -562,7 +598,7 @@ class TightenedRerunRunner(unittest.TestCase):
             self.assertEqual(cmp["targets"]["transitions"], {"NOT_COVERED": 673})
             self.assertEqual(len(cmp["accounting"]["requests_without_job"]), 21)
             self.assertEqual(rec["companion_of"], "20261010-222529-41bde9f")
-            self.assertEqual(rec["solver_variant"]["options_extra"], ["reltol=2e-4"])
+            self.assertEqual(rec["solver_variant"]["options_extra"], ["reltol=2e-4", "klu"])
             md = next((here / "records").glob("*.md")).read_text()
             self.assertIn("Companion of", md)
             self.assertIn("Pilot runtime projection", md)

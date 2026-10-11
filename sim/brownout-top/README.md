@@ -103,6 +103,22 @@ variant**, not a circuit change. The variant and the re-run set were committed i
   default deck: circuit, stimulus `.param`s, `.save` channels, tstop/tmax, the
   corner matrix and `timeout_s`. The deck banner names the variant. The unit
   tests check that the options line is the only non-comment change.
+* **Active variant `reltol2e-4-klu`** (declared 2026-10-12, in
+  `tightened_rerun.variant_decision`, before any submission under it): the
+  `reltol2e-4` SPARSE pilots both hit the runner-enforced **3600 s** whole-job
+  limit — the runner executes jobs under `timeout 3600s` and ignores the
+  request's declared `options.timeout_s=7200` — so no tightened point was
+  graded and the measured SPARSE cost is x8 (whole-job lower bound) to x20
+  (slowest corner). Of the pre-declared options (one corner per job; a longer
+  job limit; a looser tolerance; KLU), the chosen one is **`klu` carried on the
+  declared `.options` line**: the fleet runner ignores `options.ngspice_init`,
+  so the netlist is the only way to select the KLU solver there — the same
+  solver `sim/spiceinit` selects for every local run. ngspice announces
+  `Using KLU as Direct Linear Solver` on stdout; the record reports how many
+  graded point logs carry it (`netlist_klu_announced`), so a silent SPARSE
+  fallback on the runner cannot hide. The variant is declared and reported as
+  tolerance + solver together. The SPARSE pilot stays in
+  `records/20261011-214916-183a3fc.md`.
 * `tightened_rerun.rerun_tags` lists all 21 requests. Every request holds at least
   one source-NONPHYSICAL point, so whole 45-corner requests cover all 673 targets.
   The 272 source-physical points come along as controls, with request and PVT
@@ -115,13 +131,13 @@ variant**, not a circuit change. The variant and the re-run set were committed i
 
 ```bash
 # pilot (tightened_rerun.pilot_tags) from a clean pushed commit, then project cost
-KLT_SIM_BACKEND=batch python3 sim/brownout-top/run_brownout_campaign.py run --variant reltol2e-4 --run-id <id> \
+KLT_SIM_BACKEND=batch python3 sim/brownout-top/run_brownout_campaign.py run --variant reltol2e-4-klu --run-id <id> \
     --only control --only cube_v1.2_h0.0001_f50000_r10000
 python3 sim/brownout-top/run_brownout_campaign.py cost --run-id <id>
 # remaining requests into the SAME run (refuses deck drift since the first submit; each batch's commit is recorded)
-KLT_SIM_BACKEND=batch python3 sim/brownout-top/run_brownout_campaign.py run --variant reltol2e-4 --run-id <id> --retry-failed [--only <tag> ...]
+KLT_SIM_BACKEND=batch python3 sim/brownout-top/run_brownout_campaign.py run --variant reltol2e-4-klu --run-id <id> --retry-failed [--only <tag> ...]
 # grade + companion record; --compare-source defaults to tightened_rerun.source_record
-python3 sim/brownout-top/run_brownout_campaign.py record --variant reltol2e-4 --run-id <id>
+python3 sim/brownout-top/run_brownout_campaign.py record --variant reltol2e-4-klu --run-id <id>
 ```
 
 `--retry-failed` submits every selected request that does not yet have a usable
@@ -175,4 +191,4 @@ How to read the #153 tightened pilot (`20261011-214916-183a3fc`):
 * **It does not change what is known.** The 673 default-deck NONPHYSICAL points are still unknown. No tightened point was graded.
 * **Cost is the blocker.** The tightened deck is much slower on the fleet. Both pilot jobs timed out at 3600 s, against 450 s and 1402 s on the default deck, so the ratio is at least x8 on whole-job time. A local single-corner timing probe (the fleet-equivalent SPARSE solver, ff / 125 C / 2.97 V `control`) took 389 s against 19 s on the default deck, about x20. Projected against the 3600 s limit, all 21 requests exceed it.
 * The fleet runner ignores `options.ngspice_init`, so every fleet run so far, default and tightened, used ngspice's SPARSE solver rather than the KLU that `sim/spiceinit` selects.
-* Continuing needs a declared manifest change first. Options are KLU carried in the netlist, one corner per job, a longer job limit, or a looser tolerance. See the record's Notes.
+* **Decision (declared 2026-10-12 in `experiment.json` `tightened_rerun.variant_decision`)**: continue as `reltol2e-4-klu` — same `reltol=2e-4`, plus `klu` carried on the declared `.options` line. One corner per job was rejected (45x the jobs against a shared, contended fleet), a longer job limit is not available to this repo (the runner ignores the request's `timeout_s`), and a looser tolerance was rejected (`reltol=2e-4` is the value #150 derived; loosening is more likely to land nonphysical). The re-pilot must re-earn the cost projection under the enforced 3600 s limit before the remaining requests are submitted.
