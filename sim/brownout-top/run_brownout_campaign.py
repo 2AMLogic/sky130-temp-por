@@ -846,6 +846,7 @@ def main(argv: list[str]) -> int:
     r = sub.add_parser("run")
     r.add_argument("--jobs", type=int, default=2, help="concurrent fleet submissions (max 2)")
     r.add_argument("--run-id")
+    r.add_argument("--variant", help="declared solver variant key (experiment.json solver_variants); default deck if omitted")
     r.add_argument("--only", action="append", help="submit only this declared request tag (repeatable); the rest stay NOT_COVERED")
     r.add_argument("--retry-failed", action="store_true")
     r.add_argument("--capacity-wait", type=float, default=0)

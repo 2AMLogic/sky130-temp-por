@@ -277,6 +277,12 @@ class SolverVariantDeck(unittest.TestCase):
         r = rb.plan_requests(MAN)[0]
         self.assertEqual(rb.build_request(r, MAN, "batch"), rb.build_request(r, MAN, "batch"))
 
+    def test_run_subparser_accepts_variant(self):
+        with mock.patch.object(rb, "cmd_run") as run:
+            run.return_value = 0
+            self.assertEqual(rb.main(["run", "--variant", "reltol2e-4", "--run-id", "x"]), 0)
+        self.assertEqual(run.call_args[0][0].variant, "reltol2e-4")
+
 
 class TightenedRerunDeclared(unittest.TestCase):
     """The predeclared #153 rerun set must be tied to the committed source record."""
