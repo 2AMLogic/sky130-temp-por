@@ -8,7 +8,8 @@ results it produces. Two rules from the root `CLAUDE.md` shape everything here:
   corners) unless the record states why a subset was used — the runner
   *enforces* that by refusing to write a subset record without a
   `--subset-reason`.
-- **`sim/` is append-only evidence.** Records are never edited or deleted. A
+- **`sim/` is append-only evidence.** Records, netlist snapshots and corner
+  evidence are never edited, deleted or moved. A
   re-run — even one that corrects a mistake — mints a new record id; a
   correction points at what it replaces via a `Supersedes` field. The runner
   refuses to start if the record id it would mint already exists on disk.
@@ -150,7 +151,9 @@ number, limit and verdict, for tooling):
 
 ### Append-only rule
 
-`records/*` files are never edited or deleted after creation — this applies
+`records/*`, `netlist-snapshots/*` and `corners/*` files (flat and nested
+layouts alike, including logs, batch request files, summaries and compressed
+waveforms) are never edited, deleted or moved after creation — this applies
 even to typo fixes, because the append-only guarantee is the whole point of an
 evidence trail. Corrections mint a new record that references the prior one via
 **Supersedes**. A record whose overall verdict is FAIL is still valid,
@@ -158,6 +161,27 @@ committed evidence (see `sim/bias-core-smoke/`'s own first record) — it is not
 edited, loosened, or deleted just because the result was unwelcome; a genuine
 circuit finding gets a follow-up issue instead (see that experiment's own
 `experiment.json` `notes` field).
+
+**Correction process.** To fix or redo a run, preserve the old evidence
+byte-for-byte and append a new run: mint a new `<record-id>` with its own
+record, snapshot and corner evidence, and point at the old one via
+**Supersedes**. Never overwrite, delete or relocate the old files. Live
+testbenches, campaign drivers, `experiment.json` and READMEs are not evidence
+and remain editable.
+
+CI enforces this rule in the self-checks workflow
+(`.github/scripts/check_records_append_only.py`): the protected
+`sim/*/records/*`, `sim/*/netlist-snapshots/*` and `sim/*/corners/*` blobs
+are diffed against a Git baseline with rename detection disabled, and any
+modification, deletion or rename/move (including a move out of those
+directories, which shows as a deletion) of an existing evidence blob fails
+the run, with the paths listed — even when the edited file is still
+well-formed. New paths, testbenches, runner scripts, experiment manifests and
+documentation stay editable. The baseline is the merge base with the target branch for pull
+requests, the pushed-from commit (`before`) for pushes to `main`, and the
+empty tree for an initial push (no prior commit exists, so nothing can be
+violated yet); history that cannot be resolved fails the check with the
+fetch needed to fix it.
 
 ---
 

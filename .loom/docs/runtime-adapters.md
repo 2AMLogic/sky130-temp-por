@@ -1272,7 +1272,7 @@ strands the seats already paid for.
 {
   "runtimes": {
     "preference": ["claude", "codex", {"runtime": "opencode", "modelProfile": "zai-metered"}],
-    "rolePreference": { "judge": ["codex", "claude", "opencode"] }
+    "rolePreference": { "judge": ["codex", "claude"] }
   }
 }
 ```
@@ -1315,6 +1315,69 @@ entry is recorded as skipped with reason `not-admitted(worktreeIsolation)`, whic
 is materially different from "Codex had no credential" and should be read that
 way.
 
+**Model-profile role exclusion (`excludedRoles`, #11400).** A model profile may
+list roles it must never run, e.g. `"excludedRoles": ["judge", "curator"]` on the
+shipped `zai-flash` profile (review and triage stay off GLM). Admission enforces
+it for **every** selection source, judged against the profile the launch will
+actually use — a tap's `modelProfile`, else `LOOM_MODEL_PROFILE`, else
+`runtimes.defaultModelProfile`, else the bundled `zai-flash` default (so a bare
+`opencode` entry or `runtimes.roles.judge: "opencode"` is judged against
+`zai-flash` too):
+
+- a preference entry is skipped as `not-admitted(excludedRole)`, like
+  `not-admitted(worktreeIsolation)` above, and the walk continues;
+- a `runtimes.roles` binding, `LOOM_RUNTIME_<ROLE>` / `LOOM_RUNTIME` with
+  `LOOM_MODEL_PROFILE`, or an explicit per-dispatch runtime is **refused** with
+  the reason (exit 78) — a pin is never re-routed;
+- a native sweep runs Judge and Curator in its own session, so a sweep on an
+  excluding profile is refused through its review phase;
+- `spawn-worker` re-checks the profile it actually selected (an explicit
+  `--profile` included) before launching.
+
+Only native runtimes (`pi`, `opencode`, `kimi`) are checked, and only when the
+profile declares a provider for that harness. `loom-daemon validate` rejects an
+`excludedRoles` entry that is not a known role name.
+
+**GLM-first Builder and Doctor (fleet policy, tier 1).** The routing comes
+from fleet-gitops `config.defaults`, rendered into each host's machine tier
+(`~/.local/share/loom/config/defaults.json`), not from this repo's
+`.loom/config.json`, which carries no fleet keys (#11450, #11441). It sets
+`defaultModelProfile: "zai-flash"`, `rolePreference.builder` to
+`["opencode", "claude"]` and `.doctor` to `["opencode", "codex", "claude"]`
+(a bare `opencode` entry takes the default profile; a sweep's Builder phase
+resolves through `rolePreference.builder` via `worker run`, #11303): the role
+runs on a Z.ai seat while the `zai` api-keys pool has a selectable account, else
+on Claude (Doctor's Codex step is skipped while Codex's `worktreeIsolation` is
+`partial`).
+A host with **no** `zai` pool counts as unavailable, not unobservable: guarded
+launches never reuse OpenCode's own login, so unless an exported key,
+`LOOM_NATIVE_AUTH_FILE`, or a gateway route supplies it, the tap is skipped.
+`rolePreference.judge` is `["codex", "claude"]`; `zai-flash`'s `excludedRoles`
+would skip a GLM Judge entry anyway. A machine-tier pin such as
+`runtimes.roles.doctor = "claude"` still wins outright.
+
+**Launch-failure hold (role ticks, #11453).** The walk falls through only on
+credential availability, so a tap whose launch fails *deterministically* with a
+healthy pool would be relaunched every tick. A role tick that fails with an
+allowlisted class (`launch-failed`, `toolless-launch`, `preflight-auth-failed`,
+`credential-expired`, `preflight-no-cli-start`, `preflight-mcp-failed`,
+`preflight-token-selection-failed`, `exit-78`, `exit-126`, `exit-127`) extends
+a streak keyed on **(workspace root, role, tap)**. Every other class is
+transient and keeps the retry-next-tick behaviour. That includes rate/quota,
+timeouts, session refusals and `sandbox-unavailable` (the sandbox hold owns
+it). After `LOOM_LAUNCH_FAILURE_HOLD_THRESHOLD` (default 2) identical failures
+in a row, that role's ticks in that workspace skip the tap for
+`LOOM_LAUNCH_FAILURE_HOLD_SECS` (default 1800; `0` disables the feature). The
+skip shows in the marker as `unavailable(launch-failure-hold: <class> xN
+armed=… remaining=…s)`, and the walk falls through `rolePreference`. If every
+tap is held, the tick is skipped pre-spawn as usual. The daemon logs one WARN
+when the hold arms and one INFO when it clears. A hold clears on expiry (the next tick re-tests the tap,
+and one more identical failure re-arms it), on a successful tick, on a change
+to the effective `runtimes` block or the tap's model profile, and on daemon
+restart. A success, a transient failure or a different class resets the
+streak. Sweeps (`resolve_for_dispatch`, `pool_preflight`) and operator pins
+never consult it, and the role itself is never benched (#6201).
+
 **Judge independence.** A native sweep runs every phase in **one session with no
 subagents**, so a preference list that lands Builder and Judge on the same
 single-session runtime weakens review independence — the reviewer is the same
@@ -1340,6 +1403,17 @@ This is a **sibling** of `# LOOM_RUNTIME_RESOLVED`, not extra fields on it: the
 crash-signal reader takes the entire rest of that line as the runtime name, so
 appending to it would report a runtime called `"opencode tier=2"`. "How much work
 is going to the backstop" reduces to counting markers whose `tier` is not `0`.
+
+**An uninstalled tier-3 tap is skipped, not launched (#9368).** A tier-3
+generic runtime (`gemini`, `aider`, operator-defined) has no credential pool, so
+the one thing the walk can observe about it is its CLI binary: when the name is
+known (`LOOM_GENERIC_CLI_BIN`, else the manifest's `launch.cliBin`) and it is
+not an executable file on the daemon's `PATH`, the tap is passed over as
+`unavailable(binary: 'gemini' not found in PATH …)` and the walk continues, or
+holds if nothing below qualifies. Without a known name (no `launch.cliBin`) the
+tap stays ungated and `spawn-generic.sh`'s own exit-127 check remains the
+backstop, so declare `cliBin` in any tier-3 manifest you list in a preference.
+`claude`, `codex` and the native harnesses are never `PATH`-checked.
 
 Each dispatch seam emits that marker to the **daemon log** (`loom-daemon logs`),
 which is where all three resolve, and (#8599) the daemon carries it to the child
@@ -1372,6 +1446,73 @@ Because a phase can outlast the Bash tool cap (120s default / 600s max), the
 orchestrator runs it as a background Bash process writing `exit` and
 `report.json` files and polls in-turn with bounded waits until the exit file
 exists; the recipe is in `native-sweep.md` "Waiting for `worker run`".
+
+#### Usage attribution for `worker run` phases (issue #11360)
+
+A phase launched by `worker run` writes its own log,
+`.loom/logs/worker-run-<role>-<issue>-<unix-ts>.log`, never the sweep log. Its
+first line names the parent sweep, taken from `$LOOM_SWEEP_ID`:
+
+```text
+==== loom-daemon worker run: parent_sweep=<sweep-id> role=<role> issue=<N> ====
+```
+
+The key is `parent_sweep=`, not `sweep_id=`. The parent sweep log is anchored
+by a substring search for `sweep_id=<id>`, so a header carrying that text and
+quoted into the parent's stream (for example, an orchestrator `cat`ing a phase
+log) would move the parent's region past its own launch record.
+
+When the sweep reaches its terminal transition, the outcome journal reads every
+phase log for the issue and keeps only the region after this sweep's header.
+The rules:
+
+- **Kept separate from the parent.** Phase rows go in `phase_tap_usage` on the
+  `sweep-outcomes.jsonl` line, one row per `(role, tap)`. `tap_usage` /
+  `tap_usage_all` still describe only the parent orchestrator's own log. A
+  phase's spend never overwrites the parent's row, and the parent's spend
+  (Curator and Judge, which run in its process) is never charged to a phase tap.
+  The paired `sweep.outcome` telemetry record keeps `config["tap"]` set to the
+  parent and adds a `tap_phase_keys` flag (`builder=<key>,doctor=<key>`). The
+  counters live on the journal line.
+- **Each launch counted once.** Every `# LOOM_LAUNCH` record in a phase log is
+  charged only with the usage events that follow it. A header repeated inside
+  one log counts only its last region. A log that names a different sweep (a
+  resumed sweep's predecessor, or an id that only shares a prefix) adds
+  nothing. Two phase logs for the same sweep (a Builder re-run) are two real
+  launches, and both count.
+- **The tap that actually ran.** A phase whose role resolves to `claude`
+  (including an empty GLM pool falling through to Claude) prints
+  `delegate-to-claude`, writes no phase log, and charges no GLM tap. Its usage
+  is the parent's Claude transcript. A `worker run` with no `$LOOM_SWEEP_ID`
+  stamps `parent_sweep=none`, which no sweep matches.
+- **Escalated Doctor (#11359).** `worker run --role doctor --escalate-claude`
+  prints a `runtime: claude` report with no `log_path`, launches nothing, and
+  writes no phase log. The Doctor then runs as a Claude Task in the parent
+  session, with no `# LOOM_LAUNCH` record, so it charges no tap. Earlier GLM
+  Doctor attempts keep their exact GLM row, and nothing from the Claude
+  attempt lands on it. The escalated model is recorded by the checkpoint's
+  `doctor-done` write, not by tap accounting.
+- **Unmeasured is not zero.** A phase that launched but reported no usage
+  events is a row with `usage_events: 0` and no counters. A truncated final
+  line from an interrupted run is ignored. Cost figures are harness estimates,
+  not charges.
+
+The sweep's total per tap is the fold of the parent rows and the phase rows
+(`RegionAccounting::sweep_totals_by_tap`).
+
+**Operator verification of one live mixed sweep**:
+
+1. `ls .loom/logs/worker-run-*-<N>-*.log`. Each file's first line must name the
+   sweep id as `parent_sweep=<id>`. A phase that ran on Claude (empty-pool
+   fallback or escalation) has no file and no phase row.
+2. `grep '^# LOOM_LAUNCH' <phase log>`. The `tap`/`model`/`profile` must be
+   what actually launched, not just the first preference.
+3. `grep '"issue":<N>' .loom/sweep-outcomes.jsonl`. Check that `tap_usage`
+   names the parent, and that `phase_tap_usage` has one row per phase role and
+   tap, with counters only where the stream reported them.
+4. In the telemetry journal, `config.tap_phase_keys` must list the same keys.
+
+Before attaching evidence, remove account names and host paths.
 
 ### Bounding the metered backstop tier (issue #8555)
 
