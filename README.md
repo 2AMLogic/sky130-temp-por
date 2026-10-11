@@ -13,8 +13,9 @@ in progress.** `design/` has a full, netlist-checked schematic hierarchy
 (four leaf cells plus the assembled `temp_por_top`); `sim/` has testbench
 harnesses with recorded PVT-corner results; `layout/` has all six
 `bias_core` sub-blocks fully assembled and routed, with clean DRC and a
-50-device/27-net LVS match. Structural power-delivery signoff remains open
-because the ERC supply specification does not yet declare well/substrate ties.
+50-device/27-net LVS match. Structural power-delivery evidence now grades
+T1 item 11 `met`: ERC checks declared nwell-to-VDD ties, with p-substrate
+ties disclosed as unexpressible and the two PNP tubs excluded from tie grading.
 `spec/` is partially ratified: DR-003 finalized the operating-temperature
 and supply rows through the two-key process, while the remaining target rows
 are still explicit placeholders (`spec/README.md`,
@@ -86,9 +87,12 @@ layout are both advancing in parallel rather than in strict ladder order —
 DR-003 has ratified the operating-temperature and supply rows while the
 remaining target rows stay open, and `layout/` has a fully
 routed `bias_core` assembly with clean DRC and a 50-device/27-net LVS match.
-The remaining layout-side T1 gap is structural power-delivery evidence for
-well/substrate ties, and the other top-level cells are not yet laid out, so no
-single ladder rung is complete yet.**
+Leaf layouts also exist for `temp_core`, `por_comparator`, and
+`por_output_chain`; the output-chain LVS comparison still excludes the native
+startup-assist device pending tool support. Structural power-delivery item 11
+is `met` with the tie-coverage disclosures above. Whole-block layout and the
+remaining verification evidence are incomplete, so no single ladder rung is
+complete yet.**
 
 ## Repo layout
 
