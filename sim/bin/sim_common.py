@@ -470,3 +470,70 @@ def load_wave(path: Path) -> dict[str, list[float]]:
             except (TypeError, ValueError) as e:
                 raise ValueError(f"malformed waveform row {i}: non-numeric value {x!r} for {n}") from e
     return cols
+
+
+# --------------------------------------------------------------------------
+# waveform primitives shared by the supply-ramp and brown-out checkers
+# --------------------------------------------------------------------------
+
+
+def interp_cross(t0, y0, t1, y1, level):
+    """Time ``level`` is crossed on the segment (t0,y0)-(t1,y1); t1 for a flat segment."""
+    if y1 == y0:
+        return t1
+    return t0 + (level - y0) * (t1 - t0) / (y1 - y0)
+
+
+def crossings(t, y, level, direction, t_from=0.0):
+    """Interpolated crossing times of ``level`` ('rise' or 'fall'), t > t_from."""
+    out = []
+    for i in range(1, len(t)):
+        if t[i] <= t_from:
+            continue
+        a, b = y[i - 1], y[i]
+        if direction == "rise" and a < level <= b:
+            out.append(interp_cross(t[i - 1], a, t[i], b, level))
+        elif direction == "fall" and a > level >= b:
+            out.append(interp_cross(t[i - 1], a, t[i], b, level))
+    return out
+
+
+def interp_at(t, y, when):
+    """Piecewise-linear value of y at ``when`` (clamped to the end samples)."""
+    if when <= t[0]:
+        return y[0]
+    if when >= t[-1]:
+        return y[-1]
+    lo, hi = 0, len(t) - 1
+    while hi - lo > 1:
+        mid = (lo + hi) // 2
+        if t[mid] <= when:
+            lo = mid
+        else:
+            hi = mid
+    return y[lo] + (when - t[lo]) * (y[hi] - y[lo]) / (t[hi] - t[lo]) if t[hi] != t[lo] else y[hi]
+
+
+def schmitt(t, y, lo, hi, init_high=False, t_from=0.0):
+    """(rise_times, fall_times) of a two-threshold detector over t > t_from, starting in ``init_high``."""
+    state = init_high
+    rises, falls = [], []
+    for i in range(1, len(t)):
+        if t[i] <= t_from:
+            continue
+        a, b = y[i - 1], y[i]
+        if not state and b >= hi:
+            rises.append(interp_cross(t[i - 1], a, t[i], b, hi) if a < hi else t[i])
+            state = True
+        elif state and b <= lo:
+            falls.append(interp_cross(t[i - 1], a, t[i], b, lo) if a > lo else t[i])
+            state = False
+    return rises, falls
+
+
+def write_gz_rows(path: Path, header: str, rows) -> None:
+    """Write ``header`` then one ``%.6g`` CSV line per row to a gzip file (parents created)."""
+    path.parent.mkdir(parents=True, exist_ok=True)
+    lines = [header] + [",".join(f"{x:.6g}" for x in r) for r in rows]
+    with gzip.open(path, "wt", compresslevel=9) as fh:
+        fh.write("\n".join(lines) + "\n")
