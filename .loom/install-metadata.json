@@ -1,6 +1,6 @@
 {
-  "loom_version": "0.19.1039",
-  "loom_commit": "e83d19dc0a9b217339ea2f14040c50ad6f46700d",
+  "loom_version": "0.19.1047",
+  "loom_commit": "b801ec198a3113b88fa9292ccd75f934ab0c1679",
   "install_date": "2026-08-20",
   "installed_files": [
     ".claude/agents/loom-architect.md",
@@ -493,7 +493,10 @@
     ".claude/commands/loom/sweep-wave-lifecycle.md",
     ".loom/docs/park-record.md",
     ".loom/scripts/tests/test-champion-pr-merge-negation-guard.sh",
-    ".loom/scripts/tests/test-worktree-race-rescue.sh"
+    ".loom/scripts/tests/test-worktree-race-rescue.sh",
+    ".loom/docs/native-sweep.md",
+    ".loom/docs/premise-gate.md",
+    ".loom/scripts/tests/test-premise-check.sh"
   ],
   "last_resync": "2026-10-11",
   "loom_source_remote": "git@github.com:rjwalters/loom.git",

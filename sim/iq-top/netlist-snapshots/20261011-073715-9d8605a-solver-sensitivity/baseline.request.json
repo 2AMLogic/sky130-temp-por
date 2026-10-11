@@ -1,0 +1,59 @@
+{
+  "netlist": "netlist.spice",
+  "backend": "batch",
+  "models": {
+    "pdk": "sky130A",
+    "lib": "libs.tech/combined/sky130.lib.spice"
+  },
+  "corners": {
+    "process": [
+      "tt",
+      "ss",
+      "ff",
+      "sf",
+      "fs"
+    ],
+    "supply_v": {
+      "vset": [
+        2.97,
+        3.3,
+        3.63
+      ]
+    },
+    "temperature_c": [
+      -40,
+      27,
+      125
+    ]
+  },
+  "analysis": {
+    "kind": "tran",
+    "args": "1u 0.03 0 1e-05"
+  },
+  "measurements": [
+    {
+      "name": "iq_trail_neg",
+      "spice": ".meas tran iq_trail_neg AVG i(bvdd) FROM=0.025 TO=0.03",
+      "unit": "A"
+    },
+    {
+      "name": "vdd_trail",
+      "spice": ".meas tran vdd_trail AVG v(vdd) FROM=0.025 TO=0.03",
+      "unit": "V"
+    },
+    {
+      "name": "resetn_trail",
+      "spice": ".meas tran resetn_trail AVG v(resetn) FROM=0.025 TO=0.03",
+      "unit": "V"
+    }
+  ],
+  "options": {
+    "timeout_s": 3000,
+    "keep_artifacts": true,
+    "waveforms": true
+  },
+  "batch": {
+    "runner_version_check": "warn",
+    "capacity_wait_s": 1800.0
+  }
+}
