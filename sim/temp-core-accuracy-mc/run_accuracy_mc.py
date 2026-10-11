@@ -57,7 +57,8 @@ TRAMP = 100e-6
 OPTIONS = "method=gear trtol=7"  # the best-behaved #86 variant (44/45); starts are still guarded, never trusted
 N_SAMPLES = 100
 N_CONTROL = 10
-N_EXTEND = 50  # all-native samples at the extra process/supply corners
+N_EXTEND = 25  # all-native samples per chunk at the extra process/supply corners
+EXTEND_CHUNKS = 2  # chunk k uses seed SEED+k for ALL three temperatures (pairing kept); keeps every fleet job well under its 1 h limit
 SEED = 20261011
 SIGMA_K = 3  # the 3-sigma convention (spec/porting-plan.md section 3.2); stated in experiment.json
 TARGET_UNTRIMMED_C = 3.0  # DR-003 row 2 README numbers (NOT ratified; recorded for the ratio only)
@@ -202,7 +203,7 @@ def measurements():
     return out
 
 
-def build_request(variant, procs, temps, supplies, backend, n=None, timeout=3000):
+def build_request(variant, procs, temps, supplies, backend, n=None, timeout=300, seed=None):
     req = {
         "netlist": "netlist.spice",
         "backend": backend,
@@ -213,31 +214,46 @@ def build_request(variant, procs, temps, supplies, backend, n=None, timeout=3000
         "options": {"timeout_s": timeout, "keep_artifacts": True, "waveforms": False},
     }
     if n:
-        req["monte_carlo"] = {"n": n, "seed": SEED, "vary": "mismatch"}
+        req["monte_carlo"] = {"n": n, "seed": SEED if seed is None else seed, "vary": "mismatch"}
     if backend == "batch":
         req["batch"] = {"runner_version_check": "warn"}
     return req
 
 
-def group_n(v, p, s):
+def chunks(v, p, s):
+    """[(chunk index, n, seed)] -- chunk 0 is the original single request; extension groups are split (see EXTEND_CHUNKS)."""
     if v.startswith("control"):
-        return N_CONTROL
-    return N_SAMPLES if (p, s) == ("tt", 3.30) else N_EXTEND
+        return [(0, N_CONTROL, SEED)]
+    if (p, s) == ("tt", 3.30):
+        return [(0, N_SAMPLES, SEED)]
+    return [(k, N_EXTEND, SEED + k) for k in range(1, EXTEND_CHUNKS + 1)]
+
+
+def unit_name(v, p, s, k, t):
+    return f"{v}__{p}_{s:.2f}v_{'' if k == 0 else f'c{k}_'}{sim_common_t(t)}c"
 
 
 def units():
     """Every klt request of the campaign: (unit name, variant, procs, temps, supplies, n)."""
-    u = [("nominal", "nominal", PROCS, TEMPS, SUPPLIES, None),
-         ("nominal-alt", "nominal-alt", PROCS, TEMPS, SUPPLIES, None)]
+    u = [("nominal", "nominal", PROCS, TEMPS, SUPPLIES, None, None),
+         ("nominal-alt", "nominal-alt", PROCS, TEMPS, SUPPLIES, None, None)]
     for v, p, s in PLAN_MC:
-        n = group_n(v, p, s)
-        for t in TEMPS:
-            u.append((f"{v}__{p}_{s:.2f}v_{sim_common_t(t)}c", v, [corner_section(v, p)], [t], [s], n))
+        for k, n, seed in chunks(v, p, s):
+            for t in TEMPS:
+                u.append((unit_name(v, p, s, k, t), v, [corner_section(v, p)], [t], [s], n, seed))
     return u
 
 
 def sim_common_t(t):
     return cr.fmt_temp(t)
+
+
+def good_report(path):
+    """A report with per-corner results of which at least one was not an outright error (a whole-job timeout is not 'good')."""
+    if not sim_common.report_usable(path):
+        return False
+    r = json.loads(path.read_text())
+    return r.get("errored", 0) < r.get("corner_count", 1)
 
 
 def klt_version():
@@ -266,13 +282,21 @@ def cmd_run(args):
     (run_dir / "run.json").write_text(json.dumps(meta, indent=2) + "\n")
 
     def one(u):
-        name, variant, procs, temps, sups, n = u
+        name, variant, procs, temps, sups, n, seed = u
         d = run_dir / name
-        if sim_common.report_usable(d / "report.json"):
+        if good_report(d / "report.json"):
             return {"unit": name, "skipped": "usable report exists"}
+        if (d / "report.json").is_file():  # an earlier attempt (e.g. batch_job_timeout): archive, never overwrite
+            k_ = 1
+            while (d / f"attempt{k_}").exists():
+                k_ += 1
+            (d / f"attempt{k_}").mkdir()
+            for fn in ("report.json", "klt.stderr"):
+                if (d / fn).is_file():
+                    (d / fn).rename(d / f"attempt{k_}" / fn)
         d.mkdir(parents=True, exist_ok=True)
         (d / "netlist.spice").write_text(build_netlist(variant))
-        (d / "request.json").write_text(json.dumps(build_request(variant, procs, temps, sups, "batch", n), indent=2) + "\n")
+        (d / "request.json").write_text(json.dumps(build_request(variant, procs, temps, sups, "batch", n, seed=seed), indent=2) + "\n")
         npts = len(procs) * len(temps) * len(sups) * (n or 1)
         say(f"[submit] {name}: {npts} runs -> batch fleet")
         p = subprocess.run(["klt", "sim", str(d / "request.json"), "--backend", "batch", "-o", str(d / "out"), "--format", "json"],
@@ -415,24 +439,30 @@ def analyse(run_dir):
     # --- MC groups
     for v, p, s in PLAN_MC:
         g = {"variant": v, "process": p, "supply": s, "per_temp": {}, "units": {}, "missing": []}
-        samples = {}  # sample_index -> {T: measurements}
-        n_req = group_n(v, p, s)
+        samples = {}  # (chunk, sample_index) -> {T: measurements}
         for t in TEMPS:
-            name = f"{v}__{p}_{s:.2f}v_{sim_common_t(t)}c"
-            ent = load_unit(run_dir, name)
-            if not ent["report"]:
-                g["missing"].append({"temp": t, "unit": name, "refusal": ent["refusal"]})
-                continue
-            rep = ent["report"]
-            remote = rep.get("environment", {}).get("remote", {})
-            g["units"][str(t)] = {k: remote.get(k) for k in ("job_id", "instance_type", "lifecycle", "elapsed_seconds")}
-            g["units"][str(t)]["status"] = rep.get("status")
-            g["units"][str(t)]["ngspice"] = rep.get("environment", {}).get("engine_version")
-            g["family_mismatch"] = rep.get("environment", {}).get("monte_carlo", {}).get("family_mismatch")
-            for c in rep["corners"]:
-                si = (c.get("monte_carlo") or {}).get("sample_index")
-                samples.setdefault(si, {})[t] = mvals(c)
-            g["per_temp"][str(t)] = {"requested": n_req, "returned": sum(1 for sm in samples.values() if t in sm)}
+            req_n = ret_n = 0
+            for k, n_req, _seed in chunks(v, p, s):
+                name = unit_name(v, p, s, k, t)
+                ent = load_unit(run_dir, name)
+                req_n += n_req
+                if not ent["report"]:
+                    g["missing"].append({"temp": t, "unit": name, "refusal": ent["refusal"]})
+                    continue
+                rep = ent["report"]
+                remote = rep.get("environment", {}).get("remote", {})
+                u_ = {kk: remote.get(kk) for kk in ("job_id", "instance_type", "lifecycle", "elapsed_seconds")}
+                u_["status"] = rep.get("status")
+                u_["ngspice"] = rep.get("environment", {}).get("engine_version")
+                u_["chunk"] = k
+                u_["diagnostics"] = rep.get("diagnostic_counts", {}).get("by_code")
+                g["units"].setdefault(str(t), []).append(u_)
+                g["family_mismatch"] = rep.get("environment", {}).get("monte_carlo", {}).get("family_mismatch")
+                for c in rep["corners"]:
+                    si = (k, (c.get("monte_carlo") or {}).get("sample_index"))
+                    samples.setdefault(si, {})[t] = mvals(c)
+                    ret_n += 1
+            g["per_temp"][str(t)] = {"requested": req_n, "returned": ret_n}
         g["n_samples_seen"] = len(samples)
         # guard each (sample, T)
         inval = {str(t): {} for t in TEMPS}
@@ -575,7 +605,7 @@ def cmd_record(args):
         "record_id": rid, "experiment": SLUG, "issue": 105, "timestamp": now.strftime("%Y-%m-%dT%H:%M:%SZ"),
         "git": git, "git_at_record": now_git, "klt": klt_client, "backend": meta["klt_sim_backend_env"], "run_id": args.run_id,
         "sigma_convention": f"{SIGMA_K} x sample standard deviation (Bessel-corrected) of the per-sample temperature error; empirical max and 99.7th percentile reported alongside",
-        "mc": {"n_samples": N_SAMPLES, "n_extend": N_EXTEND, "n_control": N_CONTROL, "seed": SEED, "vary": "mismatch"},
+        "mc": {"n_samples": N_SAMPLES, "n_extend_per_chunk": N_EXTEND, "extend_chunks": EXTEND_CHUNKS, "n_control": N_CONTROL, "seed": SEED, "vary": "mismatch"},
         "analysis": an, "quadrature_sum_of_single_terms": quad, "unmeasured": unmeasured,
         "targets_C": {"untrimmed": TARGET_UNTRIMMED_C, "trimmed": TARGET_TRIMMED_C},
         "resumes": meta.get("resumes", []), "supersedes": args.supersedes or "(none)", "author": cr.default_author(),
@@ -591,7 +621,7 @@ def cmd_record(args):
          f"- **Tools**: {klt_client} (client); backend `{meta['klt_sim_backend_env']}` (every request submitted with an explicit `--backend batch`; nothing run locally, no local fallback)",
          f"- **Repo state**: `{git['sha']}` on `{git['branch']}` (working tree {'DIRTY' if git['dirty'] else 'clean'} at run time)"
          + "".join(f"; resumed {r['started_utc']} at `{r['git']['sha']}` (working tree {'DIRTY' if r['git']['dirty'] else 'clean'})" for r in meta.get("resumes", [])),
-         f"- **MC settings**: N = {N_SAMPLES} samples per (variant, temperature) at tt/3.30 V, {N_EXTEND} for the all-native runs at the extra corners (controls N = {N_CONTROL}), `monte_carlo.vary = mismatch`, base seed {SEED}; one request per temperature so the draws are paired across -40/27/125 C",
+         f"- **MC settings**: N = {N_SAMPLES} samples per (variant, temperature) at tt/3.30 V, {N_EXTEND} x {EXTEND_CHUNKS} chunks (seeds SEED+1, SEED+2) for the all-native runs at the extra corners (controls N = {N_CONTROL}), `monte_carlo.vary = mismatch`, base seed {SEED}; one request per temperature so the draws are paired across -40/27/125 C",
          "- **PVT**: attribution at tt, 3.30 V; the all-native aggregate additionally at ss/ff/sf/fs (3.30 V) and tt at 2.97/3.63 V; every point at -40/27/125 C. The nominal reference is the full 45-point matrix.",
          f"- **Statistical convention**: {rec['sigma_convention']}",
          "- **Operating-point guard**: a sample is VALID only if ptat/ctat/na/nb/isup/bias_ok are inside the windows of `sim/temp-core-startup/experiment.json` (unrelaxed) and PTAT/CTAT moved < 1 mV over the last millisecond. Invalid samples are excluded from every statistic and counted below; they are never replaced.",
@@ -616,8 +646,8 @@ def cmd_record(args):
                 L.append(f"| `{gk}` | {t} | - | NOT-RUN | - | - | {json.dumps(ms['refusal'] if ms else None)[:160]} |")
                 continue
             inv = g["invalid_by_temp"][str(t)]
-            ju = g["units"][str(t)]
-            L.append(f"| `{gk}` | {t} | {pt['requested']} | {pt['returned']} | {sum(inv.values())} ({', '.join(f'{k}: {v}' for k, v in inv.items()) or '-'}) | {ju.get('job_id')} | {ju.get('status')} |")
+            jus = g["units"].get(str(t), [])
+            L.append(f"| `{gk}` | {t} | {pt['requested']} | {pt['returned']} | {sum(inv.values())} ({', '.join(f'{k}: {v}' for k, v in inv.items()) or '-'}) | {', '.join(str(j.get('job_id')) for j in jus)} | {', '.join(str(j.get('status')) + (' ' + json.dumps(j['diagnostics']) if j.get('diagnostics') else '') for j in jus)} |")
     L += ["", "## Controls (negative controls: sigma must be exactly zero)", ""]
     for gk in ("control-off__tt_3.30v", "control-zeroed__tt_3.30v"):
         g = G.get(gk)
