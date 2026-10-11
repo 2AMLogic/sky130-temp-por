@@ -912,7 +912,7 @@ def render_md(rec: dict) -> str:
         L.append("## Pilot runtime projection (made before the remaining requests were submitted)")
         L.append("")
         for cp in rec["cost_projections"]:
-            L.append(f"- {cp.get('at_utc')}: pilots " + ", ".join(f"`{p['tag']}` job {p.get('job_id')} {fmt(p['default_elapsed_s'], '.0f')} -> {fmt(p['tightened_elapsed_s'], '.0f')} s (elapsed x{fmt(p['elapsed_ratio'], '.2f')}, corner-sum x{fmt(p['corner_sum_ratio'], '.2f')})" for p in cp["pilots"])
+            L.append(f"- {cp.get('at_utc')}: pilots " + ", ".join(f"`{p['tag']}` job {p.get('job_id')} {fmt(p['default_elapsed_s'], '.0f')} -> {fmt(p['tightened_elapsed_s'], '.0f')} s ({p.get('state') or 'done'}; elapsed x{'>=' if p.get('timed_out') else ''}{fmt(p['elapsed_ratio'], '.2f')}, corner-sum x{fmt(p['corner_sum_ratio'], '.2f')})" for p in cp["pilots"])
                      + (f"; limit from {cp['limit_source']}" if cp.get("limit_source") else "") + f"; worst ratio x{'>=' if cp.get('lower_bound') else ''}{fmt(cp['worst_ratio'], '.2f')}{' (lower bound: a pilot hit the job limit, its corner runtimes were lost)' if cp.get('lower_bound') else ''} against the {cp['limit_s']:.0f} s per-job limit; {cp['n_over_limit']} request(s) projected over it. "
                      + "Projected max: " + fmt(max((p["projected_tightened_elapsed_s"] or 0) for p in cp["projection"]), ".0f") + " s.")
         L.append("")
