@@ -1,0 +1,65 @@
+{
+  "slug": "temp-core-accuracy-mc",
+  "title": "temp_core temperature accuracy: full-signal-path mismatch Monte Carlo (PTAT/CTAT vs temperature) with per-term attribution",
+  "issue": 105,
+  "claim": "Issue #105 -- NOT a spec claim and no spec/ edit (DR-003 row 2 stays [TBD-1]). Evidence toward TBD-1: the temperature error, in degC, of temp_core's PTAT output under local device mismatch over -40..125 C and the PVT corner matrix, reported untrimmed and with an ideal 1-point (27 C) gain trim, with the contribution of each mismatch term (PNP pair, amplifier offset, PTAT-gain resistor ratio, branch-current mirror, everything else) separated, plus an all-terms aggregate. The earlier sim/pnp-mismatch campaign (record 20260825-220116-a9cac4b) measured only the PNP DVBE term; this campaign adds the other terms and the aggregate.",
+  "statistical_convention": "3 sigma = 3 x the sample standard deviation (Bessel, n-1) of the temperature error over the valid Monte Carlo samples of ONE PVT corner (a +/-3 sigma half-width about the sample mean). Reported per corner, for the worst corner, and RMS-pooled over the 15 corners. Mean and empirical max |error| are tabulated alongside. Mismatch is local only (vary=mismatch); global process Monte Carlo (MC_PR_SWITCH) is not sampled.",
+  "error_definition": {
+    "reference": "same-corner no-mismatch run of the same deck (plain process section, no monte_carlo)",
+    "volts_to_degC": "divide by S = (V_nom(125 C) - V_nom(-40 C)) / 165 C, the nominal full-range slope of the same output at the same corner",
+    "untrimmed": "err(T) = (V_sample(T) - V_nom(T)) / S, evaluated at -40, 27, 125 C; headline = worst of the three",
+    "trim_1point": "PTAT: ideal multiplicative gain trim so V(27 C) equals nominal at 27 C; CTAT: additive offset trim at 27 C; error evaluated at -40 and 125 C (27 C is zero by construction). Trim resolution/quantization is not modelled."
+  },
+  "provenance": "schematic",
+  "provenance_source": "design/netlist/{bias_core,temp_core}.spice (exported from design/*.sch); generated testbench in run_accuracy_mc.py",
+  "corners": {
+    "process": ["tt", "ss", "ff", "sf", "fs"],
+    "process_mismatch_sections": ["tt_mm", "ss_mm", "ff_mm", "sf_mm", "fs_mm"],
+    "temperature_c": [-40, 27, 125],
+    "temperature_note": "swept inside each ngspice process (dc temp -40 125 1) so one Monte Carlo sample is one device realisation across temperature; a klt temperature corner axis would re-draw the realisation per temperature because klt derives the sample seed from the corner index",
+    "supply_v": [2.97, 3.3, 3.63]
+  },
+  "monte_carlo": {
+    "n_per_corner": 30,
+    "vary": "mismatch",
+    "seed": 20261010,
+    "corner_count": 15,
+    "samples_per_term": 450,
+    "execution": "one klt sim request per (term, process section) = 3 supplies x N units, --backend batch (Spot fleet); never a local grid. Reason: a first attempt with one 3000-unit request per term hit the fleet per-job 1 h limit (batch_job_timeout, 3000/3000 errored; runner concurrency 1) and is disclosed in the record. Seed for process section k = seed + k (klt derives the sample seed from the corner index, which is 0..2 inside each request, so supplies share one realisation per process section and process sections draw independently)."
+  },
+  "terms": {
+    "nominal": "no mismatch; the per-corner reference curve",
+    "none": "negative control: _mm section + Monte Carlo with every device wrapped to sigma = 0; spread must be exactly zero",
+    "pnp": ["XQ1", "XQ8A", "XQ8B", "XQ8C", "XQ8D", "XQ8E", "XQ8F", "XQ8G", "XQ8H"],
+    "amp": ["XMI1", "XMI2", "XML1", "XML2"],
+    "res": ["XR1", "XR2", "XR2TRIM"],
+    "mirror": ["XMP1", "XMP2", "XMP3", "XMPC1", "XMPC2", "XMPC3"],
+    "other": "all bias_core devices and every temp_core device not listed above",
+    "all": "every device has mismatch live (the aggregate)"
+  },
+  "operating_point_guards": {
+    "scope": "applied to EVERY sample at -40, 27 and 125 C; a failing sample is INVALID, excluded from the statistics, counted and disclosed, never trimmed or substituted",
+    "ptat_V": [0.3, 2.6],
+    "ctat_V": [0.2, 1.1],
+    "isup_A": [1e-8, 5e-5],
+    "na_nb_abs_diff_V": [0.0, 0.1],
+    "ptat_monotonic": "PTAT(-40) < PTAT(27) < PTAT(125)",
+    "na_nb_T_spread_V": [0.0, 0.0005],
+    "na_nb_T_spread_definition": "branch consistency: max over T in {-40,27,125} C of |d(T) - median_T d|, d = V(NA)-V(NB). One device realisation keeps its amplifier offset across temperature (<= 0.32 mV spread on every on-branch sample of record 20261011-165400-69d13ac); a DC solution on another branch at a single temperature breaks loop closure there only. Added by the record that supersedes 20261011-165400-69d13ac (Judge review of PR #167).",
+    "offtrend_scan_degC": "disclosure only, not a guard: 27 C PTAT error vs the chord through the -40/125 C errors; samples passing every guard but above 2 degC are listed in the record",
+    "windows_source": "ptat/ctat/isup windows copied unchanged from sim/temp-core-startup-solver (#86); the NA/NB loop-closure, NA/NB branch-consistency and monotonic checks are specific to this DC-sweep bench",
+    "operating_point_trust": "sim/temp-core-startup-solver/records/20261010-200708-47b96e5 (cited, not duplicated); its limits are inherited"
+  },
+  "measurement": "dc sweep of temperature; .meas dc FIND v(ptat)/v(ctat)/v(xdut.na)/v(xdut.nb)/i(vsup) AT=-40/27/125",
+  "not_measured": [
+    "global process Monte Carlo (MC_PR_SWITCH)",
+    "systematic / gradient / layout-dependent mismatch, stress, aging, self-heating",
+    "dynamic behaviour (cold start, supply ramp): DC solutions only",
+    "physical trim ladder resolution and its mismatch",
+    "readout chain (ADC, buffer, pad load)"
+  ],
+  "cites": {
+    "pnp_only_mismatch": "sim/pnp-mismatch/records/20260825-220116-a9cac4b",
+    "operating_point_trust": "sim/temp-core-startup-solver/records/20261010-200708-47b96e5"
+  }
+}
