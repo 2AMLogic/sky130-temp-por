@@ -300,6 +300,8 @@ def analyze_variant(n: str, run_dir: Path, man: dict, traces: dict) -> dict:
         cid = rc.corner_id(p, t, v)
         full[cid] = pts.get(cid) or {"id": cid, "process": p, "temperature_c": t, "supply_v": v, "status": "nonconverged", "reason": "NOT SUBMITTED in the split resubmission"}
     outcomes = {pr: r.get("outcome") for pr, r in reqs.items()}
+    first_diag = next((p["diagnostics"][0] for p in whole["points"].values() if p.get("diagnostics")), "")
+    whole["requests"]["first_attempt_diagnostic"] = first_diag
     req = {"split_by_process": reqs, "outcome": outcomes, "job_id": {pr: r.get("job_id") for pr, r in reqs.items()},
            "instance_type": sorted({r.get("instance_type") for r in reqs.values() if r.get("instance_type")}),
            "runner_klt_version": next((r.get("runner_klt_version") for r in reqs.values() if r.get("runner_klt_version")), None),
@@ -320,7 +322,7 @@ def render_md(rec: dict) -> str:
     L += ["- **Claim**: EVIDENCE ONLY, NOT a spec claim and NOT a proposed ceiling. Issue #160 / DR-006: re-run the whole 45-point iq-total grid under the control and two solver variants and compare physical settled landings; no Iq ceiling is proposed and no ratified row is changed.",
           f"- **Netlist provenance**: schematic (`sim/iq-top/testbench/tb_temp_por_iq_total.sch`; DUT `design/netlist/temp_por_top.spice`, sha256 `{rec['provenance']['dut_sha256']}`)"]
     L += sim_common.render_pdk_tools_repo_state(rec)
-    L += [f"- **Source revision**: `{rec['git']['sha']}` on `{rec['git']['branch']}`, dirty at run time: {rec['run_git']['dirty']}; record written from tree dirty: {rec['git']['dirty']}",
+    L += [f"- **Source revision of the first submissions**: `{rec['run_git']['sha']}` on `{rec['run_git']['branch']}` (working tree dirty at submit time: {rec['run_git']['dirty']}); record written at `{rec['git']['sha']}` (dirty: {rec['git']['dirty']}). Split resubmissions ran from later commits of the same branch that changed only `run_iq_sensitivity.py` (the `--split-process` / `--process` options); each deck/request is identified by the sha256 values below.",
           f"- **Fleet PDK commit**: {rec['fleet_pdk_note']}",
           f"- **Fleet**: {rec['fleet_note']}",
           "- **Statistical convention**: N/A (corner-matrix measurement)", ""]
@@ -331,7 +333,7 @@ def render_md(rec: dict) -> str:
         outcome, job = r.get("outcome"), r.get("job_id")
         if "split_by_process" in r:
             first = r.get("first_whole_grid_attempt", {})
-            outcome = f"whole-grid attempt: {first.get('outcome')} ({(first.get('failed_earlier_attempts') or [''])[0][:160]}); resubmitted split by MOS corner: {r['outcome']}"
+            outcome = f"whole-grid attempt: {first.get('outcome')} ({(first.get('first_attempt_diagnostic') or '')[:200]}); resubmitted split by MOS corner: {r['outcome']}"
             job = f"whole-grid {first.get('job_id')}; split {r['job_id']}"
         L.append(f"| {n} | `{rec['variant_options'][n] or 'method=gear trtol=50 (unchanged control)'}` | `{h.get('deck_sha256', '-')}` | `{h.get('request_sha256', '-')}` | {outcome} | {job} |")
         for k, hh in sorted(rec["provenance"]["hashes"].items()):
