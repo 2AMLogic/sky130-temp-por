@@ -41,7 +41,13 @@ that sweep.
 4. Error in degC = (PTAT_sample - PTAT_nominal) / S, with S the same-corner
    nominal full-range slope; 3 sigma = 3 x sample standard deviation per corner.
    Samples failing a physical operating-point guard at any of -40/27/125 C are
-   excluded, counted and disclosed.
+   excluded, counted and disclosed. The guards include a branch-consistency
+   check (V(NA)-V(NB) must agree across the three temperatures to 0.5 mV), so a
+   DC solution that jumps to another branch at a single temperature is caught.
+
+`record` can re-grade an existing run without re-simulating (`record --run-id
+<id> --supersedes <old record id>`); the record states the grading SHA next to
+the run SHA.
 
 ## Cold start (from a clean checkout)
 

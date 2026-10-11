@@ -44,7 +44,10 @@
     "isup_A": [1e-8, 5e-5],
     "na_nb_abs_diff_V": [0.0, 0.1],
     "ptat_monotonic": "PTAT(-40) < PTAT(27) < PTAT(125)",
-    "windows_source": "ptat/ctat/isup windows copied unchanged from sim/temp-core-startup-solver (#86); the NA/NB loop-closure and monotonic checks are specific to this DC-sweep bench",
+    "na_nb_T_spread_V": [0.0, 0.0005],
+    "na_nb_T_spread_definition": "branch consistency: max over T in {-40,27,125} C of |d(T) - median_T d|, d = V(NA)-V(NB). One device realisation keeps its amplifier offset across temperature (<= 0.32 mV spread on every on-branch sample of record 20261011-165400-69d13ac); a DC solution on another branch at a single temperature breaks loop closure there only. Added by the record that supersedes 20261011-165400-69d13ac (Judge review of PR #167).",
+    "offtrend_scan_degC": "disclosure only, not a guard: 27 C PTAT error vs the chord through the -40/125 C errors; samples passing every guard but above 2 degC are listed in the record",
+    "windows_source": "ptat/ctat/isup windows copied unchanged from sim/temp-core-startup-solver (#86); the NA/NB loop-closure, NA/NB branch-consistency and monotonic checks are specific to this DC-sweep bench",
     "operating_point_trust": "sim/temp-core-startup-solver/records/20261010-200708-47b96e5 (cited, not duplicated); its limits are inherited"
   },
   "measurement": "dc sweep of temperature; .meas dc FIND v(ptat)/v(ctat)/v(xdut.na)/v(xdut.nb)/i(vsup) AT=-40/27/125",

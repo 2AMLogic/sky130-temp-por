@@ -71,7 +71,18 @@ DEFAULT_SEED = 20261010
 GUARDS = {
     "ptat_V": (0.3, 2.6), "ctat_V": (0.2, 1.1), "isup_A": (1e-8, 5e-5),
     "na_nb_abs_diff_V": (0.0, 0.1),  # amplifier loop closed: |V(NA)-V(NB)| (offset+finite gain is mV-scale)
+    # Branch consistency (added after record 20261011-165400-69d13ac, Judge review of #167): the amplifier's
+    # input-referred error V(NA)-V(NB) of ONE device realisation is set by its offset + finite gain and moves
+    # only slowly with temperature (<= 0.32 mV over -40..125 C in every sample of that record that is on the
+    # physical branch, even with several mV of offset). A DC solution that lands on a different branch at a
+    # single temperature breaks loop closure there only, so the per-sample spread
+    # max_T |d(T) - median_T d|, d = V(NA)-V(NB), is the branch-jump signature. Window: 0.5 mV.
+    "na_nb_T_spread_V": (0.0, 5e-4),
 }
+BRANCH_GUARD = "na_nb_T_spread_V"
+# Secondary off-trend scan (disclosure only, not a guard): deviation of the 27 C PTAT error from the chord
+# through the -40 C and 125 C errors, in degC. Samples passing every guard but exceeding this are listed.
+OFFTREND_SCAN_DEGC = 2.0
 
 # ---------------------------------------------------------------------------------------------
 # terms: which temp_core instances belong to which attribution group.  Everything in bias_core and
@@ -368,8 +379,17 @@ def load_term(run_dir, term):
     return ent
 
 
-def guard_check(v):
-    """-> list of reason strings (empty = valid operating point at all three temperatures)."""
+def na_nb_T_spread(v):
+    d = [v[f"na_{tagT(t)}"] - v[f"nb_{tagT(t)}"] for t in TEMPS]
+    med = sorted(d)[len(d) // 2]
+    return max(abs(x - med) for x in d)
+
+
+def guard_check(v, branch_guard=True):
+    """-> list of reason strings (empty = valid operating point at all three temperatures).
+
+    branch_guard=False reproduces the guard set of record 20261011-165400-69d13ac (used only to report the
+    headline with and without the branch-consistency guard)."""
     if "_error" in v:
         return [v["_error"]]
     why = []
@@ -384,7 +404,19 @@ def guard_check(v):
     p = [v[f"ptat_{tagT(t)}"] for t in TEMPS]
     if not (p[0] < p[1] < p[2]):
         why.append("PTAT not monotonic in T over -40/27/125")
+    if branch_guard:
+        sp = na_nb_T_spread(v)
+        lo, hi = GUARDS[BRANCH_GUARD]
+        if not (math.isfinite(sp) and lo <= sp <= hi):
+            why.append(f"{BRANCH_GUARD}={sp:.4g} outside [{lo:g},{hi:g}] (V(NA)-V(NB) not consistent over T: suspected DC branch jump)")
     return why
+
+
+def offtrend_degC(v, nom):
+    """Deviation of the 27 C PTAT error from the chord through the -40/125 C errors, in degC (disclosure scan)."""
+    s_nom = (nom["ptat_p125"] - nom["ptat_m40"]) / (T_HI - T_LO)
+    e = [v[f"ptat_{tagT(t)}"] - nom[f"ptat_{tagT(t)}"] for t in TEMPS]
+    return (e[1] - (e[0] + (e[2] - e[0]) * (T_REF - T_LO) / (T_HI - T_LO))) / s_nom
 
 
 def errors(v, nom):
@@ -412,17 +444,17 @@ def stat(xs):
             "max_abs": max(abs(x) for x in xs) if n else float("nan")}
 
 
-def analyse_term(ent, nominal_ent):
+def analyse_term(ent, nominal_ent, branch_guard=True):
     """Per-(proc,supply) statistics for one mismatch term."""
     res = {}
     for key, samples in sorted(ent["corners"].items()):
         nom = nominal_ent["corners"].get(key, {}).get(None)
-        nom_why = guard_check(nom) if nom else ["nominal point missing"]
+        nom_why = guard_check(nom, branch_guard) if nom else ["nominal point missing"]
         invalid = []
         errs = {}
         valid_vals = {}
         for smp, v in sorted(samples.items()):
-            why = guard_check(v)
+            why = guard_check(v, branch_guard)
             if why:
                 invalid.append({"sample": smp, "reasons": why})
             elif not nom_why:
@@ -430,6 +462,9 @@ def analyse_term(ent, nominal_ent):
                 for k, e in errors(v, nom).items():
                     errs.setdefault(k, []).append(e)
         res[key] = {"n_total": len(samples), "n_valid": len(valid_vals), "invalid": invalid, "nominal_invalid": nom_why,
+                    "offtrend": sorted(((smp, offtrend_degC(v, nom)) for smp, v in valid_vals.items()
+                                        if abs(offtrend_degC(v, nom)) > OFFTREND_SCAN_DEGC), key=lambda x: -abs(x[1])),
+                    "max_abs_offtrend_degC": max((abs(offtrend_degC(v, nom)) for v in valid_vals.values()), default=None),
                     "stats": {k: stat(xs) for k, xs in errs.items()},
                     "max_dev_from_nominal_V": (max(abs(v[f"ptat_{tagT(t)}"] - nom[f"ptat_{tagT(t)}"]) for v in valid_vals.values() for t in TEMPS)
                                                if valid_vals and nom else None)}
@@ -519,7 +554,10 @@ def cmd_record(args):
         sys.exit(f"refusing to overwrite record {rid}")
     if git["dirty"] and not args.allow_dirty:
         sys.exit("the run was made from a DIRTY tree: this record would not be provenance-clean (re-run from a clean commit)")
-    ents = {t: load_term(run_dir, t) for t in ["nominal", *RUN_TERMS]}
+    grade_git = cr.git_state()  # the analysis code that graded the run (may be later than the run SHA on a re-grade)
+    if grade_git.get("dirty") and not args.allow_dirty:
+        sys.exit("the grading tree is DIRTY: commit the analysis code first so the record is provenance-clean")
+    ents ={t: load_term(run_dir, t) for t in ["nominal", *RUN_TERMS]}
     nominal = ents["nominal"]
     for d in ("records", "netlist-snapshots", "corners"):
         (rec_dir / d).mkdir(exist_ok=True)
@@ -527,6 +565,7 @@ def cmd_record(args):
     snap.mkdir()
     cdir.mkdir()
     anal, summ, summ_ctat, fleet = {}, {}, {}, {}
+    summ_legacy, branch_suspects = {}, {}
     for t, ent in ents.items():
         if t == "nominal":
             subs = [(None, run_dir / t)]
@@ -554,6 +593,22 @@ def cmd_record(args):
             write_samples_csv(cdir / f"samples-{t}.csv", t, ent, anal[t])
             summ[t] = term_summary(anal[t], "ptat")
             summ_ctat[t] = term_summary(anal[t], "ctat")
+            # with/without: the same data graded WITHOUT the branch-consistency guard (= the superseded guard set)
+            legacy = analyse_term(ent, nominal, branch_guard=False)
+            summ_legacy[t] = term_summary(legacy, "ptat")
+            sus = []
+            for key, cs in sorted(anal[t].items()):
+                old_bad = {i["sample"] for i in legacy[key]["invalid"]}
+                nom = nominal["corners"][key][None]
+                for i in cs["invalid"]:
+                    if i["sample"] in old_bad:
+                        continue
+                    v = ent["corners"][key][i["sample"]]
+                    sus.append({"corner": f"{key[0]}_{key[1]:.2f}V", "sample": i["sample"],
+                                "na_minus_nb_mV": {T: 1e3 * (v[f"na_{tagT(T)}"] - v[f"nb_{tagT(T)}"]) for T in TEMPS},
+                                "ptat_minus_nominal_mV": {T: 1e3 * (v[f"ptat_{tagT(T)}"] - nom[f"ptat_{tagT(T)}"]) for T in TEMPS},
+                                "offtrend_degC": offtrend_degC(v, nom)})
+            branch_suspects[t] = sus
     # nominal per-corner logs
     if nominal["report"]:
         for c in nominal["report"]["corners"]:
@@ -583,9 +638,12 @@ def cmd_record(args):
            "git": git, "klt": klt_client, "backend": meta["klt_sim_backend_env"], "run_id": args.run_id,
            "n_per_corner": meta["n"], "seed": meta["seed"], "guards": GUARDS, "groups": GROUPS, "fleet": fleet,
            "not_run_terms": not_run, "partial_terms_missing_process_sections": partial, "summary_ptat": summ, "summary_ctat": summ_ctat, "rss_check": rss, "controls": ctrl,
-           "transient_crosscheck": xcheck, "resumes": meta.get("resumes", []),
+           "transient_crosscheck": xcheck, "resumes": meta.get("resumes", []), "graded_at_git": grade_git,
+           "summary_ptat_without_branch_guard": summ_legacy, "branch_guard_suspects": branch_suspects,
+           "offtrend_scan_threshold_degC": OFFTREND_SCAN_DEGC,
            "per_corner": {t: {f"{k[0]}_{k[1]:.2f}V": {"n_total": v["n_total"], "n_valid": v["n_valid"], "n_invalid": len(v["invalid"]),
                                                        "invalid": v["invalid"][:50], "nominal_invalid": v["nominal_invalid"],
+                                                       "offtrend_over_threshold": v["offtrend"], "max_abs_offtrend_degC": v["max_abs_offtrend_degC"],
                                                        "stats": {f"{a}|{b}|{c}": s for (a, b, c), s in v["stats"].items()}}
                               for k, v in a.items()} for t, a in anal.items() if a},
            "supersedes": args.supersedes or "(none)", "author": cr.default_author()}
@@ -607,11 +665,18 @@ def render_md(rec, anal, summ, summ_ctat, rss, ctrl, xcheck, not_run, fleet, met
          f"- **Tools**: {rec['klt']} (client); backend `{rec['backend']}`; fleet engine ngspice-{next((f['engine_version'] for f in fleet.values() if f.get('engine_version')), '?')}; fleet jobs: "
          + ", ".join(f"{t}[{k}]={j['job_id']}" for t, f in fleet.items() for k, j in f["jobs"].items()),
          f"- **Repo state**: `{git['sha']}` on `{git['branch']}` (working tree {'DIRTY' if git['dirty'] else 'clean'} at run time)"
-         + "".join(f"; resumed {r['started_utc']} at `{r['git']['sha']}` ({'DIRTY' if r['git']['dirty'] else 'clean'})" for r in meta.get("resumes", [])),
+         + "".join(f"; resumed {r['started_utc']} at `{r['git']['sha']}` ({'DIRTY' if r['git']['dirty'] else 'clean'})" for r in meta.get("resumes", []))
+         + f"; graded (analysis code) at `{rec['graded_at_git']['sha']}` (working tree {'DIRTY' if rec['graded_at_git']['dirty'] else 'clean'})",
          f"- **PVT + MC settings**: process tt/ss/ff/sf/fs (`<p>_mm` sections) x supply 2.97/3.30/3.63 V = 15 corners; temperature swept -40..125 C (step 1) inside each ngspice process, evaluated at -40/27/125 C; Monte Carlo `vary: mismatch`, **N = {N} samples per corner per term**, base seed {meta['seed']} (all terms share it)",
          "- **Statistical convention**: **3 sigma = 3 x the sample standard deviation (n-1) of the temperature error over the valid Monte Carlo samples of one PVT corner**, i.e. a +/-3 sigma half-width about the sample mean; mean and empirical max |error| are tabulated alongside. Global process MC (`MC_PR_SWITCH`) is NOT sampled: the process axis is the five corner sections, mismatch is local only.",
          "- **Error definition**: `err(T) = (PTAT_sample(T) - PTAT_nominal(T)) / S` where nominal is the same-corner no-mismatch run and `S = (PTAT_nom(125 C) - PTAT_nom(-40 C))/165 C` (degC from volts via the nominal full-range slope). *Untrimmed* = as-is. *1-point trim* = ideal multiplicative gain trim so PTAT(27 C) equals nominal at 27 C, error evaluated at -40 and 125 C (27 C is zero by construction; trim resolution/quantization not modelled).",
-         f"- **Operating-point trust**: DC sweep (not a cold-start transient). Operating-point trust is taken from the #86 solver-sweep record `{SOLVER_RECORD}` and its limits are inherited (six historical FAILs not reproduced on the current netlist, but some variant combos NOT-RUN; the original FAIL records remain). Physical guards applied to EVERY sample at all three temperatures: " + "; ".join(f"{k} in [{lo:g},{hi:g}]" for k, (lo, hi) in GUARDS.items()) + "; PTAT strictly increasing over -40/27/125 C. A sample failing any guard is INVALID: excluded from the statistics, never trimmed or substituted, and counted below.", ""]
+         f"- **Operating-point trust**: DC sweep (not a cold-start transient). Operating-point trust is taken from the #86 solver-sweep record `{SOLVER_RECORD}` and its limits are inherited (six historical FAILs not reproduced on the current netlist, but some variant combos NOT-RUN; the original FAIL records remain). Physical guards applied to EVERY sample at all three temperatures: " + "; ".join(f"{k} in [{lo:g},{hi:g}]" for k, (lo, hi) in GUARDS.items() if k != BRANCH_GUARD) + "; PTAT strictly increasing over -40/27/125 C; **branch consistency** `" + BRANCH_GUARD + f"` = max over T of |d(T) - median_T d|, d = V(NA)-V(NB), in [{GUARDS[BRANCH_GUARD][0]:g},{GUARDS[BRANCH_GUARD][1]:g}] V (one device realisation keeps its amplifier offset across temperature; a DC solution on another branch at one temperature breaks loop closure there only). A sample failing any guard is INVALID: excluded from the statistics, never trimmed or substituted, and counted below.", ""]
+    if rec["supersedes"] != "(none)":
+        L += [f"**Supersedes `{rec['supersedes']}`** (that record is left untouched; records are append-only). This is a **re-grade of the same fleet outputs** "
+              f"(run id `{rec['run_id']}`, the same {sum(len(f['jobs']) for f in fleet.values())} fleet job ids listed above); **no new simulation was run**. "
+              "The only change is the analysis: the branch-consistency guard above was added because the superseded record's guards (absolute windows plus "
+              "PTAT monotonicity over three points) could not see a single-temperature jump to another DC solution, and one such sample set its 1-point-trim "
+              "headline. The headline is reported below with and without the newly excluded samples.", ""]
     if not_run:
         L += [f"**PARTIAL: terms NOT-RUN (fleet refusal/timeout): {', '.join(not_run)}.** Nothing was substituted by a local grid.", ""]
     if rec.get("partial_terms_missing_process_sections"):
@@ -628,6 +693,21 @@ def render_md(rec, anal, summ, summ_ctat, rss, ctrl, xcheck, not_run, fleet, met
             L.append(f"| all terms, {name} | **{f3(m['worst_corner']['k3sd'], 2)}** (`{m['worst_corner']['corner']}`, at {m['worst_corner']['at_T']} C) | "
                      f"{f3(tt['k3sd'], 2) if tt else 'n/a'} | {f3(m['pooled_worst'], 2)} |")
         L += ["", "DR-003 row-2 targets for reference: untrimmed +/-3 C, 1-point trim +/-1.5 C (a comparison of figures only; this record ratifies nothing).", ""]
+        leg = rec["summary_ptat_without_branch_guard"]
+        L += ["### Headline with and without the branch-consistency guard (same data)", "",
+              "| term | mode | WITH suspected branch jumps (superseded guard set): worst corner / tt 3.30 / pooled | branch-jump samples EXCLUDED (this record): worst corner / tt 3.30 / pooled | valid / total (with -> excluded) |",
+              "|---|---|---|---|---|"]
+
+        def trio(m):
+            return (f"{f3(m['worst_corner']['k3sd'], 2)} (`{m['worst_corner']['corner']}`, {m['worst_corner']['at_T']} C) / "
+                    f"{f3(m['tt_3p30']['k3sd'], 2) if m['tt_3p30'] else 'n/a'} / {f3(m['pooled_worst'], 2)}")
+        for t in [*TERMS, "all"]:
+            if t not in summ or not summ[t]["untrimmed"] or t not in leg or not leg[t]["untrimmed"]:
+                continue
+            for mode in ("untrimmed", "trim1"):
+                o, n_ = leg[t][mode], summ[t][mode]
+                L.append(f"| {t} | {mode} | {trio(o)} | {trio(n_)} | {o['n_valid']} -> {n_['n_valid']} / {n_['n_total']} |")
+        L += ["", "Only the rows whose figures move are affected by the excluded samples; see \"Branch-consistency scan\" below for the samples themselves.", ""]
     else:
         L += ["The `all`-terms aggregate is NOT AVAILABLE (term not run / no valid samples); no aggregate figure is claimed.", ""]
     # attribution
@@ -678,8 +758,26 @@ def render_md(rec, anal, summ, summ_ctat, rss, ctrl, xcheck, not_run, fleet, met
         for mode in ("untrimmed", "trim1"):
             m = c[mode]
             L.append(f"| {mode} | {f3(m['worst_corner']['k3sd'], 2)} (`{m['worst_corner']['corner']}`) | {f3(m['tt_3p30']['k3sd'], 2) if m['tt_3p30'] else 'n/a'} | {f3(m['pooled_worst'], 2)} |")
+    # branch-consistency scan
+    sus = rec["branch_guard_suspects"]
+    n_sus = sum(len(v) for v in sus.values())
+    L += ["", "## Branch-consistency scan (suspected DC branch jumps; excluded)", "",
+          f"Every sample of every term and all 15 corners was scanned for the branch-jump signature. Samples that passed every guard of the superseded record but fail the branch-consistency guard: **{n_sus}** in total ("
+          + ", ".join(f"{t}: {len(sus.get(t, []))}" for t in RUN_TERMS if t in sus) + "). They are excluded from every statistic in this record and listed here:", ""]
+    if n_sus:
+        L += ["| term | corner | sample | V(NA)-V(NB) mV at -40 / 27 / 125 C | PTAT - nominal mV at -40 / 27 / 125 C | 27 C off-chord (degC) |", "|---|---|---|---|---|---|"]
+        for t in RUN_TERMS:
+            for s in sus.get(t, []):
+                d, p = s["na_minus_nb_mV"], s["ptat_minus_nominal_mV"]
+                L.append(f"| {t} | {s['corner']} | {s['sample']} | {' / '.join(f'{d[T]:.2f}' for T in TEMPS)} | {' / '.join(f'{p[T]:.1f}' for T in TEMPS)} | {s['offtrend_degC']:.2f} |")
+        L.append("")
+    off = [(t, f"{k[0]}_{k[1]:.2f}V", smp, x) for t in RUN_TERMS if t in anal and anal[t] for k, cs in sorted(anal[t].items()) for smp, x in cs["offtrend"]]
+    mx = max((cs["max_abs_offtrend_degC"] or 0.0) for t in RUN_TERMS if t in anal and anal[t] for cs in anal[t].values())
+    L += [f"Secondary off-trend scan (disclosure only, not a guard; three evaluation temperatures are all the sample CSVs hold, the dense sweep is not kept): deviation of the 27 C PTAT error from the chord through the -40 C and 125 C errors, over every sample that passes all guards in this record. "
+          f"Largest |deviation| = {mx:.2f} degC; samples above {OFFTREND_SCAN_DEGC:g} degC: "
+          + (", ".join(f"{t} {c} #{s} ({x:.2f})" for t, c, s, x in off) if off else "**none**") + ".", ""]
     # validity
-    L += ["", "## Operating-point guards: invalid samples (disclosed, excluded)", "", "| term | invalid / total | corners affected |", "|---|---|---|"]
+    L += ["## Operating-point guards: invalid samples (disclosed, excluded)", "", "| term | invalid / total | corners affected |", "|---|---|---|"]
     for t in [*RUN_TERMS]:
         if t not in anal or not anal[t]:
             L.append(f"| {t} | NOT-RUN | |")
@@ -715,7 +813,9 @@ def render_md(rec, anal, summ, summ_ctat, rss, ctrl, xcheck, not_run, fleet, met
           "- **Dynamic behaviour**: DC solutions only; cold-start and supply-ramp behaviour is #86's and the startup campaigns' business, not re-measured here. This campaign shares #86's inherited limits.",
           "- **Trim**: the 1-point trim is an ideal continuous gain correction; the physical strap-ladder resolution and its own mismatch are not modelled.",
           "- **Readout chain**: error is referred through the nominal PTAT slope; no ADC/buffer/pad load. Supply sensitivity beyond the three supply points is not swept.",
-          "- Terms listed under NOT-RUN above (if any) are unmeasured; the `all` row then still includes their physics but their individual share is unknown.", ""]
+          ("- **NOT-RUN terms**: " + ", ".join(not_run) + " -- unmeasured; the `all` row still includes their physics but their individual share is unknown."
+           if not_run else "- **Statistical resolution**: N = " + str(N) + " samples per corner gives a coarse sigma estimate (chi-square 95 % interval on a per-corner sigma at n = 30: about -20 % / +34 %); every term, the `none` control and the `nominal` reference ran on all 15 corners (none NOT-RUN)."),
+          "- **Branch detection resolution**: the branch-consistency guard sees only the three evaluation temperatures stored per sample; a branch excursion confined strictly between -40, 27 and 125 C would not be seen (the dense -40..125 C sweep is evaluated by `.meas` only at those points).", ""]
     L += ["## Links", "", f"- driver `sim/{SLUG}/run_accuracy_mc.py`; json twin `records/{rid}.json`; netlists and requests `netlist-snapshots/{rid}/`; raw per-sample values `corners/{rid}/samples-<term>.csv`; nominal points `corners/{rid}/nominal_*.log`",
           f"- **Timestamp**: {rec['timestamp']}", f"- **Author**: {rec['author']}", f"- **Supersedes**: {rec['supersedes']}"]
     return "\n".join(L)
