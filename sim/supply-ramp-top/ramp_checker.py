@@ -51,7 +51,14 @@ import sys
 from pathlib import Path
 
 sys.path.insert(0, str(Path(__file__).resolve().parents[1] / "bin"))
-from sim_common import load_wave  # noqa: E402,F401  (shared hardened loader)
+from sim_common import (  # noqa: E402,F401  (shared hardened loader + waveform primitives)
+    crossings,
+    interp_at,
+    interp_cross,
+    load_wave,
+    schmitt,
+    write_gz_rows,
+)
 
 # --- exploratory grading constants (NOT ratified bounds) -------------------
 FRAC_IL = 0.2
@@ -93,58 +100,6 @@ PHYS_NODES = (
 # --------------------------------------------------------------------------
 # primitives
 # --------------------------------------------------------------------------
-
-
-def _interp_cross(t0, y0, t1, y1, level):
-    if y1 == y0:
-        return t1
-    return t0 + (level - y0) * (t1 - t0) / (y1 - y0)
-
-
-def crossings(t, y, level, direction):
-    """Interpolated crossing times of ``level`` ('rise' or 'fall'), t > 0."""
-    out = []
-    for i in range(1, len(t)):
-        if t[i] <= 0:
-            continue
-        a, b = y[i - 1], y[i]
-        if direction == "rise" and a < level <= b:
-            out.append(_interp_cross(t[i - 1], a, t[i], b, level))
-        elif direction == "fall" and a > level >= b:
-            out.append(_interp_cross(t[i - 1], a, t[i], b, level))
-    return out
-
-
-def interp_at(t, y, when):
-    if when <= t[0]:
-        return y[0]
-    if when >= t[-1]:
-        return y[-1]
-    lo, hi = 0, len(t) - 1
-    while hi - lo > 1:
-        mid = (lo + hi) // 2
-        if t[mid] <= when:
-            lo = mid
-        else:
-            hi = mid
-    return y[lo] + (when - t[lo]) * (y[hi] - y[lo]) / (t[hi] - t[lo]) if t[hi] != t[lo] else y[hi]
-
-
-def schmitt(t, y, lo, hi):
-    """Return (rise_times, fall_times) of a LOW-initial two-threshold detector."""
-    state = False
-    rises, falls = [], []
-    for i in range(1, len(t)):
-        if t[i] <= 0:
-            continue
-        a, b = y[i - 1], y[i]
-        if not state and b >= hi:
-            rises.append(_interp_cross(t[i - 1], a, t[i], b, hi) if a < hi else t[i])
-            state = True
-        elif state and b <= lo:
-            falls.append(_interp_cross(t[i - 1], a, t[i], b, lo) if a > lo else t[i])
-            state = False
-    return rises, falls
 
 
 def runt_episodes(t, y, v_runt, v_ih):
@@ -407,11 +362,7 @@ def transitions_from_stored(rows: list[list[float]], vf: float) -> dict:
 
 
 def write_trace(path: Path, rows: list[list[float]]) -> None:
-    path.parent.mkdir(parents=True, exist_ok=True)
-    lines = ["# t_s,vdd_v,resetn_v,por_raw_v,ibias_v  (change-triggered, dV>=2mV or dt>=1ms)"]
-    lines += [",".join(f"{x:.6g}" for x in r) for r in rows]
-    with gzip.open(path, "wt", compresslevel=9) as fh:
-        fh.write("\n".join(lines) + "\n")
+    write_gz_rows(path, "# t_s,vdd_v,resetn_v,por_raw_v,ibias_v  (change-triggered, dV>=2mV or dt>=1ms)", rows)
 
 
 def read_trace(path: Path) -> list[list[float]]:
