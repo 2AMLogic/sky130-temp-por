@@ -184,7 +184,7 @@ class Accounting(unittest.TestCase):
             (here).mkdir()
             (build / "run1" / "run.json").write_text(json.dumps({"klt_client": "test", "source": {"dirty": False}}))
             gi = {"sha": "abc1234", "sha_full": "abc1234" + "0" * 33, "branch": "t", "dirty": False, "pushed_to_remote": True, "remote_branches": []}
-            ns = mock.Mock(run_id="run1", notes_file=None, author="t", supersedes=None, allow_dirty=False, allow_deck_drift=False)
+            ns = mock.Mock(run_id="run1", variant=None, compare_source=None, notes_file=None, author="t", supersedes=None, allow_dirty=False, allow_deck_drift=False)
             with mock.patch.object(rb, "BUILD", build), mock.patch.object(rb, "HERE", here), mock.patch.object(rb, "datetime", FixedDT), mock.patch.object(rb, "source_state", return_value=gi):
                 self.assertEqual(rb.cmd_record(ns), 0)
                 rec = json.loads(next((here / "records").glob("*.json")).read_text())
@@ -207,7 +207,7 @@ class Accounting(unittest.TestCase):
         with tempfile.TemporaryDirectory() as td:
             gi = {"sha": "abc1234", "sha_full": "b" * 40, "branch": "t", "dirty": True, "pushed_to_remote": True, "remote_branches": []}
             build, here = self._record_env(Path(td), gi)
-            ns = mock.Mock(run_id="run1", notes_file=None, author="t", supersedes=None, allow_dirty=False, allow_deck_drift=False)
+            ns = mock.Mock(run_id="run1", variant=None, compare_source=None, notes_file=None, author="t", supersedes=None, allow_dirty=False, allow_deck_drift=False)
             with mock.patch.object(rb, "BUILD", build), mock.patch.object(rb, "HERE", here), mock.patch.object(rb, "source_state", return_value=gi):
                 with self.assertRaises(SystemExit):
                     rb.cmd_record(ns)
@@ -217,7 +217,7 @@ class Accounting(unittest.TestCase):
         with tempfile.TemporaryDirectory() as td:
             gi = {"sha": "abc1234", "sha_full": "b" * 40, "branch": "t", "dirty": False, "pushed_to_remote": True, "remote_branches": []}
             build, here = self._record_env(Path(td), gi)
-            ns = mock.Mock(run_id="run1", notes_file=None, author="t", supersedes=None, allow_dirty=False, allow_deck_drift=False)
+            ns = mock.Mock(run_id="run1", variant=None, compare_source=None, notes_file=None, author="t", supersedes=None, allow_dirty=False, allow_deck_drift=False)
             with mock.patch.object(rb, "BUILD", build), mock.patch.object(rb, "HERE", here), mock.patch.object(rb, "source_state", return_value=gi), \
                     mock.patch.object(rb, "deck_drift", return_value=["design/netlist/temp_por_top.spice"]):
                 with self.assertRaises(SystemExit):
@@ -228,6 +228,133 @@ class Accounting(unittest.TestCase):
         head = subprocess.run(["git", "-C", str(rb.REPO_ROOT), "rev-parse", "HEAD"], capture_output=True, text=True).stdout.strip()
         self.assertEqual(rb.deck_drift(head, head), [])
         self.assertIsNone(rb.deck_drift(None, head))
+
+
+class SolverVariantDeck(unittest.TestCase):
+    """The tightened-deck variant (issue #153): only the declared .options line and the banner may differ."""
+
+    head = "* head\n.options method=gear trtol=50\n.save v(vdd)\n"
+
+    def test_default_variant_leaves_deck_identical(self):
+        r = rb.plan_requests(MAN)[0]
+        self.assertNotIn("reltol", rb.build_netlist(self.head, r))
+        self.assertEqual(rb.build_netlist(self.head, r), rb.build_netlist(self.head, r, MAN, "default"))
+        self.assertEqual(rb.build_netlist(self.head, r), rb.build_netlist(self.head, r, MAN, None))
+
+    def test_variant_changes_only_options_line_and_banner(self):
+        r = rb.plan_requests(MAN)[0]
+        a = rb.build_netlist(self.head, r)
+        b = rb.build_netlist(self.head, r, MAN, "reltol2e-4")
+        self.assertIn(".options method=gear trtol=50 reltol=2e-4", b)
+        added = [ln for ln in b.splitlines() if ln not in a.splitlines()]
+        self.assertTrue(all(ln.startswith("*") or ln.startswith(".options") for ln in added), added)
+        self.assertIn(f".param rup={r['rup']:g} t0={r['t0']:g} vlow={r['vlow']:g} th={r['th']:g} sf={r['sf']:g} sr={r['sr']:g}", b)
+        a_code = [ln for ln in a.splitlines() if not ln.startswith("*")]
+        b_code = [ln for ln in b.splitlines() if not ln.startswith("*")]
+        self.assertEqual(len(a_code), len(b_code))
+        for la, lb in zip(a_code, b_code):
+            if la.startswith(".options"):
+                self.assertEqual(lb, la + " reltol=2e-4")
+            else:
+                self.assertEqual(la, lb)
+
+    def test_variant_keeps_method_and_trtol(self):
+        r = rb.plan_requests(MAN)[0]
+        b = rb.build_netlist(self.head, r, MAN, "reltol2e-4")
+        self.assertIn("method=gear trtol=50", b)
+
+    def test_undeclared_variant_refuses(self):
+        with self.assertRaises(SystemExit):
+            rb.variant_of(MAN, "trtol7")
+        with self.assertRaises(SystemExit):
+            rb.build_netlist(self.head, rb.plan_requests(MAN)[0], MAN, "trtol7")
+
+    def test_head_without_declared_options_line_refuses(self):
+        with self.assertRaises(SystemExit):
+            rb.build_netlist("* head\n", rb.plan_requests(MAN)[0], MAN, "reltol2e-4")
+
+    def test_fleet_request_is_variant_independent(self):
+        r = rb.plan_requests(MAN)[0]
+        self.assertEqual(rb.build_request(r, MAN, "batch"), rb.build_request(r, MAN, "batch"))
+
+
+class TightenedRerunDeclared(unittest.TestCase):
+    """The predeclared #153 rerun set must be tied to the committed source record."""
+
+    SRC = HERE.parent / "records" / "20261010-222529-41bde9f.json"
+
+    def test_manifest_declares_variant_and_rerun(self):
+        self.assertEqual(MAN["solver_variants"]["default"]["options_extra"], [])
+        v = MAN["solver_variants"]["reltol2e-4"]
+        self.assertEqual(v["options_extra"], ["reltol=2e-4"])
+        rr = MAN["tightened_rerun"]
+        self.assertEqual(rr["variant"], "reltol2e-4")
+        self.assertIn("20261010-222529-41bde9f", rr["source_record"])
+        self.assertIn("UNCHANGED", rr["physicality_bounds"])
+        self.assertIn("STAYS NONPHYSICAL", rr["physicality_bounds"])
+
+    @unittest.skipUnless(SRC.is_file(), "source record not on disk")
+    def test_rerun_set_covers_every_source_nonphysical_point(self):
+        src = json.loads(self.SRC.read_text())
+        self.assertEqual(len(src["points"]), 945)
+        nonphys: dict = {}
+        for p in src["points"]:
+            if p["outcome"] == "NONPHYSICAL":
+                nonphys[p["tag"]] = nonphys.get(p["tag"], 0) + 1
+        tags = {r["tag"] for r in rb.plan_requests(MAN)}
+        self.assertEqual(sum(nonphys.values()), 673)
+        self.assertEqual(set(nonphys), tags)  # every request holds >= 1 target, so whole-request reruns cover the set
+
+
+def _cpt(tag, cid, outcome, runtime=None, phys=None, codes=()):
+    pt = {"tag": tag, "id": cid, "process": "tt", "temperature_c": 27, "supply_v": 3.3, "outcome": outcome, "runtime_s": runtime}
+    if outcome == "NOT_COVERED":
+        pt["reason"] = "fleet refused"
+    else:
+        pt["check"] = {"physical": {} if phys is None else {"ok": phys}, "fail_codes": list(codes), "unresolved_reasons": []}
+    return pt
+
+
+class Comparison(unittest.TestCase):
+    SRC_1 = {"record_id": "src-1", "points": [_cpt("a", "p1", "NONPHYSICAL", 10.0), _cpt("a", "p2", "PASS", 12.0)]}
+
+    def test_every_point_joined_exactly_once(self):
+        rerun = [_cpt("a", "p1", "PASS", 20.0, phys=True), _cpt("a", "p2", "NONPHYSICAL", 24.0, phys=False)]
+        cmp = rb.build_comparison(self.SRC_1, rerun)
+        self.assertEqual(cmp["points_compared"], 2)
+        self.assertEqual(cmp["source_record"], "src-1")
+        self.assertEqual(cmp["transition_matrix"]["NONPHYSICAL"]["PASS"], 1)
+        self.assertEqual(cmp["transition_matrix"]["PASS"]["NONPHYSICAL"], 1)
+        self.assertEqual(cmp["targets"]["n"], 1)
+        self.assertEqual(cmp["targets"]["transitions"], {"PASS": 1})
+        self.assertEqual(cmp["controls"]["n"], 1)
+        self.assertEqual(cmp["controls"]["n_changed"], 1)
+        self.assertEqual(cmp["runtime_ratio"]["median_ratio"], 2.0)
+        self.assertTrue(rb.render_comparison_md(cmp))
+
+    def test_broken_joins_refuse(self):
+        with self.assertRaises(SystemExit):  # rerun point absent from source
+            rb.build_comparison({"record_id": "s", "points": []}, [_cpt("a", "p1", "PASS")])
+        with self.assertRaises(SystemExit):  # source point with no rerun row
+            rb.build_comparison({"record_id": "s", "points": [_cpt("a", "p1", "PASS")]}, [])
+        with self.assertRaises(SystemExit):  # duplicate source rows
+            rb.build_comparison({"record_id": "s", "points": [_cpt("a", "p1", "PASS"), _cpt("a", "p1", "FAIL")]}, [_cpt("a", "p1", "PASS")])
+
+    def test_not_covered_and_error_kept_not_dropped(self):
+        rerun = [{"tag": "a", "id": "p1", "process": "tt", "temperature_c": 27, "supply_v": 3.3, "outcome": "NOT_COVERED", "reason": "fleet refused", "runtime_s": None}]
+        cmp = rb.build_comparison({"record_id": "s", "points": [_cpt("a", "p1", "NONPHYSICAL", 10.0)]}, rerun)
+        self.assertEqual(cmp["transition_matrix"]["NONPHYSICAL"]["NOT_COVERED"], 1)
+        self.assertIsNone(cmp["rows"][0]["tightened_physical"])
+        self.assertIn("refused", cmp["rows"][0]["tightened_note"])
+        rerun2 = [_cpt("a", "p1", "ERROR", runtime=None)]
+        cmp2 = rb.build_comparison({"record_id": "s", "points": [_cpt("a", "p1", "NONPHYSICAL", 10.0)]}, rerun2)
+        self.assertEqual(cmp2["transition_matrix"]["NONPHYSICAL"]["ERROR"], 1)
+        self.assertIsNone(cmp2["rows"][0]["tightened_physical"])
+
+    def test_fail_codes_surfaced_in_note(self):
+        rerun = [_cpt("a", "p1", "FAIL", 20.0, phys=True, codes=("reassert_chatter",))]
+        cmp = rb.build_comparison({"record_id": "s", "points": [_cpt("a", "p1", "NONPHYSICAL", 10.0)]}, rerun)
+        self.assertEqual(cmp["rows"][0]["tightened_note"], "reassert_chatter")
 
 
 if __name__ == "__main__":

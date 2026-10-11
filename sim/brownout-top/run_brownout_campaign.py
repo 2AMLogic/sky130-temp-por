@@ -127,6 +127,31 @@ def tmax_of(req: dict, man: dict) -> float:
 # --------------------------------------------------------------------------
 
 
+# --------------------------------------------------------------------------
+# declared solver variants (experiment.json solver_variants)
+# --------------------------------------------------------------------------
+
+
+def variant_of(man: dict, key: str | None) -> dict:
+    """Resolve a declared solver variant; an undeclared key is refused (predeclaration is enforced here)."""
+    variants = man.get("solver_variants") or {}
+    key = key or "default"
+    if key not in variants:
+        raise SystemExit(f"solver variant '{key}' is not declared in {MANIFEST.name} solver_variants (declared: {sorted(variants)})")
+    return {"key": key, **variants[key]}
+
+
+def apply_variant(head: str, variant: dict) -> str:
+    """Append the declared extra options to the testbench's single declared .options line.  Nothing else may change."""
+    extra = list(variant.get("options_extra") or [])
+    if not extra:
+        return head
+    marker = ".options method=gear trtol=50"
+    if head.count(marker) != 1:
+        raise SystemExit(f"solver variant {variant['key']}: expected exactly one '{marker}' line in the netlisted testbench head")
+    return head.replace(marker, marker + " " + " ".join(extra), 1)
+
+
 def tb_netlist_head(run_dir: Path, pdk) -> str:
     """Netlist the testbench with xschem; keep only the testbench part (DUT comes from the committed export)."""
     produced = cr.netlist_with_xschem(TB_SCH, run_dir / "tb", pdk)
@@ -135,7 +160,7 @@ def tb_netlist_head(run_dir: Path, pdk) -> str:
     return "\n".join(ln for ln in head.splitlines() if ln.strip().lower() != ".end") + "\n"
 
 
-def build_netlist(head: str, req: dict) -> str:
+def build_netlist(head: str, req: dict, man: dict | None = None, variant_key: str | None = None) -> str:
     dut = DUT_NETLIST.read_text()
     dut = "\n".join(ln for ln in dut.splitlines() if ln.strip().lower() != ".end") + "\n"
     banner = (
@@ -146,6 +171,15 @@ def build_netlist(head: str, req: dict) -> str:
         "* ignores options.ngspice_init (see experiment.json fleet.ngspice_note)\n"
         ".control\nset ng_nomodcheck\n.endc\n"
     )
+    if variant_key:
+        if man is None:
+            raise SystemExit("a solver variant needs the manifest")
+        v = variant_of(man, variant_key)
+        head = apply_variant(head, v)
+        if v["key"] != "default":
+            banner += (f"* solver variant {v['key']}: {v.get('label', '')}\n"
+                       f"* .options {' '.join(v.get('options_extra') or [])} appended to the declared default line "
+                       "(experiment.json solver_variants); circuit, stimulus, windows and checker unchanged\n")
     return banner + head + "\n" + dut
 
 
@@ -172,7 +206,7 @@ def build_request(req: dict, man: dict, backend: str, capacity_wait_s: float = 0
     return r
 
 
-def submit_one(req: dict, head: str, man: dict, run_dir: Path, capacity_wait_s: float = 0) -> dict:
+def submit_one(req: dict, head: str, man: dict, run_dir: Path, capacity_wait_s: float = 0, variant_key: str | None = None) -> dict:
     """Write netlist + request and run ``klt sim --backend batch``; an earlier attempt is archived, never overwritten."""
     d = run_dir / req["tag"]
     d.mkdir(parents=True, exist_ok=True)
@@ -184,7 +218,7 @@ def submit_one(req: dict, head: str, man: dict, run_dir: Path, capacity_wait_s: 
         for name in ("report.json", "klt.stderr"):
             if (d / name).is_file():
                 shutil.move(str(d / name), str(d / f"attempt{n}" / name))
-    (d / "netlist.spice").write_text(build_netlist(head, req))
+    (d / "netlist.spice").write_text(build_netlist(head, req, man, variant_key))
     (d / "request.json").write_text(json.dumps(build_request(req, man, "batch", capacity_wait_s), indent=2) + "\n")
     say(f"[submit] {req['tag']}: {declared_counts(man)['points_per_request']} points -> batch fleet")
     p = subprocess.run(["klt", "sim", str(d / "request.json"), "--backend", "batch", "-o", str(d / "out"), "--format", "json"],
@@ -246,12 +280,19 @@ def cmd_run(args) -> int:
     gi = source_state()
     if (gi["dirty"] or not gi["pushed_to_remote"]) and not args.allow_dirty:
         raise SystemExit(f"refusing to submit: dirty={gi['dirty']} pushed={gi['pushed_to_remote']} (commit + push first, or --allow-dirty; the state is recorded either way)")
+    variant_key = args.variant or "default"
+    variant_of(man, variant_key)  # refuse an undeclared variant before anything is submitted
     now = datetime.now(timezone.utc)
     run_id = args.run_id or f"{now:%Y%m%d-%H%M%S}-{gi['sha']}"
     run_dir = BUILD / run_id
+    meta = None
     if args.retry_failed:
         if not run_dir.exists():
             raise SystemExit(f"{run_dir} does not exist")
+        meta = json.loads((run_dir / "run.json").read_text())
+        prev = meta.get("solver_variant", "default")
+        if prev != variant_key:
+            raise SystemExit(f"run {run_id} was submitted with solver variant '{prev}'; refusing to mix variants in one run")
     else:
         if run_dir.exists():
             raise SystemExit(f"{run_dir} exists; refusing to reuse a run id")
@@ -263,16 +304,17 @@ def cmd_run(args) -> int:
             raise SystemExit("--only matched no declared request")
     if args.retry_failed:
         reqs = [r for r in reqs if not sim_common.report_usable(run_dir / r["tag"] / "report.json")]
-        say(f"retrying {len(reqs)} request(s) without a usable report, capacity_wait_s={args.capacity_wait}")
+        say(f"retrying {len(reqs)} request(s) without a usable report (variant {variant_key}), capacity_wait_s={args.capacity_wait}")
     head = tb_netlist_head(run_dir / ("retry" if args.retry_failed else "."), pdk)
-    meta = {"run_id": run_id, "started_utc": now.strftime("%Y-%m-%dT%H:%M:%SZ"), "source": gi, "klt_client": sim_common.klt_version(),
-            "klt_sim_backend_env": os.environ.get("KLT_SIM_BACKEND"), "declared": declared_counts(man), "submitted_tags": [r["tag"] for r in reqs]}
-    if not args.retry_failed:
+    if meta is None:
+        meta = {"run_id": run_id, "started_utc": now.strftime("%Y-%m-%dT%H:%M:%SZ"), "source": gi, "klt_client": sim_common.klt_version(),
+                "klt_sim_backend_env": os.environ.get("KLT_SIM_BACKEND"), "declared": declared_counts(man), "solver_variant": variant_key,
+                "submitted_tags": [r["tag"] for r in reqs]}
         (run_dir / "run.json").write_text(json.dumps(meta, indent=2) + "\n")
-    say(f"run id {run_id}: {len(reqs)} request(s)")
+    say(f"run id {run_id}: {len(reqs)} request(s), solver variant {variant_key}")
     results = []
     with concurrent.futures.ThreadPoolExecutor(max_workers=min(2, args.jobs)) as ex:
-        futs = [ex.submit(submit_one, r, head, man, run_dir, args.capacity_wait) for r in reqs]
+        futs = [ex.submit(submit_one, r, head, man, run_dir, args.capacity_wait, variant_key) for r in reqs]
         for f in futs:
             try:
                 results.append(f.result())
@@ -299,7 +341,7 @@ def cmd_probe(args) -> int:
     req = reqs[args.tag]
     d = BUILD / "probe" / args.tag
     d.mkdir(parents=True, exist_ok=True)
-    (d / "netlist.spice").write_text(build_netlist(tb_netlist_head(d, pdk), req))
+    (d / "netlist.spice").write_text(build_netlist(tb_netlist_head(d, pdk), req, man, args.variant))
     r = build_request(req, man, "local")
     r["corners"] = {"process": ["tt"], "supply_v": {"vset": [3.3]}, "temperature_c": [27]}
     if args.tstop:  # channel/netlist validation only: a truncated record is never graded or recorded
@@ -458,6 +500,111 @@ def fmt(x, spec=".4g"):
     return "n/a" if x is None else f"{x:{spec}}"
 
 
+def _cmp_note(p: dict) -> str:
+    c = p.get("check") or {}
+    if p.get("outcome") == "NOT_COVERED":
+        return (p.get("reason") or "")[:90]
+    if p.get("outcome") == "ERROR":
+        return f"{c.get('error_class', '')} {c.get('detail', '')[:70]}".strip()
+    if c.get("fail_codes"):
+        return ",".join(c["fail_codes"])
+    if c.get("unresolved_reasons"):
+        return "; ".join(c["unresolved_reasons"])[:90]
+    ph = c.get("physical") or {}
+    if p.get("outcome") == "NONPHYSICAL":
+        return ("NONPHYSICAL " + (ph.get("node_violation_phase") or "no node violation")
+                + (f" [{','.join(sorted(ph.get('violations_after_t0') or []))}]" if ph.get("violations_after_t0") else ""))[:120]
+    return ""
+
+
+def build_comparison(src_rec: dict, points: list[dict]) -> dict:
+    """Join the source (default-deck) record with this run's tightened points on (request tag, corner id).
+
+    Refuses a broken join in either direction: every declared point must appear exactly once on
+    each side, so the comparison accounts for every selected point, including refusals and
+    NOT_COVERED rows (kept, never dropped).
+    """
+    src: dict = {}
+    for p in src_rec.get("points", []):
+        k = (p.get("tag"), p.get("id"))
+        if k in src:
+            raise SystemExit(f"source record lists {k[0]}/{k[1]} twice -- refusing a broken join")
+        src[k] = p
+    rows, missing = [], []
+    for p in points:
+        s = src.pop((p.get("tag"), p.get("id")), None)
+        if s is None:
+            missing.append(f"{p.get('tag')}/{p.get('id')}")
+            continue
+        outcome = p.get("outcome")
+        phys = (p.get("check") or {}).get("physical") or {}
+        rows.append({"tag": p["tag"], "id": p["id"], "process": p.get("process"), "temperature_c": p.get("temperature_c"), "supply_v": p.get("supply_v"),
+                     "default_outcome": s.get("outcome"), "tightened_outcome": outcome,
+                     "tightened_physical": phys.get("ok") if outcome not in ("NOT_COVERED", "ERROR") else None,
+                     "default_runtime_s": s.get("runtime_s"), "tightened_runtime_s": p.get("runtime_s"),
+                     "tightened_note": _cmp_note(p)})
+    if missing:
+        raise SystemExit(f"rerun point(s) absent from the source record ({len(missing)}, first: {missing[:3]}) -- refusing a broken join")
+    if src:
+        first = [f"{k[0]}/{k[1]}" for k in list(src)[:3]]
+        raise SystemExit(f"source point(s) with no rerun row ({len(src)}, first: {first}) -- the rerun set must cover every selected point")
+    matrix: dict = {}
+    for r in rows:
+        matrix.setdefault(r["default_outcome"], {}).setdefault(r["tightened_outcome"], 0)
+        matrix[r["default_outcome"]][r["tightened_outcome"]] += 1
+    targets = [r for r in rows if r["default_outcome"] == "NONPHYSICAL"]
+    controls = [r for r in rows if r["default_outcome"] != "NONPHYSICAL"]
+    changed = [r for r in controls if r["tightened_outcome"] != r["default_outcome"]]
+    tgt: dict = {}
+    for r in targets:
+        tgt[r["tightened_outcome"]] = tgt.get(r["tightened_outcome"], 0) + 1
+    ratios = sorted(r["tightened_runtime_s"] / r["default_runtime_s"] for r in rows
+                    if r.get("default_runtime_s") and r.get("tightened_runtime_s"))
+    runtime = {"n": len(ratios), "median_ratio": ratios[len(ratios) // 2] if ratios else None,
+               "min_ratio": ratios[0] if ratios else None, "max_ratio": ratios[-1] if ratios else None}
+    return {"source_record": src_rec.get("record_id"), "points_compared": len(rows), "transition_matrix": matrix,
+            "targets": {"n": len(targets), "transitions": tgt},
+            "controls": {"n": len(controls), "n_changed": len(changed), "changed": changed},
+            "runtime_ratio": runtime, "rows": rows}
+
+
+def render_comparison_md(cmp: dict) -> list[str]:
+    L = [f"## Tightened-vs-default comparison (source record `{cmp['source_record']}`)", "",
+         "Every declared point appears exactly once: the **default** verdict is the source record's outcome for that point, the **tightened** verdict is this record's. Same circuit, stimulus, windows, checker and physicality bounds; only the declared solver options differ.", ""]
+    L.append("### Transition matrix (default -> tightened)")
+    L.append("")
+    L.append("| default \\ tightened | " + " | ".join(OUTCOMES) + " |")
+    L.append("|---|" + "---|" * len(OUTCOMES))
+    for d in OUTCOMES:
+        row = cmp["transition_matrix"].get(d, {})
+        L.append(f"| {d} | " + " | ".join(str(row.get(t, 0)) for t in OUTCOMES) + " |")
+    L.append("")
+    t, c = cmp["targets"], cmp["controls"]
+    L.append(f"- **Targets (source NONPHYSICAL, {t['n']} points)**: " + (", ".join(f"{o} {n}" for o, n in sorted(t["transitions"].items())) or "none") + ".")
+    L.append(f"- **Controls (source PASS/FAIL, {c['n']} points)**: {c['n'] - c['n_changed']} unchanged, {c['n_changed']} changed. Changed control verdicts are retained below as evidence, not discarded; control agreement is not a precondition for this record.")
+    rt = cmp["runtime_ratio"]
+    if rt["n"]:
+        L.append(f"- **Runtime, tightened vs default** (per corner, {rt['n']} points with both measured): median x{rt['median_ratio']:.2f}, range x{rt['min_ratio']:.2f} - x{rt['max_ratio']:.2f}.")
+    L.append("")
+    if c["changed"]:
+        L.append("### Changed control points (source physical)")
+        L.append("")
+        L.append("| request | point | default | tightened | tightened note |")
+        L.append("|---|---|---|---|---|")
+        for r in c["changed"]:
+            L.append(f"| {r['tag']} | {r['id']} | {r['default_outcome']} | {r['tightened_outcome']} | {r['tightened_note']} |")
+        L.append("")
+    L.append("### Per-point comparison")
+    L.append("")
+    L.append("| request | point | default | tightened | tightened physical | runtime default -> tightened (s) | tightened note |")
+    L.append("|---|---|---|---|---|---|---|")
+    for r in cmp["rows"]:
+        rt_s = f"{fmt(r['default_runtime_s'], '.0f')} -> {fmt(r['tightened_runtime_s'], '.0f')}" if r.get("tightened_runtime_s") else fmt(r["default_runtime_s"], ".0f")
+        L.append(f"| {r['tag']} | {r['id']} | {r['default_outcome']} | {r['tightened_outcome']} | {r['tightened_physical']} | {rt_s} | {r['tightened_note']} |")
+    L.append("")
+    return L
+
+
 def render_md(rec: dict) -> str:
     L = [f"# Record {rec['record_id']}", ""]
     L += sim_common.render_record_id_experiment(rec["record_id"], rec["experiment"]["slug"], rec["experiment"]["title"])
@@ -478,6 +625,9 @@ def render_md(rec: dict) -> str:
     m = rec["matrix"]
     L.append("- **Corner matrix**: process " + ", ".join(m["process"]) + "; temperature " + ", ".join(f"{cr.fmt_temp(x)} C" for x in m["temperature_c"]) + "; starting supply " + ", ".join(f"{v:.2f} V" for v in m["supply_v"]))
     L.append(f"- **Declared**: {m['n_requests']} request(s) x {m['points_per_request']} = {m['n_points']} points; {m['n_requests_submitted']} request(s) with a usable report; {m['n_points_graded']} points graded, {m['n_points_not_covered']} NOT_COVERED (never counted as covered).")
+    sv = rec.get("solver_variant") or {}
+    if sv.get("key", "default") != "default":
+        L.append(f"- **Solver variant**: `{sv['key']}` -- `.options {' '.join(sv.get('options_extra') or [])}` appended to the testbench's declared default options line (experiment.json `solver_variants`); circuit, stimulus, windows, tmax, checker and physicality bounds unchanged. {sv.get('label', '')}")
     L.append("- **Statistical convention**: N/A (corner-matrix check)")
     L.append("- **PTAT/CTAT loading**: open (no output buffer exists); RESETn unloaded; no ideal bias/sensor substitution; committed XMN1 L=20 W=0.42, no diagnostic edits.")
     L.append("")
@@ -531,6 +681,8 @@ def render_md(rec: dict) -> str:
     L.append("")
     L.append("`*` = assertion was rail-limited (VDD <= V_IL at the crossing): RESETn could not stay high regardless of the comparator.")
     L.append("")
+    if rec.get("comparison"):
+        L += render_comparison_md(rec["comparison"])
     if rec.get("submit_failures"):
         L.append("## Fleet submit failures / refusals (recorded, no local fallback)")
         for f in rec["submit_failures"]:
@@ -567,6 +719,11 @@ def cmd_record(args) -> int:
     man = sim_common.load_manifest(MANIFEST)
     run_dir = BUILD / args.run_id
     meta = json.loads((run_dir / "run.json").read_text())
+    run_variant = meta.get("solver_variant", "default")
+    variant_key = args.variant or run_variant or "default"
+    if variant_key != run_variant:
+        raise SystemExit(f"run {args.run_id} was submitted with solver variant '{run_variant}', not '{variant_key}'")
+    variant = variant_of(man, variant_key)
     pin = cr.load_pin()
     pdk = cr.resolve_pdk(pin)
     gi = source_state()
@@ -606,9 +763,19 @@ def cmd_record(args) -> int:
     runners = sorted({q.get("runner_klt_version") for q in requests if q.get("runner_klt_version")})
     cnt = declared_counts(man)
     n_graded = sum(1 for p in points if p["outcome"] != "NOT_COVERED")
+    comparison = None
+    if args.compare_source:
+        src_path = Path(args.compare_source)
+        if not src_path.is_file():
+            raise SystemExit(f"--compare-source {src_path} does not exist")
+        src_rec = json.loads(src_path.read_text())
+        comparison = build_comparison(src_rec, points)
+        t, c = comparison["targets"], comparison["controls"]
+        say(f"comparison vs {comparison['source_record']}: {comparison['points_compared']} points; targets {t['n']} -> {t['transitions']}; controls {c['n']} with {c['n_changed']} changed")
     ph = man["grading"]
     record = {
         "record_id": record_id, "timestamp": now.strftime("%Y-%m-%dT%H:%M:%SZ"), "author": args.author or cr.default_author(), "supersedes": args.supersedes,
+        "solver_variant": variant, "comparison": comparison,
         "experiment": {k: man[k] for k in ("slug", "title", "claim", "provenance", "provenance_source", "statistical_convention")},
         "pdk": {"root": "<host $PDK_ROOT>", "variant": pdk.variant, "installed_commit": pdk.installed_commit, "pinned_commit": pin["open_pdks_commit"], "matches_pin": pdk.matches_pin,
                 "lib_file": MODEL_LIB + " (resolved on the runner as /opt/pdk/sky130A/...)", "fleet_pdk_report": fleet_pdk},
@@ -685,9 +852,12 @@ def main(argv: list[str]) -> int:
     r.add_argument("--allow-dirty", action="store_true")
     x = sub.add_parser("probe")
     x.add_argument("--tag", required=True)
+    x.add_argument("--variant", help="declared solver variant key (experiment.json solver_variants); default deck if omitted")
     x.add_argument("--tstop", type=float, help="shortened stop time (s) for a quick channel-name validation; such a probe is never graded")
     c = sub.add_parser("record")
     c.add_argument("--run-id", required=True)
+    c.add_argument("--variant", help="must match the solver variant the run was submitted with (run.json solver_variant)")
+    c.add_argument("--compare-source", help="path to the source (default-deck) record .json; writes a per-point default-vs-tightened comparison into this record")
     c.add_argument("--notes-file")
     c.add_argument("--author")
     c.add_argument("--supersedes")
