@@ -234,7 +234,7 @@ def cmd_run(args) -> int:
     rate = man["measurement"]["rate_v_per_s"]
     hashes = {}
     decks = {n: build_variant_netlist(head, n, man) for n in work}
-    procs = list(man["corners"]["process"]) if args.split_process else [None]
+    procs = (list(args.process or man["corners"]["process"])) if args.split_process else [None]
     for n in work:
         for pr in procs:
             req = build_variant_request(man, args.capacity_wait, pr)
@@ -455,6 +455,7 @@ def main(argv: list[str]) -> int:
     r.add_argument("--retry-failed", action="store_true")
     r.add_argument("--capacity-wait", type=float, default=0)
     r.add_argument("--allow-dirty", action="store_true")
+    r.add_argument("--process", action="append", help="with --split-process: resubmit only these MOS corners (e.g. after a fleet capacity refusal)")
     r.add_argument("--split-process", action="store_true", help="one fleet request per MOS corner (9 points each) for a variant whose single 45-corner job exceeds the fleet wall-clock ceiling")
     c = sub.add_parser("record")
     c.add_argument("--run-id", required=True)
