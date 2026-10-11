@@ -12,6 +12,10 @@ on:
 jobs:
   self-checks:
     runs-on: ubuntu-latest
+    env:
+      # Not a default runner variable; the append-only records check reads it
+      # to find the pushed-from commit on pushes to main.
+      GITHUB_EVENT_BEFORE: ${{ github.event.before }}
     steps:
       - uses: actions/checkout@v4
         with:
