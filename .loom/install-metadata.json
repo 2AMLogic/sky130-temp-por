@@ -1,6 +1,6 @@
 {
-  "loom_version": "0.19.1060",
-  "loom_commit": "b3904db8717caa5f324b5fdc0c27b2e5ebdc1986",
+  "loom_version": "0.19.1065",
+  "loom_commit": "33bb950d65b9038d5cf119a252820edca1192edf",
   "install_date": "2026-08-20",
   "installed_files": [
     ".claude/agents/loom-architect.md",
@@ -497,7 +497,9 @@
     ".loom/docs/native-sweep.md",
     ".loom/docs/premise-gate.md",
     ".loom/scripts/tests/test-premise-check.sh",
-    ".loom/runtimes/gemini.json"
+    ".loom/runtimes/gemini.json",
+    ".claude/commands/loom/sweep-doctor-glm-escalation.md",
+    ".loom/docs/stale-check-inputs.md"
   ],
   "last_resync": "2026-10-11",
   "loom_source_remote": "git@github.com:rjwalters/loom.git",
