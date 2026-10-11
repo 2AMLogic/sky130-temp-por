@@ -1,0 +1,12 @@
+# point: brownout-top control ff_-40c_3.63v
+# process=ff temp=-40C start_supply=3.63V vlow=99 hold=1e-05s fall=2000V/s recovery=10000V/s tstop=0.0200106s
+# klt status: error   runtime on runner: 0.0 s   outcome: ERROR
+
+# ==== klt sim deck (exact input given to ngspice on the runner) ====
+| (no deck retrieved)
+
+# ==== klt diagnostics ====
+| error/batch_job_timeout: batch job klt-sim-c3ba332c37d3 finished 'timeout' without a usable report: job exceeded 3600s [output recovery: collected report.json is not valid JSON: Expecting value: line 1 column 1 (char 0); stderr.log holds no klt error envelope -- see harness.log under the job's S3 prefix]
+
+# ==== ngspice stdout+stderr ====
+(no ngspice log retrieved)

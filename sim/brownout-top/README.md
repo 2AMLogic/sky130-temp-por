@@ -159,6 +159,7 @@ Spec/design are never edited to improve results; a failing cell is evidence.
 | `records/20261010-130609-db29746-fleet-timeout.md` | First submission (`fleet1`, the 30-request manifest at `db29746`). Two jobs hit the 3600 s timeout with 0/45 usable corners each, and the attempt was abandoned. Not a result. |
 | `records/20261010-222529-41bde9f.md` (+ `.json`) | Declared 945-point grid, simulated at `bcf00bf` (21 fleet jobs) and graded at `41bde9f`. Deck inputs are identical between the two commits, and every submitted netlist's sha256 matches its fleet report. **PASS 267, FAIL 5, NONPHYSICAL 673, ERROR 0, UNRESOLVED 0, NOT_COVERED 0.** |
 | `records/20261010-222928-0265c45-checker-selftest.md` | Checker self-test: 16/16 synthetic cases give the expected verdict. |
+| `records/20261011-214916-183a3fc.md` (+ `.json`) | #153 tightened-solver (`reltol2e-4`) **pilot**, a companion of `20261010-222529-41bde9f`. It is not the re-grade. Two pilot requests (`control`, `cube_v1.2_h0.0001_f50000_r10000`; jobs `klt-sim-c3ba332c37d3`, `klt-sim-fd2409da90fb`) hit the fleet's enforced 3600 s whole-job limit, and klt discarded every corner. Each request was first refused 5 times at the shared fleet's concurrency cap. The cost rule held the other 19 requests back. **ERROR 90, NOT_COVERED 855; no tightened point graded.** The per-point comparison covers all 945 points. |
 
 How to read the graded record:
 
@@ -168,3 +169,10 @@ How to read the graded record:
   * Shallow 2.0 V dip at 50 kV/s, tt/27 C/2.97 V (two holds): the first assertion begins only after VDD has recovered.
 * Across the 221 physical points where RESETn asserted, VDD at assertion ranged from 0.36 to 1.00 x the starting supply (median 0.74), and no assertion was rail-limited. Release came a median 2.3 ms after VDD recovered (max 4.0 ms).
 * None of this is a ratified bound, and no gf180mcu number is used.
+
+How to read the #153 tightened pilot (`20261011-214916-183a3fc`):
+
+* **It does not change what is known.** The 673 default-deck NONPHYSICAL points are still unknown. No tightened point was graded.
+* **Cost is the blocker.** The tightened deck is much slower on the fleet. Both pilot jobs timed out at 3600 s, against 450 s and 1402 s on the default deck, so the ratio is at least x8 on whole-job time. A local single-corner timing probe (the fleet-equivalent SPARSE solver, ff / 125 C / 2.97 V `control`) took 389 s against 19 s on the default deck, about x20. Projected against the 3600 s limit, all 21 requests exceed it.
+* The fleet runner ignores `options.ngspice_init`, so every fleet run so far, default and tightened, used ngspice's SPARSE solver rather than the KLU that `sim/spiceinit` selects.
+* Continuing needs a declared manifest change first. Options are KLU carried in the netlist, one corner per job, a longer job limit, or a looser tolerance. See the record's Notes.

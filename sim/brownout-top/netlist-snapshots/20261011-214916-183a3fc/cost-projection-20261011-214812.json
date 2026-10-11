@@ -1,0 +1,189 @@
+{
+  "limit_s": 3600.0,
+  "pilots": [
+    {
+      "tag": "cube_v1.2_h0.0001_f50000_r10000",
+      "tightened_elapsed_s": 3604,
+      "default_elapsed_s": 1402,
+      "timed_out": true,
+      "elapsed_ratio": 2.570613409415121,
+      "tightened_corner_sum_s": 0.0,
+      "default_corner_sum_s": 11056.012000000002,
+      "corner_sum_ratio": null,
+      "job_id": "klt-sim-fd2409da90fb",
+      "instance_type": "c7i.4xlarge",
+      "state": "timeout"
+    },
+    {
+      "tag": "control",
+      "tightened_elapsed_s": 3605,
+      "default_elapsed_s": 450,
+      "timed_out": true,
+      "elapsed_ratio": 8.011111111111111,
+      "tightened_corner_sum_s": 0.0,
+      "default_corner_sum_s": 3383.1519999999996,
+      "corner_sum_ratio": null,
+      "job_id": "klt-sim-c3ba332c37d3",
+      "instance_type": "c7i.4xlarge",
+      "state": "timeout"
+    }
+  ],
+  "worst_ratio": 8.011111111111111,
+  "lower_bound": true,
+  "projection": [
+    {
+      "tag": "cube_v2_h1em05_f2000_r10000",
+      "default_elapsed_s": 2474,
+      "projected_tightened_elapsed_s": 19819.48888888889,
+      "pilot": false,
+      "over_limit": true
+    },
+    {
+      "tag": "cube_v2_h1em05_f50000_r10000",
+      "default_elapsed_s": 2281,
+      "projected_tightened_elapsed_s": 18273.344444444443,
+      "pilot": false,
+      "over_limit": true
+    },
+    {
+      "tag": "cube_v2_h0.0001_f2000_r10000",
+      "default_elapsed_s": 582,
+      "projected_tightened_elapsed_s": 4662.466666666666,
+      "pilot": false,
+      "over_limit": true
+    },
+    {
+      "tag": "cube_v2_h0.0001_f50000_r10000",
+      "default_elapsed_s": 2301,
+      "projected_tightened_elapsed_s": 18433.566666666666,
+      "pilot": false,
+      "over_limit": true
+    },
+    {
+      "tag": "cube_v2_h0.001_f2000_r10000",
+      "default_elapsed_s": 689,
+      "projected_tightened_elapsed_s": 5519.655555555555,
+      "pilot": false,
+      "over_limit": true
+    },
+    {
+      "tag": "cube_v2_h0.001_f50000_r10000",
+      "default_elapsed_s": 2420,
+      "projected_tightened_elapsed_s": 19386.88888888889,
+      "pilot": false,
+      "over_limit": true
+    },
+    {
+      "tag": "cube_v1.2_h1em05_f2000_r10000",
+      "default_elapsed_s": 2425,
+      "projected_tightened_elapsed_s": 19426.944444444445,
+      "pilot": false,
+      "over_limit": true
+    },
+    {
+      "tag": "cube_v1.2_h1em05_f50000_r10000",
+      "default_elapsed_s": 2406,
+      "projected_tightened_elapsed_s": 19274.733333333334,
+      "pilot": false,
+      "over_limit": true
+    },
+    {
+      "tag": "cube_v1.2_h0.0001_f2000_r10000",
+      "default_elapsed_s": 535,
+      "projected_tightened_elapsed_s": 4285.944444444444,
+      "pilot": false,
+      "over_limit": true
+    },
+    {
+      "tag": "cube_v1.2_h0.0001_f50000_r10000",
+      "default_elapsed_s": 1402,
+      "projected_tightened_elapsed_s": 11231.577777777778,
+      "pilot": true,
+      "over_limit": true
+    },
+    {
+      "tag": "cube_v1.2_h0.001_f2000_r10000",
+      "default_elapsed_s": 656,
+      "projected_tightened_elapsed_s": 5255.288888888889,
+      "pilot": false,
+      "over_limit": true
+    },
+    {
+      "tag": "cube_v1.2_h0.001_f50000_r10000",
+      "default_elapsed_s": 1473,
+      "projected_tightened_elapsed_s": 11800.366666666667,
+      "pilot": false,
+      "over_limit": true
+    },
+    {
+      "tag": "cube_v0.4_h1em05_f2000_r10000",
+      "default_elapsed_s": 2592,
+      "projected_tightened_elapsed_s": 20764.8,
+      "pilot": false,
+      "over_limit": true
+    },
+    {
+      "tag": "cube_v0.4_h1em05_f50000_r10000",
+      "default_elapsed_s": 2351,
+      "projected_tightened_elapsed_s": 18834.12222222222,
+      "pilot": false,
+      "over_limit": true
+    },
+    {
+      "tag": "cube_v0.4_h0.0001_f2000_r10000",
+      "default_elapsed_s": 646,
+      "projected_tightened_elapsed_s": 5175.177777777778,
+      "pilot": false,
+      "over_limit": true
+    },
+    {
+      "tag": "cube_v0.4_h0.0001_f50000_r10000",
+      "default_elapsed_s": 1073,
+      "projected_tightened_elapsed_s": 8595.922222222222,
+      "pilot": false,
+      "over_limit": true
+    },
+    {
+      "tag": "cube_v0.4_h0.001_f2000_r10000",
+      "default_elapsed_s": 676,
+      "projected_tightened_elapsed_s": 5415.511111111111,
+      "pilot": false,
+      "over_limit": true
+    },
+    {
+      "tag": "cube_v0.4_h0.001_f50000_r10000",
+      "default_elapsed_s": 1112,
+      "projected_tightened_elapsed_s": 8908.355555555556,
+      "pilot": false,
+      "over_limit": true
+    },
+    {
+      "tag": "recovery_v1.2_h0.0001_f2000_r1000",
+      "default_elapsed_s": 663,
+      "projected_tightened_elapsed_s": 5311.366666666667,
+      "pilot": false,
+      "over_limit": true
+    },
+    {
+      "tag": "recovery_v1.2_h0.0001_f2000_r100000",
+      "default_elapsed_s": 2913,
+      "projected_tightened_elapsed_s": 23336.366666666665,
+      "pilot": false,
+      "over_limit": true
+    },
+    {
+      "tag": "control",
+      "default_elapsed_s": 450,
+      "projected_tightened_elapsed_s": 3605.0,
+      "pilot": true,
+      "over_limit": true
+    }
+  ],
+  "n_over_limit": 21,
+  "n_unprojected": 0,
+  "limit_source": "--limit-s 3600 (the fleet harness log of both pilot jobs (klt-sim-c3ba332c37d3, klt-sim-fd2409da90fb) reads 'running (timeout 3600s)' and both reports say 'job exceeded 3600s'; the manifest's 7200 s is not what the harness enforced)",
+  "at_utc": "2026-10-11T21:48:12Z",
+  "run_id": "t153-reltol-0a7011c",
+  "solver_variant": "reltol2e-4",
+  "source_record": "sim/brownout-top/records/20261010-222529-41bde9f.json"
+}

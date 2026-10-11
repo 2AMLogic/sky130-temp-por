@@ -1,0 +1,138 @@
+{
+  "run_id": "t153-reltol-0a7011c",
+  "started_utc": "2026-10-11T20:13:02Z",
+  "source": {
+    "sha": "0a7011c",
+    "branch": "feature/issue-153",
+    "dirty": false,
+    "sha_full": "0a7011c58cb18b9335895ab38b480b827d3612e1",
+    "pushed_to_remote": true,
+    "remote_branches": [
+      "origin/feature/issue-153"
+    ]
+  },
+  "klt_client": "klt 0.7.0+g04ca88ce427c",
+  "klt_sim_backend_env": "batch",
+  "declared": {
+    "requests": 21,
+    "points_per_request": 45,
+    "points": 945
+  },
+  "solver_variant": "reltol2e-4",
+  "submitted_tags": [
+    "cube_v1.2_h0.0001_f50000_r10000",
+    "control"
+  ],
+  "submit_results": [
+    {
+      "tag": "cube_v1.2_h0.0001_f50000_r10000",
+      "exit": 1,
+      "status": "NO-JSON"
+    },
+    {
+      "tag": "control",
+      "exit": 1,
+      "status": "NO-JSON"
+    }
+  ],
+  "retries": [
+    {
+      "at_utc": "2026-10-11T20:13:23Z",
+      "capacity_wait_s": 3600.0,
+      "source": {
+        "sha": "0a7011c",
+        "branch": "feature/issue-153",
+        "dirty": false,
+        "sha_full": "0a7011c58cb18b9335895ab38b480b827d3612e1",
+        "pushed_to_remote": true,
+        "remote_branches": [
+          "origin/feature/issue-153"
+        ]
+      },
+      "klt_client": "klt 0.7.0+g04ca88ce427c",
+      "klt_sim_backend_env": "batch",
+      "submitted_tags": [
+        "cube_v1.2_h0.0001_f50000_r10000",
+        "control"
+      ],
+      "results": [
+        {
+          "tag": "cube_v1.2_h0.0001_f50000_r10000",
+          "exit": 1,
+          "status": "NO-JSON"
+        },
+        {
+          "tag": "control",
+          "exit": 1,
+          "status": "NO-JSON"
+        }
+      ]
+    },
+    {
+      "at_utc": "2026-10-11T20:14:47Z",
+      "capacity_wait_s": 1800.0,
+      "slot_wait_s": 3000.0,
+      "source": {
+        "sha": "db8028b",
+        "branch": "feature/issue-153",
+        "dirty": false,
+        "sha_full": "db8028b705af7cf65f3ecbe1690001bdc2a75d58",
+        "pushed_to_remote": true,
+        "remote_branches": [
+          "origin/feature/issue-153"
+        ]
+      },
+      "klt_client": "klt 0.7.0+g04ca88ce427c",
+      "klt_sim_backend_env": "batch",
+      "submitted_tags": [
+        "cube_v1.2_h0.0001_f50000_r10000",
+        "control"
+      ],
+      "results": [
+        {
+          "tag": "cube_v1.2_h0.0001_f50000_r10000",
+          "exit": 1,
+          "status": "NO-JSON"
+        },
+        {
+          "tag": "control",
+          "exit": 1,
+          "status": "NO-JSON"
+        }
+      ]
+    },
+    {
+      "at_utc": "2026-10-11T21:27:01Z",
+      "capacity_wait_s": 1800.0,
+      "slot_wait_s": 4000.0,
+      "source": {
+        "sha": "7f61169",
+        "branch": "feature/issue-153",
+        "dirty": false,
+        "sha_full": "7f6116940a2ce9ed8978026774a7ae088148b196",
+        "pushed_to_remote": true,
+        "remote_branches": [
+          "origin/feature/issue-153"
+        ]
+      },
+      "klt_client": "klt 0.7.0+g04ca88ce427c",
+      "klt_sim_backend_env": "batch",
+      "submitted_tags": [
+        "cube_v1.2_h0.0001_f50000_r10000",
+        "control"
+      ],
+      "results": [
+        {
+          "tag": "cube_v1.2_h0.0001_f50000_r10000",
+          "exit": 4,
+          "status": "error"
+        },
+        {
+          "tag": "control",
+          "exit": 4,
+          "status": "error"
+        }
+      ]
+    }
+  ]
+}
