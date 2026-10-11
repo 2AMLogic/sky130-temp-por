@@ -20,12 +20,12 @@
     "supply_v": [2.97, 3.3, 3.63]
   },
   "monte_carlo": {
-    "n_per_corner": 200,
+    "n_per_corner": 30,
     "vary": "mismatch",
     "seed": 20261010,
     "corner_count": 15,
-    "samples_per_term": 3000,
-    "execution": "one klt sim request per term, --backend batch (Spot fleet); never a local grid"
+    "samples_per_term": 450,
+    "execution": "one klt sim request per (term, process section) = 3 supplies x N units, --backend batch (Spot fleet); never a local grid. Reason: a first attempt with one 3000-unit request per term hit the fleet per-job 1 h limit (batch_job_timeout, 3000/3000 errored; runner concurrency 1) and is disclosed in the record. Seed for process section k = seed + k (klt derives the sample seed from the corner index, which is 0..2 inside each request, so supplies share one realisation per process section and process sections draw independently)."
   },
   "terms": {
     "nominal": "no mismatch; the per-corner reference curve",

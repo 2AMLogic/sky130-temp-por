@@ -61,7 +61,7 @@ PROCS = ["tt", "ss", "ff", "sf", "fs"]
 SUPPLIES = [2.97, 3.3, 3.63]
 TEMPS = [-40, 27, 125]  # the three evaluation temperatures (sweep is -40..125 step 1)
 T_LO, T_HI, T_REF = -40, 125, 27
-DEFAULT_N = 200
+DEFAULT_N = 30
 DEFAULT_SEED = 20261010
 
 # Operating-point guards (physical-branch windows copied unchanged from the #86 solver campaign,
@@ -233,29 +233,39 @@ def cmd_run(args):
         cur = meta
     (run_dir / "run.json").write_text(json.dumps(meta, indent=2) + "\n")
 
-    def one(term):
-        d = run_dir / term
-        if sim_common.report_usable(d / "report.json"):
-            return {"term": term, "skipped": "usable report exists"}
+    def usable(rp):
+        """a report with at least one corner that actually produced values (an all-error report, e.g. batch_job_timeout, is NOT usable)"""
+        try:
+            return any(c.get("status") != "error" for c in json.loads(rp.read_text()).get("corners", []))
+        except (OSError, json.JSONDecodeError):
+            return False
+
+    def one(unit):
+        term, proc = unit
+        d = run_dir / term / proc if proc else run_dir / term
+        if usable(d / "report.json"):
+            return {"term": term, "proc": proc, "skipped": "usable report exists"}
         d.mkdir(parents=True, exist_ok=True)
         (d / "netlist.spice").write_text(build_netlist(term))
-        (d / "request.json").write_text(json.dumps(build_request(term, "batch", args.n, args.seed), indent=2) + "\n")
-        units = 15 * (1 if term == "nominal" else args.n)
-        say(f"[submit] {term}: {units} ngspice units -> batch fleet")
+        seed = args.seed + (PROCS.index(proc) if proc else 0)
+        (d / "request.json").write_text(json.dumps(build_request(term, "batch", args.n, seed, ([proc], SUPPLIES) if proc else None), indent=2) + "\n")
+        units = (1 if term == "nominal" else args.n) * len(SUPPLIES) * (1 if proc else len(PROCS))
+        say(f"[submit] {term}/{proc or 'all-proc'}: {units} ngspice units -> batch fleet")
         p = subprocess.run(["klt", "sim", str(d / "request.json"), "--backend", "batch", "-o", str(d / "out"), "--format", "json"],
-                           capture_output=True, text=True, timeout=6 * 3600)
+                           capture_output=True, text=True, timeout=3 * 3600)
         (d / "report.json").write_text(p.stdout)
         (d / "klt.stderr").write_text(p.stderr)
         try:
             st = json.loads(p.stdout).get("status", "?")
         except json.JSONDecodeError:
             st = "NO-JSON"
-        say(f"[done]   {term}: exit {p.returncode}, status {st}")
-        return {"term": term, "exit": p.returncode, "status": st}
+        say(f"[done]   {term}/{proc or 'all-proc'}: exit {p.returncode}, status {st}")
+        return {"term": term, "proc": proc, "exit": p.returncode, "status": st}
 
+    units_list = [(t, None) if t == "nominal" else (t, pr) for t in terms for pr in ([None] if t == "nominal" else PROCS)]
     results = []
     with concurrent.futures.ThreadPoolExecutor(max_workers=min(2, args.jobs)) as ex:
-        for f in [ex.submit(one, t) for t in terms]:
+        for f in [ex.submit(one, u) for u in units_list]:
             try:
                 results.append(f.result())
             except Exception as err:  # noqa: BLE001 -- recorded
@@ -307,29 +317,46 @@ def parse_cid(cid):
 
 
 def load_term(run_dir, term):
-    """-> {'report': dict|None, 'refusal': ..., 'corners': {(proc, supply): {sample|None: {meas...} | {'_error': str}}}}"""
-    rep_path = run_dir / term / "report.json"
-    ent = {"report": None, "refusal": None, "corners": {}}
-    if sim_common.report_usable(rep_path):
-        rep = json.loads(rep_path.read_text())
-        ent["report"] = rep
-        for c in rep["corners"]:
-            proc, supply, smp = parse_cid(c["corner_id"])
-            vals = {m["name"]: m.get("value") for m in c["measurements"]}
-            if c.get("status") == "error" or any(v is None for v in vals.values()):
-                vals = {**vals, "_error": f"klt corner status {c.get('status')}; unextractable: "
-                        + ",".join(sorted(k for k, v in vals.items() if v is None))}
-            ent["corners"].setdefault((proc, supply), {})[smp] = vals
-    else:
-        for fn in ("klt.stderr", "report.json"):
+    """-> {'report': dict|None, 'refusal': ..., 'missing_procs': [...], 'corners': {(proc, supply): {sample|None: {meas...} | {'_error': str}}}}
+
+    nominal is one request; every mismatch term is one request PER PROCESS section (the fleet job limit is ~1 h at
+    concurrency 1), merged here.  A process whose request has no usable report is listed in missing_procs."""
+    ent = {"report": None, "refusal": None, "missing_procs": [], "jobs": {}, "corners": {}}
+    dirs = [(None, run_dir / term)] if term == "nominal" else [(p, run_dir / term / p) for p in PROCS]
+    reps = []
+    for proc, d in dirs:
+        rp = d / "report.json"
+        rep = None
+        try:
+            rep = json.loads(rp.read_text())
+        except (OSError, json.JSONDecodeError):
+            pass
+        if rep and any(c.get("status") != "error" for c in rep.get("corners", [])):
+            reps.append((proc, rep))
+        else:
+            ent["missing_procs"].append(proc or "all")
+            why = None
             try:
-                doc = json.loads((run_dir / term / fn).read_text() or "{}")
-                if doc.get("error"):
-                    ent["refusal"] = doc["error"]
-                    break
+                doc = json.loads((d / "klt.stderr").read_text() or "{}")
+                why = doc.get("error")
             except (OSError, json.JSONDecodeError):
                 pass
-        ent["refusal"] = ent["refusal"] or {"message": "no usable report", "code": "unknown"}
+            if not why and rep:
+                codes = (rep.get("diagnostic_counts") or {}).get("by_code")
+                why = {"message": f"report has no usable corner; diagnostics {codes}; remote state {(rep.get('environment') or {}).get('remote', {}).get('state')}"}
+            ent["refusal"] = why or {"message": "no usable report", "code": "unknown"}
+    if reps:
+        ent["report"] = {"corners": [], "environment": reps[0][1]["environment"]}
+        for proc, rep in reps:
+            ent["report"]["corners"] += rep["corners"]
+            ent["jobs"][proc or "all"] = rep["environment"].get("remote", {})
+            for c in rep["corners"]:
+                pr_, supply, smp = parse_cid(c["corner_id"])
+                vals = {m["name"]: m.get("value") for m in c["measurements"]}
+                if c.get("status") == "error" or any(v is None for v in vals.values()):
+                    vals = {**vals, "_error": f"klt corner status {c.get('status')}; unextractable: "
+                            + ",".join(sorted(k for k, v in vals.items() if v is None))}
+                ent["corners"].setdefault((pr_, supply), {})[smp] = vals
     return ent
 
 
@@ -493,17 +520,25 @@ def cmd_record(args):
     cdir.mkdir()
     anal, summ, summ_ctat, fleet = {}, {}, {}, {}
     for t, ent in ents.items():
-        nl = run_dir / t / "netlist.spice"
-        if nl.is_file():
-            (snap / f"{t}.spice").write_text(sim_common.scrub(nl.read_text(), run_dir, REPO_ROOT))
-            (snap / f"{t}.request.json").write_text(sim_common.scrub((run_dir / t / "request.json").read_text(), run_dir, REPO_ROOT))
+        if t == "nominal":
+            subs = [(None, run_dir / t)]
+        else:
+            subs = [(pr, run_dir / t / pr) for pr in PROCS]
+        for pr, d in subs:
+            nl = d / "netlist.spice"
+            if nl.is_file():
+                tag = t if pr is None else f"{t}.{pr}"
+                (snap / f"{tag}.spice").write_text(sim_common.scrub(nl.read_text(), run_dir, REPO_ROOT))
+                (snap / f"{tag}.request.json").write_text(sim_common.scrub((d / "request.json").read_text(), run_dir, REPO_ROOT))
         if ent["report"] is None:
             continue
-        rem = ent["report"]["environment"].get("remote", {})
-        fleet[t] = {**{k: rem.get(k) for k in ("job_id", "instance_type", "lifecycle", "runner_klt_version", "client_klt_version", "elapsed_seconds")},
-                    "engine_version": ent["report"]["environment"].get("engine_version"),
-                    "monte_carlo": {k: v for k, v in ent["report"]["environment"].get("monte_carlo", {}).items() if k != "family_mismatch"},
-                    "family_mismatch": ent["report"]["environment"].get("monte_carlo", {}).get("family_mismatch")}
+        env0 = ent["report"]["environment"]
+        jobs = {k: {kk: v.get(kk) for kk in ("job_id", "instance_type", "lifecycle", "runner_klt_version", "client_klt_version", "elapsed_seconds", "state")}
+                for k, v in ent["jobs"].items()}
+        fleet[t] = {"jobs": jobs, "missing_procs": ent["missing_procs"],
+                    "engine_version": env0.get("engine_version"),
+                    "monte_carlo": {k: v for k, v in env0.get("monte_carlo", {}).items() if k != "family_mismatch"},
+                    "family_mismatch": env0.get("monte_carlo", {}).get("family_mismatch")}
         if t == "nominal":
             continue
         anal[t] = analyse_term(ent, nominal) if nominal["report"] else None
@@ -521,6 +556,7 @@ def cmd_record(args):
                 f"corner {c['corner_id']}  term nominal  klt status={c.get('status')}  guards={'ok' if not why else why}\n"
                 + "\n".join(f"{k} = {v}" for k, v in vals.items()) + "\n")
     not_run = [t for t in RUN_TERMS if ents[t]["report"] is None] + (["nominal"] if nominal["report"] is None else [])
+    partial = {t: ents[t]["missing_procs"] for t in RUN_TERMS if ents[t]["report"] is not None and ents[t]["missing_procs"]}
     xcheck = transient_crosscheck(nominal) if nominal["report"] else None
     # --- negative control + liveness
     ctrl = {}
@@ -538,7 +574,7 @@ def cmd_record(args):
     rec = {"record_id": rid, "experiment": SLUG, "issue": 105, "timestamp": now.strftime("%Y-%m-%dT%H:%M:%SZ"),
            "git": git, "klt": klt_client, "backend": meta["klt_sim_backend_env"], "run_id": args.run_id,
            "n_per_corner": meta["n"], "seed": meta["seed"], "guards": GUARDS, "groups": GROUPS, "fleet": fleet,
-           "not_run_terms": not_run, "summary_ptat": summ, "summary_ctat": summ_ctat, "rss_check": rss, "controls": ctrl,
+           "not_run_terms": not_run, "partial_terms_missing_process_sections": partial, "summary_ptat": summ, "summary_ctat": summ_ctat, "rss_check": rss, "controls": ctrl,
            "transient_crosscheck": xcheck, "resumes": meta.get("resumes", []),
            "per_corner": {t: {f"{k[0]}_{k[1]:.2f}V": {"n_total": v["n_total"], "n_valid": v["n_valid"], "n_invalid": len(v["invalid"]),
                                                        "invalid": v["invalid"][:50], "nominal_invalid": v["nominal_invalid"],
@@ -561,7 +597,7 @@ def render_md(rec, anal, summ, summ_ctat, rss, ctrl, xcheck, not_run, fleet, met
          f"- **Netlist provenance**: schematic-derived committed `design/netlist/{{bias_core,temp_core}}.spice` in a generated testbench (`netlist-snapshots/{rid}/`); per-term device switching by `mmoff_*` wrapper subckts (see README)",
          "- **PDK**: sky130A @ open_pdks `c6d73a35f524070e85faff4a6a9eef49553ebc2b` (sim/pdk.json pin), models `libs.tech/combined/sky130.lib.spice` (`_mm` sections for mismatch)",
          f"- **Tools**: {rec['klt']} (client); backend `{rec['backend']}`; fleet engine ngspice-{next((f['engine_version'] for f in fleet.values() if f.get('engine_version')), '?')}; fleet jobs: "
-         + ", ".join(f"{t}={f['job_id']}" for t, f in fleet.items()),
+         + ", ".join(f"{t}[{k}]={j['job_id']}" for t, f in fleet.items() for k, j in f["jobs"].items()),
          f"- **Repo state**: `{git['sha']}` on `{git['branch']}` (working tree {'DIRTY' if git['dirty'] else 'clean'} at run time)"
          + "".join(f"; resumed {r['started_utc']} at `{r['git']['sha']}` ({'DIRTY' if r['git']['dirty'] else 'clean'})" for r in meta.get("resumes", [])),
          f"- **PVT + MC settings**: process tt/ss/ff/sf/fs (`<p>_mm` sections) x supply 2.97/3.30/3.63 V = 15 corners; temperature swept -40..125 C (step 1) inside each ngspice process, evaluated at -40/27/125 C; Monte Carlo `vary: mismatch`, **N = {N} samples per corner per term**, base seed {meta['seed']} (all terms share it)",
@@ -569,7 +605,10 @@ def render_md(rec, anal, summ, summ_ctat, rss, ctrl, xcheck, not_run, fleet, met
          "- **Error definition**: `err(T) = (PTAT_sample(T) - PTAT_nominal(T)) / S` where nominal is the same-corner no-mismatch run and `S = (PTAT_nom(125 C) - PTAT_nom(-40 C))/165 C` (degC from volts via the nominal full-range slope). *Untrimmed* = as-is. *1-point trim* = ideal multiplicative gain trim so PTAT(27 C) equals nominal at 27 C, error evaluated at -40 and 125 C (27 C is zero by construction; trim resolution/quantization not modelled).",
          f"- **Operating-point trust**: DC sweep (not a cold-start transient). Operating-point trust is taken from the #86 solver-sweep record `{SOLVER_RECORD}` and its limits are inherited (six historical FAILs not reproduced on the current netlist, but some variant combos NOT-RUN; the original FAIL records remain). Physical guards applied to EVERY sample at all three temperatures: " + "; ".join(f"{k} in [{lo:g},{hi:g}]" for k, (lo, hi) in GUARDS.items()) + "; PTAT strictly increasing over -40/27/125 C. A sample failing any guard is INVALID: excluded from the statistics, never trimmed or substituted, and counted below.", ""]
     if not_run:
-        L += [f"**PARTIAL: terms NOT-RUN (fleet refusal): {', '.join(not_run)}.** Nothing was substituted by a local grid.", ""]
+        L += [f"**PARTIAL: terms NOT-RUN (fleet refusal/timeout): {', '.join(not_run)}.** Nothing was substituted by a local grid.", ""]
+    if rec.get("partial_terms_missing_process_sections"):
+        L += ["**PARTIAL process coverage (those process-section requests had no usable fleet result; statistics cover the remaining sections only): "
+              + "; ".join(f"{t}: missing {', '.join(m)}" for t, m in rec["partial_terms_missing_process_sections"].items()) + ".**", ""]
     # headline
     L += ["## Headline (PTAT-referred temperature error, 3 sigma, degC)", ""]
     if "all" in summ and summ["all"]["untrimmed"]:

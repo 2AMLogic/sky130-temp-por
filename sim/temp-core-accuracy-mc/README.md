@@ -28,7 +28,8 @@ that sweep.
 
 1. One `klt sim` request per **term** (`nominal`, `none`, `pnp`, `amp`, `res`,
    `mirror`, `other`, `all`), 5 `_mm` process sections x 3 supplies x N samples,
-   submitted to the Spot batch fleet. The runner never launches ngspice over a
+   submitted to the Spot batch fleet as one request per process section (the fleet
+   job limit is ~1 h at concurrency 1; a single 3000-unit request timed out). The runner never launches ngspice over a
    grid and never falls back to a local grid.
 2. Exactly one device group has mismatch live in a term run; the others are
    instantiated through `mmoff_*` wrapper subckts that zero the model library's
@@ -56,7 +57,7 @@ to a local grid.
 python3 sim/temp-core-accuracy-mc/run_accuracy_mc.py probe --run-id dbg --term nominal --term all --n 3
 
 # 1. commit first: the runner refuses to start from a dirty tree (provenance-clean records)
-# 2. submit every term to the fleet (default N = 200 per corner, seed 20261010)
+# 2. submit every term to the fleet (default N = 30 per corner, seed 20261010; one fleet request per term x process section)
 python3 sim/temp-core-accuracy-mc/run_accuracy_mc.py run
 #    resume after an interrupted/refused submit (terms with a usable report.json are skipped):
 python3 sim/temp-core-accuracy-mc/run_accuracy_mc.py run --run-id <id> --resume
