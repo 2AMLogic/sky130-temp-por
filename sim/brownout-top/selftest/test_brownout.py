@@ -468,6 +468,15 @@ class TightenedRerunRunner(unittest.TestCase):
         self.assertFalse(p["a"]["over_limit"])
         self.assertIsNone(p["c"]["over_limit"])  # no default elapsed -> not projected, counted, not hidden
         self.assertEqual((res["n_over_limit"], res["n_unprojected"]), (1, 1))
+        self.assertFalse(res["lower_bound"])
+
+    def test_cost_projection_from_a_timed_out_pilot_is_a_lower_bound(self):
+        src = {"requests": [{"tag": "a", "elapsed_seconds": 450.0}, {"tag": "b", "elapsed_seconds": 2900.0}], "points": [{"tag": "a", "runtime_s": 3400.0}]}
+        res = rb.project_cost(src, {"a": {"elapsed_s": 3605.0, "corner_runtime_sum_s": 0.0, "timed_out": True}}, ["a", "b"], 3600.0)
+        self.assertTrue(res["lower_bound"])
+        self.assertIsNone(res["pilots"][0]["corner_sum_ratio"])  # lost corner runtimes are not a ratio
+        self.assertAlmostEqual(res["worst_ratio"], 3605.0 / 450.0)
+        self.assertTrue(all(p["over_limit"] for p in res["projection"]))
 
     CAP = json.dumps({"schema_version": 1, "error": {"command": "sim", "message": "batch backend failed: batch-fleet-provision.sh launch failed (exit 1): "
                                                                           "error: 8 instance(s) already running + 1 requested exceeds BATCH_MAX_CONCURRENT_INSTANCES=8"}})

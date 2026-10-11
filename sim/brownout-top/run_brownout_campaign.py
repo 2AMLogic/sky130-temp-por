@@ -403,10 +403,12 @@ def cmd_run(args) -> int:
 def project_cost(src_rec: dict, pilots: dict, tags: list[str], limit_s: float) -> dict:
     """Project every selected request's tightened fleet elapsed time from pilot jobs.
 
-    ``pilots`` maps tag -> {"elapsed_s", "corner_runtime_sum_s"} measured on the tightened deck.  The
-    ratio is taken per pilot against the same request in the source (default-deck) record, both on the
-    fleet's whole-job elapsed time and on the summed per-corner runtime; the projection uses the
-    LARGEST observed ratio (conservative) and flags any request whose projection exceeds ``limit_s``.
+    ``pilots`` maps tag -> {"elapsed_s", "corner_runtime_sum_s", "timed_out"} measured on the tightened
+    deck.  The ratio is taken per pilot against the same request in the source (default-deck) record,
+    both on the fleet's whole-job elapsed time and on the summed per-corner runtime; the projection uses
+    the LARGEST observed ratio (conservative) and flags any request whose projection exceeds ``limit_s``.
+    A pilot that hit the job limit gives only a LOWER bound on its ratio (its corner runtimes are lost),
+    so its corner-sum ratio is not used and the whole projection is marked ``lower_bound``.
     """
     src_req = {q["tag"]: q for q in src_rec.get("requests", [])}
     src_sum: dict = {}
@@ -415,10 +417,11 @@ def project_cost(src_rec: dict, pilots: dict, tags: list[str], limit_s: float) -
     pil = []
     for tag, m in pilots.items():
         d_el = (src_req.get(tag) or {}).get("elapsed_seconds")
-        pil.append({"tag": tag, "tightened_elapsed_s": m.get("elapsed_s"), "default_elapsed_s": d_el,
+        timed_out = bool(m.get("timed_out"))
+        pil.append({"tag": tag, "tightened_elapsed_s": m.get("elapsed_s"), "default_elapsed_s": d_el, "timed_out": timed_out,
                     "elapsed_ratio": (m["elapsed_s"] / d_el) if m.get("elapsed_s") and d_el else None,
                     "tightened_corner_sum_s": m.get("corner_runtime_sum_s"), "default_corner_sum_s": src_sum.get(tag),
-                    "corner_sum_ratio": (m["corner_runtime_sum_s"] / src_sum[tag]) if m.get("corner_runtime_sum_s") and src_sum.get(tag) else None})
+                    "corner_sum_ratio": (m["corner_runtime_sum_s"] / src_sum[tag]) if m.get("corner_runtime_sum_s") and src_sum.get(tag) and not timed_out else None})
     ratios = [x for p in pil for x in (p["elapsed_ratio"], p["corner_sum_ratio"]) if x]
     worst = max(ratios) if ratios else None
     proj = []
@@ -427,7 +430,7 @@ def project_cost(src_rec: dict, pilots: dict, tags: list[str], limit_s: float) -
         est = d_el * worst if (d_el and worst) else None
         proj.append({"tag": tag, "default_elapsed_s": d_el, "projected_tightened_elapsed_s": est, "pilot": tag in pilots,
                      "over_limit": None if est is None else est > limit_s})
-    return {"limit_s": limit_s, "pilots": pil, "worst_ratio": worst, "projection": proj,
+    return {"limit_s": limit_s, "pilots": pil, "worst_ratio": worst, "lower_bound": any(p["timed_out"] for p in pil), "projection": proj,
             "n_over_limit": sum(1 for p in proj if p["over_limit"]), "n_unprojected": sum(1 for p in proj if p["over_limit"] is None)}
 
 
@@ -445,21 +448,24 @@ def cmd_cost(args) -> int:
             continue
         rep = json.loads(rp.read_text())
         remote = (rep.get("environment") or {}).get("remote") or {}
+        timed_out = remote.get("state") == "timeout" or any(dg.get("code") == "batch_job_timeout" for c in rep.get("corners", []) for dg in c.get("diagnostics", []))
         pilots[tag] = {"elapsed_s": remote.get("elapsed_seconds"), "corner_runtime_sum_s": sum((c.get("runtime_s") or 0.0) for c in rep.get("corners", [])),
-                       "job_id": remote.get("job_id"), "instance_type": remote.get("instance_type")}
+                       "timed_out": timed_out, "job_id": remote.get("job_id"), "instance_type": remote.get("instance_type"), "state": remote.get("state")}
     if not pilots:
         raise SystemExit(f"no usable pilot report under {run_dir}")
-    res = project_cost(src_rec, pilots, selected_rerun_tags(man), float(rr.get("job_limit_s", 7200)))
+    limit = float(args.limit_s) if args.limit_s else float(rr.get("job_limit_s", 7200))
+    res = project_cost(src_rec, pilots, selected_rerun_tags(man), limit)
+    res["limit_source"] = f"--limit-s {args.limit_s:g} ({args.limit_note or 'no note given'})" if args.limit_s else "experiment.json tightened_rerun.job_limit_s"
     for p in res["pilots"]:
-        p.update({k: pilots[p["tag"]][k] for k in ("job_id", "instance_type")})
+        p.update({k: pilots[p["tag"]][k] for k in ("job_id", "instance_type", "state")})
     now = datetime.now(timezone.utc)
     res.update({"at_utc": now.strftime("%Y-%m-%dT%H:%M:%SZ"), "run_id": args.run_id, "solver_variant": meta.get("solver_variant"), "source_record": rr["source_record"]})
     out = run_dir / f"cost-projection-{now:%Y%m%d-%H%M%S}.json"
     out.write_text(json.dumps(res, indent=2) + "\n")
     for p in res["pilots"]:
-        print(f"pilot {p['tag']:<36} job {p['job_id']} elapsed {fmt(p['default_elapsed_s'], '.0f')} -> {fmt(p['tightened_elapsed_s'], '.0f')} s "
-              f"(x{fmt(p['elapsed_ratio'], '.2f')}); corner-sum x{fmt(p['corner_sum_ratio'], '.2f')}")
-    print(f"worst ratio x{fmt(res['worst_ratio'], '.2f')}; limit {res['limit_s']:.0f} s")
+        print(f"pilot {p['tag']:<36} job {p['job_id']} ({p['state']}) elapsed {fmt(p['default_elapsed_s'], '.0f')} -> {fmt(p['tightened_elapsed_s'], '.0f')} s "
+              f"(x{'>=' if p['timed_out'] else ''}{fmt(p['elapsed_ratio'], '.2f')}); corner-sum x{fmt(p['corner_sum_ratio'], '.2f')}")
+    print(f"worst ratio x{'>=' if res['lower_bound'] else ''}{fmt(res['worst_ratio'], '.2f')}{' (LOWER BOUND: a pilot hit the job limit)' if res['lower_bound'] else ''}; limit {res['limit_s']:.0f} s")
     for p in res["projection"]:
         print(f"  {p['tag']:<36} default {fmt(p['default_elapsed_s'], '.0f'):>6} s -> projected {fmt(p['projected_tightened_elapsed_s'], '.0f'):>6} s"
               f"{'  OVER LIMIT' if p['over_limit'] else ''}{'  (pilot)' if p['pilot'] else ''}")
@@ -475,17 +481,20 @@ def cmd_probe(args) -> int:
     if args.tag not in reqs:
         raise SystemExit(f"unknown request tag {args.tag}")
     req = reqs[args.tag]
-    d = BUILD / "probe" / args.tag
+    proc, temp, vf = args.process or "tt", 27.0 if args.temp is None else args.temp, 3.3 if args.supply is None else args.supply
+    if (proc, temp, vf) not in corners_of(man):
+        raise SystemExit(f"probe corner {proc}/{temp:g}C/{vf:g}V is not in the declared corner matrix")
+    d = BUILD / "probe" / f"{args.tag}{'-' + args.variant if args.variant else ''}-{corner_id(proc, temp, vf)}"
     d.mkdir(parents=True, exist_ok=True)
     (d / "netlist.spice").write_text(build_netlist(tb_netlist_head(d, pdk), req, man, args.variant))
     r = build_request(req, man, "local")
-    r["corners"] = {"process": ["tt"], "supply_v": {"vset": [3.3]}, "temperature_c": [27]}
+    r["corners"] = {"process": [proc], "supply_v": {"vset": [vf]}, "temperature_c": [temp]}
     if args.tstop:  # channel/netlist validation only: a truncated record is never graded or recorded
         r["analysis"]["args"] = f"1e-6 {args.tstop:g} 0 5e-6"
         r["measurements"] = []
     r["options"]["ngspice_init"] = [ln.strip() for ln in (SIM_DIR / "spiceinit").read_text().splitlines() if ln.strip() and not ln.startswith("*")]
     (d / "request.json").write_text(json.dumps(r, indent=2) + "\n")
-    say(f"[probe] one LOCAL corner tt/27C/3.30V for {args.tag}")
+    say(f"[probe] one LOCAL corner {corner_id(proc, temp, vf)} for {args.tag} (variant {args.variant or 'default'})")
     p = subprocess.run(["klt", "sim", str(d / "request.json"), "--backend", "local", "-o", str(d / "out"), "--format", "json"], capture_output=True, text=True, timeout=3600)
     (d / "report.json").write_text(p.stdout)
     (d / "klt.stderr").write_text(p.stderr)
@@ -899,7 +908,7 @@ def render_md(rec: dict) -> str:
         L.append("")
         for cp in rec["cost_projections"]:
             L.append(f"- {cp.get('at_utc')}: pilots " + ", ".join(f"`{p['tag']}` job {p.get('job_id')} {fmt(p['default_elapsed_s'], '.0f')} -> {fmt(p['tightened_elapsed_s'], '.0f')} s (elapsed x{fmt(p['elapsed_ratio'], '.2f')}, corner-sum x{fmt(p['corner_sum_ratio'], '.2f')})" for p in cp["pilots"])
-                     + f"; worst ratio x{fmt(cp['worst_ratio'], '.2f')} against the {cp['limit_s']:.0f} s per-job limit; {cp['n_over_limit']} request(s) projected over it. "
+                     + (f"; limit from {cp['limit_source']}" if cp.get("limit_source") else "") + f"; worst ratio x{'>=' if cp.get('lower_bound') else ''}{fmt(cp['worst_ratio'], '.2f')}{' (lower bound: a pilot hit the job limit, its corner runtimes were lost)' if cp.get('lower_bound') else ''} against the {cp['limit_s']:.0f} s per-job limit; {cp['n_over_limit']} request(s) projected over it. "
                      + "Projected max: " + fmt(max((p["projected_tightened_elapsed_s"] or 0) for p in cp["projection"]), ".0f") + " s.")
         L.append("")
     if rec.get("comparison"):
@@ -1088,6 +1097,9 @@ def main(argv: list[str]) -> int:
     x = sub.add_parser("probe")
     x.add_argument("--tag", required=True)
     x.add_argument("--variant", help="declared solver variant key (experiment.json solver_variants); default deck if omitted")
+    x.add_argument("--process", help="one declared process corner (default tt)")
+    x.add_argument("--temp", type=float, help="one declared temperature in C (default 27)")
+    x.add_argument("--supply", type=float, help="one declared starting supply in V (default 3.3)")
     x.add_argument("--tstop", type=float, help="shortened stop time (s) for a quick channel-name validation; such a probe is never graded")
     c = sub.add_parser("record")
     c.add_argument("--run-id", required=True)
@@ -1103,6 +1115,8 @@ def main(argv: list[str]) -> int:
     s.add_argument("--supersedes")
     k = sub.add_parser("cost")
     k.add_argument("--run-id", required=True, help="run holding the tightened pilot reports; projects every predeclared rerun request against tightened_rerun.job_limit_s")
+    k.add_argument("--limit-s", type=float, help="project against this per-job limit instead (e.g. the limit the fleet harness actually enforced); recorded with --limit-note")
+    k.add_argument("--limit-note", help="where the --limit-s value comes from")
     args = ap.parse_args(argv)
     return {"plan": cmd_plan, "run": cmd_run, "probe": cmd_probe, "record": cmd_record, "selftest": cmd_selftest, "cost": cmd_cost}[args.cmd](args)
 
