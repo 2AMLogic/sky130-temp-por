@@ -225,7 +225,43 @@ def build_request(req: dict, man: dict, backend: str, capacity_wait_s: float = 0
     return r
 
 
-def submit_one(req: dict, head: str, man: dict, run_dir: Path, capacity_wait_s: float = 0, variant_key: str | None = None) -> dict:
+CONCURRENCY_CAP_MARKER = "BATCH_MAX_CONCURRENT_INSTANCES"
+
+
+def concurrency_capped(report_text: str) -> bool:
+    """True when klt's error envelope is the shared fleet's concurrent-instance cap refusal.
+
+    klt's capacity_wait_s only waits out Spot capacity refusals, not this cap
+    (2AMLogic/klayout-tools#2917), so ``run --slot-wait`` waits for it here.  The refusal
+    creates no instance and runs no corner; it is archived as an earlier attempt.
+    """
+    try:
+        body = json.loads(report_text)
+    except (json.JSONDecodeError, TypeError):
+        return False
+    return "corners" not in body and CONCURRENCY_CAP_MARKER in str((body.get("error") or {}).get("message", ""))
+
+
+def submit_one(req: dict, head: str, man: dict, run_dir: Path, capacity_wait_s: float = 0, variant_key: str | None = None,
+               slot_wait_s: float = 0, slot_poll_s: float = 300, _sleep=None, _clock=None) -> dict:
+    """Submit one request; on a fleet concurrency-cap refusal, retry every ``slot_poll_s`` until ``slot_wait_s`` is spent.
+
+    Every refused attempt is archived (attemptN/), never overwritten or hidden.
+    """
+    import time
+    sleep, clock = _sleep or time.sleep, _clock or time.monotonic
+    start = clock()
+    while True:
+        res = _submit_once(req, head, man, run_dir, capacity_wait_s, variant_key)
+        rp = run_dir / req["tag"] / "report.json"
+        text = rp.read_text() if rp.is_file() else ""
+        if not (slot_wait_s > 0 and concurrency_capped(text) and clock() - start + slot_poll_s <= slot_wait_s):
+            return res
+        say(f"[wait]   {req['tag']}: fleet concurrency cap reached; resubmitting in {slot_poll_s:.0f} s")
+        sleep(slot_poll_s)
+
+
+def _submit_once(req: dict, head: str, man: dict, run_dir: Path, capacity_wait_s: float = 0, variant_key: str | None = None) -> dict:
     """Write netlist + request and run ``klt sim --backend batch``; an earlier attempt is archived, never overwritten."""
     d = run_dir / req["tag"]
     d.mkdir(parents=True, exist_ok=True)
@@ -337,13 +373,13 @@ def cmd_run(args) -> int:
     head = tb_netlist_head(run_dir / ("retry" if args.retry_failed else "."), pdk)
     if meta is None:
         meta = {"run_id": run_id, "started_utc": now.strftime("%Y-%m-%dT%H:%M:%SZ"), "source": gi, "klt_client": sim_common.klt_version(),
-                "klt_sim_backend_env": os.environ.get("KLT_SIM_BACKEND"), "declared": declared_counts(man), "solver_variant": variant_key,
+                "klt_sim_backend_env": os.environ.get("KLT_SIM_BACKEND"), "declared": declared_counts(man), "solver_variant": variant_key, "capacity_wait_s": args.capacity_wait, "slot_wait_s": args.slot_wait,
                 "submitted_tags": [r["tag"] for r in reqs]}
         (run_dir / "run.json").write_text(json.dumps(meta, indent=2) + "\n")
     say(f"run id {run_id}: {len(reqs)} request(s), solver variant {variant_key}")
     results = []
     with concurrent.futures.ThreadPoolExecutor(max_workers=min(2, args.jobs)) as ex:
-        futs = [ex.submit(submit_one, r, head, man, run_dir, args.capacity_wait, variant_key) for r in reqs]
+        futs = [ex.submit(submit_one, r, head, man, run_dir, args.capacity_wait, variant_key, args.slot_wait, args.slot_poll) for r in reqs]
         for f in futs:
             try:
                 results.append(f.result())
@@ -353,6 +389,7 @@ def cmd_run(args) -> int:
     old = json.loads((run_dir / "run.json").read_text()) if args.retry_failed else meta
     if args.retry_failed:
         old.setdefault("retries", []).append({"at_utc": datetime.now(timezone.utc).strftime("%Y-%m-%dT%H:%M:%SZ"), "capacity_wait_s": args.capacity_wait,
+                                             "slot_wait_s": args.slot_wait,
                                              "source": gi, "klt_client": sim_common.klt_version(), "klt_sim_backend_env": os.environ.get("KLT_SIM_BACKEND"),
                                              "submitted_tags": [r["tag"] for r in reqs], "results": results})
     else:
@@ -774,6 +811,10 @@ def render_md(rec: dict) -> str:
     t, g = rec["tools"], rec["git"]
     rs = rec["run_source"]
     L.append(f"- **Simulation source commit** (grid submitted from): `{rs.get('sha_full')}` (dirty at submit: {rs.get('dirty')}; pushed to a remote branch at submit: {rs.get('pushed_to_remote')})")
+    later = [(x.get("at_utc"), x.get("source") or {}, x.get("submitted_tags") or []) for x in (rec.get("run_meta") or {}).get("retries") or [] if x.get("source")]
+    if later:
+        L.append("- **Later submit batches into this run** (each refused deck drift since the first submit): "
+                 + "; ".join(f"{at} from `{s.get('sha_full')}` (dirty {s.get('dirty')}, pushed {s.get('pushed_to_remote')}), {len(tags)} request(s)" for at, s, tags in later))
     L.append(f"- **Grading source commit** (checker/record written from): `{g['sha_full']}` (dirty at grading: {g['dirty']}; pushed: {g['pushed_to_remote']})")
     dd = rec["deck_drift"]
     L.append("- **Deck inputs between the two commits** (" + ", ".join(f"`{x}`" for x in DECK_INPUTS) + "): "
@@ -1029,6 +1070,8 @@ def main(argv: list[str]) -> int:
     r.add_argument("--only", action="append", help="submit only this declared request tag (repeatable); the rest stay NOT_COVERED")
     r.add_argument("--retry-failed", action="store_true")
     r.add_argument("--capacity-wait", type=float, default=0)
+    r.add_argument("--slot-wait", type=float, default=0, help="seconds to keep resubmitting a request the fleet refused at its concurrent-instance cap (klayout-tools#2917); each refusal is archived")
+    r.add_argument("--slot-poll", type=float, default=300, help="seconds between concurrency-cap resubmissions")
     r.add_argument("--allow-dirty", action="store_true")
     x = sub.add_parser("probe")
     x.add_argument("--tag", required=True)

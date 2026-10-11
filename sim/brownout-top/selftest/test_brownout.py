@@ -469,6 +469,55 @@ class TightenedRerunRunner(unittest.TestCase):
         self.assertIsNone(p["c"]["over_limit"])  # no default elapsed -> not projected, counted, not hidden
         self.assertEqual((res["n_over_limit"], res["n_unprojected"]), (1, 1))
 
+    CAP = json.dumps({"schema_version": 1, "error": {"command": "sim", "message": "batch backend failed: batch-fleet-provision.sh launch failed (exit 1): "
+                                                                          "error: 8 instance(s) already running + 1 requested exceeds BATCH_MAX_CONCURRENT_INSTANCES=8"}})
+
+    def test_concurrency_cap_refusal_is_detected(self):
+        self.assertTrue(rb.concurrency_capped(self.CAP))
+        self.assertFalse(rb.concurrency_capped(json.dumps({"error": {"message": "no capacity in any of the 3 pools"}})))
+        self.assertFalse(rb.concurrency_capped(json.dumps({"corners": [], "status": "pass"})))
+        self.assertFalse(rb.concurrency_capped("not json"))
+
+    def _fake_submits(self, run_dir, bodies):
+        calls = []
+
+        def once(req, head, man, rd, cw, vk):
+            d = rd / req["tag"]
+            d.mkdir(parents=True, exist_ok=True)
+            if (d / "report.json").is_file():  # same archiving contract as the real submit
+                n = len(list(d.glob("attempt*"))) + 1
+                (d / f"attempt{n}").mkdir()
+                (d / "report.json").rename(d / f"attempt{n}" / "report.json")
+            (d / "report.json").write_text(bodies[len(calls)])
+            calls.append(1)
+            return {"tag": req["tag"], "n": len(calls)}
+        return once, calls
+
+    def test_slot_wait_resubmits_and_archives_every_refusal(self):
+        with tempfile.TemporaryDirectory() as td:
+            run_dir, req = Path(td), rb.plan_requests(MAN)[-1]
+            once, calls = self._fake_submits(run_dir, [self.CAP, self.CAP, json.dumps({"status": "pass", "corners": []})])
+            t = [0.0]
+            with mock.patch.object(rb, "_submit_once", side_effect=once):
+                res = rb.submit_one(req, "", MAN, run_dir, 0, "reltol2e-4", slot_wait_s=3600, slot_poll_s=300,
+                                    _sleep=lambda s: t.__setitem__(0, t[0] + s), _clock=lambda: t[0])
+            self.assertEqual((len(calls), res["n"]), (3, 3))
+            self.assertEqual(len(list((run_dir / req["tag"]).glob("attempt*/report.json"))), 2)
+
+    def test_slot_wait_gives_up_after_budget_and_without_opt_in(self):
+        with tempfile.TemporaryDirectory() as td:
+            run_dir, req = Path(td), rb.plan_requests(MAN)[-1]
+            once, calls = self._fake_submits(run_dir, [self.CAP] * 10)
+            t = [0.0]
+            with mock.patch.object(rb, "_submit_once", side_effect=once):
+                rb.submit_one(req, "", MAN, run_dir, 0, None, slot_wait_s=700, slot_poll_s=300,
+                              _sleep=lambda s: t.__setitem__(0, t[0] + s), _clock=lambda: t[0])
+            self.assertEqual(len(calls), 3)  # t=0, 300, 600; the next wait would pass the budget
+            once2, calls2 = self._fake_submits(run_dir / "b", [self.CAP] * 3)
+            with mock.patch.object(rb, "_submit_once", side_effect=once2):
+                rb.submit_one(req, "", MAN, run_dir / "b", 0, None)
+            self.assertEqual(len(calls2), 1)
+
     @unittest.skipUnless(TightenedRerunDeclared.SRC.is_file(), "source record not on disk")
     def test_tightened_record_without_reports_compares_every_source_point(self):
         with tempfile.TemporaryDirectory() as td:
