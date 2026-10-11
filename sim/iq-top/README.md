@@ -50,6 +50,7 @@ attribution-sum discrepancy is reported (it checks the instrumentation, KCL).
 | `testbench/tb_temp_por_iq_{por,total}.sch` | the two testbenches |
 | `run_iq_campaign.py` | `run` (batch fleet), `crosscheck` (one local corner), `record`, `selftest` |
 | `iq_checker.py` | settling/physicality grading + synthetic selftest cases |
+| `run_iq_sensitivity.py`, `test_solver_sensitivity.py` | issue #160 iq-total solver-sensitivity replicate (`run`, `record`) and its stdlib unit tests |
 | `selftest/` | committed synthetic settled / drifting waveforms |
 | `records/`, `corners/`, `netlist-snapshots/` | append-only evidence; a correction is a new record with `Supersedes` |
 
@@ -65,3 +66,25 @@ python3 sim/iq-top/run_iq_campaign.py record --run-id ID
 
 The grid is never run locally. A fleet refusal is recorded verbatim in the
 record and the issue stays open.
+
+## Solver-sensitivity replicate (issue #160)
+
+DR-006 requires a solver-sensitivity replicate of the natural-release `iq-total`
+state before the 17 non-physical points can support an Iq recommendation.
+`run_iq_sensitivity.py` re-runs the **whole** 45-point `iq-total` grid (not only
+the 17 exclusions: a solver change can move the failure set) as one fleet
+request per variant: `baseline` (the unchanged control deck), `trtol7` and
+`reltol2e-4` (the #86/#142 discriminators). Only the testbench `.options` line
+differs; the DUT, analysis card, windows, guards and grading code are shared.
+The comparison criterion (agreement within 1 %) and the classification of the 17
+exclusions are predeclared in `experiment.json` `solver_sensitivity`. If one
+45-corner job exceeds the fleet's per-job wall-clock ceiling, `--split-process`
+resubmits it as one fleet request per MOS corner; timeouts stay explicit
+unknowns and nothing is ever run locally.
+
+```
+python3 -I sim/iq-top/test_solver_sensitivity.py
+python3 sim/iq-top/run_iq_sensitivity.py run --run-id ID [--capacity-wait 1800]
+python3 sim/iq-top/run_iq_sensitivity.py run --run-id ID --retry-failed --variant trtol7 --split-process
+python3 sim/iq-top/run_iq_sensitivity.py record --run-id ID
+```

@@ -34,6 +34,9 @@ jobs:
       - name: Iq campaign isolation (one bad waveform does not lose the matrix)
         run: python3 -I sim/iq-top/test_campaign_isolation.py
 
+      - name: Iq solver-sensitivity harness (variant reaches deck, invalid waveforms unusable, classification rules)
+        run: python3 -I sim/iq-top/test_solver_sensitivity.py
+
       - name: Re-assertion diagnosis matrix and verdict rules (issue #142)
         run: python3 -I sim/supply-ramp-top/test_reassert_diagnosis.py
 
