@@ -1,14 +1,22 @@
 #!/usr/bin/env python3
-"""CI: sim/ measurement records (sim/*/records/*) are append-only against Git.
+"""CI: committed sim/ evidence is append-only against Git.
 
-sim/README.md's "Append-only rule" says records are never edited or deleted
-after creation — corrections mint a new record with a Supersedes link. This
-check diffs the protected record blobs (JSON and Markdown twins alike)
-between a Git baseline and HEAD with rename detection disabled, and fails on
-any modification, deletion or rename of an existing record, even when the
-edited JSON is still well-formed. Added record paths are allowed, so a
-correction can append a new record referring to the old one. Runner scripts,
-experiment manifests and documentation stay editable.
+Protected evidence (Git pathspecs; Git's * crosses '/', so flat and nested
+layouts are both covered):
+  sim/*/records/*            result records (JSON and Markdown twins)
+  sim/*/netlist-snapshots/*  frozen decks and batch request files
+  sim/*/corners/*            raw per-corner logs, summaries, waveforms (.gz)
+
+sim/README.md's "Append-only rule" says this evidence is never edited,
+deleted or moved after creation -- corrections preserve the old bytes and
+append a new run ID (with a Supersedes link in its record). This check diffs
+the protected blobs between a Git baseline and HEAD with rename detection
+disabled, so a move shows as a deletion of the old path (even a move out of
+the protected directories) and fails. Any modification, deletion, rename or
+type change of an existing evidence blob fails, even when the edited file is
+still well-formed; the affected paths are listed. Added paths are allowed.
+Live testbenches, campaign drivers, experiment manifests and READMEs are not
+protected and stay editable.
 
 Baseline resolution (first match wins):
   --baseline REV        use REV verbatim (must resolve to a commit)
@@ -24,12 +32,15 @@ with the fetch needed to fix it.
 
 Usage:
   check_records_append_only.py              check the current checkout
-  check_records_append_only.py --selftest   temp-git-repo fixtures: add,
-                                            modify, delete, rename, twin
-                                            edit, runner/manifest edit,
-                                            correction append, missing
-                                            baseline, initial push, push
-                                            before-commit, PR merge base
+  check_records_append_only.py --selftest   temp-git-repo fixtures: records
+                                            (add, modify, delete, rename,
+                                            twin edit, correction), flat and
+                                            nested snapshot/corner evidence
+                                            (modify, delete, move), fresh
+                                            run, live-file edits, and
+                                            baseline resolution (missing,
+                                            initial push, push before-commit,
+                                            PR merge base)
 
 Exit codes: 0 pass, 1 append-only violation (paths listed), 2 unusable
 invocation or unresolvable baseline.
@@ -40,7 +51,11 @@ import sys
 import tempfile
 from pathlib import Path
 
-PROTECTED = "sim/*/records/*"
+PROTECTED = (
+    "sim/*/records/*",
+    "sim/*/netlist-snapshots/*",
+    "sim/*/corners/*",
+)
 
 
 class BaselineError(Exception):
@@ -130,7 +145,7 @@ def resolve_baseline(repo, env, explicit):
 def record_changes(repo, baseline, head="HEAD"):
     """[(status, path)] for protected paths diffed baseline..head, renames off."""
     proc = git(
-        repo, "diff", "--no-renames", "--name-status", "-z", baseline, head, "--", PROTECTED
+        repo, "diff", "--no-renames", "--name-status", "-z", baseline, head, "--", *PROTECTED
     )
     # With -z the fields themselves are NUL-separated: STATUS\0PATH\0... per entry.
     tokens = proc.stdout.split("\0")
@@ -172,21 +187,22 @@ def main(argv):
         for status, path in bad:
             verb = verbs.get(status, f"changed ({status})")
             print(
-                f"::error file={path}::append-only violation: record {verb} — sim "
-                f'records are never edited or deleted; mint a new record with a '
+                f"::error file={path}::append-only violation: evidence {verb} (a move counts "
+                f"as a deletion) — committed sim evidence is never edited, "
+                f"deleted or moved; preserve it and append a new run ID with a "
                 f'Supersedes link (sim/README.md "Append-only rule")',
                 file=sys.stderr,
             )
         print(
             f"append-only check FAILED vs baseline {label}: {len(bad)} protected "
-            f"record path(s) edited or deleted, {added} new record path(s) allowed",
+            f"evidence path(s) edited, deleted or moved, {added} new path(s) allowed",
             file=sys.stderr,
         )
         return 1
 
     print(
-        f"append-only ok vs baseline {label}: no protected record edited or "
-        f"deleted; {added} new record path(s) allowed"
+        f"append-only ok vs baseline {label}: no protected evidence edited, "
+        f"deleted or moved; {added} new path(s) allowed"
     )
     return 0
 
@@ -369,10 +385,98 @@ def selftest():
             f"rc={p.returncode} {p.stderr}",
         )
 
+        # 14. evidence fixtures: flat + nested snapshots/corners
+        git(repo, "checkout", "-q", "main")
+        snap = exp / "netlist-snapshots"
+        cor = exp / "corners"
+        (snap / "r1" / "sub").mkdir(parents=True)
+        (cor / "r1" / "control").mkdir(parents=True)
+        (snap / "r0.spice").write_text("* flat deck\n")
+        (snap / "r1" / "deck.spice").write_text("* nested deck\n")
+        (snap / "r1" / "sub" / "b.request.json").write_text('{"req": 1}\n')
+        (cor / "r1" / "tt.log").write_bytes(b"log\n")
+        (cor / "r1" / "control" / "tt.trace.csv.gz").write_bytes(b"\x1f\x8bfake")
+        (exp / "testbench").mkdir()
+        (exp / "testbench" / "tb.spice").write_text("* tb\n")
+        (exp / "README.md").write_text("readme\n")
+        commit_all("add historical evidence")
+        ev_base = commit_sha(repo, "HEAD")
+
+        def ev(*args):
+            return run("--baseline", ev_base, *args)
+
+        def expect_fail(name, path):
+            p = ev()
+            check(
+                name,
+                p.returncode == 1 and path in p.stderr,
+                f"rc={p.returncode} {p.stderr}",
+            )
+            git(repo, "reset", "-q", "--hard", ev_base)
+
+        flat = "sim/exp/netlist-snapshots/r0.spice"
+        (snap / "r0.spice").write_text("* flat deck edited\n")
+        commit_all("edit flat snapshot")
+        expect_fail("modifying a flat snapshot fails", flat)
+
+        (snap / "r0.spice").unlink()
+        commit_all("delete flat snapshot")
+        expect_fail("deleting a flat snapshot fails", flat)
+
+        (snap / "r1" / "sub" / "b.request.json").write_text('{"req": 2}\n')
+        commit_all("edit nested request")
+        expect_fail(
+            "modifying a nested batch request fails",
+            "sim/exp/netlist-snapshots/r1/sub/b.request.json",
+        )
+
+        (cor / "r1" / "tt.log").write_bytes(b"log edited\n")
+        commit_all("edit corner log")
+        expect_fail("modifying a corner log fails", "sim/exp/corners/r1/tt.log")
+
+        gz = "sim/exp/corners/r1/control/tt.trace.csv.gz"
+        (cor / "r1" / "control" / "tt.trace.csv.gz").write_bytes(b"other")
+        commit_all("edit waveform")
+        expect_fail("modifying a nested waveform fails", gz)
+
+        (cor / "r1" / "control" / "tt.trace.csv.gz").unlink()
+        commit_all("delete waveform")
+        expect_fail("deleting a nested waveform fails", gz)
+
+        (exp / "archive").mkdir()
+        git(repo, "mv", "sim/exp/corners/r1/tt.log", "sim/exp/archive/tt.log")
+        commit_all("move corner log out of protected dir")
+        expect_fail("moving evidence outside protected dirs fails", "sim/exp/corners/r1/tt.log")
+
+        git(repo, "mv", "sim/exp/netlist-snapshots/r0.spice", "sim/exp/netlist-snapshots/r0b.spice")
+        commit_all("rename snapshot within protected dir")
+        expect_fail("renaming a snapshot fails", flat)
+
+        # fresh run (records + flat/nested snapshots + corners) passes
+        (snap / "r9.spice").write_text("* new flat\n")
+        (snap / "r9-x").mkdir()
+        (snap / "r9-x" / "deck.spice").write_text("* new nested\n")
+        (cor / "r9").mkdir()
+        (cor / "r9" / "tt.log").write_text("new\n")
+        (rec / "r9.md").write_text("# r9\n")
+        (rec / "r9.json").write_text("{}\n")
+        commit_all("fresh run")
+        p = ev()
+        check("adding a fresh run's evidence passes", p.returncode == 0, p.stderr)
+
+        # live files stay editable
+        (exp / "testbench" / "tb.spice").write_text("* tb v2\n")
+        (exp / "run.py").write_text("print('driver v9')\n")
+        (exp / "experiment.json").write_text('{"slug": "exp", "v": 2}\n')
+        (exp / "README.md").write_text("readme v2\n")
+        commit_all("edit live files")
+        p = ev()
+        check("editing testbench/driver/manifest/README passes", p.returncode == 0, p.stderr)
+
     if failures:
         print(f"selftest FAILED: {len(failures)} case(s): {', '.join(failures)}", file=sys.stderr)
         return 1
-    print("selftest ok: add/modify/delete/rename/twin/runner/correction/baseline fixtures all behave")
+    print("selftest ok: record and evidence (flat/nested) add/modify/delete/move, live-file and baseline fixtures all behave")
     return 0
 
 

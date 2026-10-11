@@ -13,14 +13,14 @@ jobs:
   self-checks:
     runs-on: ubuntu-latest
     env:
-      # Not a default runner variable; the append-only records check reads it
+      # Not a default runner variable; the append-only evidence check reads it
       # to find the pushed-from commit on pushes to main.
       GITHUB_EVENT_BEFORE: ${{ github.event.before }}
     steps:
       - uses: actions/checkout@v4
         with:
-          # Full history so the append-only records check can diff protected
-          # sim/*/records/* blobs against the pull_request merge base or the
+          # Full history so the append-only evidence check can diff protected
+          # sim/*/{records,netlist-snapshots,corners}/* blobs against the pull_request merge base or the
           # push event's before commit; a depth-1 clone cannot resolve either.
           fetch-depth: 0
 
@@ -40,10 +40,10 @@ jobs:
               echo "::warning::could not fetch baseline ${GITHUB_EVENT_BEFORE}; the append-only check will report it as unresolvable"
           fi
 
-      - name: Append-only records checker selftest (add, modify, delete, rename, missing-baseline fixtures)
+      - name: Append-only evidence checker selftest (records, snapshots, corners: add, modify, delete, move, baseline fixtures)
         run: python3 -I .github/scripts/check_records_append_only.py --selftest
 
-      - name: Simulation records are append-only against the Git baseline
+      - name: Simulation records, netlist snapshots and corner evidence are append-only against the Git baseline
         run: python3 -I .github/scripts/check_records_append_only.py
 
       - name: Pad-island census unit tests
