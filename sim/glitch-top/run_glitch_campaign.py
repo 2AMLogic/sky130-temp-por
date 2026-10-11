@@ -37,6 +37,7 @@ import re
 import shutil
 import subprocess
 import sys
+import time
 from datetime import datetime, timezone
 from pathlib import Path
 
@@ -246,8 +247,18 @@ def submit_one(req: dict, head: str, man: dict, run_dir: Path, capacity_wait_s: 
     (d / "netlist.spice").write_text(build_netlist(head, req))
     (d / "request.json").write_text(json.dumps(build_request(req, man, "batch", capacity_wait_s), indent=2) + "\n")
     say(f"[submit] {req['tag']}: {len(corners_of(man))} points -> batch fleet")
-    p = subprocess.run(["klt", "sim", str(d / "request.json"), "--backend", "batch", "-o", str(d / "out"), "--format", "json"],
-                       capture_output=True, text=True, timeout=4 * 3600)
+    refusals = 0
+    while True:
+        p = subprocess.run(["klt", "sim", str(d / "request.json"), "--backend", "batch", "-o", str(d / "out"), "--format", "json"],
+                           capture_output=True, text=True, timeout=4 * 3600)
+        # the fleet has a shared instance cap that klt does not wait on; a refused LAUNCH is retried later
+        # (bounded; never replaced by a local grid).  Every refusal is kept as evidence.
+        if "BATCH_MAX_CONCURRENT_INSTANCES" in p.stdout + p.stderr and capacity_wait_s and refusals < 40:
+            refusals += 1
+            (d / f"launch-refused-{refusals}.txt").write_text(p.stdout + p.stderr)
+            time.sleep(min(180, capacity_wait_s))
+            continue
+        break
     (d / "report.json").write_text(p.stdout)
     (d / "klt.stderr").write_text(p.stderr)
     try:
