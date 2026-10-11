@@ -41,6 +41,7 @@ import os
 import re
 import statistics
 import subprocess
+import time
 import sys
 from datetime import datetime, timezone
 from pathlib import Path
@@ -251,8 +252,15 @@ def cmd_run(args):
         (d / "request.json").write_text(json.dumps(build_request(term, "batch", args.n, seed, ([proc], SUPPLIES) if proc else None), indent=2) + "\n")
         units = (1 if term == "nominal" else args.n) * len(SUPPLIES) * (1 if proc else len(PROCS))
         say(f"[submit] {term}/{proc or 'all-proc'}: {units} ngspice units -> batch fleet")
-        p = subprocess.run(["klt", "sim", str(d / "request.json"), "--backend", "batch", "-o", str(d / "out"), "--format", "json"],
-                           capture_output=True, text=True, timeout=3 * 3600)
+        for attempt in range(1, 61):
+            p = subprocess.run(["klt", "sim", str(d / "request.json"), "--backend", "batch", "-o", str(d / "out"), "--format", "json"],
+                               capture_output=True, text=True, timeout=3 * 3600)
+            # the fleet has a shared instance cap; a refused LAUNCH is retried later (never replaced by a local grid)
+            if "BATCH_MAX_CONCURRENT_INSTANCES" in p.stdout + p.stderr and attempt < 60:
+                (d / f"launch-refused-{attempt}.txt").write_text(p.stdout + p.stderr)
+                time.sleep(180)
+                continue
+            break
         (d / "report.json").write_text(p.stdout)
         (d / "klt.stderr").write_text(p.stderr)
         try:
