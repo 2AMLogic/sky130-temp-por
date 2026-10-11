@@ -37,6 +37,9 @@ jobs:
       - name: Re-assertion diagnosis matrix and verdict rules (issue #142)
         run: python3 -I sim/supply-ramp-top/test_reassert_diagnosis.py
 
+      - name: Brown-out checker synthetic verdict cases (16 cases, no records written)
+        run: python3 -I sim/brownout-top/brownout_checker.py
+
       - name: Committed netlists satisfy the pinout invariants
         run: python3 design/check_committed_netlists.py
 
