@@ -25,8 +25,8 @@ _None._
 
 Issues currently being built (`loom:building`).
 
-- **#105**: Full-signal-path mismatch Monte Carlo for temp_core accuracy (DR-003 TBD-1, T1 item 6)
-- **#156**: CI: gate the brown-out checker synthetic verdict cases
+- **#117**: Characterize POR_RAW-domain and VDD-level glitch immunity as distinct assembly experiments
+- **#153**: brownout-top: re-grade NONPHYSICAL brown-out points with a tightened-solver fleet re-run
 
 ## PRs Awaiting Review
 
@@ -45,7 +45,8 @@ _None._
 Issues carrying `loom:curated`.
 
 - **#97**: Lay out por_output_chain as the next DRC/LVS-verified POR leaf *(curated)*
-- **#105**: Full-signal-path mismatch Monte Carlo for temp_core accuracy (DR-003 TBD-1, T1 item 6) *(curated)*
+- **#117**: Characterize POR_RAW-domain and VDD-level glitch immunity as distinct assembly experiments *(curated)*
+- **#153**: brownout-top: re-grade NONPHYSICAL brown-out points with a tightened-solver fleet re-run *(curated)*
 
 ## Proposed (Architect / Hermit)
 
@@ -67,7 +68,7 @@ Issues carrying `loom:curated`.
 | In Progress (`loom:building`) | 2 |
 | PRs awaiting review | 0 |
 | Approved PRs awaiting merge | 0 |
-| Curated | 2 |
+| Curated | 3 |
 | Architect / Hermit proposals | 3 |
 | Active epics | 1 |
 <!-- guide:plan-body:end -->

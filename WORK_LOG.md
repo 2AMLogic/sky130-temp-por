@@ -4,6 +4,18 @@ Chronological record of recently merged pull requests and closed issues. This fi
 
 ### 2026-10-11
 
+- **PR #167**: sim: temp-core accuracy Monte Carlo campaign with per-term error budget (#105)
+- **PR #166**: ci: preserve frozen netlist snapshots and corner evidence as append-only (#165)
+- **PR #163**: ci: enforce append-only simulation records against the Git baseline
+- **PR #161**: Solver-sensitivity replicate for natural-release iq-total (45 points x 3 variants)
+- **PR #158**: ci: gate brown-out checker synthetic verdict cases
+- **Issue #105** (closed): Full-signal-path mismatch Monte Carlo for temp_core accuracy (DR-003 TBD-1, T1 item 6)
+- **Issue #165** (closed): Preserve frozen simulation decks and raw corner evidence in CI
+- **Issue #164** (closed): Auditor Capability Request: Python interpreter for local evidence checks
+- **Issue #162** (closed): CI: enforce append-only simulation records against the Git baseline
+- **Issue #160** (closed): Resolve assembled iq-total exclusions with a full-grid solver-sensitivity replicate
+- **Issue #159** (closed): Guard decision: retain confirmation for detached-checkout hard resets
+- **Issue #156** (closed): CI: gate the brown-out checker synthetic verdict cases
 - **Issue #155** (closed): Guard decision: retain confirmation for main-checkout stash
 
 ### 2026-10-10
