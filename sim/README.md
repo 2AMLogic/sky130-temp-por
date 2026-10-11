@@ -159,6 +159,18 @@ edited, loosened, or deleted just because the result was unwelcome; a genuine
 circuit finding gets a follow-up issue instead (see that experiment's own
 `experiment.json` `notes` field).
 
+CI enforces this rule in the self-checks workflow
+(`.github/scripts/check_records_append_only.py`): the protected
+`sim/*/records/*` blobs are diffed against a Git baseline with rename
+detection disabled, and any modification, deletion or rename of an existing
+record fails the run — even when the edited JSON is still well-formed. New
+records, runner scripts, experiment manifests and documentation stay
+editable. The baseline is the merge base with the target branch for pull
+requests, the pushed-from commit (`before`) for pushes to `main`, and the
+empty tree for an initial push (no prior commit exists, so nothing can be
+violated yet); history that cannot be resolved fails the check with the
+fetch needed to fix it.
+
 ---
 
 ## Current experiments
