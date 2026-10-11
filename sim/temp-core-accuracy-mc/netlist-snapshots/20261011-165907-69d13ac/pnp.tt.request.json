@@ -1,0 +1,116 @@
+{
+  "netlist": "netlist.spice",
+  "backend": "batch",
+  "models": {
+    "pdk": "sky130A",
+    "lib": "libs.tech/combined/sky130.lib.spice"
+  },
+  "corners": {
+    "process": [
+      "tt_mm"
+    ],
+    "supply_v": {
+      "vsup": [
+        2.97,
+        3.3,
+        3.63
+      ]
+    },
+    "temperature_c": [
+      27
+    ]
+  },
+  "analysis": {
+    "kind": "dc",
+    "args": "temp -40 125 1"
+  },
+  "measurements": [
+    {
+      "name": "ptat_m40",
+      "spice": ".meas dc ptat_m40 FIND v(ptat) AT=-40",
+      "unit": "V"
+    },
+    {
+      "name": "ctat_m40",
+      "spice": ".meas dc ctat_m40 FIND v(ctat) AT=-40",
+      "unit": "V"
+    },
+    {
+      "name": "na_m40",
+      "spice": ".meas dc na_m40 FIND v(xdut.na) AT=-40",
+      "unit": "V"
+    },
+    {
+      "name": "nb_m40",
+      "spice": ".meas dc nb_m40 FIND v(xdut.nb) AT=-40",
+      "unit": "V"
+    },
+    {
+      "name": "isup_m40",
+      "spice": ".meas dc isup_m40 FIND i(vsup) AT=-40",
+      "unit": "A"
+    },
+    {
+      "name": "ptat_p27",
+      "spice": ".meas dc ptat_p27 FIND v(ptat) AT=27",
+      "unit": "V"
+    },
+    {
+      "name": "ctat_p27",
+      "spice": ".meas dc ctat_p27 FIND v(ctat) AT=27",
+      "unit": "V"
+    },
+    {
+      "name": "na_p27",
+      "spice": ".meas dc na_p27 FIND v(xdut.na) AT=27",
+      "unit": "V"
+    },
+    {
+      "name": "nb_p27",
+      "spice": ".meas dc nb_p27 FIND v(xdut.nb) AT=27",
+      "unit": "V"
+    },
+    {
+      "name": "isup_p27",
+      "spice": ".meas dc isup_p27 FIND i(vsup) AT=27",
+      "unit": "A"
+    },
+    {
+      "name": "ptat_p125",
+      "spice": ".meas dc ptat_p125 FIND v(ptat) AT=125",
+      "unit": "V"
+    },
+    {
+      "name": "ctat_p125",
+      "spice": ".meas dc ctat_p125 FIND v(ctat) AT=125",
+      "unit": "V"
+    },
+    {
+      "name": "na_p125",
+      "spice": ".meas dc na_p125 FIND v(xdut.na) AT=125",
+      "unit": "V"
+    },
+    {
+      "name": "nb_p125",
+      "spice": ".meas dc nb_p125 FIND v(xdut.nb) AT=125",
+      "unit": "V"
+    },
+    {
+      "name": "isup_p125",
+      "spice": ".meas dc isup_p125 FIND i(vsup) AT=125",
+      "unit": "A"
+    }
+  ],
+  "options": {
+    "timeout_s": 1800,
+    "keep_artifacts": true
+  },
+  "monte_carlo": {
+    "n": 30,
+    "seed": 20261010,
+    "vary": "mismatch"
+  },
+  "batch": {
+    "runner_version_check": "warn"
+  }
+}
