@@ -19,6 +19,14 @@ Subcommands
              logs, event-preserving traces, markdown + JSON record twins.
              Unsubmitted / refused / missing points are listed as NOT_COVERED.
   selftest   run the checker's synthetic cases and write a self-test record.
+  cost       (issue #153) project the tightened-solver rerun's per-job fleet time
+             from pilot reports already in a run directory; no submission.
+
+Solver variants (issue #153): ``run/probe/record --variant <key>`` select a
+variant declared in experiment.json ``solver_variants``; only the declared
+extra ``.options`` are appended to the testbench's options line.  A tightened
+run is restricted to ``tightened_rerun.rerun_tags`` and its record carries a
+per-point default-vs-tightened comparison against the source record.
 
 Append-only: ``record`` and ``selftest`` refuse to overwrite any existing path.
 """
@@ -139,6 +147,17 @@ def variant_of(man: dict, key: str | None) -> dict:
     if key not in variants:
         raise SystemExit(f"solver variant '{key}' is not declared in {MANIFEST.name} solver_variants (declared: {sorted(variants)})")
     return {"key": key, **variants[key]}
+
+
+def selected_rerun_tags(man: dict) -> list[str]:
+    """The predeclared tightened-rerun request set (experiment.json tightened_rerun.rerun_tags), validated against the matrix."""
+    rr = man.get("tightened_rerun") or {}
+    tags = list(rr.get("rerun_tags") or [])
+    declared = [r["tag"] for r in plan_requests(man)]
+    unknown = [t for t in tags if t not in declared]
+    if not tags or unknown or len(set(tags)) != len(tags):
+        raise SystemExit(f"tightened_rerun.rerun_tags must be a non-empty, duplicate-free list of declared request tags (unknown: {unknown})")
+    return [t for t in declared if t in set(tags)]
 
 
 def apply_variant(head: str, variant: dict) -> str:
@@ -293,15 +312,25 @@ def cmd_run(args) -> int:
         prev = meta.get("solver_variant", "default")
         if prev != variant_key:
             raise SystemExit(f"run {run_id} was submitted with solver variant '{prev}'; refusing to mix variants in one run")
+        drift = deck_drift((meta.get("source") or {}).get("sha_full"), gi.get("sha_full"))
+        if drift is None or drift:
+            raise SystemExit(f"refusing to continue run {run_id}: deck inputs differ from (or cannot be compared with) its first submit commit: {drift}")
     else:
         if run_dir.exists():
             raise SystemExit(f"{run_dir} exists; refusing to reuse a run id")
-        run_dir.mkdir(parents=True)
     reqs = plan_requests(man)
+    rerun = man.get("tightened_rerun") or {}
+    if variant_key != "default" and rerun.get("variant") == variant_key:
+        allowed = set(selected_rerun_tags(man))
+        if args.only and set(args.only) - allowed:
+            raise SystemExit(f"--only names request(s) outside the predeclared tightened_rerun.rerun_tags: {sorted(set(args.only) - allowed)}")
+        reqs = [r for r in reqs if r["tag"] in allowed]
     if args.only:
         reqs = [r for r in reqs if r["tag"] in args.only]
         if not reqs:
             raise SystemExit("--only matched no declared request")
+    if not args.retry_failed:
+        run_dir.mkdir(parents=True)
     if args.retry_failed:
         reqs = [r for r in reqs if not sim_common.report_usable(run_dir / r["tag"] / "report.json")]
         say(f"retrying {len(reqs)} request(s) without a usable report (variant {variant_key}), capacity_wait_s={args.capacity_wait}")
@@ -323,11 +352,80 @@ def cmd_run(args) -> int:
                 say(f"[error] submit raised: {err!r}")
     old = json.loads((run_dir / "run.json").read_text()) if args.retry_failed else meta
     if args.retry_failed:
-        old.setdefault("retries", []).append({"at_utc": datetime.now(timezone.utc).strftime("%Y-%m-%dT%H:%M:%SZ"), "capacity_wait_s": args.capacity_wait, "results": results})
+        old.setdefault("retries", []).append({"at_utc": datetime.now(timezone.utc).strftime("%Y-%m-%dT%H:%M:%SZ"), "capacity_wait_s": args.capacity_wait,
+                                             "source": gi, "klt_client": sim_common.klt_version(), "klt_sim_backend_env": os.environ.get("KLT_SIM_BACKEND"),
+                                             "submitted_tags": [r["tag"] for r in reqs], "results": results})
     else:
         old["submit_results"] = results
     (run_dir / "run.json").write_text(json.dumps(old, indent=2) + "\n")
     print(f"raw outputs: {run_dir}")
+    return 0
+
+
+def project_cost(src_rec: dict, pilots: dict, tags: list[str], limit_s: float) -> dict:
+    """Project every selected request's tightened fleet elapsed time from pilot jobs.
+
+    ``pilots`` maps tag -> {"elapsed_s", "corner_runtime_sum_s"} measured on the tightened deck.  The
+    ratio is taken per pilot against the same request in the source (default-deck) record, both on the
+    fleet's whole-job elapsed time and on the summed per-corner runtime; the projection uses the
+    LARGEST observed ratio (conservative) and flags any request whose projection exceeds ``limit_s``.
+    """
+    src_req = {q["tag"]: q for q in src_rec.get("requests", [])}
+    src_sum: dict = {}
+    for p in src_rec.get("points", []):
+        src_sum[p["tag"]] = src_sum.get(p["tag"], 0.0) + (p.get("runtime_s") or 0.0)
+    pil = []
+    for tag, m in pilots.items():
+        d_el = (src_req.get(tag) or {}).get("elapsed_seconds")
+        pil.append({"tag": tag, "tightened_elapsed_s": m.get("elapsed_s"), "default_elapsed_s": d_el,
+                    "elapsed_ratio": (m["elapsed_s"] / d_el) if m.get("elapsed_s") and d_el else None,
+                    "tightened_corner_sum_s": m.get("corner_runtime_sum_s"), "default_corner_sum_s": src_sum.get(tag),
+                    "corner_sum_ratio": (m["corner_runtime_sum_s"] / src_sum[tag]) if m.get("corner_runtime_sum_s") and src_sum.get(tag) else None})
+    ratios = [x for p in pil for x in (p["elapsed_ratio"], p["corner_sum_ratio"]) if x]
+    worst = max(ratios) if ratios else None
+    proj = []
+    for tag in tags:
+        d_el = (src_req.get(tag) or {}).get("elapsed_seconds")
+        est = d_el * worst if (d_el and worst) else None
+        proj.append({"tag": tag, "default_elapsed_s": d_el, "projected_tightened_elapsed_s": est, "pilot": tag in pilots,
+                     "over_limit": None if est is None else est > limit_s})
+    return {"limit_s": limit_s, "pilots": pil, "worst_ratio": worst, "projection": proj,
+            "n_over_limit": sum(1 for p in proj if p["over_limit"]), "n_unprojected": sum(1 for p in proj if p["over_limit"] is None)}
+
+
+def cmd_cost(args) -> int:
+    """Pilot-based runtime projection for the tightened rerun (no submission; reads pilot reports of an existing run)."""
+    man = sim_common.load_manifest(MANIFEST)
+    rr = man.get("tightened_rerun") or {}
+    run_dir = BUILD / args.run_id
+    meta = json.loads((run_dir / "run.json").read_text())
+    src_rec = json.loads((REPO_ROOT / rr["source_record"]).read_text())
+    pilots = {}
+    for tag in selected_rerun_tags(man):
+        rp = run_dir / tag / "report.json"
+        if not sim_common.report_usable(rp):
+            continue
+        rep = json.loads(rp.read_text())
+        remote = (rep.get("environment") or {}).get("remote") or {}
+        pilots[tag] = {"elapsed_s": remote.get("elapsed_seconds"), "corner_runtime_sum_s": sum((c.get("runtime_s") or 0.0) for c in rep.get("corners", [])),
+                       "job_id": remote.get("job_id"), "instance_type": remote.get("instance_type")}
+    if not pilots:
+        raise SystemExit(f"no usable pilot report under {run_dir}")
+    res = project_cost(src_rec, pilots, selected_rerun_tags(man), float(rr.get("job_limit_s", 7200)))
+    for p in res["pilots"]:
+        p.update({k: pilots[p["tag"]][k] for k in ("job_id", "instance_type")})
+    now = datetime.now(timezone.utc)
+    res.update({"at_utc": now.strftime("%Y-%m-%dT%H:%M:%SZ"), "run_id": args.run_id, "solver_variant": meta.get("solver_variant"), "source_record": rr["source_record"]})
+    out = run_dir / f"cost-projection-{now:%Y%m%d-%H%M%S}.json"
+    out.write_text(json.dumps(res, indent=2) + "\n")
+    for p in res["pilots"]:
+        print(f"pilot {p['tag']:<36} job {p['job_id']} elapsed {fmt(p['default_elapsed_s'], '.0f')} -> {fmt(p['tightened_elapsed_s'], '.0f')} s "
+              f"(x{fmt(p['elapsed_ratio'], '.2f')}); corner-sum x{fmt(p['corner_sum_ratio'], '.2f')}")
+    print(f"worst ratio x{fmt(res['worst_ratio'], '.2f')}; limit {res['limit_s']:.0f} s")
+    for p in res["projection"]:
+        print(f"  {p['tag']:<36} default {fmt(p['default_elapsed_s'], '.0f'):>6} s -> projected {fmt(p['projected_tightened_elapsed_s'], '.0f'):>6} s"
+              f"{'  OVER LIMIT' if p['over_limit'] else ''}{'  (pilot)' if p['pilot'] else ''}")
+    print(f"{res['n_over_limit']} request(s) projected over the limit; written {out}")
     return 0
 
 
@@ -517,12 +615,22 @@ def _cmp_note(p: dict) -> str:
     return ""
 
 
-def build_comparison(src_rec: dict, points: list[dict]) -> dict:
+def _physical_flag(p: dict):
+    """True/False from the checker's physicality block; None when the point was never graded (NOT_COVERED / ERROR)."""
+    if p.get("outcome") in ("NOT_COVERED", "ERROR"):
+        return None
+    return ((p.get("check") or {}).get("physical") or {}).get("ok")
+
+
+def build_comparison(src_rec: dict, points: list[dict], requests: list[dict] | None = None, variant: dict | None = None,
+                     selected_tags: list[str] | None = None) -> dict:
     """Join the source (default-deck) record with this run's tightened points on (request tag, corner id).
 
     Refuses a broken join in either direction: every declared point must appear exactly once on
     each side, so the comparison accounts for every selected point, including refusals and
-    NOT_COVERED rows (kept, never dropped).
+    NOT_COVERED rows (kept, never dropped).  ``selected_tags`` is the predeclared rerun set (request
+    tags); a point outside it is still listed, with ``selected`` False, so nothing disappears.
+    Roles: a source-NONPHYSICAL point is a ``target``, a source-physical point a ``control``.
     """
     src: dict = {}
     for p in src_rec.get("points", []):
@@ -530,6 +638,9 @@ def build_comparison(src_rec: dict, points: list[dict]) -> dict:
         if k in src:
             raise SystemExit(f"source record lists {k[0]}/{k[1]} twice -- refusing a broken join")
         src[k] = p
+    src_jobs = {q.get("tag"): q for q in src_rec.get("requests", [])}
+    new_jobs = {q.get("tag"): q for q in (requests or [])}
+    sel = None if selected_tags is None else set(selected_tags)
     rows, missing = [], []
     for p in points:
         s = src.pop((p.get("tag"), p.get("id")), None)
@@ -537,12 +648,16 @@ def build_comparison(src_rec: dict, points: list[dict]) -> dict:
             missing.append(f"{p.get('tag')}/{p.get('id')}")
             continue
         outcome = p.get("outcome")
-        phys = (p.get("check") or {}).get("physical") or {}
         rows.append({"tag": p["tag"], "id": p["id"], "process": p.get("process"), "temperature_c": p.get("temperature_c"), "supply_v": p.get("supply_v"),
+                     "role": "target" if s.get("outcome") == "NONPHYSICAL" else "control",
+                     "selected": True if sel is None else p["tag"] in sel,
                      "default_outcome": s.get("outcome"), "tightened_outcome": outcome,
-                     "tightened_physical": phys.get("ok") if outcome not in ("NOT_COVERED", "ERROR") else None,
+                     "default_physical": _physical_flag(s), "tightened_physical": _physical_flag(p),
+                     "default_job_id": (src_jobs.get(p["tag"]) or {}).get("job_id"), "tightened_job_id": (new_jobs.get(p["tag"]) or {}).get("job_id"),
                      "default_runtime_s": s.get("runtime_s"), "tightened_runtime_s": p.get("runtime_s"),
-                     "tightened_note": _cmp_note(p)})
+                     "default_fail_codes": list((s.get("check") or {}).get("fail_codes") or []),
+                     "tightened_fail_codes": list((p.get("check") or {}).get("fail_codes") or []),
+                     "default_note": _cmp_note(s), "tightened_note": _cmp_note(p)})
     if missing:
         raise SystemExit(f"rerun point(s) absent from the source record ({len(missing)}, first: {missing[:3]}) -- refusing a broken join")
     if src:
@@ -552,9 +667,11 @@ def build_comparison(src_rec: dict, points: list[dict]) -> dict:
     for r in rows:
         matrix.setdefault(r["default_outcome"], {}).setdefault(r["tightened_outcome"], 0)
         matrix[r["default_outcome"]][r["tightened_outcome"]] += 1
-    targets = [r for r in rows if r["default_outcome"] == "NONPHYSICAL"]
-    controls = [r for r in rows if r["default_outcome"] != "NONPHYSICAL"]
-    changed = [r for r in controls if r["tightened_outcome"] != r["default_outcome"]]
+    targets = [r for r in rows if r["role"] == "target"]
+    controls = [r for r in rows if r["role"] == "control"]
+    # an uncovered control is not a changed verdict: it is counted separately, never as agreement either
+    changed = [r for r in controls if r["tightened_outcome"] not in (r["default_outcome"], "NOT_COVERED")]
+    ctl_uncovered = sum(1 for r in controls if r["tightened_outcome"] == "NOT_COVERED")
     tgt: dict = {}
     for r in targets:
         tgt[r["tightened_outcome"]] = tgt.get(r["tightened_outcome"], 0) + 1
@@ -562,9 +679,32 @@ def build_comparison(src_rec: dict, points: list[dict]) -> dict:
                     if r.get("default_runtime_s") and r.get("tightened_runtime_s"))
     runtime = {"n": len(ratios), "median_ratio": ratios[len(ratios) // 2] if ratios else None,
                "min_ratio": ratios[0] if ratios else None, "max_ratio": ratios[-1] if ratios else None}
-    return {"source_record": src_rec.get("record_id"), "points_compared": len(rows), "transition_matrix": matrix,
+    req_rows = []
+    for tag in dict.fromkeys(r["tag"] for r in rows):
+        sq, nq = src_jobs.get(tag) or {}, new_jobs.get(tag) or {}
+        mine = [r for r in rows if r["tag"] == tag]
+        req_rows.append({"tag": tag, "selected": mine[0]["selected"], "n_points": len(mine),
+                         "n_targets": sum(r["role"] == "target" for r in mine), "n_controls": sum(r["role"] == "control" for r in mine),
+                         "default_job_id": sq.get("job_id"), "default_elapsed_s": sq.get("elapsed_seconds"),
+                         "tightened_job_id": nq.get("job_id"), "tightened_elapsed_s": nq.get("elapsed_seconds"),
+                         "tightened_fleet_outcome": nq.get("outcome"), "tightened_earlier_attempts": nq.get("failed_earlier_attempts") or [],
+                         "tightened_not_covered": sum(r["tightened_outcome"] == "NOT_COVERED" for r in mine),
+                         "tightened_error": sum(r["tightened_outcome"] == "ERROR" for r in mine)})
+    sel_rows = [r for r in rows if r["selected"]]
+    accounting = {"selected_points": len(sel_rows), "selected_targets": sum(r["role"] == "target" for r in sel_rows),
+                  "excluded_points": len(rows) - len(sel_rows),
+                  "unselected_targets": sum(1 for r in rows if r["role"] == "target" and not r["selected"]),
+                  "tightened_not_covered": sum(r["tightened_outcome"] == "NOT_COVERED" for r in rows),
+                  "tightened_error": sum(r["tightened_outcome"] == "ERROR" for r in rows),
+                  "requests_without_job": [q["tag"] for q in req_rows if q["selected"] and not q["tightened_job_id"]]}
+    solver = None
+    if variant is not None:
+        solver = {"default": {"key": "default", "options_extra": []},
+                  "tightened": {"key": variant.get("key"), "options_extra": list(variant.get("options_extra") or [])}}
+    return {"source_record": src_rec.get("record_id"), "solver": solver, "points_compared": len(rows), "transition_matrix": matrix,
             "targets": {"n": len(targets), "transitions": tgt},
-            "controls": {"n": len(controls), "n_changed": len(changed), "changed": changed},
+            "controls": {"n": len(controls), "n_changed": len(changed), "n_not_covered": ctl_uncovered, "changed": changed},
+            "accounting": accounting, "requests": req_rows,
             "runtime_ratio": runtime, "rows": rows}
 
 
@@ -581,26 +721,46 @@ def render_comparison_md(cmp: dict) -> list[str]:
     L.append("")
     t, c = cmp["targets"], cmp["controls"]
     L.append(f"- **Targets (source NONPHYSICAL, {t['n']} points)**: " + (", ".join(f"{o} {n}" for o, n in sorted(t["transitions"].items())) or "none") + ".")
-    L.append(f"- **Controls (source PASS/FAIL, {c['n']} points)**: {c['n'] - c['n_changed']} unchanged, {c['n_changed']} changed. Changed control verdicts are retained below as evidence, not discarded; control agreement is not a precondition for this record.")
+    L.append(f"- **Controls (source PASS/FAIL, {c['n']} points)**: {c['n'] - c['n_changed'] - c.get('n_not_covered', 0)} unchanged, {c['n_changed']} changed, {c.get('n_not_covered', 0)} not covered by the tightened run. Changed control verdicts are retained below as evidence, not discarded; control agreement is not a precondition for this record.")
+    a = cmp.get("accounting") or {}
+    if a:
+        L.append(f"- **Accounting**: {a['selected_points']} selected point(s) ({a['selected_targets']} source-NONPHYSICAL targets), {a['excluded_points']} excluded "
+                 f"({a['unselected_targets']} of them targets); tightened NOT_COVERED {a['tightened_not_covered']}, ERROR {a['tightened_error']}; "
+                 f"selected requests with no tightened fleet job: {', '.join(a['requests_without_job']) or 'none'}.")
+    if cmp.get("solver"):
+        sv = cmp["solver"]["tightened"]
+        L.append(f"- **Solver settings**: default = the testbench's declared `.options method=gear trtol=50`; tightened `{sv['key']}` = the same line + `{' '.join(sv['options_extra'])}`.")
     rt = cmp["runtime_ratio"]
     if rt["n"]:
         L.append(f"- **Runtime, tightened vs default** (per corner, {rt['n']} points with both measured): median x{rt['median_ratio']:.2f}, range x{rt['min_ratio']:.2f} - x{rt['max_ratio']:.2f}.")
     L.append("")
+    if cmp.get("requests"):
+        L.append("### Per-request fleet jobs (default -> tightened)")
+        L.append("")
+        L.append("| request | selected | targets / controls | default job | default elapsed (s) | tightened job | tightened elapsed (s) | tightened fleet outcome | NOT_COVERED | ERROR | earlier attempts |")
+        L.append("|---|---|---|---|---|---|---|---|---|---|---|")
+        for q in cmp["requests"]:
+            L.append(f"| {q['tag']} | {'yes' if q['selected'] else 'no'} | {q['n_targets']} / {q['n_controls']} | {q['default_job_id']} | {fmt(q['default_elapsed_s'], '.0f')} | "
+                     f"{q['tightened_job_id']} | {fmt(q['tightened_elapsed_s'], '.0f')} | {str(q['tightened_fleet_outcome'])[:60]} | {q['tightened_not_covered']} | {q['tightened_error']} | {len(q['tightened_earlier_attempts'])} |")
+        L.append("")
     if c["changed"]:
         L.append("### Changed control points (source physical)")
         L.append("")
-        L.append("| request | point | default | tightened | tightened note |")
-        L.append("|---|---|---|---|---|")
+        L.append("| request | point | default | tightened | tightened physical | default note | tightened note |")
+        L.append("|---|---|---|---|---|---|---|")
         for r in c["changed"]:
-            L.append(f"| {r['tag']} | {r['id']} | {r['default_outcome']} | {r['tightened_outcome']} | {r['tightened_note']} |")
+            L.append(f"| {r['tag']} | {r['id']} | {r['default_outcome']} | {r['tightened_outcome']} | {r['tightened_physical']} | {r.get('default_note', '')} | {r['tightened_note']} |")
         L.append("")
     L.append("### Per-point comparison")
     L.append("")
-    L.append("| request | point | default | tightened | tightened physical | runtime default -> tightened (s) | tightened note |")
-    L.append("|---|---|---|---|---|---|---|")
+    L.append("Physical = the checker's physicality flag under the unchanged bounds (None = not graded: NOT_COVERED or ERROR).")
+    L.append("")
+    L.append("| request | point | role | default | tightened | physical default -> tightened | runtime default -> tightened (s) | tightened note |")
+    L.append("|---|---|---|---|---|---|---|---|")
     for r in cmp["rows"]:
         rt_s = f"{fmt(r['default_runtime_s'], '.0f')} -> {fmt(r['tightened_runtime_s'], '.0f')}" if r.get("tightened_runtime_s") else fmt(r["default_runtime_s"], ".0f")
-        L.append(f"| {r['tag']} | {r['id']} | {r['default_outcome']} | {r['tightened_outcome']} | {r['tightened_physical']} | {rt_s} | {r['tightened_note']} |")
+        role = r.get("role", "") + ("" if r.get("selected", True) else " (excluded)")
+        L.append(f"| {r['tag']} | {r['id']} | {role} | {r['default_outcome']} | {r['tightened_outcome']} | {r.get('default_physical')} -> {r['tightened_physical']} | {rt_s} | {r['tightened_note']} |")
     L.append("")
     return L
 
@@ -681,6 +841,14 @@ def render_md(rec: dict) -> str:
     L.append("")
     L.append("`*` = assertion was rail-limited (VDD <= V_IL at the crossing): RESETn could not stay high regardless of the comparator.")
     L.append("")
+    if rec.get("cost_projections"):
+        L.append("## Pilot runtime projection (made before the remaining requests were submitted)")
+        L.append("")
+        for cp in rec["cost_projections"]:
+            L.append(f"- {cp.get('at_utc')}: pilots " + ", ".join(f"`{p['tag']}` job {p.get('job_id')} {fmt(p['default_elapsed_s'], '.0f')} -> {fmt(p['tightened_elapsed_s'], '.0f')} s (elapsed x{fmt(p['elapsed_ratio'], '.2f')}, corner-sum x{fmt(p['corner_sum_ratio'], '.2f')})" for p in cp["pilots"])
+                     + f"; worst ratio x{fmt(cp['worst_ratio'], '.2f')} against the {cp['limit_s']:.0f} s per-job limit; {cp['n_over_limit']} request(s) projected over it. "
+                     + "Projected max: " + fmt(max((p["projected_tightened_elapsed_s"] or 0) for p in cp["projection"]), ".0f") + " s.")
+        L.append("")
     if rec.get("comparison"):
         L += render_comparison_md(rec["comparison"])
     if rec.get("submit_failures"):
@@ -699,6 +867,8 @@ def render_md(rec: dict) -> str:
         L.append(f"- {k}: `{v}`")
     L.append(f"- **Timestamp / author**: {rec['timestamp']}, {rec['author']}")
     L.append(f"- **Supersedes**: {rec['supersedes'] or '(none)'}")
+    if rec.get("companion_of"):
+        L.append(f"- **Companion of**: `{rec['companion_of']}` -- the default-deck record stays as evidence; this solver-variant record is reported beside it and does not replace it.")
     L.append("")
     L.append("Written by `sim/brownout-top/run_brownout_campaign.py`. Append-only: never edit this file -- a correction is a new record with a `Supersedes` field (see `sim/README.md`).")
     L.append("")
@@ -758,24 +928,33 @@ def cmd_record(args) -> int:
     snap_dir.mkdir(parents=True, exist_ok=True)
     if (run_dir / "run.json").is_file():
         shutil.copyfile(run_dir / "run.json", snap_dir / "run.json")
+    cost_files = sorted(run_dir.glob("cost-projection-*.json"))
+    for cf in cost_files:
+        shutil.copyfile(cf, snap_dir / cf.name)
+    cost_projections = [json.loads(cf.read_text()) for cf in cost_files]
     fails = [{"tag": q["tag"], "reason": q["outcome"]} for q in requests if q.get("job_id") is None and q.get("outcome") and q["outcome"] not in ("ok", "OK", "PASS")]
     ngs = sorted({p["ngspice"] for p in points if p.get("ngspice")})
     runners = sorted({q.get("runner_klt_version") for q in requests if q.get("runner_klt_version")})
     cnt = declared_counts(man)
     n_graded = sum(1 for p in points if p["outcome"] != "NOT_COVERED")
     comparison = None
-    if args.compare_source:
-        src_path = Path(args.compare_source)
+    rerun = man.get("tightened_rerun") or {}
+    compare_source = args.compare_source
+    if not compare_source and variant["key"] != "default" and rerun.get("variant") == variant["key"]:
+        compare_source = str(REPO_ROOT / rerun["source_record"])  # a tightened-variant record is always a comparison
+    if compare_source:
+        src_path = Path(compare_source)
         if not src_path.is_file():
             raise SystemExit(f"--compare-source {src_path} does not exist")
         src_rec = json.loads(src_path.read_text())
-        comparison = build_comparison(src_rec, points)
+        comparison = build_comparison(src_rec, points, requests, variant, selected_rerun_tags(man) if rerun.get("variant") == variant["key"] else None)
         t, c = comparison["targets"], comparison["controls"]
         say(f"comparison vs {comparison['source_record']}: {comparison['points_compared']} points; targets {t['n']} -> {t['transitions']}; controls {c['n']} with {c['n_changed']} changed")
     ph = man["grading"]
     record = {
         "record_id": record_id, "timestamp": now.strftime("%Y-%m-%dT%H:%M:%SZ"), "author": args.author or cr.default_author(), "supersedes": args.supersedes,
-        "solver_variant": variant, "comparison": comparison,
+        "solver_variant": variant, "comparison": comparison, "cost_projections": cost_projections,
+        "companion_of": (comparison or {}).get("source_record"),
         "experiment": {k: man[k] for k in ("slug", "title", "claim", "provenance", "provenance_source", "statistical_convention")},
         "pdk": {"root": "<host $PDK_ROOT>", "variant": pdk.variant, "installed_commit": pdk.installed_commit, "pinned_commit": pin["open_pdks_commit"], "matches_pin": pdk.matches_pin,
                 "lib_file": MODEL_LIB + " (resolved on the runner as /opt/pdk/sky130A/...)", "fleet_pdk_report": fleet_pdk},
@@ -867,8 +1046,10 @@ def main(argv: list[str]) -> int:
     s = sub.add_parser("selftest")
     s.add_argument("--author")
     s.add_argument("--supersedes")
+    k = sub.add_parser("cost")
+    k.add_argument("--run-id", required=True, help="run holding the tightened pilot reports; projects every predeclared rerun request against tightened_rerun.job_limit_s")
     args = ap.parse_args(argv)
-    return {"plan": cmd_plan, "run": cmd_run, "probe": cmd_probe, "record": cmd_record, "selftest": cmd_selftest}[args.cmd](args)
+    return {"plan": cmd_plan, "run": cmd_run, "probe": cmd_probe, "record": cmd_record, "selftest": cmd_selftest, "cost": cmd_cost}[args.cmd](args)
 
 
 if __name__ == "__main__":

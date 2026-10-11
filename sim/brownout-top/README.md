@@ -18,10 +18,10 @@ edit is not used (committed XMN1 is L=20 W=0.42).
 
 | File | Role |
 |---|---|
-| `experiment.json` | the manifest: PVT axes, stimulus construction, the numeric exploratory grid and rationale, expansion policy, grading definitions |
+| `experiment.json` | the manifest: PVT axes, stimulus construction, the numeric exploratory grid and rationale, expansion policy, grading definitions, declared solver variants and the #153 tightened re-run set |
 | `testbench/tb_temp_por_brownout.sch` | assembled-DUT testbench; BVDD builds power-up + one dip from `.param`s |
 | `brownout_checker.py` | pure-stdlib waveform grader (+ synthetic cases) |
-| `run_brownout_campaign.py` | `plan` / `run` / `probe` / `record` / `selftest` |
+| `run_brownout_campaign.py` | `plan` / `run` / `probe` / `record` / `selftest` / `cost`; `--variant` selects a declared solver variant |
 | `selftest/test_brownout.py` | unit tests (axes independence, counts, accounting, append-only) |
 | `selftest/*.wave.json.gz` | committed synthetic fixtures re-graded by the tests/self-test |
 | `records/`, `corners/`, `netlist-snapshots/` | append-only evidence |
@@ -90,6 +90,57 @@ python3 sim/brownout-top/run_brownout_campaign.py run --run-id <id> --retry-fail
 python3 sim/brownout-top/run_brownout_campaign.py record --run-id <id>
 python3 sim/brownout-top/run_brownout_campaign.py selftest
 ```
+
+## Tightened-solver companion re-run (issue #153)
+
+The default-deck record `20261010-222529-41bde9f` has 673 NONPHYSICAL points
+whose brown-out behavior is unknown. #153 re-runs them with a **declared solver
+variant**, not a circuit change. The variant and the re-run set were committed in
+`experiment.json` before any tightened request was submitted:
+
+* `solver_variants.reltol2e-4` appends `reltol=2e-4` to the testbench's one
+  `.options method=gear trtol=50` line. Everything else is byte-identical to the
+  default deck: circuit, stimulus `.param`s, `.save` channels, tstop/tmax, the
+  corner matrix and `timeout_s`. The deck banner names the variant. The unit
+  tests check that the options line is the only non-comment change.
+* `tightened_rerun.rerun_tags` lists all 21 requests. Every request holds at least
+  one source-NONPHYSICAL point, so whole 45-corner requests cover all 673 targets.
+  The 272 source-physical points come along as controls, with request and PVT
+  identities unchanged. A tightened run refuses `--only` tags outside this list.
+* Physicality bounds and grading are **unchanged**. The bounded junction-clamp-scale
+  undershoot stays NONPHYSICAL; a separate class would be its own declared
+  decision.
+* Changed control verdicts are evidence. Both outcomes are kept, and control
+  agreement is not a precondition for publishing.
+
+```bash
+# pilot (tightened_rerun.pilot_tags) from a clean pushed commit, then project cost
+KLT_SIM_BACKEND=batch python3 sim/brownout-top/run_brownout_campaign.py run --variant reltol2e-4 --run-id <id> \
+    --only control --only cube_v1.2_h0.0001_f50000_r10000
+python3 sim/brownout-top/run_brownout_campaign.py cost --run-id <id>
+# remaining requests into the SAME run (refuses deck drift since the first submit; each batch's commit is recorded)
+KLT_SIM_BACKEND=batch python3 sim/brownout-top/run_brownout_campaign.py run --variant reltol2e-4 --run-id <id> --retry-failed [--only <tag> ...]
+# grade + companion record; --compare-source defaults to tightened_rerun.source_record
+python3 sim/brownout-top/run_brownout_campaign.py record --variant reltol2e-4 --run-id <id>
+```
+
+`--retry-failed` submits every selected request that does not yet have a usable
+report, including requests that have never been submitted. Earlier attempts are
+archived.
+
+The record carries `comparison` in its JSON twin, with one row per declared point.
+Each row holds the request tag, PVT id, role (`target` = source NONPHYSICAL,
+`control` = source PASS/FAIL) and selected/excluded status. It also holds the
+default and tightened verdicts, both physicality flags, both job ids, per-corner
+runtimes and fail codes. Per-request rows give job ids, elapsed time, fleet outcome,
+earlier attempts and NOT_COVERED/ERROR counts. The markdown twin renders the
+transition matrix, the changed controls, the per-request job table and the
+per-point table. The comparison refuses a broken join in either direction. A
+refused or unsubmitted request stays NOT_COVERED, and an uncovered control is
+counted separately rather than as a changed verdict. The pilot cost projections
+(`cost-projection-*.json`) are copied into the netlist snapshot and summarized in
+the record. The default-deck record is never edited. The new record names it as
+**Companion of** and does not supersede it.
 
 The grid goes to the Spot fleet as `klt sim` requests; never hand-launch
 `ngspice -b` loops. If a submit fails, the failure is recorded and the affected
