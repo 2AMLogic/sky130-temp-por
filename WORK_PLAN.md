@@ -19,7 +19,7 @@ _None._
 
 Human-approved issues ready for implementation (`loom:issue`).
 
-- **#153**: brownout-top: re-grade NONPHYSICAL brown-out points with a tightened-solver fleet re-run
+_None._
 
 ## In Progress
 
@@ -63,7 +63,7 @@ Issues carrying `loom:curated`.
 |------|-------|
 | Operator merge-risk holds | 0 |
 | Operator priority | 0 |
-| Ready (`loom:issue`) | 1 |
+| Ready (`loom:issue`) | 0 |
 | In Progress (`loom:building`) | 1 |
 | PRs awaiting review | 0 |
 | Approved PRs awaiting merge | 0 |
