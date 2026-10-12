@@ -13,6 +13,7 @@ import sys
 import tempfile
 import unittest
 from pathlib import Path
+from types import SimpleNamespace
 from unittest import mock
 
 HERE = Path(__file__).resolve().parent
@@ -23,6 +24,14 @@ import run_glitch_campaign as rg  # noqa: E402
 
 MAN = json.loads((HERE.parent / "experiment.json").read_text())
 A, B = gc.CLASS_A, gc.CLASS_B
+
+# cmd_record resolves the host PDK only to stamp provenance; CI runners have no PDK, so the record
+# tests substitute a fixed stand-in (a plain object: the record JSON serialises these fields).
+FAKE_PDK = SimpleNamespace(variant="sky130A", installed_commit="0" * 40, matches_pin=True)
+
+
+def _no_host_pdk():
+    return mock.patch.object(rg.cr, "resolve_pdk", return_value=FAKE_PDK)
 
 
 class CheckerCases(unittest.TestCase):
@@ -271,7 +280,8 @@ class Accounting(unittest.TestCase):
             (build / "run1" / "run.json").write_text(json.dumps({"klt_client": "test", "source": {"dirty": False}}))
             gi = {"sha": "abc1234", "sha_full": "abc1234" + "0" * 33, "branch": "t", "dirty": False, "pushed_to_remote": True, "remote_branches": []}
             ns = mock.Mock(run_id="run1", notes_file=None, author="t", supersedes=None, allow_dirty=False, allow_deck_drift=False)
-            with mock.patch.object(rg, "BUILD", build), mock.patch.object(rg, "HERE", here), mock.patch.object(rg, "datetime", FixedDT), mock.patch.object(rg, "source_state", return_value=gi):
+            with mock.patch.object(rg, "BUILD", build), mock.patch.object(rg, "HERE", here), mock.patch.object(rg, "datetime", FixedDT), mock.patch.object(rg, "source_state", return_value=gi), \
+                    _no_host_pdk():
                 self.assertEqual(rg.cmd_record(ns), 0)
                 recs = sorted((here / "records").glob("*.json"))
                 self.assertEqual([json.loads(p.read_text())["class"] for p in recs], [A, B])
@@ -299,12 +309,12 @@ class Accounting(unittest.TestCase):
             (build / "run1" / "run.json").write_text(json.dumps({"klt_client": "t", "source": {"dirty": False, "sha_full": "a" * 40}}))
             ns = mock.Mock(run_id="run1", notes_file=None, author="t", supersedes=None, allow_dirty=False, allow_deck_drift=False)
             gi = {"sha": "abc1234", "sha_full": "b" * 40, "branch": "t", "dirty": True, "pushed_to_remote": True, "remote_branches": []}
-            with mock.patch.object(rg, "BUILD", build), mock.patch.object(rg, "HERE", here), mock.patch.object(rg, "source_state", return_value=gi):
+            with mock.patch.object(rg, "BUILD", build), mock.patch.object(rg, "HERE", here), mock.patch.object(rg, "source_state", return_value=gi), _no_host_pdk():
                 with self.assertRaises(SystemExit):
                     rg.cmd_record(ns)
             gi["dirty"] = False
             with mock.patch.object(rg, "BUILD", build), mock.patch.object(rg, "HERE", here), mock.patch.object(rg, "source_state", return_value=gi), \
-                    mock.patch.object(rg, "deck_drift", return_value=["design/netlist/temp_por_top.spice"]):
+                    mock.patch.object(rg, "deck_drift", return_value=["design/netlist/temp_por_top.spice"]), _no_host_pdk():
                 with self.assertRaises(SystemExit):
                     rg.cmd_record(ns)
             self.assertFalse((here / "records").exists())
