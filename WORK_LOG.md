@@ -4,6 +4,10 @@ Chronological record of recently merged pull requests and closed issues. This fi
 
 ### 2026-10-11
 
+- **PR #172**: sim: consolidate duplicated waveform primitives into sim_common (#170)
+- **PR #171**: sim: brownout-top declares reltol2e-4-klu variant and the enforced 3600 s job limit (#153)
+- **PR #169**: sim: brownout-top tightened-solver (reltol2e-4) re-run harness + pilot record (#153)
+- **Issue #170** (closed): Consolidate duplicated waveform primitives across ramp and brown-out checkers
 - **PR #167**: sim: temp-core accuracy Monte Carlo campaign with per-term error budget (#105)
 - **PR #166**: ci: preserve frozen netlist snapshots and corner evidence as append-only (#165)
 - **PR #163**: ci: enforce append-only simulation records against the Git baseline
