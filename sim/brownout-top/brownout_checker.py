@@ -62,7 +62,14 @@ import sys
 from pathlib import Path
 
 sys.path.insert(0, str(Path(__file__).resolve().parents[1] / "bin"))
-from sim_common import load_wave  # noqa: E402,F401
+from sim_common import (  # noqa: E402,F401
+    crossings,
+    interp_at,
+    interp_cross,
+    load_wave,
+    schmitt,
+    write_gz_rows,
+)
 
 # --- exploratory grading constants (mirrored in experiment.json "grading") ---
 FRAC_IL, FRAC_IH, FRAC_MID = 0.2, 0.8, 0.5
@@ -146,55 +153,6 @@ def required_max_dt(vf: float, st: dict) -> float:
 # --------------------------------------------------------------------------
 
 
-def _x(t0, y0, t1, y1, level):
-    return t1 if y1 == y0 else t0 + (level - y0) * (t1 - t0) / (y1 - y0)
-
-
-def crossings(t, y, level, direction, t_from=0.0):
-    out = []
-    for i in range(1, len(t)):
-        if t[i] <= t_from:
-            continue
-        a, b = y[i - 1], y[i]
-        if direction == "rise" and a < level <= b:
-            out.append(_x(t[i - 1], a, t[i], b, level))
-        elif direction == "fall" and a > level >= b:
-            out.append(_x(t[i - 1], a, t[i], b, level))
-    return out
-
-
-def schmitt(t, y, lo, hi, init_high, t_from):
-    """(rises, falls) of a two-threshold detector over t > t_from, starting in ``init_high``."""
-    state = init_high
-    rises, falls = [], []
-    for i in range(1, len(t)):
-        if t[i] <= t_from:
-            continue
-        a, b = y[i - 1], y[i]
-        if not state and b >= hi:
-            rises.append(_x(t[i - 1], a, t[i], b, hi) if a < hi else t[i])
-            state = True
-        elif state and b <= lo:
-            falls.append(_x(t[i - 1], a, t[i], b, lo) if a > lo else t[i])
-            state = False
-    return rises, falls
-
-
-def interp_at(t, y, when):
-    if when <= t[0]:
-        return y[0]
-    if when >= t[-1]:
-        return y[-1]
-    lo, hi = 0, len(t) - 1
-    while hi - lo > 1:
-        mid = (lo + hi) // 2
-        if t[mid] <= when:
-            lo = mid
-        else:
-            hi = mid
-    return y[lo] + (when - t[lo]) * (y[hi] - y[lo]) / (t[hi] - t[lo]) if t[hi] != t[lo] else y[hi]
-
-
 def dwell_below(t, y, level, t_from=0.0):
     """Time (s) the piecewise-linear signal spends below ``level`` for t > t_from."""
     total = 0.0
@@ -207,7 +165,7 @@ def dwell_below(t, y, level, t_from=0.0):
         if a < level and b < level:
             total += t1 - t0
         elif a < level <= b or b < level <= a:
-            tc = _x(t0, a, t1, b, level)
+            tc = interp_cross(t0, a, t1, b, level)
             total += (tc - t0) if a < level else (t1 - tc)
     return total
 
@@ -419,11 +377,7 @@ def transitions_from_stored(rows, vf: float, t0: float) -> dict:
 
 
 def write_trace(path: Path, rows) -> None:
-    path.parent.mkdir(parents=True, exist_ok=True)
-    lines = ["# t_s,vdd_v,resetn_v,por_raw_v,ibias_node_v,ibias_delivered_a  (+id of bias_core XMPIB; change-triggered)"]
-    lines += [",".join(f"{x:.6g}" for x in r) for r in rows]
-    with gzip.open(path, "wt", compresslevel=9) as fh:
-        fh.write("\n".join(lines) + "\n")
+    write_gz_rows(path, "# t_s,vdd_v,resetn_v,por_raw_v,ibias_node_v,ibias_delivered_a  (+id of bias_core XMPIB; change-triggered)", rows)
 
 
 # --------------------------------------------------------------------------

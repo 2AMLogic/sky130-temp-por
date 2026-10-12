@@ -1,6 +1,6 @@
 {
-  "loom_version": "0.19.1071",
-  "loom_commit": "dcab8265613676d08b763cddc911b93c7ab7d9d4",
+  "loom_version": "0.19.1083",
+  "loom_commit": "77a174ea7fcaddbb25d0082956cd25d8633fc2df",
   "install_date": "2026-08-20",
   "installed_files": [
     ".claude/agents/loom-architect.md",
@@ -500,9 +500,18 @@
     ".loom/runtimes/gemini.json",
     ".claude/commands/loom/sweep-doctor-glm-escalation.md",
     ".loom/docs/stale-check-inputs.md",
-    ".loom/docs/session-output.md"
+    ".loom/docs/session-output.md",
+    ".loom/docs/branch-update-strategy.md",
+    ".loom/docs/push-lease-pinning.md",
+    ".loom/scripts/tests/test-merge-pr-required-checks.sh",
+    ".loom/scripts/tests/test-sweep-wave-judge-done-staleness.sh",
+    ".agents/skills/loom-builder-pr/SKILL.md",
+    ".agents/skills/loom-builder-worktree/SKILL.md",
+    ".loom/scripts/tests/test-judge-payload-drop-guard.sh",
+    ".loom/scripts/tests/test-merge-pr-ci-result.sh",
+    ".loom/scripts/tests/test-version-check-gate-callsites.sh"
   ],
-  "last_resync": "2026-10-11",
-  "loom_source_remote": "git@github.com:rjwalters/loom.git",
-  "requires_daemon": "0.19.772"
+  "last_resync": "2026-10-12",
+  "loom_source_remote": "https://github.com/rjwalters/loom.git",
+  "requires_daemon": "0.19.1081"
 }

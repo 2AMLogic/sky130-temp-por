@@ -89,6 +89,73 @@
     "verdicts": "ERROR (missing waveform / channel / non-finite data / convergence, model or backend error) > NONPHYSICAL > UNRESOLVED (unviable baseline, truncated, sparse, stimulus mismatch) > FAIL (resolved physical failure, with trace evidence) > PASS.  NOT_COVERED marks points whose request was never submitted, was refused by the fleet, or has no report; they are counted as uncovered, never as PASS.",
     "trace_storage": "committed traces are change-triggered (dV >= 2 mV on any of VDD/RESETn/POR_RAW/IBIAS node, delivered bias moved >= 2 % of its maximum, or a 1 ms anchor); RESETn assertion/release counts are re-derived from the stored trace and compared with the full-resolution result per point."
   },
+  "solver_variants": {
+    "default": {
+      "label": "default deck -- identical to the one submitted for record 20261010-222529-41bde9f",
+      "options_extra": []
+    },
+    "reltol2e-4": {
+      "label": "tightened relative tolerance (issue #153 companion re-grade of the NONPHYSICAL points)",
+      "options_extra": [
+        "reltol=2e-4"
+      ],
+      "rationale": "#150 showed the two re-asserting supply-ramp points come back physical and resolved at reltol=2e-4 (optionally with tmax=1u), and #152 showed the temp_core cold-start FAILs do not reproduce on any solver variant: the NONPHYSICAL brown-out signature (temp_core-side nodes at impossible voltages, reversed settled supply current) is a solver-branch landing expected to move with integration tolerance.  tmax and every stimulus/window/checker setting stay at the declared default; this is a deck/solver variant, not a circuit change.",
+      "netlist_application": "the extra options are appended to the testbench's single declared '.options method=gear trtol=50' line in the generated deck; circuit, stimulus parameters, .save channels, tstop/tmax, corner matrix and options.timeout_s=7200 are byte-identical to the default deck otherwise",
+      "status_note": "Piloted on the batch fleet 2026-10-11 (record 20261011-214916-183a3fc): on the fleet's SPARSE solver it is x8-x20 slower and both pilot jobs hit the runner-enforced 3600 s whole-job limit; superseded as the active rerun variant by reltol2e-4-klu (see tightened_rerun.variant_decision). The variant stays declared; its pilot record stays as evidence."
+    },
+    "reltol2e-4-klu": {
+      "label": "tightened relative tolerance + netlist-carried KLU direct linear solver (issue #153 companion re-grade of the NONPHYSICAL points)",
+      "options_extra": [
+        "reltol=2e-4",
+        "klu"
+      ],
+      "rationale": "Declared 2026-10-12, before any submission under this variant (tightened_rerun.variant_decision).  Same reltol=2e-4 that #150 showed resolves the nonphysical branch, plus `klu`: the fleet runner ignores options.ngspice_init, so every fleet run so far executed ngspice's SPARSE default solver even though sim/spiceinit selects KLU for every local run of this repo, and carrying `klu` on the declared .options line is the only netlist-level way to select it there.  ngspice announces 'Using KLU as Direct Linear Solver' on stdout, which the retrieved per-point logs carry (per-point field netlist_klu_announced) as proof the fleet engaged it.  Changing the linear solver changes the rounding path, so the variant is declared and reported as tolerance + solver together, never as reltol alone.  tmax and every stimulus/window/checker setting stay at the declared default; this is a deck/solver variant, not a circuit change.",
+      "netlist_application": "the extra options are appended to the testbench's single declared '.options method=gear trtol=50' line in the generated deck; circuit, stimulus parameters, .save channels, tstop/tmax, corner matrix and options.timeout_s=7200 are byte-identical to the default deck otherwise"
+    }
+  },
+  "tightened_rerun": {
+    "status": "DECLARED before the run (issue #153); this section was committed before any tightened request was submitted.  Re-declared 2026-10-12 (variant_decision), still before any submission under the active variant: active variant reltol2e-4-klu and the observed 3600 s enforced job limit.",
+    "variant": "reltol2e-4-klu",
+    "variant_decision": "Declared 2026-10-12, before any submission under reltol2e-4-klu.  The first declared variant reltol2e-4 was piloted on the batch fleet (record 20261011-214916-183a3fc): both pilot jobs hit the runner-enforced whole-job limit -- the runner executes the job under `timeout 3600s` and ignores the request's declared options.timeout_s=7200 (2AMLogic/klayout-tools#2833 family; tracked for the runner as klayout-tools timeout handling) -- and klt discarded every corner, so all 90 pilot points are ERROR and no tightened point has been graded.  Measured cost of the tightened deck on SPARSE: whole-job ratio >= x8 (a lower bound: both pilots timed out) and x20 per corner on the slowest corner (ff/125C/2.97V control, local fleet-equivalent probe: 19 s default -> 389 s tightened).  Options considered, all pre-declared here: (a) one corner per job -- 45x the jobs against a shared fleet already refusing at BATCH_MAX_CONCURRENT_INSTANCES, plus per-corner request plumbing; rejected; (b) a longer job limit -- NOT AVAILABLE to this repo: the runner ignores the request's timeout_s, so raising it is a runner-side (2AMLogic/klayout-tools) change, not a manifest number; (c) a looser tolerance -- rejected: reltol=2e-4 is the value #150 showed resolves the nonphysical branch, and a tightened SPARSE probe still landed on the reversed-current branch at one source-physical control point, so loosening tolerance is more likely to land nonphysical, not less; (d) netlist-carried KLU -- CHOSEN as variant reltol2e-4-klu: it keeps the #150-derived reltol=2e-4, keeps whole-request granularity inside the enforced 3600 s limit (re-piloted and re-projected before the remaining requests are submitted, per cost_rule), and restores the solver every local run of this repo already uses via sim/spiceinit.  The choice was made on timing and transport evidence only -- no tightened point had been graded -- so nothing was selected from graded results.",
+    "source_record": "sim/brownout-top/records/20261010-222529-41bde9f.json",
+    "rerun_set": "every declared request.  All 21 requests contain at least one NONPHYSICAL point in the source record (673 of 945 points; the 50 kV/s falls to 1.2 V and 0.4 V hold no physical point at all), so whole-request re-runs cover all 673 target points plus the 272 source-physical points, which ride along as controls.  Per-request point sets, stimulus, windows, tmax and timeout_s are unchanged.",
+    "rerun_tags": [
+      "cube_v2_h1em05_f2000_r10000",
+      "cube_v2_h1em05_f50000_r10000",
+      "cube_v2_h0.0001_f2000_r10000",
+      "cube_v2_h0.0001_f50000_r10000",
+      "cube_v2_h0.001_f2000_r10000",
+      "cube_v2_h0.001_f50000_r10000",
+      "cube_v1.2_h1em05_f2000_r10000",
+      "cube_v1.2_h1em05_f50000_r10000",
+      "cube_v1.2_h0.0001_f2000_r10000",
+      "cube_v1.2_h0.0001_f50000_r10000",
+      "cube_v1.2_h0.001_f2000_r10000",
+      "cube_v1.2_h0.001_f50000_r10000",
+      "cube_v0.4_h1em05_f2000_r10000",
+      "cube_v0.4_h1em05_f50000_r10000",
+      "cube_v0.4_h0.0001_f2000_r10000",
+      "cube_v0.4_h0.0001_f50000_r10000",
+      "cube_v0.4_h0.001_f2000_r10000",
+      "cube_v0.4_h0.001_f50000_r10000",
+      "recovery_v1.2_h0.0001_f2000_r1000",
+      "recovery_v1.2_h0.0001_f2000_r100000",
+      "control"
+    ],
+    "expected_selected_points": 945,
+    "expected_target_points": 673,
+    "expected_control_points": 272,
+    "physicality_bounds": "UNCHANGED from grading.physicality.  Declared decision (2026-10-11, before the run): a bounded, junction-clamp-scale undershoot (< 0.5 V past the declared window with positive supply current; 69 source points) STAYS NONPHYSICAL under the existing rule.  A separate flagged class would need its own declared decision and checker change (follow-up work), deliberately not taken here so this record stays a tolerance-only comparison.  The source record's bound is not loosened.",
+    "cost_rule": "pilot representative requests on the batch fleet first, measure per-corner runtime against the source record, and project every remaining request against the enforced per-job limit (tightened_rerun.job_limit_s) before submitting it; split or defer only with the projection recorded",
+    "job_limit_s": 3600,
+    "job_limit_note": "OBSERVED enforced limit, set 2026-10-12: the runner executed both reltol2e-4 pilot jobs under `timeout 3600s` (klt stderr; jobs klt-sim-c3ba332c37d3 and klt-sim-fd2409da90fb, elapsed 3605/3604 s) and ignored the requests' declared options.timeout_s=7200.  3600 s is the conservative, observed ceiling; the 7200 s request declaration is kept unchanged in build_request because changing it is a runner-side question (2AMLogic/klayout-tools).",
+    "pilot_tags": [
+      "control",
+      "cube_v1.2_h0.0001_f50000_r10000"
+    ],
+    "pilot_rationale": "control is the cheapest default-deck job (450 s, 18 targets + 27 controls) and cube_v1.2_h0.0001_f50000_r10000 is a mid-cost (1402 s) request from the 50 kV/s-to-1.2 V class that held no physical point; both are part of the rerun set, so the pilot jobs are kept as rerun evidence, not discarded.  The projection applies the LARGEST observed tightened/default ratio (whole-job elapsed or summed per-corner runtime) to every request's default-deck elapsed time; a request projected over job_limit_s is not submitted whole until a split is declared.  Re-piloted under reltol2e-4-klu after variant_decision (2026-10-12): the reltol2e-4 SPARSE pilots timed out, so the new variant must re-earn its projection from its own pilot jobs; those timed-out SPARSE jobs stay in record 20261011-214916-183a3fc.",
+    "control_policy": "changed control verdicts (source-physical point changing verdict under the tightened deck, either direction) are evidence: both outcomes are retained in the per-point comparison, never discarded, and control agreement is NOT a precondition for publishing this record"
+  },
   "fleet": {
     "backend": "batch (Spot fleet) via klt sim --backend batch, one request per dip point = 45 PVT corners; no local grid execution.  A single local corner probe (--backend local) is permitted for netlist validation only.",
     "ngspice_note": "The fleet runner ignores options.ngspice_init, so ng_nomodcheck is carried in the netlist body as in supply-ramp-top."
