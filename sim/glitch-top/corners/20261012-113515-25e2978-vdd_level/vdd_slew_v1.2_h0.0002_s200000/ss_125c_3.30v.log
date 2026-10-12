@@ -1,0 +1,12 @@
+# point: glitch-top vdd_level vdd_slew_v1.2_h0.0002_s200000 ss_125c_3.30v
+# process=ss temp=125C start_supply=3.30V vlow=1.2V hold=0.0002s slew(sf=sr)=200000V/s tstop=0.0162243s
+# klt status: error   runtime on runner: 0.0 s   outcome: ERROR
+
+# ==== klt sim deck (exact input given to ngspice on the runner) ====
+| (no deck retrieved)
+
+# ==== klt diagnostics ====
+| error/batch_job_timeout: batch job klt-sim-cfb5c0f8ad24 finished 'timeout' without a usable report: job exceeded 3600s [output recovery: collected report.json is not valid JSON: Expecting value: line 1 column 1 (char 0); stderr.log holds no klt error envelope -- see harness.log under the job's S3 prefix]
+
+# ==== ngspice stdout+stderr ====
+(no ngspice log retrieved)

@@ -1,0 +1,368 @@
+{
+ "author": "ci@loom.test",
+ "cases": [
+  {
+   "case": "A_rejected_pulse",
+   "class": "por_raw_inject",
+   "expected_codes_subset": [],
+   "expected_verdict": "PASS",
+   "fail_codes": [],
+   "ok": true,
+   "unresolved_reasons": [],
+   "verdict": "PASS"
+  },
+  {
+   "case": "A_optional_pulse_no_assert",
+   "class": "por_raw_inject",
+   "expected_codes_subset": [],
+   "expected_verdict": "PASS",
+   "fail_codes": [],
+   "ok": true,
+   "unresolved_reasons": [],
+   "verdict": "PASS"
+  },
+  {
+   "case": "A_required_assertion_recovers",
+   "class": "por_raw_inject",
+   "expected_codes_subset": [],
+   "expected_verdict": "PASS",
+   "fail_codes": [],
+   "ok": true,
+   "unresolved_reasons": [],
+   "verdict": "PASS"
+  },
+  {
+   "case": "A_missed_assertion",
+   "class": "por_raw_inject",
+   "expected_codes_subset": [
+    "missed_assertion"
+   ],
+   "expected_verdict": "FAIL",
+   "fail_codes": [
+    "missed_assertion"
+   ],
+   "ok": true,
+   "unresolved_reasons": [],
+   "verdict": "FAIL"
+  },
+  {
+   "case": "A_unwanted_assertion",
+   "class": "por_raw_inject",
+   "expected_codes_subset": [
+    "unwanted_assertion"
+   ],
+   "expected_verdict": "FAIL",
+   "fail_codes": [
+    "unwanted_assertion"
+   ],
+   "ok": true,
+   "unresolved_reasons": [],
+   "verdict": "FAIL"
+  },
+  {
+   "case": "A_premature_release",
+   "class": "por_raw_inject",
+   "expected_codes_subset": [
+    "premature_release"
+   ],
+   "expected_verdict": "FAIL",
+   "fail_codes": [
+    "premature_release"
+   ],
+   "ok": true,
+   "unresolved_reasons": [],
+   "verdict": "FAIL"
+  },
+  {
+   "case": "A_multiple_releases_chatter",
+   "class": "por_raw_inject",
+   "expected_codes_subset": [
+    "reassert_chatter"
+   ],
+   "expected_verdict": "FAIL",
+   "fail_codes": [
+    "reassert_chatter"
+   ],
+   "ok": true,
+   "unresolved_reasons": [],
+   "verdict": "FAIL"
+  },
+  {
+   "case": "A_no_recovery",
+   "class": "por_raw_inject",
+   "expected_codes_subset": [
+    "no_recovery"
+   ],
+   "expected_verdict": "FAIL",
+   "fail_codes": [
+    "no_recovery"
+   ],
+   "ok": true,
+   "unresolved_reasons": [],
+   "verdict": "FAIL"
+  },
+  {
+   "case": "A_bias_not_recovered",
+   "class": "por_raw_inject",
+   "expected_codes_subset": [
+    "bias_not_recovered"
+   ],
+   "expected_verdict": "FAIL",
+   "fail_codes": [
+    "bias_not_recovered"
+   ],
+   "ok": true,
+   "unresolved_reasons": [],
+   "verdict": "FAIL"
+  },
+  {
+   "case": "A_injection_not_exercised",
+   "class": "por_raw_inject",
+   "expected_codes_subset": [],
+   "expected_verdict": "UNRESOLVED",
+   "fail_codes": [],
+   "ok": true,
+   "unresolved_reasons": [
+    "injection never took POR_RAW below V_MID: the deglitch dwell was not exercised (no immunity claimed)"
+   ],
+   "verdict": "UNRESOLVED"
+  },
+  {
+   "case": "A_sparse_samples",
+   "class": "por_raw_inject",
+   "expected_codes_subset": [],
+   "expected_verdict": "UNRESOLVED",
+   "fail_codes": [],
+   "ok": true,
+   "unresolved_reasons": [
+    "max sample gap 0.0001 s in the glitch window > 2.5e-06 s (requested width/edge not resolvable)"
+   ],
+   "verdict": "UNRESOLVED"
+  },
+  {
+   "case": "A_truncated_observation",
+   "class": "por_raw_inject",
+   "expected_codes_subset": [],
+   "expected_verdict": "UNRESOLVED",
+   "fail_codes": [],
+   "ok": true,
+   "unresolved_reasons": [
+    "observation ends at 0.009 s < required 0.01804 s (truncated)"
+   ],
+   "verdict": "UNRESOLVED"
+  },
+  {
+   "case": "A_unsettled_baseline",
+   "class": "por_raw_inject",
+   "expected_codes_subset": [],
+   "expected_verdict": "UNRESOLVED",
+   "fail_codes": [],
+   "ok": true,
+   "unresolved_reasons": [
+    "baseline: baseline RESETn releases=0 re-asserts=0 (need exactly 1 / 0)",
+    "baseline: RESETn not settled high over the baseline window"
+   ],
+   "verdict": "UNRESOLVED"
+  },
+  {
+   "case": "A_nonphysical_node",
+   "class": "por_raw_inject",
+   "expected_codes_subset": [],
+   "expected_verdict": "NONPHYSICAL",
+   "fail_codes": [],
+   "ok": true,
+   "unresolved_reasons": [],
+   "verdict": "NONPHYSICAL"
+  },
+  {
+   "case": "A_missing_current_channel",
+   "class": "por_raw_inject",
+   "expected_codes_subset": [],
+   "expected_verdict": "ERROR",
+   "fail_codes": [],
+   "ok": true,
+   "unresolved_reasons": [],
+   "verdict": "ERROR"
+  },
+  {
+   "case": "A_missing_injection_channel",
+   "class": "por_raw_inject",
+   "expected_codes_subset": [],
+   "expected_verdict": "ERROR",
+   "fail_codes": [],
+   "ok": true,
+   "unresolved_reasons": [],
+   "verdict": "ERROR"
+  },
+  {
+   "case": "A_control_ok",
+   "class": "por_raw_inject",
+   "expected_codes_subset": [],
+   "expected_verdict": "PASS",
+   "fail_codes": [],
+   "ok": true,
+   "unresolved_reasons": [],
+   "verdict": "PASS"
+  },
+  {
+   "case": "A_control_spurious_assertion",
+   "class": "por_raw_inject",
+   "expected_codes_subset": [
+    "spurious_assertion_control"
+   ],
+   "expected_verdict": "FAIL",
+   "fail_codes": [
+    "spurious_assertion_control"
+   ],
+   "ok": true,
+   "unresolved_reasons": [],
+   "verdict": "FAIL"
+  },
+  {
+   "case": "B_required_assertion_recovers",
+   "class": "vdd_level",
+   "expected_codes_subset": [],
+   "expected_verdict": "PASS",
+   "fail_codes": [],
+   "ok": true,
+   "unresolved_reasons": [],
+   "verdict": "PASS"
+  },
+  {
+   "case": "B_shallow_glitch_rejected",
+   "class": "vdd_level",
+   "expected_codes_subset": [],
+   "expected_verdict": "PASS",
+   "fail_codes": [],
+   "ok": true,
+   "unresolved_reasons": [],
+   "verdict": "PASS"
+  },
+  {
+   "case": "B_missed_assertion",
+   "class": "vdd_level",
+   "expected_codes_subset": [
+    "missed_assertion"
+   ],
+   "expected_verdict": "FAIL",
+   "fail_codes": [
+    "missed_assertion"
+   ],
+   "ok": true,
+   "unresolved_reasons": [],
+   "verdict": "FAIL"
+  },
+  {
+   "case": "B_premature_release",
+   "class": "vdd_level",
+   "expected_codes_subset": [
+    "premature_release"
+   ],
+   "expected_verdict": "FAIL",
+   "fail_codes": [
+    "premature_release"
+   ],
+   "ok": true,
+   "unresolved_reasons": [],
+   "verdict": "FAIL"
+  },
+  {
+   "case": "B_multiple_releases_chatter",
+   "class": "vdd_level",
+   "expected_codes_subset": [
+    "reassert_chatter"
+   ],
+   "expected_verdict": "FAIL",
+   "fail_codes": [
+    "reassert_chatter",
+    "reassert_after_recovery"
+   ],
+   "ok": true,
+   "unresolved_reasons": [],
+   "verdict": "FAIL"
+  },
+  {
+   "case": "B_sparse_samples",
+   "class": "vdd_level",
+   "expected_codes_subset": [],
+   "expected_verdict": "UNRESOLVED",
+   "fail_codes": [],
+   "ok": true,
+   "unresolved_reasons": [
+    "max sample gap 0.0001 s in the dip window > 4.2e-06 s"
+   ],
+   "verdict": "UNRESOLVED"
+  },
+  {
+   "case": "B_unsettled_baseline",
+   "class": "vdd_level",
+   "expected_codes_subset": [],
+   "expected_verdict": "UNRESOLVED",
+   "fail_codes": [],
+   "ok": true,
+   "unresolved_reasons": [
+    "baseline: baseline RESETn releases=0 re-asserts=0 (need exactly 1 / 0)",
+    "baseline: RESETn not settled high over the baseline window"
+   ],
+   "verdict": "UNRESOLVED"
+  },
+  {
+   "case": "B_rail_collapse_nonphysical",
+   "class": "vdd_level",
+   "expected_codes_subset": [],
+   "expected_verdict": "NONPHYSICAL",
+   "fail_codes": [],
+   "ok": true,
+   "unresolved_reasons": [],
+   "verdict": "NONPHYSICAL"
+  },
+  {
+   "case": "B_missing_waveform_channel",
+   "class": "vdd_level",
+   "expected_codes_subset": [],
+   "expected_verdict": "ERROR",
+   "fail_codes": [],
+   "ok": true,
+   "unresolved_reasons": [],
+   "verdict": "ERROR"
+  },
+  {
+   "case": "B_control_ok",
+   "class": "vdd_level",
+   "expected_codes_subset": [],
+   "expected_verdict": "PASS",
+   "fail_codes": [],
+   "ok": true,
+   "unresolved_reasons": [],
+   "verdict": "PASS"
+  },
+  {
+   "case": "B_control_spurious_assertion",
+   "class": "vdd_level",
+   "expected_codes_subset": [
+    "spurious_assertion_control"
+   ],
+   "expected_verdict": "FAIL",
+   "fail_codes": [
+    "spurious_assertion_control",
+    "reassert_after_recovery"
+   ],
+   "ok": true,
+   "unresolved_reasons": [],
+   "verdict": "FAIL"
+  }
+ ],
+ "git": {
+  "branch": "feature/issue-117",
+  "dirty": false,
+  "pushed_to_remote": false,
+  "remote_branches": [],
+  "sha": "8895cf0",
+  "sha_full": "8895cf0949962ed33131f1714b5a4ffc32197be1"
+ },
+ "kind": "glitch checker self-test (synthetic behavioural stand-ins, no simulation)",
+ "overall_pass": true,
+ "record_id": "20261011-182542-8895cf0-checker-selftest",
+ "supersedes": null,
+ "timestamp": "2026-10-11T18:25:42Z"
+}

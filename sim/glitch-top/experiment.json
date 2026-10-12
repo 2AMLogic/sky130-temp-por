@@ -1,0 +1,138 @@
+{
+  "slug": "glitch-top",
+  "title": "Assembled temp_por_top glitch immunity as two separately reported classes: POR_RAW-domain pulse injection (instrumented) and VDD-level supply glitches (unmodified), over the PVT grid",
+  "claim": "Issue #117 (child of #106; completes the porting-plan Sec3.5 scope next to brownout-top) -- NOT a spec claim: no ratified numeric glitch envelope exists (DR-003 Sec8) and no gf180mcu number is used. Two glitch classes are stimulated, graded and summarised SEPARATELY on the committed design/netlist/temp_por_top.spice (bias_core + temp_core + por_comparator + por_output_chain, real shared IBIAS node, real RESETn -> temp_core.EN feedback, no ideal bias/sensor substitution, PTAT/CTAT open, committed XMN1 L=20 W=0.42, no retired diagnostic edit): (A) por_raw_inject -- a finite-impedance pulse injected into the POR_RAW node through an instrument element spliced into the DUT subckt, so it is INSTRUMENTED-assembly evidence, not as-drawn; the comparator stays connected and no-injection controls are retained; (B) vdd_level -- a symmetric-edge supply glitch on the UNMODIFIED assembly. Each is run across {tt,ss,ff,sf,fs} x {-40,27,125 C} x {2.97,3.30,3.63 V} starting supplies and graded from full-resolution RESETn/POR_RAW/VDD/IBIAS-node waveforms and the explicit delivered bias branch current (sim/glitch-top/glitch_checker.py). A completed simulation is not a behavioural PASS; failed cells are evidence.",
+  "provenance": "schematic",
+  "provenance_source": "sim/glitch-top/testbench/tb_temp_por_glitch.sch (DUT: design/netlist/temp_por_top.spice, the committed export of design/temp_por_top.sch; class por_raw_inject adds two instrument lines, see injection)",
+  "schematic": "testbench/tb_temp_por_glitch.sch",
+  "statistical_convention": "N/A (corner-matrix check, not a distribution claim)",
+  "corners": {
+    "process": [
+      "tt",
+      "ss",
+      "ff",
+      "sf",
+      "fs"
+    ],
+    "temperature_c": [
+      -40,
+      27,
+      125
+    ],
+    "supply_v": [
+      2.97,
+      3.3,
+      3.63
+    ],
+    "supply_v_meaning": "STARTING supply (VSET); the dip floor is absolute, so the excursion vf - vlow grows with the starting supply and every edge duration is derived from it"
+  },
+  "stimulus": {
+    "construction": "Common: power-up ramp min(vf, rup*t) from a physical 0 V, then glitch at t0. Class vdd_level: V(VDD) = min(vf, rup*t) - ex*(clip01((t-t0)*s/ex) - clip01((t-t0-ex/s-th)*s/ex)), ex = max(vf - vlow, 0), symmetric slews sf = sr = s, hold th at the floor (the brown-out BVDD source with sf = sr; SPICE twin of brownout_checker.vdd_expected). Class por_raw_inject: V(VDD) = min(vf, rup*t) only; GINJ g(t) = gen*(clip01((t-t0)/te) - clip01((t-t0-te-tw)/te)). Width tw is the FLAT-TOP width; the full pulse is tw + 2te at the base and tw + te at half amplitude. Control: gen = 0 (class A) / vlow = 99 (class B).",
+    "power_up_rate_v_per_s": 100000.0,
+    "power_up_note": "100 kV/s power-up (33 us ramp), as in sim/brownout-top; chosen to keep the baseline short and cheap, not a claim about power-up behavior",
+    "t0_s": 0.008,
+    "t0_rationale": "glitch starts 8 ms after power-up begins: 1.9x the slowest observed as-drawn release (4.3 ms, supply-ramp-top record 20261010-015905-fbd6329, over the whole PVT grid). The checker REQUIRES a viable baseline (exactly one release, RESETn settled high, POR_RAW high, delivered bias settled over the last 2 ms before t0) or the point is UNRESOLVED. Shorter than brown-out's 10 ms because fleet cost is binding (brownout-top cost_note).",
+    "observation_after_recovery_s": 0.008,
+    "observation_rationale": "8 ms after the glitch ends (class A: end of the GINJ fall edge; class B: end of the recovery edge, at the largest starting supply): 1.9x the slowest observed release delay (4.3 ms). A shorter record is truncated -> UNRESOLVED unless a failure is already detected.",
+    "tmax_rule": "Class A: tmax = min(10 us, width/10, edge/10); the checker's sample-gap limit is min(20 us, width/5, edge/8) (+0.1 % float tolerance), so the step bound is strictly tighter than the limit (a first attempt with tmax = edge/8 sat exactly AT the limit and was superseded before any record was written). Class B: the brown-out rules unchanged, tmax = min(10 us, hold/6, edge/12) at the smallest starting supply and a sample-gap limit min(20 us, hold/5, edge/10). tmax is recorded in each request. A requested width/edge that the samples cannot resolve is UNRESOLVED, never PASS.",
+    "cost_note": "Brown-out measured 450-2900 s per 45-corner request at tmax 1.6-8 us on 20 ms windows, with a 3600 s batch timeout hit at tmax 0.5-1 us (fleet1 timeout record). Widths and edges here are therefore >= 10 us and windows are 16 ms; faster edges are a declared expansion, not a silent gap."
+  },
+  "grid": {
+    "status": "EXPLORATORY initial grid -- chosen to bracket, not to bound; NOT a specification envelope and NOT derived from any gf180mcu figure.",
+    "por_raw_inject": {
+      "rinj_ohm": [
+        1000.0,
+        30000.0
+      ],
+      "flat_widths_s": [
+        2e-05,
+        0.0002,
+        0.002
+      ],
+      "edge_default_s": 2e-05,
+      "edge_variants_s": [
+        1e-05,
+        0.0002
+      ],
+      "edge_variant_center": {
+        "rinj": 1000.0,
+        "tw": 0.0002
+      },
+      "rationale": "RINJ is the amplitude axis: 1 kohm against the comparator's W=2 L=0.5 pull-up is a deep pull-down, 30 kohm a shallow one (levels factor 30 apart; the achieved POR_RAW minimum is MEASURED per point, not assumed). Flat widths 20 us - 2 ms (two decades) straddle the checker's D_REJ = 50 us and D_REQ = 1 ms expectation thresholds on the measured POR_RAW dwell. Edge time is varied one factor at a time around the center point (10 us, 200 us around the 20 us default) -- a declared one-factor-at-a-time treatment, not a full cube. Faster edges (< 10 us) need tmax < 1.25 us and a per-request cost estimate first."
+    },
+    "vdd_level": {
+      "floors_v": [
+        2.0,
+        1.2,
+        0.4
+      ],
+      "holds_s": [
+        2e-05,
+        0.0002
+      ],
+      "slew_default_v_per_s": 50000.0,
+      "slew_variants_v_per_s": [
+        20000.0,
+        200000.0
+      ],
+      "slew_variant_center": {
+        "vlow": 1.2,
+        "th": 0.0002
+      },
+      "rationale": "Floors as in brownout-top (2.0 V shallow, 1.2 V below half supply, 0.4 V below V_IL at every starting supply) so the two experiments are comparable; holds 20 us and 200 us are the short-glitch decade that brown-out (>= 10 us at slews 2/50 kV/s) did not isolate; symmetric edges at 50 kV/s (~20-50 us per edge), varied one factor at a time at the center to 20 and 200 kV/s (a 200 kV/s edge to 1.2 V is ~9 us; tmax 1.1 us). Faster edges (1 MV/s class) need tmax <= 50 ns and are a declared expansion."
+    },
+    "request_count": "class A: 6 cube + 2 edge variants + 1 control = 9; class B: 6 cube + 2 slew variants + 1 control = 9; 18 requests x 45 PVT points = 810 declared points (405 per class)",
+    "expansion_policy": "No envelope is claimed. Expansion is a NEW record, never an edit: (a) where a PASS<->FAIL (or reject<->assert) boundary appears between adjacent levels on any axis, add the midpoint level on that axis at the affected corners only; (b) edges faster than 10 us (class A) / slews above 200 kV/s (class B) need a cost estimate first; (c) widths outside 20 us - 2 ms, RINJ between/outside {1k, 30k}, floors between the three levels only with a stated reason; (d) repeated glitches, glitches before the baseline is released, ll/hh passive skew and mismatch Monte Carlo are not in this increment. Any post-hoc addition is labelled as such in its record.",
+    "not_covered": "class A: injection targets other than VSS, injected capacitance/charge coupling, rinj outside {1k,30k}, widths outside 20 us - 2 ms, edges outside 10-200 us, injection before baseline settling; class B: floors outside 0.4-2.0 V, holds outside 20-200 us, slews outside 20-200 kV/s, asymmetric edges, repeated glitches; both: ll/hh passive skew, mismatch Monte Carlo, PTAT/CTAT loading, post-layout parasitics, solver variants other than the default deck (a tightened-solver re-run of NONPHYSICAL cells is the #153-style follow-on)."
+  },
+  "grading": {
+    "status": "EXPLORATORY -- every number below is a measurement definition chosen for this campaign; none is a ratified bound, and none is a gf180mcu figure.",
+    "levels": "V_IL = 0.2 vf, V_IH = 0.8 vf, V_MID = 0.5 vf, V_MUST = 0.5 vf (vf = the point's starting supply)",
+    "assertion": "RESETn falls through V_IL starting from HIGH at t0 (Schmitt).  assertion_rail_limited is recorded when VDD itself was <= V_IL at that instant (the output could not stay high regardless of the comparator).  Release = RESETn rises through V_IH.",
+    "detectability": "a dip is 'required-to-assert' when VDD spends >= 50 us below V_MUST (piecewise-linear dwell from the full-resolution VDD).  Dips that are not required may assert or not -- both are recorded, neither fails -- but an assertion must still recover.",
+    "baseline": "viable when, before t0: exactly one RESETn release and no re-assert, RESETn >= V_IH and POR_RAW >= V_MID over the 2 ms before t0, delivered bias branch current > 0 with peak-to-peak <= 5 % of its mean. Otherwise UNRESOLVED (detected codes are kept in 'detected_codes_ungraded').",
+    "failure_codes": "unwanted_assertion (A); missed_assertion; no_recovery; premature_release (spurious release); reassert_chatter; reassert_after_recovery (B); not_high_at_end; bias_not_recovered; spurious_assertion_control (definitions in glitch_checker.py docstring).",
+    "recovery": "VDD recovered when >= 0.98 vf after the recovery edge starts; an assertion beginning later is reassert_after_recovery; two or more assertions are reassert_chatter; RESETn must be >= V_IH over the last 1 ms.",
+    "delivered_bias": "explicit measurement: drain current [id] of bias_core XMPIB (PMOS whose drain IS the IBIAS node), saved by the testbench as .save @m.xdut.xbias.xmpib.msky130_fd_pr__pfet_g5v0d10v5[id] and appearing in the klt waveform as i(@m.xdut.xbias.xmpib.msky130_fd_pr__pfet_g5v0d10v5[id]). Sign: ngspice BSIM4 reports id POSITIVE for normal conduction in both polarities (established by the brownout-top local probe: XMPIB id ~0.78 uA equals the sum of the consumer diode devices' ids), so the delivered branch current is +id and must be positive at baseline (else NONPHYSICAL). The consumer-side diode devices (comparator, output chain, temp_core XMBD [id]) are saved; their sum over the delivered current at the end is recorded. The IBIAS NODE voltage is recorded separately and never used as a current. End/baseline ratio band [0.8, 1.25] else FAIL bias_not_recovered.",
+    "resolution": "max sample gap from t0-10 us to glitch end+100 us must be <= min(20 us, width/5, edge/8) for class A (0.1 % float tolerance) and the brown-out rule min(20 us, hold/5, edge/10) for class B AND the sampled drive (VDD for B, GINJ and VDD for A) must match the declared stimulus (VDD within 20 mV, GINJ within 0.02); class A additionally needs the injection to take POR_RAW below V_MID (else the dwell was not exercised -> UNRESOLVED). Otherwise a point with no detected failure is UNRESOLVED, not PASS.",
+    "physicality": "every saved node within [-0.3 V, vf+0.5 V] for t>0, settled supply current -i(BVDD) > 0, delivered bias positive at baseline. Violation -> NONPHYSICAL (cannot PASS; behavioural verdict not graded).",
+    "verdicts": "ERROR (missing waveform / channel / non-finite data / convergence, model or backend error) > NONPHYSICAL > UNRESOLVED (unviable baseline, truncated, sparse, stimulus mismatch) > FAIL (resolved physical failure, with trace evidence) > PASS.  NOT_COVERED marks points whose request was never submitted, was refused by the fleet, or has no report; they are counted as uncovered, never as PASS.",
+    "trace_storage": "committed traces are change-triggered (dV >= 2 mV on VDD/RESETn/POR_RAW/IBIAS node, delivered bias or injection current moved >= 2 % of its maximum, GINJ moved >= 0.01, or a 1 ms anchor); RESETn assertion/release counts are re-derived from the stored trace and compared with the full-resolution result per point.",
+    "expectation": "Per stimulus, stated in every point: class A from the full-resolution POR_RAW dwell below V_MID -- < 50 us (D_REJ) calls for REJECTION (RESETn must stay above V_IL), >= 1 ms (D_REQ) calls for ASSERTION (must assert, then release), in between assertion is optional but must release; no-injection control calls for no assertion. Class B from the VDD dwell below V_MUST -- >= 50 us (T_REQ) calls for assertion, otherwise optional; rail_collapse (VDD <= V_IL) and dwell_rejection_visible (POR_RAW fell, RESETn did not assert) are recorded. D_REJ/D_REQ are exploratory definitions, not claims about the design's dwell.",
+    "deck_attribution": "each point's retrieved input deck must carry this experiment's banner and request tag, the committed XMN1 L=20 W=0.42, no diagnostic marker, the class's injection element exactly when the class is por_raw_inject, and the declared .param line; otherwise ERROR deck_attribution (a point can never be credited to the wrong DUT/class)."
+  },
+  "fleet": {
+    "backend": "batch (Spot fleet) via klt sim --backend batch, one request per glitch point = 45 PVT corners; no local grid execution. A single local corner probe (--backend local) is permitted for netlist validation only.",
+    "ngspice_note": "The fleet runner ignores options.ngspice_init, so ng_nomodcheck is carried in the netlist body as in supply-ramp-top and brownout-top.",
+    "solver": "default deck (identical solver settings to brownout-top: .options method=gear trtol=50)"
+  },
+  "classes": {
+    "por_raw_inject": {
+      "label": "POR_RAW-domain pulse injection (instrumented assembly)",
+      "tag_prefix": "por_raw",
+      "purpose": "exercise the deglitch dwell of por_output_chain directly (spec/porting-plan.md Sec3.5 axis 1); the VDD rail is a clean power-up ramp"
+    },
+    "vdd_level": {
+      "label": "VDD-level supply glitch (unmodified assembly)",
+      "tag_prefix": "vdd",
+      "purpose": "characterise the boundary between 'the dwell visibly rejects' and 'the rail is too low for the block to hold state' (axis 2); DUT netlist spliced byte-identical"
+    }
+  },
+  "injection": {
+    "status": "INSTRUMENT, not part of the design. The two lines are present in every class-A deck (the no-injection control keeps them with gen = 0, so the control has the same topology and an idle, zero-current element) and absent from every class-B deck, whose DUT netlist is byte-identical to the committed export.",
+    "elements": [
+      "BINJ INJD VSS V=v(POR_RAW)*(1-v(ginj))",
+      "RINJ INJD POR_RAW <rinj>"
+    ],
+    "mechanism": "A Thevenin source behind a finite resistor RINJ into the por_comparator output node POR_RAW (the node the deglitch dwell filters). The source voltage tracks v(POR_RAW)*(1-g) where g(t) in [0,1] is the global drive GINJ (testbench BGINJ, a trapezoid: rise te, flat width tw, fall te, starting at t0). With g = 0 the source equals the node voltage, so the element draws exactly zero current at baseline (no idle loading); with g = 1 POR_RAW is pulled toward VSS through RINJ and the comparator output stage (XMI2P/XMI2N) keeps driving the node -- the injected level is therefore a divider of RINJ against the comparator pull-up, not an imposed voltage.",
+    "loading": "RINJ (amplitude axis), the target level is VSS (0 V), no capacitance is added. The comparator, output chain, bias and temp_core stay connected and unmodified; the netlist diff against the committed DUT is exactly the two lines above plus a .save of the RINJ current (checked by selftest).",
+    "limit_rule": "if injection prevents a physically meaningful operating point (nonphysical node, supply current reversal, injection never takes POR_RAW below V_MID, or POR_RAW pinned below V_IL) the point is reported NONPHYSICAL/UNRESOLVED with the injection fields recorded; as-drawn immunity is not claimed from it.",
+    "measured_injection": "current through RINJ (i(@r.xdut.rinj[i])), POR_RAW minimum, POR_RAW dwell below V_MID are recorded per point; the sampled GINJ drive is checked against the declared trapezoid (tolerance 0.02) or the point is UNRESOLVED."
+  },
+  "dut_loading": {
+    "PTAT": "open",
+    "CTAT": "open",
+    "RESETn": "unloaded",
+    "substitutions": "none -- no ideal bias, no ideal sensor, no retired diagnostic XMN1 edit; class por_raw_inject differs from the committed netlist by the instrument lines in 'injection' only"
+  }
+}

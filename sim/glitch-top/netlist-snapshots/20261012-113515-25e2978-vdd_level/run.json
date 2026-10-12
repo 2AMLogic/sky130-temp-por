@@ -1,0 +1,147 @@
+{
+  "run_id": "20261012-014941-25e2978",
+  "started_utc": "2026-10-12T01:49:41Z",
+  "source": {
+    "sha": "25e2978",
+    "branch": "feature/issue-117",
+    "dirty": false,
+    "sha_full": "25e2978dd7ea61de60f190cd1e0f98962bcd828c",
+    "pushed_to_remote": true,
+    "remote_branches": [
+      "origin/feature/issue-117"
+    ]
+  },
+  "klt_client": "klt 0.7.0+gff97d692a147",
+  "klt_sim_backend_env": "batch",
+  "declared": {
+    "requests": 18,
+    "points_per_request": 45,
+    "points": 810
+  },
+  "submitted_tags": [
+    "por_raw_cube_r1000_w2em05_e2em05",
+    "por_raw_cube_r1000_w0.0002_e2em05",
+    "por_raw_cube_r1000_w0.002_e2em05",
+    "por_raw_cube_r30000_w2em05_e2em05",
+    "por_raw_cube_r30000_w0.0002_e2em05",
+    "por_raw_cube_r30000_w0.002_e2em05",
+    "por_raw_edge_r1000_w0.0002_e1em05",
+    "por_raw_edge_r1000_w0.0002_e0.0002",
+    "por_raw_control",
+    "vdd_cube_v2_h2em05_s50000",
+    "vdd_cube_v2_h0.0002_s50000",
+    "vdd_cube_v1.2_h2em05_s50000",
+    "vdd_cube_v1.2_h0.0002_s50000",
+    "vdd_cube_v0.4_h2em05_s50000",
+    "vdd_cube_v0.4_h0.0002_s50000",
+    "vdd_slew_v1.2_h0.0002_s20000",
+    "vdd_slew_v1.2_h0.0002_s200000",
+    "vdd_control"
+  ],
+  "submit_results": [
+    {
+      "tag": "por_raw_cube_r1000_w2em05_e2em05",
+      "exit": 0,
+      "status": "pass"
+    },
+    {
+      "tag": "por_raw_cube_r1000_w0.0002_e2em05",
+      "exit": 0,
+      "status": "pass"
+    },
+    {
+      "tag": "por_raw_cube_r1000_w0.002_e2em05",
+      "exit": 0,
+      "status": "pass"
+    },
+    {
+      "tag": "por_raw_cube_r30000_w2em05_e2em05",
+      "exit": 0,
+      "status": "pass"
+    },
+    {
+      "tag": "por_raw_cube_r30000_w0.0002_e2em05",
+      "exit": 0,
+      "status": "pass"
+    },
+    {
+      "tag": "por_raw_cube_r30000_w0.002_e2em05",
+      "exit": 0,
+      "status": "pass"
+    },
+    {
+      "error": "TimeoutExpired(['klt', 'sim', '/home/ubuntu/GitHub/sky130-temp-por/.loom/worktrees/issue-117/sim/build/glitch-top/20261012-014941-25e2978/por_raw_edge_r1000_w0.0002_e1em05/request.json', '--backend', 'batch', '-o', '/home/ubuntu/GitHub/sky130-temp-por/.loom/worktrees/issue-117/sim/build/glitch-top/20261012-014941-25e2978/por_raw_edge_r1000_w0.0002_e1em05/out', '--format', 'json'], 14400)"
+    },
+    {
+      "tag": "por_raw_edge_r1000_w0.0002_e0.0002",
+      "exit": 0,
+      "status": "pass"
+    },
+    {
+      "tag": "por_raw_control",
+      "exit": 0,
+      "status": "pass"
+    },
+    {
+      "tag": "vdd_cube_v2_h2em05_s50000",
+      "exit": 0,
+      "status": "pass"
+    },
+    {
+      "tag": "vdd_cube_v2_h0.0002_s50000",
+      "exit": 0,
+      "status": "pass"
+    },
+    {
+      "tag": "vdd_cube_v1.2_h2em05_s50000",
+      "exit": 0,
+      "status": "pass"
+    },
+    {
+      "error": "TimeoutExpired(['klt', 'sim', '/home/ubuntu/GitHub/sky130-temp-por/.loom/worktrees/issue-117/sim/build/glitch-top/20261012-014941-25e2978/vdd_cube_v1.2_h0.0002_s50000/request.json', '--backend', 'batch', '-o', '/home/ubuntu/GitHub/sky130-temp-por/.loom/worktrees/issue-117/sim/build/glitch-top/20261012-014941-25e2978/vdd_cube_v1.2_h0.0002_s50000/out', '--format', 'json'], 14400)"
+    },
+    {
+      "tag": "vdd_cube_v0.4_h2em05_s50000",
+      "exit": 0,
+      "status": "pass"
+    },
+    {
+      "tag": "vdd_cube_v0.4_h0.0002_s50000",
+      "exit": 0,
+      "status": "pass"
+    },
+    {
+      "tag": "vdd_slew_v1.2_h0.0002_s20000",
+      "exit": 0,
+      "status": "pass"
+    },
+    {
+      "tag": "vdd_slew_v1.2_h0.0002_s200000",
+      "exit": 4,
+      "status": "error"
+    },
+    {
+      "tag": "vdd_control",
+      "exit": 0,
+      "status": "pass"
+    }
+  ],
+  "retries": [
+    {
+      "at_utc": "2026-10-12T11:35:03Z",
+      "capacity_wait_s": 600.0,
+      "results": [
+        {
+          "tag": "por_raw_edge_r1000_w0.0002_e1em05",
+          "exit": 0,
+          "status": "pass"
+        },
+        {
+          "tag": "vdd_cube_v1.2_h0.0002_s50000",
+          "exit": 0,
+          "status": "pass"
+        }
+      ]
+    }
+  ]
+}

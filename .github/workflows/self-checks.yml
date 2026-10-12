@@ -70,6 +70,11 @@ jobs:
       - name: Brown-out checker synthetic verdict cases (16 cases, no records written)
         run: python3 -I sim/brownout-top/brownout_checker.py
 
+      - name: Glitch checker synthetic verdict cases and campaign unit tests (no simulation, no records written)
+        run: |
+          python3 -I sim/glitch-top/glitch_checker.py
+          python3 -I sim/glitch-top/selftest/test_glitch.py
+
       - name: Committed netlists satisfy the pinout invariants
         run: python3 design/check_committed_netlists.py
 
