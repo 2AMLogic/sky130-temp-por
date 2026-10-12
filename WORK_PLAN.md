@@ -19,14 +19,13 @@ _None._
 
 Human-approved issues ready for implementation (`loom:issue`).
 
-_None._
+- **#153**: brownout-top: re-grade NONPHYSICAL brown-out points with a tightened-solver fleet re-run
 
 ## In Progress
 
 Issues currently being built (`loom:building`).
 
 - **#117**: Characterize POR_RAW-domain and VDD-level glitch immunity as distinct assembly experiments
-- **#153**: brownout-top: re-grade NONPHYSICAL brown-out points with a tightened-solver fleet re-run
 
 ## PRs Awaiting Review
 
@@ -64,8 +63,8 @@ Issues carrying `loom:curated`.
 |------|-------|
 | Operator merge-risk holds | 0 |
 | Operator priority | 0 |
-| Ready (`loom:issue`) | 0 |
-| In Progress (`loom:building`) | 2 |
+| Ready (`loom:issue`) | 1 |
+| In Progress (`loom:building`) | 1 |
 | PRs awaiting review | 0 |
 | Approved PRs awaiting merge | 0 |
 | Curated | 3 |
