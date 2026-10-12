@@ -114,3 +114,26 @@ The grid goes to the Spot fleet as `klt sim` requests; never hand-launch `ngspic
 loops. A refused/failed submit is recorded and its points stay `NOT_COVERED`; there
 is no local fallback. Raw outputs live in git-ignored `sim/build/glitch-top/<run-id>/`.
 Spec/design are never edited to improve results; a failing cell is evidence.
+
+## Results (run `20261012-014941-25e2978`, records `20261012-113515-25e2978-*`)
+
+All 18 declared requests / 810 points were submitted to the Spot fleet and graded
+(0 `NOT_COVERED`). The two classes are reported in separate records; a simulation
+`pass` from `klt` is not a verdict.
+
+| Class | PASS | FAIL | ERROR | NONPHYSICAL | UNRESOLVED |
+|---|---|---|---|---|---|
+| `por_raw_inject` (instrumented) | 152 | 0 | 0 | 172 | 81 |
+| `vdd_level` (unmodified) | 67 | 5 | 45 | 288 | 0 |
+
+* The large NONPHYSICAL counts are the default-deck solver-branch signature already seen in
+  `sim/brownout-top/` (e.g. `singular_matrix` at the `temp_core` PNP emitter in a local
+  probe). They are retained, not graded for behaviour, and give no immunity claim; the
+  tightened-solver re-run is the declared follow-on (see `experiment.json` `not_covered`).
+* `vdd_slew_v1.2_h0.0002_s200000` returned a fleet report with status `error`; its 45
+  points are `ERROR`. Two other requests (`por_raw_edge_r1000_w0.0002_e1em05`,
+  `vdd_cube_v1.2_h0.0002_s50000`) hung client-side until the driver's 4 h cap, were
+  recorded as failed submits and were re-submitted once with `--retry-failed` (same run id).
+* The 5 class-B FAILs and the class-A UNRESOLVED cells are per-point in the records; no
+  numeric envelope is claimed.
+
