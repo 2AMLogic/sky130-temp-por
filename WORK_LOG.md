@@ -2,6 +2,11 @@
 
 Chronological record of recently merged pull requests and closed issues. This file is maintained by the Loom Guide role.
 
+### 2026-10-12
+
+- **PR #176**: sim: glitch-top POR_RAW-domain and VDD-level glitch campaign (#117)
+- **Issue #117** (closed): Characterize POR_RAW-domain and VDD-level glitch immunity as distinct assembly experiments
+
 ### 2026-10-11
 
 - **PR #172**: sim: consolidate duplicated waveform primitives into sim_common (#170)
