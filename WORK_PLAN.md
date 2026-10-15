@@ -5,13 +5,19 @@ Current roadmap derived from GitHub label state. The region below is maintained 
 <!-- guide:plan-body:start -->
 ## Operator Attention: Merge-Risk-Hold Pileup
 
-Judge-approved PRs stuck under a `loom:operator` merge-risk hold — implementation work is done, only a human merge decision is missing.
+Judge-approved PRs under a hold (`loom:blocked` or `loom:operator`) — only a human merge decision is missing.
 
 _None._
 
-## Operator Priority
+## Very Important
 
-Issues the operator starred (`loom:operator-priority`); land these first.
+`loom:very-important` (one counts per workspace); every stage takes these first.
+
+_None._
+
+## Important
+
+`loom:important`; taken before unlabelled work.
 
 _None._
 
@@ -25,7 +31,7 @@ _None._
 
 Issues currently being built (`loom:building`).
 
-- **#117**: Characterize POR_RAW-domain and VDD-level glitch immunity as distinct assembly experiments
+_None._
 
 ## PRs Awaiting Review
 
@@ -44,7 +50,6 @@ _None._
 Issues carrying `loom:curated`.
 
 - **#97**: Lay out por_output_chain as the next DRC/LVS-verified POR leaf *(curated)*
-- **#117**: Characterize POR_RAW-domain and VDD-level glitch immunity as distinct assembly experiments *(curated)*
 - **#153**: brownout-top: re-grade NONPHYSICAL brown-out points with a tightened-solver fleet re-run *(curated)*
 
 ## Proposed (Architect / Hermit)
@@ -59,15 +64,16 @@ Issues carrying `loom:curated`.
 
 ## Backlog Balance
 
-| Tier | Count |
+| Bucket | Count |
 |------|-------|
 | Operator merge-risk holds | 0 |
-| Operator priority | 0 |
+| Very important | 0 |
+| Important | 0 |
 | Ready (`loom:issue`) | 0 |
-| In Progress (`loom:building`) | 1 |
+| In Progress (`loom:building`) | 0 |
 | PRs awaiting review | 0 |
 | Approved PRs awaiting merge | 0 |
-| Curated | 3 |
+| Curated | 2 |
 | Architect / Hermit proposals | 3 |
 | Active epics | 1 |
 <!-- guide:plan-body:end -->
