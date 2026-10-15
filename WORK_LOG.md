@@ -2,6 +2,14 @@
 
 Chronological record of recently merged pull requests and closed issues. This file is maintained by the Loom Guide role.
 
+### 2026-10-15
+
+- **PR #180**: refactor(layout): retire unused lvs.dependency_variants from compose-cell
+- **PR #179**: test: add guard reproducer and controls for /tmp-cwd relative writes
+- **Issue #110** (closed): Remove unused LVS dependency-variant support from compose-cell.py
+- **Issue #106** (closed): Brown-out and glitch-immunity matrix for assembled temp_por_top (porting-plan §3.4/§3.5)
+- **Issue #88** (closed): Guard false positive: worktree write confinement rejects resolved /tmp loop paths
+
 ### 2026-10-12
 
 - **PR #176**: sim: glitch-top POR_RAW-domain and VDD-level glitch campaign (#117)
