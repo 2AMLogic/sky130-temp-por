@@ -31,7 +31,7 @@ _None._
 
 Issues currently being built (`loom:building`).
 
-- **#181**: glitch-top: re-run failed vdd_level request vdd_slew_v1.2_h0.0002_s200000 (45 ERROR points)
+_None._
 
 ## PRs Awaiting Review
 
@@ -69,7 +69,7 @@ Issues carrying `loom:curated`.
 | Very important | 0 |
 | Important | 0 |
 | Ready (`loom:issue`) | 0 |
-| In Progress (`loom:building`) | 1 |
+| In Progress (`loom:building`) | 0 |
 | PRs awaiting review | 0 |
 | Approved PRs awaiting merge | 0 |
 | Curated | 3 |
