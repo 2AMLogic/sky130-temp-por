@@ -31,7 +31,7 @@ _None._
 
 Issues currently being built (`loom:building`).
 
-_None._
+- **#181**: glitch-top: re-run failed vdd_level request vdd_slew_v1.2_h0.0002_s200000 (45 ERROR points)
 
 ## PRs Awaiting Review
 
@@ -51,12 +51,11 @@ Issues carrying `loom:curated`.
 
 - **#97**: Lay out por_output_chain as the next DRC/LVS-verified POR leaf *(curated)*
 - **#153**: brownout-top: re-grade NONPHYSICAL brown-out points with a tightened-solver fleet re-run *(curated)*
+- **#181**: glitch-top: re-run failed vdd_level request vdd_slew_v1.2_h0.0002_s200000 (45 ERROR points) *(curated)*
 
 ## Proposed (Architect / Hermit)
 
-- **#106**: Brown-out and glitch-immunity matrix for assembled temp_por_top (porting-plan §3.4/§3.5) *(architect)*
 - **#137**: Run the two-key ratification ceremony on DR-004 and DR-005 *(architect)*
-- **#110**: Remove unused LVS dependency-variant support from compose-cell.py *(hermit)*
 
 ## Epics
 
@@ -70,10 +69,10 @@ Issues carrying `loom:curated`.
 | Very important | 0 |
 | Important | 0 |
 | Ready (`loom:issue`) | 0 |
-| In Progress (`loom:building`) | 0 |
+| In Progress (`loom:building`) | 1 |
 | PRs awaiting review | 0 |
 | Approved PRs awaiting merge | 0 |
-| Curated | 2 |
-| Architect / Hermit proposals | 3 |
+| Curated | 3 |
+| Architect / Hermit proposals | 1 |
 | Active epics | 1 |
 <!-- guide:plan-body:end -->
