@@ -1,0 +1,77 @@
+{
+  "schema_version": 1,
+  "kind": "t1-attestation-inventory",
+  "t1_item": 1,
+  "description": "Design sources: the xschem schematics/symbols under design/ and the ngspice netlists derived from them. The freshness check is design/netlist.py --check (re-exports every cell with xschem and diffs the committed netlists); it needs xschem >= 3.4.5 (verified on 3.4.7) and the sky130 PDK, so it cannot run on a stock CI runner. See manifests/README.md.",
+  "sources": [
+    "design/bias_core.sch",
+    "design/bias_core.sym",
+    "design/por_comparator.sch",
+    "design/por_comparator.sym",
+    "design/por_output_chain.sch",
+    "design/por_output_chain.sym",
+    "design/temp_core.sch",
+    "design/temp_core.sym",
+    "design/temp_por_top.sch",
+    "design/temp_por_top.sym",
+    "design/netlist.py",
+    "design/xschemrc"
+  ],
+  "derived": [
+    {
+      "path": "design/netlist/bias_core.spice",
+      "generator": "python3 design/netlist.py",
+      "check": {
+        "argv": [
+          "python3",
+          "design/netlist.py",
+          "--check"
+        ]
+      }
+    },
+    {
+      "path": "design/netlist/por_comparator.spice",
+      "generator": "python3 design/netlist.py",
+      "check": {
+        "argv": [
+          "python3",
+          "design/netlist.py",
+          "--check"
+        ]
+      }
+    },
+    {
+      "path": "design/netlist/por_output_chain.spice",
+      "generator": "python3 design/netlist.py",
+      "check": {
+        "argv": [
+          "python3",
+          "design/netlist.py",
+          "--check"
+        ]
+      }
+    },
+    {
+      "path": "design/netlist/temp_core.spice",
+      "generator": "python3 design/netlist.py",
+      "check": {
+        "argv": [
+          "python3",
+          "design/netlist.py",
+          "--check"
+        ]
+      }
+    },
+    {
+      "path": "design/netlist/temp_por_top.spice",
+      "generator": "python3 design/netlist.py",
+      "check": {
+        "argv": [
+          "python3",
+          "design/netlist.py",
+          "--check"
+        ]
+      }
+    }
+  ]
+}

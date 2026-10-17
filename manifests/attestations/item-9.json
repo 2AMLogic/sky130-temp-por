@@ -1,0 +1,342 @@
+{
+  "schema_version": 1,
+  "kind": "generic",
+  "status": "pass",
+  "t1_item": 9,
+  "summary": "T1 item 9 (Testbenches shipped): 43/43 attestation checks passed (klt signoff --attest)",
+  "source": "manifests/inventories/item-9.json",
+  "attestation": {
+    "producer": "klt signoff --attest",
+    "inventory_schema_version": 1,
+    "hash_algorithm": "sha256-raw-bytes",
+    "check_count": 43,
+    "passed_count": 43,
+    "checks": [
+      {
+        "check": "present",
+        "role": "testbench",
+        "path": "sim/bias-core-op-branch/run_op_branch.py",
+        "passed": true,
+        "content_hash": "sha256:56ddfd36ec1fbf5cae670786a55d5902e4ff2c9eec659ceafb5e27646650a421"
+      },
+      {
+        "check": "present",
+        "role": "testbench",
+        "path": "sim/bias-core-smoke/experiment.json",
+        "passed": true,
+        "content_hash": "sha256:6d8cbb5ed86f097d8c77be6bdb3ee862f8bf1389bd3efc161be3590cae4224cd"
+      },
+      {
+        "check": "present",
+        "role": "testbench",
+        "path": "sim/bias-core-smoke/testbench/tb_bias_core_smoke.sch",
+        "passed": true,
+        "content_hash": "sha256:6d69c1bdfc1b0c6f36ddbd1e3d537bfd9a3bf198f277221f34e4fcaa5b6fcfe7"
+      },
+      {
+        "check": "present",
+        "role": "testbench",
+        "path": "sim/bias-core-startup/experiment.json",
+        "passed": true,
+        "content_hash": "sha256:6e18ea22f82499597152ff23941952f9ab4822cd674269476be159d7b8492dc3"
+      },
+      {
+        "check": "present",
+        "role": "testbench",
+        "path": "sim/bias-core-startup/testbench/tb_bias_core_startup.sch",
+        "passed": true,
+        "content_hash": "sha256:429ad9edabce5693bee9785172128386cba52a77cb2df2035fb3a651b7394433"
+      },
+      {
+        "check": "present",
+        "role": "testbench",
+        "path": "sim/bin/corner-run.py",
+        "passed": true,
+        "content_hash": "sha256:65e3cf34bcc969b52e88dea6e695f13d4e6bfdc4abf1c0258690cc41531a4671"
+      },
+      {
+        "check": "present",
+        "role": "testbench",
+        "path": "sim/bin/sim_common.py",
+        "passed": true,
+        "content_hash": "sha256:f9bd9bf9e696154508ad283f943ea89d6f2820685560fdaf4933f3d4361cb041"
+      },
+      {
+        "check": "present",
+        "role": "testbench",
+        "path": "sim/brownout-top/experiment.json",
+        "passed": true,
+        "content_hash": "sha256:4c1b61d86c5602e647168de39c85416c92bdcccfc164872b44d3834ab98ea85a"
+      },
+      {
+        "check": "present",
+        "role": "testbench",
+        "path": "sim/brownout-top/run_brownout_campaign.py",
+        "passed": true,
+        "content_hash": "sha256:f3c524df429d85bafbfee8dced67a7fdc47c7eee8e1361edbdd82ad61cf9db17"
+      },
+      {
+        "check": "present",
+        "role": "testbench",
+        "path": "sim/brownout-top/testbench/tb_temp_por_brownout.sch",
+        "passed": true,
+        "content_hash": "sha256:e5965faf119859bb4f3ee358aeef74d4b816085f3deabd9947bf26949fd063a3"
+      },
+      {
+        "check": "present",
+        "role": "testbench",
+        "path": "sim/glitch-top/experiment.json",
+        "passed": true,
+        "content_hash": "sha256:e73d76ba5a0cf3c2444c06be1ddbcc7505514ca3b71531366442a2731a9876a1"
+      },
+      {
+        "check": "present",
+        "role": "testbench",
+        "path": "sim/glitch-top/run_glitch_campaign.py",
+        "passed": true,
+        "content_hash": "sha256:21788a25fc0c40e395b5a8f87ccb3e6e37ffa5d0bcc07c057c69b0bc3f89e72d"
+      },
+      {
+        "check": "present",
+        "role": "testbench",
+        "path": "sim/glitch-top/testbench/tb_temp_por_glitch.sch",
+        "passed": true,
+        "content_hash": "sha256:baa8a974f2f3480566555f8369d4e718b4493ba65a2f33e0576acda7c9d3a061"
+      },
+      {
+        "check": "present",
+        "role": "testbench",
+        "path": "sim/iq-top/experiment.json",
+        "passed": true,
+        "content_hash": "sha256:4763145c81af7d183acb8cf3545cb31ef41c0698cc63c27433e1fd90d213c288"
+      },
+      {
+        "check": "present",
+        "role": "testbench",
+        "path": "sim/iq-top/run_iq_campaign.py",
+        "passed": true,
+        "content_hash": "sha256:28eacd98e2d98789184cac48baf65540d6d54eeb0b8a5a8ea1be0f0fd6fab7e9"
+      },
+      {
+        "check": "present",
+        "role": "testbench",
+        "path": "sim/iq-top/run_iq_sensitivity.py",
+        "passed": true,
+        "content_hash": "sha256:968f866124db1aa03fb9fc8de858c7c15a81cb9f9bc1a094440188ffc02e2be9"
+      },
+      {
+        "check": "present",
+        "role": "testbench",
+        "path": "sim/iq-top/testbench/tb_temp_por_iq_por.sch",
+        "passed": true,
+        "content_hash": "sha256:174a536f4b7bade8b86422b853b4b6a83e65a4bde378acba932845edaabfe1ce"
+      },
+      {
+        "check": "present",
+        "role": "testbench",
+        "path": "sim/iq-top/testbench/tb_temp_por_iq_total.sch",
+        "passed": true,
+        "content_hash": "sha256:0079e0adb0e07df406e057d135ee769bd3180d485cab7e02990d05e52a6fcc6d"
+      },
+      {
+        "check": "present",
+        "role": "testbench",
+        "path": "sim/native-device-characterization/experiment.json",
+        "passed": true,
+        "content_hash": "sha256:941ebad747c9502d560bce771b619762903b6bf2e44e0908c23adbac39691af8"
+      },
+      {
+        "check": "present",
+        "role": "testbench",
+        "path": "sim/native-device-characterization/testbench/tb_native_device_char.sch",
+        "passed": true,
+        "content_hash": "sha256:7ef01bf9fac61458adda266986b0f188c44df29ca37632e29919cae3239be84c"
+      },
+      {
+        "check": "present",
+        "role": "testbench",
+        "path": "sim/pdk.json",
+        "passed": true,
+        "content_hash": "sha256:d89775b5919db6c106348e97070f6c8574ba5661856488d7e1351c4e9d7facc9"
+      },
+      {
+        "check": "present",
+        "role": "testbench",
+        "path": "sim/pnp-mismatch/run_pnp_mismatch.py",
+        "passed": true,
+        "content_hash": "sha256:c5d24ea461d0a2a5b1aceb2f83925eb026bb18e60ad0fdeb3ce18be29cac2fcc"
+      },
+      {
+        "check": "present",
+        "role": "testbench",
+        "path": "sim/pnp-mismatch/testbench/tb_pnp_mismatch.spice",
+        "passed": true,
+        "content_hash": "sha256:a87f01de536e674808931fcf3ee808d65dd8585e3fd1fd0e9d2a77597cd531fb"
+      },
+      {
+        "check": "present",
+        "role": "testbench",
+        "path": "sim/por-comparator-thresholds/experiment.json",
+        "passed": true,
+        "content_hash": "sha256:baaca14412f70d18140debb01078217da687bf2678d1fd2628f68b4334b22890"
+      },
+      {
+        "check": "present",
+        "role": "testbench",
+        "path": "sim/por-comparator-thresholds/run_thresholds_campaign.py",
+        "passed": true,
+        "content_hash": "sha256:71191a0917325d9c23a45952590c0fff0c5a80eae3068996e87d023e814f218d"
+      },
+      {
+        "check": "present",
+        "role": "testbench",
+        "path": "sim/por-comparator-thresholds/testbench/tb_por_comparator_thresholds.sch",
+        "passed": true,
+        "content_hash": "sha256:a6d8d516d745314e94c51ee52ae1f5c537126a604510e442c705f8c7760db637"
+      },
+      {
+        "check": "present",
+        "role": "testbench",
+        "path": "sim/por-comparator-thresholds/testbench/tb_por_comparator_thresholds_realbias.sch",
+        "passed": true,
+        "content_hash": "sha256:d40d3511e31b1182343c95030f8d07a3f9da03d1c07b1803fc55d39832f18bec"
+      },
+      {
+        "check": "present",
+        "role": "testbench",
+        "path": "sim/spiceinit",
+        "passed": true,
+        "content_hash": "sha256:7b5350d05d41130e5473ca284e89fbb2cac330e7ac023ab0226190acd961d917"
+      },
+      {
+        "check": "present",
+        "role": "testbench",
+        "path": "sim/supply-ramp-top/experiment.json",
+        "passed": true,
+        "content_hash": "sha256:1fc0774cce3cdb427b14ddfdef45756501528983df316a337a732ebc903bb599"
+      },
+      {
+        "check": "present",
+        "role": "testbench",
+        "path": "sim/supply-ramp-top/run_ramp_campaign.py",
+        "passed": true,
+        "content_hash": "sha256:c463c2448edc5c5ead71420aa4a58facbda717a2fae14c7f0fdbc37819c1d638"
+      },
+      {
+        "check": "present",
+        "role": "testbench",
+        "path": "sim/supply-ramp-top/run_reassert_diagnosis.py",
+        "passed": true,
+        "content_hash": "sha256:5f1cb5831bc03568436b2f43e0399eae38938aebbf69dad9414f4881a8c09355"
+      },
+      {
+        "check": "present",
+        "role": "testbench",
+        "path": "sim/supply-ramp-top/testbench/tb_temp_por_ramp.sch",
+        "passed": true,
+        "content_hash": "sha256:7a2ac5b952e2d85b1d46f46ad957d12a9b2caca54c049b2d3ceadf8cadef1d01"
+      },
+      {
+        "check": "present",
+        "role": "testbench",
+        "path": "sim/temp-core-accuracy-mc/experiment.json",
+        "passed": true,
+        "content_hash": "sha256:b7b72fa0c5e7eae4914ad6fcaadf59aadd808a96b350324ef4d6b84b2432af48"
+      },
+      {
+        "check": "present",
+        "role": "testbench",
+        "path": "sim/temp-core-accuracy-mc/run_accuracy_mc.py",
+        "passed": true,
+        "content_hash": "sha256:db3e3e8575f26ed633526c041d062f4605a14a28b1635be98bb1883f11f71219"
+      },
+      {
+        "check": "present",
+        "role": "testbench",
+        "path": "sim/temp-core-startup-en-delayed/experiment.json",
+        "passed": true,
+        "content_hash": "sha256:b6274b60e1fbde642235049d521dc833f6db9fb7092283ab9600050dac03d521"
+      },
+      {
+        "check": "present",
+        "role": "testbench",
+        "path": "sim/temp-core-startup-en-delayed/testbench/tb_temp_core_startup_en_delayed.sch",
+        "passed": true,
+        "content_hash": "sha256:8486be46e7e690446f713d287d385a566c7d2cc201c8c8aac62508902656b975"
+      },
+      {
+        "check": "present",
+        "role": "testbench",
+        "path": "sim/temp-core-startup-solver/run_solver_sweep.py",
+        "passed": true,
+        "content_hash": "sha256:a40971944c43d04f56def0dc1a7515e991b290154bc75ec00bee8680139b3f53"
+      },
+      {
+        "check": "present",
+        "role": "testbench",
+        "path": "sim/temp-core-startup/experiment.json",
+        "passed": true,
+        "content_hash": "sha256:e3c8d9386b3f6bde59c767f18d0cfc53a3425d41c74c727d7980859c131e71c0"
+      },
+      {
+        "check": "present",
+        "role": "testbench",
+        "path": "sim/temp-core-startup/testbench/tb_temp_core_startup.sch",
+        "passed": true,
+        "content_hash": "sha256:d973e9473c3194c9ce9eef5778f06c00e92f16a926903d696391858513ba26f3"
+      },
+      {
+        "check": "present",
+        "role": "testbench",
+        "path": "sim/xschemrc",
+        "passed": true,
+        "content_hash": "sha256:d5768d6e09f36d37e62e7c2246f217405f3caeb250401adad4f7953960573406"
+      },
+      {
+        "check": "command",
+        "role": "cold_start",
+        "argv": [
+          "python3",
+          "sim/bin/corner-run.py",
+          "sim/bias-core-smoke",
+          "--dry-run"
+        ],
+        "cwd": ".",
+        "exit_status": 0,
+        "passed": true
+      },
+      {
+        "check": "pin",
+        "role": "pdk",
+        "passed": true,
+        "value": {
+          "name": "sky130A",
+          "revision": "c6d73a35f524070e85faff4a6a9eef49553ebc2b"
+        }
+      },
+      {
+        "check": "pin",
+        "role": "tools",
+        "passed": true,
+        "value": {
+          "klt": "0.7.1.dev1610+g758c6e224053",
+          "ngspice": "46",
+          "xschem": "3.4.7"
+        }
+      }
+    ]
+  },
+  "provenance": {
+    "klt_version": "0.7.1.dev1610+g758c6e224053",
+    "klayout_version": null,
+    "pdk": null,
+    "deck": null,
+    "input": {
+      "path": {
+        "path": "manifests/inventories/item-9.json",
+        "scope": "repo"
+      },
+      "content_hash": "sha256:99dd37adef89b248fb9901a23299a5759a66f9dbe4bb8ed6eb5e1262e92900b0"
+    }
+  }
+}

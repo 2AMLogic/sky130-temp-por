@@ -1,0 +1,67 @@
+{
+  "schema_version": 1,
+  "kind": "t1-attestation-inventory",
+  "t1_item": 9,
+  "description": "Testbenches shipped: every sim/<experiment>/ testbench schematic, experiment manifest and campaign runner, plus the corner runner and the PDK pin (sim/pdk.json is hashed here, so a PDK re-pin drifts this attestation). The cold start is the runner's --dry-run on the smoke experiment: it netlists the testbench with xschem and prints the corner list and one deck, writing nothing under sim/. It does not run ngspice; the full PVT matrices are recorded under sim/*/records/. It needs xschem and the sky130 PDK, so it cannot run on a stock CI runner. See manifests/README.md.",
+  "testbenches": [
+    "sim/bias-core-op-branch/run_op_branch.py",
+    "sim/bias-core-smoke/experiment.json",
+    "sim/bias-core-smoke/testbench/tb_bias_core_smoke.sch",
+    "sim/bias-core-startup/experiment.json",
+    "sim/bias-core-startup/testbench/tb_bias_core_startup.sch",
+    "sim/bin/corner-run.py",
+    "sim/bin/sim_common.py",
+    "sim/brownout-top/experiment.json",
+    "sim/brownout-top/run_brownout_campaign.py",
+    "sim/brownout-top/testbench/tb_temp_por_brownout.sch",
+    "sim/glitch-top/experiment.json",
+    "sim/glitch-top/run_glitch_campaign.py",
+    "sim/glitch-top/testbench/tb_temp_por_glitch.sch",
+    "sim/iq-top/experiment.json",
+    "sim/iq-top/run_iq_campaign.py",
+    "sim/iq-top/run_iq_sensitivity.py",
+    "sim/iq-top/testbench/tb_temp_por_iq_por.sch",
+    "sim/iq-top/testbench/tb_temp_por_iq_total.sch",
+    "sim/native-device-characterization/experiment.json",
+    "sim/native-device-characterization/testbench/tb_native_device_char.sch",
+    "sim/pdk.json",
+    "sim/pnp-mismatch/run_pnp_mismatch.py",
+    "sim/pnp-mismatch/testbench/tb_pnp_mismatch.spice",
+    "sim/por-comparator-thresholds/experiment.json",
+    "sim/por-comparator-thresholds/run_thresholds_campaign.py",
+    "sim/por-comparator-thresholds/testbench/tb_por_comparator_thresholds.sch",
+    "sim/por-comparator-thresholds/testbench/tb_por_comparator_thresholds_realbias.sch",
+    "sim/spiceinit",
+    "sim/supply-ramp-top/experiment.json",
+    "sim/supply-ramp-top/run_ramp_campaign.py",
+    "sim/supply-ramp-top/run_reassert_diagnosis.py",
+    "sim/supply-ramp-top/testbench/tb_temp_por_ramp.sch",
+    "sim/temp-core-accuracy-mc/experiment.json",
+    "sim/temp-core-accuracy-mc/run_accuracy_mc.py",
+    "sim/temp-core-startup-en-delayed/experiment.json",
+    "sim/temp-core-startup-en-delayed/testbench/tb_temp_core_startup_en_delayed.sch",
+    "sim/temp-core-startup-solver/run_solver_sweep.py",
+    "sim/temp-core-startup/experiment.json",
+    "sim/temp-core-startup/testbench/tb_temp_core_startup.sch",
+    "sim/xschemrc"
+  ],
+  "cold_start": {
+    "argv": [
+      "python3",
+      "sim/bin/corner-run.py",
+      "sim/bias-core-smoke",
+      "--dry-run"
+    ]
+  },
+  "pins": {
+    "pdk": {
+      "name": "sky130A",
+      "revision": "c6d73a35f524070e85faff4a6a9eef49553ebc2b"
+    },
+    "tools": {
+      "ngspice": "46",
+      "xschem": "3.4.7",
+      "klt": "0.7.1.dev1610+g758c6e224053"
+    }
+  }
+}
