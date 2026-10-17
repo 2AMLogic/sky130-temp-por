@@ -28,7 +28,6 @@ import json
 import math
 import os
 import shutil
-import subprocess
 import sys
 from datetime import datetime, timezone
 from pathlib import Path
@@ -44,6 +43,7 @@ SLUG = camp.SLUG
 MANIFEST = camp.MANIFEST
 BUILD = camp.BUILD
 say = camp.say
+fmt = sim_common.fmt
 SOURCE_RECORD = "20261010-015905-fbd6329"
 
 EXTRA_SAVES = [
@@ -133,31 +133,10 @@ def cmd_matrix(args) -> int:
 
 
 def submit_case(case, head, man, run_dir):
-    d = run_dir / case["id"]
-    netlist = netlist_for(head, man, case)
-    req = request_for(man, case)
-    d.mkdir(parents=True, exist_ok=True)
-    if (d / "report.json").is_file():
-        n = 1
-        while (d / f"attempt{n}").exists():
-            n += 1
-        (d / f"attempt{n}").mkdir()
-        for name in ("report.json", "klt.stderr"):
-            if (d / name).is_file():
-                shutil.move(str(d / name), str(d / f"attempt{n}" / name))
-    (d / "netlist.spice").write_text(netlist)
-    (d / "request.json").write_text(json.dumps(req, indent=2) + "\n")
-    say(f"[submit] {case['id']} -> batch fleet")
-    p = subprocess.run(["klt", "sim", str(d / "request.json"), "--backend", "batch", "-o", str(d / "out"), "--format", "json"],
-                       capture_output=True, text=True, timeout=4 * 3600)
-    (d / "report.json").write_text(p.stdout)
-    (d / "klt.stderr").write_text(p.stderr)
-    try:
-        st = json.loads(p.stdout).get("status", "?")
-    except json.JSONDecodeError:
-        st = "NO-JSON"
-    say(f"[done]   {case['id']}: exit {p.returncode}, status {st}")
-    return {"case": case["id"], "exit": p.returncode, "status": st}
+    res = sim_common.submit_prepared(
+        run_dir / case["id"], netlist_for(head, man, case), request_for(man, case),
+        f"{case['id']} -> batch fleet", case["id"])
+    return {"case": case["id"], **res}
 
 
 def cmd_run(args) -> int:
@@ -449,10 +428,6 @@ def load_case(case, run_dir, man, corners_dir, write):
             art_log = Path(art["log"]).read_text() if art.get("log") and Path(art["log"]).is_file() else "(no log)"
             (corners_dir / f"{case['id']}.log").write_text(camp.scrub(art_log, run_dir))
     return rec
-
-
-def fmt(x, spec=".4g"):
-    return "n/a" if x is None else f"{x:{spec}}"
 
 
 def render_md(rec):

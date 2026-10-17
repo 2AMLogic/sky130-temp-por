@@ -65,11 +65,9 @@ BUILD = REPO_ROOT / "sim" / "build" / SLUG
 MODEL_LIB = "libs.tech/combined/sky130.lib.spice"
 
 say = sim_common.say
+fmt = sim_common.fmt
+corner_id = sim_common.corner_id
 scrub = functools.partial(sim_common.scrub, repo_root=REPO_ROOT)
-
-
-def corner_id(proc: str, temp: float, vf: float) -> str:
-    return f"{proc}_{cr.fmt_temp(temp)}c_{vf:.2f}v"
 
 
 def corners_of(man: dict) -> list[tuple[str, float, float]]:
@@ -261,29 +259,10 @@ def submit_one(req: dict, head: str, man: dict, run_dir: Path, capacity_wait_s: 
 
 def _submit_once(req: dict, head: str, man: dict, run_dir: Path, capacity_wait_s: float = 0, variant_key: str | None = None) -> dict:
     """Write netlist + request and run ``klt sim --backend batch``; an earlier attempt is archived, never overwritten."""
-    d = run_dir / req["tag"]
-    d.mkdir(parents=True, exist_ok=True)
-    if (d / "report.json").is_file():
-        n = 1
-        while (d / f"attempt{n}").exists():
-            n += 1
-        (d / f"attempt{n}").mkdir()
-        for name in ("report.json", "klt.stderr"):
-            if (d / name).is_file():
-                shutil.move(str(d / name), str(d / f"attempt{n}" / name))
-    (d / "netlist.spice").write_text(build_netlist(head, req, man, variant_key))
-    (d / "request.json").write_text(json.dumps(build_request(req, man, "batch", capacity_wait_s), indent=2) + "\n")
-    say(f"[submit] {req['tag']}: {declared_counts(man)['points_per_request']} points -> batch fleet")
-    p = subprocess.run(["klt", "sim", str(d / "request.json"), "--backend", "batch", "-o", str(d / "out"), "--format", "json"],
-                       capture_output=True, text=True, timeout=4 * 3600)
-    (d / "report.json").write_text(p.stdout)
-    (d / "klt.stderr").write_text(p.stderr)
-    try:
-        status = json.loads(p.stdout).get("status", "?")
-    except json.JSONDecodeError:
-        status = "NO-JSON"
-    say(f"[done]   {req['tag']}: exit {p.returncode}, report status {status}")
-    return {"tag": req["tag"], "exit": p.returncode, "status": status}
+    res = sim_common.submit_prepared(
+        run_dir / req["tag"], build_netlist(head, req, man, variant_key), build_request(req, man, "batch", capacity_wait_s),
+        f"{req['tag']}: {declared_counts(man)['points_per_request']} points -> batch fleet", req["tag"])
+    return {"tag": req["tag"], **res}
 
 
 # --------------------------------------------------------------------------
@@ -651,10 +630,6 @@ def summarize(points: list[dict]) -> dict:
         for c in (p.get("check") or {}).get("fail_codes", []):
             codes[c] = codes.get(c, 0) + 1
     return {"by_request": by_req, "total": total, "fail_codes": codes, "nonphysical_breakdown": nonphys}
-
-
-def fmt(x, spec=".4g"):
-    return "n/a" if x is None else f"{x:{spec}}"
 
 
 def _cmp_note(p: dict) -> str:

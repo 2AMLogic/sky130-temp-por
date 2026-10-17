@@ -54,6 +54,7 @@ import sim_common  # noqa: E402
 
 cr = sim_common.load_corner_run()
 say = sim_common.say
+fmt = sim_common.fmt
 scrub = rb.scrub
 
 SLUG = "glitch-top"
@@ -232,38 +233,20 @@ def build_request(req: dict, man: dict, backend: str, capacity_wait_s: float = 0
 def submit_one(req: dict, head: str, man: dict, run_dir: Path, capacity_wait_s: float = 0) -> dict:
     """Write netlist + request and run ``klt sim --backend batch``; an earlier attempt is archived, never overwritten."""
     d = run_dir / req["tag"]
-    d.mkdir(parents=True, exist_ok=True)
-    if (d / "report.json").is_file():
-        n = 1
-        while (d / f"attempt{n}").exists():
-            n += 1
-        (d / f"attempt{n}").mkdir()
-        for name in ("report.json", "klt.stderr"):
-            if (d / name).is_file():
-                shutil.move(str(d / name), str(d / f"attempt{n}" / name))
-    (d / "netlist.spice").write_text(build_netlist(head, req))
-    (d / "request.json").write_text(json.dumps(build_request(req, man, "batch", capacity_wait_s), indent=2) + "\n")
-    say(f"[submit] {req['tag']}: {len(corners_of(man))} points -> batch fleet")
-    refusals = 0
-    while True:
-        p = subprocess.run(["klt", "sim", str(d / "request.json"), "--backend", "batch", "-o", str(d / "out"), "--format", "json"],
-                           capture_output=True, text=True, timeout=4 * 3600)
+
+    def refused(p, n):
         # the fleet has a shared instance cap that klt does not wait on; a refused LAUNCH is retried later
         # (bounded; never replaced by a local grid).  Every refusal is kept as evidence.
-        if "BATCH_MAX_CONCURRENT_INSTANCES" in p.stdout + p.stderr and capacity_wait_s and refusals < 40:
-            refusals += 1
-            (d / f"launch-refused-{refusals}.txt").write_text(p.stdout + p.stderr)
+        if "BATCH_MAX_CONCURRENT_INSTANCES" in p.stdout + p.stderr and capacity_wait_s and n <= 40:
+            (d / f"launch-refused-{n}.txt").write_text(p.stdout + p.stderr)
             time.sleep(min(180, capacity_wait_s))
-            continue
-        break
-    (d / "report.json").write_text(p.stdout)
-    (d / "klt.stderr").write_text(p.stderr)
-    try:
-        status = json.loads(p.stdout).get("status", "?")
-    except json.JSONDecodeError:
-        status = "NO-JSON"
-    say(f"[done]   {req['tag']}: exit {p.returncode}, report status {status}")
-    return {"tag": req["tag"], "exit": p.returncode, "status": status}
+            return True
+        return False
+
+    res = sim_common.submit_prepared(
+        d, build_netlist(head, req), build_request(req, man, "batch", capacity_wait_s),
+        f"{req['tag']}: {len(corners_of(man))} points -> batch fleet", req["tag"], retry=refused)
+    return {"tag": req["tag"], **res}
 
 
 # --------------------------------------------------------------------------
@@ -531,10 +514,6 @@ def summarize(points: list[dict]) -> dict:
             nonphys["supply current reversed at end"] += bool(ph.get("supply_current_reversed_at_end"))
             nonphys["supply current reversed at baseline"] += bool(ph.get("supply_current_reversed_at_baseline"))
     return {"by_request": by_req, "by_corner": by_corner, "total": total, "fail_codes": codes, "nonphysical_breakdown": nonphys}
-
-
-def fmt(x, spec=".4g"):
-    return "n/a" if x is None else f"{x:{spec}}"
 
 
 def _uA(x):

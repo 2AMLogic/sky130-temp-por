@@ -35,6 +35,7 @@ SLUG = "temp-core-startup-solver"
 BUILD = REPO_ROOT / "sim" / "build" / SLUG
 MODEL_LIB = "libs.tech/combined/sky130.lib.spice"
 say = sim_common.say
+corner_id = sim_common.corner_id
 
 PROCS = ["tt", "ss", "ff", "sf", "fs"]
 TEMPS = [-40, 27, 125]
@@ -63,10 +64,6 @@ WINDOWS = {
     "ptat": (0.3, 2.6), "ctat": (0.2, 1.1), "na": (-1.0, 4.7), "nb": (-1.0, 4.7),
     "isup": (1e-8, 5e-5), "bias_ok": (2.0, 3.7), "ptat_settled": (0.0, 1e-3), "ctat_settled": (0.0, 1e-3),
 }
-
-
-def corner_id(p, t, v):
-    return f"{p}_{cr.fmt_temp(t)}c_{v:.2f}v"
 
 
 def grid():
