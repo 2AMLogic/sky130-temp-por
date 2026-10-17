@@ -57,22 +57,21 @@ each citation below is the envelope that genuinely backs the claim, and its
 blind spots are stated here (coverage honesty: a verdict's blind spots are
 part of the claim and travel with it):
 
-- **Item 1 — Design sources: `met`** via
-  `layout/bias_core_mirror_amp/lvs.json` (an LVS **match**: 15/15 devices,
-  13/13 nets, 0 mismatches). The block's schematic sources and the netlist
-  derived from them are committed (`design/` — leaf cells plus the
-  assembled `temp_por_top`; netlists exported by committed
-  netlist.py tooling) and that closes tracker sub-item #5. The citation
-  mechanically exercises exactly the derived netlist: the LVS reference is
-  rewritten ("subckt-call" converter) from `design/netlist/bias_core.spice`'s
-  own device cards, so a match is a passing check against the design's
-  committed netlist. **Not proven by this envelope:** that the netlist gets
-  *regenerated* on design change (that is discipline the committed export
-  tooling and the composition harness own) — freshness of this exact
-  citation is asserted in CI by re-hashing the committed compare netlists
-  against the envelope's recorded `environment` hashes, since `klt lvs`'s
-  envelope shape carries no `provenance.input.content_hash` a manifest pin
-  could bind to.
+- **Item 1 — Design sources: `unmet` (`wrong_kind`)** at the pinned build
+  (klt `0.7.1.dev1610+g758c6e224053`). It graded `met` at the previous pin
+  (`0.6.0+g0ce8c64842d9`) on `layout/bias_core_mirror_amp/lvs.json`, a native
+  LVS **match** (15/15 devices, 13/13 nets). Since klayout-tools#2718, items
+  1, 2, 9 and 10 accept only an **artifact-anchored** envelope that pins the
+  audited artifact by path and content hash, so a native LVS envelope no
+  longer satisfies item 1 and the row renders `citation: null`. The
+  manifest still lists that file under `evidence."1"`; it is kept so the
+  downgrade is visible, and it is deliberately **not** replaced with another
+  native envelope to turn the row green. What remains true, and is not an
+  item-1 claim: the block's schematic sources and the netlists derived from
+  them are committed (`design/`), and that LVS match exercises the derived
+  netlist. The path back to `met` is an attestation made with
+  `klt signoff --attest 1 --inventory <file>` (klayout-tools#2844), tracked
+  in #186.
 - **Item 2 — Layout: `unmet` (`no_evidence`)**, truthfully: the block has
   no `temp_por_top` layout yet, so no envelope can honestly back a
   block-level layout claim. Partial progress exists — six `bias_core`
@@ -138,7 +137,8 @@ part of the claim and travel with it):
   experiment with records is cited), but it is a hand-aggregated report that
   states FAILs and gaps as such, not a passing check, so item 8 stays
   `unmet`.
-- **Items 9, 10 — `unmet` (`no_evidence`)** despite genuinely committed
+- **Items 9, 10 — `unmet` (`no_evidence`; unchanged by the pin bump, and the
+  same artifact-anchored rule applies, with attestations tracked in #186)** despite genuinely committed
   testbenches (`sim/` harnesses with recorded PVT-corner results, pinned
   PDK) and repo hygiene (README + LICENSE): no *passing klt envelope*
   topically backs either claim, and citing an unrelated one just to turn
