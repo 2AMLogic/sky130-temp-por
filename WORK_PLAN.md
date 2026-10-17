@@ -7,7 +7,7 @@ Current roadmap derived from GitHub label state. The region below is maintained 
 
 Judge-approved PRs under a hold (`loom:blocked` or `loom:operator`) — only a human merge decision is missing.
 
-_None._
+- **#192**: fix(pdk): re-pin open_pdks to f6eeac7 via ciel and refuse a mismatched tree
 
 ## Very Important
 
@@ -31,7 +31,7 @@ _None._
 
 Issues currently being built (`loom:building`).
 
-_None._
+- **#188**: Re-pin the sky130 PDK to open_pdks f6eeac7 (ciel 2.6.1) so testbenches name an installable revision (T1 item 9)
 
 ## PRs Awaiting Review
 
@@ -43,7 +43,7 @@ _None._
 
 PRs that passed review and are queued for Champion auto-merge (`loom:pr`).
 
-_None._
+- **#192**: fix(pdk): re-pin open_pdks to f6eeac7 via ciel and refuse a mismatched tree
 
 ## Proposed
 
@@ -52,10 +52,13 @@ Issues carrying `loom:curated`.
 - **#97**: Lay out por_output_chain as the next DRC/LVS-verified POR leaf *(curated)*
 - **#153**: brownout-top: re-grade NONPHYSICAL brown-out points with a tightened-solver fleet re-run *(curated)*
 - **#181**: glitch-top: re-run failed vdd_level request vdd_slew_v1.2_h0.0002_s200000 (45 ERROR points) *(curated)*
+- **#188**: Re-pin the sky130 PDK to open_pdks f6eeac7 (ciel 2.6.1) so testbenches name an installable revision (T1 item 9) *(curated)*
 
 ## Proposed (Architect / Hermit)
 
 - **#137**: Run the two-key ratification ceremony on DR-004 and DR-005 *(architect)*
+- **#191**: Remove docs/guard-repro reproducer: stale, unreferenced test of a Loom-managed hook *(hermit)*
+- **#193**: Replace raw xschem call in design/netlist.py with klt netlist (drop hand-rolled PDK lookup, no timeout) *(hermit)*
 
 ## Epics
 
@@ -65,14 +68,14 @@ Issues carrying `loom:curated`.
 
 | Bucket | Count |
 |------|-------|
-| Operator merge-risk holds | 0 |
+| Operator merge-risk holds | 1 |
 | Very important | 0 |
 | Important | 0 |
 | Ready (`loom:issue`) | 0 |
-| In Progress (`loom:building`) | 0 |
+| In Progress (`loom:building`) | 1 |
 | PRs awaiting review | 0 |
-| Approved PRs awaiting merge | 0 |
-| Curated | 3 |
-| Architect / Hermit proposals | 1 |
+| Approved PRs awaiting merge | 1 |
+| Curated | 4 |
+| Architect / Hermit proposals | 3 |
 | Active epics | 1 |
 <!-- guide:plan-body:end -->
