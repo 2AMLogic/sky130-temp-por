@@ -403,8 +403,8 @@ needed for a future submission.
   [ngspice](https://ngspice.sourceforge.io/), against the open
   [SkyWater sky130](https://github.com/google/skywater-pdk) PDK.
   `PDK_ROOT`/`PDK` are resolved inline by both `design/xschemrc` and
-  `design/netlist.py`'s own `find_pdk()`, falling back to the volare
-  default (`~/.volare/sky130A`) — no PDK path is ever baked into a
+  `design/netlist.py`'s own `find_pdk()`, falling back to the ciel
+  default (`~/.ciel/sky130A`) — no PDK path is ever baked into a
   schematic or netlist.
 - **Layout / DRC / LVS**: [klayout-tools](https://github.com/2AMLogic/klayout-tools)
   (`klt`), a headless, scriptable KLayout-based flow. `layout/` now holds an

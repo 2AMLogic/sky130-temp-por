@@ -27,7 +27,8 @@ read as one house convention. Anything specific to *this* repo's own design
 
 ```bash
 # 1. install the pinned PDK (~1 min; see sim/pdk.json for the pin)
-volare enable --pdk sky130 c6d73a35f524070e85faff4a6a9eef49553ebc2b
+pip install ciel==2.6.1
+ciel enable --pdk-family sky130 -l sky130_fd_pr f6eeac7dad085ffcc829ccfd721f7b4ce39edcf7
 
 # 2. sanity-check the toolchain and PDK resolution
 python3 sim/bin/corner-run.py --print-env
@@ -40,7 +41,7 @@ python3 sim/pnp-mismatch/run_pnp_mismatch.py
 ```
 
 Prerequisites, all machine-level (not vendored here): `ngspice`, `xschem`,
-`volare`, `python3` (3.9+, standard library only).
+`ciel`, `python3` (3.9+, standard library only).
 
 ### Driving the tools by hand
 
@@ -67,11 +68,13 @@ interactive sessions and the runner resolve the PDK identically.
 | env helper | `sim/bin/pdk-env.sh` | `source` it for interactive xschem/ngspice work |
 | experiment | `sim/<slug>/experiment.json` | what is being claimed, which corners, which measurements and their limits |
 
-**PDK resolution order**: `$PDK_ROOT` → `volare path` → `default_pdk_root` from
-`sim/pdk.json`; variant from `$PDK` → `variant` in `sim/pdk.json`. The runner
-resolves the PDK directory symlink back to its volare version hash and
-**refuses to run against a version other than the pin** unless
-`--allow-pdk-mismatch` is passed — in which case the record says so.
+**PDK resolution order**: `$PDK_ROOT` → `default_pdk_root` (`~/.ciel`) from
+`sim/pdk.json`; variant from `$PDK` → `variant` in `sim/pdk.json`. No other
+install location is searched. The runner resolves the PDK directory symlink
+back to its ciel version hash and **refuses to run against a version other
+than the pin** unless `--allow-pdk-mismatch` is passed — in which case the
+record says so. `--print-env` (and so `pdk-env.sh`) has no override: it always
+refuses a mismatched tree. `design/netlist.py` applies the same check.
 
 **What the runner injects** (so one testbench serves the whole matrix): the
 `.lib <models> <corner>` include, `.temp`, `.param vsup=<supply>`, `.option`s

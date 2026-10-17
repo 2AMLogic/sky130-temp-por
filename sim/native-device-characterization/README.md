@@ -21,7 +21,7 @@ free sizing choices — see `design/por_output_chain.md`'s "Device choice"):
 ## Cold-start command
 
 ```bash
-volare enable --pdk sky130 c6d73a35f524070e85faff4a6a9eef49553ebc2b
+ciel enable --pdk-family sky130 -l sky130_fd_pr f6eeac7dad085ffcc829ccfd721f7b4ce39edcf7
 python3 sim/bin/corner-run.py sim/native-device-characterization
 ```
 

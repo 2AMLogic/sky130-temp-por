@@ -31,8 +31,8 @@ stays schematic entry rather than simulation/layout infrastructure:
   rather than importing one from ``sim/bin`` (which now hosts
   ``corner-run.py`` and ``sim_common.py`` for the PVT-corner/mismatch
   harness itself). The resolution order mirrors ``design/xschemrc`` and
-  ``sky130-bandgap/sim/harness``'s own PDK_ROOT/PDK-with-volare-fallback
-  convention, so both stay in sync by construction.
+  ``sim/bin/corner-run.py`` (PDK_ROOT, else ``~/.ciel``), and like the
+  latter it refuses a tree whose revision is not ``sim/pdk.json``'s pin.
 * **The ratified-port-list assertion** uses a small inlined SPICE
   ``.subckt`` port-list parser (:func:`subckt_ports`) instead of importing
   ``layout/lvs_reference.py``, which also does not exist yet in this repo
@@ -54,6 +54,7 @@ from __future__ import annotations
 
 import argparse
 import difflib
+import json
 import os
 import re
 import subprocess
@@ -103,20 +104,49 @@ class Pdk:
         self.variant = variant
 
 
+def load_pdk_pin() -> dict:
+    """The reproducibility pin in sim/pdk.json (the single source of the revision)."""
+    pin_file = REPO_ROOT / "sim" / "pdk.json"
+    try:
+        return json.loads(pin_file.read_text())
+    except (OSError, ValueError) as exc:
+        raise PdkNotFound(f"cannot read PDK pin {pin_file}: {exc}")
+
+
+def installed_revision(path: Path) -> str:
+    """open_pdks revision of a PDK variant dir: the ``versions/<hash>`` component
+    its symlink resolves to, or ``unknown`` (which never matches the pin)."""
+    parts = path.resolve().parts
+    if "versions" in parts:
+        idx = parts.index("versions")
+        if idx + 1 < len(parts):
+            return parts[idx + 1]
+    return "unknown"
+
+
 def find_pdk() -> Pdk:
-    """Resolve the sky130 PDK: PDK_ROOT/PDK env vars, else the volare default.
+    """Resolve the sky130 PDK: PDK_ROOT/PDK env vars, else ``~/.ciel``, and
+    require it to be the revision pinned in sim/pdk.json.
 
     Mirrors design/xschemrc's own resolution order exactly (PDK_ROOT falls
-    back to ``~/.volare``, PDK falls back to ``sky130A``), so a schematic
-    that opens fine interactively netlists the same way here.
+    back to ``~/.ciel``, PDK falls back to ``sky130A``), so a schematic
+    that opens fine interactively netlists the same way here. No other
+    install location is searched.
     """
-    root = os.environ.get("PDK_ROOT") or str(Path.home() / ".volare")
+    pin = load_pdk_pin()
+    root = os.environ.get("PDK_ROOT") or str(Path.home() / ".ciel")
     variant = os.environ.get("PDK") or "sky130A"
     path = Path(root) / variant
     if not (path / "libs.tech").is_dir():
         raise PdkNotFound(
             f"no sky130 PDK at {path} (expected {path}/libs.tech/...). "
-            f"Install the sky130A PDK (volare) or set PDK_ROOT/PDK."
+            f"Install the pinned PDK: {pin['install_command']} (or set PDK_ROOT/PDK)."
+        )
+    found = installed_revision(path)
+    if found != pin["open_pdks_commit"]:
+        raise PdkNotFound(
+            f"PDK at {path} is open_pdks {found}, but sim/pdk.json pins "
+            f"{pin['open_pdks_commit']}. Install the pinned PDK: {pin['install_command']}"
         )
     return Pdk(path=path, variant=variant)
 
