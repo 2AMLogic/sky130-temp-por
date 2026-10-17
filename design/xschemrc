@@ -3,13 +3,16 @@
 #### Used by `python3 design/netlist.py` (via `xschem --rcfile`) and suitable
 #### for interactive sessions:
 ####
-####     export PDK_ROOT=~/.volare PDK=sky130A   # or let the volare default apply
+####     export PDK_ROOT=~/.ciel PDK=sky130A   # or let the ciel default apply
 ####     xschem --rcfile design/xschemrc design/bias_core.sch
 ####
-#### PDK discovery, in order: PDK_ROOT/PDK env vars, else the volare default
-#### root (~/.volare/sky130A) -- the same fallback design/netlist.py uses and
-#### the same one sky130-bandgap/sim/xschemrc pins, so a machine with the PDK
-#### volare-installed needs no environment setup at all. This is option (b)
+#### PDK discovery, in order: PDK_ROOT/PDK env vars, else the ciel default
+#### root (~/.ciel/sky130A) -- the same fallback design/netlist.py uses, so a
+#### machine with the pinned PDK ciel-installed needs no environment setup at
+#### all. This file only points at the tree; it does NOT check the revision.
+#### The enforcing path is `python3 design/netlist.py --check` (and
+#### sim/bin/pdk-env.sh for sim/), which refuse a tree that is not the
+#### open_pdks revision pinned in sim/pdk.json. This is option (b)
 #### from issue #6 ("inline PDK discovery directly in design/xschemrc"): a
 #### shared sim/harness/pdk.py-equivalent module is deferred to
 #### spec/porting-plan.md §4 item 1 (sim-harness port, not yet filed) so this
@@ -23,7 +26,7 @@
 #### the same source pattern for its own corner runner.
 
 if {![info exists env(PDK_ROOT)] || $env(PDK_ROOT) eq {}} {
-  set env(PDK_ROOT) [file normalize ~/.volare]
+  set env(PDK_ROOT) [file normalize ~/.ciel]
 }
 if {![info exists env(PDK)] || $env(PDK) eq {}} {
   set env(PDK) sky130A
@@ -32,7 +35,7 @@ if {![info exists env(PDK)] || $env(PDK) eq {}} {
 set _sky130_rc $env(PDK_ROOT)/$env(PDK)/libs.tech/xschem/xschemrc
 if {![file exists $_sky130_rc]} {
   puts stderr "design/xschemrc: no PDK xschemrc at $_sky130_rc"
-  puts stderr "design/xschemrc: install the sky130A PDK (volare) or set PDK_ROOT/PDK"
+  puts stderr "design/xschemrc: install the pinned PDK (see sim/pdk.json install_command) or set PDK_ROOT/PDK"
 } else {
   source $_sky130_rc
 }

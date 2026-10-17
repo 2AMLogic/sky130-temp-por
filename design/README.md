@@ -94,8 +94,8 @@ python3 design/netlist.py --cell temp_core -v
 
 Requirements: `xschem` on `PATH` (this repo has been verified against 3.4.7)
 plus the sky130A PDK installed — `design/xschemrc` resolves it via
-`PDK_ROOT`/`PDK` env vars, falling back to the volare default
-(`~/.volare/sky130A`) if unset, exactly as `design/netlist.py`'s own
+`PDK_ROOT`/`PDK` env vars, falling back to the ciel default
+(`~/.ciel/sky130A`) if unset, exactly as `design/netlist.py`'s own
 `find_pdk()` does (see both files' docstrings — this is issue #6's chosen
 option (b): inline PDK discovery rather than a `sim/harness/pdk.py`-style
 shared module, deferred to `spec/porting-plan.md` §4 item 1). No PDK path is

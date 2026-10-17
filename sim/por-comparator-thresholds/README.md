@@ -55,7 +55,7 @@ two separately recorded variants (`variants` in `experiment.json`):
 
 Prerequisites: `xschem`, `klt` (klayout-tools, with `KLT_SIM_BACKEND=batch`
 fleet credentials), and the pinned PDK
-(`volare enable --pdk sky130 c6d73a35f524070e85faff4a6a9eef49553ebc2b`, or
+(`ciel enable --pdk-family sky130 -l sky130_fd_pr f6eeac7dad085ffcc829ccfd721f7b4ce39edcf7`, or
 `PDK_ROOT` pointing at an install of that commit). The working tree must be
 clean: `run` and `record` both refuse a dirty tree, because records carry
 the commit SHA.
