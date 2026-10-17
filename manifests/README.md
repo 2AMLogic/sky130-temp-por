@@ -31,7 +31,10 @@ klt signoff --attest 10 --inventory manifests/inventories/item-10.json \
 ```
 
 then cite its `provenance.input.content_hash` in the manifest and re-render
-the report. `-o` writes only a passing envelope. Item 1 is the one without
+the report. Item 10's inventory lists `.github/workflows/signoff-manifest.yml`,
+so that workflow is self-hashed: make every workflow edit first, regenerate
+the item-10 envelope last, and confirm `--check` returns `match` before the
+final commit. `-o` writes only a passing envelope. Item 1 is the one without
 one; see its row below.
 
 ## Regenerate
