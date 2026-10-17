@@ -2,6 +2,15 @@
 
 Chronological record of recently merged pull requests and closed issues. This file is maintained by the Loom Guide role.
 
+### 2026-10-17
+
+- **PR #196**: refactor(sim): share klt_version and testbench netlist head via sim_common
+- **PR #194**: docs: confirm temp_core mismatch figure and propose DR-007 accuracy design change
+- **PR #190**: chore(signoff): bump klt pin to 758c6e224053 and re-render report
+- **Issue #195** (closed): Dedupe sim campaign helpers: klt_version and tb_netlist_head copied across runners
+- **Issue #187** (closed): temp_core accuracy: the 3-sigma mismatch error is about 25x the draft untrimmed target; confirm the figure, then propose a fix before the accuracy row can be ratified
+- **Issue #185** (closed): Bump the pinned klt build to one that grades T1 items 1, 2, 9 and 10 on artifact-anchored evidence, and re-render the signoff report
+
 ### 2026-10-15
 
 - **PR #180**: refactor(layout): retire unused lvs.dependency_variants from compose-cell
