@@ -44,6 +44,7 @@ SLUG = camp.SLUG
 MANIFEST = camp.MANIFEST
 BUILD = camp.BUILD
 say = camp.say
+fmt = sim_common.fmt
 SOURCE_RECORD = "20261010-015905-fbd6329"
 
 EXTRA_SAVES = [
@@ -449,10 +450,6 @@ def load_case(case, run_dir, man, corners_dir, write):
             art_log = Path(art["log"]).read_text() if art.get("log") and Path(art["log"]).is_file() else "(no log)"
             (corners_dir / f"{case['id']}.log").write_text(camp.scrub(art_log, run_dir))
     return rec
-
-
-def fmt(x, spec=".4g"):
-    return "n/a" if x is None else f"{x:{spec}}"
 
 
 def render_md(rec):

@@ -64,6 +64,7 @@ and/or `corner-run.py` itself):
 from __future__ import annotations
 
 import argparse
+import functools
 import gzip
 import importlib.util
 import json
@@ -222,6 +223,21 @@ def load_corner_run() -> ModuleType:
     sys.modules[spec.name] = module
     spec.loader.exec_module(module)
     return module
+
+
+@functools.lru_cache(maxsize=1)
+def _corner_run() -> ModuleType:
+    return load_corner_run()
+
+
+def corner_id(proc: str, temp: float, vf: float) -> str:
+    """Record/run-directory key for one (process, temperature, supply) corner, e.g. tt_27c_1.80v."""
+    return f"{proc}_{_corner_run().fmt_temp(temp)}c_{vf:.2f}v"
+
+
+def fmt(x, spec: str = ".4g", unit: str = "") -> str:
+    """Format a number for a report table; None -> "n/a"."""
+    return "n/a" if x is None else f"{x:{spec}}{unit}"
 
 
 _PRINT_LINE = re.compile(r"^([A-Za-z_][A-Za-z0-9_]*)\s*=\s*(-?[0-9.]+(?:[eE][-+]?[0-9]+)?)$")

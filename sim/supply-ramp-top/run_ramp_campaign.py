@@ -60,12 +60,10 @@ TMAX_S = 5e-6
 MODEL_LIB = "libs.tech/combined/sky130.lib.spice"
 
 say = sim_common.say
+corner_id = sim_common.corner_id
+fmt = sim_common.fmt
 rate_tag = sim_common.rate_tag
 scrub = functools.partial(sim_common.scrub, repo_root=REPO_ROOT)
-
-
-def corner_id(proc: str, temp: float, vf: float) -> str:
-    return f"{proc}_{cr.fmt_temp(temp)}c_{vf:.2f}v"
 
 
 def tstop_for(rate: float) -> float:
@@ -438,10 +436,6 @@ def summarize(points: list[dict]) -> dict:
         if not chk["physical"]["ok"]:
             s["nonphysical"] += 1
     return out
-
-
-def fmt(x, spec=".4g", unit=""):
-    return "n/a" if x is None else f"{x:{spec}}{unit}"
 
 
 def render_md(rec: dict) -> str:

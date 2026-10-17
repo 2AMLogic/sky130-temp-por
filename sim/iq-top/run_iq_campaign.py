@@ -54,6 +54,7 @@ STATES = ["por-iq", "iq-total"]
 STATE_TAG = {"por-iq": "por", "iq-total": "total"}
 
 say = sim_common.say
+corner_id = sim_common.corner_id
 scrub = functools.partial(sim_common.scrub, repo_root=REPO_ROOT)
 
 # the four sub-cell instance lines in the committed top-level export, and the same
@@ -64,10 +65,6 @@ INSTRUMENT = [
     ("xpor VDD VSS IBIAS POR_RAW RESETn por_output_chain", "vspor VDD VDDPOR 0\nxpor VDDPOR VSS IBIAS POR_RAW RESETn por_output_chain"),
     ("xtemp VDD VSS IBIAS RESETn PTAT CTAT temp_core", "vstemp VDD VDDTEMP 0\nxtemp VDDTEMP VSS IBIAS RESETn PTAT CTAT temp_core"),
 ]
-
-
-def corner_id(proc: str, temp: float, vf: float) -> str:
-    return f"{proc}_{cr.fmt_temp(temp)}c_{vf:.2f}v"
 
 
 def grid(man: dict):

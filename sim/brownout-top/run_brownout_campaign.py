@@ -65,11 +65,9 @@ BUILD = REPO_ROOT / "sim" / "build" / SLUG
 MODEL_LIB = "libs.tech/combined/sky130.lib.spice"
 
 say = sim_common.say
+fmt = sim_common.fmt
+corner_id = sim_common.corner_id
 scrub = functools.partial(sim_common.scrub, repo_root=REPO_ROOT)
-
-
-def corner_id(proc: str, temp: float, vf: float) -> str:
-    return f"{proc}_{cr.fmt_temp(temp)}c_{vf:.2f}v"
 
 
 def corners_of(man: dict) -> list[tuple[str, float, float]]:
@@ -651,10 +649,6 @@ def summarize(points: list[dict]) -> dict:
         for c in (p.get("check") or {}).get("fail_codes", []):
             codes[c] = codes.get(c, 0) + 1
     return {"by_request": by_req, "total": total, "fail_codes": codes, "nonphysical_breakdown": nonphys}
-
-
-def fmt(x, spec=".4g"):
-    return "n/a" if x is None else f"{x:{spec}}"
 
 
 def _cmp_note(p: dict) -> str:

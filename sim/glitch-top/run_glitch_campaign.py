@@ -54,6 +54,7 @@ import sim_common  # noqa: E402
 
 cr = sim_common.load_corner_run()
 say = sim_common.say
+fmt = sim_common.fmt
 scrub = rb.scrub
 
 SLUG = "glitch-top"
@@ -531,10 +532,6 @@ def summarize(points: list[dict]) -> dict:
             nonphys["supply current reversed at end"] += bool(ph.get("supply_current_reversed_at_end"))
             nonphys["supply current reversed at baseline"] += bool(ph.get("supply_current_reversed_at_baseline"))
     return {"by_request": by_req, "by_corner": by_corner, "total": total, "fail_codes": codes, "nonphysical_breakdown": nonphys}
-
-
-def fmt(x, spec=".4g"):
-    return "n/a" if x is None else f"{x:{spec}}"
 
 
 def _uA(x):
