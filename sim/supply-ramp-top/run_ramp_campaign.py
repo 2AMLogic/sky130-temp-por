@@ -94,11 +94,7 @@ def tb_netlist_head(run_dir: Path, pdk) -> str:
     export (xschem 3.4.4 on this host leaves ``expr()`` device-parameter forms
     that ngspice cannot evaluate; the committed export was produced by 3.4.7).
     """
-    out_dir = run_dir / "tb"
-    produced = cr.netlist_with_xschem(TB_SCH, out_dir, pdk)
-    text = produced.read_text().replace(str(REPO_ROOT) + os.sep, "")
-    head = text.split("\n* expanding")[0]
-    return "\n".join(ln for ln in head.splitlines() if ln.strip().lower() != ".end") + "\n"
+    return sim_common.netlist_tb_head(TB_SCH, run_dir / "tb", pdk)
 
 
 def build_netlist(head: str, variant: dict, rate: float) -> str:

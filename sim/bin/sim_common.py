@@ -441,6 +441,15 @@ def klt_version() -> str:
     return p.stdout.strip() or p.stderr.strip()
 
 
+def netlist_tb_head(sch: Path, out_dir: Path, pdk) -> str:
+    """xschem-netlist a testbench; keep only the testbench part (the DUT comes from the committed export)."""
+    cr = sys.modules.get("corner_run") or load_corner_run()
+    produced = cr.netlist_with_xschem(sch, out_dir, pdk)
+    text = produced.read_text().replace(str(BIN_DIR.parent.parent) + os.sep, "")
+    head = text.split("\n* expanding")[0]
+    return "\n".join(ln for ln in head.splitlines() if ln.strip().lower() != ".end") + "\n"
+
+
 def load_manifest(path: Path) -> dict:
     return json.loads(Path(path).read_text())
 
