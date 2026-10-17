@@ -411,23 +411,16 @@ def report_usable(report_path: Path) -> bool:
         return False
 
 
-def submit_request(
-    variant_name: str,
-    rate: float,
-    run_dir: Path,
-    netlist: str,
-    request: dict,
-    label: str,
-    points: int,
-) -> dict:
-    """Write netlist.spice + request.json under run_dir/variant/rate_tag and run `klt sim --backend batch`.
+def submit_prepared(d: Path, netlist: str, request: dict, submit_msg: str, done_label: str, retry=None) -> dict:
+    """Archive d's earlier attempt, write netlist.spice + request.json, run `klt sim --backend batch`.
 
     An earlier attempt's report.json/klt.stderr is archived to attemptN/, never
-    overwritten. `label` is the text after the rate tag in the [submit] log
-    line (e.g. "" or " (axis)"); `points` is the caller's own point count.
+    overwritten. `submit_msg`/`done_label` are the texts after "[submit] " and
+    "[done]   " in the log lines. `retry(proc, n)`, if given, is called after
+    each klt run (n = 1, 2, ...) and returns True to run klt again on the same
+    request (e.g. a bounded launch-refusal wait); only the last run's output is
+    written to report.json/klt.stderr.
     """
-    tag = rate_tag(rate)
-    d = run_dir / variant_name / tag
     d.mkdir(parents=True, exist_ok=True)
     if (d / "report.json").is_file():  # archive an earlier attempt, never overwrite
         n = 1
@@ -440,16 +433,43 @@ def submit_request(
     (d / "netlist.spice").write_text(netlist)
     (d / "request.json").write_text(json.dumps(request, indent=2) + "\n")
     cmd = ["klt", "sim", str(d / "request.json"), "--backend", "batch", "-o", str(d / "out"), "--format", "json"]
-    say(f"[submit] {variant_name} {tag}{label}: {points} points -> batch fleet")
-    p = subprocess.run(cmd, capture_output=True, text=True, timeout=4 * 3600)
+    say(f"[submit] {submit_msg}")
+    runs = 0
+    while True:
+        p = subprocess.run(cmd, capture_output=True, text=True, timeout=4 * 3600)
+        runs += 1
+        if not (retry and retry(p, runs)):
+            break
     (d / "report.json").write_text(p.stdout)
     (d / "klt.stderr").write_text(p.stderr)
     try:
         status = json.loads(p.stdout).get("status", "?")
     except json.JSONDecodeError:
         status = "NO-JSON"
-    say(f"[done]   {variant_name} {tag}: exit {p.returncode}, report status {status}")
-    return {"variant": variant_name, "rate": rate, "tag": tag, "exit": p.returncode, "status": status}
+    say(f"[done]   {done_label}: exit {p.returncode}, report status {status}")
+    return {"exit": p.returncode, "status": status}
+
+
+def submit_request(
+    variant_name: str,
+    rate: float,
+    run_dir: Path,
+    netlist: str,
+    request: dict,
+    label: str,
+    points: int,
+) -> dict:
+    """Write netlist.spice + request.json under run_dir/variant/rate_tag and run `klt sim --backend batch`.
+
+    `label` is the text after the rate tag in the [submit] log line (e.g. ""
+    or " (axis)"); `points` is the caller's own point count.
+    """
+    tag = rate_tag(rate)
+    res = submit_prepared(
+        run_dir / variant_name / tag, netlist, request,
+        f"{variant_name} {tag}{label}: {points} points -> batch fleet", f"{variant_name} {tag}",
+    )
+    return {"variant": variant_name, "rate": rate, "tag": tag, **res}
 
 
 def klt_version() -> str:
