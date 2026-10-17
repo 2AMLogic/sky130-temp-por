@@ -1,0 +1,134 @@
+{
+  "schema_version": 1,
+  "kind": "generic",
+  "status": "pass",
+  "t1_item": 10,
+  "summary": "T1 item 10 (Repo hygiene): 10/10 attestation checks passed (klt signoff --attest)",
+  "source": "manifests/inventories/item-10.json",
+  "attestation": {
+    "producer": "klt signoff --attest",
+    "inventory_schema_version": 1,
+    "hash_algorithm": "sha256-raw-bytes",
+    "check_count": 10,
+    "passed_count": 10,
+    "checks": [
+      {
+        "check": "present",
+        "role": "hygiene",
+        "path": ".github/workflows/self-checks.yml",
+        "passed": true,
+        "content_hash": "sha256:9e88848e53a25f403bfc8362cc9a4da5b5569f5d796e09b87d365648bb62e2de"
+      },
+      {
+        "check": "present",
+        "role": "hygiene",
+        "path": ".github/workflows/signoff-manifest.yml",
+        "passed": true,
+        "content_hash": "sha256:3e813b81b32af9e04ec7a221344ea5e0e6708678784e587be492e1e087bba7cb"
+      },
+      {
+        "check": "present",
+        "role": "hygiene",
+        "path": "LICENSE",
+        "passed": true,
+        "content_hash": "sha256:cfc7749b96f63bd31c3c42b5c471bf756814053e847c10f3eb003417bc523d30"
+      },
+      {
+        "check": "present",
+        "role": "hygiene",
+        "path": "README.md",
+        "passed": true,
+        "content_hash": "sha256:668e481926b66edcc96c69a96657eaa60e17a8d85d3952d3963ac3da60343b8f"
+      },
+      {
+        "check": "command",
+        "role": "audit",
+        "name": "committed-netlist-invariants",
+        "argv": [
+          "python3",
+          "design/check_committed_netlists.py"
+        ],
+        "cwd": ".",
+        "exit_status": 0,
+        "passed": true
+      },
+      {
+        "check": "command",
+        "role": "audit",
+        "name": "json-well-formed",
+        "argv": [
+          "python3",
+          ".github/scripts/check_json.py"
+        ],
+        "cwd": ".",
+        "exit_status": 0,
+        "passed": true
+      },
+      {
+        "check": "command",
+        "role": "audit",
+        "name": "characterization-coverage",
+        "argv": [
+          "python3",
+          "-I",
+          ".github/scripts/check_characterization_coverage.py"
+        ],
+        "cwd": ".",
+        "exit_status": 0,
+        "passed": true
+      },
+      {
+        "check": "command",
+        "role": "audit",
+        "name": "records-append-only-selftest",
+        "argv": [
+          "python3",
+          "-I",
+          ".github/scripts/check_records_append_only.py",
+          "--selftest"
+        ],
+        "cwd": ".",
+        "exit_status": 0,
+        "passed": true
+      },
+      {
+        "check": "command",
+        "role": "audit",
+        "name": "ramp-checker-selftest",
+        "argv": [
+          "python3",
+          "sim/supply-ramp-top/ramp_checker.py"
+        ],
+        "cwd": ".",
+        "exit_status": 0,
+        "passed": true
+      },
+      {
+        "check": "command",
+        "role": "audit",
+        "name": "brownout-checker-selftest",
+        "argv": [
+          "python3",
+          "-I",
+          "sim/brownout-top/brownout_checker.py"
+        ],
+        "cwd": ".",
+        "exit_status": 0,
+        "passed": true
+      }
+    ]
+  },
+  "provenance": {
+    "klt_version": "0.7.1.dev1610+g758c6e224053",
+    "klayout_version": null,
+    "pdk": null,
+    "deck": null,
+    "input": {
+      "path": {
+        "path": "manifests/inventories/item-10.json",
+        "scope": "repo"
+      },
+      "content_hash": "sha256:4afc99fe28c2accb3405fbdb7d5bb492d09a7e4c7f6d6d03329a4b9465816836"
+    }
+  }
+}

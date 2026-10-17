@@ -18,6 +18,25 @@ hand-maintained checklist that used to live in the gap-to-T1 tracker issue
   byte-compares against this file (see below), so a manifest citing an
   artifact that has since changed fails instead of silently rotting.
 
+## Attestation inventories (items 1, 9, 10)
+
+`manifests/inventories/item-{1,9,10}.json` are `klt signoff --attest`
+inventories (schema in klayout-tools `docs/cli/signoff.md` → "Attesting items
+1, 9 and 10"). Regenerate a passing envelope after changing anything it
+lists (a whitespace edit changes a hash):
+
+```sh
+klt signoff --attest 10 --inventory manifests/inventories/item-10.json \
+  -o manifests/attestations/item-10.json
+```
+
+then cite its `provenance.input.content_hash` in the manifest and re-render
+the report. Item 10's inventory lists `.github/workflows/signoff-manifest.yml`,
+so that workflow is self-hashed: make every workflow edit first, regenerate
+the item-10 envelope last, and confirm `--check` returns `match` before the
+final commit. `-o` writes only a passing envelope. Item 1 is the one without
+one; see its row below.
+
 ## Regenerate
 
 From the repo root (evidence paths in the manifest are repo-root-relative
@@ -57,21 +76,28 @@ each citation below is the envelope that genuinely backs the claim, and its
 blind spots are stated here (coverage honesty: a verdict's blind spots are
 part of the claim and travel with it):
 
-- **Item 1 — Design sources: `unmet` (`wrong_kind`)** at the pinned build
-  (klt `0.7.1.dev1610+g758c6e224053`). It graded `met` at the previous pin
-  (`0.6.0+g0ce8c64842d9`) on `layout/bias_core_mirror_amp/lvs.json`, a native
-  LVS **match** (15/15 devices, 13/13 nets). Since klayout-tools#2718, items
-  1, 2, 9 and 10 accept only an **artifact-anchored** envelope that pins the
-  audited artifact by path and content hash, so a native LVS envelope no
-  longer satisfies item 1 and the row renders `citation: null`. The
-  manifest still lists that file under `evidence."1"`; it is kept so the
-  downgrade is visible, and it is deliberately **not** replaced with another
-  native envelope to turn the row green. What remains true, and is not an
-  item-1 claim: the block's schematic sources and the netlists derived from
-  them are committed (`design/`), and that LVS match exercises the derived
-  netlist. The path back to `met` is an attestation made with
-  `klt signoff --attest 1 --inventory <file>` (klayout-tools#2844), tracked
-  in #186.
+- **Item 1 — Design sources: `unmet` (`check_failed`)**. Since
+  klayout-tools#2718, items 1, 2, 9 and 10 accept only an
+  **artifact-anchored** envelope, so the old native LVS envelope
+  (`layout/bias_core_mirror_amp/lvs.json`, klt `0.6.0+g0ce8c64842d9`) no
+  longer satisfies it. The row now cites the attestation
+  `klt signoff --attest 1 --inventory manifests/inventories/item-1.json`
+  (klayout-tools#2844, #186) as a **command-backed** entry, because there is
+  no passing envelope to commit (`--attest -o` writes only a passing
+  envelope). The inventory lists the 10 xschem sources (`design/*.sch`,
+  `*.sym`), the export tool and `design/xschemrc`, and the 5 committed
+  netlists, each with the freshness check `python3 design/netlist.py
+  --check`. **The failing check is that freshness check, on all 5 netlists**:
+  it needs xschem >= 3.4.5 (verified on 3.4.7) and the sky130 PDK. On a
+  stock runner it cannot launch; on the 3.4.4 host this was authored on,
+  xschem does not evaluate `expr()` and the export fails
+  (`.subckt temp_por_top not found in its own netlist`). The other 17 of 22
+  checks (all sources and netlists present) pass. The check is declared
+  in the inventory, not dropped. The row turns `met` when the attestation
+  runs on a machine with a working xschem: commit the passing envelope to
+  `manifests/attestations/item-1.json`, cite it as a file entry like items
+  9 and 10 and re-render. The previous pin's native-LVS evidence was
+  not re-cited for item 1.
 - **Item 2 — Layout: `unmet` (`no_evidence`)**, truthfully: the block has
   no `temp_por_top` layout yet, so no envelope can honestly back a
   block-level layout claim. Partial progress exists — six `bias_core`
@@ -137,14 +163,33 @@ part of the claim and travel with it):
   experiment with records is cited), but it is a hand-aggregated report that
   states FAILs and gaps as such, not a passing check, so item 8 stays
   `unmet`.
-- **Items 9, 10 — `unmet` (`no_evidence`; unchanged by the pin bump, and the
-  same artifact-anchored rule applies, with attestations tracked in #186)** despite genuinely committed
-  testbenches (`sim/` harnesses with recorded PVT-corner results, pinned
-  PDK) and repo hygiene (README + LICENSE): no *passing klt envelope*
-  topically backs either claim, and citing an unrelated one just to turn
-  the rows green is exactly the failure mode the contract names. These
-  rows are the machine-honest statement "no check backs this claim", not
-  statements that the testbenches or hygiene are absent.
+- **Items 9, 10 — `met`** via artifact-anchored attestations (#186), each
+  pinned to its inventory by content hash. The inventories live in
+  `manifests/inventories/`; the passing envelopes `klt signoff --attest N
+  --inventory ... -o` produced live in `manifests/attestations/`.
+  - **Item 9** (`item-9.json`, 43/43 checks): 40 files present (every
+    `sim/*/experiment.json`, testbench schematic or `.spice`, campaign
+    runner, the corner runner, `sim/pdk.json`, `spiceinit`, `xschemrc`), the
+    cold start, and the PDK/tool pins. `sim/pdk.json` is inventoried, so a PDK
+    re-pin (#188) changes its hash and the next `--check` drifts until the
+    envelope is regenerated. **Limits:** the cold start is
+    `python3 sim/bin/corner-run.py sim/bias-core-smoke --dry-run`. It netlists
+    the testbench with xschem and prints the corner list and one deck. It does
+    **not** run ngspice, so it shows the harness starts cold, not that any
+    result is right (the PVT-corner results are in `sim/*/records/`, graded by
+    no klt check). The `pins` block (PDK `c6d73a35…`, ngspice 46, xschem
+    3.4.7, klt) is recorded as claimed; klt checks it is non-empty, not that
+    the installed tools match. It needs xschem and the PDK, so CI cannot
+    re-attest it (below).
+  - **Item 10** (`item-10.json`, 10/10 checks): `README.md`, `LICENSE` and
+    both workflows present, plus six stdlib-only audit commands
+    `self-checks.yml` also runs (netlist pinout invariants, JSON
+    well-formedness, characterization coverage, append-only checker
+    selftest, ramp and brown-out checker selftests). **Limits:** it does not
+    run the SPICE campaigns, layout composition, DRC/LVS or the
+    `unittest` suites, and "CI passed" is not a check (a `gh run view`
+    query would need credentials and a network). Hygiene here means the
+    files exist and the cheap audits run clean.
 - **Item 11 — Power delivery (structural): `met`** (`reason: null`, #90).
   Through #81 this row rendered `unmet` / `supply_spec_incomplete`
   because the cited spec declared no `ties[]` and no `ties_disclosure`, so
@@ -224,7 +269,12 @@ push/PR:
    any drift (a cited envelope's status changed, a report was regenerated
    against a new artifact, a stale pinned hash, a bumped `klt` with a new
    checklist) fails the build, and
-4. re-hashes the committed artifact behind each `content_hash` pin
+4. re-attests item 10 (`klt signoff --attest 10 ... --check`), and item 9
+   only where xschem exists: a stock runner has neither xschem nor the PDK,
+   so the step prints a `::warning::` and skips (item 9's `--check` and item
+   1's freshness checks need that toolchain; run them locally after changing
+   `sim/` or `design/`), and
+5. re-hashes the committed artifact behind each `content_hash` pin
    (`layout/bias_core/bias_core.gds`) and the compare netlists behind each
    unpinned LVS citation (checked against the envelope's recorded
    `environment.layout_sha256` / `reference_sha256`) — so a layout change

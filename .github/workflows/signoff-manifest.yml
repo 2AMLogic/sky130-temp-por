@@ -49,3 +49,22 @@ jobs:
 
       - name: Cited artifacts must still hash to what their envelopes recorded
         run: python3 manifests/check-citations.py manifests/sky130-temp-por.json
+
+      - name: Re-attest item 10 (repo hygiene) against its committed envelope
+        run: |
+          klt signoff --attest 10 --inventory manifests/inventories/item-10.json \
+            --check manifests/attestations/item-10.json
+
+      - name: Re-attest item 9 (testbenches shipped) against its committed envelope
+        run: |
+          # The cold-start command netlists a testbench with xschem and needs
+          # the sky130 PDK; a stock runner has neither, so the re-attestation
+          # cannot run here. Say so instead of skipping silently, and run it
+          # wherever the toolchain exists (manifests/README.md, "Attested
+          # evidence and its limits").
+          if ! command -v xschem >/dev/null 2>&1; then
+            echo "::warning::item 9 not re-attested: xschem and the sky130 PDK are not installed on this runner. Run 'klt signoff --attest 9 --inventory manifests/inventories/item-9.json --check manifests/attestations/item-9.json' locally."
+            exit 0
+          fi
+          klt signoff --attest 9 --inventory manifests/inventories/item-9.json \
+            --check manifests/attestations/item-9.json

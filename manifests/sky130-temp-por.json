@@ -3,7 +3,16 @@
   "kind": "analog",
   "evidence": {
     "1": {
-      "file": "layout/bias_core_mirror_amp/lvs.json"
+      "command": [
+        "klt",
+        "signoff",
+        "--attest",
+        "1",
+        "--inventory",
+        "manifests/inventories/item-1.json",
+        "--format",
+        "json"
+      ]
     },
     "3": {
       "file": "layout/bias_core/drc.json",
@@ -11,6 +20,14 @@
     },
     "4": {
       "file": "layout/bias_core/lvs.json"
+    },
+    "9": {
+      "file": "manifests/attestations/item-9.json",
+      "content_hash": "sha256:99dd37adef89b248fb9901a23299a5759a66f9dbe4bb8ed6eb5e1262e92900b0"
+    },
+    "10": {
+      "file": "manifests/attestations/item-10.json",
+      "content_hash": "sha256:4afc99fe28c2accb3405fbdb7d5bb492d09a7e4c7f6d6d03329a4b9465816836"
     },
     "11": [
       {
