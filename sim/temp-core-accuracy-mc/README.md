@@ -86,3 +86,4 @@ record id and refuses a run made from a dirty tree.
 | `records/<id>.{md,json}` | the evidence record and its machine-readable twin |
 | `netlist-snapshots/<id>/` | generated deck and request for every term |
 | `corners/<id>/` | `samples-<term>.csv` (every sample, valid flag and guard reason) and `nominal_*.log` |
+| `hand-calc-20261017.md`, `hand_calc_20261017.py` | issue #187: closed-form Pelgrom check of the mirror/amplifier terms against record `20261011-165907-69d13ac` (verdict: confirmed) |
