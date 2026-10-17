@@ -93,10 +93,7 @@ def tstop_for(rate: float, man: dict) -> float:
 
 def tb_netlist_head(variant: dict, run_dir: Path, pdk) -> str:
     """Netlist the variant's testbench schematic with xschem; keep only the testbench part."""
-    produced = cr.netlist_with_xschem(HERE / variant["schematic"], run_dir / "tb" / variant["schematic"].split("/")[-1][:-4], pdk)
-    text = produced.read_text().replace(str(REPO_ROOT) + os.sep, "")
-    head = text.split("\n* expanding")[0]
-    return "\n".join(ln for ln in head.splitlines() if ln.strip().lower() != ".end") + "\n"
+    return sim_common.netlist_tb_head(HERE / variant["schematic"], run_dir / "tb" / variant["schematic"].split("/")[-1][:-4], pdk)
 
 
 def build_netlist(head: str, variant: dict, rate: float) -> str:

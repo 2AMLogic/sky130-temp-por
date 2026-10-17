@@ -129,11 +129,6 @@ def build_request(backend, corners=None, timeout=3000):
     return req
 
 
-def klt_version():
-    p = subprocess.run(["klt", "--version"], capture_output=True, text=True)
-    return (p.stdout.strip() or p.stderr.strip())
-
-
 def cmd_run(args):
     now = datetime.now(timezone.utc)
     git = cr.git_state()
@@ -141,7 +136,7 @@ def cmd_run(args):
     run_dir = BUILD / run_id
     run_dir.mkdir(parents=True, exist_ok=args.resume)
     combos = [(s, v) for s in (args.scenario or SCENARIOS) for v in (args.variant or list(VARIANTS))]
-    this = {"started_utc": now.strftime("%Y-%m-%dT%H:%M:%SZ"), "klt_client": klt_version(),
+    this = {"started_utc": now.strftime("%Y-%m-%dT%H:%M:%SZ"), "klt_client": sim_common.klt_version(),
             "klt_sim_backend_env": os.environ.get("KLT_SIM_BACKEND"), "git": git, "combos": combos}
     if args.resume and (run_dir / "run.json").is_file():
         # keep the original run's provenance; a resume is appended, never overwrites it
