@@ -4,6 +4,10 @@ Chronological record of recently merged pull requests and closed issues. This fi
 
 ### 2026-10-17
 
+- **PR #200**: refactor(sim): consolidate corner_id, fmt and batch-submit core into sim_common
+- **PR #198**: feat(signoff): attest T1 items 1, 9 and 10 via klt inventories
+- **Issue #199** (closed): Consolidate corner_id/fmt and batch-submit copies into sim_common
+- **Issue #186** (closed): T1 items 1, 9 and 10: commit design-source, testbench and repo-hygiene inventories and attest them with klt signoff --attest
 - **PR #196**: refactor(sim): share klt_version and testbench netlist head via sim_common
 - **PR #194**: docs: confirm temp_core mismatch figure and propose DR-007 accuracy design change
 - **PR #190**: chore(signoff): bump klt pin to 758c6e224053 and re-render report
