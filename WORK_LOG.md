@@ -2,6 +2,11 @@
 
 Chronological record of recently merged pull requests and closed issues. This file is maintained by the Loom Guide role.
 
+### 2026-10-20
+
+- **PR #207**: refactor(sim): share trace decimation and gz writer across checkers
+- **Issue #206** (closed): Consolidate duplicated trace writer and decimation loop in sim checkers (6 copies)
+
 ### 2026-10-17
 
 - **PR #200**: refactor(sim): consolidate corner_id, fmt and batch-submit core into sim_common
