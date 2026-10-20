@@ -32,13 +32,12 @@ _None._
 Issues currently being built (`loom:building`).
 
 - **#188**: Re-pin the sky130 PDK to open_pdks f6eeac7 (ciel 2.6.1) so testbenches name an installable revision (T1 item 9)
-- **#206**: Consolidate duplicated trace writer and decimation loop in sim checkers (6 copies)
 
 ## PRs Awaiting Review
 
 PRs waiting on Judge (`loom:review-requested`).
 
-- **#207**: refactor(sim): share trace decimation and gz writer across checkers
+_None._
 
 ## Approved (Awaiting Merge)
 
@@ -74,8 +73,8 @@ Issues carrying `loom:curated`.
 | Very important | 0 |
 | Important | 0 |
 | Ready (`loom:issue`) | 0 |
-| In Progress (`loom:building`) | 2 |
-| PRs awaiting review | 1 |
+| In Progress (`loom:building`) | 1 |
+| PRs awaiting review | 0 |
 | Approved PRs awaiting merge | 1 |
 | Curated | 4 |
 | Architect / Hermit proposals | 4 |
