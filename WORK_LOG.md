@@ -4,6 +4,10 @@ Chronological record of recently merged pull requests and closed issues. This fi
 
 ### 2026-10-20
 
+- **PR #212**: refactor(design): netlist via klt netlist instead of raw xschem
+- **Issue #193** (closed): Replace raw xschem call in design/netlist.py with klt netlist (drop hand-rolled PDK lookup, no timeout)
+- **PR #215**: fix: refresh item-10 attestation envelope for edited self-checks.yml
+- **Issue #214** (closed): signoff-manifest red on main: item-10 attestation envelope drifted after #192
 - **PR #192**: fix(pdk): re-pin open_pdks to f6eeac7 via ciel and refuse a mismatched tree
 - **Issue #188** (closed): Re-pin the sky130 PDK to open_pdks f6eeac7 (ciel 2.6.1) so testbenches name an installable revision (T1 item 9)
 - **PR #207**: refactor(sim): share trace decimation and gz writer across checkers
