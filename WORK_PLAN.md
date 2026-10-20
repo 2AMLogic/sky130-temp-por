@@ -7,7 +7,7 @@ Current roadmap derived from GitHub label state. The region below is maintained 
 
 Judge-approved PRs under a hold (`loom:blocked` or `loom:operator`) — only a human merge decision is missing.
 
-- **#192**: fix(pdk): re-pin open_pdks to f6eeac7 via ciel and refuse a mismatched tree
+_None._
 
 ## Very Important
 
@@ -31,7 +31,8 @@ _None._
 
 Issues currently being built (`loom:building`).
 
-- **#188**: Re-pin the sky130 PDK to open_pdks f6eeac7 (ciel 2.6.1) so testbenches name an installable revision (T1 item 9)
+- **#189**: Re-qualify cited sky130 evidence under open_pdks f6eeac7 (split from #188)
+- **#193**: Replace raw xschem call in design/netlist.py with klt netlist (drop hand-rolled PDK lookup, no timeout)
 
 ## PRs Awaiting Review
 
@@ -43,7 +44,7 @@ _None._
 
 PRs that passed review and are queued for Champion auto-merge (`loom:pr`).
 
-- **#192**: fix(pdk): re-pin open_pdks to f6eeac7 via ciel and refuse a mismatched tree
+_None._
 
 ## Proposed
 
@@ -52,7 +53,7 @@ Issues carrying `loom:curated`.
 - **#97**: Lay out por_output_chain as the next DRC/LVS-verified POR leaf *(curated)*
 - **#153**: brownout-top: re-grade NONPHYSICAL brown-out points with a tightened-solver fleet re-run *(curated)*
 - **#181**: glitch-top: re-run failed vdd_level request vdd_slew_v1.2_h0.0002_s200000 (45 ERROR points) *(curated)*
-- **#188**: Re-pin the sky130 PDK to open_pdks f6eeac7 (ciel 2.6.1) so testbenches name an installable revision (T1 item 9) *(curated)*
+- **#189**: Re-qualify cited sky130 evidence under open_pdks f6eeac7 (split from #188) *(curated)*
 
 ## Proposed (Architect / Hermit)
 
@@ -68,13 +69,13 @@ Issues carrying `loom:curated`.
 
 | Bucket | Count |
 |------|-------|
-| Operator merge-risk holds | 1 |
+| Operator merge-risk holds | 0 |
 | Very important | 0 |
 | Important | 0 |
 | Ready (`loom:issue`) | 0 |
-| In Progress (`loom:building`) | 1 |
+| In Progress (`loom:building`) | 2 |
 | PRs awaiting review | 0 |
-| Approved PRs awaiting merge | 1 |
+| Approved PRs awaiting merge | 0 |
 | Curated | 4 |
 | Architect / Hermit proposals | 3 |
 | Active epics | 1 |

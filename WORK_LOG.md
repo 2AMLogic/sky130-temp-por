@@ -4,6 +4,8 @@ Chronological record of recently merged pull requests and closed issues. This fi
 
 ### 2026-10-20
 
+- **PR #192**: fix(pdk): re-pin open_pdks to f6eeac7 via ciel and refuse a mismatched tree
+- **Issue #188** (closed): Re-pin the sky130 PDK to open_pdks f6eeac7 (ciel 2.6.1) so testbenches name an installable revision (T1 item 9)
 - **PR #207**: refactor(sim): share trace decimation and gz writer across checkers
 - **Issue #206** (closed): Consolidate duplicated trace writer and decimation loop in sim checkers (6 copies)
 
