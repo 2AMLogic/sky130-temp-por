@@ -97,8 +97,10 @@ Requirements: `klt` on `PATH` (klayout-tools; `design/netlist.py` calls
 plus the sky130A PDK installed — `design/xschemrc` resolves it via
 `PDK_ROOT`/`PDK` env vars, falling back to the ciel default
 (`~/.ciel/sky130A`) if unset, and `klt netlist` cross-checks the PDK root the
-rcfile declares against `$PDK_ROOT`/`$PDK`. `netlist.py` no longer does its own
-PDK discovery or revision check. No PDK path is ever baked into a netlist or
+rcfile declares against `$PDK_ROOT`/`$PDK`. `netlist.py` still resolves the PDK
+itself and refuses any tree whose revision is not the `sim/pdk.json` pin
+(asserted by `sim/bin/test_pdk_pin.py`), then passes it to `klt netlist
+--pdk-root/--pdk`. No PDK path is ever baked into a netlist or
 into this directory.
 
 > **sky130 device-parameter unit convention.** `sky130_fd_pr__*` primitive
@@ -119,7 +121,8 @@ into this directory.
 Under the hood, per cell:
 
 ```bash
-klt netlist design/<cell>.sch -o <outdir>/<cell>.spice --rcfile design/xschemrc
+klt netlist design/<cell>.sch -o <outdir>/<cell>.spice --rcfile design/xschemrc \
+    --pdk-root <PDK_ROOT> --pdk <variant>
 ```
 
 `klt netlist` forces the headless xschem flags (`-n -s -q -x -r`) and bounds

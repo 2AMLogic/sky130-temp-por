@@ -26,9 +26,11 @@ this issue's scope stays schematic entry rather than simulation/layout
 infrastructure:
 
 * **The xschem run is delegated to** ``klt netlist`` (headless flags forced,
-  bounded by ``--timeout-s``, PDK resolved from ``$PDK_ROOT``/``$PDK`` and
-  cross-checked against ``design/xschemrc``). This file no longer discovers
-  or revision-checks the PDK itself.
+  bounded by ``--timeout-s``). The PDK pin stays enforced *here*, before
+  ``klt`` is called: :func:`find_pdk` resolves ``$PDK_ROOT``/``$PDK`` (else
+  ``~/.ciel``), refuses a tree whose revision is not ``sim/pdk.json``'s pin
+  (``sim/bin/test_pdk_pin.py`` asserts this), and hands the resolved PDK to
+  ``klt netlist --pdk-root/--pdk``.
 * **The ratified-port-list assertion** uses a small inlined SPICE
   ``.subckt`` port-list parser (:func:`subckt_ports`) instead of importing
   ``layout/lvs_reference.py``, which also does not exist yet in this repo
@@ -50,6 +52,7 @@ from __future__ import annotations
 
 import argparse
 import difflib
+import json
 import os
 import re
 import subprocess
@@ -85,6 +88,63 @@ ENDS_RE = re.compile(r"^\.ends\b", re.IGNORECASE)
 
 class ExportError(RuntimeError):
     pass
+
+
+class PdkNotFound(RuntimeError):
+    pass
+
+
+class Pdk:
+    """Resolved PDK location: ``path`` is the variant dir (contains libs.tech/)."""
+
+    def __init__(self, path: Path, variant: str):
+        self.path = path
+        self.variant = variant
+
+
+def load_pdk_pin() -> dict:
+    """The reproducibility pin in sim/pdk.json (the single source of the revision)."""
+    pin_file = REPO_ROOT / "sim" / "pdk.json"
+    try:
+        return json.loads(pin_file.read_text())
+    except (OSError, ValueError) as exc:
+        raise PdkNotFound(f"cannot read PDK pin {pin_file}: {exc}")
+
+
+def installed_revision(path: Path) -> str:
+    """open_pdks revision of a PDK variant dir: the ``versions/<hash>`` component
+    its symlink resolves to, or ``unknown`` (which never matches the pin)."""
+    parts = path.resolve().parts
+    if "versions" in parts:
+        idx = parts.index("versions")
+        if idx + 1 < len(parts):
+            return parts[idx + 1]
+    return "unknown"
+
+
+def find_pdk() -> Pdk:
+    """Resolve the sky130 PDK: PDK_ROOT/PDK env vars, else ``~/.ciel``, and
+    require it to be the revision pinned in sim/pdk.json.
+
+    Mirrors design/xschemrc's own resolution order (PDK_ROOT falls back to
+    ``~/.ciel``, PDK to ``sky130A``). No other install location is searched.
+    """
+    pin = load_pdk_pin()
+    root = os.environ.get("PDK_ROOT") or str(Path.home() / ".ciel")
+    variant = os.environ.get("PDK") or "sky130A"
+    path = Path(root) / variant
+    if not (path / "libs.tech").is_dir():
+        raise PdkNotFound(
+            f"no sky130 PDK at {path} (expected {path}/libs.tech/...). "
+            f"Install the pinned PDK: {pin['install_command']} (or set PDK_ROOT/PDK)."
+        )
+    found = installed_revision(path)
+    if found != pin["open_pdks_commit"]:
+        raise PdkNotFound(
+            f"PDK at {path} is open_pdks {found}, but sim/pdk.json pins "
+            f"{pin['open_pdks_commit']}. Install the pinned PDK: {pin['install_command']}"
+        )
+    return Pdk(path=path, variant=variant)
 
 
 def logical_lines(text: str) -> list[str]:
@@ -133,7 +193,7 @@ def normalize(text: str) -> str:
     return text.rstrip("\n") + "\n"
 
 
-def export_cell(cell: str, outdir: Path) -> str:
+def export_cell(cell: str, outdir: Path, pdk: Pdk) -> str:
     """Netlist one cell with ``klt netlist`` and return its normalized text."""
     sch = DESIGN_DIR / f"{cell}.sch"
     if not sch.is_file():
@@ -143,6 +203,8 @@ def export_cell(cell: str, outdir: Path) -> str:
         "klt", "netlist", str(sch),
         "-o", str(produced),
         "--rcfile", str(XSCHEMRC),
+        "--pdk-root", str(pdk.path.parent),
+        "--pdk", pdk.variant,
     ]
     try:
         proc = subprocess.run(cmd, capture_output=True, text=True)
@@ -265,12 +327,13 @@ def check_invariants(netlists: dict[str, str]) -> list[str]:
 
 
 def run(check: bool, only: str | None, verbose: bool) -> int:
+    pdk = find_pdk()  # refuse a PDK tree that is not the sim/pdk.json pin
     wanted = [only] if only else cells()
     netlists: dict[str, str] = {}
     with tempfile.TemporaryDirectory(prefix="sky130-temp-por-netlist-") as tmp:
         outdir = Path(tmp)
         for cell in wanted:
-            netlists[cell] = export_cell(cell, outdir)
+            netlists[cell] = export_cell(cell, outdir, pdk)
             if verbose:
                 print(f"  netlisted {cell}")
 
@@ -338,6 +401,9 @@ def main(argv: list[str] | None = None) -> int:
     args = parser.parse_args(argv)
     try:
         return run(check=args.check, only=args.cell, verbose=args.verbose)
+    except PdkNotFound as exc:
+        print(f"design/netlist.py: {exc}", file=sys.stderr)
+        return 2
     except ExportError as exc:
         print(f"design/netlist.py: {exc}", file=sys.stderr)
         return 1
