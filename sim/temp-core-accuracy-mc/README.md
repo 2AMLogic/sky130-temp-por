@@ -52,7 +52,7 @@ the run SHA.
 ## Cold start (from a clean checkout)
 
 Prerequisites are machine-level: `ngspice`, the pinned sky130A PDK
-(`volare enable --pdk sky130 c6d73a35f524070e85faff4a6a9eef49553ebc2b`),
+(`ciel enable --pdk-family sky130 -l sky130_fd_pr f6eeac7dad085ffcc829ccfd721f7b4ce39edcf7`),
 `python3` (3.9+, standard library only) and `klt` on `PATH`. Monte Carlo goes to
 the 2am EDA batch fleet (`KLT_SIM_BACKEND=batch`); on a host with no fleet access
 `run` records a refusal and the affected terms are NOT-RUN -- it does not fall back

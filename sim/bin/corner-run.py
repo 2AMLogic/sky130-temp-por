@@ -82,25 +82,14 @@ def load_pin() -> dict:
     return json.loads(PDK_PIN_FILE.read_text())
 
 
-def volare_path() -> Path | None:
-    exe = shutil.which("volare")
-    if not exe:
-        return None
-    try:
-        out = subprocess.run(
-            [exe, "path"], capture_output=True, text=True, timeout=60, check=True
-        ).stdout.strip()
-    except (subprocess.SubprocessError, OSError):
-        return None
-    return Path(out) if out else None
-
-
 def resolve_pdk(pin: dict) -> Pdk:
     root_env = os.environ.get("PDK_ROOT", "").strip()
     if root_env:
         root = Path(root_env).expanduser()
     else:
-        root = volare_path() or Path(pin["default_pdk_root"]).expanduser()
+        # One tree only: $PDK_ROOT or the pinned default (~/.ciel). No probe of
+        # any other install, so a shadowing tree cannot be picked up (#188).
+        root = Path(pin["default_pdk_root"]).expanduser()
     variant = os.environ.get("PDK", "").strip() or pin["variant"]
     pdk_dir = root / variant
     if not pdk_dir.is_dir():
@@ -123,13 +112,21 @@ def resolve_pdk(pin: dict) -> Pdk:
 
 
 def installed_commit(pdk_dir: Path) -> str:
-    """Recover the volare version hash by resolving the PDK symlink."""
+    """Recover the ciel version hash by resolving the PDK symlink."""
     parts = pdk_dir.resolve().parts
     if "versions" in parts:
         idx = parts.index("versions")
         if idx + 1 < len(parts):
             return parts[idx + 1]
     return "unknown"
+
+
+def pdk_mismatch_message(pdk: Pdk, pin: dict) -> str:
+    return (
+        f"installed PDK {pdk.dir} is open_pdks {pdk.installed_commit}, "
+        f"but sim/pdk.json pins {pin['open_pdks_commit']}\n"
+        f"  install the pin: {pin['install_command']}"
+    )
 
 
 def print_env(pdk: Pdk) -> None:
@@ -735,6 +732,10 @@ def main(argv: list[str]) -> int:
     pdk = resolve_pdk(pin)
 
     if args.print_env:
+        # Fail closed: pdk-env.sh evals this output, so a tree that is not the
+        # pinned revision must never reach the environment. No override here.
+        if not pdk.matches_pin:
+            raise HarnessError(pdk_mismatch_message(pdk, pin))
         print_env(pdk)
         return 0
 
@@ -743,10 +744,8 @@ def main(argv: list[str]) -> int:
 
     if not pdk.matches_pin and not args.allow_pdk_mismatch:
         raise HarnessError(
-            f"installed PDK {pdk.variant} is open_pdks {pdk.installed_commit}, "
-            f"but sim/pdk.json pins {pin['open_pdks_commit']}\n"
-            f"  install the pin: {pin['install_command']}\n"
-            f"  or re-run with --allow-pdk-mismatch (the record will say so)"
+            pdk_mismatch_message(pdk, pin)
+            + "\n  or re-run with --allow-pdk-mismatch (the record will say so)"
         )
 
     exp = load_experiment(Path(args.experiment))

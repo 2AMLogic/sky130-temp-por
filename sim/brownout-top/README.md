@@ -70,7 +70,7 @@ separately and never used as a current.
 ## Cold start
 
 ```bash
-# toolchain (see sim/README.md): pinned PDK via volare, ngspice, xschem, klt
+# toolchain (see sim/README.md): pinned PDK via ciel, ngspice, xschem, klt
 python3 sim/bin/corner-run.py --print-env
 
 # 0. checks that need no simulator

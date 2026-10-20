@@ -46,6 +46,9 @@ jobs:
       - name: Simulation records, netlist snapshots and corner evidence are append-only against the Git baseline
         run: python3 -I .github/scripts/check_records_append_only.py
 
+      - name: PDK pin enforcement tests (refuse a tree whose revision is not the sim/pdk.json pin)
+        run: python3 -I sim/bin/test_pdk_pin.py
+
       - name: Pad-island census unit tests
         run: python3 -m unittest layout/bin/test_pad_island_census.py
 
