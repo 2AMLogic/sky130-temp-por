@@ -23,7 +23,6 @@ from __future__ import annotations
 
 import argparse
 import concurrent.futures
-import gzip
 import json
 import math
 import os
@@ -257,28 +256,16 @@ def compress_ext(w, vf):
     names = [c for c in TRACE_COLS if c in w]
     cols = [w[c] for c in names]
     t = w["time"]
-    n = len(t)
     rel, fall = rc.schmitt(t, w["v(resetn)"], rc.FRAC_IL * vf, rc.FRAC_IH * vf)
     anchors = rel + fall
     trig = [names.index(c) for c in TRIGGER_COLS if c in names]
-    rows = [[c[0] for c in cols]]
-    last = rows[0]
-    for i in range(1, n - 1):
-        cur = [c[i] for c in cols]
-        in_win = any(abs(t[i] - a) <= WINDOW_S for a in anchors)
-        if in_win or cur[0] - last[0] >= TRACE_DT or any(abs(cur[k] - last[k]) >= TRACE_DV for k in trig):
-            rows.append(cur)
-            last = cur
-    rows.append([c[n - 1] for c in cols])
+    th = [TRACE_DV if k in trig else None for k in range(len(cols))]
+    rows = rc.decimate(cols, TRACE_DT, th, keep_at=lambda x: any(abs(x - a) <= WINDOW_S for a in anchors))
     return names, rows
 
 
 def write_ext_trace(path, names, rows):
-    path.parent.mkdir(parents=True, exist_ok=True)
-    lines = [f"# {','.join(names)}  (change-triggered: dV>={TRACE_DV * 1e3:g} mV on vdd/resetn/por_raw/ibias or dt>={TRACE_DT * 1e3:g} ms; every sample within +-100 us of a RESETn release/re-assert is kept)"]
-    lines += [",".join(f"{x:.6g}" for x in r) for r in rows]
-    with gzip.open(path, "wt", compresslevel=9) as fh:
-        fh.write("\n".join(lines) + "\n")
+    rc.write_gz_rows(path, f"# {','.join(names)}  (change-triggered: dV>={TRACE_DV * 1e3:g} mV on vdd/resetn/por_raw/ibias or dt>={TRACE_DT * 1e3:g} ms; every sample within +-100 us of a RESETn release/re-assert is kept)", rows)
 
 
 def classify(res):

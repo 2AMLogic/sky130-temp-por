@@ -582,3 +582,23 @@ def write_gz_rows(path: Path, header: str, rows) -> None:
     lines = [header] + [",".join(f"{x:.6g}" for x in r) for r in rows]
     with gzip.open(path, "wt", compresslevel=9) as fh:
         fh.write("\n".join(lines) + "\n")
+
+
+def decimate(cols, keep_dt, thresholds, keep_at=None):
+    """Change-triggered decimation of column-major ``cols`` (``cols[0]`` is time).
+
+    Keep the first and last sample, plus any sample where ``dt >= keep_dt`` since the last kept
+    row, or a column with a non-None entry in ``thresholds`` (aligned with ``cols``) moved by at
+    least that much, or ``keep_at(t)`` is true.  Returns kept rows (row-major).
+    """
+    n = len(cols[0])
+    trig = [(k, th) for k, th in enumerate(thresholds) if k and th is not None]
+    rows = [[c[0] for c in cols]]
+    last = rows[0]
+    for i in range(1, n - 1):
+        cur = [c[i] for c in cols]
+        if (keep_at is not None and keep_at(cur[0])) or cur[0] - last[0] >= keep_dt or any(abs(cur[k] - last[k]) >= th for k, th in trig):
+            rows.append(cur)
+            last = cur
+    rows.append([c[n - 1] for c in cols])
+    return rows

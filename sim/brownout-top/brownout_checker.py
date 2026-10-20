@@ -64,6 +64,7 @@ from pathlib import Path
 sys.path.insert(0, str(Path(__file__).resolve().parents[1] / "bin"))
 from sim_common import (  # noqa: E402,F401
     crossings,
+    decimate,
     interp_at,
     interp_cross,
     load_wave,
@@ -357,17 +358,8 @@ KEEP_DV, KEEP_DT, KEEP_DI_FRAC = 2e-3, 1e-3, 0.02
 def compress(w: dict) -> list[list[float]]:
     """Change-triggered decimation: keep a row when any voltage moved >= 2 mV, the delivered bias moved >= 2 % of its max, or 1 ms elapsed."""
     cols = [w["time"], w["v(vdd)"], w["v(resetn)"], w["v(xdut.por_raw)"], w["v(xdut.ibias)"], list(w[I_DELIVERED])]
-    n = len(cols[0])
     di = KEEP_DI_FRAC * max(abs(x) for x in cols[5]) or 1e-12
-    rows = [[c[0] for c in cols]]
-    last = rows[0]
-    for i in range(1, n - 1):
-        cur = [c[i] for c in cols]
-        if cur[0] - last[0] >= KEEP_DT or any(abs(cur[k] - last[k]) >= KEEP_DV for k in range(1, 5)) or abs(cur[5] - last[5]) >= di:
-            rows.append(cur)
-            last = cur
-    rows.append([c[n - 1] for c in cols])
-    return rows
+    return decimate(cols, KEEP_DT, [None, KEEP_DV, KEEP_DV, KEEP_DV, KEEP_DV, di])
 
 
 def transitions_from_stored(rows, vf: float, t0: float) -> dict:
