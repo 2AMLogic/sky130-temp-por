@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Export ngspice netlists from the xschem sources in ``design/``.
+"""Export ngspice netlists from the xschem sources in ``design/`` via ``klt netlist``.
 
     python3 design/netlist.py            # regenerate design/netlist/*.spice
     python3 design/netlist.py --check    # verify committed netlists are current
@@ -20,19 +20,15 @@ temporary directory and diffs it against what is committed; it fails if the
 committed netlists are stale, if the export is not reproducible, or if a
 pinout/port-order invariant is broken.
 
-Ported from gf180-temp-por/design/netlist.py (issue #6) with two deliberate
-scope cuts, both option (b) from that issue's Implementation Guidance -- kept
-inline here rather than factored into shared modules, so this issue's scope
-stays schematic entry rather than simulation/layout infrastructure:
+Ported from gf180-temp-por/design/netlist.py (issue #6) with deliberate
+scope cuts, kept inline here rather than factored into shared modules, so
+this issue's scope stays schematic entry rather than simulation/layout
+infrastructure:
 
-* **PDK discovery** is inlined below (:func:`find_pdk`) instead of delegated
-  to a shared ``sim/``-side module -- this file netlists standalone, ahead of
-  and independent from any testbench harness run, so it keeps its own copy
-  rather than importing one from ``sim/bin`` (which now hosts
-  ``corner-run.py`` and ``sim_common.py`` for the PVT-corner/mismatch
-  harness itself). The resolution order mirrors ``design/xschemrc`` and
-  ``sim/bin/corner-run.py`` (PDK_ROOT, else ``~/.ciel``), and like the
-  latter it refuses a tree whose revision is not ``sim/pdk.json``'s pin.
+* **The xschem run is delegated to** ``klt netlist`` (headless flags forced,
+  bounded by ``--timeout-s``, PDK resolved from ``$PDK_ROOT``/``$PDK`` and
+  cross-checked against ``design/xschemrc``). This file no longer discovers
+  or revision-checks the PDK itself.
 * **The ratified-port-list assertion** uses a small inlined SPICE
   ``.subckt`` port-list parser (:func:`subckt_ports`) instead of importing
   ``layout/lvs_reference.py``, which also does not exist yet in this repo
@@ -54,7 +50,6 @@ from __future__ import annotations
 
 import argparse
 import difflib
-import json
 import os
 import re
 import subprocess
@@ -90,65 +85,6 @@ ENDS_RE = re.compile(r"^\.ends\b", re.IGNORECASE)
 
 class ExportError(RuntimeError):
     pass
-
-
-class PdkNotFound(RuntimeError):
-    pass
-
-
-class Pdk:
-    """Resolved PDK location: ``path`` is the variant dir (contains libs.tech/)."""
-
-    def __init__(self, path: Path, variant: str):
-        self.path = path
-        self.variant = variant
-
-
-def load_pdk_pin() -> dict:
-    """The reproducibility pin in sim/pdk.json (the single source of the revision)."""
-    pin_file = REPO_ROOT / "sim" / "pdk.json"
-    try:
-        return json.loads(pin_file.read_text())
-    except (OSError, ValueError) as exc:
-        raise PdkNotFound(f"cannot read PDK pin {pin_file}: {exc}")
-
-
-def installed_revision(path: Path) -> str:
-    """open_pdks revision of a PDK variant dir: the ``versions/<hash>`` component
-    its symlink resolves to, or ``unknown`` (which never matches the pin)."""
-    parts = path.resolve().parts
-    if "versions" in parts:
-        idx = parts.index("versions")
-        if idx + 1 < len(parts):
-            return parts[idx + 1]
-    return "unknown"
-
-
-def find_pdk() -> Pdk:
-    """Resolve the sky130 PDK: PDK_ROOT/PDK env vars, else ``~/.ciel``, and
-    require it to be the revision pinned in sim/pdk.json.
-
-    Mirrors design/xschemrc's own resolution order exactly (PDK_ROOT falls
-    back to ``~/.ciel``, PDK falls back to ``sky130A``), so a schematic
-    that opens fine interactively netlists the same way here. No other
-    install location is searched.
-    """
-    pin = load_pdk_pin()
-    root = os.environ.get("PDK_ROOT") or str(Path.home() / ".ciel")
-    variant = os.environ.get("PDK") or "sky130A"
-    path = Path(root) / variant
-    if not (path / "libs.tech").is_dir():
-        raise PdkNotFound(
-            f"no sky130 PDK at {path} (expected {path}/libs.tech/...). "
-            f"Install the pinned PDK: {pin['install_command']} (or set PDK_ROOT/PDK)."
-        )
-    found = installed_revision(path)
-    if found != pin["open_pdks_commit"]:
-        raise PdkNotFound(
-            f"PDK at {path} is open_pdks {found}, but sim/pdk.json pins "
-            f"{pin['open_pdks_commit']}. Install the pinned PDK: {pin['install_command']}"
-        )
-    return Pdk(path=path, variant=variant)
 
 
 def logical_lines(text: str) -> list[str]:
@@ -189,17 +125,6 @@ def cells() -> list[str]:
     return names
 
 
-def xschem_env() -> dict[str, str]:
-    """Environment for xschem: the PDK design/xschemrc itself would resolve."""
-    pdk = find_pdk()
-    env = dict(os.environ)
-    env["PDK_ROOT"] = str(pdk.path.parent)
-    env["PDK"] = pdk.variant
-    # Keep batch runs off the user's ~/.xschem state.
-    env.setdefault("XSCHEM_USER_LIBRARY_PATH", str(DESIGN_DIR))
-    return env
-
-
 def normalize(text: str) -> str:
     """Make xschem output machine-independent (and therefore diffable)."""
     text = text.replace(str(REPO_ROOT) + os.sep, "")
@@ -208,27 +133,24 @@ def normalize(text: str) -> str:
     return text.rstrip("\n") + "\n"
 
 
-def export_cell(cell: str, outdir: Path, env: dict[str, str]) -> str:
-    """Run xschem headless on one cell and return its normalized netlist."""
+def export_cell(cell: str, outdir: Path) -> str:
+    """Netlist one cell with ``klt netlist`` and return its normalized text."""
     sch = DESIGN_DIR / f"{cell}.sch"
     if not sch.is_file():
         raise ExportError(f"no such cell: {sch}")
-    cmd = [
-        "xschem",
-        "-x",  # no X11: batch
-        "-q",  # quit when done
-        "-n",  # netlist
-        "-s",  # spice
-        "-r",  # no tclreadline (stdin/stdout may be redirected)
-        "--rcfile", str(XSCHEMRC),
-        "-o", str(outdir),
-        str(sch),
-    ]
-    proc = subprocess.run(cmd, env=env, capture_output=True, text=True)
     produced = outdir / f"{cell}.spice"
+    cmd = [
+        "klt", "netlist", str(sch),
+        "-o", str(produced),
+        "--rcfile", str(XSCHEMRC),
+    ]
+    try:
+        proc = subprocess.run(cmd, capture_output=True, text=True)
+    except FileNotFoundError:
+        raise ExportError("`klt` not found on PATH (klayout-tools provides `klt netlist`)")
     if proc.returncode != 0 or not produced.is_file():
         raise ExportError(
-            f"xschem failed for {cell} (exit {proc.returncode})\n"
+            f"klt netlist failed for {cell} (exit {proc.returncode})\n"
             f"--- stdout ---\n{proc.stdout}\n--- stderr ---\n{proc.stderr}"
         )
     text = normalize(produced.read_text())
@@ -343,18 +265,12 @@ def check_invariants(netlists: dict[str, str]) -> list[str]:
 
 
 def run(check: bool, only: str | None, verbose: bool) -> int:
-    try:
-        env = xschem_env()
-    except PdkNotFound as exc:
-        print(f"design/netlist.py: {exc}", file=sys.stderr)
-        return 2
-
     wanted = [only] if only else cells()
     netlists: dict[str, str] = {}
     with tempfile.TemporaryDirectory(prefix="sky130-temp-por-netlist-") as tmp:
         outdir = Path(tmp)
         for cell in wanted:
-            netlists[cell] = export_cell(cell, outdir, env)
+            netlists[cell] = export_cell(cell, outdir)
             if verbose:
                 print(f"  netlisted {cell}")
 
@@ -406,7 +322,7 @@ def run(check: bool, only: str | None, verbose: bool) -> int:
 
 def main(argv: list[str] | None = None) -> int:
     parser = argparse.ArgumentParser(
-        description="Export ngspice netlists from design/*.sch via xschem.",
+        description="Export ngspice netlists from design/*.sch via klt netlist.",
     )
     parser.add_argument(
         "--check",
