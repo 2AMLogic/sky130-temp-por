@@ -92,14 +92,16 @@ python3 design/netlist.py --check    # verify committed netlists are current
 python3 design/netlist.py --cell temp_core -v
 ```
 
-Requirements: `xschem` on `PATH` (this repo has been verified against 3.4.7)
+Requirements: `klt` on `PATH` (klayout-tools; `design/netlist.py` calls
+`klt netlist`), `xschem` on `PATH` (this repo has been verified against 3.4.7)
 plus the sky130A PDK installed — `design/xschemrc` resolves it via
 `PDK_ROOT`/`PDK` env vars, falling back to the ciel default
-(`~/.ciel/sky130A`) if unset, exactly as `design/netlist.py`'s own
-`find_pdk()` does (see both files' docstrings — this is issue #6's chosen
-option (b): inline PDK discovery rather than a `sim/harness/pdk.py`-style
-shared module, deferred to `spec/porting-plan.md` §4 item 1). No PDK path is
-ever baked into a netlist or into this directory.
+(`~/.ciel/sky130A`) if unset, and `klt netlist` cross-checks the PDK root the
+rcfile declares against `$PDK_ROOT`/`$PDK`. `netlist.py` still resolves the PDK
+itself and refuses any tree whose revision is not the `sim/pdk.json` pin
+(asserted by `sim/bin/test_pdk_pin.py`), then passes it to `klt netlist
+--pdk-root/--pdk`. No PDK path is ever baked into a netlist or
+into this directory.
 
 > **sky130 device-parameter unit convention.** `sky130_fd_pr__*` primitive
 > subcircuits (MOS, resistor, cap) take `W`/`L` (and `r_width`/`r_length`) as
@@ -119,11 +121,13 @@ ever baked into a netlist or into this directory.
 Under the hood, per cell:
 
 ```bash
-xschem -x -q -n -s -r --rcfile design/xschemrc -o <outdir> design/<cell>.sch
+klt netlist design/<cell>.sch -o <outdir>/<cell>.spice --rcfile design/xschemrc \
+    --pdk-root <PDK_ROOT> --pdk <variant>
 ```
 
-`-x` batch (no X11), `-q` quit when done, `-n -s` netlist as SPICE, `-r` no
-readline. `design/xschemrc` sets `top_is_subckt 1`: **every** cell —
+`klt netlist` forces the headless xschem flags (`-n -s -q -x -r`) and bounds
+the run with `--timeout-s` (default 120 s), so a hung xschem cannot stall the
+export. `design/xschemrc` sets `top_is_subckt 1`: **every** cell —
 `temp_por_top` included — netlists as a `.subckt`, never as a flat
 simulation deck. Cells here are blocks that testbenches instantiate; the
 deck belongs to the testbench.
