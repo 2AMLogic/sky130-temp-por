@@ -57,7 +57,6 @@ Issues carrying `loom:curated`.
 ## Proposed (Architect / Hermit)
 
 - **#137**: Run the two-key ratification ceremony on DR-004 and DR-005 *(architect)*
-- **#191**: Remove docs/guard-repro reproducer: stale, unreferenced test of a Loom-managed hook *(hermit)*
 - **#193**: Replace raw xschem call in design/netlist.py with klt netlist (drop hand-rolled PDK lookup, no timeout) *(hermit)*
 - **#203**: Consolidate duplicated .end-stripping idiom into sim_common (10 copies) *(hermit)*
 
@@ -77,6 +76,6 @@ Issues carrying `loom:curated`.
 | PRs awaiting review | 0 |
 | Approved PRs awaiting merge | 1 |
 | Curated | 4 |
-| Architect / Hermit proposals | 4 |
+| Architect / Hermit proposals | 3 |
 | Active epics | 1 |
 <!-- guide:plan-body:end -->
