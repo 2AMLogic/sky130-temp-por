@@ -53,6 +53,7 @@ from pathlib import Path
 sys.path.insert(0, str(Path(__file__).resolve().parents[1] / "bin"))
 from sim_common import (  # noqa: E402,F401  (shared hardened loader + waveform primitives)
     crossings,
+    decimate,
     interp_at,
     interp_cross,
     load_wave,
@@ -332,16 +333,7 @@ KEEP_DT = 1e-3  # s: and at least one anchor per this interval
 def compress(w: dict[str, list[float]]) -> list[list[float]]:
     """Change-triggered decimation: every excursion >= KEEP_DV is retained."""
     cols = [w[c] for c in STORE_COLS]
-    n = len(cols[0])
-    rows = [[c[0] for c in cols]]
-    last = rows[0]
-    for i in range(1, n - 1):
-        cur = [c[i] for c in cols]
-        if cur[0] - last[0] >= KEEP_DT or any(abs(cur[k] - last[k]) >= KEEP_DV for k in range(1, len(cols))):
-            rows.append(cur)
-            last = cur
-    rows.append([c[n - 1] for c in cols])
-    return rows
+    return decimate(cols, KEEP_DT, [None] + [KEEP_DV] * (len(cols) - 1))
 
 
 def transitions_from_stored(rows: list[list[float]], vf: float) -> dict:

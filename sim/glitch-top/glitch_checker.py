@@ -75,7 +75,7 @@ HERE = Path(__file__).resolve().parent
 sys.path.insert(0, str(HERE.parent / "bin"))
 sys.path.insert(0, str(HERE.parent / "brownout-top"))
 import brownout_checker as bc  # noqa: E402  (primitives + class-B grading core; stimulus twin of the SPICE BVDD)
-from sim_common import load_wave  # noqa: E402,F401
+from sim_common import decimate, load_wave, write_gz_rows  # noqa: E402,F401
 
 schmitt, crossings, dwell_below, interp_at, _mean = bc.schmitt, bc.crossings, bc.dwell_below, bc.interp_at, bc._mean
 FRAC_IL, FRAC_IH, FRAC_MID, FRAC_MUST = bc.FRAC_IL, bc.FRAC_IH, bc.FRAC_MID, bc.FRAC_MUST
@@ -392,21 +392,11 @@ def compress(w: dict, with_inj: bool) -> list[list[float]]:
     cols = [w["time"], w["v(vdd)"], w["v(resetn)"], w["v(xdut.por_raw)"], w["v(xdut.ibias)"], list(w[I_DELIVERED])]
     if with_inj:
         cols += [list(w[V_GINJ]), list(w[I_INJ])]
-    n = len(cols[0])
     di = KEEP_DI_FRAC * max(abs(x) for x in cols[5]) or 1e-12
-    dj = (KEEP_DI_FRAC * max(abs(x) for x in cols[7]) or 1e-12) if with_inj else None
-    rows = [[c[0] for c in cols]]
-    last = rows[0]
-    for i in range(1, n - 1):
-        cur = [c[i] for c in cols]
-        ch = cur[0] - last[0] >= KEEP_DT or any(abs(cur[k] - last[k]) >= KEEP_DV for k in range(1, 5)) or abs(cur[5] - last[5]) >= di
-        if with_inj:
-            ch = ch or abs(cur[6] - last[6]) >= 0.01 or abs(cur[7] - last[7]) >= dj
-        if ch:
-            rows.append(cur)
-            last = cur
-    rows.append([c[n - 1] for c in cols])
-    return rows
+    th = [None, KEEP_DV, KEEP_DV, KEEP_DV, KEEP_DV, di]
+    if with_inj:
+        th += [0.01, KEEP_DI_FRAC * max(abs(x) for x in cols[7]) or 1e-12]
+    return decimate(cols, KEEP_DT, th)
 
 
 def transitions_from_stored(rows, vf: float, t0: float) -> dict:
@@ -414,12 +404,8 @@ def transitions_from_stored(rows, vf: float, t0: float) -> dict:
 
 
 def write_trace(path: Path, rows, with_inj: bool) -> None:
-    path.parent.mkdir(parents=True, exist_ok=True)
     head = "# t_s,vdd_v,resetn_v,por_raw_v,ibias_node_v,ibias_delivered_a" + (",ginj_drive,i_inj_a" if with_inj else "")
-    lines = [head + "  (ibias_delivered = +id of bias_core XMPIB; i_inj = current in RINJ; change-triggered)"]
-    lines += [",".join(f"{x:.6g}" for x in r) for r in rows]
-    with gzip.open(path, "wt", compresslevel=9) as fh:
-        fh.write("\n".join(lines) + "\n")
+    write_gz_rows(path, head + "  (ibias_delivered = +id of bias_core XMPIB; i_inj = current in RINJ; change-triggered)", rows)
 
 
 # --------------------------------------------------------------------------
