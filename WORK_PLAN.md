@@ -31,8 +31,7 @@ _None._
 
 Issues currently being built (`loom:building`).
 
-- **#189**: Re-qualify cited sky130 evidence under open_pdks f6eeac7 (split from #188)
-- **#193**: Replace raw xschem call in design/netlist.py with klt netlist (drop hand-rolled PDK lookup, no timeout)
+_None._
 
 ## PRs Awaiting Review
 
@@ -58,7 +57,6 @@ Issues carrying `loom:curated`.
 ## Proposed (Architect / Hermit)
 
 - **#137**: Run the two-key ratification ceremony on DR-004 and DR-005 *(architect)*
-- **#193**: Replace raw xschem call in design/netlist.py with klt netlist (drop hand-rolled PDK lookup, no timeout) *(hermit)*
 - **#203**: Consolidate duplicated .end-stripping idiom into sim_common (10 copies) *(hermit)*
 
 ## Epics
@@ -73,10 +71,10 @@ Issues carrying `loom:curated`.
 | Very important | 0 |
 | Important | 0 |
 | Ready (`loom:issue`) | 0 |
-| In Progress (`loom:building`) | 2 |
+| In Progress (`loom:building`) | 0 |
 | PRs awaiting review | 0 |
 | Approved PRs awaiting merge | 0 |
 | Curated | 4 |
-| Architect / Hermit proposals | 3 |
+| Architect / Hermit proposals | 2 |
 | Active epics | 1 |
 <!-- guide:plan-body:end -->
