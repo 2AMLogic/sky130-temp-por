@@ -330,40 +330,6 @@ def build_matrix(exp: Experiment, args: argparse.Namespace, pin: dict) -> tuple[
 # --------------------------------------------------------------------------
 
 
-def netlist_with_xschem(schematic: Path, out_dir: Path, pdk: Pdk) -> Path:
-    if not shutil.which("xschem"):
-        raise HarnessError("xschem not found on PATH; cannot netlist the testbench")
-    out_dir.mkdir(parents=True, exist_ok=True)
-    env = dict(os.environ)
-    env["PDK_ROOT"] = str(pdk.root)
-    env["PDK"] = pdk.variant
-    cmd = [
-        "xschem",
-        "-n",  # netlist
-        "-q",  # quit when done
-        "-x",  # no X11 / no GUI
-        "-s",  # spice netlist format
-        "-o",
-        str(out_dir),
-        "--rcfile",
-        str(XSCHEMRC_FILE),
-        str(schematic),
-    ]
-    proc = subprocess.run(
-        cmd, capture_output=True, text=True, env=env, timeout=300, stdin=subprocess.DEVNULL
-    )
-    produced = out_dir / (schematic.stem + ".spice")
-    if proc.returncode != 0 or not produced.is_file():
-        raise HarnessError(
-            "xschem netlisting failed\n"
-            f"  cmd: {' '.join(cmd)}\n"
-            f"  rc: {proc.returncode}\n"
-            f"  stdout: {proc.stdout.strip()}\n"
-            f"  stderr: {proc.stderr.strip()}"
-        )
-    return produced
-
-
 def netlist_body(netlist: Path) -> list[str]:
     """Strip the trailing .end so the deck can wrap the netlist.
 
@@ -564,7 +530,7 @@ def run_corner(
 
 
 # --------------------------------------------------------------------------
-# batch backend (klt sim --backend batch)
+# klt netlist + batch backend (klt sim --backend batch)
 # --------------------------------------------------------------------------
 
 
@@ -585,7 +551,7 @@ def netlist_with_klt(schematic: Path, out_dir: Path, pdk: Pdk) -> Path:
             cmd, capture_output=True, text=True, timeout=360, stdin=subprocess.DEVNULL
         )
     except FileNotFoundError:
-        raise HarnessError("klt not found on PATH; the batch backend needs klayout-tools")
+        raise HarnessError("klt not found on PATH; netlisting needs klayout-tools (klt netlist)")
     if proc.returncode != 0 or not produced.is_file():
         raise HarnessError(
             "klt netlist failed\n"
@@ -1066,10 +1032,7 @@ def main(argv: list[str]) -> int:
     run_dir.mkdir(parents=True, exist_ok=True)
     shutil.copyfile(SPICEINIT_FILE, run_dir / ".spiceinit")
 
-    if backend == "batch":
-        netlist = netlist_with_klt(exp.schematic, run_dir, pdk)
-    else:
-        netlist = netlist_with_xschem(exp.schematic, run_dir, pdk)
+    netlist = netlist_with_klt(exp.schematic, run_dir, pdk)
     body = netlist_body(netlist)
 
     print(f"experiment      : {exp.slug}")

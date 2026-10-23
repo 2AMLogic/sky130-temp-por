@@ -495,9 +495,9 @@ def load_dut_netlist(path: Path = DUT_NETLIST) -> str:
 
 
 def netlist_tb_head(sch: Path, out_dir: Path, pdk) -> str:
-    """xschem-netlist a testbench; keep only the testbench part (the DUT comes from the committed export)."""
+    """Netlist a testbench via `klt netlist`; keep only the testbench part (the DUT comes from the committed export)."""
     cr = sys.modules.get("corner_run") or load_corner_run()
-    produced = cr.netlist_with_xschem(sch, out_dir, pdk)
+    produced = cr.netlist_with_klt(sch, out_dir, pdk)
     text = produced.read_text().replace(str(BIN_DIR.parent.parent) + os.sep, "")
     head = text.split("\n* expanding")[0]
     return drop_end(head)

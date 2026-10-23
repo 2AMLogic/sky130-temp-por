@@ -882,7 +882,7 @@ def main(argv: list[str]) -> int:
 
     run_dir = BUILD_DIR / record_id
     run_dir.mkdir(parents=True, exist_ok=True)
-    netlist = cr.netlist_with_xschem(TESTBENCH, run_dir, pdk)
+    netlist = cr.netlist_with_klt(TESTBENCH, run_dir, pdk)
     body = cr.netlist_body(netlist)
 
     print(f"experiment      : {SLUG}")

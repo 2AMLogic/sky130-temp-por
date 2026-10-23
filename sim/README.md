@@ -41,6 +41,7 @@ python3 sim/pnp-mismatch/run_pnp_mismatch.py
 ```
 
 Prerequisites, all machine-level (not vendored here): `ngspice`, `xschem`,
+`klt` (klayout-tools; the harness netlists through `klt netlist`, never raw `xschem`),
 `ciel`, `python3` (3.9+, standard library only).
 
 ### Driving the tools by hand
@@ -324,7 +325,7 @@ failed, `1` harness/setup error (no record written).
 `design/bias_core.sym` on a supply and reads its untrimmed DC operating point
 open-circuit. `VREF`, `IBIAS`, `BIAS_OK` and the supply current are all
 process/temperature-dependent, so this experiment proves the PDK models load,
-xschem netlists this repo's own `design/` sources headlessly, ngspice parses
+`klt netlist` (headless xschem) netlists this repo's own `design/` sources, ngspice parses
 the deck, and the corner/temperature/supply knobs actually reach the
 simulator (asserted by the `vref` spread check, not just eyeballed).
 
