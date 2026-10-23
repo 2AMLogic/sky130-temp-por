@@ -2,6 +2,18 @@
 
 Chronological record of recently merged pull requests and closed issues. This file is maintained by the Loom Guide role.
 
+### 2026-10-23
+
+- **PR #227**: refactor: hoist DUT .end-strip and ng_nomodcheck control into sim_common
+- **Issue #225** (closed): Dedupe campaign-runner netlist boilerplate (.end strip, ng_nomodcheck banner) into sim_common
+- **PR #226**: feat(sim): store campaign driver evidence in the artifact store
+- **Issue #218** (closed): Adopt the common artifact store for sim evidence (manifests in git, bytes via klt artifact)
+- **PR #224**: feat(signoff): attest design sources and cite the item-1 envelope
+- **Issue #220** (closed): T1 item 1: run the design-source attestation through klt netlist (#193) and commit the passing envelope
+- **PR #222**: feat(sim): add --backend batch to corner-run for fleet-routed PVT grids
+- **Issue #219** (closed): corner-run.py: add a klt sim --backend batch path so the six local-grid experiments can be re-run on the fleet
+- **PR #221**: feat(sim): route new corner-run evidence through the fleet artifact store
+
 ### 2026-10-20
 
 - **PR #212**: refactor(design): netlist via klt netlist instead of raw xschem
