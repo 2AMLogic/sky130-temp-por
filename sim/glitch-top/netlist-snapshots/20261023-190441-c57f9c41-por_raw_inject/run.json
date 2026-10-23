@@ -1,0 +1,32 @@
+{
+  "run_id": "fleet-verify-229",
+  "started_utc": "2026-10-23T18:46:19Z",
+  "source": {
+    "sha": "c57f9c41",
+    "branch": "feature/issue-229",
+    "dirty": false,
+    "sha_full": "c57f9c41134befab98cb56046bf1b638f44f08bb",
+    "pushed_to_remote": true,
+    "remote_branches": [
+      "origin/HEAD -> origin/main",
+      "origin/main"
+    ]
+  },
+  "klt_client": "klt 0.7.1.dev2517+g6bb7cf233677",
+  "klt_sim_backend_env": "batch",
+  "declared": {
+    "requests": 18,
+    "points_per_request": 45,
+    "points": 810
+  },
+  "submitted_tags": [
+    "por_raw_control"
+  ],
+  "submit_results": [
+    {
+      "tag": "por_raw_control",
+      "exit": 0,
+      "status": "pass"
+    }
+  ]
+}
