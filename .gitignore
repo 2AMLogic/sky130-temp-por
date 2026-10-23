@@ -97,3 +97,8 @@ flow/build/
 .loom/gh-config-by-owner-*/
 .loom-local/
 # <<< loom-managed <<<
+
+# Staged evidence scratch: raw outputs of new runs go to the fleet artifact
+# store (sim/bin/evidence_store.py); only manifests/artifacts/ is committed.
+# The corners/**/*.log exception above covers already-committed history only.
+sim/.work/

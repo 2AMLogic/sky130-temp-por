@@ -46,6 +46,15 @@ jobs:
       - name: Simulation records, netlist snapshots and corner evidence are append-only against the Git baseline
         run: python3 -I .github/scripts/check_records_append_only.py
 
+      - name: Evidence-store helper selftest (fake klt; fail-closed preflight and put, artifact-only manifests)
+        run: python3 -I sim/bin/evidence_store.py --selftest
+
+      - name: Artifact manifest checker selftest (schema, artifact-only URIs, tracked-bytes fixtures)
+        run: python3 -I .github/scripts/check_artifact_manifests.py --selftest
+
+      - name: Artifact manifests are well-formed, artifact-only and byte-free
+        run: python3 -I .github/scripts/check_artifact_manifests.py
+
       - name: PDK pin enforcement tests (refuse a tree whose revision is not the sim/pdk.json pin)
         run: python3 -I sim/bin/test_pdk_pin.py
 
