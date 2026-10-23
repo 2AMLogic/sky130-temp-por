@@ -403,6 +403,42 @@ def scrub(text: str, run_dir: Path, repo_root: Path) -> str:
     return re.sub(r"/home/[^/\s]+", "<home>", text)
 
 
+FLEET_NOTE = "client/runner klt skew accepted with batch.runner_version_check=warn; the runner ignores options.ngspice_init so a netlist-carried `set ng_nomodcheck` is used"
+XSCHEM_NOTE = "only the testbench is netlisted by xschem here; the DUT is spliced from the committed design/netlist/temp_por_top.spice (host xschem leaves expr() parameters unevaluated)"
+
+
+def deck_drift(repo_root: Path, deck_inputs, run_sha: str | None, grade_sha: str | None) -> list[str] | None:
+    """Deck-affecting paths changed between the submit and grading commits (None = not determinable)."""
+    if not run_sha or not grade_sha:
+        return None
+    p = subprocess.run(["git", "-C", str(repo_root), "diff", "--name-only", run_sha, grade_sha, "--", *deck_inputs], capture_output=True, text=True)
+    return None if p.returncode != 0 else [ln for ln in p.stdout.splitlines() if ln.strip()]
+
+
+def snapshot_request_artifacts(src: Path, tag: str, snap_dir: Path, corners_dir: Path, run_dir: Path, repo_root: Path) -> None:
+    """Copy a request's netlist/request snapshots into snap_dir and its scrubbed klt report into corners_dir/<tag>."""
+    for name in ("netlist.spice", "request.json"):
+        if (src / name).is_file():
+            snap_dir.mkdir(parents=True, exist_ok=True)
+            shutil.copyfile(src / name, snap_dir / f"{tag}.{name}")
+    if (src / "report.json").is_file():
+        (corners_dir / tag).mkdir(parents=True, exist_ok=True)
+        (corners_dir / tag / "klt-report.json").write_text(scrub((src / "report.json").read_text(), run_dir, repo_root))
+
+
+def submit_failures(requests: list[dict]) -> list[dict]:
+    """Requests that never got a job id and ended in a non-passing outcome."""
+    return [{"tag": q["tag"], "reason": q["outcome"]} for q in requests if q.get("job_id") is None and q.get("outcome") and q["outcome"] not in ("ok", "OK", "PASS")]
+
+
+def refuse_unrecordable(gi: dict, drift: list[str] | None, allow_dirty: bool, allow_deck_drift: bool) -> None:
+    """Exit unless the tree is clean and the deck unchanged since submit (each overridable)."""
+    if gi["dirty"] and not allow_dirty:
+        raise SystemExit("refusing to record from a dirty tree (commit first, or --allow-dirty; the state is recorded either way)")
+    if drift and not allow_deck_drift:
+        raise SystemExit(f"deck inputs changed between the submit commit and HEAD: {drift} -- the record would mis-attribute the evidence")
+
+
 def report_usable(report_path: Path) -> bool:
     """True when a klt report.json exists and carries per-corner results (the retry-failed predicate)."""
     try:

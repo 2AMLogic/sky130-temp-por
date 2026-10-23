@@ -31,6 +31,7 @@ from __future__ import annotations
 
 import argparse
 import concurrent.futures
+import functools
 import json
 import os
 import re
@@ -254,11 +255,7 @@ def submit_one(req: dict, head: str, man: dict, run_dir: Path, capacity_wait_s: 
 # --------------------------------------------------------------------------
 
 
-def deck_drift(run_sha, grade_sha):
-    if not run_sha or not grade_sha:
-        return None
-    p = subprocess.run(["git", "-C", str(REPO_ROOT), "diff", "--name-only", run_sha, grade_sha, "--", *DECK_INPUTS], capture_output=True, text=True)
-    return None if p.returncode != 0 else [ln for ln in p.stdout.splitlines() if ln.strip()]
+deck_drift = functools.partial(sim_common.deck_drift, REPO_ROOT, DECK_INPUTS)
 
 
 def deck_attribution(deck: str, req: dict) -> list[str]:
@@ -680,11 +677,8 @@ def cmd_record(args) -> int:
     pin = cr.load_pin()
     pdk = cr.resolve_pdk(pin)
     gi = source_state()
-    if gi["dirty"] and not args.allow_dirty:
-        raise SystemExit("refusing to record from a dirty tree (commit first, or --allow-dirty; the state is recorded either way)")
     drift = deck_drift((meta.get("source") or {}).get("sha_full"), gi.get("sha_full"))
-    if drift and not args.allow_deck_drift:
-        raise SystemExit(f"deck inputs changed between the submit commit and HEAD: {drift} -- the record would mis-attribute the evidence")
+    sim_common.refuse_unrecordable(gi, drift, args.allow_dirty, args.allow_deck_drift)
     now = datetime.now(timezone.utc)
     ph = man["grading"]
     wrote = []
@@ -703,13 +697,7 @@ def cmd_record(args) -> int:
             requests.append(res["info"])
             fleet_pdk = res["pdk_report"] or fleet_pdk
             src = run_dir / r["tag"]
-            for name in ("netlist.spice", "request.json"):
-                if (src / name).is_file():
-                    snap_dir.mkdir(parents=True, exist_ok=True)
-                    shutil.copyfile(src / name, snap_dir / f"{r['tag']}.{name}")
-            if (src / "report.json").is_file():
-                (corners_dir / r["tag"]).mkdir(parents=True, exist_ok=True)
-                (corners_dir / r["tag"] / "klt-report.json").write_text(scrub((src / "report.json").read_text(), run_dir))
+            sim_common.snapshot_request_artifacts(src, r["tag"], snap_dir, corners_dir, run_dir, REPO_ROOT)
         # A class with nothing submitted/graded (a --only subset run) stages no bytes: record it as NOT_COVERED
         # with null artifact links rather than tripping the store's fail-closed empty-manifest refusal.
         staged = corners_dir.is_dir() and any(corners_dir.rglob("*"))
@@ -717,7 +705,7 @@ def cmd_record(args) -> int:
             snap_dir.mkdir(parents=True, exist_ok=True)
             if (run_dir / "run.json").is_file():
                 shutil.copyfile(run_dir / "run.json", snap_dir / "run.json")
-        fails = [{"tag": q["tag"], "reason": q["outcome"]} for q in requests if q.get("job_id") is None and q.get("outcome") and q["outcome"] not in ("ok", "OK", "PASS")]
+        fails = sim_common.submit_failures(requests)
         ngs = sorted({p["ngspice"] for p in points if p.get("ngspice")})
         runners = sorted({q.get("runner_klt_version") for q in requests if q.get("runner_klt_version")})
         cnt = declared_counts(man, cls)
@@ -733,8 +721,8 @@ def cmd_record(args) -> int:
             "tools": {"ngspice": f"{cr.first_line(['ngspice', '-v'])} (host; the grid ran on the fleet)", "xschem": cr.first_line(["xschem", "--version"]),
                       "platform": cr.tool_versions()["platform"], "python": cr.tool_versions()["python"], "klt_client": meta.get("klt_client"),
                       "fleet_runner_klt": ", ".join(runners) or "unknown", "fleet_ngspice": ", ".join(ngs) or "unknown",
-                      "fleet_note": "client/runner klt skew accepted with batch.runner_version_check=warn; the runner ignores options.ngspice_init so a netlist-carried `set ng_nomodcheck` is used",
-                      "xschem_note": "only the testbench is netlisted by xschem here; the DUT is spliced from the committed design/netlist/temp_por_top.spice (host xschem leaves expr() parameters unevaluated)"},
+                      "fleet_note": sim_common.FLEET_NOTE,
+                      "xschem_note": sim_common.XSCHEM_NOTE},
             "git": gi, "run_source": meta.get("source", {}), "deck_drift": drift, "run_meta": {k: meta.get(k) for k in ("run_id", "started_utc", "submitted_tags", "retries")},
             "matrix": {"process": man["corners"]["process"], "temperature_c": man["corners"]["temperature_c"], "supply_v": man["corners"]["supply_v"],
                        "n_requests": cnt["requests"], "points_per_request": cnt["points_per_request"], "n_points": cnt["points"],
