@@ -72,7 +72,7 @@ def grid():
 
 def subckt_text(name):
     txt = (REPO_ROOT / "design" / "netlist" / f"{name}.spice").read_text()
-    return "\n".join(ln for ln in txt.splitlines() if ln.strip().lower() != ".end") + "\n"
+    return sim_common.drop_end(txt)
 
 
 def build_netlist(scenario, variant):
@@ -91,7 +91,7 @@ def build_netlist(scenario, variant):
         f".param tstop={TSTOP:.9g}",
         f".options wnflag=1 {opts}",
         "* ng_nomodcheck: same as sim/spiceinit; carried in the netlist because the fleet runner ignores options.ngspice_init",
-        ".control", "set ng_nomodcheck", ".endc",
+        *sim_common.NOMODCHECK_CONTROL.splitlines(),
         "VSET vsetn 0 3.3",
         "* unit PWL ramp keeps the exact breakpoint at tramp that the original V1 PWL source had; BVDD scales it by the swept VSET",
         "VRAMP rampn 0 PWL(0 0 {tramp} 1 {tstop} 1)",

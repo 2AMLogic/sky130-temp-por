@@ -52,7 +52,7 @@ cr = sim_common.load_corner_run()
 SLUG = "supply-ramp-top"
 MANIFEST = HERE / "experiment.json"
 TB_SCH = HERE / "testbench" / "tb_temp_por_ramp.sch"
-DUT_NETLIST = REPO_ROOT / "design" / "netlist" / "temp_por_top.spice"
+DUT_NETLIST = sim_common.DUT_NETLIST
 BUILD = REPO_ROOT / "sim" / "build" / SLUG
 HOLD_S = 15e-3
 RATE_CEIL_SUPPLY = 3.63
@@ -96,8 +96,7 @@ def tb_netlist_head(run_dir: Path, pdk) -> str:
 
 
 def build_netlist(head: str, variant: dict, rate: float) -> str:
-    dut = DUT_NETLIST.read_text()
-    dut = "\n".join(ln for ln in dut.splitlines() if ln.strip().lower() != ".end") + "\n"
+    dut = sim_common.load_dut_netlist(DUT_NETLIST)
     edit = variant.get("netlist_edit")
     if edit:
         if dut.count(edit["find"]) != 1:
@@ -109,7 +108,7 @@ def build_netlist(head: str, variant: dict, rate: float) -> str:
         f".param rate={rate:g}\n"
         "* ng_nomodcheck: same setting as sim/spiceinit; carried in the netlist because the\n"
         "* fleet runner ignores options.ngspice_init (see experiment.json ngspice_note)\n"
-        ".control\nset ng_nomodcheck\n.endc\n"
+        + sim_common.NOMODCHECK_CONTROL
     )
     return banner + head + "\n" + dut
 
