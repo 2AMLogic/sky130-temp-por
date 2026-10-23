@@ -314,6 +314,51 @@ class Accounting(unittest.TestCase):
                     rg.cmd_record(ns)
                 self.assertEqual(before, {p: p.read_text() for p in (here / "records").glob("*")})
 
+    def test_record_subset_run_skips_store_for_empty_class(self):
+        fixed = _dt.datetime(2030, 1, 2, 3, 4, 5, tzinfo=_dt.timezone.utc)
+
+        class FixedDT(_dt.datetime):
+            @classmethod
+            def now(cls, tz=None):
+                return fixed
+
+        real = rg.analyze_request
+
+        for covered in (A, B):
+            with tempfile.TemporaryDirectory() as td:
+                td = Path(td)
+                build, here = td / "build", td / "here"
+                (build / "run1").mkdir(parents=True)
+                here.mkdir()
+                (build / "run1" / "run.json").write_text(json.dumps({"klt_client": "test", "source": {"dirty": False}}))
+                gi = {"sha": "abc1234", "sha_full": "abc1234" + "0" * 33, "branch": "t", "dirty": False, "pushed_to_remote": True, "remote_branches": []}
+                ns = mock.Mock(run_id="run1", notes_file=None, author="t", supersedes=None, allow_dirty=False, allow_deck_drift=False)
+
+                def an(r, run_dir, man, corners_dir, write=True):
+                    res = real(r, run_dir, man, corners_dir, write=write)
+                    if res["points"][0]["class"] == covered:
+                        corners_dir.mkdir(parents=True, exist_ok=True)
+                        (corners_dir / "x.txt").write_text("x")
+                    return res
+
+                with mock.patch.object(rg, "BUILD", build), mock.patch.object(rg, "HERE", here), mock.patch.object(rg, "datetime", FixedDT), \
+                        mock.patch.object(rg, "source_state", return_value=gi), mock.patch.object(rg, "analyze_request", side_effect=an), \
+                        mock.patch.object(rg.evidence_store, "stage_dir_for", side_effect=lambda bench, rid: td / "stage" / rid), _no_host_pdk(), _fake_store():
+                    self.assertEqual(rg.cmd_record(ns), 0)
+                    self.assertEqual(rg.evidence_store.store_or_exit.call_count, 1)
+                    recs = {json.loads(p.read_text())["class"]: (p, json.loads(p.read_text())) for p in (here / "records").glob("*.json")}
+                    self.assertEqual(set(recs), {A, B})
+                    for cls, (p, rec) in recs.items():
+                        if cls == covered:
+                            self.assertTrue(rec["links"]["artifact_manifest"])
+                            self.assertTrue(rec["links"]["netlist_snapshots"])
+                        else:
+                            self.assertIsNone(rec["links"]["artifact_manifest"])
+                            self.assertIsNone(rec["links"]["artifact_summary"])
+                            self.assertIsNone(rec["links"]["netlist_snapshots"])
+                            self.assertIn("none stored", p.with_suffix(".md").read_text())
+                            self.assertFalse((here / "netlist-snapshots" / rec["record_id"]).exists())
+
     def test_record_refuses_dirty_tree_and_deck_drift(self):
         with tempfile.TemporaryDirectory() as td:
             td = Path(td)
