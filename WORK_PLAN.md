@@ -25,19 +25,21 @@ _None._
 
 Human-approved issues ready for implementation (`loom:issue`).
 
-_None._
+- **#220**: T1 item 1: run the design-source attestation through klt netlist (#193) and commit the passing envelope
 
 ## In Progress
 
 Issues currently being built (`loom:building`).
 
-_None._
+- **#218**: Adopt the common artifact store for sim evidence (manifests in git, bytes via klt artifact)
+- **#219**: corner-run.py: add a klt sim --backend batch path so the six local-grid experiments can be re-run on the fleet (unblocks #189)
 
 ## PRs Awaiting Review
 
 PRs waiting on Judge (`loom:review-requested`).
 
-_None._
+- **#221**: feat(sim): route new corner-run evidence through the fleet artifact store
+- **#222**: feat(sim): add --backend batch to corner-run for fleet-routed PVT grids
 
 ## Approved (Awaiting Merge)
 
@@ -53,6 +55,9 @@ Issues carrying `loom:curated`.
 - **#153**: brownout-top: re-grade NONPHYSICAL brown-out points with a tightened-solver fleet re-run *(curated)*
 - **#181**: glitch-top: re-run failed vdd_level request vdd_slew_v1.2_h0.0002_s200000 (45 ERROR points) *(curated)*
 - **#189**: Re-qualify cited sky130 evidence under open_pdks f6eeac7 (split from #188) *(curated)*
+- **#218**: Adopt the common artifact store for sim evidence (manifests in git, bytes via klt artifact) *(curated)*
+- **#219**: corner-run.py: add a klt sim --backend batch path so the six local-grid experiments can be re-run on the fleet (unblocks #189) *(curated)*
+- **#220**: T1 item 1: run the design-source attestation through klt netlist (#193) and commit the passing envelope *(curated)*
 
 ## Proposed (Architect / Hermit)
 
@@ -70,11 +75,11 @@ Issues carrying `loom:curated`.
 | Operator merge-risk holds | 0 |
 | Very important | 0 |
 | Important | 0 |
-| Ready (`loom:issue`) | 0 |
-| In Progress (`loom:building`) | 0 |
-| PRs awaiting review | 0 |
+| Ready (`loom:issue`) | 1 |
+| In Progress (`loom:building`) | 2 |
+| PRs awaiting review | 2 |
 | Approved PRs awaiting merge | 0 |
-| Curated | 4 |
+| Curated | 7 |
 | Architect / Hermit proposals | 2 |
 | Active epics | 1 |
 <!-- guide:plan-body:end -->
