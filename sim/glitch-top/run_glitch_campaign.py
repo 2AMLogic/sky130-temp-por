@@ -648,7 +648,9 @@ def render_md(rec: dict) -> str:
         L += ["## Notes", rec["follow_on"], ""]
     L.append("## Links")
     for k, v in rec["links"].items():
-        L.append(f"- {k}: `{v}`")
+        L.append(f"- {k}: `{v}`" if v else f"- {k}: none")
+    if not rec["links"].get("artifact_manifest"):
+        L.append("- **Evidence bytes**: none stored -- no point of this class was graded and no request was submitted (all points NOT_COVERED).")
     L.append(f"- **Timestamp / author**: {rec['timestamp']}, {rec['author']}")
     L.append(f"- **Supersedes**: {rec['supersedes'] or '(none)'}")
     L.append("")
@@ -708,15 +710,19 @@ def cmd_record(args) -> int:
             if (src / "report.json").is_file():
                 (corners_dir / r["tag"]).mkdir(parents=True, exist_ok=True)
                 (corners_dir / r["tag"] / "klt-report.json").write_text(scrub((src / "report.json").read_text(), run_dir))
-        snap_dir.mkdir(parents=True, exist_ok=True)
-        if (run_dir / "run.json").is_file():
-            shutil.copyfile(run_dir / "run.json", snap_dir / "run.json")
+        # A class with nothing submitted/graded (a --only subset run) stages no bytes: record it as NOT_COVERED
+        # with null artifact links rather than tripping the store's fail-closed empty-manifest refusal.
+        staged = corners_dir.is_dir() and any(corners_dir.rglob("*"))
+        if staged or snap_dir.is_dir():
+            snap_dir.mkdir(parents=True, exist_ok=True)
+            if (run_dir / "run.json").is_file():
+                shutil.copyfile(run_dir / "run.json", snap_dir / "run.json")
         fails = [{"tag": q["tag"], "reason": q["outcome"]} for q in requests if q.get("job_id") is None and q.get("outcome") and q["outcome"] not in ("ok", "OK", "PASS")]
         ngs = sorted({p["ngspice"] for p in points if p.get("ngspice")})
         runners = sorted({q.get("runner_klt_version") for q in requests if q.get("runner_klt_version")})
         cnt = declared_counts(man, cls)
         n_graded = sum(1 for p in points if p["outcome"] != "NOT_COVERED")
-        art_manifest, art_summary = evidence_store.store_or_exit(SLUG, record_id, corners_dir)
+        art_manifest, art_summary = evidence_store.store_or_exit(SLUG, record_id, corners_dir) if staged else (None, None)
         record = {
             "record_id": record_id, "class": cls, "timestamp": now.strftime("%Y-%m-%dT%H:%M:%SZ"), "author": args.author or cr.default_author(), "supersedes": args.supersedes,
             "experiment": {k: man[k] for k in ("slug", "title", "claim", "provenance", "provenance_source", "statistical_convention")},
@@ -743,7 +749,8 @@ def cmd_record(args) -> int:
             "absent_coverage": absent(man, cls), "follow_on": Path(args.notes_file).read_text().strip() if args.notes_file else "",
             "links": {"testbench": "sim/glitch-top/testbench/tb_temp_por_glitch.sch", "manifest": "sim/glitch-top/experiment.json",
                       "driver": "sim/glitch-top/run_glitch_campaign.py", "checker": "sim/glitch-top/glitch_checker.py",
-                      "netlist_snapshots": f"sim/glitch-top/netlist-snapshots/{record_id}/", "artifact_manifest": str(art_manifest.relative_to(REPO_ROOT)), "artifact_summary": str(art_summary.relative_to(REPO_ROOT)),
+                      "netlist_snapshots": f"sim/glitch-top/netlist-snapshots/{record_id}/" if snap_dir.is_dir() else None,
+                      "artifact_manifest": str(art_manifest.relative_to(REPO_ROOT)) if art_manifest else None, "artifact_summary": str(art_summary.relative_to(REPO_ROOT)) if art_summary else None,
                       "json": f"sim/glitch-top/records/{record_id}.json", "record": f"sim/glitch-top/records/{record_id}.md"},
         }
         rec_dir.mkdir(parents=True, exist_ok=True)
