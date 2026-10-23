@@ -4,6 +4,9 @@ Chronological record of recently merged pull requests and closed issues. This fi
 
 ### 2026-10-23
 
+- **PR #231**: sim(glitch-top): fleet subset run record with stored-evidence manifest
+- **PR #233**: fix(sim): glitch record skips evidence store for empty classes
+- **Issue #230** (closed): glitch-top record fails on a single-class subset run: empty stage refused for the all-NOT_COVERED class
 - **PR #227**: refactor: hoist DUT .end-strip and ng_nomodcheck control into sim_common
 - **Issue #225** (closed): Dedupe campaign-runner netlist boilerplate (.end strip, ng_nomodcheck banner) into sim_common
 - **PR #226**: feat(sim): store campaign driver evidence in the artifact store
