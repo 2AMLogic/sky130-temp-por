@@ -40,6 +40,7 @@ REPO_ROOT = SIM_DIR.parent
 sys.path.insert(0, str(SIM_DIR / "bin"))
 sys.path.insert(0, str(HERE))
 
+import evidence_store  # noqa: E402
 import iq_checker as qc  # noqa: E402
 import sim_common  # noqa: E402
 
@@ -131,6 +132,7 @@ def build_request(netlist_name: str, man: dict, backend: str, capacity_wait_s: f
 
 
 def cmd_run(args) -> int:
+    evidence_store.preflight_or_exit()  # fail closed before anything is submitted
     man = sim_common.load_manifest(MANIFEST)
     pdk = cr.resolve_pdk(cr.load_pin())
     git_info = cr.git_state()
@@ -474,6 +476,7 @@ DEFS = {
 
 
 def cmd_record(args) -> int:
+    evidence_store.preflight_or_exit()
     man = sim_common.load_manifest(MANIFEST)
     run_dir = BUILD / args.run_id
     meta = json.loads((run_dir / "run.json").read_text())
@@ -483,8 +486,9 @@ def cmd_record(args) -> int:
     now = datetime.now(timezone.utc)
     record_id = f"{now:%Y%m%d}-{now:%H%M%S}-{git_info['sha']}"
     rate = man["measurement"]["rate_v_per_s"]
-    rec_dir, corners_dir, snap_dir = HERE / "records", HERE / "corners" / record_id, HERE / "netlist-snapshots" / record_id
-    for pth in (rec_dir / f"{record_id}.md", rec_dir / f"{record_id}.json", corners_dir, snap_dir):
+    rec_dir, snap_dir = HERE / "records", HERE / "netlist-snapshots" / record_id
+    corners_dir = evidence_store.stage_dir_for(SLUG, record_id)  # git-ignored scratch; stored below
+    for pth in (rec_dir / f"{record_id}.md", rec_dir / f"{record_id}.json", corners_dir, snap_dir, evidence_store.manifest_path(SLUG, record_id)):
         if pth.exists():
             raise SystemExit(f"{pth} exists -- sim/ is append-only")
     traces: dict = {}
@@ -544,6 +548,7 @@ def cmd_record(args) -> int:
     jobs = [per[s]["requests"].get("job_id") for s in STATES]
     fleet_note = (f"batch jobs {jobs}; runner klt {', '.join(runners) or 'unknown'}; fleet ngspice {', '.join(ngs) or 'unknown'}; client {meta['klt_client']}; "
                   "client/runner version skew accepted with batch.runner_version_check=warn")
+    art_manifest, art_summary = evidence_store.store_or_exit(SLUG, record_id, corners_dir)
     record = {
         "record_id": record_id, "timestamp": now.strftime("%Y-%m-%dT%H:%M:%SZ"), "author": args.author or cr.default_author(), "supersedes": args.supersedes,
         "experiment": {k: man[k] for k in ("slug", "title", "claim", "provenance", "provenance_source", "statistical_convention")},
@@ -555,7 +560,7 @@ def cmd_record(args) -> int:
         "points": {s: per[s]["points"] for s in STATES}, "temp_iq": temp, "summary": summary, "crosscheck": xc, "absent_coverage": ABSENT,
         "links": {"testbench_por": "sim/iq-top/testbench/tb_temp_por_iq_por.sch", "testbench_total": "sim/iq-top/testbench/tb_temp_por_iq_total.sch", "manifest": "sim/iq-top/experiment.json",
                   "driver": "sim/iq-top/run_iq_campaign.py", "checker": "sim/iq-top/iq_checker.py", "netlist_snapshots": f"sim/iq-top/netlist-snapshots/{record_id}/",
-                  "corners_dir": f"sim/iq-top/corners/{record_id}/", "json": f"sim/iq-top/records/{record_id}.json", "record": f"sim/iq-top/records/{record_id}.md"},
+                  "artifact_manifest": str(art_manifest.relative_to(REPO_ROOT)), "artifact_summary": str(art_summary.relative_to(REPO_ROOT)), "json": f"sim/iq-top/records/{record_id}.json", "record": f"sim/iq-top/records/{record_id}.md"},
     }
     rec_dir.mkdir(parents=True, exist_ok=True)
     (rec_dir / f"{record_id}.json").write_text(json.dumps(record, indent=1, sort_keys=True, default=float) + "\n")

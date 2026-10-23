@@ -101,6 +101,7 @@ sim/
   xschemrc                           # project-local xschem config
   bin/
     corner-run.py                    # PVT corner runner
+    evidence_store.py                # fail-closed client for the fleet artifact store
     sim_common.py                    # shared helpers for bespoke run_*.py scripts
     pdk-env.sh                       # `source` for interactive use
   build/                             # gitignored scratch (decks, xschem netlists)
@@ -114,6 +115,8 @@ sim/
     corners/
       <record-id>/
         <corner-id>.log              # deck + raw ngspice output per point
+                                      # (records before the artifact-store change only;
+                                      # new runs store these bytes off-repo, see below)
     records/
       <record-id>.md                 # append-only summary record (human)
       <record-id>.json               # same record, machine-readable
@@ -171,6 +174,38 @@ record, snapshot and corner evidence, and point at the old one via
 **Supersedes**. Never overwrite, delete or relocate the old files. Live
 testbenches, campaign drivers, `experiment.json` and READMEs are not evidence
 and remain editable.
+
+### New evidence goes to the artifact store
+
+New runs do not commit raw bytes. `corner-run.py` and the five campaign drivers
+(`brownout-top`, `glitch-top`, `iq-top`, `supply-ramp-top`,
+`por-comparator-thresholds`) stage their per-corner logs, traces and fleet
+reports in the git-ignored `sim/.work/.stage/<slug>/<record-id>/`, store them
+with `klt artifact put` (via `sim/bin/evidence_store.py`), and commit only:
+
+- `manifests/artifacts/<slug>-<record-id>.manifest.json` — every `uri` is
+  `artifact:<key>`; and
+- `manifests/artifacts/<slug>-<record-id>.summary.md` — name, size and sha256
+  per stored object.
+
+The record's `links` name those two files in place of the old `corners_dir`.
+Check the stored bytes with
+`klt artifact verify manifests/artifacts/<slug>-<record-id>.manifest.json`.
+
+**Fail closed, no fallback.** If `$KLT_ARTIFACT_BROKER` is unset, the worker's
+`klt` lacks `artifact put`/`verify`, or the broker is unreachable, the run exits
+nonzero and commits nothing. `corner-run.py` checks before simulating; each
+campaign driver checks in both `run` (before anything is submitted to the
+fleet) and `record` (before it writes anything). If the put fails after the
+grid ran, the staged bytes stay in `sim/.work/.stage/` for a retry and no
+manifest, summary or record is written. There is no flag that commits bytes
+instead. The broker URL is never written to the repo. The fleet workers set
+`$KLT_ARTIFACT_BROKER` and carry a recent enough `klt`; CI does not call it.
+
+CI (`.github/scripts/check_artifact_manifests.py`) validates the manifests'
+schema, accepts only `artifact:` URIs, fails if a stored object's bytes are also
+tracked, and rejects `s3://` / `arn:aws:` strings under `manifests/`. Evidence
+committed before this change stays where it is.
 
 CI enforces this rule in the self-checks workflow
 (`.github/scripts/check_records_append_only.py`): the protected
@@ -277,9 +312,11 @@ failed, `1` harness/setup error (no record written).
    mismatch and `mc` global-process sections also exist in the library and are
    used by bespoke scripts, not by `corner-run.py`'s own manifest validation).
 4. Run it: `python3 sim/bin/corner-run.py sim/<slug>`
-5. Commit the produced record, netlist snapshot and per-corner logs. (The
-   root `.gitignore` ignores `*.log` globally but un-ignores
-   `sim/*/corners/**/*.log`, which is committed evidence.)
+5. Commit the produced record, netlist snapshot, and the artifact manifest and
+   summary under `manifests/artifacts/` (see "New evidence goes to the
+   artifact store" below). The per-corner logs of a new run are not committed.
+   (The root `.gitignore` still un-ignores `sim/*/corners/**/*.log` so the
+   already-committed history stays tracked.)
 
 ## `bias-core-smoke` — the harness's own testbench
 

@@ -43,6 +43,7 @@ REPO_ROOT = SIM_DIR.parent
 sys.path.insert(0, str(SIM_DIR / "bin"))
 sys.path.insert(0, str(HERE))
 
+import evidence_store  # noqa: E402
 import sim_common  # noqa: E402
 import threshold_extractor as tx  # noqa: E402
 
@@ -149,6 +150,7 @@ def submit(variant_name: str, rate: float, head: str, man: dict, run_dir: Path, 
 
 
 def cmd_run(args) -> int:
+    evidence_store.preflight_or_exit()  # fail closed before anything is submitted
     man = sim_common.load_manifest(MANIFEST)
     pdk = cr.resolve_pdk(cr.load_pin())
     git_info = cr.git_state()
@@ -463,6 +465,7 @@ def render_md(rec: dict) -> str:
 
 
 def cmd_record(args) -> int:
+    evidence_store.preflight_or_exit()
     man = sim_common.load_manifest(MANIFEST)
     run_dir = BUILD / args.run_id
     meta = json.loads((run_dir / "run.json").read_text())
@@ -478,8 +481,9 @@ def cmd_record(args) -> int:
     for idx, variant in enumerate(args.variant or meta["variants"]):
         stamp = now if idx == 0 else datetime.now(timezone.utc)
         record_id = f"{stamp:%Y%m%d}-{stamp:%H%M%S}-{git_info['sha']}-{variant}" + ("" if axis == "main" else f"-{axis}")
-        rec_dir, corners_dir, snap_dir = HERE / "records", HERE / "corners" / record_id, HERE / "netlist-snapshots" / record_id
-        for pth in (rec_dir / f"{record_id}.md", rec_dir / f"{record_id}.json", corners_dir, snap_dir):
+        rec_dir, snap_dir = HERE / "records", HERE / "netlist-snapshots" / record_id
+        corners_dir = evidence_store.stage_dir_for(SLUG, record_id)  # git-ignored scratch; stored below
+        for pth in (rec_dir / f"{record_id}.md", rec_dir / f"{record_id}.json", corners_dir, snap_dir, evidence_store.manifest_path(SLUG, record_id)):
             if pth.exists():
                 raise SystemExit(f"{pth} exists -- sim/ is append-only")
         res = analyze_variant(variant, run_dir, man, corners_dir)
@@ -520,6 +524,7 @@ def cmd_record(args) -> int:
         runners = sorted({r.get("runner_klt_version") for r in res["requests"] if r.get("runner_klt_version")})
         ngs = sorted({p["ngspice"] for p in res["points"] if p["ngspice"]})
         v = man["variants"][variant]
+        art_manifest, art_summary = evidence_store.store_or_exit(SLUG, record_id, corners_dir)
         record = {
             "record_id": record_id,
             "timestamp": stamp.strftime("%Y-%m-%dT%H:%M:%SZ"),
@@ -553,7 +558,7 @@ def cmd_record(args) -> int:
             "links": {
                 "testbench": "sim/" + SLUG + "/" + v["schematic"], "manifest": f"sim/{SLUG}/experiment.json", "driver": f"sim/{SLUG}/run_thresholds_campaign.py",
                 "extractor": f"sim/{SLUG}/threshold_extractor.py", "netlist_snapshots": f"sim/{SLUG}/netlist-snapshots/{record_id}/",
-                "corners_dir": f"sim/{SLUG}/corners/{record_id}/", "json": f"sim/{SLUG}/records/{record_id}.json", "record": f"sim/{SLUG}/records/{record_id}.md",
+                "artifact_manifest": str(art_manifest.relative_to(REPO_ROOT)), "artifact_summary": str(art_summary.relative_to(REPO_ROOT)), "json": f"sim/{SLUG}/records/{record_id}.json", "record": f"sim/{SLUG}/records/{record_id}.md",
             },
         }
         rec_dir.mkdir(parents=True, exist_ok=True)

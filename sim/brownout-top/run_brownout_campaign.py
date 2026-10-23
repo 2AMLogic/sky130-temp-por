@@ -53,6 +53,7 @@ sys.path.insert(0, str(SIM_DIR / "bin"))
 sys.path.insert(0, str(HERE))
 
 import brownout_checker as bc  # noqa: E402
+import evidence_store  # noqa: E402
 import sim_common  # noqa: E402
 
 cr = sim_common.load_corner_run()
@@ -307,6 +308,7 @@ def cmd_plan(args) -> int:
 
 
 def cmd_run(args) -> int:
+    evidence_store.preflight_or_exit()  # fail closed before anything is submitted
     man = sim_common.load_manifest(MANIFEST)
     pdk = cr.resolve_pdk(cr.load_pin())
     gi = source_state()
@@ -929,6 +931,7 @@ def absent(man: dict) -> list[str]:
 
 
 def cmd_record(args) -> int:
+    evidence_store.preflight_or_exit()
     man = sim_common.load_manifest(MANIFEST)
     run_dir = BUILD / args.run_id
     meta = json.loads((run_dir / "run.json").read_text())
@@ -948,9 +951,9 @@ def cmd_record(args) -> int:
     now = datetime.now(timezone.utc)
     record_id = f"{now:%Y%m%d}-{now:%H%M%S}-{gi['sha']}"
     rec_dir = HERE / "records"
-    corners_dir = HERE / "corners" / record_id
+    corners_dir = evidence_store.stage_dir_for(HERE.name, record_id)  # git-ignored scratch; stored below
     snap_dir = HERE / "netlist-snapshots" / record_id
-    for pth in (rec_dir / f"{record_id}.md", rec_dir / f"{record_id}.json", corners_dir, snap_dir):
+    for pth in (rec_dir / f"{record_id}.md", rec_dir / f"{record_id}.json", corners_dir, snap_dir, evidence_store.manifest_path(HERE.name, record_id)):
         if pth.exists():
             raise SystemExit(f"{pth} exists -- sim/ is append-only")
     reqs = plan_requests(man)
@@ -993,6 +996,7 @@ def cmd_record(args) -> int:
         comparison = build_comparison(src_rec, points, requests, variant, selected_rerun_tags(man) if rerun.get("variant") == variant["key"] else None)
         t, c = comparison["targets"], comparison["controls"]
         say(f"comparison vs {comparison['source_record']}: {comparison['points_compared']} points; targets {t['n']} -> {t['transitions']}; controls {c['n']} with {c['n_changed']} changed, {c.get('n_error', 0)} ERROR, {c.get('n_not_covered', 0)} NOT_COVERED")
+    art_manifest, art_summary = evidence_store.store_or_exit(HERE.name, record_id, corners_dir)
     ph = man["grading"]
     record = {
         "record_id": record_id, "timestamp": now.strftime("%Y-%m-%dT%H:%M:%SZ"), "author": args.author or cr.default_author(), "supersedes": args.supersedes,
@@ -1020,7 +1024,7 @@ def cmd_record(args) -> int:
         "absent_coverage": absent(man), "follow_on": Path(args.notes_file).read_text().strip() if args.notes_file else "",
         "links": {"testbench": "sim/brownout-top/testbench/tb_temp_por_brownout.sch", "manifest": "sim/brownout-top/experiment.json",
                   "driver": "sim/brownout-top/run_brownout_campaign.py", "checker": "sim/brownout-top/brownout_checker.py",
-                  "netlist_snapshots": f"sim/brownout-top/netlist-snapshots/{record_id}/", "corners_dir": f"sim/brownout-top/corners/{record_id}/",
+                  "netlist_snapshots": f"sim/brownout-top/netlist-snapshots/{record_id}/", "artifact_manifest": str(art_manifest.relative_to(REPO_ROOT)), "artifact_summary": str(art_summary.relative_to(REPO_ROOT)),
                   "json": f"sim/brownout-top/records/{record_id}.json", "record": f"sim/brownout-top/records/{record_id}.md"},
     }
     rec_dir.mkdir(parents=True, exist_ok=True)
