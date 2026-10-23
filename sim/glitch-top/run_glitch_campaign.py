@@ -60,7 +60,7 @@ scrub = rb.scrub
 SLUG = "glitch-top"
 MANIFEST = HERE / "experiment.json"
 TB_SCH = HERE / "testbench" / "tb_temp_por_glitch.sch"
-DUT_NETLIST = REPO_ROOT / "design" / "netlist" / "temp_por_top.spice"
+DUT_NETLIST = sim_common.DUT_NETLIST
 BUILD = REPO_ROOT / "sim" / "build" / SLUG
 MODEL_LIB = rb.MODEL_LIB
 CLASSES = (gc.CLASS_A, gc.CLASS_B)
@@ -183,8 +183,7 @@ def splice_injection(dut: str, rinj: float) -> str:
 
 
 def build_netlist(head: str, req: dict) -> str:
-    dut = DUT_NETLIST.read_text()
-    dut = "\n".join(ln for ln in dut.splitlines() if ln.strip().lower() != ".end") + "\n"
+    dut = sim_common.load_dut_netlist(DUT_NETLIST)
     A = req["cls"] == gc.CLASS_A
     sr = req["sf"]  # symmetric edges: the testbench sr is the class's sf
     params = (f".param rup={req['rup']:g} t0={req['t0']:g} vlow={req['vlow']:g} th={req['th']:g} sf={req['sf']:g} sr={sr:g} "
@@ -197,7 +196,7 @@ def build_netlist(head: str, req: dict) -> str:
         + params + "\n"
         "* ng_nomodcheck: same setting as sim/spiceinit; carried in the netlist because the fleet runner\n"
         "* ignores options.ngspice_init (see experiment.json fleet.ngspice_note)\n"
-        ".control\nset ng_nomodcheck\n.endc\n"
+        + sim_common.NOMODCHECK_CONTROL
     )
     if A:
         # GINJ must be global so the drive inside the DUT subckt is the testbench's GINJ node

@@ -47,7 +47,7 @@ cr = sim_common.load_corner_run()
 
 SLUG = "iq-top"
 MANIFEST = HERE / "experiment.json"
-DUT_NETLIST = REPO_ROOT / "design" / "netlist" / "temp_por_top.spice"
+DUT_NETLIST = sim_common.DUT_NETLIST
 BUILD = REPO_ROOT / "sim" / "build" / SLUG
 MODEL_LIB = "libs.tech/combined/sky130.lib.spice"
 STATES = ["por-iq", "iq-total"]
@@ -84,8 +84,7 @@ def tb_netlist_head(state: str, run_dir: Path, pdk) -> str:
 
 
 def instrumented_dut() -> str:
-    dut = DUT_NETLIST.read_text()
-    dut = "\n".join(ln for ln in dut.splitlines() if ln.strip().lower() != ".end") + "\n"
+    dut = sim_common.load_dut_netlist(DUT_NETLIST)
     for find, repl in INSTRUMENT:
         if dut.count(find) != 1:
             raise SystemExit(f"instrumentation target not found exactly once in {DUT_NETLIST.name}: {find!r}")
@@ -101,7 +100,7 @@ def build_netlist(head: str, state: str, man: dict) -> str:
         f".param rate={m['rate_v_per_s']:g}\n"
         "* ng_nomodcheck: same setting as sim/spiceinit; carried in the netlist because the\n"
         "* fleet runner ignores options.ngspice_init (see experiment.json ngspice_note)\n"
-        ".control\nset ng_nomodcheck\n.endc\n"
+        + sim_common.NOMODCHECK_CONTROL
     )
     return banner + head + "\n" + instrumented_dut()
 

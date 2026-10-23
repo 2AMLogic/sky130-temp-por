@@ -477,13 +477,30 @@ def klt_version() -> str:
     return p.stdout.strip() or p.stderr.strip()
 
 
+DUT_NETLIST = Path(__file__).resolve().parents[2] / "design" / "netlist" / "temp_por_top.spice"
+
+# Fleet-runner workaround: the runner ignores options.ngspice_init, so the setting
+# from sim/spiceinit is carried in the netlist itself.  Change it here only.
+NOMODCHECK_CONTROL = ".control\nset ng_nomodcheck\n.endc\n"
+
+
+def drop_end(text: str) -> str:
+    """Drop the `.end` line(s) so the netlist can be embedded in a wrapper deck."""
+    return "\n".join(ln for ln in text.splitlines() if ln.strip().lower() != ".end") + "\n"
+
+
+def load_dut_netlist(path: Path = DUT_NETLIST) -> str:
+    """Read a committed DUT export with its `.end` dropped."""
+    return drop_end(Path(path).read_text())
+
+
 def netlist_tb_head(sch: Path, out_dir: Path, pdk) -> str:
     """xschem-netlist a testbench; keep only the testbench part (the DUT comes from the committed export)."""
     cr = sys.modules.get("corner_run") or load_corner_run()
     produced = cr.netlist_with_xschem(sch, out_dir, pdk)
     text = produced.read_text().replace(str(BIN_DIR.parent.parent) + os.sep, "")
     head = text.split("\n* expanding")[0]
-    return "\n".join(ln for ln in head.splitlines() if ln.strip().lower() != ".end") + "\n"
+    return drop_end(head)
 
 
 def load_manifest(path: Path) -> dict:
