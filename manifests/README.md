@@ -49,8 +49,7 @@ then cite its `provenance.input.content_hash` in the manifest and re-render
 the report. Item 10's inventory lists `.github/workflows/signoff-manifest.yml`,
 so that workflow is self-hashed: make every workflow edit first, regenerate
 the item-10 envelope last, and confirm `--check` returns `match` before the
-final commit. `-o` writes only a passing envelope. Item 1 is the one without
-one; see its row below.
+final commit. `-o` writes only a passing envelope.
 
 ## Regenerate
 
@@ -91,28 +90,24 @@ each citation below is the envelope that genuinely backs the claim, and its
 blind spots are stated here (coverage honesty: a verdict's blind spots are
 part of the claim and travel with it):
 
-- **Item 1 — Design sources: `unmet` (`check_failed`)**. Since
-  klayout-tools#2718, items 1, 2, 9 and 10 accept only an
-  **artifact-anchored** envelope, so the old native LVS envelope
-  (`layout/bias_core_mirror_amp/lvs.json`, klt `0.6.0+g0ce8c64842d9`) no
-  longer satisfies it. The row now cites the attestation
-  `klt signoff --attest 1 --inventory manifests/inventories/item-1.json`
-  (klayout-tools#2844, #186) as a **command-backed** entry, because there is
-  no passing envelope to commit (`--attest -o` writes only a passing
-  envelope). The inventory lists the 10 xschem sources (`design/*.sch`,
-  `*.sym`), the export tool and `design/xschemrc`, and the 5 committed
-  netlists, each with the freshness check `python3 design/netlist.py
-  --check`. **The failing check is that freshness check, on all 5 netlists**:
-  it needs xschem >= 3.4.5 (verified on 3.4.7) and the sky130 PDK. On a
-  stock runner it cannot launch; on the 3.4.4 host this was authored on,
-  xschem does not evaluate `expr()` and the export fails
-  (`.subckt temp_por_top not found in its own netlist`). The other 17 of 22
-  checks (all sources and netlists present) pass. The check is declared
-  in the inventory, not dropped. The row turns `met` when the attestation
-  runs on a machine with a working xschem: commit the passing envelope to
-  `manifests/attestations/item-1.json`, cite it as a file entry like items
-  9 and 10 and re-render. The previous pin's native-LVS evidence was
-  not re-cited for item 1.
+- **Item 1 — Design sources: `met`** via the artifact-anchored attestation
+  `item-1.json` (22/22 checks, #220), pinned to its inventory by content hash
+  like items 9 and 10. (Since klayout-tools#2718 items 1, 2, 9 and 10 accept
+  only an artifact-anchored envelope, so the old native LVS envelope no longer
+  satisfies it.) The inventory (`inventories/item-1.json`) lists the 10 xschem
+  sources (`design/*.sch`, `*.sym`), the export tool and `design/xschemrc`,
+  and the 5 committed netlists. Each netlist carries the freshness check
+  `python3 design/netlist.py --check`, which passed on all 5 (netlists
+  reproduce byte-for-byte). **Route and version:** run locally with the
+  worker's PATH xschem, XSCHEM V3.4.7 (>= 3.4.5 is required; 3.4.4 does not
+  evaluate `expr()`), against the sky130 PDK; no `--xschem-binary` pin and no
+  `--backend batch`. **Limits:** it shows the committed netlists are what the
+  committed schematics export, not that the circuit is right. CI cannot
+  re-run the freshness check (no xschem or PDK on a stock runner); it only
+  verifies the committed envelope's `content_hash`. After editing anything in
+  the inventory, re-run `klt signoff --attest 1 --inventory
+  manifests/inventories/item-1.json -o manifests/attestations/item-1.json`
+  locally, then re-cite and re-render.
 - **Item 2 — Layout: `unmet` (`no_evidence`)**, truthfully: the block has
   no `temp_por_top` layout yet, so no envelope can honestly back a
   block-level layout claim. Partial progress exists — six `bias_core`
