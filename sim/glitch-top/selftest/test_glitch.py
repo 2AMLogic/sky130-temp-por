@@ -6,9 +6,11 @@
 
 from __future__ import annotations
 
+import contextlib
 import datetime as _dt
 import gzip
 import json
+import os
 import sys
 import tempfile
 import unittest
@@ -32,6 +34,18 @@ FAKE_PDK = SimpleNamespace(variant="sky130A", installed_commit="0" * 40, matches
 
 def _no_host_pdk():
     return mock.patch.object(rg.cr, "resolve_pdk", return_value=FAKE_PDK)
+
+
+def _fake_store():
+    """Hermetic stand-in for the artifact store: no broker, no klt. The fail-closed behavior itself
+    is tested separately (test_record_fails_closed_without_broker) against the real preflight."""
+    def store(bench, record_id, stage_dir):
+        return (rg.REPO_ROOT / "manifests" / "artifacts" / f"{bench}-{record_id}.manifest.json",
+                rg.REPO_ROOT / "manifests" / "artifacts" / f"{bench}-{record_id}.summary.md")
+    stack = contextlib.ExitStack()
+    stack.enter_context(mock.patch.object(rg.evidence_store, "preflight_or_exit", return_value=None))
+    stack.enter_context(mock.patch.object(rg.evidence_store, "store_or_exit", side_effect=store))
+    return stack
 
 
 class CheckerCases(unittest.TestCase):
@@ -281,7 +295,7 @@ class Accounting(unittest.TestCase):
             gi = {"sha": "abc1234", "sha_full": "abc1234" + "0" * 33, "branch": "t", "dirty": False, "pushed_to_remote": True, "remote_branches": []}
             ns = mock.Mock(run_id="run1", notes_file=None, author="t", supersedes=None, allow_dirty=False, allow_deck_drift=False)
             with mock.patch.object(rg, "BUILD", build), mock.patch.object(rg, "HERE", here), mock.patch.object(rg, "datetime", FixedDT), mock.patch.object(rg, "source_state", return_value=gi), \
-                    _no_host_pdk():
+                    _no_host_pdk(), _fake_store():
                 self.assertEqual(rg.cmd_record(ns), 0)
                 recs = sorted((here / "records").glob("*.json"))
                 self.assertEqual([json.loads(p.read_text())["class"] for p in recs], [A, B])
@@ -309,14 +323,28 @@ class Accounting(unittest.TestCase):
             (build / "run1" / "run.json").write_text(json.dumps({"klt_client": "t", "source": {"dirty": False, "sha_full": "a" * 40}}))
             ns = mock.Mock(run_id="run1", notes_file=None, author="t", supersedes=None, allow_dirty=False, allow_deck_drift=False)
             gi = {"sha": "abc1234", "sha_full": "b" * 40, "branch": "t", "dirty": True, "pushed_to_remote": True, "remote_branches": []}
-            with mock.patch.object(rg, "BUILD", build), mock.patch.object(rg, "HERE", here), mock.patch.object(rg, "source_state", return_value=gi), _no_host_pdk():
+            with mock.patch.object(rg, "BUILD", build), mock.patch.object(rg, "HERE", here), mock.patch.object(rg, "source_state", return_value=gi), _no_host_pdk(), _fake_store():
                 with self.assertRaises(SystemExit):
                     rg.cmd_record(ns)
             gi["dirty"] = False
             with mock.patch.object(rg, "BUILD", build), mock.patch.object(rg, "HERE", here), mock.patch.object(rg, "source_state", return_value=gi), \
-                    mock.patch.object(rg, "deck_drift", return_value=["design/netlist/temp_por_top.spice"]), _no_host_pdk():
+                    mock.patch.object(rg, "deck_drift", return_value=["design/netlist/temp_por_top.spice"]), _no_host_pdk(), _fake_store():
                 with self.assertRaises(SystemExit):
                     rg.cmd_record(ns)
+            self.assertFalse((here / "records").exists())
+
+    def test_record_fails_closed_without_broker(self):
+        with tempfile.TemporaryDirectory() as td:
+            td = Path(td)
+            build, here = td / "build", td / "here"
+            (build / "run1").mkdir(parents=True)
+            here.mkdir()
+            ns = mock.Mock(run_id="run1", notes_file=None, author="t", supersedes=None, allow_dirty=False, allow_deck_drift=False)
+            env = {k: v for k, v in os.environ.items() if k != rg.evidence_store.BROKER_ENV}
+            with mock.patch.dict(os.environ, env, clear=True), mock.patch.object(rg, "BUILD", build), mock.patch.object(rg, "HERE", here):
+                with self.assertRaises(SystemExit) as cm:
+                    rg.cmd_record(ns)
+            self.assertIn(rg.evidence_store.BROKER_ENV, str(cm.exception))
             self.assertFalse((here / "records").exists())
 
 
