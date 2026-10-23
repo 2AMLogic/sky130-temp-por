@@ -6,6 +6,7 @@ layouts are both covered):
   sim/*/records/*            result records (JSON and Markdown twins)
   sim/*/netlist-snapshots/*  frozen decks and batch request files
   sim/*/corners/*            raw per-corner logs, summaries, waveforms (.gz)
+  manifests/artifacts/*      artifact-store manifests and summaries of new runs
 
 sim/README.md's "Append-only rule" says this evidence is never edited,
 deleted or moved after creation -- corrections preserve the old bytes and
@@ -55,6 +56,7 @@ PROTECTED = (
     "sim/*/records/*",
     "sim/*/netlist-snapshots/*",
     "sim/*/corners/*",
+    "manifests/artifacts/*",
 )
 
 
@@ -451,6 +453,20 @@ def selftest():
         git(repo, "mv", "sim/exp/netlist-snapshots/r0.spice", "sim/exp/netlist-snapshots/r0b.spice")
         commit_all("rename snapshot within protected dir")
         expect_fail("renaming a snapshot fails", flat)
+
+        # artifact manifests are protected too; adding one passes
+        art = repo / "manifests" / "artifacts"
+        art.mkdir(parents=True)
+        (art / "exp-r0.manifest.json").write_text("{}\n")
+        commit_all("add artifact manifest")
+        ev_base = commit_sha(repo, "HEAD")
+        (art / "exp-r1.manifest.json").write_text("{}\n")
+        commit_all("add second artifact manifest")
+        p = ev()
+        check("adding an artifact manifest passes", p.returncode == 0, p.stderr)
+        (art / "exp-r0.manifest.json").write_text('{"x": 1}\n')
+        commit_all("edit artifact manifest")
+        expect_fail("modifying an artifact manifest fails", "manifests/artifacts/exp-r0.manifest.json")
 
         # fresh run (records + flat/nested snapshots + corners) passes
         (snap / "r9.spice").write_text("* new flat\n")

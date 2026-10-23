@@ -51,6 +51,7 @@ from pathlib import Path
 # importlib shim (whose only caller already put sim/bin on sys.path before
 # importing sim_common in the first place) -- issue #191.
 import sim_common
+import evidence_store
 
 SIM_DIR = Path(__file__).resolve().parent.parent
 REPO_ROOT = SIM_DIR.parent
@@ -926,7 +927,8 @@ def render_record(record: dict) -> str:
     lines.append("- **Links**:")
     lines.append(f"  - Testbench: `{r['links']['testbench']}`")
     lines.append(f"  - Netlist snapshot: `{r['links']['netlist_snapshot']}`")
-    lines.append(f"  - Raw per-corner logs: `{r['links']['corners_dir']}`")
+    lines.append(f"  - Raw per-corner logs (artifact store manifest): `{r['links']['artifact_manifest']}`")
+    lines.append(f"  - Stored-object summary: `{r['links']['artifact_summary']}`")
     lines.append(f"  - Machine-readable record: `{r['links']['json']}`")
     lines.append(f"  - Experiment manifest: `{r['links']['manifest']}`")
     lines.append(
@@ -1039,16 +1041,26 @@ def main(argv: list[str]) -> int:
 
     records_dir = exp.dir / "records"
     snapshots_dir = exp.dir / "netlist-snapshots"
-    corners_dir = exp.dir / "corners" / record_id
+    # New runs stage raw logs in git-ignored scratch and store them in the
+    # fleet artifact store; only the manifest + summary are committed.
+    corners_dir = evidence_store.stage_dir_for(exp.slug, record_id)
+    art_manifest = evidence_store.manifest_path(exp.slug, record_id)
     record_md = records_dir / f"{record_id}.md"
     record_json = records_dir / f"{record_id}.json"
     snapshot = snapshots_dir / f"{record_id}.spice"
 
-    for path in (record_md, record_json, snapshot, corners_dir):
+    for path in (record_md, record_json, snapshot, corners_dir, art_manifest):
         if path.exists():
             raise HarnessError(
                 f"{path} already exists — sim/ is append-only, refusing to overwrite"
             )
+
+    if not args.dry_run:
+        # Fail closed before simulating: no broker/klt means no run, no fallback.
+        try:
+            evidence_store.preflight()
+        except evidence_store.StoreError as err:
+            raise HarnessError(str(err))
 
     run_dir = BUILD_DIR / exp.slug / record_id
     run_dir.mkdir(parents=True, exist_ok=True)
@@ -1123,6 +1135,13 @@ def main(argv: list[str]) -> int:
     spreads = spread_checks(exp, results)
     overall = all(r["pass"] for r in results) and all(s["pass"] for s in spreads)
 
+    # Store the raw logs first; on failure nothing is written under sim/<exp>/
+    # or manifests/ and the staged bytes stay in the scratch dir for a retry.
+    try:
+        art_manifest, art_summary = evidence_store.store_run(exp.slug, record_id, corners_dir)
+    except evidence_store.StoreError as err:
+        raise HarnessError(f"evidence not stored, nothing committed: {err}")
+
     snapshot.parent.mkdir(parents=True, exist_ok=True)
     snapshot.write_text("\n".join(body) + "\n.end\n")
 
@@ -1178,7 +1197,8 @@ def main(argv: list[str]) -> int:
             "testbench": str(exp.schematic.relative_to(REPO_ROOT)),
             "manifest": str((exp.dir / "experiment.json").relative_to(REPO_ROOT)),
             "netlist_snapshot": str(snapshot.relative_to(REPO_ROOT)),
-            "corners_dir": str(corners_dir.relative_to(REPO_ROOT)) + "/",
+            "artifact_manifest": str(art_manifest.relative_to(REPO_ROOT)),
+            "artifact_summary": str(art_summary.relative_to(REPO_ROOT)),
             "json": str(record_json.relative_to(REPO_ROOT)),
             "record": str(record_md.relative_to(REPO_ROOT)),
         },
@@ -1194,7 +1214,7 @@ def main(argv: list[str]) -> int:
     print()
     print(f"record  : {record_md.relative_to(REPO_ROOT)}")
     print(f"json    : {record_json.relative_to(REPO_ROOT)}")
-    print(f"logs    : {corners_dir.relative_to(REPO_ROOT)}/")
+    print(f"logs    : {art_manifest.relative_to(REPO_ROOT)} (artifact store)")
     print(f"overall : {'PASS' if overall else 'FAIL'}")
     if fleet is not None and not pdk_record["matches_pin"]:
         print(
