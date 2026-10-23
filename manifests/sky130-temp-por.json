@@ -3,16 +3,8 @@
   "kind": "analog",
   "evidence": {
     "1": {
-      "command": [
-        "klt",
-        "signoff",
-        "--attest",
-        "1",
-        "--inventory",
-        "manifests/inventories/item-1.json",
-        "--format",
-        "json"
-      ]
+      "file": "manifests/attestations/item-1.json",
+      "content_hash": "sha256:9514e3cd3ab20e4b0fe0dd118d34476a8467f4122321eed100ae113a7a41e478"
     },
     "3": {
       "file": "layout/bias_core/drc.json",

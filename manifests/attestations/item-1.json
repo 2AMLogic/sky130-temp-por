@@ -1,0 +1,219 @@
+{
+  "schema_version": 1,
+  "kind": "generic",
+  "status": "pass",
+  "t1_item": 1,
+  "summary": "T1 item 1 (Design sources): 22/22 attestation checks passed (klt signoff --attest)",
+  "source": "manifests/inventories/item-1.json",
+  "attestation": {
+    "producer": "klt signoff --attest",
+    "inventory_schema_version": 1,
+    "hash_algorithm": "sha256-raw-bytes",
+    "check_count": 22,
+    "passed_count": 22,
+    "checks": [
+      {
+        "check": "present",
+        "role": "source",
+        "path": "design/bias_core.sch",
+        "passed": true,
+        "content_hash": "sha256:12cc848927e57d719fe87b59b013b5e728af3b683ec57555ceca39e79cc0defd"
+      },
+      {
+        "check": "present",
+        "role": "source",
+        "path": "design/bias_core.sym",
+        "passed": true,
+        "content_hash": "sha256:5ee4ae57a32819237b189f7802b5aa1a593656c7d8e8ca369b47a64be3ee4f87"
+      },
+      {
+        "check": "present",
+        "role": "source",
+        "path": "design/netlist.py",
+        "passed": true,
+        "content_hash": "sha256:74d1db798b3233ee2b591ab221076a62140a6416282554bf85da843360ae1cef"
+      },
+      {
+        "check": "present",
+        "role": "source",
+        "path": "design/por_comparator.sch",
+        "passed": true,
+        "content_hash": "sha256:5bad87fb3817f250aa5cf32f1dbaae39175471f5b13d254d51abd28b180b4a13"
+      },
+      {
+        "check": "present",
+        "role": "source",
+        "path": "design/por_comparator.sym",
+        "passed": true,
+        "content_hash": "sha256:caef6a48e56204a7f42e7890e47aa7a0c20a0437e61e0271e4c5eff2c2035725"
+      },
+      {
+        "check": "present",
+        "role": "source",
+        "path": "design/por_output_chain.sch",
+        "passed": true,
+        "content_hash": "sha256:52741b6bdb419783442f90c589d440b6f1a34c45ea9825120ab55e2ac2d9cfc6"
+      },
+      {
+        "check": "present",
+        "role": "source",
+        "path": "design/por_output_chain.sym",
+        "passed": true,
+        "content_hash": "sha256:109caf9486f028841403d883c731eb6a9a7e49ecedce145f304d33d7b056ec14"
+      },
+      {
+        "check": "present",
+        "role": "source",
+        "path": "design/temp_core.sch",
+        "passed": true,
+        "content_hash": "sha256:8c973acce7a867e254abb33a13f330c55e14abe4946e4a277a6af5c74d718a6d"
+      },
+      {
+        "check": "present",
+        "role": "source",
+        "path": "design/temp_core.sym",
+        "passed": true,
+        "content_hash": "sha256:1802d459e124fd2a7338a13b48149bbae66bba5c5b7230884032179343c7f5dc"
+      },
+      {
+        "check": "present",
+        "role": "source",
+        "path": "design/temp_por_top.sch",
+        "passed": true,
+        "content_hash": "sha256:b6777e4436932837aec9b2037db0c19de27d02ecd0222c61e4776ebe0f3b232e"
+      },
+      {
+        "check": "present",
+        "role": "source",
+        "path": "design/temp_por_top.sym",
+        "passed": true,
+        "content_hash": "sha256:dfd55d5530c728848f25a1d58f46f98f2b3602cbc5f1538480f5c7b1c3535080"
+      },
+      {
+        "check": "present",
+        "role": "source",
+        "path": "design/xschemrc",
+        "passed": true,
+        "content_hash": "sha256:6309bb8d908a8b7ea102dcdac05a15e90735bc1d3aa95df02780faa9adf43c55"
+      },
+      {
+        "check": "present",
+        "role": "derived",
+        "path": "design/netlist/bias_core.spice",
+        "passed": true,
+        "content_hash": "sha256:49daee3a53d0ed9c68352afe646dbf0dfd06d2477fe216d85ef0e1481839e55d"
+      },
+      {
+        "check": "present",
+        "role": "derived",
+        "path": "design/netlist/por_comparator.spice",
+        "passed": true,
+        "content_hash": "sha256:1071bd8c29d1fcd67ef7023856ceb9a8b76ec978c8cfbe20409ce68fc4995fd9"
+      },
+      {
+        "check": "present",
+        "role": "derived",
+        "path": "design/netlist/por_output_chain.spice",
+        "passed": true,
+        "content_hash": "sha256:275a5a0639636e0367fbd7f9fe585216fbe51c62bc13c271c60e507cc53562eb"
+      },
+      {
+        "check": "present",
+        "role": "derived",
+        "path": "design/netlist/temp_core.spice",
+        "passed": true,
+        "content_hash": "sha256:d8ae348bdd572fa3be2b25f9dfbe359da34a03173e368e8a6c525f765121c0c0"
+      },
+      {
+        "check": "present",
+        "role": "derived",
+        "path": "design/netlist/temp_por_top.spice",
+        "passed": true,
+        "content_hash": "sha256:af1844081039ac3bef9b6e92ec95b629bbb19785c366c09bc8e3d07dda70bb36"
+      },
+      {
+        "check": "command",
+        "role": "freshness",
+        "target": "design/netlist/bias_core.spice",
+        "generator": "python3 design/netlist.py",
+        "argv": [
+          "python3",
+          "design/netlist.py",
+          "--check"
+        ],
+        "cwd": ".",
+        "exit_status": 0,
+        "passed": true
+      },
+      {
+        "check": "command",
+        "role": "freshness",
+        "target": "design/netlist/por_comparator.spice",
+        "generator": "python3 design/netlist.py",
+        "argv": [
+          "python3",
+          "design/netlist.py",
+          "--check"
+        ],
+        "cwd": ".",
+        "exit_status": 0,
+        "passed": true
+      },
+      {
+        "check": "command",
+        "role": "freshness",
+        "target": "design/netlist/por_output_chain.spice",
+        "generator": "python3 design/netlist.py",
+        "argv": [
+          "python3",
+          "design/netlist.py",
+          "--check"
+        ],
+        "cwd": ".",
+        "exit_status": 0,
+        "passed": true
+      },
+      {
+        "check": "command",
+        "role": "freshness",
+        "target": "design/netlist/temp_core.spice",
+        "generator": "python3 design/netlist.py",
+        "argv": [
+          "python3",
+          "design/netlist.py",
+          "--check"
+        ],
+        "cwd": ".",
+        "exit_status": 0,
+        "passed": true
+      },
+      {
+        "check": "command",
+        "role": "freshness",
+        "target": "design/netlist/temp_por_top.spice",
+        "generator": "python3 design/netlist.py",
+        "argv": [
+          "python3",
+          "design/netlist.py",
+          "--check"
+        ],
+        "cwd": ".",
+        "exit_status": 0,
+        "passed": true
+      }
+    ]
+  },
+  "provenance": {
+    "klt_version": "0.7.1.dev2517+g6bb7cf233677",
+    "klayout_version": null,
+    "pdk": null,
+    "deck": null,
+    "input": {
+      "path": {
+        "path": "manifests/inventories/item-1.json",
+        "scope": "repo"
+      },
+      "content_hash": "sha256:9514e3cd3ab20e4b0fe0dd118d34476a8467f4122321eed100ae113a7a41e478"
+    }
+  }
+}
