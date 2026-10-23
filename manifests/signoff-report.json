@@ -5,7 +5,7 @@
   "tier": null,
   "t1_item_count": 11,
   "build_t1_item_count": 11,
-  "t1_met_count": 5,
+  "t1_met_count": 6,
   "source_doc": "docs/design-evidence-tiers.md",
   "source_doc_content_hash": "sha256:3066f2cacd94ebe33088dd4c442976ed704738ed14e608e5f071efbf58570904",
   "build": {
@@ -25,10 +25,35 @@
       "partition": null,
       "text": "committed schematic sources (or generator) plus the netlist derived from them, regenerated on design change.",
       "notes": [],
-      "status": "unmet",
-      "reason": "check_failed",
+      "status": "met",
+      "reason": null,
       "graded_by_build": true,
-      "citation": null
+      "citation": {
+        "file": "manifests/attestations/item-1.json",
+        "command": null,
+        "kind": "generic",
+        "check_status": "pass",
+        "content_hash": "sha256:9514e3cd3ab20e4b0fe0dd118d34476a8467f4122321eed100ae113a7a41e478",
+        "input_verified": true,
+        "exit_status": 0,
+        "artifact_binding": {
+          "t1_item": 1,
+          "path": {
+            "path": "manifests/inventories/item-1.json",
+            "scope": "repo"
+          },
+          "content_hash": "sha256:9514e3cd3ab20e4b0fe0dd118d34476a8467f4122321eed100ae113a7a41e478",
+          "input_verified": true,
+          "summary": "T1 item 1 (Design sources): 22/22 attestation checks passed (klt signoff --attest)",
+          "source": "manifests/inventories/item-1.json",
+          "attestation": {
+            "producer": "klt signoff --attest",
+            "inventory_schema_version": 1,
+            "check_count": 22,
+            "passed_count": 22
+          }
+        }
+      }
     },
     {
       "tier": "T1",
