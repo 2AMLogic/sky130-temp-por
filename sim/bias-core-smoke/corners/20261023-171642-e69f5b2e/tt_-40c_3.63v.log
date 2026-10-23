@@ -1,0 +1,6 @@
+# corner: tt_-40c_3.63v
+# process=tt temp=-40C supply=3.63V
+# klt sim --backend batch corner status: pass
+# result: PASS
+
+# diagnostic [warning] nonconvergence: Warning: Dynamic gmin stepping failed

@@ -1,0 +1,62 @@
+{
+  "netlist": "netlist.spice",
+  "backend": "batch",
+  "models": {
+    "pdk": "sky130A",
+    "lib": "libs.tech/combined/sky130.lib.spice"
+  },
+  "corners": {
+    "process": [
+      "tt",
+      "ss",
+      "ff",
+      "sf",
+      "fs"
+    ],
+    "supply_v": {
+      "v1": [
+        2.97,
+        3.3,
+        3.63
+      ]
+    },
+    "temperature_c": [
+      -40.0,
+      27.0,
+      125.0
+    ]
+  },
+  "analysis": {
+    "kind": "op",
+    "args": ""
+  },
+  "measurements": [
+    {
+      "name": "vref",
+      "expr": "v(vref)",
+      "unit": "V"
+    },
+    {
+      "name": "ibias",
+      "expr": "v(ibias)",
+      "unit": "V"
+    },
+    {
+      "name": "bias_ok",
+      "expr": "v(bias_ok)",
+      "unit": "V"
+    },
+    {
+      "name": "isup",
+      "expr": "-i(v1)",
+      "unit": "A"
+    }
+  ],
+  "options": {
+    "timeout_s": 300,
+    "keep_artifacts": true
+  },
+  "batch": {
+    "runner_version_check": "warn"
+  }
+}

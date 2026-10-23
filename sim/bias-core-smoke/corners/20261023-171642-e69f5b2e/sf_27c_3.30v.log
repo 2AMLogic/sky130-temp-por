@@ -1,0 +1,6 @@
+# corner: sf_27c_3.30v
+# process=sf temp=27C supply=3.30V
+# klt sim --backend batch corner status: pass
+# result: PASS
+
+# diagnostic [warning] nonconvergence: Warning: Dynamic gmin stepping failed

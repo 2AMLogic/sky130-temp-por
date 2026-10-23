@@ -1,0 +1,7 @@
+# corner: fs_-40c_3.63v
+# process=fs temp=-40C supply=3.63V
+# klt sim --backend batch corner status: pass
+# result: PASS
+
+# diagnostic [warning] singular_matrix: Warning: singular matrix:  check nodes xdut.xrz.t1 and xdut.nb
+# diagnostic [warning] nonconvergence: Warning: Dynamic gmin stepping failed
