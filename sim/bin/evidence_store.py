@@ -136,6 +136,22 @@ def store_run(bench: str, run_id: str, stage_dir: Path) -> tuple[Path, Path]:
     return manifest, summary
 
 
+def preflight_or_exit() -> None:
+    """Driver entry point: preflight(), exiting nonzero with the reason."""
+    try:
+        preflight()
+    except StoreError as err:
+        raise SystemExit(f"evidence store unavailable, refusing to run: {err}")
+
+
+def store_or_exit(bench: str, run_id: str, stage_dir: Path) -> tuple[Path, Path]:
+    """Driver entry point: store_run(), exiting nonzero (nothing committed) on failure."""
+    try:
+        return store_run(bench, run_id, stage_dir)
+    except StoreError as err:
+        raise SystemExit(f"evidence not stored, nothing committed: {err}")
+
+
 # --------------------------------------------------------------------------
 # self-test (fake klt)
 # --------------------------------------------------------------------------
@@ -182,6 +198,13 @@ def selftest() -> int:
         except StoreError as exc:
             return str(exc)
         return None
+
+    def raises_exit(fn) -> bool:
+        try:
+            fn()
+        except SystemExit as exc:
+            return bool(exc.code)
+        return False
 
     with tempfile.TemporaryDirectory() as tmp:
         tmpd = Path(tmp)
@@ -235,6 +258,27 @@ def selftest() -> int:
             msg = raises(lambda: store_run("b", "r2", stage2))
             check("non-artifact URI from put is rejected and removed",
                   msg is not None and not manifest_path("b", "r2").exists(), str(msg))
+
+            os.environ["FAKE_KLT_MODE"] = "no-put"
+            check("preflight_or_exit exits nonzero", raises_exit(preflight_or_exit))
+            stage4 = stage_dir_for("b", "r4")
+            stage4.mkdir(parents=True)
+            (stage4 / "a.log").write_text("a\n")
+            os.environ["FAKE_KLT_MODE"] = "put-fails"
+            check("store_or_exit exits nonzero and commits nothing",
+                  raises_exit(lambda: store_or_exit("b", "r4", stage4))
+                  and not manifest_path("b", "r4").exists())
+
+            # Every campaign driver refuses to submit or record without the
+            # broker, before touching anything (no fleet job, no files).
+            env = {k: v for k, v in os.environ.items() if k != BROKER_ENV}
+            for drv in sorted(REPO_ROOT.glob("sim/*/run_*_campaign.py")):
+                for argv in (["run"], ["record", "--run-id", "selftest-none"]):
+                    proc = subprocess.run([sys.executable, "-I", str(drv), *argv],
+                                          capture_output=True, text=True, env=env, timeout=120)
+                    check(f"{drv.parent.name} `{argv[0]}` fails closed without the broker",
+                          proc.returncode != 0 and BROKER_ENV in (proc.stderr + proc.stdout),
+                          (proc.stderr or proc.stdout)[-200:])
 
             empty = stage_dir_for("b", "r3")
             empty.mkdir(parents=True)

@@ -18,6 +18,21 @@ hand-maintained checklist that used to live in the gap-to-T1 tracker issue
   byte-compares against this file (see below), so a manifest citing an
   artifact that has since changed fails instead of silently rotting.
 
+## Artifact manifests (`manifests/artifacts/`)
+
+`manifests/artifacts/<slug>-<record-id>.manifest.json` and `.summary.md` are the
+committed half of every new simulation run: the raw logs, traces and fleet
+reports live in the fleet artifact store, and the manifest lists them as
+`artifact:<key>` URIs with a size and sha256 each. Manifests are public-safe (no
+bucket, account or broker URL, and no storage-scheme URI; CI greps for them). They are written only by `sim/bin/evidence_store.py`, which fails
+closed: with no `$KLT_ARTIFACT_BROKER`, no `klt artifact put`/`verify`, or an
+unreachable broker, the run exits nonzero and nothing is committed. They are
+append-only like the rest of the evidence, and
+`.github/scripts/check_artifact_manifests.py` checks them in CI. Verify one from
+a fleet worker with `klt artifact verify <manifest>`. They are separate from
+the signoff report and attestations below. Flow and rationale: `sim/README.md`,
+"New evidence goes to the artifact store".
+
 ## Attestation inventories (items 1, 9, 10)
 
 `manifests/inventories/item-{1,9,10}.json` are `klt signoff --attest`

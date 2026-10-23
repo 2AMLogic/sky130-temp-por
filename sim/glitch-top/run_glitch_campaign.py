@@ -48,6 +48,7 @@ sys.path.insert(0, str(SIM_DIR / "bin"))
 sys.path.insert(0, str(HERE))
 sys.path.insert(0, str(SIM_DIR / "brownout-top"))
 
+import evidence_store  # noqa: E402
 import glitch_checker as gc  # noqa: E402
 import run_brownout_campaign as rb  # noqa: E402  (generic helpers: provenance, per-point logs, error classes)
 import sim_common  # noqa: E402
@@ -311,6 +312,7 @@ def cmd_plan(args) -> int:
 
 
 def cmd_run(args) -> int:
+    evidence_store.preflight_or_exit()  # fail closed before anything is submitted
     man = sim_common.load_manifest(MANIFEST)
     pdk = cr.resolve_pdk(cr.load_pin())
     gi = source_state()
@@ -669,6 +671,7 @@ def absent(man: dict, cls: str) -> list[str]:
 
 
 def cmd_record(args) -> int:
+    evidence_store.preflight_or_exit()
     man = sim_common.load_manifest(MANIFEST)
     run_dir = BUILD / args.run_id
     meta = json.loads((run_dir / "run.json").read_text())
@@ -686,9 +689,9 @@ def cmd_record(args) -> int:
     for cls in CLASSES:
         record_id = f"{now:%Y%m%d}-{now:%H%M%S}-{gi['sha']}-{cls}"
         rec_dir = HERE / "records"
-        corners_dir = HERE / "corners" / record_id
+        corners_dir = evidence_store.stage_dir_for(SLUG, record_id)  # git-ignored scratch; stored below
         snap_dir = HERE / "netlist-snapshots" / record_id
-        for pth in (rec_dir / f"{record_id}.md", rec_dir / f"{record_id}.json", corners_dir, snap_dir):
+        for pth in (rec_dir / f"{record_id}.md", rec_dir / f"{record_id}.json", corners_dir, snap_dir, evidence_store.manifest_path(SLUG, record_id)):
             if pth.exists():
                 raise SystemExit(f"{pth} exists -- sim/ is append-only")
         points, requests, fleet_pdk = [], [], {}
@@ -713,6 +716,7 @@ def cmd_record(args) -> int:
         runners = sorted({q.get("runner_klt_version") for q in requests if q.get("runner_klt_version")})
         cnt = declared_counts(man, cls)
         n_graded = sum(1 for p in points if p["outcome"] != "NOT_COVERED")
+        art_manifest, art_summary = evidence_store.store_or_exit(SLUG, record_id, corners_dir)
         record = {
             "record_id": record_id, "class": cls, "timestamp": now.strftime("%Y-%m-%dT%H:%M:%SZ"), "author": args.author or cr.default_author(), "supersedes": args.supersedes,
             "experiment": {k: man[k] for k in ("slug", "title", "claim", "provenance", "provenance_source", "statistical_convention")},
@@ -739,7 +743,7 @@ def cmd_record(args) -> int:
             "absent_coverage": absent(man, cls), "follow_on": Path(args.notes_file).read_text().strip() if args.notes_file else "",
             "links": {"testbench": "sim/glitch-top/testbench/tb_temp_por_glitch.sch", "manifest": "sim/glitch-top/experiment.json",
                       "driver": "sim/glitch-top/run_glitch_campaign.py", "checker": "sim/glitch-top/glitch_checker.py",
-                      "netlist_snapshots": f"sim/glitch-top/netlist-snapshots/{record_id}/", "corners_dir": f"sim/glitch-top/corners/{record_id}/",
+                      "netlist_snapshots": f"sim/glitch-top/netlist-snapshots/{record_id}/", "artifact_manifest": str(art_manifest.relative_to(REPO_ROOT)), "artifact_summary": str(art_summary.relative_to(REPO_ROOT)),
                       "json": f"sim/glitch-top/records/{record_id}.json", "record": f"sim/glitch-top/records/{record_id}.md"},
         }
         rec_dir.mkdir(parents=True, exist_ok=True)

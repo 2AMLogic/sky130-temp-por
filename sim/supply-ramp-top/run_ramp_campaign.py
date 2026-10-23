@@ -44,6 +44,7 @@ REPO_ROOT = SIM_DIR.parent
 sys.path.insert(0, str(SIM_DIR / "bin"))
 sys.path.insert(0, str(HERE))
 
+import evidence_store  # noqa: E402
 import ramp_checker as rc  # noqa: E402
 import sim_common  # noqa: E402
 
@@ -151,6 +152,7 @@ def submit(variant_name: str, rate: float, head: str, man: dict, run_dir: Path, 
 
 
 def cmd_run(args) -> int:
+    evidence_store.preflight_or_exit()  # fail closed before anything is submitted
     man = sim_common.load_manifest(MANIFEST)
     pdk = cr.resolve_pdk(cr.load_pin())
     git_info = cr.git_state()
@@ -539,6 +541,7 @@ ABSENT = [
 
 
 def cmd_record(args) -> int:
+    evidence_store.preflight_or_exit()
     man = sim_common.load_manifest(MANIFEST)
     run_dir = BUILD / args.run_id
     meta = json.loads((run_dir / "run.json").read_text())
@@ -557,9 +560,9 @@ def cmd_record(args) -> int:
         if idx and record_id in out_ids:
             raise SystemExit("record id collision")
         rec_dir = HERE / "records"
-        corners_dir = HERE / "corners" / record_id
+        corners_dir = evidence_store.stage_dir_for(SLUG, record_id)  # git-ignored scratch; stored below
         snap_dir = HERE / "netlist-snapshots" / record_id
-        for pth in (rec_dir / f"{record_id}.md", rec_dir / f"{record_id}.json", corners_dir, snap_dir):
+        for pth in (rec_dir / f"{record_id}.md", rec_dir / f"{record_id}.json", corners_dir, snap_dir, evidence_store.manifest_path(SLUG, record_id)):
             if pth.exists():
                 raise SystemExit(f"{pth} exists -- sim/ is append-only")
         res = analyze_variant(variant, run_dir, man, corners_dir, write=True)
@@ -598,6 +601,7 @@ def cmd_record(args) -> int:
         v = man["variants"][variant]
         ngs = sorted({p["ngspice"] for p in pts if p["ngspice"]})
         runners = sorted({r.get("runner_klt_version") for r in res["requests"] if r.get("runner_klt_version")})
+        art_manifest, art_summary = evidence_store.store_or_exit(SLUG, record_id, corners_dir)
         record = {
             "record_id": record_id,
             "timestamp": stamp.strftime("%Y-%m-%dT%H:%M:%SZ"),
@@ -652,7 +656,8 @@ def cmd_record(args) -> int:
                 "driver": "sim/supply-ramp-top/run_ramp_campaign.py",
                 "checker": "sim/supply-ramp-top/ramp_checker.py",
                 "netlist_snapshots": f"sim/supply-ramp-top/netlist-snapshots/{record_id}/",
-                "corners_dir": f"sim/supply-ramp-top/corners/{record_id}/",
+                "artifact_manifest": str(art_manifest.relative_to(REPO_ROOT)),
+                "artifact_summary": str(art_summary.relative_to(REPO_ROOT)),
                 "json": f"sim/supply-ramp-top/records/{record_id}.json",
                 "record": f"sim/supply-ramp-top/records/{record_id}.md",
             },
