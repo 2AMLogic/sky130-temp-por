@@ -1,0 +1,6 @@
+# corner: ff_125c_3.63v
+# process=ff temp=125C supply=3.63V
+# klt sim --backend batch corner status: pass
+# result: PASS
+
+# diagnostic [warning] singular_matrix: Warning: singular matrix:  check node xdut.xrz.t1

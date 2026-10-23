@@ -1,0 +1,3169 @@
+{
+  "author": "builder@issue-219",
+  "backend": "batch",
+  "batch": {
+    "client_pdk_version": "open_pdks f6eeac7dad085ffcc829ccfd721f7b4ce39edcf7",
+    "fleet_pdk_name": "sky130A",
+    "fleet_pdk_version": "open_pdks c6d73a35f524070e85faff4a6a9eef49553ebc2b",
+    "job_id": "klt-sim-2a09cae095b8",
+    "klt_client": "klt 0.7.1.dev2517+g6bb7cf233677",
+    "models_lib_sha256": "48de7c677e2c6e7d09b2559279de9f818be71010a4aa933d728eb4db3b133c84",
+    "remote": {
+      "ami_id": "ami-0e0bec04ad8e81877",
+      "availability_zone": "us-east-1b",
+      "client_collected_at": "2026-10-23T17:18:42.021329Z",
+      "client_klt_version": "0.7.1.dev2517+g6bb7cf233677",
+      "client_launched_at": "2026-10-23T17:17:07.700538Z",
+      "client_status_terminal_at": "2026-10-23T17:18:40.778058Z",
+      "client_submitted_at": "2026-10-23T17:16:43.046054Z",
+      "concurrency": "2",
+      "elapsed_seconds": 55,
+      "exit_code": "0",
+      "instance_id": "i-034b7438ed8fda281",
+      "instance_type": "c7i.8xlarge",
+      "job_ceiling": {
+        "basis": "conservative_serial_bound",
+        "check": "warn",
+        "exceeds_ceiling": true,
+        "job_bound_s": 13620.0,
+        "max_job_seconds": 3600.0,
+        "max_job_seconds_source": "fleet_config",
+        "max_units_per_job": 11,
+        "overhead_s": 120.0,
+        "per_unit_timeout_s": 300,
+        "recommended_hosts": 5,
+        "unit_count": 45,
+        "warning": "batch job bound 13620s (options.timeout_s 300s x 45 units + 120s; a conservative fully-serial upper bound, not a runtime estimate) exceeds the fleet's whole-job ceiling of 3600s (max_job_seconds from fleet_config); a job still running at the ceiling is killed and every unit is reported batch_job_timeout. Set request.remote.hosts to at least 5 to run one job per shard of at most 11 units, each within the ceiling"
+      },
+      "job_id": "klt-sim-2a09cae095b8",
+      "lifecycle": "spot",
+      "physical_cores": "16",
+      "provider": "aws-batch-fleet",
+      "region": "us-east-1",
+      "runner_compatibility": "match",
+      "runner_klt_version": "0.7.0",
+      "runner_model_inputs": null,
+      "runner_request_features": {
+        "missing": [],
+        "required": [
+          "measurements[].expr"
+        ],
+        "status": "supported"
+      },
+      "spot": true,
+      "state": "done",
+      "worker_environment": {
+        "capture": "ok",
+        "cpu_model": "Intel(R) Xeon(R) Platinum 8488C",
+        "diagnostics": [],
+        "engine_build_comparison": {
+          "status": "mismatch",
+          "warning": "the worker's ngspice --version banner differs from the local binary's; build options (e.g. FFT linkage) may differ, so results derived from them can differ from a local run"
+        },
+        "image_manifest": null,
+        "model_inputs": null,
+        "omp_num_threads": null,
+        "pdk": {
+          "models_staged": false,
+          "root": "/opt/pdk",
+          "stamp_scheme": "sources-sha256",
+          "stamp_scope": "executed",
+          "stamp_sha256": "d5ac52956829da3fee35d0b307d4e6cb83ae0e6535b56dba2eefed61cdffaf9b",
+          "stamp_text": "open_pdks c6d73a35f524070e85faff4a6a9eef49553ebc2b",
+          "variant": "sky130A"
+        },
+        "pdk_stamp_comparison": {
+          "reason": "client_stamp_unavailable",
+          "status": "not_comparable"
+        },
+        "simulator": {
+          "binary_source": "PATH",
+          "requested_binary": "ngspice",
+          "selected_path": "/usr/local/bin/ngspice",
+          "version_banner": "******\n** ngspice-46 : Circuit level simulation program\n** Compiled with KLU Direct Linear Solver\n** The U. C. Berkeley CAD Group\n** Copyright 1985-1994, Regents of the University of California.\n** Copyright 2001-2025, The ngspice team.\n** Please get your ngspice manual from https://ngspice.sourceforge.io/docs.html\n** Please file your bug-reports at http://ngspice.sourceforge.net/bugrep.html\n** Creation Date: Thu Oct  1 23:51:59 UTC 2026\n******\n",
+          "version_probe": "ok"
+        }
+      }
+    },
+    "runner_klt": "0.7.0",
+    "status": "pass"
+  },
+  "corners": [
+    {
+      "batch_status": "pass",
+      "corner_id": "tt_-40c_2.97v",
+      "diagnostics": [
+        {
+          "code": "nonconvergence",
+          "message": "Warning: Dynamic gmin stepping failed",
+          "severity": "warning"
+        }
+      ],
+      "elapsed_s": 18.064,
+      "killed_by_signal": null,
+      "killed_by_signal_name": null,
+      "log": "sim/bias-core-smoke/corners/20261023-171642-e69f5b2e/tt_-40c_2.97v.log",
+      "measurements": [
+        {
+          "expr": "v(vref)",
+          "max": 1.4,
+          "min": 1.0,
+          "name": "vref",
+          "pass": true,
+          "reason": "",
+          "unit": "V",
+          "value": 1.248388
+        },
+        {
+          "expr": "v(ibias)",
+          "max": 3.7,
+          "min": 2.0,
+          "name": "ibias",
+          "pass": true,
+          "reason": "",
+          "unit": "V",
+          "value": 2.97
+        },
+        {
+          "expr": "v(bias_ok)",
+          "max": 3.7,
+          "min": 2.0,
+          "name": "bias_ok",
+          "pass": true,
+          "reason": "",
+          "unit": "V",
+          "value": 2.97
+        },
+        {
+          "expr": "-i(v1)",
+          "max": 1e-05,
+          "min": 1e-08,
+          "name": "isup",
+          "pass": true,
+          "reason": "",
+          "unit": "A",
+          "value": 7.766159e-07
+        }
+      ],
+      "ngspice_exit": 0,
+      "pass": true,
+      "process": "tt",
+      "supply_v": 2.97,
+      "temperature_c": -40.0,
+      "timed_out": false,
+      "timeout_s": 300
+    },
+    {
+      "batch_status": "pass",
+      "corner_id": "tt_-40c_3.30v",
+      "diagnostics": [],
+      "elapsed_s": 17.863,
+      "killed_by_signal": null,
+      "killed_by_signal_name": null,
+      "log": "sim/bias-core-smoke/corners/20261023-171642-e69f5b2e/tt_-40c_3.30v.log",
+      "measurements": [
+        {
+          "expr": "v(vref)",
+          "max": 1.4,
+          "min": 1.0,
+          "name": "vref",
+          "pass": true,
+          "reason": "",
+          "unit": "V",
+          "value": 1.248527
+        },
+        {
+          "expr": "v(ibias)",
+          "max": 3.7,
+          "min": 2.0,
+          "name": "ibias",
+          "pass": true,
+          "reason": "",
+          "unit": "V",
+          "value": 3.3
+        },
+        {
+          "expr": "v(bias_ok)",
+          "max": 3.7,
+          "min": 2.0,
+          "name": "bias_ok",
+          "pass": true,
+          "reason": "",
+          "unit": "V",
+          "value": 3.3
+        },
+        {
+          "expr": "-i(v1)",
+          "max": 1e-05,
+          "min": 1e-08,
+          "name": "isup",
+          "pass": true,
+          "reason": "",
+          "unit": "A",
+          "value": 7.801758e-07
+        }
+      ],
+      "ngspice_exit": 0,
+      "pass": true,
+      "process": "tt",
+      "supply_v": 3.3,
+      "temperature_c": -40.0,
+      "timed_out": false,
+      "timeout_s": 300
+    },
+    {
+      "batch_status": "pass",
+      "corner_id": "tt_-40c_3.63v",
+      "diagnostics": [
+        {
+          "code": "nonconvergence",
+          "message": "Warning: Dynamic gmin stepping failed",
+          "severity": "warning"
+        }
+      ],
+      "elapsed_s": 13.891,
+      "killed_by_signal": null,
+      "killed_by_signal_name": null,
+      "log": "sim/bias-core-smoke/corners/20261023-171642-e69f5b2e/tt_-40c_3.63v.log",
+      "measurements": [
+        {
+          "expr": "v(vref)",
+          "max": 1.4,
+          "min": 1.0,
+          "name": "vref",
+          "pass": true,
+          "reason": "",
+          "unit": "V",
+          "value": 1.248594
+        },
+        {
+          "expr": "v(ibias)",
+          "max": 3.7,
+          "min": 2.0,
+          "name": "ibias",
+          "pass": true,
+          "reason": "",
+          "unit": "V",
+          "value": 3.63
+        },
+        {
+          "expr": "v(bias_ok)",
+          "max": 3.7,
+          "min": 2.0,
+          "name": "bias_ok",
+          "pass": true,
+          "reason": "",
+          "unit": "V",
+          "value": 3.63
+        },
+        {
+          "expr": "-i(v1)",
+          "max": 1e-05,
+          "min": 1e-08,
+          "name": "isup",
+          "pass": true,
+          "reason": "",
+          "unit": "A",
+          "value": 7.835426e-07
+        }
+      ],
+      "ngspice_exit": 0,
+      "pass": true,
+      "process": "tt",
+      "supply_v": 3.63,
+      "temperature_c": -40.0,
+      "timed_out": false,
+      "timeout_s": 300
+    },
+    {
+      "batch_status": "pass",
+      "corner_id": "tt_27c_2.97v",
+      "diagnostics": [
+        {
+          "code": "nonconvergence",
+          "message": "Warning: Dynamic gmin stepping failed",
+          "severity": "warning"
+        }
+      ],
+      "elapsed_s": 18.061,
+      "killed_by_signal": null,
+      "killed_by_signal_name": null,
+      "log": "sim/bias-core-smoke/corners/20261023-171642-e69f5b2e/tt_27c_2.97v.log",
+      "measurements": [
+        {
+          "expr": "v(vref)",
+          "max": 1.4,
+          "min": 1.0,
+          "name": "vref",
+          "pass": true,
+          "reason": "",
+          "unit": "V",
+          "value": 1.256014
+        },
+        {
+          "expr": "v(ibias)",
+          "max": 3.7,
+          "min": 2.0,
+          "name": "ibias",
+          "pass": true,
+          "reason": "",
+          "unit": "V",
+          "value": 2.97
+        },
+        {
+          "expr": "v(bias_ok)",
+          "max": 3.7,
+          "min": 2.0,
+          "name": "bias_ok",
+          "pass": true,
+          "reason": "",
+          "unit": "V",
+          "value": 2.969999
+        },
+        {
+          "expr": "-i(v1)",
+          "max": 1e-05,
+          "min": 1e-08,
+          "name": "isup",
+          "pass": true,
+          "reason": "",
+          "unit": "A",
+          "value": 9.32333e-07
+        }
+      ],
+      "ngspice_exit": 0,
+      "pass": true,
+      "process": "tt",
+      "supply_v": 2.97,
+      "temperature_c": 27.0,
+      "timed_out": false,
+      "timeout_s": 300
+    },
+    {
+      "batch_status": "pass",
+      "corner_id": "tt_27c_3.30v",
+      "diagnostics": [],
+      "elapsed_s": 14.096,
+      "killed_by_signal": null,
+      "killed_by_signal_name": null,
+      "log": "sim/bias-core-smoke/corners/20261023-171642-e69f5b2e/tt_27c_3.30v.log",
+      "measurements": [
+        {
+          "expr": "v(vref)",
+          "max": 1.4,
+          "min": 1.0,
+          "name": "vref",
+          "pass": true,
+          "reason": "",
+          "unit": "V",
+          "value": 1.256174
+        },
+        {
+          "expr": "v(ibias)",
+          "max": 3.7,
+          "min": 2.0,
+          "name": "ibias",
+          "pass": true,
+          "reason": "",
+          "unit": "V",
+          "value": 3.3
+        },
+        {
+          "expr": "v(bias_ok)",
+          "max": 3.7,
+          "min": 2.0,
+          "name": "bias_ok",
+          "pass": true,
+          "reason": "",
+          "unit": "V",
+          "value": 3.299999
+        },
+        {
+          "expr": "-i(v1)",
+          "max": 1e-05,
+          "min": 1e-08,
+          "name": "isup",
+          "pass": true,
+          "reason": "",
+          "unit": "A",
+          "value": 9.357564e-07
+        }
+      ],
+      "ngspice_exit": 0,
+      "pass": true,
+      "process": "tt",
+      "supply_v": 3.3,
+      "temperature_c": 27.0,
+      "timed_out": false,
+      "timeout_s": 300
+    },
+    {
+      "batch_status": "pass",
+      "corner_id": "tt_27c_3.63v",
+      "diagnostics": [],
+      "elapsed_s": 13.989,
+      "killed_by_signal": null,
+      "killed_by_signal_name": null,
+      "log": "sim/bias-core-smoke/corners/20261023-171642-e69f5b2e/tt_27c_3.63v.log",
+      "measurements": [
+        {
+          "expr": "v(vref)",
+          "max": 1.4,
+          "min": 1.0,
+          "name": "vref",
+          "pass": true,
+          "reason": "",
+          "unit": "V",
+          "value": 1.256217
+        },
+        {
+          "expr": "v(ibias)",
+          "max": 3.7,
+          "min": 2.0,
+          "name": "ibias",
+          "pass": true,
+          "reason": "",
+          "unit": "V",
+          "value": 3.63
+        },
+        {
+          "expr": "v(bias_ok)",
+          "max": 3.7,
+          "min": 2.0,
+          "name": "bias_ok",
+          "pass": true,
+          "reason": "",
+          "unit": "V",
+          "value": 3.629999
+        },
+        {
+          "expr": "-i(v1)",
+          "max": 1e-05,
+          "min": 1e-08,
+          "name": "isup",
+          "pass": true,
+          "reason": "",
+          "unit": "A",
+          "value": 9.390211e-07
+        }
+      ],
+      "ngspice_exit": 0,
+      "pass": true,
+      "process": "tt",
+      "supply_v": 3.63,
+      "temperature_c": 27.0,
+      "timed_out": false,
+      "timeout_s": 300
+    },
+    {
+      "batch_status": "pass",
+      "corner_id": "tt_125c_2.97v",
+      "diagnostics": [
+        {
+          "code": "nonconvergence",
+          "message": "Warning: Dynamic gmin stepping failed",
+          "severity": "warning"
+        }
+      ],
+      "elapsed_s": 13.894,
+      "killed_by_signal": null,
+      "killed_by_signal_name": null,
+      "log": "sim/bias-core-smoke/corners/20261023-171642-e69f5b2e/tt_125c_2.97v.log",
+      "measurements": [
+        {
+          "expr": "v(vref)",
+          "max": 1.4,
+          "min": 1.0,
+          "name": "vref",
+          "pass": true,
+          "reason": "",
+          "unit": "V",
+          "value": 1.257183
+        },
+        {
+          "expr": "v(ibias)",
+          "max": 3.7,
+          "min": 2.0,
+          "name": "ibias",
+          "pass": true,
+          "reason": "",
+          "unit": "V",
+          "value": 2.97
+        },
+        {
+          "expr": "v(bias_ok)",
+          "max": 3.7,
+          "min": 2.0,
+          "name": "bias_ok",
+          "pass": true,
+          "reason": "",
+          "unit": "V",
+          "value": 2.969935
+        },
+        {
+          "expr": "-i(v1)",
+          "max": 1e-05,
+          "min": 1e-08,
+          "name": "isup",
+          "pass": true,
+          "reason": "",
+          "unit": "A",
+          "value": 1.160687e-06
+        }
+      ],
+      "ngspice_exit": 0,
+      "pass": true,
+      "process": "tt",
+      "supply_v": 2.97,
+      "temperature_c": 125.0,
+      "timed_out": false,
+      "timeout_s": 300
+    },
+    {
+      "batch_status": "pass",
+      "corner_id": "tt_125c_3.30v",
+      "diagnostics": [],
+      "elapsed_s": 13.942,
+      "killed_by_signal": null,
+      "killed_by_signal_name": null,
+      "log": "sim/bias-core-smoke/corners/20261023-171642-e69f5b2e/tt_125c_3.30v.log",
+      "measurements": [
+        {
+          "expr": "v(vref)",
+          "max": 1.4,
+          "min": 1.0,
+          "name": "vref",
+          "pass": true,
+          "reason": "",
+          "unit": "V",
+          "value": 1.257412
+        },
+        {
+          "expr": "v(ibias)",
+          "max": 3.7,
+          "min": 2.0,
+          "name": "ibias",
+          "pass": true,
+          "reason": "",
+          "unit": "V",
+          "value": 3.3
+        },
+        {
+          "expr": "v(bias_ok)",
+          "max": 3.7,
+          "min": 2.0,
+          "name": "bias_ok",
+          "pass": true,
+          "reason": "",
+          "unit": "V",
+          "value": 3.299936
+        },
+        {
+          "expr": "-i(v1)",
+          "max": 1e-05,
+          "min": 1e-08,
+          "name": "isup",
+          "pass": true,
+          "reason": "",
+          "unit": "A",
+          "value": 1.164246e-06
+        }
+      ],
+      "ngspice_exit": 0,
+      "pass": true,
+      "process": "tt",
+      "supply_v": 3.3,
+      "temperature_c": 125.0,
+      "timed_out": false,
+      "timeout_s": 300
+    },
+    {
+      "batch_status": "pass",
+      "corner_id": "tt_125c_3.63v",
+      "diagnostics": [],
+      "elapsed_s": 14.454,
+      "killed_by_signal": null,
+      "killed_by_signal_name": null,
+      "log": "sim/bias-core-smoke/corners/20261023-171642-e69f5b2e/tt_125c_3.63v.log",
+      "measurements": [
+        {
+          "expr": "v(vref)",
+          "max": 1.4,
+          "min": 1.0,
+          "name": "vref",
+          "pass": true,
+          "reason": "",
+          "unit": "V",
+          "value": 1.257421
+        },
+        {
+          "expr": "v(ibias)",
+          "max": 3.7,
+          "min": 2.0,
+          "name": "ibias",
+          "pass": true,
+          "reason": "",
+          "unit": "V",
+          "value": 3.63
+        },
+        {
+          "expr": "v(bias_ok)",
+          "max": 3.7,
+          "min": 2.0,
+          "name": "bias_ok",
+          "pass": true,
+          "reason": "",
+          "unit": "V",
+          "value": 3.629936
+        },
+        {
+          "expr": "-i(v1)",
+          "max": 1e-05,
+          "min": 1e-08,
+          "name": "isup",
+          "pass": true,
+          "reason": "",
+          "unit": "A",
+          "value": 1.167759e-06
+        }
+      ],
+      "ngspice_exit": 0,
+      "pass": true,
+      "process": "tt",
+      "supply_v": 3.63,
+      "temperature_c": 125.0,
+      "timed_out": false,
+      "timeout_s": 300
+    },
+    {
+      "batch_status": "pass",
+      "corner_id": "ss_-40c_2.97v",
+      "diagnostics": [],
+      "elapsed_s": 16.752,
+      "killed_by_signal": null,
+      "killed_by_signal_name": null,
+      "log": "sim/bias-core-smoke/corners/20261023-171642-e69f5b2e/ss_-40c_2.97v.log",
+      "measurements": [
+        {
+          "expr": "v(vref)",
+          "max": 1.4,
+          "min": 1.0,
+          "name": "vref",
+          "pass": true,
+          "reason": "",
+          "unit": "V",
+          "value": 1.24904
+        },
+        {
+          "expr": "v(ibias)",
+          "max": 3.7,
+          "min": 2.0,
+          "name": "ibias",
+          "pass": true,
+          "reason": "",
+          "unit": "V",
+          "value": 2.97
+        },
+        {
+          "expr": "v(bias_ok)",
+          "max": 3.7,
+          "min": 2.0,
+          "name": "bias_ok",
+          "pass": true,
+          "reason": "",
+          "unit": "V",
+          "value": 2.97
+        },
+        {
+          "expr": "-i(v1)",
+          "max": 1e-05,
+          "min": 1e-08,
+          "name": "isup",
+          "pass": true,
+          "reason": "",
+          "unit": "A",
+          "value": 7.773524e-07
+        }
+      ],
+      "ngspice_exit": 0,
+      "pass": true,
+      "process": "ss",
+      "supply_v": 2.97,
+      "temperature_c": -40.0,
+      "timed_out": false,
+      "timeout_s": 300
+    },
+    {
+      "batch_status": "pass",
+      "corner_id": "ss_-40c_3.30v",
+      "diagnostics": [
+        {
+          "code": "nonconvergence",
+          "message": "Warning: Dynamic gmin stepping failed",
+          "severity": "warning"
+        }
+      ],
+      "elapsed_s": 18.104,
+      "killed_by_signal": null,
+      "killed_by_signal_name": null,
+      "log": "sim/bias-core-smoke/corners/20261023-171642-e69f5b2e/ss_-40c_3.30v.log",
+      "measurements": [
+        {
+          "expr": "v(vref)",
+          "max": 1.4,
+          "min": 1.0,
+          "name": "vref",
+          "pass": true,
+          "reason": "",
+          "unit": "V",
+          "value": 1.249175
+        },
+        {
+          "expr": "v(ibias)",
+          "max": 3.7,
+          "min": 2.0,
+          "name": "ibias",
+          "pass": true,
+          "reason": "",
+          "unit": "V",
+          "value": 3.3
+        },
+        {
+          "expr": "v(bias_ok)",
+          "max": 3.7,
+          "min": 2.0,
+          "name": "bias_ok",
+          "pass": true,
+          "reason": "",
+          "unit": "V",
+          "value": 3.3
+        },
+        {
+          "expr": "-i(v1)",
+          "max": 1e-05,
+          "min": 1e-08,
+          "name": "isup",
+          "pass": true,
+          "reason": "",
+          "unit": "A",
+          "value": 7.808929e-07
+        }
+      ],
+      "ngspice_exit": 0,
+      "pass": true,
+      "process": "ss",
+      "supply_v": 3.3,
+      "temperature_c": -40.0,
+      "timed_out": false,
+      "timeout_s": 300
+    },
+    {
+      "batch_status": "pass",
+      "corner_id": "ss_-40c_3.63v",
+      "diagnostics": [
+        {
+          "code": "nonconvergence",
+          "message": "Warning: Dynamic gmin stepping failed",
+          "severity": "warning"
+        }
+      ],
+      "elapsed_s": 17.397,
+      "killed_by_signal": null,
+      "killed_by_signal_name": null,
+      "log": "sim/bias-core-smoke/corners/20261023-171642-e69f5b2e/ss_-40c_3.63v.log",
+      "measurements": [
+        {
+          "expr": "v(vref)",
+          "max": 1.4,
+          "min": 1.0,
+          "name": "vref",
+          "pass": true,
+          "reason": "",
+          "unit": "V",
+          "value": 1.249238
+        },
+        {
+          "expr": "v(ibias)",
+          "max": 3.7,
+          "min": 2.0,
+          "name": "ibias",
+          "pass": true,
+          "reason": "",
+          "unit": "V",
+          "value": 3.63
+        },
+        {
+          "expr": "v(bias_ok)",
+          "max": 3.7,
+          "min": 2.0,
+          "name": "bias_ok",
+          "pass": true,
+          "reason": "",
+          "unit": "V",
+          "value": 3.63
+        },
+        {
+          "expr": "-i(v1)",
+          "max": 1e-05,
+          "min": 1e-08,
+          "name": "isup",
+          "pass": true,
+          "reason": "",
+          "unit": "A",
+          "value": 7.842234e-07
+        }
+      ],
+      "ngspice_exit": 0,
+      "pass": true,
+      "process": "ss",
+      "supply_v": 3.63,
+      "temperature_c": -40.0,
+      "timed_out": false,
+      "timeout_s": 300
+    },
+    {
+      "batch_status": "pass",
+      "corner_id": "ss_27c_2.97v",
+      "diagnostics": [],
+      "elapsed_s": 17.461,
+      "killed_by_signal": null,
+      "killed_by_signal_name": null,
+      "log": "sim/bias-core-smoke/corners/20261023-171642-e69f5b2e/ss_27c_2.97v.log",
+      "measurements": [
+        {
+          "expr": "v(vref)",
+          "max": 1.4,
+          "min": 1.0,
+          "name": "vref",
+          "pass": true,
+          "reason": "",
+          "unit": "V",
+          "value": 1.2566
+        },
+        {
+          "expr": "v(ibias)",
+          "max": 3.7,
+          "min": 2.0,
+          "name": "ibias",
+          "pass": true,
+          "reason": "",
+          "unit": "V",
+          "value": 2.97
+        },
+        {
+          "expr": "v(bias_ok)",
+          "max": 3.7,
+          "min": 2.0,
+          "name": "bias_ok",
+          "pass": true,
+          "reason": "",
+          "unit": "V",
+          "value": 2.97
+        },
+        {
+          "expr": "-i(v1)",
+          "max": 1e-05,
+          "min": 1e-08,
+          "name": "isup",
+          "pass": true,
+          "reason": "",
+          "unit": "A",
+          "value": 9.312553e-07
+        }
+      ],
+      "ngspice_exit": 0,
+      "pass": true,
+      "process": "ss",
+      "supply_v": 2.97,
+      "temperature_c": 27.0,
+      "timed_out": false,
+      "timeout_s": 300
+    },
+    {
+      "batch_status": "pass",
+      "corner_id": "ss_27c_3.30v",
+      "diagnostics": [
+        {
+          "code": "nonconvergence",
+          "message": "Warning: Dynamic gmin stepping failed",
+          "severity": "warning"
+        }
+      ],
+      "elapsed_s": 13.891,
+      "killed_by_signal": null,
+      "killed_by_signal_name": null,
+      "log": "sim/bias-core-smoke/corners/20261023-171642-e69f5b2e/ss_27c_3.30v.log",
+      "measurements": [
+        {
+          "expr": "v(vref)",
+          "max": 1.4,
+          "min": 1.0,
+          "name": "vref",
+          "pass": true,
+          "reason": "",
+          "unit": "V",
+          "value": 1.256754
+        },
+        {
+          "expr": "v(ibias)",
+          "max": 3.7,
+          "min": 2.0,
+          "name": "ibias",
+          "pass": true,
+          "reason": "",
+          "unit": "V",
+          "value": 3.3
+        },
+        {
+          "expr": "v(bias_ok)",
+          "max": 3.7,
+          "min": 2.0,
+          "name": "bias_ok",
+          "pass": true,
+          "reason": "",
+          "unit": "V",
+          "value": 3.3
+        },
+        {
+          "expr": "-i(v1)",
+          "max": 1e-05,
+          "min": 1e-08,
+          "name": "isup",
+          "pass": true,
+          "reason": "",
+          "unit": "A",
+          "value": 9.346472e-07
+        }
+      ],
+      "ngspice_exit": 0,
+      "pass": true,
+      "process": "ss",
+      "supply_v": 3.3,
+      "temperature_c": 27.0,
+      "timed_out": false,
+      "timeout_s": 300
+    },
+    {
+      "batch_status": "pass",
+      "corner_id": "ss_27c_3.63v",
+      "diagnostics": [],
+      "elapsed_s": 14.455,
+      "killed_by_signal": null,
+      "killed_by_signal_name": null,
+      "log": "sim/bias-core-smoke/corners/20261023-171642-e69f5b2e/ss_27c_3.63v.log",
+      "measurements": [
+        {
+          "expr": "v(vref)",
+          "max": 1.4,
+          "min": 1.0,
+          "name": "vref",
+          "pass": true,
+          "reason": "",
+          "unit": "V",
+          "value": 1.256793
+        },
+        {
+          "expr": "v(ibias)",
+          "max": 3.7,
+          "min": 2.0,
+          "name": "ibias",
+          "pass": true,
+          "reason": "",
+          "unit": "V",
+          "value": 3.63
+        },
+        {
+          "expr": "v(bias_ok)",
+          "max": 3.7,
+          "min": 2.0,
+          "name": "bias_ok",
+          "pass": true,
+          "reason": "",
+          "unit": "V",
+          "value": 3.63
+        },
+        {
+          "expr": "-i(v1)",
+          "max": 1e-05,
+          "min": 1e-08,
+          "name": "isup",
+          "pass": true,
+          "reason": "",
+          "unit": "A",
+          "value": 9.378621e-07
+        }
+      ],
+      "ngspice_exit": 0,
+      "pass": true,
+      "process": "ss",
+      "supply_v": 3.63,
+      "temperature_c": 27.0,
+      "timed_out": false,
+      "timeout_s": 300
+    },
+    {
+      "batch_status": "pass",
+      "corner_id": "ss_125c_2.97v",
+      "diagnostics": [],
+      "elapsed_s": 13.995,
+      "killed_by_signal": null,
+      "killed_by_signal_name": null,
+      "log": "sim/bias-core-smoke/corners/20261023-171642-e69f5b2e/ss_125c_2.97v.log",
+      "measurements": [
+        {
+          "expr": "v(vref)",
+          "max": 1.4,
+          "min": 1.0,
+          "name": "vref",
+          "pass": true,
+          "reason": "",
+          "unit": "V",
+          "value": 1.257724
+        },
+        {
+          "expr": "v(ibias)",
+          "max": 3.7,
+          "min": 2.0,
+          "name": "ibias",
+          "pass": true,
+          "reason": "",
+          "unit": "V",
+          "value": 2.97
+        },
+        {
+          "expr": "v(bias_ok)",
+          "max": 3.7,
+          "min": 2.0,
+          "name": "bias_ok",
+          "pass": true,
+          "reason": "",
+          "unit": "V",
+          "value": 2.969967
+        },
+        {
+          "expr": "-i(v1)",
+          "max": 1e-05,
+          "min": 1e-08,
+          "name": "isup",
+          "pass": true,
+          "reason": "",
+          "unit": "A",
+          "value": 1.156645e-06
+        }
+      ],
+      "ngspice_exit": 0,
+      "pass": true,
+      "process": "ss",
+      "supply_v": 2.97,
+      "temperature_c": 125.0,
+      "timed_out": false,
+      "timeout_s": 300
+    },
+    {
+      "batch_status": "pass",
+      "corner_id": "ss_125c_3.30v",
+      "diagnostics": [],
+      "elapsed_s": 15.657,
+      "killed_by_signal": null,
+      "killed_by_signal_name": null,
+      "log": "sim/bias-core-smoke/corners/20261023-171642-e69f5b2e/ss_125c_3.30v.log",
+      "measurements": [
+        {
+          "expr": "v(vref)",
+          "max": 1.4,
+          "min": 1.0,
+          "name": "vref",
+          "pass": true,
+          "reason": "",
+          "unit": "V",
+          "value": 1.257945
+        },
+        {
+          "expr": "v(ibias)",
+          "max": 3.7,
+          "min": 2.0,
+          "name": "ibias",
+          "pass": true,
+          "reason": "",
+          "unit": "V",
+          "value": 3.3
+        },
+        {
+          "expr": "v(bias_ok)",
+          "max": 3.7,
+          "min": 2.0,
+          "name": "bias_ok",
+          "pass": true,
+          "reason": "",
+          "unit": "V",
+          "value": 3.299968
+        },
+        {
+          "expr": "-i(v1)",
+          "max": 1e-05,
+          "min": 1e-08,
+          "name": "isup",
+          "pass": true,
+          "reason": "",
+          "unit": "A",
+          "value": 1.160088e-06
+        }
+      ],
+      "ngspice_exit": 0,
+      "pass": true,
+      "process": "ss",
+      "supply_v": 3.3,
+      "temperature_c": 125.0,
+      "timed_out": false,
+      "timeout_s": 300
+    },
+    {
+      "batch_status": "pass",
+      "corner_id": "ss_125c_3.63v",
+      "diagnostics": [],
+      "elapsed_s": 14.096,
+      "killed_by_signal": null,
+      "killed_by_signal_name": null,
+      "log": "sim/bias-core-smoke/corners/20261023-171642-e69f5b2e/ss_125c_3.63v.log",
+      "measurements": [
+        {
+          "expr": "v(vref)",
+          "max": 1.4,
+          "min": 1.0,
+          "name": "vref",
+          "pass": true,
+          "reason": "",
+          "unit": "V",
+          "value": 1.257949
+        },
+        {
+          "expr": "v(ibias)",
+          "max": 3.7,
+          "min": 2.0,
+          "name": "ibias",
+          "pass": true,
+          "reason": "",
+          "unit": "V",
+          "value": 3.63
+        },
+        {
+          "expr": "v(bias_ok)",
+          "max": 3.7,
+          "min": 2.0,
+          "name": "bias_ok",
+          "pass": true,
+          "reason": "",
+          "unit": "V",
+          "value": 3.629969
+        },
+        {
+          "expr": "-i(v1)",
+          "max": 1e-05,
+          "min": 1e-08,
+          "name": "isup",
+          "pass": true,
+          "reason": "",
+          "unit": "A",
+          "value": 1.163441e-06
+        }
+      ],
+      "ngspice_exit": 0,
+      "pass": true,
+      "process": "ss",
+      "supply_v": 3.63,
+      "temperature_c": 125.0,
+      "timed_out": false,
+      "timeout_s": 300
+    },
+    {
+      "batch_status": "pass",
+      "corner_id": "ff_-40c_2.97v",
+      "diagnostics": [
+        {
+          "code": "nonconvergence",
+          "message": "Warning: Dynamic gmin stepping failed",
+          "severity": "warning"
+        }
+      ],
+      "elapsed_s": 14.146,
+      "killed_by_signal": null,
+      "killed_by_signal_name": null,
+      "log": "sim/bias-core-smoke/corners/20261023-171642-e69f5b2e/ff_-40c_2.97v.log",
+      "measurements": [
+        {
+          "expr": "v(vref)",
+          "max": 1.4,
+          "min": 1.0,
+          "name": "vref",
+          "pass": true,
+          "reason": "",
+          "unit": "V",
+          "value": 1.247711
+        },
+        {
+          "expr": "v(ibias)",
+          "max": 3.7,
+          "min": 2.0,
+          "name": "ibias",
+          "pass": true,
+          "reason": "",
+          "unit": "V",
+          "value": 2.97
+        },
+        {
+          "expr": "v(bias_ok)",
+          "max": 3.7,
+          "min": 2.0,
+          "name": "bias_ok",
+          "pass": true,
+          "reason": "",
+          "unit": "V",
+          "value": 2.97
+        },
+        {
+          "expr": "-i(v1)",
+          "max": 1e-05,
+          "min": 1e-08,
+          "name": "isup",
+          "pass": true,
+          "reason": "",
+          "unit": "A",
+          "value": 7.972215e-07
+        }
+      ],
+      "ngspice_exit": 0,
+      "pass": true,
+      "process": "ff",
+      "supply_v": 2.97,
+      "temperature_c": -40.0,
+      "timed_out": false,
+      "timeout_s": 300
+    },
+    {
+      "batch_status": "pass",
+      "corner_id": "ff_-40c_3.30v",
+      "diagnostics": [
+        {
+          "code": "nonconvergence",
+          "message": "Warning: Dynamic gmin stepping failed",
+          "severity": "warning"
+        }
+      ],
+      "elapsed_s": 14.545,
+      "killed_by_signal": null,
+      "killed_by_signal_name": null,
+      "log": "sim/bias-core-smoke/corners/20261023-171642-e69f5b2e/ff_-40c_3.30v.log",
+      "measurements": [
+        {
+          "expr": "v(vref)",
+          "max": 1.4,
+          "min": 1.0,
+          "name": "vref",
+          "pass": true,
+          "reason": "",
+          "unit": "V",
+          "value": 1.247856
+        },
+        {
+          "expr": "v(ibias)",
+          "max": 3.7,
+          "min": 2.0,
+          "name": "ibias",
+          "pass": true,
+          "reason": "",
+          "unit": "V",
+          "value": 3.3
+        },
+        {
+          "expr": "v(bias_ok)",
+          "max": 3.7,
+          "min": 2.0,
+          "name": "bias_ok",
+          "pass": true,
+          "reason": "",
+          "unit": "V",
+          "value": 3.3
+        },
+        {
+          "expr": "-i(v1)",
+          "max": 1e-05,
+          "min": 1e-08,
+          "name": "isup",
+          "pass": true,
+          "reason": "",
+          "unit": "A",
+          "value": 8.083264e-07
+        }
+      ],
+      "ngspice_exit": 0,
+      "pass": true,
+      "process": "ff",
+      "supply_v": 3.3,
+      "temperature_c": -40.0,
+      "timed_out": false,
+      "timeout_s": 300
+    },
+    {
+      "batch_status": "pass",
+      "corner_id": "ff_-40c_3.63v",
+      "diagnostics": [],
+      "elapsed_s": 13.24,
+      "killed_by_signal": null,
+      "killed_by_signal_name": null,
+      "log": "sim/bias-core-smoke/corners/20261023-171642-e69f5b2e/ff_-40c_3.63v.log",
+      "measurements": [
+        {
+          "expr": "v(vref)",
+          "max": 1.4,
+          "min": 1.0,
+          "name": "vref",
+          "pass": true,
+          "reason": "",
+          "unit": "V",
+          "value": 1.247927
+        },
+        {
+          "expr": "v(ibias)",
+          "max": 3.7,
+          "min": 2.0,
+          "name": "ibias",
+          "pass": true,
+          "reason": "",
+          "unit": "V",
+          "value": 3.63
+        },
+        {
+          "expr": "v(bias_ok)",
+          "max": 3.7,
+          "min": 2.0,
+          "name": "bias_ok",
+          "pass": true,
+          "reason": "",
+          "unit": "V",
+          "value": 3.63
+        },
+        {
+          "expr": "-i(v1)",
+          "max": 1e-05,
+          "min": 1e-08,
+          "name": "isup",
+          "pass": true,
+          "reason": "",
+          "unit": "A",
+          "value": 8.204076e-07
+        }
+      ],
+      "ngspice_exit": 0,
+      "pass": true,
+      "process": "ff",
+      "supply_v": 3.63,
+      "temperature_c": -40.0,
+      "timed_out": false,
+      "timeout_s": 300
+    },
+    {
+      "batch_status": "pass",
+      "corner_id": "ff_27c_2.97v",
+      "diagnostics": [
+        {
+          "code": "nonconvergence",
+          "message": "Warning: Dynamic gmin stepping failed",
+          "severity": "warning"
+        }
+      ],
+      "elapsed_s": 14.554,
+      "killed_by_signal": null,
+      "killed_by_signal_name": null,
+      "log": "sim/bias-core-smoke/corners/20261023-171642-e69f5b2e/ff_27c_2.97v.log",
+      "measurements": [
+        {
+          "expr": "v(vref)",
+          "max": 1.4,
+          "min": 1.0,
+          "name": "vref",
+          "pass": true,
+          "reason": "",
+          "unit": "V",
+          "value": 1.255402
+        },
+        {
+          "expr": "v(ibias)",
+          "max": 3.7,
+          "min": 2.0,
+          "name": "ibias",
+          "pass": true,
+          "reason": "",
+          "unit": "V",
+          "value": 2.97
+        },
+        {
+          "expr": "v(bias_ok)",
+          "max": 3.7,
+          "min": 2.0,
+          "name": "bias_ok",
+          "pass": true,
+          "reason": "",
+          "unit": "V",
+          "value": 2.969999
+        },
+        {
+          "expr": "-i(v1)",
+          "max": 1e-05,
+          "min": 1e-08,
+          "name": "isup",
+          "pass": true,
+          "reason": "",
+          "unit": "A",
+          "value": 9.57212e-07
+        }
+      ],
+      "ngspice_exit": 0,
+      "pass": true,
+      "process": "ff",
+      "supply_v": 2.97,
+      "temperature_c": 27.0,
+      "timed_out": false,
+      "timeout_s": 300
+    },
+    {
+      "batch_status": "pass",
+      "corner_id": "ff_27c_3.30v",
+      "diagnostics": [],
+      "elapsed_s": 14.346,
+      "killed_by_signal": null,
+      "killed_by_signal_name": null,
+      "log": "sim/bias-core-smoke/corners/20261023-171642-e69f5b2e/ff_27c_3.30v.log",
+      "measurements": [
+        {
+          "expr": "v(vref)",
+          "max": 1.4,
+          "min": 1.0,
+          "name": "vref",
+          "pass": true,
+          "reason": "",
+          "unit": "V",
+          "value": 1.255569
+        },
+        {
+          "expr": "v(ibias)",
+          "max": 3.7,
+          "min": 2.0,
+          "name": "ibias",
+          "pass": true,
+          "reason": "",
+          "unit": "V",
+          "value": 3.3
+        },
+        {
+          "expr": "v(bias_ok)",
+          "max": 3.7,
+          "min": 2.0,
+          "name": "bias_ok",
+          "pass": true,
+          "reason": "",
+          "unit": "V",
+          "value": 3.299999
+        },
+        {
+          "expr": "-i(v1)",
+          "max": 1e-05,
+          "min": 1e-08,
+          "name": "isup",
+          "pass": true,
+          "reason": "",
+          "unit": "A",
+          "value": 9.691662e-07
+        }
+      ],
+      "ngspice_exit": 0,
+      "pass": true,
+      "process": "ff",
+      "supply_v": 3.3,
+      "temperature_c": 27.0,
+      "timed_out": false,
+      "timeout_s": 300
+    },
+    {
+      "batch_status": "pass",
+      "corner_id": "ff_27c_3.63v",
+      "diagnostics": [],
+      "elapsed_s": 12.689,
+      "killed_by_signal": null,
+      "killed_by_signal_name": null,
+      "log": "sim/bias-core-smoke/corners/20261023-171642-e69f5b2e/ff_27c_3.63v.log",
+      "measurements": [
+        {
+          "expr": "v(vref)",
+          "max": 1.4,
+          "min": 1.0,
+          "name": "vref",
+          "pass": true,
+          "reason": "",
+          "unit": "V",
+          "value": 1.255617
+        },
+        {
+          "expr": "v(ibias)",
+          "max": 3.7,
+          "min": 2.0,
+          "name": "ibias",
+          "pass": true,
+          "reason": "",
+          "unit": "V",
+          "value": 3.63
+        },
+        {
+          "expr": "v(bias_ok)",
+          "max": 3.7,
+          "min": 2.0,
+          "name": "bias_ok",
+          "pass": true,
+          "reason": "",
+          "unit": "V",
+          "value": 3.629999
+        },
+        {
+          "expr": "-i(v1)",
+          "max": 1e-05,
+          "min": 1e-08,
+          "name": "isup",
+          "pass": true,
+          "reason": "",
+          "unit": "A",
+          "value": 9.821921e-07
+        }
+      ],
+      "ngspice_exit": 0,
+      "pass": true,
+      "process": "ff",
+      "supply_v": 3.63,
+      "temperature_c": 27.0,
+      "timed_out": false,
+      "timeout_s": 300
+    },
+    {
+      "batch_status": "pass",
+      "corner_id": "ff_125c_2.97v",
+      "diagnostics": [],
+      "elapsed_s": 14.103,
+      "killed_by_signal": null,
+      "killed_by_signal_name": null,
+      "log": "sim/bias-core-smoke/corners/20261023-171642-e69f5b2e/ff_125c_2.97v.log",
+      "measurements": [
+        {
+          "expr": "v(vref)",
+          "max": 1.4,
+          "min": 1.0,
+          "name": "vref",
+          "pass": true,
+          "reason": "",
+          "unit": "V",
+          "value": 1.256618
+        },
+        {
+          "expr": "v(ibias)",
+          "max": 3.7,
+          "min": 2.0,
+          "name": "ibias",
+          "pass": true,
+          "reason": "",
+          "unit": "V",
+          "value": 2.97
+        },
+        {
+          "expr": "v(bias_ok)",
+          "max": 3.7,
+          "min": 2.0,
+          "name": "bias_ok",
+          "pass": true,
+          "reason": "",
+          "unit": "V",
+          "value": 2.969864
+        },
+        {
+          "expr": "-i(v1)",
+          "max": 1e-05,
+          "min": 1e-08,
+          "name": "isup",
+          "pass": true,
+          "reason": "",
+          "unit": "A",
+          "value": 1.193476e-06
+        }
+      ],
+      "ngspice_exit": 0,
+      "pass": true,
+      "process": "ff",
+      "supply_v": 2.97,
+      "temperature_c": 125.0,
+      "timed_out": false,
+      "timeout_s": 300
+    },
+    {
+      "batch_status": "pass",
+      "corner_id": "ff_125c_3.30v",
+      "diagnostics": [],
+      "elapsed_s": 14.194,
+      "killed_by_signal": null,
+      "killed_by_signal_name": null,
+      "log": "sim/bias-core-smoke/corners/20261023-171642-e69f5b2e/ff_125c_3.30v.log",
+      "measurements": [
+        {
+          "expr": "v(vref)",
+          "max": 1.4,
+          "min": 1.0,
+          "name": "vref",
+          "pass": true,
+          "reason": "",
+          "unit": "V",
+          "value": 1.256856
+        },
+        {
+          "expr": "v(ibias)",
+          "max": 3.7,
+          "min": 2.0,
+          "name": "ibias",
+          "pass": true,
+          "reason": "",
+          "unit": "V",
+          "value": 3.3
+        },
+        {
+          "expr": "v(bias_ok)",
+          "max": 3.7,
+          "min": 2.0,
+          "name": "bias_ok",
+          "pass": true,
+          "reason": "",
+          "unit": "V",
+          "value": 3.299865
+        },
+        {
+          "expr": "-i(v1)",
+          "max": 1e-05,
+          "min": 1e-08,
+          "name": "isup",
+          "pass": true,
+          "reason": "",
+          "unit": "A",
+          "value": 1.207284e-06
+        }
+      ],
+      "ngspice_exit": 0,
+      "pass": true,
+      "process": "ff",
+      "supply_v": 3.3,
+      "temperature_c": 125.0,
+      "timed_out": false,
+      "timeout_s": 300
+    },
+    {
+      "batch_status": "pass",
+      "corner_id": "ff_125c_3.63v",
+      "diagnostics": [
+        {
+          "code": "singular_matrix",
+          "message": "Warning: singular matrix:  check node xdut.xrz.t1",
+          "severity": "warning"
+        }
+      ],
+      "elapsed_s": 12.29,
+      "killed_by_signal": null,
+      "killed_by_signal_name": null,
+      "log": "sim/bias-core-smoke/corners/20261023-171642-e69f5b2e/ff_125c_3.63v.log",
+      "measurements": [
+        {
+          "expr": "v(vref)",
+          "max": 1.4,
+          "min": 1.0,
+          "name": "vref",
+          "pass": true,
+          "reason": "",
+          "unit": "V",
+          "value": 1.256869
+        },
+        {
+          "expr": "v(ibias)",
+          "max": 3.7,
+          "min": 2.0,
+          "name": "ibias",
+          "pass": true,
+          "reason": "",
+          "unit": "V",
+          "value": 3.63
+        },
+        {
+          "expr": "v(bias_ok)",
+          "max": 3.7,
+          "min": 2.0,
+          "name": "bias_ok",
+          "pass": true,
+          "reason": "",
+          "unit": "V",
+          "value": 3.629865
+        },
+        {
+          "expr": "-i(v1)",
+          "max": 1e-05,
+          "min": 1e-08,
+          "name": "isup",
+          "pass": true,
+          "reason": "",
+          "unit": "A",
+          "value": 1.222362e-06
+        }
+      ],
+      "ngspice_exit": 0,
+      "pass": true,
+      "process": "ff",
+      "supply_v": 3.63,
+      "temperature_c": 125.0,
+      "timed_out": false,
+      "timeout_s": 300
+    },
+    {
+      "batch_status": "pass",
+      "corner_id": "sf_-40c_2.97v",
+      "diagnostics": [],
+      "elapsed_s": 12.787,
+      "killed_by_signal": null,
+      "killed_by_signal_name": null,
+      "log": "sim/bias-core-smoke/corners/20261023-171642-e69f5b2e/sf_-40c_2.97v.log",
+      "measurements": [
+        {
+          "expr": "v(vref)",
+          "max": 1.4,
+          "min": 1.0,
+          "name": "vref",
+          "pass": true,
+          "reason": "",
+          "unit": "V",
+          "value": 1.245553
+        },
+        {
+          "expr": "v(ibias)",
+          "max": 3.7,
+          "min": 2.0,
+          "name": "ibias",
+          "pass": true,
+          "reason": "",
+          "unit": "V",
+          "value": 2.97
+        },
+        {
+          "expr": "v(bias_ok)",
+          "max": 3.7,
+          "min": 2.0,
+          "name": "bias_ok",
+          "pass": true,
+          "reason": "",
+          "unit": "V",
+          "value": 2.97
+        },
+        {
+          "expr": "-i(v1)",
+          "max": 1e-05,
+          "min": 1e-08,
+          "name": "isup",
+          "pass": true,
+          "reason": "",
+          "unit": "A",
+          "value": 7.899539e-07
+        }
+      ],
+      "ngspice_exit": 0,
+      "pass": true,
+      "process": "sf",
+      "supply_v": 2.97,
+      "temperature_c": -40.0,
+      "timed_out": false,
+      "timeout_s": 300
+    },
+    {
+      "batch_status": "pass",
+      "corner_id": "sf_-40c_3.30v",
+      "diagnostics": [
+        {
+          "code": "nonconvergence",
+          "message": "Warning: Dynamic gmin stepping failed",
+          "severity": "warning"
+        }
+      ],
+      "elapsed_s": 12.141,
+      "killed_by_signal": null,
+      "killed_by_signal_name": null,
+      "log": "sim/bias-core-smoke/corners/20261023-171642-e69f5b2e/sf_-40c_3.30v.log",
+      "measurements": [
+        {
+          "expr": "v(vref)",
+          "max": 1.4,
+          "min": 1.0,
+          "name": "vref",
+          "pass": true,
+          "reason": "",
+          "unit": "V",
+          "value": 1.245691
+        },
+        {
+          "expr": "v(ibias)",
+          "max": 3.7,
+          "min": 2.0,
+          "name": "ibias",
+          "pass": true,
+          "reason": "",
+          "unit": "V",
+          "value": 3.3
+        },
+        {
+          "expr": "v(bias_ok)",
+          "max": 3.7,
+          "min": 2.0,
+          "name": "bias_ok",
+          "pass": true,
+          "reason": "",
+          "unit": "V",
+          "value": 3.3
+        },
+        {
+          "expr": "-i(v1)",
+          "max": 1e-05,
+          "min": 1e-08,
+          "name": "isup",
+          "pass": true,
+          "reason": "",
+          "unit": "A",
+          "value": 7.936521e-07
+        }
+      ],
+      "ngspice_exit": 0,
+      "pass": true,
+      "process": "sf",
+      "supply_v": 3.3,
+      "temperature_c": -40.0,
+      "timed_out": false,
+      "timeout_s": 300
+    },
+    {
+      "batch_status": "pass",
+      "corner_id": "sf_-40c_3.63v",
+      "diagnostics": [],
+      "elapsed_s": 11.591,
+      "killed_by_signal": null,
+      "killed_by_signal_name": null,
+      "log": "sim/bias-core-smoke/corners/20261023-171642-e69f5b2e/sf_-40c_3.63v.log",
+      "measurements": [
+        {
+          "expr": "v(vref)",
+          "max": 1.4,
+          "min": 1.0,
+          "name": "vref",
+          "pass": true,
+          "reason": "",
+          "unit": "V",
+          "value": 1.245756
+        },
+        {
+          "expr": "v(ibias)",
+          "max": 3.7,
+          "min": 2.0,
+          "name": "ibias",
+          "pass": true,
+          "reason": "",
+          "unit": "V",
+          "value": 3.63
+        },
+        {
+          "expr": "v(bias_ok)",
+          "max": 3.7,
+          "min": 2.0,
+          "name": "bias_ok",
+          "pass": true,
+          "reason": "",
+          "unit": "V",
+          "value": 3.63
+        },
+        {
+          "expr": "-i(v1)",
+          "max": 1e-05,
+          "min": 1e-08,
+          "name": "isup",
+          "pass": true,
+          "reason": "",
+          "unit": "A",
+          "value": 7.971371e-07
+        }
+      ],
+      "ngspice_exit": 0,
+      "pass": true,
+      "process": "sf",
+      "supply_v": 3.63,
+      "temperature_c": -40.0,
+      "timed_out": false,
+      "timeout_s": 300
+    },
+    {
+      "batch_status": "pass",
+      "corner_id": "sf_27c_2.97v",
+      "diagnostics": [
+        {
+          "code": "nonconvergence",
+          "message": "Warning: Dynamic gmin stepping failed",
+          "severity": "warning"
+        }
+      ],
+      "elapsed_s": 12.09,
+      "killed_by_signal": null,
+      "killed_by_signal_name": null,
+      "log": "sim/bias-core-smoke/corners/20261023-171642-e69f5b2e/sf_27c_2.97v.log",
+      "measurements": [
+        {
+          "expr": "v(vref)",
+          "max": 1.4,
+          "min": 1.0,
+          "name": "vref",
+          "pass": true,
+          "reason": "",
+          "unit": "V",
+          "value": 1.253635
+        },
+        {
+          "expr": "v(ibias)",
+          "max": 3.7,
+          "min": 2.0,
+          "name": "ibias",
+          "pass": true,
+          "reason": "",
+          "unit": "V",
+          "value": 2.97
+        },
+        {
+          "expr": "v(bias_ok)",
+          "max": 3.7,
+          "min": 2.0,
+          "name": "bias_ok",
+          "pass": true,
+          "reason": "",
+          "unit": "V",
+          "value": 2.969997
+        },
+        {
+          "expr": "-i(v1)",
+          "max": 1e-05,
+          "min": 1e-08,
+          "name": "isup",
+          "pass": true,
+          "reason": "",
+          "unit": "A",
+          "value": 9.453883e-07
+        }
+      ],
+      "ngspice_exit": 0,
+      "pass": true,
+      "process": "sf",
+      "supply_v": 2.97,
+      "temperature_c": 27.0,
+      "timed_out": false,
+      "timeout_s": 300
+    },
+    {
+      "batch_status": "pass",
+      "corner_id": "sf_27c_3.30v",
+      "diagnostics": [
+        {
+          "code": "nonconvergence",
+          "message": "Warning: Dynamic gmin stepping failed",
+          "severity": "warning"
+        }
+      ],
+      "elapsed_s": 12.392,
+      "killed_by_signal": null,
+      "killed_by_signal_name": null,
+      "log": "sim/bias-core-smoke/corners/20261023-171642-e69f5b2e/sf_27c_3.30v.log",
+      "measurements": [
+        {
+          "expr": "v(vref)",
+          "max": 1.4,
+          "min": 1.0,
+          "name": "vref",
+          "pass": true,
+          "reason": "",
+          "unit": "V",
+          "value": 1.253793
+        },
+        {
+          "expr": "v(ibias)",
+          "max": 3.7,
+          "min": 2.0,
+          "name": "ibias",
+          "pass": true,
+          "reason": "",
+          "unit": "V",
+          "value": 3.3
+        },
+        {
+          "expr": "v(bias_ok)",
+          "max": 3.7,
+          "min": 2.0,
+          "name": "bias_ok",
+          "pass": true,
+          "reason": "",
+          "unit": "V",
+          "value": 3.299997
+        },
+        {
+          "expr": "-i(v1)",
+          "max": 1e-05,
+          "min": 1e-08,
+          "name": "isup",
+          "pass": true,
+          "reason": "",
+          "unit": "A",
+          "value": 9.489447e-07
+        }
+      ],
+      "ngspice_exit": 0,
+      "pass": true,
+      "process": "sf",
+      "supply_v": 3.3,
+      "temperature_c": 27.0,
+      "timed_out": false,
+      "timeout_s": 300
+    },
+    {
+      "batch_status": "pass",
+      "corner_id": "sf_27c_3.63v",
+      "diagnostics": [
+        {
+          "code": "nonconvergence",
+          "message": "Warning: Dynamic gmin stepping failed",
+          "severity": "warning"
+        }
+      ],
+      "elapsed_s": 11.883,
+      "killed_by_signal": null,
+      "killed_by_signal_name": null,
+      "log": "sim/bias-core-smoke/corners/20261023-171642-e69f5b2e/sf_27c_3.63v.log",
+      "measurements": [
+        {
+          "expr": "v(vref)",
+          "max": 1.4,
+          "min": 1.0,
+          "name": "vref",
+          "pass": true,
+          "reason": "",
+          "unit": "V",
+          "value": 1.253835
+        },
+        {
+          "expr": "v(ibias)",
+          "max": 3.7,
+          "min": 2.0,
+          "name": "ibias",
+          "pass": true,
+          "reason": "",
+          "unit": "V",
+          "value": 3.63
+        },
+        {
+          "expr": "v(bias_ok)",
+          "max": 3.7,
+          "min": 2.0,
+          "name": "bias_ok",
+          "pass": true,
+          "reason": "",
+          "unit": "V",
+          "value": 3.629997
+        },
+        {
+          "expr": "-i(v1)",
+          "max": 1e-05,
+          "min": 1e-08,
+          "name": "isup",
+          "pass": true,
+          "reason": "",
+          "unit": "A",
+          "value": 9.523313e-07
+        }
+      ],
+      "ngspice_exit": 0,
+      "pass": true,
+      "process": "sf",
+      "supply_v": 3.63,
+      "temperature_c": 27.0,
+      "timed_out": false,
+      "timeout_s": 300
+    },
+    {
+      "batch_status": "pass",
+      "corner_id": "sf_125c_2.97v",
+      "diagnostics": [],
+      "elapsed_s": 12.142,
+      "killed_by_signal": null,
+      "killed_by_signal_name": null,
+      "log": "sim/bias-core-smoke/corners/20261023-171642-e69f5b2e/sf_125c_2.97v.log",
+      "measurements": [
+        {
+          "expr": "v(vref)",
+          "max": 1.4,
+          "min": 1.0,
+          "name": "vref",
+          "pass": true,
+          "reason": "",
+          "unit": "V",
+          "value": 1.255236
+        },
+        {
+          "expr": "v(ibias)",
+          "max": 3.7,
+          "min": 2.0,
+          "name": "ibias",
+          "pass": true,
+          "reason": "",
+          "unit": "V",
+          "value": 2.97
+        },
+        {
+          "expr": "v(bias_ok)",
+          "max": 3.7,
+          "min": 2.0,
+          "name": "bias_ok",
+          "pass": true,
+          "reason": "",
+          "unit": "V",
+          "value": 2.96969
+        },
+        {
+          "expr": "-i(v1)",
+          "max": 1e-05,
+          "min": 1e-08,
+          "name": "isup",
+          "pass": true,
+          "reason": "",
+          "unit": "A",
+          "value": 1.176322e-06
+        }
+      ],
+      "ngspice_exit": 0,
+      "pass": true,
+      "process": "sf",
+      "supply_v": 2.97,
+      "temperature_c": 125.0,
+      "timed_out": false,
+      "timeout_s": 300
+    },
+    {
+      "batch_status": "pass",
+      "corner_id": "sf_125c_3.30v",
+      "diagnostics": [],
+      "elapsed_s": 11.64,
+      "killed_by_signal": null,
+      "killed_by_signal_name": null,
+      "log": "sim/bias-core-smoke/corners/20261023-171642-e69f5b2e/sf_125c_3.30v.log",
+      "measurements": [
+        {
+          "expr": "v(vref)",
+          "max": 1.4,
+          "min": 1.0,
+          "name": "vref",
+          "pass": true,
+          "reason": "",
+          "unit": "V",
+          "value": 1.255465
+        },
+        {
+          "expr": "v(ibias)",
+          "max": 3.7,
+          "min": 2.0,
+          "name": "ibias",
+          "pass": true,
+          "reason": "",
+          "unit": "V",
+          "value": 3.3
+        },
+        {
+          "expr": "v(bias_ok)",
+          "max": 3.7,
+          "min": 2.0,
+          "name": "bias_ok",
+          "pass": true,
+          "reason": "",
+          "unit": "V",
+          "value": 3.299697
+        },
+        {
+          "expr": "-i(v1)",
+          "max": 1e-05,
+          "min": 1e-08,
+          "name": "isup",
+          "pass": true,
+          "reason": "",
+          "unit": "A",
+          "value": 1.18038e-06
+        }
+      ],
+      "ngspice_exit": 0,
+      "pass": true,
+      "process": "sf",
+      "supply_v": 3.3,
+      "temperature_c": 125.0,
+      "timed_out": false,
+      "timeout_s": 300
+    },
+    {
+      "batch_status": "pass",
+      "corner_id": "sf_125c_3.63v",
+      "diagnostics": [],
+      "elapsed_s": 11.791,
+      "killed_by_signal": null,
+      "killed_by_signal_name": null,
+      "log": "sim/bias-core-smoke/corners/20261023-171642-e69f5b2e/sf_125c_3.63v.log",
+      "measurements": [
+        {
+          "expr": "v(vref)",
+          "max": 1.4,
+          "min": 1.0,
+          "name": "vref",
+          "pass": true,
+          "reason": "",
+          "unit": "V",
+          "value": 1.255473
+        },
+        {
+          "expr": "v(ibias)",
+          "max": 3.7,
+          "min": 2.0,
+          "name": "ibias",
+          "pass": true,
+          "reason": "",
+          "unit": "V",
+          "value": 3.63
+        },
+        {
+          "expr": "v(bias_ok)",
+          "max": 3.7,
+          "min": 2.0,
+          "name": "bias_ok",
+          "pass": true,
+          "reason": "",
+          "unit": "V",
+          "value": 3.629699
+        },
+        {
+          "expr": "-i(v1)",
+          "max": 1e-05,
+          "min": 1e-08,
+          "name": "isup",
+          "pass": true,
+          "reason": "",
+          "unit": "A",
+          "value": 1.184462e-06
+        }
+      ],
+      "ngspice_exit": 0,
+      "pass": true,
+      "process": "sf",
+      "supply_v": 3.63,
+      "temperature_c": 125.0,
+      "timed_out": false,
+      "timeout_s": 300
+    },
+    {
+      "batch_status": "pass",
+      "corner_id": "fs_-40c_2.97v",
+      "diagnostics": [
+        {
+          "code": "nonconvergence",
+          "message": "Warning: Dynamic gmin stepping failed",
+          "severity": "warning"
+        }
+      ],
+      "elapsed_s": 11.885,
+      "killed_by_signal": null,
+      "killed_by_signal_name": null,
+      "log": "sim/bias-core-smoke/corners/20261023-171642-e69f5b2e/fs_-40c_2.97v.log",
+      "measurements": [
+        {
+          "expr": "v(vref)",
+          "max": 1.4,
+          "min": 1.0,
+          "name": "vref",
+          "pass": true,
+          "reason": "",
+          "unit": "V",
+          "value": 1.249496
+        },
+        {
+          "expr": "v(ibias)",
+          "max": 3.7,
+          "min": 2.0,
+          "name": "ibias",
+          "pass": true,
+          "reason": "",
+          "unit": "V",
+          "value": 2.97
+        },
+        {
+          "expr": "v(bias_ok)",
+          "max": 3.7,
+          "min": 2.0,
+          "name": "bias_ok",
+          "pass": true,
+          "reason": "",
+          "unit": "V",
+          "value": 2.97
+        },
+        {
+          "expr": "-i(v1)",
+          "max": 1e-05,
+          "min": 1e-08,
+          "name": "isup",
+          "pass": true,
+          "reason": "",
+          "unit": "A",
+          "value": 7.629186e-07
+        }
+      ],
+      "ngspice_exit": 0,
+      "pass": true,
+      "process": "fs",
+      "supply_v": 2.97,
+      "temperature_c": -40.0,
+      "timed_out": false,
+      "timeout_s": 300
+    },
+    {
+      "batch_status": "pass",
+      "corner_id": "fs_-40c_3.30v",
+      "diagnostics": [
+        {
+          "code": "nonconvergence",
+          "message": "Warning: Dynamic gmin stepping failed",
+          "severity": "warning"
+        }
+      ],
+      "elapsed_s": 11.885,
+      "killed_by_signal": null,
+      "killed_by_signal_name": null,
+      "log": "sim/bias-core-smoke/corners/20261023-171642-e69f5b2e/fs_-40c_3.30v.log",
+      "measurements": [
+        {
+          "expr": "v(vref)",
+          "max": 1.4,
+          "min": 1.0,
+          "name": "vref",
+          "pass": true,
+          "reason": "",
+          "unit": "V",
+          "value": 1.249637
+        },
+        {
+          "expr": "v(ibias)",
+          "max": 3.7,
+          "min": 2.0,
+          "name": "ibias",
+          "pass": true,
+          "reason": "",
+          "unit": "V",
+          "value": 3.3
+        },
+        {
+          "expr": "v(bias_ok)",
+          "max": 3.7,
+          "min": 2.0,
+          "name": "bias_ok",
+          "pass": true,
+          "reason": "",
+          "unit": "V",
+          "value": 3.3
+        },
+        {
+          "expr": "-i(v1)",
+          "max": 1e-05,
+          "min": 1e-08,
+          "name": "isup",
+          "pass": true,
+          "reason": "",
+          "unit": "A",
+          "value": 7.663517e-07
+        }
+      ],
+      "ngspice_exit": 0,
+      "pass": true,
+      "process": "fs",
+      "supply_v": 3.3,
+      "temperature_c": -40.0,
+      "timed_out": false,
+      "timeout_s": 300
+    },
+    {
+      "batch_status": "pass",
+      "corner_id": "fs_-40c_3.63v",
+      "diagnostics": [
+        {
+          "code": "singular_matrix",
+          "message": "Warning: singular matrix:  check nodes xdut.xrz.t1 and xdut.nb",
+          "severity": "warning"
+        },
+        {
+          "code": "nonconvergence",
+          "message": "Warning: Dynamic gmin stepping failed",
+          "severity": "warning"
+        }
+      ],
+      "elapsed_s": 11.59,
+      "killed_by_signal": null,
+      "killed_by_signal_name": null,
+      "log": "sim/bias-core-smoke/corners/20261023-171642-e69f5b2e/fs_-40c_3.63v.log",
+      "measurements": [
+        {
+          "expr": "v(vref)",
+          "max": 1.4,
+          "min": 1.0,
+          "name": "vref",
+          "pass": true,
+          "reason": "",
+          "unit": "V",
+          "value": 1.249705
+        },
+        {
+          "expr": "v(ibias)",
+          "max": 3.7,
+          "min": 2.0,
+          "name": "ibias",
+          "pass": true,
+          "reason": "",
+          "unit": "V",
+          "value": 3.63
+        },
+        {
+          "expr": "v(bias_ok)",
+          "max": 3.7,
+          "min": 2.0,
+          "name": "bias_ok",
+          "pass": true,
+          "reason": "",
+          "unit": "V",
+          "value": 3.63
+        },
+        {
+          "expr": "-i(v1)",
+          "max": 1e-05,
+          "min": 1e-08,
+          "name": "isup",
+          "pass": true,
+          "reason": "",
+          "unit": "A",
+          "value": 7.696133e-07
+        }
+      ],
+      "ngspice_exit": 0,
+      "pass": true,
+      "process": "fs",
+      "supply_v": 3.63,
+      "temperature_c": -40.0,
+      "timed_out": false,
+      "timeout_s": 300
+    },
+    {
+      "batch_status": "pass",
+      "corner_id": "fs_27c_2.97v",
+      "diagnostics": [
+        {
+          "code": "nonconvergence",
+          "message": "Warning: Dynamic gmin stepping failed",
+          "severity": "warning"
+        }
+      ],
+      "elapsed_s": 11.791,
+      "killed_by_signal": null,
+      "killed_by_signal_name": null,
+      "log": "sim/bias-core-smoke/corners/20261023-171642-e69f5b2e/fs_27c_2.97v.log",
+      "measurements": [
+        {
+          "expr": "v(vref)",
+          "max": 1.4,
+          "min": 1.0,
+          "name": "vref",
+          "pass": true,
+          "reason": "",
+          "unit": "V",
+          "value": 1.256906
+        },
+        {
+          "expr": "v(ibias)",
+          "max": 3.7,
+          "min": 2.0,
+          "name": "ibias",
+          "pass": true,
+          "reason": "",
+          "unit": "V",
+          "value": 2.97
+        },
+        {
+          "expr": "v(bias_ok)",
+          "max": 3.7,
+          "min": 2.0,
+          "name": "bias_ok",
+          "pass": true,
+          "reason": "",
+          "unit": "V",
+          "value": 2.97
+        },
+        {
+          "expr": "-i(v1)",
+          "max": 1e-05,
+          "min": 1e-08,
+          "name": "isup",
+          "pass": true,
+          "reason": "",
+          "unit": "A",
+          "value": 9.190395e-07
+        }
+      ],
+      "ngspice_exit": 0,
+      "pass": true,
+      "process": "fs",
+      "supply_v": 2.97,
+      "temperature_c": 27.0,
+      "timed_out": false,
+      "timeout_s": 300
+    },
+    {
+      "batch_status": "pass",
+      "corner_id": "fs_27c_3.30v",
+      "diagnostics": [],
+      "elapsed_s": 11.885,
+      "killed_by_signal": null,
+      "killed_by_signal_name": null,
+      "log": "sim/bias-core-smoke/corners/20261023-171642-e69f5b2e/fs_27c_3.30v.log",
+      "measurements": [
+        {
+          "expr": "v(vref)",
+          "max": 1.4,
+          "min": 1.0,
+          "name": "vref",
+          "pass": true,
+          "reason": "",
+          "unit": "V",
+          "value": 1.257068
+        },
+        {
+          "expr": "v(ibias)",
+          "max": 3.7,
+          "min": 2.0,
+          "name": "ibias",
+          "pass": true,
+          "reason": "",
+          "unit": "V",
+          "value": 3.3
+        },
+        {
+          "expr": "v(bias_ok)",
+          "max": 3.7,
+          "min": 2.0,
+          "name": "bias_ok",
+          "pass": true,
+          "reason": "",
+          "unit": "V",
+          "value": 3.3
+        },
+        {
+          "expr": "-i(v1)",
+          "max": 1e-05,
+          "min": 1e-08,
+          "name": "isup",
+          "pass": true,
+          "reason": "",
+          "unit": "A",
+          "value": 9.223488e-07
+        }
+      ],
+      "ngspice_exit": 0,
+      "pass": true,
+      "process": "fs",
+      "supply_v": 3.3,
+      "temperature_c": 27.0,
+      "timed_out": false,
+      "timeout_s": 300
+    },
+    {
+      "batch_status": "pass",
+      "corner_id": "fs_27c_3.63v",
+      "diagnostics": [],
+      "elapsed_s": 11.489,
+      "killed_by_signal": null,
+      "killed_by_signal_name": null,
+      "log": "sim/bias-core-smoke/corners/20261023-171642-e69f5b2e/fs_27c_3.63v.log",
+      "measurements": [
+        {
+          "expr": "v(vref)",
+          "max": 1.4,
+          "min": 1.0,
+          "name": "vref",
+          "pass": true,
+          "reason": "",
+          "unit": "V",
+          "value": 1.257113
+        },
+        {
+          "expr": "v(ibias)",
+          "max": 3.7,
+          "min": 2.0,
+          "name": "ibias",
+          "pass": true,
+          "reason": "",
+          "unit": "V",
+          "value": 3.63
+        },
+        {
+          "expr": "v(bias_ok)",
+          "max": 3.7,
+          "min": 2.0,
+          "name": "bias_ok",
+          "pass": true,
+          "reason": "",
+          "unit": "V",
+          "value": 3.63
+        },
+        {
+          "expr": "-i(v1)",
+          "max": 1e-05,
+          "min": 1e-08,
+          "name": "isup",
+          "pass": true,
+          "reason": "",
+          "unit": "A",
+          "value": 9.255181e-07
+        }
+      ],
+      "ngspice_exit": 0,
+      "pass": true,
+      "process": "fs",
+      "supply_v": 3.63,
+      "temperature_c": 27.0,
+      "timed_out": false,
+      "timeout_s": 300
+    },
+    {
+      "batch_status": "pass",
+      "corner_id": "fs_125c_2.97v",
+      "diagnostics": [],
+      "elapsed_s": 11.891,
+      "killed_by_signal": null,
+      "killed_by_signal_name": null,
+      "log": "sim/bias-core-smoke/corners/20261023-171642-e69f5b2e/fs_125c_2.97v.log",
+      "measurements": [
+        {
+          "expr": "v(vref)",
+          "max": 1.4,
+          "min": 1.0,
+          "name": "vref",
+          "pass": true,
+          "reason": "",
+          "unit": "V",
+          "value": 1.257891
+        },
+        {
+          "expr": "v(ibias)",
+          "max": 3.7,
+          "min": 2.0,
+          "name": "ibias",
+          "pass": true,
+          "reason": "",
+          "unit": "V",
+          "value": 2.97
+        },
+        {
+          "expr": "v(bias_ok)",
+          "max": 3.7,
+          "min": 2.0,
+          "name": "bias_ok",
+          "pass": true,
+          "reason": "",
+          "unit": "V",
+          "value": 2.969985
+        },
+        {
+          "expr": "-i(v1)",
+          "max": 1e-05,
+          "min": 1e-08,
+          "name": "isup",
+          "pass": true,
+          "reason": "",
+          "unit": "A",
+          "value": 1.147156e-06
+        }
+      ],
+      "ngspice_exit": 0,
+      "pass": true,
+      "process": "fs",
+      "supply_v": 2.97,
+      "temperature_c": 125.0,
+      "timed_out": false,
+      "timeout_s": 300
+    },
+    {
+      "batch_status": "pass",
+      "corner_id": "fs_125c_3.30v",
+      "diagnostics": [],
+      "elapsed_s": 11.691,
+      "killed_by_signal": null,
+      "killed_by_signal_name": null,
+      "log": "sim/bias-core-smoke/corners/20261023-171642-e69f5b2e/fs_125c_3.30v.log",
+      "measurements": [
+        {
+          "expr": "v(vref)",
+          "max": 1.4,
+          "min": 1.0,
+          "name": "vref",
+          "pass": true,
+          "reason": "",
+          "unit": "V",
+          "value": 1.25812
+        },
+        {
+          "expr": "v(ibias)",
+          "max": 3.7,
+          "min": 2.0,
+          "name": "ibias",
+          "pass": true,
+          "reason": "",
+          "unit": "V",
+          "value": 3.3
+        },
+        {
+          "expr": "v(bias_ok)",
+          "max": 3.7,
+          "min": 2.0,
+          "name": "bias_ok",
+          "pass": true,
+          "reason": "",
+          "unit": "V",
+          "value": 3.299985
+        },
+        {
+          "expr": "-i(v1)",
+          "max": 1e-05,
+          "min": 1e-08,
+          "name": "isup",
+          "pass": true,
+          "reason": "",
+          "unit": "A",
+          "value": 1.150505e-06
+        }
+      ],
+      "ngspice_exit": 0,
+      "pass": true,
+      "process": "fs",
+      "supply_v": 3.3,
+      "temperature_c": 125.0,
+      "timed_out": false,
+      "timeout_s": 300
+    },
+    {
+      "batch_status": "pass",
+      "corner_id": "fs_125c_3.63v",
+      "diagnostics": [],
+      "elapsed_s": 11.44,
+      "killed_by_signal": null,
+      "killed_by_signal_name": null,
+      "log": "sim/bias-core-smoke/corners/20261023-171642-e69f5b2e/fs_125c_3.63v.log",
+      "measurements": [
+        {
+          "expr": "v(vref)",
+          "max": 1.4,
+          "min": 1.0,
+          "name": "vref",
+          "pass": true,
+          "reason": "",
+          "unit": "V",
+          "value": 1.258129
+        },
+        {
+          "expr": "v(ibias)",
+          "max": 3.7,
+          "min": 2.0,
+          "name": "ibias",
+          "pass": true,
+          "reason": "",
+          "unit": "V",
+          "value": 3.63
+        },
+        {
+          "expr": "v(bias_ok)",
+          "max": 3.7,
+          "min": 2.0,
+          "name": "bias_ok",
+          "pass": true,
+          "reason": "",
+          "unit": "V",
+          "value": 3.629985
+        },
+        {
+          "expr": "-i(v1)",
+          "max": 1e-05,
+          "min": 1e-08,
+          "name": "isup",
+          "pass": true,
+          "reason": "",
+          "unit": "A",
+          "value": 1.153795e-06
+        }
+      ],
+      "ngspice_exit": 0,
+      "pass": true,
+      "process": "fs",
+      "supply_v": 3.63,
+      "temperature_c": 125.0,
+      "timed_out": false,
+      "timeout_s": 300
+    }
+  ],
+  "experiment": {
+    "claim": "Harness bring-up for issue #17 -- NOT a spec claim (spec/target-spec.md does not exist yet, spec/porting-plan.md Sec4 item 4). Substantiates that sim/bin/corner-run.py, ported from sky130-bandgap, actually drives THIS repo's own design/bias_core.sch through xschem/ngspice across the full 45-point PVT matrix, and that the process/voltage/temperature knobs measurably change the result. design/bias_core.md already documents an informal, uncommitted spot check at tt/ff/ss x -40/27/125 degC; this record is the harness's own first COMMITTED sim/ evidence, across the full 5-corner x 3-temp x 3-supply grid, not a spot check.",
+    "provenance": "schematic",
+    "provenance_source": "sim/bias-core-smoke/testbench/tb_bias_core_smoke.sch",
+    "slug": "bias-core-smoke",
+    "statistical_convention": "N/A (corner-matrix check, not a distribution claim)",
+    "title": "bias_core schematic-entry smoke check: untrimmed nominal operating point"
+  },
+  "git": {
+    "branch": "feature/issue-219",
+    "dirty": true,
+    "sha": "e69f5b2e"
+  },
+  "links": {
+    "corners_dir": "sim/bias-core-smoke/corners/20261023-171642-e69f5b2e/",
+    "json": "sim/bias-core-smoke/records/20261023-171642-e69f5b2e.json",
+    "manifest": "sim/bias-core-smoke/experiment.json",
+    "netlist_snapshot": "sim/bias-core-smoke/netlist-snapshots/20261023-171642-e69f5b2e.spice",
+    "record": "sim/bias-core-smoke/records/20261023-171642-e69f5b2e.md",
+    "testbench": "sim/bias-core-smoke/testbench/tb_bias_core_smoke.sch"
+  },
+  "matrix": {
+    "is_subset": false,
+    "n_points": 45,
+    "point_ids": [
+      "tt_-40c_2.97v",
+      "tt_-40c_3.30v",
+      "tt_-40c_3.63v",
+      "tt_27c_2.97v",
+      "tt_27c_3.30v",
+      "tt_27c_3.63v",
+      "tt_125c_2.97v",
+      "tt_125c_3.30v",
+      "tt_125c_3.63v",
+      "ss_-40c_2.97v",
+      "ss_-40c_3.30v",
+      "ss_-40c_3.63v",
+      "ss_27c_2.97v",
+      "ss_27c_3.30v",
+      "ss_27c_3.63v",
+      "ss_125c_2.97v",
+      "ss_125c_3.30v",
+      "ss_125c_3.63v",
+      "ff_-40c_2.97v",
+      "ff_-40c_3.30v",
+      "ff_-40c_3.63v",
+      "ff_27c_2.97v",
+      "ff_27c_3.30v",
+      "ff_27c_3.63v",
+      "ff_125c_2.97v",
+      "ff_125c_3.30v",
+      "ff_125c_3.63v",
+      "sf_-40c_2.97v",
+      "sf_-40c_3.30v",
+      "sf_-40c_3.63v",
+      "sf_27c_2.97v",
+      "sf_27c_3.30v",
+      "sf_27c_3.63v",
+      "sf_125c_2.97v",
+      "sf_125c_3.30v",
+      "sf_125c_3.63v",
+      "fs_-40c_2.97v",
+      "fs_-40c_3.30v",
+      "fs_-40c_3.63v",
+      "fs_27c_2.97v",
+      "fs_27c_3.30v",
+      "fs_27c_3.63v",
+      "fs_125c_2.97v",
+      "fs_125c_3.30v",
+      "fs_125c_3.63v"
+    ],
+    "points": [
+      [
+        "tt",
+        -40.0,
+        2.97
+      ],
+      [
+        "tt",
+        -40.0,
+        3.3
+      ],
+      [
+        "tt",
+        -40.0,
+        3.63
+      ],
+      [
+        "tt",
+        27.0,
+        2.97
+      ],
+      [
+        "tt",
+        27.0,
+        3.3
+      ],
+      [
+        "tt",
+        27.0,
+        3.63
+      ],
+      [
+        "tt",
+        125.0,
+        2.97
+      ],
+      [
+        "tt",
+        125.0,
+        3.3
+      ],
+      [
+        "tt",
+        125.0,
+        3.63
+      ],
+      [
+        "ss",
+        -40.0,
+        2.97
+      ],
+      [
+        "ss",
+        -40.0,
+        3.3
+      ],
+      [
+        "ss",
+        -40.0,
+        3.63
+      ],
+      [
+        "ss",
+        27.0,
+        2.97
+      ],
+      [
+        "ss",
+        27.0,
+        3.3
+      ],
+      [
+        "ss",
+        27.0,
+        3.63
+      ],
+      [
+        "ss",
+        125.0,
+        2.97
+      ],
+      [
+        "ss",
+        125.0,
+        3.3
+      ],
+      [
+        "ss",
+        125.0,
+        3.63
+      ],
+      [
+        "ff",
+        -40.0,
+        2.97
+      ],
+      [
+        "ff",
+        -40.0,
+        3.3
+      ],
+      [
+        "ff",
+        -40.0,
+        3.63
+      ],
+      [
+        "ff",
+        27.0,
+        2.97
+      ],
+      [
+        "ff",
+        27.0,
+        3.3
+      ],
+      [
+        "ff",
+        27.0,
+        3.63
+      ],
+      [
+        "ff",
+        125.0,
+        2.97
+      ],
+      [
+        "ff",
+        125.0,
+        3.3
+      ],
+      [
+        "ff",
+        125.0,
+        3.63
+      ],
+      [
+        "sf",
+        -40.0,
+        2.97
+      ],
+      [
+        "sf",
+        -40.0,
+        3.3
+      ],
+      [
+        "sf",
+        -40.0,
+        3.63
+      ],
+      [
+        "sf",
+        27.0,
+        2.97
+      ],
+      [
+        "sf",
+        27.0,
+        3.3
+      ],
+      [
+        "sf",
+        27.0,
+        3.63
+      ],
+      [
+        "sf",
+        125.0,
+        2.97
+      ],
+      [
+        "sf",
+        125.0,
+        3.3
+      ],
+      [
+        "sf",
+        125.0,
+        3.63
+      ],
+      [
+        "fs",
+        -40.0,
+        2.97
+      ],
+      [
+        "fs",
+        -40.0,
+        3.3
+      ],
+      [
+        "fs",
+        -40.0,
+        3.63
+      ],
+      [
+        "fs",
+        27.0,
+        2.97
+      ],
+      [
+        "fs",
+        27.0,
+        3.3
+      ],
+      [
+        "fs",
+        27.0,
+        3.63
+      ],
+      [
+        "fs",
+        125.0,
+        2.97
+      ],
+      [
+        "fs",
+        125.0,
+        3.3
+      ],
+      [
+        "fs",
+        125.0,
+        3.63
+      ]
+    ],
+    "process": [
+      "tt",
+      "ss",
+      "ff",
+      "sf",
+      "fs"
+    ],
+    "subset_reason": "",
+    "supply_v": [
+      2.97,
+      3.3,
+      3.63
+    ],
+    "temperature_c": [
+      -40.0,
+      27.0,
+      125.0
+    ]
+  },
+  "overall_pass": true,
+  "pdk": {
+    "installed_commit": "c6d73a35f524070e85faff4a6a9eef49553ebc2b",
+    "lib_file": "libs.tech/combined/sky130.lib.spice (resolved on the runner)",
+    "local_installed_commit": "f6eeac7dad085ffcc829ccfd721f7b4ce39edcf7",
+    "matches_pin": false,
+    "pinned_commit": "f6eeac7dad085ffcc829ccfd721f7b4ce39edcf7",
+    "root": "/home/ubuntu/.ciel",
+    "variant": "sky130A"
+  },
+  "record_id": "20261023-171642-e69f5b2e",
+  "spread_checks": [
+    {
+      "measurement": "vref",
+      "min_spread": 0.005,
+      "n": 45,
+      "note": "Guards against a silently corner-blind harness: if every corner returns the same vref, the .lib/.temp injection is not taking effect. design/bias_core.md's own spot check already found a ~9.7 mV vref spread across process x temperature alone (1.2477-1.2574 V), so this bound is well inside what a working harness should observe.",
+      "observed_spread": 0.012576000000000143,
+      "pass": true,
+      "reason": ""
+    }
+  ],
+  "supersedes": "",
+  "timestamp": "2026-10-23T17:16:42Z",
+  "tools": {
+    "ngspice": "ngspice 46 (fleet)",
+    "platform": "Linux 7.0.0-1014-aws x86_64",
+    "python": "3.12.3",
+    "xschem": "XSCHEM V3.4.7"
+  }
+}
