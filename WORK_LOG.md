@@ -4,6 +4,11 @@ Chronological record of recently merged pull requests and closed issues. This fi
 
 ### 2026-10-23
 
+- **PR #236**: refactor: netlist sim testbenches via klt netlist, remove raw xschem path
+- **Issue #235** (closed): Remove raw-xschem netlist_with_xschem from sim harness: use netlist_with_klt everywhere
+- **PR #237**: refactor(sim): share record-assembly helpers between brownout and glitch drivers
+- **Issue #228** (closed): Consolidate duplicated record-assembly block in brownout/glitch campaign drivers into sim_common
+
 - **PR #231**: sim(glitch-top): fleet subset run record with stored-evidence manifest
 - **PR #233**: fix(sim): glitch record skips evidence store for empty classes
 - **Issue #230** (closed): glitch-top record fails on a single-class subset run: empty stage refused for the all-NOT_COVERED class

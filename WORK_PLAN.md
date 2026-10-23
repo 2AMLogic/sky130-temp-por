@@ -31,8 +31,7 @@ _None._
 
 Issues currently being built (`loom:building`).
 
-- **#229**: Live fleet verification of campaign-driver evidence storage (follow-on from PR #226)
-- **#230**: glitch-top record fails on a single-class subset run: empty stage refused for the all-NOT_COVERED class
+_None._
 
 ## PRs Awaiting Review
 
@@ -44,8 +43,7 @@ _None._
 
 PRs that passed review and are queued for Champion auto-merge (`loom:pr`).
 
-- **#231**: sim(glitch-top): fleet subset run record with stored-evidence manifest
-- **#233**: fix(sim): glitch record skips evidence store for empty classes
+_None._
 
 ## Proposed
 
@@ -56,13 +54,11 @@ Issues carrying `loom:curated`.
 - **#181**: glitch-top: re-run failed vdd_level request vdd_slew_v1.2_h0.0002_s200000 (45 ERROR points) *(curated)*
 - **#189**: Re-qualify cited sky130 evidence under open_pdks f6eeac7 (split from #188) *(curated)*
 - **#229**: Live fleet verification of campaign-driver evidence storage (follow-on from PR #226) *(curated)*
-- **#230**: glitch-top record fails on a single-class subset run: empty stage refused for the all-NOT_COVERED class *(curated)*
 
 ## Proposed (Architect / Hermit)
 
 - **#137**: Run the two-key ratification ceremony on DR-004 and DR-005 *(architect)*
 - **#203**: Consolidate duplicated .end-stripping idiom into sim_common (10 copies) *(hermit)*
-- **#228**: Consolidate duplicated record-assembly block in brownout/glitch campaign drivers into sim_common *(hermit)*
 
 ## Epics
 
@@ -76,10 +72,10 @@ Issues carrying `loom:curated`.
 | Very important | 0 |
 | Important | 0 |
 | Ready (`loom:issue`) | 0 |
-| In Progress (`loom:building`) | 2 |
+| In Progress (`loom:building`) | 0 |
 | PRs awaiting review | 0 |
-| Approved PRs awaiting merge | 2 |
-| Curated | 6 |
-| Architect / Hermit proposals | 3 |
+| Approved PRs awaiting merge | 0 |
+| Curated | 5 |
+| Architect / Hermit proposals | 2 |
 | Active epics | 1 |
 <!-- guide:plan-body:end -->
