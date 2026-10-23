@@ -17,6 +17,13 @@ Usage
     sim/bin/corner-run.py sim/bias-core-smoke --quick \\
         --subset-reason "harness liveness check"            # 3-point subset
     sim/bin/corner-run.py --print-env                       # PDK env exports
+    sim/bin/corner-run.py sim/bias-core-smoke --backend batch   # whole grid -> fleet
+    sim/bin/corner-run.py sim/bias-core-smoke --backend batch --dry-run  # print request
+
+--backend batch submits the corner grid as ONE `klt sim --backend batch` request
+(never per-corner calls) and records the fleet's own PDK stamp, engine and job
+id. A failed submit is an error quoting klt verbatim; there is no local
+fallback. --quick always stays on the local backend.
 
 The runner never edits or deletes an existing record: it refuses to start if
 the record id it would mint already exists on disk.
@@ -435,6 +442,38 @@ def exit_note(rc: int, timed_out: bool, killed_by_signal: int | None) -> str:
     return ""
 
 
+def evaluate_measurements(exp: Experiment, values: dict[str, float]) -> tuple[list[dict], bool]:
+    """Grade measured values against the manifest's min/max windows.
+
+    Shared by the local ngspice path and the batch path so both apply the
+    same pass/fail rules and emit the same per-measurement check schema.
+    """
+    checks = []
+    ok = True
+    for m in exp.measurements:
+        value = values.get(m.name)
+        passed = value is not None
+        reason = "" if passed else "measurement not found in ngspice output"
+        if passed and m.min is not None and value < m.min:
+            passed, reason = False, f"below min {m.min:g}"
+        if passed and m.max is not None and value > m.max:
+            passed, reason = False, f"above max {m.max:g}"
+        checks.append(
+            {
+                "name": m.name,
+                "expr": m.expr,
+                "unit": m.unit,
+                "value": value,
+                "min": m.min,
+                "max": m.max,
+                "pass": passed,
+                "reason": reason,
+            }
+        )
+        ok = ok and passed
+    return checks, ok
+
+
 def run_corner(
     exp: Experiment,
     pdk: Pdk,
@@ -477,29 +516,8 @@ def run_corner(
     killed_by_signal = None if timed_out else (-rc if rc < 0 else None)
 
     values = parse_measurements(stdout + "\n" + stderr)
-    checks = []
-    ok = rc == 0 and not timed_out
-    for m in exp.measurements:
-        value = values.get(m.name)
-        passed = value is not None
-        reason = "" if passed else "measurement not found in ngspice output"
-        if passed and m.min is not None and value < m.min:
-            passed, reason = False, f"below min {m.min:g}"
-        if passed and m.max is not None and value > m.max:
-            passed, reason = False, f"above max {m.max:g}"
-        checks.append(
-            {
-                "name": m.name,
-                "expr": m.expr,
-                "unit": m.unit,
-                "value": value,
-                "min": m.min,
-                "max": m.max,
-                "pass": passed,
-                "reason": reason,
-            }
-        )
-        ok = ok and passed
+    checks, ok = evaluate_measurements(exp, values)
+    ok = ok and rc == 0 and not timed_out
 
     log_path.parent.mkdir(parents=True, exist_ok=True)
     log_path.write_text(
@@ -541,6 +559,239 @@ def run_corner(
         "measurements": checks,
         "pass": ok,
         "log": str(log_path.relative_to(REPO_ROOT)),
+    }
+
+
+# --------------------------------------------------------------------------
+# batch backend (klt sim --backend batch)
+# --------------------------------------------------------------------------
+
+
+def netlist_with_klt(schematic: Path, out_dir: Path, pdk: Pdk) -> Path:
+    """Netlist via `klt netlist` (headless flags, bounded run) -- never raw xschem."""
+    out_dir.mkdir(parents=True, exist_ok=True)
+    produced = out_dir / (schematic.stem + ".spice")
+    cmd = [
+        "klt", "netlist", str(schematic),
+        "-o", str(produced),
+        "--rcfile", str(XSCHEMRC_FILE),
+        "--pdk", pdk.variant,
+        "--pdk-root", str(pdk.root),
+        "--timeout-s", "300",
+    ]
+    try:
+        proc = subprocess.run(
+            cmd, capture_output=True, text=True, timeout=360, stdin=subprocess.DEVNULL
+        )
+    except FileNotFoundError:
+        raise HarnessError("klt not found on PATH; the batch backend needs klayout-tools")
+    if proc.returncode != 0 or not produced.is_file():
+        raise HarnessError(
+            "klt netlist failed\n"
+            f"  cmd: {' '.join(cmd)}\n"
+            f"  rc: {proc.returncode}\n"
+            f"  stdout: {proc.stdout.strip()}\n"
+            f"  stderr: {proc.stderr.strip()}"
+        )
+    return produced
+
+
+def batch_axes(matrix: list[Corner]) -> tuple[list[str], list[float], list[float]]:
+    """The (process, temperature, supply) axes of a cross-product matrix.
+
+    One `klt sim` request spans a full cross product; an explicit point list
+    (e.g. a quick_subset) is not expressible as one grid request.
+    """
+    process = unique_in_order(c.process for c in matrix)
+    temps = sorted({c.temp_c for c in matrix})
+    supplies = sorted({c.supply_v for c in matrix})
+    if len(matrix) != len(process) * len(temps) * len(supplies):
+        raise HarnessError(
+            "the batch backend submits one grid request, but this corner list is not a "
+            "full process x temperature x supply cross product; run it with --backend local"
+        )
+    return process, temps, supplies
+
+
+def build_batch_netlist(exp: Experiment, body: list[str], matrix: list[Corner]) -> str:
+    """Netlist for the fleet: klt supplies .lib, .temp and the supply alter."""
+    deck = exp.raw.get("deck", {})
+    supplies = sorted({c.supply_v for c in matrix})
+    nominal = supplies[len(supplies) // 2]
+    head = [
+        f"* {exp.slug} batch netlist -- generated by sim/bin/corner-run.py, do not edit",
+        "* .lib / .temp / supply value are applied per corner by klt sim; vsup below is only",
+        "* the placeholder the testbench's supply source references before klt's alter.",
+        f".param vsup={nominal}",
+    ]
+    for name, value in (deck.get("params") or {}).items():
+        head.append(f".param {name}={value}")
+    for opt in deck.get("options") or []:
+        head.append(f".option {opt}")
+    return "\n".join(head + body + [".end", ""])
+
+
+def build_batch_request(exp: Experiment, pdk: Pdk, matrix: list[Corner], timeout: int) -> dict:
+    deck = exp.raw.get("deck", {})
+    analyses = list(deck.get("analyses") or ["op"])
+    if len(analyses) != 1:
+        raise HarnessError(
+            f"{exp.slug}: the batch backend supports exactly one deck analysis, got {analyses}"
+        )
+    kind, _, args = analyses[0].strip().partition(" ")
+    analysis = {"kind": kind.lower(), "args": args.strip()}
+    process, temps, supplies = batch_axes(matrix)
+    supply_source = deck.get("supply_source", "v1")
+    return {
+        "netlist": "netlist.spice",
+        "backend": "batch",
+        "models": {"pdk": pdk.variant, "lib": pdk.pin["ngspice_lib"]},
+        "corners": {
+            "process": process,
+            "supply_v": {supply_source: supplies},
+            "temperature_c": temps,
+        },
+        "analysis": analysis,
+        "measurements": [
+            {"name": m.name, "expr": m.expr, **({"unit": m.unit} if m.unit else {})}
+            for m in exp.measurements
+        ],
+        "options": {"timeout_s": timeout, "keep_artifacts": True},
+        "batch": {"runner_version_check": "warn"},
+    }
+
+
+def fleet_pdk_commit(version: str) -> str:
+    """open_pdks commit out of the fleet's `provenance.pdk.version` string."""
+    m = re.search(r"\b[0-9a-f]{40}\b", version or "")
+    return m.group(0) if m else "unknown"
+
+
+def _report_corner_key(c: dict) -> tuple:
+    supply = c.get("supply_v")
+    if isinstance(supply, dict):
+        supply = next(iter(supply.values()), None)
+    return (c.get("process"), float(c["temperature_c"]), float(supply))
+
+
+def results_from_report(
+    exp: Experiment, matrix: list[Corner], report: dict, corners_dir: Path, timeout: int
+) -> list[dict]:
+    """Map a klt report.json onto `run_corner`-shaped per-corner result dicts.
+
+    Limits are graded here with `evaluate_measurements`, not by klt, so the
+    batch and local paths share one pass/fail rule.
+    """
+    by_key = {}
+    for c in report.get("corners", []):
+        try:
+            by_key[_report_corner_key(c)] = c
+        except (KeyError, TypeError, ValueError):
+            continue
+    results = []
+    for corner in matrix:
+        rc = by_key.get((corner.process, corner.temp_c, corner.supply_v))
+        values = {}
+        status = "missing"
+        runtime = 0.0
+        if rc is not None:
+            status = rc.get("status", "?")
+            runtime = float(rc.get("runtime_s") or 0.0)
+            values = {
+                m["name"]: m["value"]
+                for m in rc.get("measurements", [])
+                if m.get("value") is not None
+            }
+        checks, ok = evaluate_measurements(exp, values)
+        errored = rc is None or status in ("error", "errored")
+        log_path = corners_dir / f"{corner.id}.log"
+        results.append(
+            {
+                "corner_id": corner.id,
+                "process": corner.process,
+                "temperature_c": corner.temp_c,
+                "supply_v": corner.supply_v,
+                "ngspice_exit": 1 if errored else 0,
+                "timed_out": False,
+                "killed_by_signal": None,
+                "killed_by_signal_name": None,
+                "elapsed_s": round(runtime, 3),
+                "timeout_s": timeout,
+                "measurements": checks,
+                "pass": ok and not errored,
+                "log": str(log_path.relative_to(REPO_ROOT)),
+                "batch_status": status,
+                "diagnostics": (rc or {}).get("diagnostics", []),
+            }
+        )
+    return results
+
+
+def write_batch_corner_log(res: dict, log_path: Path) -> None:
+    log_path.parent.mkdir(parents=True, exist_ok=True)
+    lines = [
+        f"# corner: {res['corner_id']}",
+        f"# process={res['process']} temp={fmt_temp(res['temperature_c'])}C "
+        f"supply={res['supply_v']:.2f}V",
+        f"# klt sim --backend batch corner status: {res['batch_status']}",
+        f"# result: {'PASS' if res['pass'] else 'FAIL'}",
+        "",
+    ]
+    for d in res["diagnostics"]:
+        lines.append(f"# diagnostic [{d.get('severity')}] {d.get('code')}: {d.get('message')}")
+    log_path.write_text("\n".join(lines) + "\n")
+
+
+def submit_batch(
+    exp: Experiment, matrix: list[Corner], netlist: str, request: dict, run_dir: Path
+) -> tuple[dict, dict]:
+    """Submit the grid as one `klt sim --backend batch` request.
+
+    Returns (report, fleet) where `fleet` carries what the fleet reported about
+    itself. A submit that yields no usable report is a HarnessError quoting klt
+    verbatim: there is no local fallback.
+    """
+    d = run_dir / "batch"
+    outcome = sim_common.submit_prepared(
+        d, netlist, request, f"{exp.slug}: {len(matrix)} points -> batch fleet", exp.slug
+    )
+    report_path = d / "report.json"
+    if not sim_common.report_usable(report_path):
+        raise HarnessError(
+            f"batch submit produced no usable report (klt exit {outcome['exit']}, "
+            f"status {outcome['status']}); not falling back to a local grid\n"
+            f"  klt stdout (verbatim): {report_path.read_text().strip()}\n"
+            f"  klt stderr (verbatim): {(d / 'klt.stderr').read_text().strip()}"
+        )
+    report = json.loads(report_path.read_text())
+    prov = report.get("provenance") or {}
+    env = report.get("environment") or {}
+    remote = env.get("remote") or {}
+    pdk_prov = prov.get("pdk") or {}
+    # `provenance.pdk` describes the PDK the *client* resolved, not the runner's:
+    # the runner executes against its own /opt/pdk, whose stamp is reported under
+    # remote.worker_environment.pdk. Cite the runner's stamp; only when the fleet
+    # reports none is the commit "unknown" (never the client's, which would
+    # make an unverified fleet look pinned).
+    runner_pdk = (remote.get("worker_environment") or {}).get("pdk") or {}
+    runner_stamp = runner_pdk.get("stamp_text") or ""
+    return report, {
+        "pdk": {
+            "installed_commit": fleet_pdk_commit(runner_stamp),
+            "lib_file": f"{request['models']['lib']} (resolved on the runner)",
+        },
+        "ngspice": f"{env.get('engine', 'ngspice')} {env.get('engine_version', '?')} (fleet)",
+        "batch": {
+            "job_id": remote.get("job_id"),
+            "klt_client": sim_common.klt_version(),
+            "runner_klt": remote.get("runner_klt_version"),
+            "fleet_pdk_name": runner_pdk.get("variant") or pdk_prov.get("name"),
+            "fleet_pdk_version": runner_stamp or "not reported by the runner",
+            "client_pdk_version": pdk_prov.get("version"),
+            "models_lib_sha256": env.get("models_lib_sha256"),
+            "status": report.get("status"),
+            "remote": remote,
+        },
     }
 
 
@@ -600,6 +851,15 @@ def render_record(record: dict) -> str:
         f"(`{r['experiment']['provenance_source']}`)"
     )
     lines += sim_common.render_pdk_tools_repo_state(r)
+    if r.get("batch"):
+        b = r["batch"]
+        lines.append(
+            f"- **Backend**: `klt sim --backend batch` (fleet job `{b['job_id']}`); "
+            f"klt client `{b['klt_client']}`, runner klt `{b['runner_klt']}`; "
+            f"runner PDK `{b['fleet_pdk_name']}` stamp `{b['fleet_pdk_version']}` "
+            f"(client-side PDK: {b.get('client_pdk_version')}); "
+            f"client-staged models lib sha256 `{b['models_lib_sha256']}`"
+        )
 
     matrix = r["matrix"]
     lines.append("- **Corner matrix run**:")
@@ -721,7 +981,16 @@ def parse_args(argv: list[str]) -> argparse.Namespace:
     p.add_argument(
         "--dry-run",
         action="store_true",
-        help="netlist and print the corner list and one deck, write nothing under sim/",
+        help="netlist and print the corner list and one deck (with --backend batch: the "
+        "klt sim request instead), write nothing under sim/ and submit nothing",
+    )
+    p.add_argument(
+        "--backend",
+        choices=("local", "batch"),
+        default="local",
+        help="local: serial ngspice on this host (default; single points and --quick). "
+        "batch: submit the whole grid as one `klt sim --backend batch` request to the "
+        "fleet; a failed submit is an error, never a local fallback",
     )
     return p.parse_args(argv)
 
@@ -759,6 +1028,11 @@ def main(argv: list[str]) -> int:
             "recorded result)"
         )
 
+    backend = args.backend
+    if backend == "batch" and args.quick:
+        print("corner-run: --quick is a local liveness subset; keeping it on the local backend")
+        backend = "local"
+
     git_info = git_state()
     now = datetime.now(timezone.utc)
     record_id = f"{now:%Y%m%d}-{now:%H%M%S}-{git_info['sha']}"
@@ -780,7 +1054,10 @@ def main(argv: list[str]) -> int:
     run_dir.mkdir(parents=True, exist_ok=True)
     shutil.copyfile(SPICEINIT_FILE, run_dir / ".spiceinit")
 
-    netlist = netlist_with_xschem(exp.schematic, run_dir, pdk)
+    if backend == "batch":
+        netlist = netlist_with_klt(exp.schematic, run_dir, pdk)
+    else:
+        netlist = netlist_with_xschem(exp.schematic, run_dir, pdk)
     body = netlist_body(netlist)
 
     print(f"experiment      : {exp.slug}")
@@ -790,7 +1067,37 @@ def main(argv: list[str]) -> int:
     print(f"corner points   : {len(matrix)}" + (" (SUBSET)" if is_subset else " (full matrix)"))
     print(f"scratch run dir : {run_dir}")
 
-    if args.dry_run:
+    fleet = None
+    if backend == "batch":
+        request = build_batch_request(exp, pdk, matrix, args.timeout)
+        batch_netlist = build_batch_netlist(exp, body, matrix)
+        if args.dry_run:
+            print(f"\n-- klt sim request ({len(matrix)} corners, one grid) --")
+            print(json.dumps(request, indent=2))
+            print("\n-- corner list --")
+            for corner in matrix:
+                print(f"  {corner.id}")
+            print("\n(dry run: nothing submitted, nothing written under sim/<experiment>/)")
+            return 0
+        report, fleet = submit_batch(exp, matrix, batch_netlist, request, run_dir)
+        results = results_from_report(exp, matrix, report, corners_dir, args.timeout)
+        for i, res in enumerate(results, start=1):
+            write_batch_corner_log(res, corners_dir / f"{res['corner_id']}.log")
+            summary = ", ".join(
+                f"{c['name']}={'n/a' if c['value'] is None else format(c['value'], '.6g')}"
+                for c in res["measurements"]
+            )
+            print(
+                f"[{i:>3}/{len(matrix)}] {res['corner_id']:<20} "
+                f"{'PASS' if res['pass'] else 'FAIL'}  {summary}"
+            )
+        for name in ("netlist.spice", "request.json", "report.json", "klt.stderr"):
+            src = run_dir / "batch" / name
+            if src.is_file():
+                dst = corners_dir / "batch" / name
+                dst.parent.mkdir(parents=True, exist_ok=True)
+                dst.write_text(sim_common.scrub(src.read_text(), run_dir, REPO_ROOT))
+    elif args.dry_run:
         print("\n-- corner list --")
         for corner in matrix:
             print(f"  {corner.id}")
@@ -798,26 +1105,43 @@ def main(argv: list[str]) -> int:
         print(build_deck(exp, pdk, matrix[0], body))
         print("\n(dry run: nothing written under sim/<experiment>/)")
         return 0
-
-    results = []
-    for i, corner in enumerate(matrix, start=1):
-        log_path = corners_dir / f"{corner.id}.log"
-        res = run_corner(exp, pdk, corner, body, run_dir, log_path, args.timeout)
-        results.append(res)
-        summary = ", ".join(
-            f"{c['name']}={'n/a' if c['value'] is None else format(c['value'], '.6g')}"
-            for c in res["measurements"]
-        )
-        print(
-            f"[{i:>3}/{len(matrix)}] {corner.id:<20} "
-            f"{'PASS' if res['pass'] else 'FAIL'}  {summary}"
-        )
+    else:
+        results = []
+        for i, corner in enumerate(matrix, start=1):
+            log_path = corners_dir / f"{corner.id}.log"
+            res = run_corner(exp, pdk, corner, body, run_dir, log_path, args.timeout)
+            results.append(res)
+            summary = ", ".join(
+                f"{c['name']}={'n/a' if c['value'] is None else format(c['value'], '.6g')}"
+                for c in res["measurements"]
+            )
+            print(
+                f"[{i:>3}/{len(matrix)}] {corner.id:<20} "
+                f"{'PASS' if res['pass'] else 'FAIL'}  {summary}"
+            )
 
     spreads = spread_checks(exp, results)
     overall = all(r["pass"] for r in results) and all(s["pass"] for s in spreads)
 
     snapshot.parent.mkdir(parents=True, exist_ok=True)
     snapshot.write_text("\n".join(body) + "\n.end\n")
+
+    pdk_record = {
+        "root": str(pdk.root),
+        "variant": pdk.variant,
+        "installed_commit": pdk.installed_commit,
+        "pinned_commit": pin["open_pdks_commit"],
+        "matches_pin": pdk.matches_pin,
+        "lib_file": str(pdk.lib_file),
+    }
+    tools = tool_versions()
+    if fleet is not None:
+        # The fleet, not this host, ran the simulator: the record must cite the
+        # PDK and engine the fleet reports (the pin is checked against that).
+        pdk_record.update(fleet["pdk"])
+        pdk_record["local_installed_commit"] = pdk.installed_commit
+        pdk_record["matches_pin"] = pdk_record["installed_commit"] == pin["open_pdks_commit"]
+        tools["ngspice"] = fleet["ngspice"]
 
     record = {
         "record_id": record_id,
@@ -834,15 +1158,8 @@ def main(argv: list[str]) -> int:
             ),
             "statistical_convention": exp.raw.get("statistical_convention", "N/A"),
         },
-        "pdk": {
-            "root": str(pdk.root),
-            "variant": pdk.variant,
-            "installed_commit": pdk.installed_commit,
-            "pinned_commit": pin["open_pdks_commit"],
-            "matches_pin": pdk.matches_pin,
-            "lib_file": str(pdk.lib_file),
-        },
-        "tools": tool_versions(),
+        "pdk": pdk_record,
+        "tools": tools,
         "git": git_info,
         "matrix": {
             "process": unique_in_order(c.process for c in matrix),
@@ -867,6 +1184,9 @@ def main(argv: list[str]) -> int:
         },
     }
 
+    if fleet is not None:
+        record["backend"] = "batch"
+        record["batch"] = fleet["batch"]
     records_dir.mkdir(parents=True, exist_ok=True)
     record_json.write_text(json.dumps(record, indent=2, sort_keys=True) + "\n")
     record_md.write_text(render_record(record))
@@ -876,6 +1196,15 @@ def main(argv: list[str]) -> int:
     print(f"json    : {record_json.relative_to(REPO_ROOT)}")
     print(f"logs    : {corners_dir.relative_to(REPO_ROOT)}/")
     print(f"overall : {'PASS' if overall else 'FAIL'}")
+    if fleet is not None and not pdk_record["matches_pin"]:
+        print(
+            f"corner-run: WARNING: the fleet runner's PDK is {pdk_record['installed_commit']}, "
+            f"but sim/pdk.json pins {pin['open_pdks_commit']}; the record says MISMATCH.",
+            file=sys.stderr,
+        )
+        if not args.allow_pdk_mismatch:
+            print("  re-run with --allow-pdk-mismatch to accept this as exit 0", file=sys.stderr)
+            return 3
     return 0 if overall else 2
 
 
