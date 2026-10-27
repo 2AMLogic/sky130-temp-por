@@ -36,7 +36,6 @@ import json
 import os
 import re
 import shutil
-import subprocess
 import sys
 import time
 from datetime import datetime, timezone
@@ -367,12 +366,10 @@ def cmd_probe(args) -> int:
     if args.tstop:
         r["analysis"]["args"] = f"1e-6 {args.tstop:g} 0 5e-6"
         r["measurements"] = []
-    r["options"]["ngspice_init"] = [ln.strip() for ln in (SIM_DIR / "spiceinit").read_text().splitlines() if ln.strip() and not ln.startswith("*")]
+    r["options"]["ngspice_init"] = sim_common.spiceinit_lines(SIM_DIR)
     (d / "request.json").write_text(json.dumps(r, indent=2) + "\n")
     say(f"[probe] one LOCAL corner tt/27C/3.30V for {args.tag}")
-    p = subprocess.run(["klt", "sim", str(d / "request.json"), "--backend", "local", "-o", str(d / "out"), "--format", "json"], capture_output=True, text=True, timeout=3600)
-    (d / "report.json").write_text(p.stdout)
-    (d / "klt.stderr").write_text(p.stderr)
+    p = sim_common.run_local_probe(d)
     print(f"exit {p.returncode}; {d}")
     return 0
 
@@ -458,7 +455,7 @@ def analyze_request(req: dict, run_dir: Path, man: dict, corners_dir: Path, writ
         pt["check"] = res
         if wave is not None and res["verdict"] != "ERROR":
             rows = gc.compress(wave, A and bool(st["gen"]))
-            stt = gc.transitions_from_stored(rows, vf, st["t0"])
+            stt = gc.bc.transitions_from_stored(rows, vf, st["t0"])
             n_as = res["resetn"]["n_assert"]
             n_rel = res["resetn"]["n_release_after_t0"]
             pt["stored_trace"] = {"rows": len(rows), "full_samples": len(wave["time"]), "n_assert": stt["n_assert"], "n_release": stt["n_release"],
@@ -680,9 +677,7 @@ def cmd_record(args) -> int:
         rec_dir = HERE / "records"
         corners_dir = evidence_store.stage_dir_for(SLUG, record_id)  # git-ignored scratch; stored below
         snap_dir = HERE / "netlist-snapshots" / record_id
-        for pth in (rec_dir / f"{record_id}.md", rec_dir / f"{record_id}.json", corners_dir, snap_dir, evidence_store.manifest_path(SLUG, record_id)):
-            if pth.exists():
-                raise SystemExit(f"{pth} exists -- sim/ is append-only")
+        sim_common.refuse_existing((rec_dir / f"{record_id}.md", rec_dir / f"{record_id}.json", corners_dir, snap_dir, evidence_store.manifest_path(SLUG, record_id)))
         points, requests, fleet_pdk = [], [], {}
         for r in plan_requests(man, cls):
             res = analyze_request(r, run_dir, man, corners_dir, write=True)

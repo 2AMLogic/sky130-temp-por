@@ -399,10 +399,6 @@ def compress(w: dict, with_inj: bool) -> list[list[float]]:
     return decimate(cols, KEEP_DT, th)
 
 
-def transitions_from_stored(rows, vf: float, t0: float) -> dict:
-    return bc.transitions_from_stored(rows, vf, t0)
-
-
 def write_trace(path: Path, rows, with_inj: bool) -> None:
     head = "# t_s,vdd_v,resetn_v,por_raw_v,ibias_node_v,ibias_delivered_a" + (",ginj_drive,i_inj_a" if with_inj else "")
     write_gz_rows(path, head + "  (ibias_delivered = +id of bias_core XMPIB; i_inj = current in RINJ; change-triggered)", rows)
