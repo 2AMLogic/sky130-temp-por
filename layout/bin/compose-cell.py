@@ -177,6 +177,19 @@ first exercised by ``layout/ro_ring5/``:
     single-instance cards (``<name>_0``..) because ``klt lvs``'s plain-element
     converter refuses multiplied devices; the layout must draw N devices.
 
+``extract.top_cell_pins`` / ``extract.hierarchical_cells``
+    Forwarded to ``klt extract`` as ``--top-cell-pins`` and
+    ``--hierarchical-cells``. A cell that places several already-composed
+    sibling streams needs them: the leaves label their internal nets
+    independently, so the same label (or labels differing only by case --
+    ``pb``/``PB``) recurs in more than one leaf, and a *flat* extracted netlist
+    then collapses those distinct nets when ``klt lvs`` reads it back
+    (``net.merged``). Naming the placed cells (spelled ``<block id>__<cell
+    name>`` in the composed stream) writes one ``.SUBCKT`` per leaf, scoping
+    each leaf's internal labels; pair it with ``lvs.flatten_layout`` so the
+    hierarchical layout netlist is compared against the flattened reference
+    (``layout/temp_por_top/``).
+
 Compatibility note: ``lvs.dependency_variants`` (#22/#27) is **removed** (#110).
 It let a top subckt call one dependency at several sizings, rewriting a renamed
 copy per instance. No committed cell recipe declared it, and the generated
@@ -615,7 +628,16 @@ def compose_cell(spec: dict, spec_dir: Path, out_dir: Path) -> dict:
     write_json(out_dir / "drc.json", drc)
 
     # 4. Extraction.
-    extract = run_klt(["extract", f"{cell}.gds", "--deck", deck], env=env, cwd=out_dir)
+    extract_spec = spec.get("extract") or {}
+    extract_args = ["extract", f"{cell}.gds", "--deck", deck]
+    if extract_spec.get("top_cell_pins"):
+        extract_args.append("--top-cell-pins")
+    if extract_spec.get("hierarchical_cells"):
+        extract_args += [
+            "--hierarchical-cells",
+            ",".join(extract_spec["hierarchical_cells"]),
+        ]
+    extract = run_klt(extract_args, env=env, cwd=out_dir)
     write_json(out_dir / "extract.json", extract)
 
     # 5. LVS against the design's own schematic-exported subckt.

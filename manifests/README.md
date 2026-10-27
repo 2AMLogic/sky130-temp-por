@@ -108,19 +108,21 @@ part of the claim and travel with it):
   the inventory, re-run `klt signoff --attest 1 --inventory
   manifests/inventories/item-1.json -o manifests/attestations/item-1.json`
   locally, then re-cite and re-render.
-- **Item 2 — Layout: `unmet` (`no_evidence`)**, truthfully: the block has
-  no `temp_por_top` layout yet, so no envelope can honestly back a
-  block-level layout claim. Partial progress exists — six `bias_core`
-  device-group sub-blocks, the `bias_core` full-cell assembly and the
-  `por_comparator` leaf cell (21 devices, DRC clean, LVS `match`, #82) are
-  committed under `layout/` (see `layout/README.md`), as are the
-  `por_output_chain` leaf cell (#97: DRC clean, LVS `match` 33/33 devices,
-  but **without** its native-Vt device `XMASSIST`, which klt cannot draw or
-  compare, so that cell is incomplete) and the `temp_core` leaf cell (#104:
-  DRC clean, LVS `match` 48/48 devices and 24/24 nets, no exclusions; PNP
-  `AE` and resistor/MiM values are not compared, and the 5 V `hvi` marker is
-  not drawn) — but those are leaf and sub-block increments, not the block's
-  layout, and no citation is made.
+- **Item 2 — Layout: `met`** via the hand-written artifact-anchored
+  envelope `attestations/item-2.json` (#240; `klt signoff --attest` does not
+  cover item 2, so `layout/bin/attest-layout.py` writes it). It binds, as a set
+  (`provenance.input.paths`), the committed `layout/temp_por_top/temp_por_top.gds`
+  and its recipe `layout/temp_por_top/cell.json`, and carries a regeneration
+  claim: the script rebuilds the stream from the recipe and refuses to write
+  the envelope unless the rebuild is byte-identical. Any edit to either file
+  (or to a leaf stream the top embeds) turns the row `stale_evidence`.
+  **What it does not claim:** presence and reproducibility only. The top's
+  recorded checks are *not* clean and are not cited — DRC 351
+  `poly.endcap.diff.1` violations (all inherited from the committed leaf
+  streams, which predate the pinned klt's endcap rule), ERC 2
+  `erc.missing_tie` (two `temp_core` nwells), and an LVS `match` (152/152
+  devices, 71/71 nets) that excludes the native-Vt `XMASSIST` (#97). See
+  `layout/temp_por_top/README.md`.
 - **Item 3 — DRC clean: `met`** via `layout/bias_core/drc.json` (`status:
   clean`, 0 violations), pinned to
   `content_hash sha256:9c414f91…7ab68e`, the sha256 of the committed
@@ -149,7 +151,8 @@ part of the claim and travel with it):
   klayout-tools#2738 added (layer plan in `layout/bias_core/README.md`);
   before it, the compare stood at 21/50 devices and 14/27 nets. **Not
   proven by this envelope:** it is the `bias_core` assembly, not a
-  block-level (`temp_por_top`) layout (see item 2). It also carries five
+  block-level (`temp_por_top`) layout (item 2's `temp_por_top` stream is
+  not cited here: its DRC/ERC are not clean and its LVS excludes `XMASSIST`). It also carries five
   disclosed warnings: the `PNP` compare is scoped to `NE`, so `AE` is not
   verified; the subckt-call reference has `R=0`/`C=0` placeholders on the
   4 `res_xhigh_po` and 2 MiM caps, so their values are not compared; and

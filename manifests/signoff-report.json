@@ -5,7 +5,7 @@
   "tier": null,
   "t1_item_count": 11,
   "build_t1_item_count": 11,
-  "t1_met_count": 6,
+  "t1_met_count": 7,
   "source_doc": "docs/design-evidence-tiers.md",
   "source_doc_content_hash": "sha256:3066f2cacd94ebe33088dd4c442976ed704738ed14e608e5f071efbf58570904",
   "build": {
@@ -62,10 +62,49 @@
       "partition": null,
       "text": "committed GDS/OASIS, reproducibly generated or with documented provenance.",
       "notes": [],
-      "status": "unmet",
-      "reason": "no_evidence",
+      "status": "met",
+      "reason": null,
       "graded_by_build": true,
-      "citation": null
+      "citation": {
+        "file": "manifests/attestations/item-2.json",
+        "command": null,
+        "kind": "generic",
+        "check_status": "pass",
+        "content_hash": "sha256:a4b7093235a81da5687ae087fa40108b57029bc90056995219c6a0fe134cbff8",
+        "input_verified": true,
+        "exit_status": 0,
+        "artifact_binding": {
+          "t1_item": 2,
+          "path": null,
+          "content_hash": "sha256:a4b7093235a81da5687ae087fa40108b57029bc90056995219c6a0fe134cbff8",
+          "input_verified": true,
+          "members": [
+            {
+              "path": {
+                "path": "layout/temp_por_top/cell.json",
+                "scope": "repo"
+              },
+              "content_hash": "sha256:99ae60a6d28f02ef771b5c98e6034cde8027a770db2ae6db8905683dabb9e084",
+              "status": "verified"
+            },
+            {
+              "path": {
+                "path": "layout/temp_por_top/temp_por_top.gds",
+                "scope": "repo"
+              },
+              "content_hash": "sha256:87c49a903e50f9d93968eb68360123a60a6c064478f3b9309670e0c22ca65352",
+              "status": "verified"
+            }
+          ],
+          "summary": "T1 item 2 (Layout): layout/temp_por_top/temp_por_top.gds is composed from the four committed leaf streams by layout/bin/compose-cell.py and rebuilds byte-for-byte. Attests presence and reproducibility only; not a verification claim. Recorded and NOT cited: DRC 351 poly.endcap.diff.1 violations (inherited from the leaf streams), ERC 2 erc.missing_tie (temp_core), LVS match 152/152 with native-Vt XMASSIST excluded (#97). See layout/temp_por_top/README.md.",
+          "source": "layout/temp_por_top/cell.json",
+          "regeneration": {
+            "generator": "python3 layout/bin/compose-cell.py layout/temp_por_top/cell.json --check",
+            "regenerated_hash": "sha256:a4b7093235a81da5687ae087fa40108b57029bc90056995219c6a0fe134cbff8",
+            "executed_by_klt": false
+          }
+        }
+      }
     },
     {
       "tier": "T1",
