@@ -55,7 +55,7 @@ import sim_common  # noqa: E402
 cr = sim_common.load_corner_run()
 SLUG = "temp-core-accuracy-mc"
 BUILD = REPO_ROOT / "sim" / "build" / SLUG
-MODEL_LIB = "libs.tech/combined/sky130.lib.spice"
+MODEL_LIB = sim_common.MODEL_LIB
 say = sim_common.say
 
 PROCS = ["tt", "ss", "ff", "sf", "fs"]
@@ -202,21 +202,16 @@ def measurements():
 def build_request(term, backend, n, seed, corners=None, timeout=1800):
     procs, supplies = corners or (PROCS, SUPPLIES)
     mm = term != "nominal"
-    req = {
-        "netlist": "netlist.spice",
-        "backend": backend,
-        "models": {"pdk": "sky130A", "lib": MODEL_LIB},
-        "corners": {"process": [f"{p}_mm" if mm else p for p in procs], "supply_v": {"vsup": supplies},
-                    "temperature_c": [T_REF]},
-        "analysis": {"kind": "dc", "args": f"temp {T_LO} {T_HI} 1"},
-        "measurements": measurements(),
-        "options": {"timeout_s": timeout, "keep_artifacts": True},
-    }
-    if mm:
-        req["monte_carlo"] = {"n": n, "seed": seed, "vary": "mismatch"}
-    if backend == "batch":
-        req["batch"] = {"runner_version_check": "warn"}
-    return req
+    return sim_common.base_request(
+        "netlist.spice", backend,
+        {"process": [f"{p}_mm" if mm else p for p in procs], "supply_v": {"vsup": supplies},
+         "temperature_c": [T_REF]},
+        {"kind": "dc", "args": f"temp {T_LO} {T_HI} 1"},
+        measurements(),
+        timeout,
+        waveforms=False,
+        monte_carlo={"n": n, "seed": seed, "vary": "mismatch"} if mm else None,
+    )
 
 
 def cmd_run(args):

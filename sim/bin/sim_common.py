@@ -403,6 +403,41 @@ def scrub(text: str, run_dir: Path, repo_root: Path) -> str:
     return re.sub(r"/home/[^/\s]+", "<home>", text)
 
 
+MODEL_LIB = "libs.tech/combined/sky130.lib.spice"
+
+
+def base_request(
+    netlist: str,
+    backend: str,
+    corners: dict,
+    analysis: dict,
+    measurements: list[dict],
+    timeout_s: int,
+    capacity_wait_s: float = 0,
+    waveforms: bool = True,
+    monte_carlo: dict | None = None,
+) -> dict:
+    """Fleet request skeleton shared by every campaign driver: the sky130A `models` block, the
+    `options` block and, on the batch backend, the `batch` block.  Key order is part of the
+    contract (request.json is recorded evidence)."""
+    req = {
+        "netlist": netlist,
+        "backend": backend,
+        "models": {"pdk": "sky130A", "lib": MODEL_LIB},
+        "corners": corners,
+        "analysis": analysis,
+        "measurements": measurements,
+        "options": {"timeout_s": timeout_s, "keep_artifacts": True, **({"waveforms": True} if waveforms else {})},
+    }
+    if monte_carlo:
+        req["monte_carlo"] = monte_carlo
+    if backend == "batch":
+        req["batch"] = {"runner_version_check": "warn"}
+        if capacity_wait_s:
+            req["batch"]["capacity_wait_s"] = capacity_wait_s
+    return req
+
+
 FLEET_NOTE = "client/runner klt skew accepted with batch.runner_version_check=warn; the runner ignores options.ngspice_init so a netlist-carried `set ng_nomodcheck` is used"
 XSCHEM_NOTE = "only the testbench is netlisted by xschem here; the DUT is spliced from the committed design/netlist/temp_por_top.spice (host xschem leaves expr() parameters unevaluated)"
 

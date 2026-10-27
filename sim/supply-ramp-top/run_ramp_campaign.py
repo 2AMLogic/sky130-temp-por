@@ -58,7 +58,7 @@ BUILD = REPO_ROOT / "sim" / "build" / SLUG
 HOLD_S = 15e-3
 RATE_CEIL_SUPPLY = 3.63
 TMAX_S = 5e-6
-MODEL_LIB = "libs.tech/combined/sky130.lib.spice"
+MODEL_LIB = sim_common.MODEL_LIB
 
 say = sim_common.say
 corner_id = sim_common.corner_id
@@ -118,30 +118,23 @@ def build_request(netlist_name: str, rate: float, man: dict, backend: str, capac
     tstop = tstop_for(rate)
     t_at = f"{(tstop - 0.1e-3):.9g}"
     c = man["corners"]
-    req = {
-        "netlist": netlist_name,
-        "backend": backend,
-        "models": {"pdk": "sky130A", "lib": MODEL_LIB},
-        "corners": {
+    return sim_common.base_request(
+        netlist_name, backend,
+        {
             "process": c["process"],
             "supply_v": {"vset": c["supply_v"]},
             "temperature_c": c["temperature_c"],
         },
-        "analysis": {"kind": "tran", "args": f"1u {tstop:.9g} 0 {TMAX_S:.3g}"},
-        "measurements": [
+        {"kind": "tran", "args": f"1u {tstop:.9g} 0 {TMAX_S:.3g}"},
+        [
             {"name": "vdd_end", "spice": f".meas tran vdd_end FIND v(vdd) AT={t_at}", "unit": "V"},
             {"name": "resetn_end", "spice": f".meas tran resetn_end FIND v(resetn) AT={t_at}", "unit": "V"},
             {"name": "resetn_max", "spice": ".meas tran resetn_max MAX v(resetn)", "unit": "V"},
             {"name": "por_raw_max", "spice": ".meas tran por_raw_max MAX v(xdut.por_raw)", "unit": "V"},
             {"name": "ibias_end", "spice": f".meas tran ibias_end FIND v(xdut.ibias) AT={t_at}", "unit": "V"},
         ],
-        "options": {"timeout_s": 1500, "keep_artifacts": True, "waveforms": True},
-    }
-    if backend == "batch":
-        req["batch"] = {"runner_version_check": "warn"}
-        if capacity_wait_s:
-            req["batch"]["capacity_wait_s"] = capacity_wait_s
-    return req
+        1500, capacity_wait_s,
+    )
 
 
 def submit(variant_name: str, rate: float, head: str, man: dict, run_dir: Path, capacity_wait_s: float = 0) -> dict:
