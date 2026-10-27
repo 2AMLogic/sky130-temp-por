@@ -42,12 +42,16 @@
     "                    per compose-cell.py run and WARNS (never hard-fails)",
     "                    on a mismatch, so a stale install self-reports",
     "                    instead of surfacing deep in the chain as a",
-    "                    confusing 'unrecognized key(s)' error (issue #51)."
+    "                    confusing 'unrecognized key(s)' error (issue #51).",
+    "                    Bumped to the 0.8.0 release (a release build reports",
+    "                    its tag commit, so the prefix match still applies);",
+    "                    the per-cell klt_version fields in layout/*/*.json",
+    "                    stay as historical provenance of each stream."
   ],
   "variant": "sky130A",
   "open_pdks_commit": "f6eeac7dad085ffcc829ccfd721f7b4ce39edcf7",
   "install_command": "pip install ciel==2.6.1 && ciel enable --pdk-family sky130 -l sky130_fd_pr f6eeac7dad085ffcc829ccfd721f7b4ce39edcf7",
   "klt_deck": "sky130",
-  "klt_version_pin": "0.7.1.dev1610+g758c6e224053",
-  "klt_commit_pin": "758c6e224053"
+  "klt_version_pin": "0.8.0",
+  "klt_commit_pin": "c572046be644"
 }

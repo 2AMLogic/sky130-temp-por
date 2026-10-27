@@ -24,7 +24,7 @@
         "role": "hygiene",
         "path": ".github/workflows/signoff-manifest.yml",
         "passed": true,
-        "content_hash": "sha256:3e813b81b32af9e04ec7a221344ea5e0e6708678784e587be492e1e087bba7cb"
+        "content_hash": "sha256:c81154e352592955ca22ba3cd25a9ce1f5d6eca1bbbc59ba4e9f7cfb83390ef7"
       },
       {
         "check": "present",
@@ -119,7 +119,7 @@
     ]
   },
   "provenance": {
-    "klt_version": "0.7.1.dev2517+g6bb7cf233677",
+    "klt_version": "0.8.0",
     "klayout_version": null,
     "pdk": null,
     "deck": null,

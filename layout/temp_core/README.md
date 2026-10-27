@@ -84,7 +84,7 @@ evidence here comes from the pinned commit, run through a throwaway wrapper
 outside the repo, so `check_klt_pin()` stays silent:
 
 ```
-uvx --from "git+https://github.com/2AMLogic/klayout-tools@0ce8c64842d9" klt "$@"
+uvx --from "klayout-tools==0.8.0" klt "$@"
 ```
 
 Put a `klt` script that execs this first on `PATH`. The deck is the curated

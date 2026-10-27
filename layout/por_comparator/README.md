@@ -61,8 +61,8 @@ the host's installed `klt`, which on the build host is a different, newer
 build (`0.7.0+g6fd0278268cc`):
 
 ```
-uvx --from "git+https://github.com/2AMLogic/klayout-tools@0ce8c64842d9" klt version --format json
-# version 0.6.0+g0ce8c64842d9, git_commit 0ce8c64842d9cbcd7689d40ebfa3774355c1da4c,
+uvx --from "klayout-tools==0.8.0" klt version --format json
+# version 0.8.0, git_commit c572046be644e0407f693f2410f3abb799d68a3a,
 # klayout 0.30.12 (expected 0.30.12)
 ```
 
