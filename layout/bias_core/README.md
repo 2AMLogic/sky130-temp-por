@@ -1,5 +1,7 @@
 # layout/bias_core
 
+> **Re-generated in #243 at `klt 758c6e224053` (the `layout/pdk.json` pin).** Committed streams and `drc/lvs/extract.json` now come from the pin; "Tool build" / `klt 0.6.0` statements below record the original run. See `layout/README.md`.
+
 `bias_core` is `design/netlist/bias_core.spice`'s top-level subckt: `.subckt
 bias_core VDD VSS IBIAS VREF BIAS_OK`, 50 devices across six device groups,
 each already landed as its own standalone proof cell

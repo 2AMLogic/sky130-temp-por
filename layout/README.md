@@ -4,6 +4,18 @@ Physical layout evidence for sky130-temp-por, built with `klayout-tools`
 (`klt`) against the sky130 open PDK. See `layout/pdk.json` for the PDK/tool
 pin.
 
+## Evidence regenerated at the pin (issue #243)
+
+All `layout/*` evidence (leaf and sub-block streams, `drc/lvs/extract/erc.json`,
+`temp_por_top`) was regenerated with `klt 0.7.1.dev1610+g758c6e224053`, the
+`layout/pdk.json` and CI pin. The earlier per-cell statements below that cite
+`klt 0.6.0` / `0ce8c64842d9` are the history of how each cell was first closed;
+the committed files now come from the pin. Results: DRC 0 violations on every
+cell and on `temp_por_top`; LVS `match` everywhere it matched before. The
+regeneration shifted hand-declared sub-block ports in
+`layout/bias_core/cell.json`, which were re-synced to each sub-block's
+`compose.response.json` (otherwise `bias_core` LVS regressed to 45/50).
+
 ## `klt` version pin: the commit, not the semver, is authoritative (issue #51)
 
 `layout/pdk.json` carries two fields for the `klt` build this evidence was

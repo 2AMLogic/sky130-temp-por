@@ -6,13 +6,13 @@
   "pdk": {
     "name": "sky130A",
     "variant": "sky130A",
-    "version": "open_pdks c6d73a35f524070e85faff4a6a9eef49553ebc2b"
+    "version": "open_pdks f6eeac7dad085ffcc829ccfd721f7b4ce39edcf7"
   },
   "dbu_um": 0.001,
   "bbox_um": {
     "x0": -6.5,
     "y0": -6.0,
-    "x1": 87.84,
+    "x1": 87.965,
     "y1": 65.17
   },
   "ports": [
@@ -70,7 +70,7 @@
         "name": null
       },
       "x_um": 83.42,
-      "y_um": 22.36,
+      "y_um": 22.21,
       "width_um": 0.42000000000000004,
       "direction_deg": 270,
       "block": "mi2",
@@ -168,14 +168,14 @@
       "generator": "mos_array",
       "cell_name": "mp2_pfet",
       "source_path": "gen/mp2.gds",
-      "source_digest": "sha256:484187ebbe10e8f24d8765915aefdcc11a12e6110a64630a1b4ed603a7b59e2e",
+      "source_digest": "sha256:d83e55d463504c2bbb26ba850461cff068b82146dfe99df09df1d81e8ce721df",
       "offset_um": {
         "x": 0.0,
         "y": 30.97
       },
       "bbox_um": {
         "x0": -0.15,
-        "y0": 22.0,
+        "y0": 21.7,
         "x1": 4.99,
         "y1": 31.119999999999997
       },
@@ -188,14 +188,14 @@
       "generator": "mos_array",
       "cell_name": "mp3_pfet",
       "source_path": "gen/mp3.gds",
-      "source_digest": "sha256:bb7de11c130cb86cf565ef3d3831a1d4911a99b26e6d1d1d033dcc372b128d3d",
+      "source_digest": "sha256:f0f269d118083134e54630168c0c0679159d66b9bcb8522a67e7e334f5f23072",
       "offset_um": {
         "x": 9.0,
         "y": 30.97
       },
       "bbox_um": {
         "x0": 8.85,
-        "y0": 22.0,
+        "y0": 21.7,
         "x1": 13.99,
         "y1": 31.119999999999997
       },
@@ -208,14 +208,14 @@
       "generator": "mos_array",
       "cell_name": "mp1_pfet",
       "source_path": "gen/mp1.gds",
-      "source_digest": "sha256:0a161e16e8cc8c3bbd7bea0cb72f3ae583fbe0c0fa4ef703e84bc8e1f5e4438f",
+      "source_digest": "sha256:0b44e03dac812eb9dbf5dfbeb447b4013d4ebfb1df198794bccbb1c616b686f4",
       "offset_um": {
         "x": 18.0,
         "y": 30.97
       },
       "bbox_um": {
         "x0": 17.85,
-        "y0": 22.0,
+        "y0": 21.7,
         "x1": 22.990000000000002,
         "y1": 31.119999999999997
       },
@@ -228,14 +228,14 @@
       "generator": "mos_array",
       "cell_name": "mpbn_pfet",
       "source_path": "gen/mpbn.gds",
-      "source_digest": "sha256:7539fdf83f2778adfe590cc6651c4eba94f1bb8cb8673d6ce2251aaa4c64a5bb",
+      "source_digest": "sha256:210464809f3b39b9fc88f228482ff526db1c1ee917b92fa2b73dfac4f8b8ae43",
       "offset_um": {
         "x": 27.0,
         "y": 24.97
       },
       "bbox_um": {
         "x0": 26.85,
-        "y0": 22.0,
+        "y0": 21.7,
         "x1": 31.990000000000002,
         "y1": 25.119999999999997
       },
@@ -248,14 +248,14 @@
       "generator": "mos_array",
       "cell_name": "ms2p_pfet",
       "source_path": "gen/ms2p.gds",
-      "source_digest": "sha256:ebf4ea36d9988f6f531e407f2008168419457e855995ee3a8d280f404c64b41c",
+      "source_digest": "sha256:3961c57878a3bb781b76b3350c18cb076d17b9181e36d844a4c627e2354f2177",
       "offset_um": {
         "x": 36.0,
         "y": 24.97
       },
       "bbox_um": {
         "x0": 35.85,
-        "y0": 22.0,
+        "y0": 21.7,
         "x1": 40.99,
         "y1": 25.119999999999997
       },
@@ -268,14 +268,14 @@
       "generator": "mos_array",
       "cell_name": "mbp_pfet",
       "source_path": "gen/mbp.gds",
-      "source_digest": "sha256:8c88e19f0bcc30fa05b988e91ec57243b87ae57ae5e9afc2e71c764db1ed20f6",
+      "source_digest": "sha256:e6126cb08d36a18d4d8ecc3acaa25849bdf4bbb9a7ff90a1c7308421ec276afa",
       "offset_um": {
         "x": 45.0,
         "y": 24.97
       },
       "bbox_um": {
         "x0": 44.85,
-        "y0": 22.0,
+        "y0": 21.7,
         "x1": 49.99,
         "y1": 25.119999999999997
       },
@@ -288,14 +288,14 @@
       "generator": "mos_array",
       "cell_name": "mpib_pfet",
       "source_path": "gen/mpib.gds",
-      "source_digest": "sha256:283fc70ccb6aedca60a153b793465d6d1d9d0a4efb14956b54c1591f465e24b7",
+      "source_digest": "sha256:7922645dff80d5f28f6f8c123862485f52755da4923ab4b3aef627670a23f003",
       "offset_um": {
         "x": 54.0,
         "y": 62.97
       },
       "bbox_um": {
         "x0": 53.85,
-        "y0": 22.0,
+        "y0": 21.699999999999996,
         "x1": 58.99,
         "y1": 63.12
       },
@@ -308,14 +308,14 @@
       "generator": "mos_array",
       "cell_name": "mpt_pfet",
       "source_path": "gen/mpt.gds",
-      "source_digest": "sha256:3bde9709f92641fd92c787b5b2cf19893b878efa7ea09e3342b22d11eb9d3a1b",
+      "source_digest": "sha256:870fe1c7ae8d97f96e80c5ae7d25f3fe63ca075bb9c335dd2d48c67c1e432779",
       "offset_um": {
         "x": 63.0,
         "y": 24.97
       },
       "bbox_um": {
         "x0": 62.85,
-        "y0": 22.0,
+        "y0": 21.7,
         "x1": 67.99,
         "y1": 25.119999999999997
       },
@@ -328,14 +328,14 @@
       "generator": "mos_array",
       "cell_name": "mi1_pfet",
       "source_path": "gen/mi1.gds",
-      "source_digest": "sha256:6a8471d1b2b9b6ea52f922c5993cf724173530960181f3dddd1b44130a42f709",
+      "source_digest": "sha256:c17ed466c6a7108eac3be71a40536a4879bee5924bd8efb292b4ec0bffbfb367",
       "offset_um": {
         "x": 72.0,
         "y": 38.97
       },
       "bbox_um": {
         "x0": 71.85,
-        "y0": 22.0,
+        "y0": 21.7,
         "x1": 76.99,
         "y1": 39.12
       },
@@ -348,14 +348,14 @@
       "generator": "mos_array",
       "cell_name": "mi2_pfet",
       "source_path": "gen/mi2.gds",
-      "source_digest": "sha256:b23d5b4b77996196d25b751f20dcc01fb25be909714a49480ad5f1ae5b504720",
+      "source_digest": "sha256:9a0ed7db280666475692df24ace745a75dfbe2777671d0932fcafb1770ea9c82",
       "offset_um": {
         "x": 81.0,
         "y": 38.97
       },
       "bbox_um": {
         "x0": 80.85,
-        "y0": 22.0,
+        "y0": 21.7,
         "x1": 85.99,
         "y1": 39.12
       },
@@ -368,16 +368,16 @@
       "generator": "mos_array",
       "cell_name": "mbn_nfet",
       "source_path": "gen/mbn.gds",
-      "source_digest": "sha256:e5e20fb5cae3cad4ab29bc3609ecb2147752c40e6a3ac28ead4cccb9577bc1ad",
+      "source_digest": "sha256:34369df5d8f09791275bb971c533a01881be110c8cce54f8cb7b5cf9c5f280b9",
       "offset_um": {
         "x": 24.0,
         "y": 0.0
       },
       "bbox_um": {
-        "x0": 24.0,
-        "y0": 0.0,
-        "x1": 28.84,
-        "y1": 2.82
+        "x0": 23.875,
+        "y0": -0.15,
+        "x1": 28.965,
+        "y1": 2.97
       },
       "orientation": "none",
       "abuts": []
@@ -388,16 +388,16 @@
       "generator": "mos_array",
       "cell_name": "mbn2_nfet",
       "source_path": "gen/mbn2.gds",
-      "source_digest": "sha256:acba90d661d296c7d475dba2283e73ea5c441171b9e8d396bd02cdd436523dba",
+      "source_digest": "sha256:f55c6db268c9a3d407e8be8c8d7f0232c4aee54bf313a69216a3c3277428b289",
       "offset_um": {
         "x": 31.0,
         "y": 0.0
       },
       "bbox_um": {
-        "x0": 31.0,
-        "y0": 0.0,
-        "x1": 35.84,
-        "y1": 2.82
+        "x0": 30.875,
+        "y0": -0.15,
+        "x1": 35.965,
+        "y1": 2.97
       },
       "orientation": "none",
       "abuts": []
@@ -408,16 +408,16 @@
       "generator": "mos_array",
       "cell_name": "ms2n_nfet",
       "source_path": "gen/ms2n.gds",
-      "source_digest": "sha256:d48528ea3498aaa55f2927a7b314b9e688554c8a60e633dddf869881930da636",
+      "source_digest": "sha256:a59be705e2d5c224fe537c25e3541286a682b315e7151eda79497d2186b597f9",
       "offset_um": {
         "x": 38.0,
         "y": 0.0
       },
       "bbox_um": {
-        "x0": 38.0,
-        "y0": 0.0,
-        "x1": 46.84,
-        "y1": 8.82
+        "x0": 37.875,
+        "y0": -0.15,
+        "x1": 46.965,
+        "y1": 8.97
       },
       "orientation": "none",
       "abuts": []
@@ -428,16 +428,16 @@
       "generator": "mos_array",
       "cell_name": "ml1_nfet",
       "source_path": "gen/ml1.gds",
-      "source_digest": "sha256:79225af70519e9bc16807aae8327729246263e0fb1e68dc52281ae5aad2b9f20",
+      "source_digest": "sha256:4a1c8a558d3bd29a486e7a8314d43dade455a0d5f95bb32e6cb9d978b47790c5",
       "offset_um": {
         "x": 68.0,
         "y": 0.0
       },
       "bbox_um": {
-        "x0": 68.0,
-        "y0": 0.0,
-        "x1": 76.84,
-        "y1": 4.82
+        "x0": 67.875,
+        "y0": -0.15,
+        "x1": 76.965,
+        "y1": 4.97
       },
       "orientation": "none",
       "abuts": []
@@ -448,16 +448,16 @@
       "generator": "mos_array",
       "cell_name": "ml2_nfet",
       "source_path": "gen/ml2.gds",
-      "source_digest": "sha256:dd9863fa2fd66450bf49ae9d972c2327f7f3b57621ace458908b8f6a516b6cb5",
+      "source_digest": "sha256:2fad660fd129040b91cb56d625880d36710860c8e4a8fe0fe1250612d85c87cd",
       "offset_um": {
         "x": 79.0,
         "y": 0.0
       },
       "bbox_um": {
-        "x0": 79.0,
-        "y0": 0.0,
-        "x1": 87.84,
-        "y1": 4.82
+        "x0": 78.875,
+        "y0": -0.15,
+        "x1": 87.965,
+        "y1": 4.97
       },
       "orientation": "none",
       "abuts": []
@@ -468,16 +468,16 @@
       "generator": "guard_ring",
       "cell_name": "nwt_mp2",
       "source_path": "gen/nwt_mp2.gds",
-      "source_digest": "sha256:aa1b6dd1ea32f2c0ffeb5372241357e2d455df8949e56803796cb077b23d09aa",
+      "source_digest": "sha256:2e171f77d1901650c26b335ef2308797543eaac1faa019c6bfa39b2a2d5e1fc5",
       "offset_um": {
         "x": -2.04,
         "y": 22.2
       },
       "bbox_um": {
-        "x0": -2.19,
-        "y0": 22.05,
-        "x1": -0.050000000000000044,
-        "y1": 24.189999999999998
+        "x0": -2.24,
+        "y0": 22.0,
+        "x1": 0.0,
+        "y1": 24.24
       },
       "orientation": "none",
       "abuts": []
@@ -488,16 +488,16 @@
       "generator": "guard_ring",
       "cell_name": "nwt_mp3",
       "source_path": "gen/nwt_mp3.gds",
-      "source_digest": "sha256:b500b42defee759adc79ff4fcad76b4d96b13b4c48797790dab27c713d1ca38d",
+      "source_digest": "sha256:f2b4f312e3070214beaf06ac26eecd0bcb51c6f257cdd992d3e7f27cf079948f",
       "offset_um": {
         "x": 6.96,
         "y": 22.2
       },
       "bbox_um": {
-        "x0": 6.81,
-        "y0": 22.05,
-        "x1": 8.95,
-        "y1": 24.189999999999998
+        "x0": 6.76,
+        "y0": 22.0,
+        "x1": 9.0,
+        "y1": 24.24
       },
       "orientation": "none",
       "abuts": []
@@ -508,16 +508,16 @@
       "generator": "guard_ring",
       "cell_name": "nwt_mp1",
       "source_path": "gen/nwt_mp1.gds",
-      "source_digest": "sha256:18ce1dc45079ce8f2d14573b859bfe91eea0696db173c8ef2cecfa1099d2a173",
+      "source_digest": "sha256:6e92d961b264c755ec1c3cb0def382ff9999114955c1ba6a277418c394ae746b",
       "offset_um": {
         "x": 15.96,
         "y": 22.2
       },
       "bbox_um": {
-        "x0": 15.81,
-        "y0": 22.05,
-        "x1": 17.95,
-        "y1": 24.189999999999998
+        "x0": 15.760000000000002,
+        "y0": 22.0,
+        "x1": 18.0,
+        "y1": 24.24
       },
       "orientation": "none",
       "abuts": []
@@ -528,16 +528,16 @@
       "generator": "guard_ring",
       "cell_name": "nwt_mpbn",
       "source_path": "gen/nwt_mpbn.gds",
-      "source_digest": "sha256:2e78db824af696dea927b57555ed1660b87c9d7af060bf70ff0693c7429b1e63",
+      "source_digest": "sha256:a693479f01b6ceaf8d18f5551b5f34323dad42bca76214b9204ea8f6b8fdb307",
       "offset_um": {
         "x": 24.96,
         "y": 22.2
       },
       "bbox_um": {
-        "x0": 24.810000000000002,
-        "y0": 22.05,
-        "x1": 26.95,
-        "y1": 24.189999999999998
+        "x0": 24.76,
+        "y0": 22.0,
+        "x1": 27.0,
+        "y1": 24.24
       },
       "orientation": "none",
       "abuts": []
@@ -548,16 +548,16 @@
       "generator": "guard_ring",
       "cell_name": "nwt_ms2p",
       "source_path": "gen/nwt_ms2p.gds",
-      "source_digest": "sha256:7f98b13fae55a50de46dc7850f4e05469637b2e62551391f5672e9248f177059",
+      "source_digest": "sha256:d46b0c17bbd6e47d741a1beebd8716ae7e110e1024974c6ba9ad6986d385567b",
       "offset_um": {
         "x": 33.96,
         "y": 22.2
       },
       "bbox_um": {
-        "x0": 33.81,
-        "y0": 22.05,
-        "x1": 35.95,
-        "y1": 24.189999999999998
+        "x0": 33.76,
+        "y0": 22.0,
+        "x1": 36.0,
+        "y1": 24.24
       },
       "orientation": "none",
       "abuts": []
@@ -568,16 +568,16 @@
       "generator": "guard_ring",
       "cell_name": "nwt_mbp",
       "source_path": "gen/nwt_mbp.gds",
-      "source_digest": "sha256:da2131dd357dadba49c745ecc7ff817261607a12f991c62014cb8e6c24a0ac4e",
+      "source_digest": "sha256:eeef5025143dd1c301f62a106a7ffa683860a3d5eca52db9d384f11a63fd5e3e",
       "offset_um": {
         "x": 42.96,
         "y": 22.2
       },
       "bbox_um": {
-        "x0": 42.81,
-        "y0": 22.05,
-        "x1": 44.95,
-        "y1": 24.189999999999998
+        "x0": 42.76,
+        "y0": 22.0,
+        "x1": 45.0,
+        "y1": 24.24
       },
       "orientation": "none",
       "abuts": []
@@ -588,16 +588,16 @@
       "generator": "guard_ring",
       "cell_name": "nwt_mpib",
       "source_path": "gen/nwt_mpib.gds",
-      "source_digest": "sha256:97fb092818ea48d67f03b5780248906da3a04c715d55cada202dc8e31e273e43",
+      "source_digest": "sha256:c457220ff28b66b445dc25720e0cfa347090e8e74339dc662995239a45445a29",
       "offset_um": {
         "x": 51.96,
         "y": 22.2
       },
       "bbox_um": {
-        "x0": 51.81,
-        "y0": 22.05,
-        "x1": 53.95,
-        "y1": 24.189999999999998
+        "x0": 51.76,
+        "y0": 22.0,
+        "x1": 54.0,
+        "y1": 24.24
       },
       "orientation": "none",
       "abuts": []
@@ -608,16 +608,16 @@
       "generator": "guard_ring",
       "cell_name": "nwt_mpt",
       "source_path": "gen/nwt_mpt.gds",
-      "source_digest": "sha256:d2b58cba81fb45d743e8f04650f74c07b0cd8ebbeb0ab586a3a58a0ecd83b058",
+      "source_digest": "sha256:bf5927e1100b8e71574a9dc8bd137a3e6f7b509d3fa13a71d796b8baede57616",
       "offset_um": {
         "x": 60.96,
         "y": 22.2
       },
       "bbox_um": {
-        "x0": 60.81,
-        "y0": 22.05,
-        "x1": 62.95,
-        "y1": 24.189999999999998
+        "x0": 60.76,
+        "y0": 22.0,
+        "x1": 63.0,
+        "y1": 24.24
       },
       "orientation": "none",
       "abuts": []
@@ -628,16 +628,16 @@
       "generator": "guard_ring",
       "cell_name": "nwt_mi1",
       "source_path": "gen/nwt_mi1.gds",
-      "source_digest": "sha256:42e445f121cbe097004f090e1514f391ed4c873b7029729a3e2b4f7a23b86128",
+      "source_digest": "sha256:5ae7256eed392570f553bd3186a4fbccbaf0479d5ed0f25c3ee5833a3e3c8303",
       "offset_um": {
         "x": 69.96,
         "y": 22.2
       },
       "bbox_um": {
-        "x0": 69.80999999999999,
-        "y0": 22.05,
-        "x1": 71.94999999999999,
-        "y1": 24.189999999999998
+        "x0": 69.75999999999999,
+        "y0": 22.0,
+        "x1": 72.0,
+        "y1": 24.24
       },
       "orientation": "none",
       "abuts": []
@@ -648,16 +648,16 @@
       "generator": "guard_ring",
       "cell_name": "nwt_mi2",
       "source_path": "gen/nwt_mi2.gds",
-      "source_digest": "sha256:5889e813a98e4c74ef26b82b074da208f6581f775045debf5353b571e8954067",
+      "source_digest": "sha256:c032db8e0f8f148979eab1768492531056d13173d64b65424c506bb199f00acd",
       "offset_um": {
         "x": 78.96,
         "y": 22.2
       },
       "bbox_um": {
-        "x0": 78.80999999999999,
-        "y0": 22.05,
-        "x1": 80.94999999999999,
-        "y1": 24.189999999999998
+        "x0": 78.75999999999999,
+        "y0": 22.0,
+        "x1": 81.0,
+        "y1": 24.24
       },
       "orientation": "none",
       "abuts": []
@@ -668,16 +668,16 @@
       "generator": "guard_ring",
       "cell_name": "pst",
       "source_path": "gen/pst.gds",
-      "source_digest": "sha256:0b502306a70957a5c715ee9480cb1cce9d356d6f0a7da298fbef02f706735cd7",
+      "source_digest": "sha256:8b0f1d99cb947f7aa5e66f0df7a80146aff42ad38793c4743de8355d9e2e83bd",
       "offset_um": {
         "x": 55.0,
         "y": 0.0
       },
       "bbox_um": {
-        "x0": 55.0,
-        "y0": 0.0,
-        "x1": 56.84,
-        "y1": 1.84
+        "x0": 54.875,
+        "y0": -0.125,
+        "x1": 56.965,
+        "y1": 1.965
       },
       "orientation": "none",
       "abuts": []
@@ -687,7 +687,7 @@
       "source": "cell",
       "generator": null,
       "cell_name": "promo_stub",
-      "source_path": "/home/ubuntu/GitHub/sky130-temp-por/.loom/worktrees/issue-81/layout/bias_core_mirror_amp/promo_stub.gds",
+      "source_path": "promo_stub.gds",
       "source_digest": "sha256:902ff80454f309f31943b44b8a7f942a6d96817455a784cbefd7f85d019f84ab",
       "offset_um": {
         "x": -4.0,
@@ -707,7 +707,7 @@
       "source": "cell",
       "generator": null,
       "cell_name": "promo_stub",
-      "source_path": "/home/ubuntu/GitHub/sky130-temp-por/.loom/worktrees/issue-81/layout/bias_core_mirror_amp/promo_stub.gds",
+      "source_path": "promo_stub.gds",
       "source_digest": "sha256:902ff80454f309f31943b44b8a7f942a6d96817455a784cbefd7f85d019f84ab",
       "offset_um": {
         "x": -4.0,
@@ -727,7 +727,7 @@
       "source": "cell",
       "generator": null,
       "cell_name": "promo_stub",
-      "source_path": "/home/ubuntu/GitHub/sky130-temp-por/.loom/worktrees/issue-81/layout/bias_core_mirror_amp/promo_stub.gds",
+      "source_path": "promo_stub.gds",
       "source_digest": "sha256:902ff80454f309f31943b44b8a7f942a6d96817455a784cbefd7f85d019f84ab",
       "offset_um": {
         "x": -4.0,
@@ -747,7 +747,7 @@
       "source": "cell",
       "generator": null,
       "cell_name": "promo_stub",
-      "source_path": "/home/ubuntu/GitHub/sky130-temp-por/.loom/worktrees/issue-81/layout/bias_core_mirror_amp/promo_stub.gds",
+      "source_path": "promo_stub.gds",
       "source_digest": "sha256:902ff80454f309f31943b44b8a7f942a6d96817455a784cbefd7f85d019f84ab",
       "offset_um": {
         "x": -4.0,
@@ -767,7 +767,7 @@
       "source": "cell",
       "generator": null,
       "cell_name": "promo_stub",
-      "source_path": "/home/ubuntu/GitHub/sky130-temp-por/.loom/worktrees/issue-81/layout/bias_core_mirror_amp/promo_stub.gds",
+      "source_path": "promo_stub.gds",
       "source_digest": "sha256:902ff80454f309f31943b44b8a7f942a6d96817455a784cbefd7f85d019f84ab",
       "offset_um": {
         "x": -4.0,
@@ -787,7 +787,7 @@
       "source": "cell",
       "generator": null,
       "cell_name": "promo_stub_v",
-      "source_path": "/home/ubuntu/GitHub/sky130-temp-por/.loom/worktrees/issue-81/layout/bias_core_mirror_amp/promo_stub_v.gds",
+      "source_path": "promo_stub_v.gds",
       "source_digest": "sha256:d424bed4ea0c150c3b587f778629b56bbddafe6074de3201ed45fcc12436409c",
       "offset_um": {
         "x": -6.5,
@@ -1371,7 +1371,7 @@
         }
       ],
       "routed": true,
-      "route_length_um": 160.71499999999997,
+      "route_length_um": 159.36499999999998,
       "status": "routed",
       "landed_on_block": true,
       "legs": [
@@ -1387,7 +1387,7 @@
             }
           ],
           "routed": true,
-          "route_length_um": 25.72,
+          "route_length_um": 25.419999999999995,
           "reason": null,
           "channel_track": 0,
           "landed_on_block": true
@@ -1404,7 +1404,7 @@
             }
           ],
           "routed": true,
-          "route_length_um": 25.72,
+          "route_length_um": 25.419999999999998,
           "reason": null,
           "channel_track": 0,
           "landed_on_block": true
@@ -1421,7 +1421,7 @@
             }
           ],
           "routed": true,
-          "route_length_um": 25.72,
+          "route_length_um": 25.419999999999998,
           "reason": null,
           "channel_track": 0,
           "landed_on_block": true
@@ -1438,7 +1438,7 @@
             }
           ],
           "routed": true,
-          "route_length_um": 32.07999999999999,
+          "route_length_um": 31.929999999999993,
           "reason": null,
           "channel_track": 0,
           "landed_on_block": true
@@ -1455,7 +1455,7 @@
             }
           ],
           "routed": true,
-          "route_length_um": 38.11,
+          "route_length_um": 37.96,
           "reason": null,
           "channel_track": 0,
           "landed_on_block": true
@@ -1472,7 +1472,7 @@
             }
           ],
           "routed": true,
-          "route_length_um": 13.365,
+          "route_length_um": 13.214999999999998,
           "reason": null,
           "channel_track": 0,
           "landed_on_block": true
@@ -1512,7 +1512,7 @@
         }
       ],
       "routed": true,
-      "route_length_um": 150.14499999999998,
+      "route_length_um": 148.945,
       "status": "routed",
       "landed_on_block": true,
       "legs": [
@@ -1528,7 +1528,7 @@
             }
           ],
           "routed": true,
-          "route_length_um": 24.15,
+          "route_length_um": 24.0,
           "reason": null,
           "channel_track": 0,
           "landed_on_block": true
@@ -1545,7 +1545,7 @@
             }
           ],
           "routed": true,
-          "route_length_um": 17.72,
+          "route_length_um": 17.42,
           "reason": null,
           "channel_track": 0,
           "landed_on_block": true
@@ -1562,7 +1562,7 @@
             }
           ],
           "routed": true,
-          "route_length_um": 15.079999999999991,
+          "route_length_um": 14.929999999999993,
           "reason": null,
           "channel_track": 0,
           "landed_on_block": true
@@ -1579,7 +1579,7 @@
             }
           ],
           "routed": true,
-          "route_length_um": 17.72,
+          "route_length_um": 17.42,
           "reason": null,
           "channel_track": 0,
           "landed_on_block": true
@@ -1596,7 +1596,7 @@
             }
           ],
           "routed": true,
-          "route_length_um": 17.72,
+          "route_length_um": 17.42,
           "reason": null,
           "channel_track": 0,
           "landed_on_block": true
@@ -1641,7 +1641,7 @@
         }
       ],
       "routed": true,
-      "route_length_um": 50.07000000000001,
+      "route_length_um": 49.47,
       "status": "routed",
       "landed_on_block": true,
       "legs": [
@@ -1657,7 +1657,7 @@
             }
           ],
           "routed": true,
-          "route_length_um": 23.150000000000002,
+          "route_length_um": 23.0,
           "reason": null,
           "channel_track": 0,
           "landed_on_block": true
@@ -1674,7 +1674,7 @@
             }
           ],
           "routed": true,
-          "route_length_um": 13.780000000000001,
+          "route_length_um": 13.48,
           "reason": null,
           "channel_track": 0,
           "landed_on_block": true
@@ -1691,7 +1691,7 @@
             }
           ],
           "routed": true,
-          "route_length_um": 13.139999999999997,
+          "route_length_um": 12.989999999999997,
           "reason": null,
           "channel_track": 0,
           "landed_on_block": true
@@ -1715,7 +1715,7 @@
         }
       ],
       "routed": true,
-      "route_length_um": 263.775,
+      "route_length_um": 263.925,
       "status": "routed",
       "landed_on_block": true,
       "legs": [
@@ -1731,7 +1731,7 @@
             }
           ],
           "routed": true,
-          "route_length_um": 134.46,
+          "route_length_um": 134.61,
           "reason": null,
           "channel_track": 0,
           "landed_on_block": true
@@ -1833,7 +1833,7 @@
         }
       ],
       "routed": true,
-      "route_length_um": 81.43000000000004,
+      "route_length_um": 80.98000000000002,
       "status": "routed",
       "landed_on_block": true,
       "legs": [
@@ -1866,7 +1866,7 @@
             }
           ],
           "routed": true,
-          "route_length_um": 24.140000000000015,
+          "route_length_um": 23.990000000000013,
           "reason": null,
           "channel_track": 0,
           "landed_on_block": true
@@ -1883,7 +1883,7 @@
             }
           ],
           "routed": true,
-          "route_length_um": 25.78,
+          "route_length_um": 25.479999999999997,
           "reason": null,
           "channel_track": 0,
           "landed_on_block": true
@@ -1911,7 +1911,7 @@
         }
       ],
       "routed": true,
-      "route_length_um": 143.04500000000004,
+      "route_length_um": 142.74500000000003,
       "status": "routed",
       "landed_on_block": true,
       "legs": [
@@ -1944,7 +1944,7 @@
             }
           ],
           "routed": true,
-          "route_length_um": 61.140000000000015,
+          "route_length_um": 60.99000000000001,
           "reason": null,
           "channel_track": 0,
           "landed_on_block": true
@@ -1961,7 +1961,7 @@
             }
           ],
           "routed": true,
-          "route_length_um": 48.395,
+          "route_length_um": 48.245,
           "reason": null,
           "channel_track": 0,
           "landed_on_block": true
@@ -2082,12 +2082,15 @@
     "block 'mi2' is placed 0.00um from block 'nwt_mi2' (strategy: explicit), closer than nwt_mi2's own declared drc_hints.min_spacing_um of 0.40um"
   ],
   "provenance": {
-    "klt_version": "0.6.0+g0ce8c64842d9",
+    "klt_version": "0.7.1.dev1610+g758c6e224053",
     "klayout_version": "0.30.12",
     "pdk": {
       "name": "sky130A",
-      "source": "search root: ~/.volare",
-      "version": "open_pdks c6d73a35f524070e85faff4a6a9eef49553ebc2b"
+      "source": "search root: ~/.ciel",
+      "version": "open_pdks f6eeac7dad085ffcc829ccfd721f7b4ce39edcf7",
+      "ambiguous_sources": [
+        "search root: ~/.volare"
+      ]
     },
     "deck": null,
     "input": null

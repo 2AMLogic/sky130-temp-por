@@ -6,14 +6,14 @@
   "pdk": {
     "name": "sky130A",
     "variant": "sky130A",
-    "version": "open_pdks c6d73a35f524070e85faff4a6a9eef49553ebc2b"
+    "version": "open_pdks f6eeac7dad085ffcc829ccfd721f7b4ce39edcf7"
   },
   "dbu_um": 0.001,
   "bbox_um": {
-    "x0": 0.0,
-    "y0": 0.0,
-    "x1": 18.34,
-    "y1": 2.0
+    "x0": -0.25,
+    "y0": -0.3,
+    "x1": 18.53,
+    "y1": 2.3000000000000003
   },
   "device_count": 1,
   "ports": [
@@ -25,9 +25,9 @@
         "datatype": 20,
         "name": null
       },
-      "x_um": 0.21000000000000002,
+      "x_um": 0.195,
       "y_um": 1.0,
-      "width_um": 2.0,
+      "width_um": 2.2,
       "direction_deg": 180
     },
     {
@@ -38,9 +38,9 @@
         "datatype": 20,
         "name": null
       },
-      "x_um": 18.13,
+      "x_um": 18.085,
       "y_um": 1.0,
-      "width_um": 2.0,
+      "width_um": 2.2,
       "direction_deg": 0
     }
   ],
@@ -50,16 +50,21 @@
     "foreign_clearance_um": 0.4,
     "matched_group_id": "res_array:1",
     "snapped_to_grid": false,
-    "notes": []
+    "notes": [
+      "flavor 'xhigh' on PDK family 'sky130' draws rectangular 0.19um x 2.0um end contacts (licon.1b/c precision-resistor exception) on 2.2um-tall poly/local-metal end pads"
+    ]
   },
   "warnings": [],
   "provenance": {
-    "klt_version": "0.6.0+g0ce8c64842d9",
+    "klt_version": "0.7.1.dev1610+g758c6e224053",
     "klayout_version": "0.30.12",
     "pdk": {
       "name": "sky130A",
-      "source": "search root: ~/.volare",
-      "version": "open_pdks c6d73a35f524070e85faff4a6a9eef49553ebc2b"
+      "source": "search root: ~/.ciel",
+      "version": "open_pdks f6eeac7dad085ffcc829ccfd721f7b4ce39edcf7",
+      "ambiguous_sources": [
+        "search root: ~/.volare"
+      ]
     },
     "deck": null,
     "input": null

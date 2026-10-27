@@ -6,14 +6,14 @@
   "pdk": {
     "name": "sky130A",
     "variant": "sky130A",
-    "version": "open_pdks c6d73a35f524070e85faff4a6a9eef49553ebc2b"
+    "version": "open_pdks f6eeac7dad085ffcc829ccfd721f7b4ce39edcf7"
   },
   "dbu_um": 0.001,
   "bbox_um": {
-    "x0": 0.0,
-    "y0": 0.0,
-    "x1": 8.84,
-    "y1": 1.82
+    "x0": -0.125,
+    "y0": -0.15,
+    "x1": 8.965,
+    "y1": 1.97
   },
   "device_count": 1,
   "ports": [
@@ -52,7 +52,7 @@
         "name": null
       },
       "x_um": 4.42,
-      "y_um": 1.6099999999999999,
+      "y_um": 1.7599999999999998,
       "width_um": 0.42000000000000004,
       "direction_deg": 90
     }
@@ -62,21 +62,22 @@
     "min_spacing_um": 0.4,
     "matched_group_id": "mos_array:1x1:common_centroid",
     "snapped_to_grid": false,
-    "notes": [
-      "family 'sky130' declares no S/D implant role ('nplus') for flavor 'nfet' -- no implant mask was drawn"
-    ],
+    "notes": [],
     "voltage_flavor": null,
     "voltage_flavor_mark_present": false,
-    "sd_implant_present": false
+    "sd_implant_present": true
   },
   "warnings": [],
   "provenance": {
-    "klt_version": "0.6.0+g0ce8c64842d9",
+    "klt_version": "0.7.1.dev1610+g758c6e224053",
     "klayout_version": "0.30.12",
     "pdk": {
       "name": "sky130A",
-      "source": "search root: ~/.volare",
-      "version": "open_pdks c6d73a35f524070e85faff4a6a9eef49553ebc2b"
+      "source": "search root: ~/.ciel",
+      "version": "open_pdks f6eeac7dad085ffcc829ccfd721f7b4ce39edcf7",
+      "ambiguous_sources": [
+        "search root: ~/.volare"
+      ]
     },
     "deck": null,
     "input": null

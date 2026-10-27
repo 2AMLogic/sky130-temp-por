@@ -135,16 +135,16 @@ Q$43 VSS|vss VSS|vss ec pnp AE=11.56P PE=13.6U AB=12.96P PB=14.4U AC=12.96P
 * device instance $44 r0 *1 215.56,105.5 pnp
 Q$44 VSS|vss VSS|vss ec pnp AE=11.56P PE=13.6U AB=12.96P PB=14.4U AC=12.96P
 + PC=14.4U NE=1
-* device instance $45 r0 *1 5530.36,-46.5 sky130_fd_pr__model__cap_mim
+* device instance $45 r0 *1 5531.87,-46.5 sky130_fd_pr__model__cap_mim
 C$45 VDD|vdd nokx 7.656e-14
-* device instance $46 r0 *1 1405.52,-39.5 sky130_fd_pr__model__cap_mim
+* device instance $46 r0 *1 1406.59,-39.5 sky130_fd_pr__model__cap_mim
 C$46 nz pg 8.152e-13
-* device instance $47 r0 *1 9.17,-49 res_xhigh_po
+* device instance $47 r0 *1 9.14,-49 res_xhigh_po
 X$47 nbtop nb VSS|vss res_xhigh_po r=17500 L=17.5U W=2U
-* device instance $48 r0 *1 196.76,-49 res_xhigh_po
+* device instance $48 r0 *1 197.17,-49 res_xhigh_po
 X$48 nb ec VSS|vss res_xhigh_po r=350000 L=350U W=2U
-* device instance $49 r0 *1 883.6,-49 res_xhigh_po
+* device instance $49 r0 *1 884.45,-49 res_xhigh_po
 X$49 n2 nz VSS|vss res_xhigh_po r=1016000 L=1016U W=2U
-* device instance $50 r0 *1 3471.44,-49 res_xhigh_po
+* device instance $50 r0 *1 3472.73,-49 res_xhigh_po
 X$50 VREF|vref er VSS|vss res_xhigh_po r=4104000 L=4104U W=2U
 .ENDS bias_core

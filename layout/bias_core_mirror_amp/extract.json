@@ -6,6 +6,7 @@
   "dbu_um": 0.001,
   "netlist_path": "bias_core_mirror_amp.spice",
   "netlist_sha256": "14abdb6a9d5c81894215d6c1e6f341193e33c13a037d0b0d83854fb83813a2ac",
+  "netlist_normalized_sha256": "d2fb0c479d95b526f88e0aee1b6500c73fa72b54dde44a49293d6b86fc42450d",
   "status": "extracted",
   "device_count": 15,
   "net_count": 13,
@@ -15,8 +16,25 @@
     "pfet": 10
   },
   "dummy_devices_dropped": 0,
-  "ignored_layers": [],
-  "device_recognition_only_layers": [],
+  "ignored_layers": [
+    {
+      "layer": 93,
+      "datatype": 44,
+      "shapes": 15
+    },
+    {
+      "layer": 95,
+      "datatype": 20,
+      "shapes": 15
+    }
+  ],
+  "device_recognition_only_layers": [
+    {
+      "layer": 94,
+      "datatype": 20,
+      "shapes": 11
+    }
+  ],
   "device_classes": [
     "nfet",
     "pfet",
@@ -452,7 +470,7 @@
       "name": "ibias",
       "pin": true,
       "device_count": 1,
-      "net_id": 12,
+      "net_id": 13,
       "pin_index": 0,
       "label_positions_um": [
         {
@@ -509,7 +527,7 @@
         },
         {
           "text": "na",
-          "x_um": 50.83,
+          "x_um": 50.905,
           "y_um": 66.0
         }
       ]
@@ -524,7 +542,7 @@
         {
           "text": "nb",
           "x_um": 83.42,
-          "y_um": 22.36
+          "y_um": 22.21
         }
       ]
     },
@@ -532,13 +550,13 @@
       "name": "nbg",
       "pin": true,
       "device_count": 4,
-      "net_id": 2,
+      "net_id": 3,
       "pin_index": 5,
       "label_positions_um": [
         {
           "text": "nbg",
           "x_um": 32.9,
-          "y_um": 13.665
+          "y_um": 13.74
         }
       ]
     },
@@ -560,7 +578,7 @@
       "name": "nt",
       "pin": true,
       "device_count": 3,
-      "net_id": 13,
+      "net_id": 12,
       "pin_index": 7,
       "label_positions_um": [
         {
@@ -574,7 +592,7 @@
       "name": "pb",
       "pin": true,
       "device_count": 6,
-      "net_id": 3,
+      "net_id": 2,
       "pin_index": 8,
       "label_positions_um": [
         {
@@ -585,7 +603,7 @@
         {
           "text": "pb",
           "x_um": 36.9,
-          "y_um": 11.805
+          "y_um": 11.73
         }
       ]
     },
@@ -661,31 +679,39 @@
       ]
     }
   ],
-  "warnings": [],
+  "warnings": [
+    "2 layers (93/44, 95/20) carrying 30 shapes are outside 'sky130' deck's connectivity graph -- this geometry is invisible to extraction, so a net routed only through it extracts as multiple disconnected nets instead of one, which will silently mismatch a downstream `klt lvs` reference netlist -- see ignored_layers[] for the full per-layer shape counts. See docs/cli/extract.md's 'ignored_layers' field documentation."
+  ],
   "black_box_regions": [],
   "abstracted_cells": [],
   "unmodelled_poly": [],
   "merged_net_labels": [],
   "voltage_domain_warnings": [],
   "missing_flavour_markers": [],
+  "unsupported_devices": [],
   "unbiased_pmos_body_nets": [],
   "single_terminal_nets": [],
   "dead_metal": [],
   "matched_device_groups": [],
   "def_pin_promotion": null,
+  "pin_renames": null,
+  "rename_declared_pins": false,
+  "declared_pins": null,
+  "def_pins": null,
   "label_layers": null,
+  "probes": [],
   "pdk": null,
   "provenance": {
-    "klt_version": "0.6.0+g0ce8c64842d9",
+    "klt_version": "0.7.1.dev1610+g758c6e224053",
     "klayout_version": "0.30.12",
     "pdk": null,
     "deck": {
       "name": "sky130",
-      "content_hash": "sha256:f8f2c3f48eada473dc34a7a8926c0b04fef446fb351a70a636ce43a9ca9c70ba",
+      "content_hash": "sha256:773f73886500d88310f3c3ebe671aad84de425473e9eb6b7ae5a22902416e973",
       "released": false
     },
     "input": {
-      "content_hash": "sha256:3b61ca635eefd91f198db1e43e6f9ed740ac66f940863a73ff74951c2794ab9b",
+      "content_hash": "sha256:096cb8cf394cffba114316b6f910451cda4bb635a101bb32581aef64f7be725a",
       "role": "layout"
     }
   },
@@ -696,5 +722,17 @@
     "extract__device__count": 15,
     "extract__net__count": 13,
     "extract__pin__count": 13
+  },
+  "timing": {
+    "stages": {
+      "read_layout": 0.001,
+      "device_extraction": 0.016,
+      "diagnostics": 0.0,
+      "netlist_write": 0.0,
+      "netlist_hash": 0.0,
+      "netlist_normalized_hash": 0.0
+    },
+    "total_seconds": 0.099,
+    "unattributed_seconds": 0.082
   }
 }

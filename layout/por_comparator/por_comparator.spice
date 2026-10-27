@@ -56,10 +56,10 @@ M$16 VDDA BIAS_OKB VDD VDD pfet L=0.5U W=4U AS=1.68P AD=1.68P PS=8.84U PD=8.84U
 M$17 NA NA VDDA VDD pfet L=1U W=4U AS=1.68P AD=1.68P PS=8.84U PD=8.84U
 * device instance $18 r0 *1 49.16,22.61 pfet
 M$18 CMPO NA VDDA VDD pfet L=1U W=4U AS=1.68P AD=1.68P PS=8.84U PD=8.84U
-* device instance $19 r0 *1 7257.57,5 res_xhigh_po
+* device instance $19 r0 *1 7257.54,5 res_xhigh_po
 X$19 SNSB VSS VSS res_xhigh_po r=775000 L=775U W=2U
-* device instance $20 r0 *1 3485.035,13 res_xhigh_po
+* device instance $20 r0 *1 3485.005,13 res_xhigh_po
 X$20 SNS SNSB VSS res_xhigh_po r=6769230 L=6769.23U W=2U
-* device instance $21 r0 *1 4049.14,21 res_xhigh_po
+* device instance $21 r0 *1 4049.11,21 res_xhigh_po
 X$21 SNS VDD VSS res_xhigh_po r=7897440 L=7897.44U W=2U
 .ENDS por_comparator

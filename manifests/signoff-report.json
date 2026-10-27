@@ -70,13 +70,13 @@
         "command": null,
         "kind": "generic",
         "check_status": "pass",
-        "content_hash": "sha256:a4b7093235a81da5687ae087fa40108b57029bc90056995219c6a0fe134cbff8",
+        "content_hash": "sha256:8ff2d4dbffe7329f8f8e35450be575c0181ae41cc1beaac7d6e175d30c4b89d8",
         "input_verified": true,
         "exit_status": 0,
         "artifact_binding": {
           "t1_item": 2,
           "path": null,
-          "content_hash": "sha256:a4b7093235a81da5687ae087fa40108b57029bc90056995219c6a0fe134cbff8",
+          "content_hash": "sha256:8ff2d4dbffe7329f8f8e35450be575c0181ae41cc1beaac7d6e175d30c4b89d8",
           "input_verified": true,
           "members": [
             {
@@ -92,15 +92,15 @@
                 "path": "layout/temp_por_top/temp_por_top.gds",
                 "scope": "repo"
               },
-              "content_hash": "sha256:87c49a903e50f9d93968eb68360123a60a6c064478f3b9309670e0c22ca65352",
+              "content_hash": "sha256:1af73f5f94333939d5a16268144a396055e88ae9ed1f78f9644676332ca40539",
               "status": "verified"
             }
           ],
-          "summary": "T1 item 2 (Layout): layout/temp_por_top/temp_por_top.gds is composed from the four committed leaf streams by layout/bin/compose-cell.py and rebuilds byte-for-byte. Attests presence and reproducibility only; not a verification claim. Recorded and NOT cited: DRC 351 poly.endcap.diff.1 violations (inherited from the leaf streams), ERC 2 erc.missing_tie (temp_core), LVS match 152/152 with native-Vt XMASSIST excluded (#97). See layout/temp_por_top/README.md.",
+          "summary": "T1 item 2 (Layout): layout/temp_por_top/temp_por_top.gds is composed from the four committed leaf streams by layout/bin/compose-cell.py and rebuilds byte-for-byte. Attests presence and reproducibility only; not a verification claim. Recorded and NOT cited: DRC clean (0 violations) under the pinned klt 758c6e224053; ERC 2 erc.missing_tie (temp_core XMI1/XMI2 nwells, bulk NT by design), LVS match 152/152 with native-Vt XMASSIST excluded (#97). See layout/temp_por_top/README.md.",
           "source": "layout/temp_por_top/cell.json",
           "regeneration": {
             "generator": "python3 layout/bin/compose-cell.py layout/temp_por_top/cell.json --check",
-            "regenerated_hash": "sha256:a4b7093235a81da5687ae087fa40108b57029bc90056995219c6a0fe134cbff8",
+            "regenerated_hash": "sha256:8ff2d4dbffe7329f8f8e35450be575c0181ae41cc1beaac7d6e175d30c4b89d8",
             "executed_by_klt": false
           }
         }
@@ -121,7 +121,7 @@
         "command": null,
         "kind": "drc",
         "check_status": "clean",
-        "content_hash": "sha256:9c414f9103f2174a7aebddce2a796c5a52fb9ffc1156158f97afbafe987ab68e",
+        "content_hash": "sha256:a044bcd3ce64e0f4a290c261de9962c25f003dc63f9bb2be98b9368601e6dae3",
         "input_verified": true,
         "exit_status": 0,
         "coverage": {
@@ -133,7 +133,6 @@
             "70/5",
             "71/5",
             "72/5",
-            "79/20",
             "82/44"
           ],
           "rules_skipped": [
@@ -159,12 +158,9 @@
             "mf.ongrid.1",
             "ncm.angle.1",
             "ncm.ongrid.1",
-            "npc.angle.1",
-            "npc.ongrid.1",
-            "nsdm.angle.1",
-            "nsdm.ongrid.1",
             "nsm.angle.1",
             "nsm.ongrid.1",
+            "nwell.enclosed.hvi.1",
             "pad.angle.1",
             "pad.ongrid.1",
             "pwbm.angle.1",
@@ -175,6 +171,7 @@
             "pwell_rs.ongrid.1",
             "rpm.angle.1",
             "rpm.ongrid.1",
+            "rpm.width.1",
             "tunm.angle.1",
             "tunm.ongrid.1",
             "uhvi.angle.1",
@@ -198,6 +195,8 @@
             "m5",
             "nwell",
             "poly",
+            "rpm",
+            "urpm",
             "via",
             "via2",
             "via3",
@@ -222,7 +221,7 @@
         "command": null,
         "kind": "lvs",
         "check_status": "match",
-        "content_hash": "sha256:c8817733ccc997a72458a96523d0e8211bc7ab5972ae2169a40fa1ed638deb64",
+        "content_hash": "sha256:e4a8ba053136c8f6fee964486b2a91d56c1a2e390ef396522c2f568d21850246",
         "input_verified": true,
         "exit_status": 0
       }
@@ -371,7 +370,7 @@
         "command": null,
         "kind": "erc",
         "check_status": "not_checked",
-        "content_hash": "sha256:9c414f9103f2174a7aebddce2a796c5a52fb9ffc1156158f97afbafe987ab68e",
+        "content_hash": "sha256:a044bcd3ce64e0f4a290c261de9962c25f003dc63f9bb2be98b9368601e6dae3",
         "input_verified": true,
         "exit_status": 0,
         "parts": [
@@ -380,7 +379,7 @@
             "command": null,
             "kind": "erc",
             "check_status": "not_checked",
-            "content_hash": "sha256:9c414f9103f2174a7aebddce2a796c5a52fb9ffc1156158f97afbafe987ab68e",
+            "content_hash": "sha256:a044bcd3ce64e0f4a290c261de9962c25f003dc63f9bb2be98b9368601e6dae3",
             "input_verified": true,
             "exit_status": 0
           },
@@ -389,7 +388,7 @@
             "command": null,
             "kind": "lvs",
             "check_status": "match",
-            "content_hash": "sha256:c8817733ccc997a72458a96523d0e8211bc7ab5972ae2169a40fa1ed638deb64",
+            "content_hash": "sha256:e4a8ba053136c8f6fee964486b2a91d56c1a2e390ef396522c2f568d21850246",
             "input_verified": true,
             "exit_status": 0
           }

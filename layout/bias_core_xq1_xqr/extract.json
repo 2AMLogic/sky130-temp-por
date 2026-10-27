@@ -6,6 +6,7 @@
   "dbu_um": 0.001,
   "netlist_path": "bias_core_xq1_xqr.spice",
   "netlist_sha256": "219d1d5aa29dca115791d22f99dafbf4e00734dfc2d160ce50b84ab41f79c637",
+  "netlist_normalized_sha256": "ce14ab57ba783d5c6f0d6c4534efff4fcc4bb60a35e549d2830c2c408e97ddbc",
   "status": "extracted",
   "device_count": 2,
   "net_count": 3,
@@ -14,12 +15,23 @@
     "pnp": 2
   },
   "dummy_devices_dropped": 0,
-  "ignored_layers": [],
+  "ignored_layers": [
+    {
+      "layer": 93,
+      "datatype": 44,
+      "shapes": 2
+    }
+  ],
   "device_recognition_only_layers": [
     {
       "layer": 82,
       "datatype": 44,
       "shapes": 2
+    },
+    {
+      "layer": 94,
+      "datatype": 20,
+      "shapes": 3
     }
   ],
   "device_classes": [
@@ -121,31 +133,39 @@
       ]
     }
   ],
-  "warnings": [],
+  "warnings": [
+    "1 layer (93/44) carrying 2 shapes is outside 'sky130' deck's connectivity graph -- this geometry is invisible to extraction, so a net routed only through it extracts as multiple disconnected nets instead of one, which will silently mismatch a downstream `klt lvs` reference netlist -- see ignored_layers[] for the full per-layer shape counts. See docs/cli/extract.md's 'ignored_layers' field documentation."
+  ],
   "black_box_regions": [],
   "abstracted_cells": [],
   "unmodelled_poly": [],
   "merged_net_labels": [],
   "voltage_domain_warnings": [],
   "missing_flavour_markers": [],
+  "unsupported_devices": [],
   "unbiased_pmos_body_nets": [],
   "single_terminal_nets": [],
   "dead_metal": [],
   "matched_device_groups": [],
   "def_pin_promotion": null,
+  "pin_renames": null,
+  "rename_declared_pins": false,
+  "declared_pins": null,
+  "def_pins": null,
   "label_layers": null,
+  "probes": [],
   "pdk": null,
   "provenance": {
-    "klt_version": "0.6.0+g0ce8c64842d9",
+    "klt_version": "0.7.1.dev1610+g758c6e224053",
     "klayout_version": "0.30.12",
     "pdk": null,
     "deck": {
       "name": "sky130",
-      "content_hash": "sha256:f8f2c3f48eada473dc34a7a8926c0b04fef446fb351a70a636ce43a9ca9c70ba",
+      "content_hash": "sha256:773f73886500d88310f3c3ebe671aad84de425473e9eb6b7ae5a22902416e973",
       "released": false
     },
     "input": {
-      "content_hash": "sha256:b1a4014447bd282c8444a7307fb972e24ba8d67f41134605914069d113aadd47",
+      "content_hash": "sha256:5890d064523ad452ac9c5e1f828c7d4098bd6f769a6fdd93090780ecd394d248",
       "role": "layout"
     }
   },
@@ -156,5 +176,17 @@
     "extract__device__count": 2,
     "extract__net__count": 3,
     "extract__pin__count": 3
+  },
+  "timing": {
+    "stages": {
+      "read_layout": 0.001,
+      "device_extraction": 0.004,
+      "diagnostics": 0.0,
+      "netlist_write": 0.0,
+      "netlist_hash": 0.0,
+      "netlist_normalized_hash": 0.0
+    },
+    "total_seconds": 0.084,
+    "unattributed_seconds": 0.079
   }
 }

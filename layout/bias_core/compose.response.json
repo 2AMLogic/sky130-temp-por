@@ -6,13 +6,13 @@
   "pdk": {
     "name": "sky130A",
     "variant": "sky130A",
-    "version": "open_pdks c6d73a35f524070e85faff4a6a9eef49553ebc2b"
+    "version": "open_pdks f6eeac7dad085ffcc829ccfd721f7b4ce39edcf7"
   },
   "dbu_um": 0.001,
   "bbox_um": {
     "x0": -104.0,
-    "y0": -50.0,
-    "x1": 5533.860000000001,
+    "y0": -50.3,
+    "x1": 5535.37,
     "y1": 165.17000000000002
   },
   "ports": [
@@ -79,8 +79,8 @@
       "source": "cell",
       "generator": null,
       "cell_name": "bias_core_mirror_amp",
-      "source_path": "/home/ubuntu/GitHub/sky130-temp-por/.loom/worktrees/issue-81/layout/bias_core/../bias_core_mirror_amp/bias_core_mirror_amp.gds",
-      "source_digest": "sha256:227070ec2f7c6ab2789f75382e2380efd543ee31e9f5dffe793cfc06ecda2eaa",
+      "source_path": "../bias_core_mirror_amp/bias_core_mirror_amp.gds",
+      "source_digest": "sha256:93a04a0e742ab38838665bf11f15fe1f93fbab2b6a4bf2430031501effc93220",
       "offset_um": {
         "x": 0.0,
         "y": 100.0
@@ -88,7 +88,7 @@
       "bbox_um": {
         "x0": -6.5,
         "y0": 94.0,
-        "x1": 87.84,
+        "x1": 87.965,
         "y1": 165.17000000000002
       },
       "orientation": "none",
@@ -99,17 +99,17 @@
       "source": "cell",
       "generator": null,
       "cell_name": "bias_core_xq1_xqr",
-      "source_path": "/home/ubuntu/GitHub/sky130-temp-por/.loom/worktrees/issue-81/layout/bias_core/../bias_core_xq1_xqr/bias_core_xq1_xqr.gds",
-      "source_digest": "sha256:e280b5d171577e3fa62b7f986da92e705ba5804aa21190d72684d6cbf925bf57",
+      "source_path": "../bias_core_xq1_xqr/bias_core_xq1_xqr.gds",
+      "source_digest": "sha256:4a9821d8274dd0b0cee4e4d9687cb64667f0e47af823204ed88f796fdb7b6e54",
       "offset_um": {
         "x": 150.0,
         "y": 100.0
       },
       "bbox_um": {
-        "x0": 149.03,
-        "y0": 99.03,
-        "x1": 159.81,
-        "y1": 104.37
+        "x0": 145.0,
+        "y0": 98.725,
+        "x1": 160.115,
+        "y1": 106.085
       },
       "orientation": "none",
       "abuts": []
@@ -119,17 +119,17 @@
       "source": "cell",
       "generator": null,
       "cell_name": "bias_core_pnp8_leg",
-      "source_path": "/home/ubuntu/GitHub/sky130-temp-por/.loom/worktrees/issue-81/layout/bias_core/../bias_core_pnp8_leg/bias_core_pnp8_leg.gds",
-      "source_digest": "sha256:33b366fe82f84b9ce0a30639f0c4c9b2aadb955237a84a23dd562a654834c6f4",
+      "source_path": "../bias_core_pnp8_leg/bias_core_pnp8_leg.gds",
+      "source_digest": "sha256:10623e3b7d36b09c086ee90780140653abb5243aad1175ba1a8148bb4f2ce222",
       "offset_um": {
         "x": 200.0,
         "y": 100.0
       },
       "bbox_um": {
         "x0": 195.0,
-        "y0": 99.03,
+        "y0": 98.725,
         "x1": 223.5,
-        "y1": 110.08500000000001
+        "y1": 110.085
       },
       "orientation": "none",
       "abuts": []
@@ -139,16 +139,16 @@
       "source": "cell",
       "generator": null,
       "cell_name": "bias_core_startup",
-      "source_path": "/home/ubuntu/GitHub/sky130-temp-por/.loom/worktrees/issue-81/layout/bias_core/../bias_core_startup/bias_core_startup.gds",
-      "source_digest": "sha256:588297a74848df4cef5a8549e00441130cc8f85d2a81fe160624a23facbf42ff",
+      "source_path": "../bias_core_startup/bias_core_startup.gds",
+      "source_digest": "sha256:e95b0df38411cee836a810e5520d0ad31451ea5fc04a6c09ce40c80ef729e99c",
       "offset_um": {
         "x": 1350.0,
         "y": 100.0
       },
       "bbox_um": {
         "x0": 1310.0,
-        "y0": 100.0,
-        "x1": 1404.04,
+        "y0": 99.85,
+        "x1": 1404.165,
         "y1": 113.17
       },
       "orientation": "none",
@@ -159,8 +159,8 @@
       "source": "cell",
       "generator": null,
       "cell_name": "bias_core_settle_flag",
-      "source_path": "/home/ubuntu/GitHub/sky130-temp-por/.loom/worktrees/issue-81/layout/bias_core/../bias_core_settle_flag/bias_core_settle_flag.gds",
-      "source_digest": "sha256:8981ca480bae6642aaf5fc239cb156267e184b8c96b32513c221c9335b99b372",
+      "source_path": "../bias_core_settle_flag/bias_core_settle_flag.gds",
+      "source_digest": "sha256:cdca20bbc1a4ea5b3db48b6079acef11a9f9167ffd5c64e059cddc466a4a23c7",
       "offset_um": {
         "x": 5450.0,
         "y": 100.0
@@ -179,16 +179,16 @@
       "source": "cell",
       "generator": null,
       "cell_name": "bias_core_passives",
-      "source_path": "/home/ubuntu/GitHub/sky130-temp-por/.loom/worktrees/issue-81/layout/bias_core/../bias_core_passives/bias_core_passives.gds",
-      "source_digest": "sha256:b17b662712b92993db7de8e0e6e59fd9619605c558b145bf35edd45712f96c96",
+      "source_path": "../bias_core_passives/bias_core_passives.gds",
+      "source_digest": "sha256:249232cf75c766987e269a2885e09f330b7ae02dc9214c01f9e9b50367503a19",
       "offset_um": {
         "x": 0.0,
         "y": -50.0
       },
       "bbox_um": {
-        "x0": 0.0,
-        "y0": -50.0,
-        "x1": 5533.860000000001,
+        "x0": -0.25,
+        "y0": -50.3,
+        "x1": 5535.37,
         "y1": -28.08
       },
       "orientation": "none",
@@ -199,7 +199,7 @@
       "source": "cell",
       "generator": null,
       "cell_name": "promo_stub",
-      "source_path": "/home/ubuntu/GitHub/sky130-temp-por/.loom/worktrees/issue-81/layout/bias_core/promo_stub.gds",
+      "source_path": "promo_stub.gds",
       "source_digest": "sha256:902ff80454f309f31943b44b8a7f942a6d96817455a784cbefd7f85d019f84ab",
       "offset_um": {
         "x": -100.0,
@@ -219,7 +219,7 @@
       "source": "cell",
       "generator": null,
       "cell_name": "promo_stub",
-      "source_path": "/home/ubuntu/GitHub/sky130-temp-por/.loom/worktrees/issue-81/layout/bias_core/promo_stub.gds",
+      "source_path": "promo_stub.gds",
       "source_digest": "sha256:902ff80454f309f31943b44b8a7f942a6d96817455a784cbefd7f85d019f84ab",
       "offset_um": {
         "x": -104.0,
@@ -261,7 +261,7 @@
         }
       ],
       "routed": true,
-      "route_length_um": 6609.370000000001,
+      "route_length_um": 6610.88,
       "status": "routed",
       "landed_on_block": true,
       "legs": [
@@ -311,7 +311,7 @@
             }
           ],
           "routed": true,
-          "route_length_um": 255.9450000000006,
+          "route_length_um": 257.4549999999999,
           "reason": null,
           "channel_track": 0,
           "landed_on_block": true
@@ -462,7 +462,7 @@
         }
       ],
       "routed": true,
-      "route_length_um": 541.275,
+      "route_length_um": 542.14,
       "status": "routed",
       "landed_on_block": true,
       "legs": [
@@ -478,7 +478,7 @@
             }
           ],
           "routed": true,
-          "route_length_um": 541.275,
+          "route_length_um": 542.14,
           "reason": null,
           "channel_track": 0,
           "landed_on_block": true
@@ -498,7 +498,7 @@
         }
       ],
       "routed": true,
-      "route_length_um": 294.62000000000006,
+      "route_length_um": 294.77000000000004,
       "status": "routed",
       "landed_on_block": true,
       "legs": [
@@ -514,7 +514,7 @@
             }
           ],
           "routed": true,
-          "route_length_um": 294.62000000000006,
+          "route_length_um": 294.77000000000004,
           "reason": null,
           "channel_track": 0,
           "landed_on_block": true
@@ -534,7 +534,7 @@
         }
       ],
       "routed": true,
-      "route_length_um": 358.03000000000003,
+      "route_length_um": 358.42499999999995,
       "status": "routed",
       "landed_on_block": true,
       "legs": [
@@ -550,7 +550,7 @@
             }
           ],
           "routed": true,
-          "route_length_um": 358.03000000000003,
+          "route_length_um": 358.42499999999995,
           "reason": null,
           "channel_track": 0,
           "landed_on_block": true
@@ -570,7 +570,7 @@
         }
       ],
       "routed": true,
-      "route_length_um": 1591.11,
+      "route_length_um": 1589.8049999999998,
       "status": "routed",
       "landed_on_block": true,
       "legs": [
@@ -586,7 +586,7 @@
             }
           ],
           "routed": true,
-          "route_length_um": 1591.11,
+          "route_length_um": 1589.8049999999998,
           "reason": null,
           "channel_track": 0,
           "landed_on_block": true
@@ -606,7 +606,7 @@
         }
       ],
       "routed": true,
-      "route_length_um": 235.53499999999985,
+      "route_length_um": 236.2449999999999,
       "status": "routed",
       "landed_on_block": true,
       "legs": [
@@ -621,8 +621,23 @@
               "port": "nokx"
             }
           ],
+          "routed": false,
+          "route_length_um": null,
+          "reason": "backbone's 0.4um-wide drawn path crosses 15.92um through its own pin's block 'passives' -- more than that pin's own 14.41um edge margin (including 0.2um for the route's own half-width), so the route plows through, or clips the edge of, the block's interior (e.g. a same-facing port pair reaching a pin on the block's far side, crossing another pin on the way, or a connecting jog running close enough alongside the block's own edge that the drawn wire's width still overlaps it) rather than approaching the pin cleanly"
+        },
+        {
+          "pins": [
+            {
+              "block": "passives",
+              "port": "nokx"
+            },
+            {
+              "block": "settle_flag",
+              "port": "nokx"
+            }
+          ],
           "routed": true,
-          "route_length_um": 235.53499999999985,
+          "route_length_um": 236.2449999999999,
           "reason": null,
           "channel_track": 0,
           "landed_on_block": true
@@ -646,7 +661,7 @@
         }
       ],
       "routed": true,
-      "route_length_um": 2918.0099999999998,
+      "route_length_um": 1556.795,
       "status": "routed",
       "landed_on_block": true,
       "legs": [
@@ -678,8 +693,23 @@
               "port": "pg"
             }
           ],
+          "routed": false,
+          "route_length_um": null,
+          "reason": "backbone's 0.4um-wide drawn path crosses 1.48um through its own pin's block 'passives' -- more than that pin's own 0.41um edge margin (including 0.2um for the route's own half-width), so the route plows through, or clips the edge of, the block's interior (e.g. a same-facing port pair reaching a pin on the block's far side, crossing another pin on the way, or a connecting jog running close enough alongside the block's own edge that the drawn wire's width still overlaps it) rather than approaching the pin cleanly"
+        },
+        {
+          "pins": [
+            {
+              "block": "startup",
+              "port": "pg"
+            },
+            {
+              "block": "passives",
+              "port": "pg"
+            }
+          ],
           "routed": true,
-          "route_length_um": 1555.725,
+          "route_length_um": 194.51000000000025,
           "reason": null,
           "channel_track": 0,
           "landed_on_block": true
@@ -699,7 +729,7 @@
         }
       ],
       "routed": true,
-      "route_length_um": 5548.63,
+      "route_length_um": 5549.905,
       "status": "routed",
       "landed_on_block": true,
       "legs": [
@@ -715,7 +745,7 @@
             }
           ],
           "routed": true,
-          "route_length_um": 5548.63,
+          "route_length_um": 5549.905,
           "reason": null,
           "channel_track": 0,
           "landed_on_block": true
@@ -739,7 +769,7 @@
         }
       ],
       "routed": true,
-      "route_length_um": 5712.27,
+      "route_length_um": 5712.405000000001,
       "status": "routed",
       "landed_on_block": true,
       "legs": [
@@ -755,7 +785,7 @@
             }
           ],
           "routed": true,
-          "route_length_um": 204.81,
+          "route_length_um": 204.795,
           "reason": null,
           "channel_track": 0,
           "landed_on_block": true
@@ -772,7 +802,7 @@
             }
           ],
           "routed": true,
-          "route_length_um": 5507.46,
+          "route_length_um": 5507.610000000001,
           "reason": null,
           "channel_track": 0,
           "landed_on_block": true
@@ -796,7 +826,7 @@
         }
       ],
       "routed": true,
-      "route_length_um": 5705.05,
+      "route_length_um": 5705.2,
       "status": "routed",
       "landed_on_block": true,
       "legs": [
@@ -829,7 +859,7 @@
             }
           ],
           "routed": true,
-          "route_length_um": 5539.635,
+          "route_length_um": 5539.785,
           "reason": null,
           "channel_track": 0,
           "landed_on_block": true
@@ -853,7 +883,7 @@
         }
       ],
       "routed": true,
-      "route_length_um": 6798.895,
+      "route_length_um": 6798.745,
       "status": "routed",
       "landed_on_block": true,
       "legs": [
@@ -869,7 +899,7 @@
             }
           ],
           "routed": true,
-          "route_length_um": 1342.3950000000002,
+          "route_length_um": 1342.2450000000001,
           "reason": null,
           "channel_track": 0,
           "landed_on_block": true
@@ -928,12 +958,15 @@
   },
   "warnings": [],
   "provenance": {
-    "klt_version": "0.6.0+g0ce8c64842d9",
+    "klt_version": "0.7.1.dev1610+g758c6e224053",
     "klayout_version": "0.30.12",
     "pdk": {
       "name": "sky130A",
-      "source": "search root: ~/.volare",
-      "version": "open_pdks c6d73a35f524070e85faff4a6a9eef49553ebc2b"
+      "source": "search root: ~/.ciel",
+      "version": "open_pdks f6eeac7dad085ffcc829ccfd721f7b4ce39edcf7",
+      "ambiguous_sources": [
+        "search root: ~/.volare"
+      ]
     },
     "deck": null,
     "input": null

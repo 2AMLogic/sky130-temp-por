@@ -6,7 +6,7 @@
   "pdk": {
     "name": "sky130A",
     "variant": "sky130A",
-    "version": "open_pdks c6d73a35f524070e85faff4a6a9eef49553ebc2b"
+    "version": "open_pdks f6eeac7dad085ffcc829ccfd721f7b4ce39edcf7"
   },
   "dbu_um": 0.001,
   "bbox_um": {
@@ -94,16 +94,16 @@
       "generator": "mos_array",
       "cell_name": "mbd",
       "source_path": "gen/mbd.gds",
-      "source_digest": "sha256:ea628d2b188c00d74c193f5d293f70127b5470d6b8334eef666f455a1bb770bd",
+      "source_digest": "sha256:ef950eb198e2aded6917265085098c5e2bf91c8844a9156892f59c01bdbe2e85",
       "offset_um": {
         "x": 0.0,
         "y": 0.0
       },
       "bbox_um": {
-        "x0": 0.0,
-        "y0": 0.0,
-        "x1": 4.84,
-        "y1": 4.82
+        "x0": -0.125,
+        "y0": -0.15,
+        "x1": 4.965,
+        "y1": 4.97
       },
       "orientation": "none",
       "abuts": []
@@ -114,16 +114,16 @@
       "generator": "mos_array",
       "cell_name": "mn1",
       "source_path": "gen/mn1.gds",
-      "source_digest": "sha256:a6215c6e65702d031b76b4f0156dc6416b93fc0c36c8015546159087c55c99eb",
+      "source_digest": "sha256:ee9bbfa87e5fc705431b6151840083c1bd48a68a06bc9454898fffcdb402fc6c",
       "offset_um": {
         "x": 8.84,
         "y": 0.0
       },
       "bbox_um": {
-        "x0": 8.84,
-        "y0": 0.0,
-        "x1": 29.68,
-        "y1": 1.24
+        "x0": 8.715,
+        "y0": -0.15,
+        "x1": 29.805,
+        "y1": 1.3900000000000001
       },
       "orientation": "none",
       "abuts": []
@@ -134,14 +134,14 @@
       "generator": "mos_array",
       "cell_name": "mpd",
       "source_path": "gen/mpd.gds",
-      "source_digest": "sha256:a3c54820f4c0c99354d5b5394698b78cf06ac6e73be47cce3b609ee183a45832",
+      "source_digest": "sha256:81296b822b6af755464fefca83cbe32f1c979be4973e71f67280f5d9b3771f2f",
       "offset_um": {
         "x": 2.64,
         "y": 47.81
       },
       "bbox_um": {
         "x0": 2.49,
-        "y0": 44.84,
+        "y0": 44.54,
         "x1": 13.63,
         "y1": 47.96
       },
@@ -154,14 +154,14 @@
       "generator": "mos_array",
       "cell_name": "mp2",
       "source_path": "gen/mp2.gds",
-      "source_digest": "sha256:ed65c7f5b48b678dc86d28cbeb619d38b53faf9d709636b978a17218d057ca65",
+      "source_digest": "sha256:6a5c85b0a2dd962ec98471cce5ca5efbac98c8cabcb1b711b1df14f3589f26a3",
       "offset_um": {
         "x": 20.27,
         "y": 47.81
       },
       "bbox_um": {
         "x0": 20.12,
-        "y0": 44.84,
+        "y0": 44.54,
         "x1": 31.259999999999998,
         "y1": 47.96
       },
@@ -174,16 +174,16 @@
       "generator": "mos_array",
       "cell_name": "mnd",
       "source_path": "gen/mnd.gds",
-      "source_digest": "sha256:bb0cb0f662b6f079a812c662a243333d1b7a9b525ebcf0906cda1b8d19d1495a",
+      "source_digest": "sha256:a93d5ce0e26c8975563941c37d3df9a562e07db6fe9279ce5e561014973d4632",
       "offset_um": {
         "x": 41.68,
         "y": 0.0
       },
       "bbox_um": {
-        "x0": 41.68,
-        "y0": 0.0,
-        "x1": 52.519999999999996,
-        "y1": 2.82
+        "x0": 41.555,
+        "y0": -0.15,
+        "x1": 52.644999999999996,
+        "y1": 2.97
       },
       "orientation": "none",
       "abuts": []
@@ -194,14 +194,14 @@
       "generator": "mos_array",
       "cell_name": "mdgpt",
       "source_path": "gen/mdgpt.gds",
-      "source_digest": "sha256:12e5ccad8e1b5eb459e1c1d669d00f5b89aa80806ac1fb2584eefde5b20593e0",
+      "source_digest": "sha256:0fcc5ad561678f9061097ceb4ac3eead1db90fce2701861db7b8b7c82f8b0135",
       "offset_um": {
         "x": 55.53,
         "y": 55.81
       },
       "bbox_um": {
         "x0": 55.38,
-        "y0": 44.84,
+        "y0": 44.540000000000006,
         "x1": 66.52,
         "y1": 55.96
       },
@@ -214,14 +214,14 @@
       "generator": "mos_array",
       "cell_name": "mdgpi",
       "source_path": "gen/mdgpi.gds",
-      "source_digest": "sha256:1a6fc113eff9708886683550f4d46b94c1022795d43c7af69ab8da10e5a93249",
+      "source_digest": "sha256:b43fda5792c7b27ad709f16697f4b7b4cf29459e04d00b0ee2581c191dd05a8e",
       "offset_um": {
         "x": 73.16,
         "y": 46.81
       },
       "bbox_um": {
         "x0": 73.00999999999999,
-        "y0": 44.84,
+        "y0": 44.54,
         "x1": 74.64999999999999,
         "y1": 46.96
       },
@@ -234,16 +234,16 @@
       "generator": "mos_array",
       "cell_name": "mdgni",
       "source_path": "gen/mdgni.gds",
-      "source_digest": "sha256:a8a3ae4a9d2fd9a13ee66b535b3ecde1e7328dd0c398346299040b5761629084",
+      "source_digest": "sha256:96a131d84361a8c37c7f1d03775fcc0a7cb5b6911c85e2b173ebf576b784057b",
       "offset_um": {
         "x": 74.36,
         "y": 0.0
       },
       "bbox_um": {
-        "x0": 74.36,
-        "y0": 0.0,
-        "x1": 75.7,
-        "y1": 1.82
+        "x0": 74.235,
+        "y0": -0.15,
+        "x1": 75.825,
+        "y1": 1.97
       },
       "orientation": "none",
       "abuts": []
@@ -254,16 +254,16 @@
       "generator": "mos_array",
       "cell_name": "mdgnt",
       "source_path": "gen/mdgnt.gds",
-      "source_digest": "sha256:05bfe7c70ae1a9cd607f47ac83bf160459eb4ee7b0e518dab7443f32aab1e873",
+      "source_digest": "sha256:29d2882b3513f5020ad856ea6fe0195f9e11f4e587665bcaeed692452b0028e8",
       "offset_um": {
         "x": 56.52,
         "y": 0.0
       },
       "bbox_um": {
-        "x0": 56.52,
-        "y0": 0.0,
-        "x1": 67.36,
-        "y1": 10.82
+        "x0": 56.395,
+        "y0": -0.15,
+        "x1": 67.485,
+        "y1": 10.97
       },
       "orientation": "none",
       "abuts": []
@@ -274,14 +274,14 @@
       "generator": "mos_array",
       "cell_name": "mg1p",
       "source_path": "gen/mg1p.gds",
-      "source_digest": "sha256:944f90f54d5136db6b061ea550e0ca944b546dd799766dc44d821589e79d2f75",
+      "source_digest": "sha256:6a09b0f2b963c032875d43e148e8fe1eae506d15de24d1a29003cfd486ae6d48",
       "offset_um": {
         "x": 81.29,
         "y": 46.31
       },
       "bbox_um": {
         "x0": 81.14,
-        "y0": 44.84,
+        "y0": 44.54,
         "x1": 84.28,
         "y1": 46.46
       },
@@ -294,16 +294,16 @@
       "generator": "mos_array",
       "cell_name": "mg1n",
       "source_path": "gen/mg1n.gds",
-      "source_digest": "sha256:044f19593e4bd6ec425d3616b8b72cc10e429897b40eb854558bec6e93a5fb45",
+      "source_digest": "sha256:929add93f80b05419289f17e0b411f3e220e5a2e06ae5ef4e95388a2c9356930",
       "offset_um": {
         "x": 79.7,
         "y": 0.0
       },
       "bbox_um": {
-        "x0": 79.7,
-        "y0": 0.0,
-        "x1": 81.04,
-        "y1": 2.82
+        "x0": 79.575,
+        "y0": -0.15,
+        "x1": 81.165,
+        "y1": 2.97
       },
       "orientation": "none",
       "abuts": []
@@ -314,14 +314,14 @@
       "generator": "mos_array",
       "cell_name": "mg2p",
       "source_path": "gen/mg2p.gds",
-      "source_digest": "sha256:8b2251194634e560bee425528731c9e09a4b63ae1e4851e4577210933c7a53fa",
+      "source_digest": "sha256:38f7e1a63b243625ac684521a4ca41214963d51cca4aa5358a96b6f36fae0126",
       "offset_um": {
         "x": 90.92,
         "y": 47.81
       },
       "bbox_um": {
         "x0": 90.77,
-        "y0": 44.84,
+        "y0": 44.54,
         "x1": 92.41,
         "y1": 47.96
       },
@@ -334,16 +334,16 @@
       "generator": "mos_array",
       "cell_name": "mg2n",
       "source_path": "gen/mg2n.gds",
-      "source_digest": "sha256:8e36bc6139547024aec599d5cfc69b35425c1da08c65d0a8ed7d2b163f99a8c2",
+      "source_digest": "sha256:a11b784142e41a9d34dd4da661608bd4faf66d6720a3aef77162bd1d73d9cbac",
       "offset_um": {
         "x": 88.04,
         "y": 0.0
       },
       "bbox_um": {
-        "x0": 88.04,
-        "y0": 0.0,
-        "x1": 90.88000000000001,
-        "y1": 1.32
+        "x0": 87.915,
+        "y0": -0.15,
+        "x1": 91.00500000000001,
+        "y1": 1.47
       },
       "orientation": "none",
       "abuts": []
@@ -354,14 +354,14 @@
       "generator": "mos_array",
       "cell_name": "mpt",
       "source_path": "gen/mpt.gds",
-      "source_digest": "sha256:dfc8385b45f4cc46925bd04c7a883d175b456d1bc4a4b42fb4451cf1c23c0808",
+      "source_digest": "sha256:d6aa7757ca3c6d39b58c569924d58ba1298c4b55aca2384ec4fc915414c16a33",
       "offset_um": {
         "x": 37.9,
         "y": 46.31
       },
       "bbox_um": {
         "x0": 37.75,
-        "y0": 44.84,
+        "y0": 44.54,
         "x1": 48.89,
         "y1": 46.46
       },
@@ -374,14 +374,14 @@
       "generator": "mos_array",
       "cell_name": "mtsw",
       "source_path": "gen/mtsw.gds",
-      "source_digest": "sha256:2d3e4ef1dc538e4c17f777c3a59dc6c90c8b5fc60f9f87687a906b137f3eed1f",
+      "source_digest": "sha256:05fdf5cd3210e7174d347b49dc7c27621069b3d8be8539e761a4a5d752b7a191",
       "offset_um": {
         "x": 99.05,
         "y": 47.81
       },
       "bbox_um": {
         "x0": 98.89999999999999,
-        "y0": 44.84,
+        "y0": 44.54,
         "x1": 101.03999999999999,
         "y1": 47.96
       },
@@ -394,16 +394,16 @@
       "generator": "mos_array",
       "cell_name": "mdis",
       "source_path": "gen/mdis.gds",
-      "source_digest": "sha256:6cbb45d6f1ae48e9bda6af21bf2848b1e520b7d600501ec1fde52946bf4c7a44",
+      "source_digest": "sha256:49fe2680826bae2f368a3ed52f14d837f9e2168690ba8076763d5875a0117a26",
       "offset_um": {
         "x": 94.88,
         "y": 0.0
       },
       "bbox_um": {
-        "x0": 94.88,
-        "y0": 0.0,
-        "x1": 96.72,
-        "y1": 1.82
+        "x0": 94.755,
+        "y0": -0.15,
+        "x1": 96.845,
+        "y1": 1.97
       },
       "orientation": "none",
       "abuts": []
@@ -414,14 +414,14 @@
       "generator": "mos_array",
       "cell_name": "mdapi",
       "source_path": "gen/mdapi.gds",
-      "source_digest": "sha256:ed7b56a00640d8cb52e9902fffc91631737440835da07d9abce7498aeb6dba22",
+      "source_digest": "sha256:ebb1ba381df57f4f18471ed3a47bdc51441aa53b0a2ec2e3ee6841b3f303eb7f",
       "offset_um": {
         "x": 107.68,
         "y": 47.81
       },
       "bbox_um": {
         "x0": 107.53,
-        "y0": 44.84,
+        "y0": 44.54,
         "x1": 109.67,
         "y1": 47.96
       },
@@ -434,16 +434,16 @@
       "generator": "mos_array",
       "cell_name": "mdant",
       "source_path": "gen/mdant.gds",
-      "source_digest": "sha256:616f1d47687dfd2e29af4ccd071d54c6eed9fed2c101c5eb5296479de5bb1b94",
+      "source_digest": "sha256:a8e53b75ff1e0c0048d0561a121a3cb670042454f313d64bd84e84aa69ad61cb",
       "offset_um": {
         "x": 103.72,
         "y": 0.0
       },
       "bbox_um": {
-        "x0": 103.72,
-        "y0": 0.0,
-        "x1": 114.56,
-        "y1": 1.32
+        "x0": 103.595,
+        "y0": -0.15,
+        "x1": 114.685,
+        "y1": 1.47
       },
       "orientation": "none",
       "abuts": []
@@ -454,16 +454,16 @@
       "generator": "mos_array",
       "cell_name": "mdbni",
       "source_path": "gen/mdbni.gds",
-      "source_digest": "sha256:6a593007883145031b6d76e42a408079da1e7aca1d05bd2088cccc5c97ac9334",
+      "source_digest": "sha256:496559666d4840f5538a96d3075cb98629b20115905adcd6fc4d4659a7aae88d",
       "offset_um": {
         "x": 118.56,
         "y": 0.0
       },
       "bbox_um": {
-        "x0": 118.56,
-        "y0": 0.0,
-        "x1": 120.4,
-        "y1": 1.82
+        "x0": 118.435,
+        "y0": -0.15,
+        "x1": 120.525,
+        "y1": 1.97
       },
       "orientation": "none",
       "abuts": []
@@ -474,14 +474,14 @@
       "generator": "mos_array",
       "cell_name": "mdbpt",
       "source_path": "gen/mdbpt.gds",
-      "source_digest": "sha256:c994020cc27f02891422b85434d8e082448786a7011e2fae4e2b5f9bc0f0a042",
+      "source_digest": "sha256:39ecc1eb9d6ccdeae2ab3c39a30dfa83877acf84c91ce5c1d8fa8927267e42a7",
       "offset_um": {
         "x": 116.31,
         "y": 46.31
       },
       "bbox_um": {
         "x0": 116.16,
-        "y0": 44.84,
+        "y0": 44.54,
         "x1": 127.3,
         "y1": 46.46
       },
@@ -494,16 +494,16 @@
       "generator": "mos_array",
       "cell_name": "mrlk",
       "source_path": "gen/mrlk.gds",
-      "source_digest": "sha256:b8196083b8307d24d27d74ebf0e1823a3958fd2363fd8425665580c99fd35a30",
+      "source_digest": "sha256:a997fbda243bc7123820b1e26a1b72920142877739239eda33fb5db39b71503d",
       "offset_um": {
         "x": 127.4,
         "y": 0.0
       },
       "bbox_um": {
-        "x0": 127.4,
-        "y0": 0.0,
-        "x1": 129.24,
-        "y1": 1.82
+        "x0": 127.275,
+        "y0": -0.15,
+        "x1": 129.365,
+        "y1": 1.97
       },
       "orientation": "none",
       "abuts": []
@@ -514,14 +514,14 @@
       "generator": "mos_array",
       "cell_name": "mnap1",
       "source_path": "gen/mnap1.gds",
-      "source_digest": "sha256:c8f6964d15d749bb0214b41a4b730a0b3ffb79f98b50dc1d1aa4711ba19daf31",
+      "source_digest": "sha256:9e9833447086e87f9cb91b72bbf65692ec921f0fe74134f8385f7a5066120a6b",
       "offset_um": {
         "x": 142.07,
         "y": 49.81
       },
       "bbox_um": {
         "x0": 141.92,
-        "y0": 44.84,
+        "y0": 44.54,
         "x1": 143.56,
         "y1": 49.96
       },
@@ -534,14 +534,14 @@
       "generator": "mos_array",
       "cell_name": "mnap2",
       "source_path": "gen/mnap2.gds",
-      "source_digest": "sha256:0ee755b79412d19634bbef375c3649075fee455c19514c2fdfc2a055b617b8dc",
+      "source_digest": "sha256:c5ba66a2ddd0d609c54cb579ce4666b797193a5593ff99e445f1c89f782e9ce3",
       "offset_um": {
         "x": 133.94,
         "y": 49.81
       },
       "bbox_um": {
         "x0": 133.79,
-        "y0": 44.84,
+        "y0": 44.54,
         "x1": 135.43,
         "y1": 49.96
       },
@@ -554,16 +554,16 @@
       "generator": "mos_array",
       "cell_name": "mnan1",
       "source_path": "gen/mnan1.gds",
-      "source_digest": "sha256:ca357dad97b37d4ae0b5f663396117311cb87c44b8cc8d22a2293c6114a39655",
+      "source_digest": "sha256:171e056ce04474833168b69c6c49f639ef60a9ff8d8507a49ad63334eb9d770c",
       "offset_um": {
         "x": 141.58,
         "y": 0.0
       },
       "bbox_um": {
-        "x0": 141.58,
-        "y0": 0.0,
-        "x1": 142.92000000000002,
-        "y1": 2.82
+        "x0": 141.455,
+        "y0": -0.15,
+        "x1": 143.04500000000002,
+        "y1": 2.97
       },
       "orientation": "none",
       "abuts": []
@@ -574,16 +574,16 @@
       "generator": "mos_array",
       "cell_name": "mnan2",
       "source_path": "gen/mnan2.gds",
-      "source_digest": "sha256:2f5f45519a98d17cf87c4cf084349d8cf7f4be968603f308e599381c8e7658c0",
+      "source_digest": "sha256:e6f82434efc30aec723cb8b2426fd0c6880b4547c4c2e23b096135056e39f1ad",
       "offset_um": {
         "x": 133.24,
         "y": 0.0
       },
       "bbox_um": {
-        "x0": 133.24,
-        "y0": 0.0,
-        "x1": 134.58,
-        "y1": 2.82
+        "x0": 133.115,
+        "y0": -0.15,
+        "x1": 134.705,
+        "y1": 2.97
       },
       "orientation": "none",
       "abuts": []
@@ -594,14 +594,14 @@
       "generator": "mos_array",
       "cell_name": "mast",
       "source_path": "gen/mast.gds",
-      "source_digest": "sha256:586ea894faf2dc5c490e25acae5a3da7f1ec4621871e7e14cecce6a7eba38d10",
+      "source_digest": "sha256:fd493e7e2eae7b36d624741d47a0a9b3b6c27ea25363ac8e266089a19d10731a",
       "offset_um": {
         "x": 150.2,
         "y": 46.31
       },
       "bbox_um": {
         "x0": 150.04999999999998,
-        "y0": 44.84,
+        "y0": 44.54,
         "x1": 161.19,
         "y1": 46.46
       },
@@ -614,14 +614,14 @@
       "generator": "mos_array",
       "cell_name": "mop",
       "source_path": "gen/mop.gds",
-      "source_digest": "sha256:c2b407cd0b8034217fc305163ee375bb1dd4aca6f1f061a8a16c3f144c083bf6",
+      "source_digest": "sha256:a9cdae0693eaa92913a15a8696d7e759cca00792a77b9a074aaef5f034955dd6",
       "offset_um": {
         "x": 167.83,
         "y": 46.81
       },
       "bbox_um": {
         "x0": 167.68,
-        "y0": 44.84,
+        "y0": 44.54,
         "x1": 169.82000000000002,
         "y1": 46.96
       },
@@ -634,16 +634,16 @@
       "generator": "mos_array",
       "cell_name": "mon",
       "source_path": "gen/mon.gds",
-      "source_digest": "sha256:82241356cc3a50b529b3dda293041b2a483890ea613fbb1aa0d7e4c58014b68e",
+      "source_digest": "sha256:392886cb313380bc9262904a6cf1beae8e3e047550f5eb92dff4a888e0ec2b33",
       "offset_um": {
         "x": 146.92,
         "y": 0.0
       },
       "bbox_um": {
-        "x0": 146.92,
-        "y0": 0.0,
-        "x1": 148.26,
-        "y1": 10.82
+        "x0": 146.795,
+        "y0": -0.15,
+        "x1": 148.385,
+        "y1": 10.97
       },
       "orientation": "none",
       "abuts": []
@@ -654,16 +654,16 @@
       "generator": "guard_ring",
       "cell_name": "nwt_mpd",
       "source_path": "gen/nwt_mpd.gds",
-      "source_digest": "sha256:9d15dd88b6261a1865fa9ee3634a72f48edc6988ddba640801b85e223bbbd0e5",
+      "source_digest": "sha256:1031f73772e820fa370b9d976ce61b7940c013ebb9c2a00d8236008407817e4f",
       "offset_um": {
         "x": 0.6,
         "y": 45.04
       },
       "bbox_um": {
-        "x0": 0.44999999999999996,
-        "y0": 44.89,
-        "x1": 2.59,
-        "y1": 47.03
+        "x0": 0.39999999999999997,
+        "y0": 44.839999999999996,
+        "x1": 2.64,
+        "y1": 47.08
       },
       "orientation": "none",
       "abuts": []
@@ -674,16 +674,16 @@
       "generator": "guard_ring",
       "cell_name": "nwt_mp2",
       "source_path": "gen/nwt_mp2.gds",
-      "source_digest": "sha256:aa1b6dd1ea32f2c0ffeb5372241357e2d455df8949e56803796cb077b23d09aa",
+      "source_digest": "sha256:2e171f77d1901650c26b335ef2308797543eaac1faa019c6bfa39b2a2d5e1fc5",
       "offset_um": {
         "x": 18.23,
         "y": 45.04
       },
       "bbox_um": {
-        "x0": 18.080000000000002,
-        "y0": 44.89,
-        "x1": 20.22,
-        "y1": 47.03
+        "x0": 18.03,
+        "y0": 44.839999999999996,
+        "x1": 20.27,
+        "y1": 47.08
       },
       "orientation": "none",
       "abuts": []
@@ -694,16 +694,16 @@
       "generator": "guard_ring",
       "cell_name": "nwt_mpt",
       "source_path": "gen/nwt_mpt.gds",
-      "source_digest": "sha256:d2b58cba81fb45d743e8f04650f74c07b0cd8ebbeb0ab586a3a58a0ecd83b058",
+      "source_digest": "sha256:bf5927e1100b8e71574a9dc8bd137a3e6f7b509d3fa13a71d796b8baede57616",
       "offset_um": {
         "x": 35.86,
         "y": 45.04
       },
       "bbox_um": {
-        "x0": 35.71,
-        "y0": 44.89,
-        "x1": 37.85,
-        "y1": 47.03
+        "x0": 35.66,
+        "y0": 44.839999999999996,
+        "x1": 37.9,
+        "y1": 47.08
       },
       "orientation": "none",
       "abuts": []
@@ -714,16 +714,16 @@
       "generator": "guard_ring",
       "cell_name": "nwt_mdgpt",
       "source_path": "gen/nwt_mdgpt.gds",
-      "source_digest": "sha256:3fbdc152759cb762d20cc4851b03b7d2c358472e617e545a4cc9022c7a64e81a",
+      "source_digest": "sha256:d83177526fd340f3911839ab6f4a123c1527a7760a00e49936d64a26cbbac927",
       "offset_um": {
         "x": 53.49,
         "y": 45.04
       },
       "bbox_um": {
-        "x0": 53.34,
-        "y0": 44.89,
-        "x1": 55.480000000000004,
-        "y1": 47.03
+        "x0": 53.29,
+        "y0": 44.839999999999996,
+        "x1": 55.53,
+        "y1": 47.08
       },
       "orientation": "none",
       "abuts": []
@@ -734,16 +734,16 @@
       "generator": "guard_ring",
       "cell_name": "nwt_mdgpi",
       "source_path": "gen/nwt_mdgpi.gds",
-      "source_digest": "sha256:5f2c38514d5dee3aaad8bc252ee3743e1eb7c64b14b287671fff5ef047b80ae7",
+      "source_digest": "sha256:28e5e7e80a3ff53129f7341a9c2ff37cb6bb1ebdbabbc212e1772a79b7c2e9a0",
       "offset_um": {
         "x": 71.12,
         "y": 45.04
       },
       "bbox_um": {
-        "x0": 70.97,
-        "y0": 44.89,
-        "x1": 73.11,
-        "y1": 47.03
+        "x0": 70.92,
+        "y0": 44.839999999999996,
+        "x1": 73.16000000000001,
+        "y1": 47.08
       },
       "orientation": "none",
       "abuts": []
@@ -754,16 +754,16 @@
       "generator": "guard_ring",
       "cell_name": "nwt_mg1p",
       "source_path": "gen/nwt_mg1p.gds",
-      "source_digest": "sha256:92c0e30a2691aa372a221fd06f8a37c6ac3eaff2dafae3505ed2ce4978c0d8f6",
+      "source_digest": "sha256:9d9ef85809b4e1cc238919b2b44fecda707f72f87e1625133d64cf1c79867de0",
       "offset_um": {
         "x": 79.25,
         "y": 45.04
       },
       "bbox_um": {
-        "x0": 79.1,
-        "y0": 44.89,
-        "x1": 81.24,
-        "y1": 47.03
+        "x0": 79.05,
+        "y0": 44.839999999999996,
+        "x1": 81.29,
+        "y1": 47.08
       },
       "orientation": "none",
       "abuts": []
@@ -774,16 +774,16 @@
       "generator": "guard_ring",
       "cell_name": "nwt_mg2p",
       "source_path": "gen/nwt_mg2p.gds",
-      "source_digest": "sha256:b897412e220e467146ebf67277ea9937194356cfd7fca27011de19e1596c7ccc",
+      "source_digest": "sha256:86f0f626be979da015d4a850bfbba6b4586faf060a54741160dc8b979ab4713c",
       "offset_um": {
         "x": 88.88,
         "y": 45.04
       },
       "bbox_um": {
-        "x0": 88.72999999999999,
-        "y0": 44.89,
-        "x1": 90.86999999999999,
-        "y1": 47.03
+        "x0": 88.67999999999999,
+        "y0": 44.839999999999996,
+        "x1": 90.92,
+        "y1": 47.08
       },
       "orientation": "none",
       "abuts": []
@@ -794,16 +794,16 @@
       "generator": "guard_ring",
       "cell_name": "nwt_mtsw",
       "source_path": "gen/nwt_mtsw.gds",
-      "source_digest": "sha256:94028fac7a7254a5ebed56355ad27579e78a230c20e5f82d8dc70fb814dc5825",
+      "source_digest": "sha256:05c2d840d0e609805c1f7512f9fea00952d9e925bb3065988d0a31a783efb309",
       "offset_um": {
         "x": 97.01,
         "y": 45.04
       },
       "bbox_um": {
-        "x0": 96.86,
-        "y0": 44.89,
-        "x1": 99.0,
-        "y1": 47.03
+        "x0": 96.81,
+        "y0": 44.839999999999996,
+        "x1": 99.05000000000001,
+        "y1": 47.08
       },
       "orientation": "none",
       "abuts": []
@@ -814,16 +814,16 @@
       "generator": "guard_ring",
       "cell_name": "nwt_mdapi",
       "source_path": "gen/nwt_mdapi.gds",
-      "source_digest": "sha256:3299fe15804d110f3355fe5ba6197992dee02dd9c2d0aeb89af008cdc448d618",
+      "source_digest": "sha256:ff16d3e43206c2751f0b463179cf2084c1d3ac1cdb4893f840ba76c372829815",
       "offset_um": {
         "x": 105.64,
         "y": 45.04
       },
       "bbox_um": {
-        "x0": 105.49,
-        "y0": 44.89,
-        "x1": 107.63,
-        "y1": 47.03
+        "x0": 105.44,
+        "y0": 44.839999999999996,
+        "x1": 107.68,
+        "y1": 47.08
       },
       "orientation": "none",
       "abuts": []
@@ -834,16 +834,16 @@
       "generator": "guard_ring",
       "cell_name": "nwt_mdbpt",
       "source_path": "gen/nwt_mdbpt.gds",
-      "source_digest": "sha256:df5a766fc8ba1b365616483b692a1aa53bd0630237c7b799e1403638a96a9719",
+      "source_digest": "sha256:efb29ea18264580dca77705da669b39d6af6cecf65346370000888a313f85ce0",
       "offset_um": {
         "x": 114.27,
         "y": 45.04
       },
       "bbox_um": {
-        "x0": 114.11999999999999,
-        "y0": 44.89,
-        "x1": 116.25999999999999,
-        "y1": 47.03
+        "x0": 114.07,
+        "y0": 44.839999999999996,
+        "x1": 116.31,
+        "y1": 47.08
       },
       "orientation": "none",
       "abuts": []
@@ -854,16 +854,16 @@
       "generator": "guard_ring",
       "cell_name": "nwt_mnap2",
       "source_path": "gen/nwt_mnap2.gds",
-      "source_digest": "sha256:d809428d4d682bef1d1ef0c9a280ab0d3439e069b724501c41e95bdaaec730e7",
+      "source_digest": "sha256:689201ad6c8df4671784b18330fa3a53edb36260229283e75cdacefa5e000304",
       "offset_um": {
         "x": 131.9,
         "y": 45.04
       },
       "bbox_um": {
-        "x0": 131.75,
-        "y0": 44.89,
-        "x1": 133.89000000000001,
-        "y1": 47.03
+        "x0": 131.70000000000002,
+        "y0": 44.839999999999996,
+        "x1": 133.94,
+        "y1": 47.08
       },
       "orientation": "none",
       "abuts": []
@@ -874,16 +874,16 @@
       "generator": "guard_ring",
       "cell_name": "nwt_mnap1",
       "source_path": "gen/nwt_mnap1.gds",
-      "source_digest": "sha256:2d8312e87f9289f3af42eddba1d3e0653b32218ee82d25272cd40398325d8abe",
+      "source_digest": "sha256:d64cad5d78686ced4c1f0012cfc1ac0f5b6e7917b258981a46bc887e15e75939",
       "offset_um": {
         "x": 140.03,
         "y": 45.04
       },
       "bbox_um": {
-        "x0": 139.88,
-        "y0": 44.89,
-        "x1": 142.02,
-        "y1": 47.03
+        "x0": 139.83,
+        "y0": 44.839999999999996,
+        "x1": 142.07,
+        "y1": 47.08
       },
       "orientation": "none",
       "abuts": []
@@ -894,16 +894,16 @@
       "generator": "guard_ring",
       "cell_name": "nwt_mast",
       "source_path": "gen/nwt_mast.gds",
-      "source_digest": "sha256:58e42d18e624d44a2c0e5b2650155ff62cdae10c214da2fea2d8836a8a6b9279",
+      "source_digest": "sha256:2b53b2a19a7064601554097009c587b0231535ed2f90f356cef991cb94a91359",
       "offset_um": {
         "x": 148.16,
         "y": 45.04
       },
       "bbox_um": {
-        "x0": 148.01,
-        "y0": 44.89,
-        "x1": 150.15,
-        "y1": 47.03
+        "x0": 147.96,
+        "y0": 44.839999999999996,
+        "x1": 150.2,
+        "y1": 47.08
       },
       "orientation": "none",
       "abuts": []
@@ -914,16 +914,16 @@
       "generator": "guard_ring",
       "cell_name": "nwt_mop",
       "source_path": "gen/nwt_mop.gds",
-      "source_digest": "sha256:8a8a74ad76159a329802820ec8a05ffcd67fda579115afa4243fe7973f3f9d1a",
+      "source_digest": "sha256:93d1fa7e7c093cdc80df5ad437c1baff19350e33b06fb68e3443e84fe325565d",
       "offset_um": {
         "x": 165.79,
         "y": 45.04
       },
       "bbox_um": {
-        "x0": 165.64,
-        "y0": 44.89,
-        "x1": 167.78,
-        "y1": 47.03
+        "x0": 165.59,
+        "y0": 44.839999999999996,
+        "x1": 167.82999999999998,
+        "y1": 47.08
       },
       "orientation": "none",
       "abuts": []
@@ -934,16 +934,16 @@
       "generator": "guard_ring",
       "cell_name": "pst1",
       "source_path": "gen/pst1.gds",
-      "source_digest": "sha256:b4fe8937cadb232c50046c0ba870d416ba9e9206bcf38dcc3581a9ed8b9a43f5",
+      "source_digest": "sha256:1a25615057e66e40f4bdb2ed139001d1c7faf52b150f8b4b0954a03f8c9c842f",
       "offset_um": {
         "x": -3.2,
         "y": -3.5
       },
       "bbox_um": {
-        "x0": -3.2,
-        "y0": -3.5,
-        "x1": -1.36,
-        "y1": -1.66
+        "x0": -3.325,
+        "y0": -3.625,
+        "x1": -1.235,
+        "y1": -1.535
       },
       "orientation": "none",
       "abuts": []
@@ -954,16 +954,16 @@
       "generator": "guard_ring",
       "cell_name": "pst2",
       "source_path": "gen/pst2.gds",
-      "source_digest": "sha256:2bd9a23ed4e88b0a24d87216ce5b60ef13b068ab18df931502373da6a3ba9bab",
+      "source_digest": "sha256:5d3cb5b6d22a80cb803520b96e1f9e3ad44e73e8fe3c196e3b69f486687430bd",
       "offset_um": {
         "x": 38.48,
         "y": -3.5
       },
       "bbox_um": {
-        "x0": 38.48,
-        "y0": -3.5,
-        "x1": 40.32,
-        "y1": -1.66
+        "x0": 38.355,
+        "y0": -3.625,
+        "x1": 40.445,
+        "y1": -1.535
       },
       "orientation": "none",
       "abuts": []
@@ -974,16 +974,16 @@
       "generator": "guard_ring",
       "cell_name": "pst3",
       "source_path": "gen/pst3.gds",
-      "source_digest": "sha256:0ac0cacb2567ad146767fe95b7b7e3e80c87c6b05c01a64700778f1d95f0467a",
+      "source_digest": "sha256:012d84679bca91c1a0401627ceefe4a522f8d74268765a6997c43ea68cf5d50e",
       "offset_um": {
         "x": 71.16,
         "y": -3.5
       },
       "bbox_um": {
-        "x0": 71.16,
-        "y0": -3.5,
-        "x1": 73.0,
-        "y1": -1.66
+        "x0": 71.035,
+        "y0": -3.625,
+        "x1": 73.125,
+        "y1": -1.535
       },
       "orientation": "none",
       "abuts": []
@@ -994,16 +994,16 @@
       "generator": "guard_ring",
       "cell_name": "pst4",
       "source_path": "gen/pst4.gds",
-      "source_digest": "sha256:5aa8b21f155637a9a67e0b36cc2169a82025c753989bd4eeb2cb3817536b7136",
+      "source_digest": "sha256:c430605af0da4a67c5882cc8a6854c53c8f9e9731f7a576e92e62637539ed87e",
       "offset_um": {
         "x": 84.84,
         "y": -3.5
       },
       "bbox_um": {
-        "x0": 84.84,
-        "y0": -3.5,
-        "x1": 86.68,
-        "y1": -1.66
+        "x0": 84.715,
+        "y0": -3.625,
+        "x1": 86.805,
+        "y1": -1.535
       },
       "orientation": "none",
       "abuts": []
@@ -1014,16 +1014,16 @@
       "generator": "guard_ring",
       "cell_name": "pst5",
       "source_path": "gen/pst5.gds",
-      "source_digest": "sha256:361c28b4dfbb8319d4b6bef77b6886829aba29c8edf180c6ba1dd9de2ffdb7de",
+      "source_digest": "sha256:b757c3cb1b4d4a0752d506da78f0cfac65de982422e89f010802a6ad71ad7ae2",
       "offset_um": {
         "x": 100.52,
         "y": -3.5
       },
       "bbox_um": {
-        "x0": 100.52,
-        "y0": -3.5,
-        "x1": 102.36,
-        "y1": -1.66
+        "x0": 100.395,
+        "y0": -3.625,
+        "x1": 102.485,
+        "y1": -1.535
       },
       "orientation": "none",
       "abuts": []
@@ -1034,16 +1034,16 @@
       "generator": "guard_ring",
       "cell_name": "pst6",
       "source_path": "gen/pst6.gds",
-      "source_digest": "sha256:bd9b10dd4b988b1ee8140087b82467c66abc4d73fa1884ee41ae20173eb59b04",
+      "source_digest": "sha256:e11a2d91b07d8580c35a42071801f33c020c332e86d9c53d71bdffab0f0292a8",
       "offset_um": {
         "x": 124.2,
         "y": -3.5
       },
       "bbox_um": {
-        "x0": 124.2,
-        "y0": -3.5,
-        "x1": 126.04,
-        "y1": -1.66
+        "x0": 124.075,
+        "y0": -3.625,
+        "x1": 126.165,
+        "y1": -1.535
       },
       "orientation": "none",
       "abuts": []
@@ -1054,16 +1054,16 @@
       "generator": "guard_ring",
       "cell_name": "pst7",
       "source_path": "gen/pst7.gds",
-      "source_digest": "sha256:d0c7770d514103b95a83ddccd1fafa9e61cd6b07a395aedf4892bf47508b7937",
+      "source_digest": "sha256:598baa3418bd1fac0f77f0373416b09eafef77028e4b89791783b0994c70b55a",
       "offset_um": {
         "x": 138.38,
         "y": -3.5
       },
       "bbox_um": {
-        "x0": 138.38,
-        "y0": -3.5,
-        "x1": 140.22,
-        "y1": -1.66
+        "x0": 138.255,
+        "y0": -3.625,
+        "x1": 140.345,
+        "y1": -1.535
       },
       "orientation": "none",
       "abuts": []
@@ -1173,7 +1173,7 @@
       "source": "cell",
       "generator": null,
       "cell_name": "promo_stub",
-      "source_path": "/home/ubuntu/GitHub/sky130-temp-por/.loom/worktrees/issue-101/layout/por_output_chain/promo_stub.gds",
+      "source_path": "promo_stub.gds",
       "source_digest": "sha256:902ff80454f309f31943b44b8a7f942a6d96817455a784cbefd7f85d019f84ab",
       "offset_um": {
         "x": -10.0,
@@ -1193,7 +1193,7 @@
       "source": "cell",
       "generator": null,
       "cell_name": "promo_stub",
-      "source_path": "/home/ubuntu/GitHub/sky130-temp-por/.loom/worktrees/issue-101/layout/por_output_chain/promo_stub.gds",
+      "source_path": "promo_stub.gds",
       "source_digest": "sha256:902ff80454f309f31943b44b8a7f942a6d96817455a784cbefd7f85d019f84ab",
       "offset_um": {
         "x": -10.0,
@@ -1213,7 +1213,7 @@
       "source": "cell",
       "generator": null,
       "cell_name": "promo_stub",
-      "source_path": "/home/ubuntu/GitHub/sky130-temp-por/.loom/worktrees/issue-101/layout/por_output_chain/promo_stub.gds",
+      "source_path": "promo_stub.gds",
       "source_digest": "sha256:902ff80454f309f31943b44b8a7f942a6d96817455a784cbefd7f85d019f84ab",
       "offset_um": {
         "x": 173.96,
@@ -1233,7 +1233,7 @@
       "source": "cell",
       "generator": null,
       "cell_name": "promo_stub",
-      "source_path": "/home/ubuntu/GitHub/sky130-temp-por/.loom/worktrees/issue-101/layout/por_output_chain/promo_stub.gds",
+      "source_path": "promo_stub.gds",
       "source_digest": "sha256:902ff80454f309f31943b44b8a7f942a6d96817455a784cbefd7f85d019f84ab",
       "offset_um": {
         "x": -6.0,
@@ -1253,7 +1253,7 @@
       "source": "cell",
       "generator": null,
       "cell_name": "promo_stub",
-      "source_path": "/home/ubuntu/GitHub/sky130-temp-por/.loom/worktrees/issue-101/layout/por_output_chain/promo_stub.gds",
+      "source_path": "promo_stub.gds",
       "source_digest": "sha256:902ff80454f309f31943b44b8a7f942a6d96817455a784cbefd7f85d019f84ab",
       "offset_um": {
         "x": -6.0,
@@ -1291,7 +1291,7 @@
         }
       ],
       "routed": true,
-      "route_length_um": 129.53000000000003,
+      "route_length_um": 128.93,
       "status": "routed",
       "landed_on_block": true,
       "legs": [
@@ -1307,7 +1307,7 @@
             }
           ],
           "routed": true,
-          "route_length_um": 42.6,
+          "route_length_um": 42.45,
           "reason": null,
           "channel_track": 0,
           "landed_on_block": true
@@ -1324,7 +1324,7 @@
             }
           ],
           "routed": true,
-          "route_length_um": 42.2,
+          "route_length_um": 41.900000000000006,
           "reason": null,
           "channel_track": 0,
           "landed_on_block": true
@@ -1341,7 +1341,7 @@
             }
           ],
           "routed": true,
-          "route_length_um": 44.730000000000004,
+          "route_length_um": 44.58,
           "reason": null,
           "channel_track": 0,
           "landed_on_block": true
@@ -1381,7 +1381,7 @@
         }
       ],
       "routed": true,
-      "route_length_um": 702.22,
+      "route_length_um": 700.72,
       "status": "routed",
       "landed_on_block": true,
       "legs": [
@@ -1397,7 +1397,7 @@
             }
           ],
           "routed": true,
-          "route_length_um": 137.24999999999997,
+          "route_length_um": 137.1,
           "reason": null,
           "channel_track": 0,
           "landed_on_block": true
@@ -1414,7 +1414,7 @@
             }
           ],
           "routed": true,
-          "route_length_um": 131.27,
+          "route_length_um": 131.12,
           "reason": null,
           "channel_track": 0,
           "landed_on_block": true
@@ -1431,7 +1431,7 @@
             }
           ],
           "routed": true,
-          "route_length_um": 134.87,
+          "route_length_um": 134.57,
           "reason": null,
           "channel_track": 0,
           "landed_on_block": true
@@ -1448,7 +1448,7 @@
             }
           ],
           "routed": true,
-          "route_length_um": 117.24000000000002,
+          "route_length_um": 116.94000000000001,
           "reason": null,
           "channel_track": 0,
           "landed_on_block": true
@@ -1465,7 +1465,7 @@
             }
           ],
           "routed": true,
-          "route_length_um": 81.97999999999999,
+          "route_length_um": 81.68,
           "reason": null,
           "channel_track": 0,
           "landed_on_block": true
@@ -1482,7 +1482,7 @@
             }
           ],
           "routed": true,
-          "route_length_um": 99.60999999999999,
+          "route_length_um": 99.31,
           "reason": null,
           "channel_track": 0,
           "landed_on_block": true
@@ -1514,7 +1514,7 @@
         }
       ],
       "routed": true,
-      "route_length_um": 408.06000000000006,
+      "route_length_um": 407.16,
       "status": "routed",
       "landed_on_block": true,
       "legs": [
@@ -1530,7 +1530,7 @@
             }
           ],
           "routed": true,
-          "route_length_um": 123.94000000000003,
+          "route_length_um": 123.79000000000002,
           "reason": null,
           "channel_track": 0,
           "landed_on_block": true
@@ -1547,7 +1547,7 @@
             }
           ],
           "routed": true,
-          "route_length_um": 99.92000000000002,
+          "route_length_um": 99.77000000000001,
           "reason": null,
           "channel_track": 0,
           "landed_on_block": true
@@ -1564,7 +1564,7 @@
             }
           ],
           "routed": true,
-          "route_length_um": 103.52000000000001,
+          "route_length_um": 103.22,
           "reason": null,
           "channel_track": 0,
           "landed_on_block": true
@@ -1581,7 +1581,7 @@
             }
           ],
           "routed": true,
-          "route_length_um": 80.68,
+          "route_length_um": 80.38000000000001,
           "reason": null,
           "channel_track": 0,
           "landed_on_block": true
@@ -1649,7 +1649,7 @@
         }
       ],
       "routed": true,
-      "route_length_um": 268.38000000000005,
+      "route_length_um": 267.63000000000005,
       "status": "routed",
       "landed_on_block": true,
       "legs": [
@@ -1665,7 +1665,7 @@
             }
           ],
           "routed": true,
-          "route_length_um": 25.93000000000002,
+          "route_length_um": 25.780000000000022,
           "reason": null,
           "channel_track": 0,
           "landed_on_block": true
@@ -1682,7 +1682,7 @@
             }
           ],
           "routed": true,
-          "route_length_um": 51.920000000000016,
+          "route_length_um": 51.77000000000002,
           "reason": null,
           "channel_track": 0,
           "landed_on_block": true
@@ -1699,7 +1699,7 @@
             }
           ],
           "routed": true,
-          "route_length_um": 44.93000000000001,
+          "route_length_um": 44.63000000000001,
           "reason": null,
           "channel_track": 0,
           "landed_on_block": true
@@ -1716,7 +1716,7 @@
             }
           ],
           "routed": true,
-          "route_length_um": 145.60000000000002,
+          "route_length_um": 145.45000000000002,
           "reason": null,
           "channel_track": 0,
           "landed_on_block": true
@@ -1740,7 +1740,7 @@
         }
       ],
       "routed": true,
-      "route_length_um": 150.51,
+      "route_length_um": 150.06,
       "status": "routed",
       "landed_on_block": true,
       "legs": [
@@ -1756,7 +1756,7 @@
             }
           ],
           "routed": true,
-          "route_length_um": 44.790000000000006,
+          "route_length_um": 44.49000000000001,
           "reason": null,
           "channel_track": 0,
           "landed_on_block": true
@@ -1773,7 +1773,7 @@
             }
           ],
           "routed": true,
-          "route_length_um": 105.72,
+          "route_length_um": 105.57,
           "reason": null,
           "channel_track": 0,
           "landed_on_block": true
@@ -1845,7 +1845,7 @@
         }
       ],
       "routed": true,
-      "route_length_um": 410.6800000000003,
+      "route_length_um": 409.48000000000025,
       "status": "routed",
       "landed_on_block": true,
       "legs": [
@@ -1861,7 +1861,7 @@
             }
           ],
           "routed": true,
-          "route_length_um": 94.35000000000005,
+          "route_length_um": 94.20000000000005,
           "reason": null,
           "channel_track": 0,
           "landed_on_block": true
@@ -1878,7 +1878,7 @@
             }
           ],
           "routed": true,
-          "route_length_um": 97.98000000000005,
+          "route_length_um": 97.83000000000004,
           "reason": null,
           "channel_track": 0,
           "landed_on_block": true
@@ -1895,7 +1895,7 @@
             }
           ],
           "routed": true,
-          "route_length_um": 85.82000000000005,
+          "route_length_um": 85.52000000000004,
           "reason": null,
           "channel_track": 0,
           "landed_on_block": true
@@ -1912,7 +1912,7 @@
             }
           ],
           "routed": true,
-          "route_length_um": 89.24000000000007,
+          "route_length_um": 88.94000000000005,
           "reason": null,
           "channel_track": 0,
           "landed_on_block": true
@@ -1929,7 +1929,7 @@
             }
           ],
           "routed": true,
-          "route_length_um": 43.29000000000005,
+          "route_length_um": 42.99000000000005,
           "reason": null,
           "channel_track": 0,
           "landed_on_block": true
@@ -1957,7 +1957,7 @@
         }
       ],
       "routed": true,
-      "route_length_um": 123.14000000000001,
+      "route_length_um": 122.54000000000002,
       "status": "routed",
       "landed_on_block": true,
       "legs": [
@@ -1973,7 +1973,7 @@
             }
           ],
           "routed": true,
-          "route_length_um": 21.13000000000001,
+          "route_length_um": 20.98000000000001,
           "reason": null,
           "channel_track": 0,
           "landed_on_block": true
@@ -1990,7 +1990,7 @@
             }
           ],
           "routed": true,
-          "route_length_um": 54.25,
+          "route_length_um": 54.1,
           "reason": null,
           "channel_track": 0,
           "landed_on_block": true
@@ -2007,7 +2007,7 @@
             }
           ],
           "routed": true,
-          "route_length_um": 47.760000000000005,
+          "route_length_um": 47.46000000000001,
           "reason": null,
           "channel_track": 0,
           "landed_on_block": true
@@ -2083,7 +2083,7 @@
         }
       ],
       "routed": true,
-      "route_length_um": 777.1600000000001,
+      "route_length_um": 776.2600000000002,
       "status": "routed",
       "landed_on_block": true,
       "legs": [
@@ -2099,7 +2099,7 @@
             }
           ],
           "routed": true,
-          "route_length_um": 23.530000000000015,
+          "route_length_um": 23.380000000000017,
           "reason": null,
           "channel_track": 0,
           "landed_on_block": true
@@ -2116,7 +2116,7 @@
             }
           ],
           "routed": true,
-          "route_length_um": 56.79000000000002,
+          "route_length_um": 56.64000000000002,
           "reason": null,
           "channel_track": 0,
           "landed_on_block": true
@@ -2133,7 +2133,7 @@
             }
           ],
           "routed": true,
-          "route_length_um": 126.21000000000001,
+          "route_length_um": 126.06000000000003,
           "reason": null,
           "channel_track": 0,
           "landed_on_block": true
@@ -2150,7 +2150,7 @@
             }
           ],
           "routed": true,
-          "route_length_um": 158.21000000000004,
+          "route_length_um": 158.06000000000003,
           "reason": null,
           "channel_track": 0,
           "landed_on_block": true
@@ -2167,7 +2167,7 @@
             }
           ],
           "routed": true,
-          "route_length_um": 190.21000000000004,
+          "route_length_um": 190.06000000000003,
           "reason": null,
           "channel_track": 0,
           "landed_on_block": true
@@ -2184,7 +2184,7 @@
             }
           ],
           "routed": true,
-          "route_length_um": 222.21000000000004,
+          "route_length_um": 222.06000000000003,
           "reason": null,
           "channel_track": 0,
           "landed_on_block": true
@@ -2212,7 +2212,7 @@
         }
       ],
       "routed": true,
-      "route_length_um": 192.20000000000002,
+      "route_length_um": 192.05,
       "status": "routed",
       "landed_on_block": true,
       "legs": [
@@ -2262,7 +2262,7 @@
             }
           ],
           "routed": true,
-          "route_length_um": 59.84,
+          "route_length_um": 59.69,
           "reason": null,
           "channel_track": 0,
           "landed_on_block": true
@@ -2290,7 +2290,7 @@
         }
       ],
       "routed": true,
-      "route_length_um": 179.39000000000013,
+      "route_length_um": 178.79000000000013,
       "status": "routed",
       "landed_on_block": true,
       "legs": [
@@ -2306,7 +2306,7 @@
             }
           ],
           "routed": true,
-          "route_length_um": 67.25000000000004,
+          "route_length_um": 67.10000000000005,
           "reason": null,
           "channel_track": 0,
           "landed_on_block": true
@@ -2323,7 +2323,7 @@
             }
           ],
           "routed": true,
-          "route_length_um": 69.06000000000004,
+          "route_length_um": 68.91000000000005,
           "reason": null,
           "channel_track": 0,
           "landed_on_block": true
@@ -2340,7 +2340,7 @@
             }
           ],
           "routed": true,
-          "route_length_um": 43.08000000000004,
+          "route_length_um": 42.780000000000044,
           "reason": null,
           "channel_track": 0,
           "landed_on_block": true
@@ -2372,7 +2372,7 @@
         }
       ],
       "routed": true,
-      "route_length_um": 174.22000000000008,
+      "route_length_um": 173.9200000000001,
       "status": "routed",
       "landed_on_block": true,
       "legs": [
@@ -2388,7 +2388,7 @@
             }
           ],
           "routed": true,
-          "route_length_um": 85.84000000000002,
+          "route_length_um": 85.69000000000003,
           "reason": null,
           "channel_track": 0,
           "landed_on_block": true
@@ -2405,7 +2405,7 @@
             }
           ],
           "routed": true,
-          "route_length_um": 19.350000000000037,
+          "route_length_um": 19.20000000000004,
           "reason": null,
           "channel_track": 0,
           "landed_on_block": true
@@ -2475,7 +2475,7 @@
         }
       ],
       "routed": true,
-      "route_length_um": 255.6200000000001,
+      "route_length_um": 254.72000000000008,
       "status": "routed",
       "landed_on_block": true,
       "legs": [
@@ -2491,7 +2491,7 @@
             }
           ],
           "routed": true,
-          "route_length_um": 46.96000000000002,
+          "route_length_um": 46.810000000000024,
           "reason": null,
           "channel_track": 0,
           "landed_on_block": true
@@ -2508,7 +2508,7 @@
             }
           ],
           "routed": true,
-          "route_length_um": 55.09000000000002,
+          "route_length_um": 54.94000000000002,
           "reason": null,
           "channel_track": 0,
           "landed_on_block": true
@@ -2525,7 +2525,7 @@
             }
           ],
           "routed": true,
-          "route_length_um": 70.24,
+          "route_length_um": 70.09,
           "reason": null,
           "channel_track": 0,
           "landed_on_block": true
@@ -2542,7 +2542,7 @@
             }
           ],
           "routed": true,
-          "route_length_um": 27.580000000000027,
+          "route_length_um": 27.430000000000028,
           "reason": null,
           "channel_track": 0,
           "landed_on_block": true
@@ -2559,7 +2559,7 @@
             }
           ],
           "routed": true,
-          "route_length_um": 55.75000000000003,
+          "route_length_um": 55.45000000000003,
           "reason": null,
           "channel_track": 0,
           "landed_on_block": true
@@ -3798,12 +3798,15 @@
     "block 'mop' is placed 0.00um from block 'nwt_mop' (strategy: explicit), closer than nwt_mop's own declared drc_hints.min_spacing_um of 0.40um"
   ],
   "provenance": {
-    "klt_version": "0.6.0+g0ce8c64842d9",
+    "klt_version": "0.7.1.dev1610+g758c6e224053",
     "klayout_version": "0.30.12",
     "pdk": {
       "name": "sky130A",
-      "source": "search root: ~/.volare",
-      "version": "open_pdks c6d73a35f524070e85faff4a6a9eef49553ebc2b"
+      "source": "search root: ~/.ciel",
+      "version": "open_pdks f6eeac7dad085ffcc829ccfd721f7b4ce39edcf7",
+      "ambiguous_sources": [
+        "search root: ~/.volare"
+      ]
     },
     "deck": null,
     "input": null

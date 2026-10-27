@@ -117,15 +117,14 @@ part of the claim and travel with it):
   the envelope unless the rebuild is byte-identical. Any edit to either file
   (or to a leaf stream the top embeds) turns the row `stale_evidence`.
   **What it does not claim:** presence and reproducibility only. The top's
-  recorded checks are *not* clean and are not cited — DRC 351
-  `poly.endcap.diff.1` violations (all inherited from the committed leaf
-  streams, which predate the pinned klt's endcap rule), ERC 2
-  `erc.missing_tie` (two `temp_core` nwells), and an LVS `match` (152/152
+  recorded checks are *not* clean and are not cited — DRC is
+  clean (0 violations, #243: leaf streams regenerated at the pinned klt), ERC 2
+  `erc.missing_tie` (the two `temp_core` nwells of `XMI1`/`XMI2`, bulk `NT` by design), and an LVS `match` (152/152
   devices, 71/71 nets) that excludes the native-Vt `XMASSIST` (#97). See
   `layout/temp_por_top/README.md`.
 - **Item 3 — DRC clean: `met`** via `layout/bias_core/drc.json` (`status:
   clean`, 0 violations), pinned to
-  `content_hash sha256:9c414f91…7ab68e`, the sha256 of the committed
+  `content_hash sha256:a044bcd3…e6dae3`, the sha256 of the committed
   `layout/bias_core/bias_core.gds` the run executed on (#81's fully
   wired composition), so the citation is provably fresh against the
   current artifact (CI re-asserts this). **Scope disclosure, per item 3's
@@ -215,7 +214,7 @@ part of the claim and travel with it):
   Cited: `layout/bias_core/erc-supply-spec.json` (rationale in
   `layout/bias_core/erc-supply-spec.md`, because klt at this pin rejects
   an inline `_comment`) and `layout/bias_core/erc.json`, pinned to the
-  committed GDS's `sha256:9c414f91…7ab68e`, the same pin as item 3.
+  committed GDS's `sha256:a044bcd3…e6dae3`, the same pin as item 3.
   **What the ERC citation establishes:** with `VDD`/`VSS` declared
   `kind: "supply"`, `erc_status: "clean"`, with zero
   `erc.unconnected_net` and zero `erc.supply_short` over 18 gate nets.

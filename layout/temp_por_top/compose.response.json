@@ -12,7 +12,7 @@
   "bbox_um": {
     "x0": -104.0,
     "y0": -54.2,
-    "x1": 7998.325,
+    "x1": 7998.47,
     "y1": 759.79
   },
   "ports": [
@@ -94,7 +94,7 @@
       "generator": null,
       "cell_name": "bias_core",
       "source_path": "../bias_core/bias_core.gds",
-      "source_digest": "sha256:44d3d2cf47a00a297eb99f04b2e2919b41fc2d3dbe90973f81ae8f20a9096c85",
+      "source_digest": "sha256:82f4007e5dae2d0a1a9f807d3845caf02c0dd485948af95a1a2cef5adafcf985",
       "offset_um": {
         "x": 0.0,
         "y": 0.0
@@ -102,7 +102,7 @@
       "bbox_um": {
         "x0": -104.0,
         "y0": -54.2,
-        "x1": 5533.86,
+        "x1": 5535.37,
         "y1": 200.085
       },
       "orientation": "none",
@@ -111,7 +111,7 @@
         {
           "name": "VREF",
           "label_um": {
-            "x": 808.215,
+            "x": 807.562,
             "y": 126.0
           },
           "layer": {
@@ -143,7 +143,7 @@
       "generator": null,
       "cell_name": "por_comparator",
       "source_path": "../por_comparator/por_comparator.gds",
-      "source_digest": "sha256:c55ae9a6de7c21c244fa4768a4defaf04fb7a1dbb60dd679c255a5369059a1fb",
+      "source_digest": "sha256:aab10a11bc5b5c036863582039385725b376036ea69d9841bcc37e4d686adb4e",
       "offset_um": {
         "x": 0.0,
         "y": 300.0
@@ -151,7 +151,7 @@
       "bbox_um": {
         "x0": -10.0,
         "y0": 271.915,
-        "x1": 7998.325,
+        "x1": 7998.47,
         "y1": 337.5
       },
       "orientation": "none",
@@ -163,7 +163,7 @@
       "generator": null,
       "cell_name": "por_output_chain",
       "source_path": "../por_output_chain/por_output_chain.gds",
-      "source_digest": "sha256:418b307e03d5e14a1ed7138392da5acb204926d362c5b06a78d9ae7efe664e41",
+      "source_digest": "sha256:f0e708c1a47803dfbe4434d9771cc7bb009ca830bd5b4674bfc2d3dadd339c39",
       "offset_um": {
         "x": 0.0,
         "y": 520.0
@@ -183,7 +183,7 @@
       "generator": null,
       "cell_name": "temp_core",
       "source_path": "../temp_core/temp_core.gds",
-      "source_digest": "sha256:7548dbf76a0d813394ab1991412d97cc49c355608ef5fd5ad2a65dab60b5f941",
+      "source_digest": "sha256:f23a4f8e851d2a97e498857bf51e03a04812ef789193029adb831a986bb86d59",
       "offset_um": {
         "x": 0.0,
         "y": 700.0
@@ -191,7 +191,7 @@
       "bbox_um": {
         "x0": -10.0,
         "y0": 678.915,
-        "x1": 2793.92,
+        "x1": 2794.11,
         "y1": 759.79
       },
       "orientation": "none",
