@@ -19,13 +19,13 @@ _None._
 
 `loom:important`; taken before unlabelled work.
 
-- **#240**: T1 item 2 (layout): assemble the temp_por_top GDS from the committed leaf cells and cite it as block-level layout evidence
+_None._
 
 ## Ready
 
 Human-approved issues ready for implementation (`loom:issue`).
 
-- **#240**: T1 item 2 (layout): assemble the temp_por_top GDS from the committed leaf cells and cite it as block-level layout evidence
+_None._
 
 ## In Progress
 
@@ -54,12 +54,12 @@ Issues carrying `loom:curated`.
 - **#181**: glitch-top: re-run failed vdd_level request vdd_slew_v1.2_h0.0002_s200000 (45 ERROR points) *(curated)*
 - **#189**: Re-qualify cited sky130 evidence under open_pdks f6eeac7 (split from #188) *(curated)*
 - **#229**: Live fleet verification of campaign-driver evidence storage (follow-on from PR #226) *(curated)*
-- **#240**: T1 item 2 (layout): assemble the temp_por_top GDS from the committed leaf cells and cite it as block-level layout evidence *(curated)*
 
 ## Proposed (Architect / Hermit)
 
 - **#137**: Run the two-key ratification ceremony on DR-004 and DR-005 *(architect)*
 - **#203**: Consolidate duplicated .end-stripping idiom into sim_common (10 copies) *(hermit)*
+- **#247**: Consolidate duplicated probe, append-only guard, and spiceinit loader into sim_common *(hermit)*
 
 ## Epics
 
@@ -71,12 +71,12 @@ Issues carrying `loom:curated`.
 |------|-------|
 | Operator merge-risk holds | 0 |
 | Very important | 0 |
-| Important | 1 |
-| Ready (`loom:issue`) | 1 |
+| Important | 0 |
+| Ready (`loom:issue`) | 0 |
 | In Progress (`loom:building`) | 0 |
 | PRs awaiting review | 0 |
 | Approved PRs awaiting merge | 0 |
-| Curated | 6 |
-| Architect / Hermit proposals | 2 |
+| Curated | 5 |
+| Architect / Hermit proposals | 3 |
 | Active epics | 1 |
 <!-- guide:plan-body:end -->
