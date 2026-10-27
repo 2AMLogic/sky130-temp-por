@@ -53,7 +53,7 @@ SLUG = "por-comparator-thresholds"
 MANIFEST = HERE / "experiment.json"
 BUILD = REPO_ROOT / "sim" / "build" / SLUG
 NETLIST_DIR = REPO_ROOT / "design" / "netlist"
-MODEL_LIB = "libs.tech/combined/sky130.lib.spice"
+MODEL_LIB = sim_common.MODEL_LIB
 
 
 say = sim_common.say
@@ -118,28 +118,21 @@ def build_request(rate: float, man: dict, backend: str, corners: dict | None = N
     sw = man["sweep"]
     tstop = tstop_for(rate, man)
     c = man["corners"]
-    req = {
-        "netlist": "netlist.spice",
-        "backend": backend,
-        "models": {"pdk": "sky130A", "lib": MODEL_LIB},
-        "corners": corners
+    return sim_common.base_request(
+        "netlist.spice", backend,
+        corners
         or {
             "process": processes(man, axis),
             "supply_v": {"vset": [sw["peak_v"]]},
             "temperature_c": c["temperature_c"],
         },
-        "analysis": {"kind": "tran", "args": f"1u {tstop:.9g} 0 {sw['tmax_s']:.3g}"},
-        "measurements": [
+        {"kind": "tran", "args": f"1u {tstop:.9g} 0 {sw['tmax_s']:.3g}"},
+        [
             {"name": "vdd_end", "spice": f".meas tran vdd_end FIND v(vdd) AT={tstop - 1e-6:.9g}", "unit": "V"},
             {"name": "por_raw_max", "spice": ".meas tran por_raw_max MAX v(por_raw)", "unit": "V"},
         ],
-        "options": {"timeout_s": 1500, "keep_artifacts": True, "waveforms": True},
-    }
-    if backend == "batch":
-        req["batch"] = {"runner_version_check": "warn"}
-        if capacity_wait_s:
-            req["batch"]["capacity_wait_s"] = capacity_wait_s
-    return req
+        1500, capacity_wait_s,
+    )
 
 
 def submit(variant_name: str, rate: float, head: str, man: dict, run_dir: Path, capacity_wait_s: float, axis: str = "main") -> dict:

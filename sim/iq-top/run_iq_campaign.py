@@ -50,7 +50,7 @@ SLUG = "iq-top"
 MANIFEST = HERE / "experiment.json"
 DUT_NETLIST = sim_common.DUT_NETLIST
 BUILD = REPO_ROOT / "sim" / "build" / SLUG
-MODEL_LIB = "libs.tech/combined/sky130.lib.spice"
+MODEL_LIB = sim_common.MODEL_LIB
 STATES = ["por-iq", "iq-total"]
 STATE_TAG = {"por-iq": "por", "iq-total": "total"}
 
@@ -110,24 +110,17 @@ def build_request(netlist_name: str, man: dict, backend: str, capacity_wait_s: f
     m = man["measurement"]
     c = man["corners"]
     tw = m["trail_window_s"]
-    req = {
-        "netlist": netlist_name,
-        "backend": backend,
-        "models": {"pdk": "sky130A", "lib": MODEL_LIB},
-        "corners": {"process": c["process"], "supply_v": {"vset": c["supply_v"]}, "temperature_c": c["temperature_c"]},
-        "analysis": {"kind": "tran", "args": f"1u {m['tstop_s']:.9g} 0 {m['tmax_s']:.3g}"},
-        "measurements": [
+    return sim_common.base_request(
+        netlist_name, backend,
+        {"process": c["process"], "supply_v": {"vset": c["supply_v"]}, "temperature_c": c["temperature_c"]},
+        {"kind": "tran", "args": f"1u {m['tstop_s']:.9g} 0 {m['tmax_s']:.3g}"},
+        [
             {"name": "iq_trail_neg", "spice": f".meas tran iq_trail_neg AVG i(bvdd) FROM={tw[0]:.9g} TO={tw[1]:.9g}", "unit": "A"},
             {"name": "vdd_trail", "spice": f".meas tran vdd_trail AVG v(vdd) FROM={tw[0]:.9g} TO={tw[1]:.9g}", "unit": "V"},
             {"name": "resetn_trail", "spice": f".meas tran resetn_trail AVG v(resetn) FROM={tw[0]:.9g} TO={tw[1]:.9g}", "unit": "V"},
         ],
-        "options": {"timeout_s": 3000, "keep_artifacts": True, "waveforms": True},
-    }
-    if backend == "batch":
-        req["batch"] = {"runner_version_check": "warn"}
-        if capacity_wait_s:
-            req["batch"]["capacity_wait_s"] = capacity_wait_s
-    return req
+        3000, capacity_wait_s,
+    )
 
 
 def cmd_run(args) -> int:

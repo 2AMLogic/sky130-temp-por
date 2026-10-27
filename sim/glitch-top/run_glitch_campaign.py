@@ -64,7 +64,7 @@ MANIFEST = HERE / "experiment.json"
 TB_SCH = HERE / "testbench" / "tb_temp_por_glitch.sch"
 DUT_NETLIST = sim_common.DUT_NETLIST
 BUILD = REPO_ROOT / "sim" / "build" / SLUG
-MODEL_LIB = rb.MODEL_LIB
+MODEL_LIB = sim_common.MODEL_LIB
 CLASSES = (gc.CLASS_A, gc.CLASS_B)
 OUTCOMES = rb.OUTCOMES
 DECK_INPUTS = ("design/netlist", "sim/glitch-top/testbench", "sim/spiceinit", "sim/pdk.json")
@@ -211,24 +211,17 @@ def build_request(req: dict, man: dict, backend: str, capacity_wait_s: float = 0
     tstop, tmax = tstop_of(req, man), tmax_of(req, man)
     c = man["corners"]
     t0 = req["t0"]
-    r = {
-        "netlist": "netlist.spice",
-        "backend": backend,
-        "models": {"pdk": "sky130A", "lib": MODEL_LIB},
-        "corners": {"process": c["process"], "supply_v": {"vset": c["supply_v"]}, "temperature_c": c["temperature_c"]},
-        "analysis": {"kind": "tran", "args": f"{min(1e-6, tmax):.3g} {tstop:.9g} 0 {tmax:.3g}"},
-        "measurements": [
+    return sim_common.base_request(
+        "netlist.spice", backend,
+        {"process": c["process"], "supply_v": {"vset": c["supply_v"]}, "temperature_c": c["temperature_c"]},
+        {"kind": "tran", "args": f"{min(1e-6, tmax):.3g} {tstop:.9g} 0 {tmax:.3g}"},
+        [
             {"name": "vdd_min", "spice": ".meas tran vdd_min MIN v(vdd)", "unit": "V"},
             {"name": "resetn_end", "spice": f".meas tran resetn_end FIND v(resetn) AT={(tstop - 0.1e-3):.9g}", "unit": "V"},
             {"name": "resetn_min_after_t0", "spice": f".meas tran resetn_min_after_t0 MIN v(resetn) FROM={t0:g} TO={tstop:.9g}", "unit": "V"},
         ],
-        "options": {"timeout_s": 7200, "keep_artifacts": True, "waveforms": True},
-    }
-    if backend == "batch":
-        r["batch"] = {"runner_version_check": "warn"}
-        if capacity_wait_s:
-            r["batch"]["capacity_wait_s"] = capacity_wait_s
-    return r
+        7200, capacity_wait_s,
+    )
 
 
 def submit_one(req: dict, head: str, man: dict, run_dir: Path, capacity_wait_s: float = 0) -> dict:

@@ -33,7 +33,7 @@ import sim_common  # noqa: E402
 cr = sim_common.load_corner_run()
 SLUG = "temp-core-startup-solver"
 BUILD = REPO_ROOT / "sim" / "build" / SLUG
-MODEL_LIB = "libs.tech/combined/sky130.lib.spice"
+MODEL_LIB = sim_common.MODEL_LIB
 say = sim_common.say
 corner_id = sim_common.corner_id
 
@@ -112,18 +112,13 @@ def build_netlist(scenario, variant):
 
 def build_request(backend, corners=None, timeout=3000):
     p, t, v = (corners or (PROCS, TEMPS, SUPPLIES))
-    req = {
-        "netlist": "netlist.spice",
-        "backend": backend,
-        "models": {"pdk": "sky130A", "lib": MODEL_LIB},
-        "corners": {"process": p, "supply_v": {"vset": v}, "temperature_c": t},
-        "analysis": {"kind": "tran", "args": f"{STEP:.6g} {TSTOP:.6g} uic"},
-        "measurements": [{"name": "vdd_end", "spice": f".meas tran vdd_end FIND v(vdd) AT={TSTOP:.6g}", "unit": "V"}],
-        "options": {"timeout_s": timeout, "keep_artifacts": True, "waveforms": True},
-    }
-    if backend == "batch":
-        req["batch"] = {"runner_version_check": "warn"}
-    return req
+    return sim_common.base_request(
+        "netlist.spice", backend,
+        {"process": p, "supply_v": {"vset": v}, "temperature_c": t},
+        {"kind": "tran", "args": f"{STEP:.6g} {TSTOP:.6g} uic"},
+        [{"name": "vdd_end", "spice": f".meas tran vdd_end FIND v(vdd) AT={TSTOP:.6g}", "unit": "V"}],
+        timeout,
+    )
 
 
 def cmd_run(args):
