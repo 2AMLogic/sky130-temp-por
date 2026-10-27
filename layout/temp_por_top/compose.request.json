@@ -1,0 +1,802 @@
+{
+  "pdk": {
+    "variant": "sky130A"
+  },
+  "blocks": [
+    {
+      "id": "bias",
+      "cell": {
+        "gds_path": "../bias_core/bias_core.gds",
+        "cell_name": "bias_core",
+        "ports": [
+          {
+            "name": "VDD",
+            "x_um": -100.0,
+            "y_um": 10.0,
+            "layer": {
+              "layer": 67,
+              "datatype": 20
+            },
+            "width_um": 0.17,
+            "direction_deg": 180
+          },
+          {
+            "name": "VSS",
+            "x_um": -104.0,
+            "y_um": 14.0,
+            "layer": {
+              "layer": 67,
+              "datatype": 20
+            },
+            "width_um": 0.17,
+            "direction_deg": 180
+          },
+          {
+            "name": "IBIAS",
+            "x_um": 58.63,
+            "y_um": 142.97,
+            "layer": {
+              "layer": 67,
+              "datatype": 20
+            },
+            "width_um": 40.0,
+            "direction_deg": 0
+          },
+          {
+            "name": "BIAS_OK",
+            "x_um": 5443.585,
+            "y_um": 119.5,
+            "layer": {
+              "layer": 67,
+              "datatype": 20
+            },
+            "width_um": 0.17,
+            "direction_deg": 270
+          }
+        ],
+        "ports_from_labels": {
+          "layers": [
+            {
+              "layer": 70,
+              "datatype": 5
+            }
+          ],
+          "names": [
+            {
+              "name": "VREF",
+              "access": {
+                "up_to": "metal6",
+                "grid_um": 1
+              }
+            }
+          ]
+        }
+      }
+    },
+    {
+      "id": "cmp",
+      "cell": {
+        "gds_path": "../por_comparator/por_comparator.gds",
+        "cell_name": "por_comparator",
+        "ports": [
+          {
+            "name": "VDD",
+            "x_um": -6.0,
+            "y_um": 29.0,
+            "layer": {
+              "layer": 67,
+              "datatype": 20
+            },
+            "width_um": 0.17,
+            "direction_deg": 180
+          },
+          {
+            "name": "VSS",
+            "x_um": -6.0,
+            "y_um": -6.0,
+            "layer": {
+              "layer": 67,
+              "datatype": 20
+            },
+            "width_um": 0.17,
+            "direction_deg": 180
+          },
+          {
+            "name": "IBIAS",
+            "x_um": 16.630000000000003,
+            "y_um": -12.0,
+            "layer": {
+              "layer": 67,
+              "datatype": 20
+            },
+            "width_um": 0.17,
+            "direction_deg": 270
+          },
+          {
+            "name": "VREF",
+            "x_um": 55.16,
+            "y_um": 37.5,
+            "layer": {
+              "layer": 67,
+              "datatype": 20
+            },
+            "width_um": 0.17,
+            "direction_deg": 90
+          },
+          {
+            "name": "BIAS_OK",
+            "x_um": -10.0,
+            "y_um": 7.5,
+            "layer": {
+              "layer": 67,
+              "datatype": 20
+            },
+            "width_um": 0.17,
+            "direction_deg": 180
+          },
+          {
+            "name": "POR_RAW",
+            "x_um": 88.0,
+            "y_um": 0.49999999999999994,
+            "layer": {
+              "layer": 67,
+              "datatype": 20
+            },
+            "width_um": 0.17,
+            "direction_deg": 0
+          }
+        ]
+      }
+    },
+    {
+      "id": "por",
+      "cell": {
+        "gds_path": "../por_output_chain/por_output_chain.gds",
+        "cell_name": "por_output_chain",
+        "ports": [
+          {
+            "name": "VDD",
+            "x_um": -6.0,
+            "y_um": 58.81,
+            "layer": {
+              "layer": 67,
+              "datatype": 20
+            },
+            "width_um": 0.17,
+            "direction_deg": 180
+          },
+          {
+            "name": "VSS",
+            "x_um": -6.0,
+            "y_um": -6.0,
+            "layer": {
+              "layer": 67,
+              "datatype": 20
+            },
+            "width_um": 0.17,
+            "direction_deg": 180
+          },
+          {
+            "name": "IBIAS",
+            "x_um": -10.0,
+            "y_um": 13.0,
+            "layer": {
+              "layer": 67,
+              "datatype": 20
+            },
+            "width_um": 0.17,
+            "direction_deg": 180
+          },
+          {
+            "name": "POR_RAW",
+            "x_um": -10.0,
+            "y_um": 23.8,
+            "layer": {
+              "layer": 67,
+              "datatype": 20
+            },
+            "width_um": 0.17,
+            "direction_deg": 180
+          },
+          {
+            "name": "RESETn",
+            "x_um": 173.96,
+            "y_um": 43.0,
+            "layer": {
+              "layer": 67,
+              "datatype": 20
+            },
+            "width_um": 0.17,
+            "direction_deg": 0
+          }
+        ]
+      }
+    },
+    {
+      "id": "temp",
+      "cell": {
+        "gds_path": "../temp_core/temp_core.gds",
+        "cell_name": "temp_core",
+        "ports": [
+          {
+            "name": "VDD",
+            "x_um": -6.0,
+            "y_um": 59.58,
+            "layer": {
+              "layer": 67,
+              "datatype": 20
+            },
+            "width_um": 0.17,
+            "direction_deg": 180
+          },
+          {
+            "name": "VSS",
+            "x_um": -6.0,
+            "y_um": -6.0,
+            "layer": {
+              "layer": 67,
+              "datatype": 20
+            },
+            "width_um": 0.17,
+            "direction_deg": 180
+          },
+          {
+            "name": "IBIAS",
+            "x_um": -10.0,
+            "y_um": 14.22,
+            "layer": {
+              "layer": 67,
+              "datatype": 20
+            },
+            "width_um": 0.17,
+            "direction_deg": 180
+          },
+          {
+            "name": "EN",
+            "x_um": -10.0,
+            "y_um": 23.720000000000002,
+            "layer": {
+              "layer": 67,
+              "datatype": 20
+            },
+            "width_um": 0.17,
+            "direction_deg": 180
+          },
+          {
+            "name": "PTAT",
+            "x_um": -10.0,
+            "y_um": 24.720000000000002,
+            "layer": {
+              "layer": 67,
+              "datatype": 20
+            },
+            "width_um": 0.17,
+            "direction_deg": 180
+          },
+          {
+            "name": "CTAT",
+            "x_um": -10.0,
+            "y_um": 12.72,
+            "layer": {
+              "layer": 67,
+              "datatype": 20
+            },
+            "width_um": 0.17,
+            "direction_deg": 180
+          }
+        ]
+      }
+    }
+  ],
+  "placement": {
+    "strategy": "explicit",
+    "order": [
+      "bias",
+      "cmp",
+      "por",
+      "temp"
+    ],
+    "origins_um": {
+      "bias": {
+        "x": 0,
+        "y": 0
+      },
+      "cmp": {
+        "x": 0,
+        "y": 300
+      },
+      "por": {
+        "x": 0,
+        "y": 520
+      },
+      "temp": {
+        "x": 0,
+        "y": 700
+      }
+    }
+  },
+  "routing": {
+    "layer_role": "metal",
+    "width_um": 0.17
+  },
+  "connectivity": [
+    {
+      "net": "VDD",
+      "layer_role": "metal4",
+      "width_um": 0.5,
+      "legs": [
+        {
+          "from_pin": {
+            "block": "bias",
+            "port": "VDD"
+          },
+          "to_pin": {
+            "block": "cmp",
+            "port": "VDD"
+          },
+          "waypoints_um": [
+            [
+              -150,
+              10.0
+            ],
+            [
+              -150,
+              329.0
+            ]
+          ],
+          "layer_role": "metal4",
+          "width_um": 0.5
+        },
+        {
+          "from_pin": {
+            "block": "cmp",
+            "port": "VDD"
+          },
+          "to_pin": {
+            "block": "por",
+            "port": "VDD"
+          },
+          "waypoints_um": [
+            [
+              -150,
+              329.0
+            ],
+            [
+              -150,
+              578.81
+            ]
+          ],
+          "layer_role": "metal4",
+          "width_um": 0.5
+        },
+        {
+          "from_pin": {
+            "block": "por",
+            "port": "VDD"
+          },
+          "to_pin": {
+            "block": "temp",
+            "port": "VDD"
+          },
+          "waypoints_um": [
+            [
+              -150,
+              578.81
+            ],
+            [
+              -150,
+              759.58
+            ]
+          ],
+          "layer_role": "metal4",
+          "width_um": 0.5
+        }
+      ],
+      "pins": [
+        {
+          "block": "bias",
+          "port": "VDD"
+        },
+        {
+          "block": "cmp",
+          "port": "VDD"
+        },
+        {
+          "block": "por",
+          "port": "VDD"
+        },
+        {
+          "block": "temp",
+          "port": "VDD"
+        }
+      ]
+    },
+    {
+      "net": "VSS",
+      "layer_role": "metal5",
+      "width_um": 0.5,
+      "legs": [
+        {
+          "from_pin": {
+            "block": "bias",
+            "port": "VSS"
+          },
+          "to_pin": {
+            "block": "cmp",
+            "port": "VSS"
+          },
+          "waypoints_um": [
+            [
+              -200,
+              14.0
+            ],
+            [
+              -200,
+              294.0
+            ]
+          ],
+          "layer_role": "metal5",
+          "width_um": 0.5
+        },
+        {
+          "from_pin": {
+            "block": "cmp",
+            "port": "VSS"
+          },
+          "to_pin": {
+            "block": "por",
+            "port": "VSS"
+          },
+          "waypoints_um": [
+            [
+              -200,
+              294.0
+            ],
+            [
+              -200,
+              514.0
+            ]
+          ],
+          "layer_role": "metal5",
+          "width_um": 0.5
+        },
+        {
+          "from_pin": {
+            "block": "por",
+            "port": "VSS"
+          },
+          "to_pin": {
+            "block": "temp",
+            "port": "VSS"
+          },
+          "waypoints_um": [
+            [
+              -200,
+              514.0
+            ],
+            [
+              -200,
+              694.0
+            ]
+          ],
+          "layer_role": "metal5",
+          "width_um": 0.5
+        }
+      ],
+      "pins": [
+        {
+          "block": "bias",
+          "port": "VSS"
+        },
+        {
+          "block": "cmp",
+          "port": "VSS"
+        },
+        {
+          "block": "por",
+          "port": "VSS"
+        },
+        {
+          "block": "temp",
+          "port": "VSS"
+        }
+      ]
+    },
+    {
+      "net": "IBIAS",
+      "layer_role": "metal6",
+      "width_um": 1.6,
+      "legs": [
+        {
+          "from_pin": {
+            "block": "bias",
+            "port": "IBIAS"
+          },
+          "to_pin": {
+            "block": "cmp",
+            "port": "IBIAS"
+          },
+          "waypoints_um": [
+            [
+              58.63,
+              240
+            ],
+            [
+              -250,
+              240
+            ],
+            [
+              -250,
+              268
+            ],
+            [
+              16.630000000000003,
+              268
+            ]
+          ]
+        },
+        {
+          "from_pin": {
+            "block": "cmp",
+            "port": "IBIAS"
+          },
+          "to_pin": {
+            "block": "por",
+            "port": "IBIAS"
+          },
+          "waypoints_um": [
+            [
+              16.630000000000003,
+              268
+            ],
+            [
+              -250,
+              268
+            ],
+            [
+              -250,
+              533.0
+            ]
+          ]
+        },
+        {
+          "from_pin": {
+            "block": "por",
+            "port": "IBIAS"
+          },
+          "to_pin": {
+            "block": "temp",
+            "port": "IBIAS"
+          },
+          "waypoints_um": [
+            [
+              -250,
+              533.0
+            ],
+            [
+              -250,
+              714.22
+            ]
+          ]
+        }
+      ],
+      "pins": [
+        {
+          "block": "bias",
+          "port": "IBIAS"
+        },
+        {
+          "block": "cmp",
+          "port": "IBIAS"
+        },
+        {
+          "block": "por",
+          "port": "IBIAS"
+        },
+        {
+          "block": "temp",
+          "port": "IBIAS"
+        }
+      ]
+    },
+    {
+      "net": "VREF",
+      "layer_role": "metal2",
+      "width_um": 0.3,
+      "legs": [
+        {
+          "from_pin": {
+            "block": "bias",
+            "port": "VREF"
+          },
+          "to_pin": {
+            "block": "cmp",
+            "port": "VREF"
+          },
+          "waypoints_um": [
+            [
+              808,
+              235
+            ],
+            [
+              -300,
+              235
+            ],
+            [
+              -300,
+              350
+            ],
+            [
+              55.16,
+              350
+            ]
+          ]
+        }
+      ],
+      "pins": [
+        {
+          "block": "bias",
+          "port": "VREF"
+        },
+        {
+          "block": "cmp",
+          "port": "VREF"
+        }
+      ]
+    },
+    {
+      "net": "BIAS_OK",
+      "layer_role": "metal3",
+      "width_um": 0.3,
+      "legs": [
+        {
+          "from_pin": {
+            "block": "bias",
+            "port": "BIAS_OK"
+          },
+          "to_pin": {
+            "block": "cmp",
+            "port": "BIAS_OK"
+          },
+          "waypoints_um": [
+            [
+              5443.585,
+              250
+            ],
+            [
+              -320,
+              250
+            ],
+            [
+              -320,
+              307.5
+            ]
+          ]
+        }
+      ],
+      "pins": [
+        {
+          "block": "bias",
+          "port": "BIAS_OK"
+        },
+        {
+          "block": "cmp",
+          "port": "BIAS_OK"
+        }
+      ]
+    },
+    {
+      "net": "POR_RAW",
+      "layer_role": "metal3",
+      "width_um": 0.3,
+      "legs": [
+        {
+          "from_pin": {
+            "block": "cmp",
+            "port": "POR_RAW"
+          },
+          "to_pin": {
+            "block": "por",
+            "port": "POR_RAW"
+          },
+          "waypoints_um": [
+            [
+              88.0,
+              345
+            ],
+            [
+              -350,
+              345
+            ],
+            [
+              -350,
+              543.8
+            ]
+          ]
+        }
+      ],
+      "pins": [
+        {
+          "block": "cmp",
+          "port": "POR_RAW"
+        },
+        {
+          "block": "por",
+          "port": "POR_RAW"
+        }
+      ]
+    },
+    {
+      "net": "RESETn",
+      "layer_role": "metal2",
+      "width_um": 0.3,
+      "legs": [
+        {
+          "from_pin": {
+            "block": "por",
+            "port": "RESETn"
+          },
+          "to_pin": {
+            "block": "temp",
+            "port": "EN"
+          },
+          "waypoints_um": [
+            [
+              173.96,
+              620
+            ],
+            [
+              -400,
+              620
+            ],
+            [
+              -400,
+              723.72
+            ]
+          ]
+        }
+      ],
+      "pins": [
+        {
+          "block": "por",
+          "port": "RESETn"
+        },
+        {
+          "block": "temp",
+          "port": "EN"
+        }
+      ]
+    }
+  ],
+  "pins": [
+    {
+      "net": "VDD",
+      "block": "bias",
+      "port": "VDD"
+    },
+    {
+      "net": "VSS",
+      "block": "bias",
+      "port": "VSS"
+    },
+    {
+      "net": "RESETn",
+      "block": "temp",
+      "port": "EN"
+    },
+    {
+      "net": "PTAT",
+      "block": "temp",
+      "port": "PTAT"
+    },
+    {
+      "net": "CTAT",
+      "block": "temp",
+      "port": "CTAT"
+    }
+  ],
+  "options": {
+    "cell_name": "temp_por_top",
+    "output": "temp_por_top.gds"
+  }
+}

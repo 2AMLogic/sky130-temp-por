@@ -1,0 +1,37 @@
+{
+  "schema_version": 1,
+  "kind": "generic",
+  "status": "pass",
+  "t1_item": 2,
+  "summary": "T1 item 2 (Layout): layout/temp_por_top/temp_por_top.gds is composed from the four committed leaf streams by layout/bin/compose-cell.py and rebuilds byte-for-byte. Attests presence and reproducibility only; not a verification claim. Recorded and NOT cited: DRC 351 poly.endcap.diff.1 violations (inherited from the leaf streams), ERC 2 erc.missing_tie (temp_core), LVS match 152/152 with native-Vt XMASSIST excluded (#97). See layout/temp_por_top/README.md.",
+  "source": "layout/temp_por_top/cell.json",
+  "provenance": {
+    "klt_version": "0.7.1.dev1610+g758c6e224053",
+    "klayout_version": "0.30.12",
+    "pdk": null,
+    "deck": null,
+    "input": {
+      "content_hash": "sha256:a4b7093235a81da5687ae087fa40108b57029bc90056995219c6a0fe134cbff8",
+      "paths": [
+        {
+          "path": {
+            "path": "layout/temp_por_top/cell.json",
+            "scope": "repo"
+          },
+          "content_hash": "sha256:99ae60a6d28f02ef771b5c98e6034cde8027a770db2ae6db8905683dabb9e084"
+        },
+        {
+          "path": {
+            "path": "layout/temp_por_top/temp_por_top.gds",
+            "scope": "repo"
+          },
+          "content_hash": "sha256:87c49a903e50f9d93968eb68360123a60a6c064478f3b9309670e0c22ca65352"
+        }
+      ]
+    },
+    "regeneration": {
+      "generator": "python3 layout/bin/compose-cell.py layout/temp_por_top/cell.json --check",
+      "regenerated_hash": "sha256:a4b7093235a81da5687ae087fa40108b57029bc90056995219c6a0fe134cbff8"
+    }
+  }
+}

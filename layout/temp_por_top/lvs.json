@@ -1,0 +1,721 @@
+{
+  "schema_version": 1,
+  "engine": "klayout",
+  "layout": "temp_por_top.spice",
+  "reference": "temp_por_top.ref.spice",
+  "top": "TEMP_POR_TOP",
+  "reference_top": "TEMP_POR_TOP",
+  "reference_conversion": {
+    "form": "subckt-call",
+    "deck": "sky130",
+    "device_map": null
+  },
+  "parameter_tolerance": null,
+  "options": {
+    "combine_devices": false,
+    "combine_devices_per_circuit": null,
+    "combine_devices_max_attempts": 5,
+    "flatten_layout": true,
+    "flatten_reference": true,
+    "netgen_setup": null,
+    "parameter_tolerance": null,
+    "compare_parameters": {
+      "pnp": [
+        "NE"
+      ],
+      "res_xhigh_po": [
+        "L",
+        "W"
+      ]
+    },
+    "power_connectivity": null,
+    "anchor_top_level_pins": null,
+    "strict_top_level_pin_count": false,
+    "compare_mos_flavour": false,
+    "supply_nets": [
+      "GND",
+      "VCC",
+      "VDD",
+      "VGND",
+      "VPWR",
+      "VSS"
+    ],
+    "finfet_bulk": null
+  },
+  "hints_applied": null,
+  "constant_nets_applied": null,
+  "status": "match",
+  "power_connectivity": {
+    "status": "unchecked",
+    "reason": "reference.form is 'subckt-call', whose reference netlist carries its own power/ground pins and nets -- they take part in the ordinary compare, so this check (which exists to cover the signal-only 'gate-level-verilog' form) does not apply",
+    "power_pins": [],
+    "power_pins_derivation": null,
+    "instance_count": 0,
+    "expected_nets": null,
+    "unchecked_expected_pins": [],
+    "findings": [],
+    "finding_count": 0
+  },
+  "body_verification": {
+    "status": "verified",
+    "reason": null,
+    "device_classes": [],
+    "device_count": 0,
+    "findings": [],
+    "finding_count": 0
+  },
+  "device_parameter_coverage": [
+    {
+      "class": "res_xhigh_po",
+      "device_kind": "resistor",
+      "layout_devices": 12,
+      "reference_devices": 12,
+      "compared": [
+        "L",
+        "W"
+      ],
+      "not_compared": [
+        {
+          "parameter": "R",
+          "reason": "placeholder_value"
+        },
+        {
+          "parameter": "A",
+          "reason": "secondary"
+        },
+        {
+          "parameter": "P",
+          "reason": "secondary"
+        }
+      ]
+    },
+    {
+      "class": "sky130_fd_pr__model__cap_mim",
+      "device_kind": "capacitor",
+      "layout_devices": 8,
+      "reference_devices": 8,
+      "compared": [],
+      "not_compared": [
+        {
+          "parameter": "C",
+          "reason": "placeholder_value"
+        },
+        {
+          "parameter": "A",
+          "reason": "secondary"
+        },
+        {
+          "parameter": "P",
+          "reason": "secondary"
+        }
+      ]
+    }
+  ],
+  "mismatch_count": 8,
+  "error_count": 0,
+  "category_counts": {
+    "device.geometry_not_compared": 2,
+    "device.parameter_excluded": 2,
+    "device.placeholder_value": 2,
+    "topology.flattened": 2
+  },
+  "category_error_counts": {},
+  "counts": {
+    "nets": {
+      "layout": 71,
+      "reference": 71,
+      "matched": 71
+    },
+    "devices": {
+      "layout": 152,
+      "reference": 152,
+      "matched": 152
+    },
+    "pins": {
+      "layout": 11,
+      "reference": 5,
+      "matched": 11
+    }
+  },
+  "device_classes": [
+    "nfet",
+    "pfet",
+    "pnp",
+    "sky130_fd_pr__model__cap_mim",
+    "sky130_fd_pr__model__cap_mim_m4",
+    "resistor"
+  ],
+  "environment": {
+    "engine": "klayout",
+    "engine_version": "0.30.12",
+    "netgen_binary": null,
+    "layout_sha256": "36c13e22d38fdba691c9342bb80bfff189c559be266fcdbfd84f0b81941ce714",
+    "reference_sha256": "10048e7041e4e0445c5e7708be79f39279c63c6cb7408078859892eedececf53",
+    "extracted_netlist": null
+  },
+  "provenance": {
+    "klt_version": "0.7.1.dev1610+g758c6e224053",
+    "klayout_version": "0.30.12",
+    "pdk": null,
+    "deck": {
+      "name": "sky130",
+      "content_hash": "sha256:773f73886500d88310f3c3ebe671aad84de425473e9eb6b7ae5a22902416e973",
+      "released": false
+    },
+    "input": {
+      "content_hash": "sha256:36c13e22d38fdba691c9342bb80bfff189c559be266fcdbfd84f0b81941ce714",
+      "role": "netlist"
+    },
+    "klayout_version_mismatch": false
+  },
+  "mismatches": [
+    {
+      "category": "device.geometry_not_compared",
+      "severity": "warning",
+      "description": "device class 'res_xhigh_po' is a resistor class, whose ['A', 'P'] parameter(s) KLayout declares *secondary*: kdb.NetlistComparer compares primary parameters only, so none of them took part in this compare and each is NOT verified -- this resistor's geometry could differ between the two sides by any amount and this run would still report 'match'. The compared parameter(s) were ['L', 'W']. Name them in options.compare_parameters to compare them (see docs/cli/lvs.md, 'device.geometry_not_compared')",
+      "side": "both",
+      "net": null,
+      "device": {
+        "layout": null,
+        "reference": null,
+        "class": "res_xhigh_po"
+      },
+      "property": null,
+      "details": {
+        "device_kind": "resistor",
+        "compared_parameters": [
+          "L",
+          "W"
+        ],
+        "not_compared_parameters": [
+          "A",
+          "P"
+        ],
+        "layout_devices": 12,
+        "reference_devices": 12
+      },
+      "circuit": null,
+      "instance": null,
+      "subcircuit": null
+    },
+    {
+      "category": "device.geometry_not_compared",
+      "severity": "warning",
+      "description": "device class 'sky130_fd_pr__model__cap_mim' is a capacitor class, whose ['A', 'P'] parameter(s) KLayout declares *secondary*: kdb.NetlistComparer compares primary parameters only, so none of them took part in this compare and each is NOT verified -- this capacitor's geometry could differ between the two sides by any amount and this run would still report 'match'. No parameter of this class was compared at all: the remaining parameter(s) were separately excluded from this run (see the device.placeholder_value/device.parameter_excluded entries), so the two sides were paired on topology alone. Name them in options.compare_parameters to compare them (see docs/cli/lvs.md, 'device.geometry_not_compared')",
+      "side": "both",
+      "net": null,
+      "device": {
+        "layout": null,
+        "reference": null,
+        "class": "sky130_fd_pr__model__cap_mim"
+      },
+      "property": null,
+      "details": {
+        "device_kind": "capacitor",
+        "compared_parameters": [],
+        "not_compared_parameters": [
+          "A",
+          "P"
+        ],
+        "layout_devices": 8,
+        "reference_devices": 8
+      },
+      "circuit": null,
+      "instance": null,
+      "subcircuit": null
+    },
+    {
+      "category": "device.parameter_excluded",
+      "severity": "warning",
+      "description": "options.compare_parameters scoped device class 'PNP' to compare only ['NE'] -- 'AE' was excluded from this compare and is NOT verified; a 'match' does not confirm the two sides agree on it (see docs/cli/lvs.md, 'device.parameter_excluded')",
+      "side": "both",
+      "net": null,
+      "device": {
+        "layout": null,
+        "reference": null,
+        "class": "PNP"
+      },
+      "property": null,
+      "details": {
+        "parameter": "AE",
+        "compared_parameters": [
+          "NE"
+        ]
+      },
+      "circuit": null,
+      "instance": null,
+      "subcircuit": null
+    },
+    {
+      "category": "device.parameter_excluded",
+      "severity": "warning",
+      "description": "options.compare_parameters scoped device class 'res_xhigh_po' to compare only ['L', 'W'] -- 'R' was excluded from this compare and is NOT verified; a 'match' does not confirm the two sides agree on it (see docs/cli/lvs.md, 'device.parameter_excluded')",
+      "side": "both",
+      "net": null,
+      "device": {
+        "layout": null,
+        "reference": null,
+        "class": "res_xhigh_po"
+      },
+      "property": null,
+      "details": {
+        "parameter": "R",
+        "compared_parameters": [
+          "L",
+          "W"
+        ]
+      },
+      "circuit": null,
+      "instance": null,
+      "subcircuit": null
+    },
+    {
+      "category": "device.placeholder_value",
+      "severity": "warning",
+      "description": "reference device class 'RES_XHIGH_PO' was converted from a subcircuit call (request.reference.form: \"subckt-call\"), so its 'R' value is the literal 0 placeholder on all 12 reference instance(s) -- klt lvs has no PDK sheet-resistance/capacitance-per-area data to compute a real one. 'R' was therefore excluded from this compare on both sides (layout: 12 instance(s), R 17500..7897440) and the two sides were paired on topology alone -- that dimension of the compare is not independently verified. Supply a reference in the plain-element form carrying real 'R' values to compare it (see docs/cli/lvs.md, 'device.placeholder_value')",
+      "side": "reference",
+      "net": null,
+      "device": {
+        "layout": null,
+        "reference": null,
+        "class": "RES_XHIGH_PO"
+      },
+      "property": null,
+      "details": {
+        "parameter": "R",
+        "device_kind": "resistor",
+        "reference_devices": 12,
+        "layout_devices": 12,
+        "layout_values": [
+          17500.0,
+          111050.0,
+          119470.0,
+          350000.0,
+          450880.0,
+          775000.0,
+          1000000.0,
+          1016000.0,
+          2652600.0,
+          4104000.0,
+          6769230.0,
+          7897440.0
+        ]
+      },
+      "circuit": null,
+      "instance": null,
+      "subcircuit": null
+    },
+    {
+      "category": "device.placeholder_value",
+      "severity": "warning",
+      "description": "reference device class 'SKY130_FD_PR__MODEL__CAP_MIM' was converted from a subcircuit call (request.reference.form: \"subckt-call\"), so its 'C' value is the literal 0 placeholder on all 8 reference instance(s) -- klt lvs has no PDK sheet-resistance/capacitance-per-area data to compute a real one. 'C' was therefore excluded from this compare on both sides (layout: 8 instance(s), C 7.656e-14..1.58928e-12) and the two sides were paired on topology alone -- that dimension of the compare is not independently verified. Supply a reference in the plain-element form carrying real 'C' values to compare it (see docs/cli/lvs.md, 'device.placeholder_value')",
+      "side": "reference",
+      "net": null,
+      "device": {
+        "layout": null,
+        "reference": null,
+        "class": "SKY130_FD_PR__MODEL__CAP_MIM"
+      },
+      "property": null,
+      "details": {
+        "parameter": "C",
+        "device_kind": "capacitor",
+        "reference_devices": 8,
+        "layout_devices": 8,
+        "layout_values": [
+          7.656e-14,
+          2.5036e-13,
+          2.9712e-13,
+          8.152e-13,
+          1.58928e-12
+        ]
+      },
+      "circuit": null,
+      "instance": null,
+      "subcircuit": null
+    },
+    {
+      "category": "topology.flattened",
+      "severity": "warning",
+      "description": "options.flatten_layout flattened the layout netlist before comparing: 5 circuit(s) were collapsed into 1 top-level circuit(s), substituting every subcircuit-call instance in place -- this compare verified topology only after removing the original hierarchy boundaries on this side (see docs/cli/lvs.md, \"topology.flattened\")",
+      "side": "layout",
+      "net": null,
+      "device": null,
+      "property": null,
+      "details": null,
+      "circuit": null,
+      "instance": null,
+      "subcircuit": null
+    },
+    {
+      "category": "topology.flattened",
+      "severity": "warning",
+      "description": "options.flatten_reference flattened the reference netlist before comparing: 5 circuit(s) were collapsed into 1 top-level circuit(s), substituting every subcircuit-call instance in place -- this compare verified topology only after removing the original hierarchy boundaries on this side (see docs/cli/lvs.md, \"topology.flattened\")",
+      "side": "reference",
+      "net": null,
+      "device": null,
+      "property": null,
+      "details": null,
+      "circuit": null,
+      "instance": null,
+      "subcircuit": null
+    }
+  ],
+  "net_correspondence": [
+    {
+      "layout": "BIAS__BIAS_CORE_1_EC",
+      "reference": "BIAS_EC",
+      "pin": false
+    },
+    {
+      "layout": "BIAS__BIAS_CORE_1_ER",
+      "reference": "BIAS_ER",
+      "pin": false
+    },
+    {
+      "layout": "BIAS__BIAS_CORE_1_KS1",
+      "reference": "BIAS_KS1",
+      "pin": false
+    },
+    {
+      "layout": "BIAS__BIAS_CORE_1_KS2",
+      "reference": "BIAS_KS2",
+      "pin": false
+    },
+    {
+      "layout": "BIAS__BIAS_CORE_1_KS3",
+      "reference": "BIAS_KS3",
+      "pin": false
+    },
+    {
+      "layout": "BIAS__BIAS_CORE_1_KS4",
+      "reference": "BIAS_KS4",
+      "pin": false
+    },
+    {
+      "layout": "BIAS__BIAS_CORE_1_N1",
+      "reference": "BIAS_N1",
+      "pin": false
+    },
+    {
+      "layout": "BIAS__BIAS_CORE_1_N2",
+      "reference": "BIAS_N2",
+      "pin": false
+    },
+    {
+      "layout": "BIAS__BIAS_CORE_1_NA",
+      "reference": "BIAS_NA",
+      "pin": false
+    },
+    {
+      "layout": "BIAS__BIAS_CORE_1_NB",
+      "reference": "BIAS_NB",
+      "pin": false
+    },
+    {
+      "layout": "BIAS__BIAS_CORE_1_NBG",
+      "reference": "BIAS_NBG",
+      "pin": false
+    },
+    {
+      "layout": "BIAS__BIAS_CORE_1_NBTOP",
+      "reference": "BIAS_NBTOP",
+      "pin": false
+    },
+    {
+      "layout": "BIAS__BIAS_CORE_1_NKG",
+      "reference": "BIAS_NKG",
+      "pin": false
+    },
+    {
+      "layout": "BIAS__BIAS_CORE_1_NKM",
+      "reference": "BIAS_NKM",
+      "pin": false
+    },
+    {
+      "layout": "BIAS__BIAS_CORE_1_NOKL",
+      "reference": "BIAS_NOKL",
+      "pin": false
+    },
+    {
+      "layout": "BIAS__BIAS_CORE_1_NOKO",
+      "reference": "BIAS_NOKO",
+      "pin": false
+    },
+    {
+      "layout": "BIAS__BIAS_CORE_1_NOKX",
+      "reference": "BIAS_NOKX",
+      "pin": false
+    },
+    {
+      "layout": "BIAS__BIAS_CORE_1_NT",
+      "reference": "BIAS_NT",
+      "pin": false
+    },
+    {
+      "layout": "BIAS__BIAS_CORE_1_NZ",
+      "reference": "BIAS_NZ",
+      "pin": false
+    },
+    {
+      "layout": "BIAS_OK|BIAS_OK",
+      "reference": "BIAS_OK",
+      "pin": true
+    },
+    {
+      "layout": "BIAS__BIAS_CORE_1_PB",
+      "reference": "BIAS_PB",
+      "pin": false
+    },
+    {
+      "layout": "BIAS__BIAS_CORE_1_PG",
+      "reference": "BIAS_PG",
+      "pin": false
+    },
+    {
+      "layout": "BIAS__BIAS_CORE_1_TOK",
+      "reference": "BIAS_TOK",
+      "pin": false
+    },
+    {
+      "layout": "CMP__POR_COMPARATOR_1_BIAS_OKB",
+      "reference": "CMP_BIAS_OKB",
+      "pin": false
+    },
+    {
+      "layout": "CMP__POR_COMPARATOR_1_CMPO",
+      "reference": "CMP_CMPO",
+      "pin": false
+    },
+    {
+      "layout": "CMP__POR_COMPARATOR_1_N1",
+      "reference": "CMP_N1",
+      "pin": false
+    },
+    {
+      "layout": "CMP__POR_COMPARATOR_1_NA",
+      "reference": "CMP_NA",
+      "pin": false
+    },
+    {
+      "layout": "CMP__POR_COMPARATOR_1_NBG",
+      "reference": "CMP_NBG",
+      "pin": false
+    },
+    {
+      "layout": "CMP__POR_COMPARATOR_1_SNS",
+      "reference": "CMP_SNS",
+      "pin": false
+    },
+    {
+      "layout": "CMP__POR_COMPARATOR_1_SNSB",
+      "reference": "CMP_SNSB",
+      "pin": false
+    },
+    {
+      "layout": "CMP__POR_COMPARATOR_1_TN",
+      "reference": "CMP_TN",
+      "pin": false
+    },
+    {
+      "layout": "CMP__POR_COMPARATOR_1_VDDA",
+      "reference": "CMP_VDDA",
+      "pin": false
+    },
+    {
+      "layout": "CTAT",
+      "reference": "CTAT",
+      "pin": true
+    },
+    {
+      "layout": "IBIAS|IBIAS",
+      "reference": "IBIAS",
+      "pin": true
+    },
+    {
+      "layout": "POR__POR_OUTPUT_CHAIN_1_ND1",
+      "reference": "POR_ND1",
+      "pin": false
+    },
+    {
+      "layout": "POR__POR_OUTPUT_CHAIN_1_NDG",
+      "reference": "POR_NDG",
+      "pin": false
+    },
+    {
+      "layout": "POR__POR_OUTPUT_CHAIN_1_NDGN",
+      "reference": "POR_NDGN",
+      "pin": false
+    },
+    {
+      "layout": "POR__POR_OUTPUT_CHAIN_1_NDGP",
+      "reference": "POR_NDGP",
+      "pin": false
+    },
+    {
+      "layout": "POR__POR_OUTPUT_CHAIN_1_NDL",
+      "reference": "POR_NDL",
+      "pin": false
+    },
+    {
+      "layout": "POR__POR_OUTPUT_CHAIN_1_NNAND",
+      "reference": "POR_NNAND",
+      "pin": false
+    },
+    {
+      "layout": "POR__POR_OUTPUT_CHAIN_1_NTS",
+      "reference": "POR_NTS",
+      "pin": false
+    },
+    {
+      "layout": "POR__POR_OUTPUT_CHAIN_1_PDN",
+      "reference": "POR_PDN",
+      "pin": false
+    },
+    {
+      "layout": "POR__POR_OUTPUT_CHAIN_1_PGDG",
+      "reference": "POR_PGDG",
+      "pin": false
+    },
+    {
+      "layout": "POR__POR_OUTPUT_CHAIN_1_PGDGB",
+      "reference": "POR_PGDGB",
+      "pin": false
+    },
+    {
+      "layout": "POR_RAW",
+      "reference": "POR_RAW",
+      "pin": true
+    },
+    {
+      "layout": "POR__POR_OUTPUT_CHAIN_1_RSTB",
+      "reference": "POR_RSTB",
+      "pin": false
+    },
+    {
+      "layout": "POR__POR_OUTPUT_CHAIN_1_TIM",
+      "reference": "POR_TIM",
+      "pin": false
+    },
+    {
+      "layout": "POR__POR_OUTPUT_CHAIN_1_TRIP",
+      "reference": "POR_TRIP",
+      "pin": false
+    },
+    {
+      "layout": "PTAT",
+      "reference": "PTAT",
+      "pin": true
+    },
+    {
+      "layout": "EN|RESETN",
+      "reference": "RESETN",
+      "pin": true
+    },
+    {
+      "layout": "TEMP__TEMP_CORE_1_ENB",
+      "reference": "TEMP_ENB",
+      "pin": false
+    },
+    {
+      "layout": "TEMP__TEMP_CORE_1_M1D",
+      "reference": "TEMP_M1D",
+      "pin": false
+    },
+    {
+      "layout": "TEMP__TEMP_CORE_1_M2D",
+      "reference": "TEMP_M2D",
+      "pin": false
+    },
+    {
+      "layout": "TEMP__TEMP_CORE_1_M3D",
+      "reference": "TEMP_M3D",
+      "pin": false
+    },
+    {
+      "layout": "TEMP__TEMP_CORE_1_N1",
+      "reference": "TEMP_N1",
+      "pin": false
+    },
+    {
+      "layout": "TEMP__TEMP_CORE_1_N2",
+      "reference": "TEMP_N2",
+      "pin": false
+    },
+    {
+      "layout": "NA|NA",
+      "reference": "TEMP_NA",
+      "pin": true
+    },
+    {
+      "layout": "TEMP__TEMP_CORE_1_NB",
+      "reference": "TEMP_NB",
+      "pin": false
+    },
+    {
+      "layout": "TEMP__TEMP_CORE_1_NBG",
+      "reference": "TEMP_NBG",
+      "pin": false
+    },
+    {
+      "layout": "NC|EC",
+      "reference": "TEMP_NC",
+      "pin": true
+    },
+    {
+      "layout": "TEMP__TEMP_CORE_1_ND",
+      "reference": "TEMP_ND",
+      "pin": false
+    },
+    {
+      "layout": "TEMP__TEMP_CORE_1_NR",
+      "reference": "TEMP_NR",
+      "pin": false
+    },
+    {
+      "layout": "TEMP__TEMP_CORE_1_NT",
+      "reference": "TEMP_NT",
+      "pin": false
+    },
+    {
+      "layout": "TEMP__TEMP_CORE_1_NZ",
+      "reference": "TEMP_NZ",
+      "pin": false
+    },
+    {
+      "layout": "TEMP__TEMP_CORE_1_PB",
+      "reference": "TEMP_PB",
+      "pin": false
+    },
+    {
+      "layout": "TEMP__TEMP_CORE_1_PCAS",
+      "reference": "TEMP_PCAS",
+      "pin": false
+    },
+    {
+      "layout": "TEMP__TEMP_CORE_1_PG",
+      "reference": "TEMP_PG",
+      "pin": false
+    },
+    {
+      "layout": "TEMP__TEMP_CORE_1_PTAT_TRIM",
+      "reference": "TEMP_PTAT_TRIM",
+      "pin": false
+    },
+    {
+      "layout": "VDD|VDD",
+      "reference": "VDD",
+      "pin": true
+    },
+    {
+      "layout": "VREF|VREF",
+      "reference": "VREF",
+      "pin": true
+    },
+    {
+      "layout": "VSS|VSS",
+      "reference": "VSS",
+      "pin": true
+    }
+  ]
+}
