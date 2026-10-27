@@ -2,6 +2,15 @@
 
 Chronological record of recently merged pull requests and closed issues. This file is maintained by the Loom Guide role.
 
+### 2026-10-27
+
+- **PR #248**: fix: regenerate layout streams under the pinned klt and re-sync bias_core ports
+- **Issue #243** (closed): Re-generate leaf layout streams under the pinned klt: committed leaf GDS now show 351 poly.endcap.diff.1 DRC violations
+- **PR #246**: refactor: build campaign fleet requests through sim_common.base_request
+- **Issue #245** (closed): Consolidate duplicated fleet-request scaffolding (batch block, MODEL_LIB) in campaign build_request into sim_common
+- **PR #244**: feat: assemble temp_por_top GDS from the leaf streams and cite it for T1 item 2
+- **Issue #240** (closed): T1 item 2 (layout): assemble the temp_por_top GDS from the committed leaf cells and cite it as block-level layout evidence
+
 ### 2026-10-23
 
 - **PR #236**: refactor: netlist sim testbenches via klt netlist, remove raw xschem path
