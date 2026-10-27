@@ -192,10 +192,7 @@ def cmd_probe(args):
         req = build_request("local", ([p], [t], [v]))
         (d / "request.json").write_text(json.dumps(req, indent=2) + "\n")
         say(f"[probe] local single corner {scen} {variant} {cid}")
-        pr = subprocess.run(["klt", "sim", str(d / "request.json"), "--backend", "local", "-o", str(d / "out"), "--format", "json"],
-                            capture_output=True, text=True, timeout=3600)
-        (d / "report.json").write_text(pr.stdout)
-        (d / "klt.stderr").write_text(pr.stderr)
+        pr = sim_common.run_local_probe(d)
         say(f"[probe] exit {pr.returncode}")
     return 0
 

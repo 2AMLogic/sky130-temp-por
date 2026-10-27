@@ -206,12 +206,10 @@ def cmd_probe(args) -> int:
         rate, man, "local",
         corners={"process": [args.process], "supply_v": {"vset": [man["sweep"]["peak_v"]]}, "temperature_c": [args.temp]},
     )
-    req["options"]["ngspice_init"] = [ln.strip() for ln in (SIM_DIR / "spiceinit").read_text().splitlines() if ln.strip() and not ln.startswith("*")]
+    req["options"]["ngspice_init"] = sim_common.spiceinit_lines(SIM_DIR)
     (d / "request.json").write_text(json.dumps(req, indent=2) + "\n")
     say(f"[probe] one local corner {args.process}/{args.temp}C, {rate:g} V/s, variant {variant}")
-    p = subprocess.run(["klt", "sim", str(d / "request.json"), "--backend", "local", "-o", str(d / "out"), "--format", "json"], capture_output=True, text=True, timeout=3600)
-    (d / "report.json").write_text(p.stdout)
-    (d / "klt.stderr").write_text(p.stderr)
+    p = sim_common.run_local_probe(d)
     print(f"exit {p.returncode}; report {d / 'report.json'}")
     try:
         rep = json.loads(p.stdout)
@@ -476,9 +474,7 @@ def cmd_record(args) -> int:
         record_id = f"{stamp:%Y%m%d}-{stamp:%H%M%S}-{git_info['sha']}-{variant}" + ("" if axis == "main" else f"-{axis}")
         rec_dir, snap_dir = HERE / "records", HERE / "netlist-snapshots" / record_id
         corners_dir = evidence_store.stage_dir_for(SLUG, record_id)  # git-ignored scratch; stored below
-        for pth in (rec_dir / f"{record_id}.md", rec_dir / f"{record_id}.json", corners_dir, snap_dir, evidence_store.manifest_path(SLUG, record_id)):
-            if pth.exists():
-                raise SystemExit(f"{pth} exists -- sim/ is append-only")
+        sim_common.refuse_existing((rec_dir / f"{record_id}.md", rec_dir / f"{record_id}.json", corners_dir, snap_dir, evidence_store.manifest_path(SLUG, record_id)))
         res = analyze_variant(variant, run_dir, man, corners_dir)
         # per-request submit commit: a retried request ran at the retry's (clean) commit, not run.json's
         submit_git = {}

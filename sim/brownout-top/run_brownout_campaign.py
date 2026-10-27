@@ -41,7 +41,6 @@ import json
 import os
 import re
 import shutil
-import subprocess
 import sys
 from datetime import datetime, timezone
 from pathlib import Path
@@ -458,14 +457,12 @@ def cmd_probe(args) -> int:
         r["analysis"]["args"] = f"1e-6 {args.tstop:g} 0 5e-6"
         r["measurements"] = []
     if not args.fleet_equivalent:
-        r["options"]["ngspice_init"] = [ln.strip() for ln in (SIM_DIR / "spiceinit").read_text().splitlines() if ln.strip() and not ln.startswith("*")]
+        r["options"]["ngspice_init"] = sim_common.spiceinit_lines(SIM_DIR)
     # --fleet-equivalent: no ngspice_init, exactly as the fleet runner executes the deck (it ignores
     # options.ngspice_init, so ngspice falls back to its default SPARSE solver) -- for like-for-like timing
     (d / "request.json").write_text(json.dumps(r, indent=2) + "\n")
     say(f"[probe] one LOCAL corner {corner_id(proc, temp, vf)} for {args.tag} (variant {args.variant or 'default'})")
-    p = subprocess.run(["klt", "sim", str(d / "request.json"), "--backend", "local", "-o", str(d / "out"), "--format", "json"], capture_output=True, text=True, timeout=3600)
-    (d / "report.json").write_text(p.stdout)
-    (d / "klt.stderr").write_text(p.stderr)
+    p = sim_common.run_local_probe(d)
     print(f"exit {p.returncode}; {d}")
     return 0
 
@@ -937,9 +934,7 @@ def cmd_record(args) -> int:
     rec_dir = HERE / "records"
     corners_dir = evidence_store.stage_dir_for(HERE.name, record_id)  # git-ignored scratch; stored below
     snap_dir = HERE / "netlist-snapshots" / record_id
-    for pth in (rec_dir / f"{record_id}.md", rec_dir / f"{record_id}.json", corners_dir, snap_dir, evidence_store.manifest_path(HERE.name, record_id)):
-        if pth.exists():
-            raise SystemExit(f"{pth} exists -- sim/ is append-only")
+    sim_common.refuse_existing((rec_dir / f"{record_id}.md", rec_dir / f"{record_id}.json", corners_dir, snap_dir, evidence_store.manifest_path(HERE.name, record_id)))
     reqs = plan_requests(man)
     points, requests, fleet_pdk = [], [], {}
     for r in reqs:

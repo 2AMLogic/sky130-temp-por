@@ -385,9 +385,7 @@ def cmd_record(args) -> int:
     now = datetime.now(timezone.utc)
     record_id = f"{now:%Y%m%d}-{now:%H%M%S}-{meta['git']['sha']}-{SLUG_SUFFIX}"
     rec_dir, cdir, sdir = HERE / "records", HERE / "corners" / record_id, HERE / "netlist-snapshots" / record_id
-    for pth in (rec_dir / f"{record_id}.md", rec_dir / f"{record_id}.json", cdir, sdir):
-        if pth.exists():
-            raise SystemExit(f"{pth} exists -- sim/ is append-only")
+    sim_common.refuse_existing((rec_dir / f"{record_id}.md", rec_dir / f"{record_id}.json", cdir, sdir))
     names = variant_names(man)
     traces: dict = {}
     per = {n: analyze_variant(n, run_dir, man, traces) for n in names}

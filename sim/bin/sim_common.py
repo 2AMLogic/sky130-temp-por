@@ -690,3 +690,28 @@ def decimate(cols, keep_dt, thresholds, keep_at=None):
             last = cur
     rows.append([c[n - 1] for c in cols])
     return rows
+
+
+def refuse_existing(paths) -> None:
+    """Abort if any of ``paths`` already exists: ``sim/`` is append-only evidence, never overwritten."""
+    for pth in paths:
+        if pth.exists():
+            raise SystemExit(f"{pth} exists -- sim/ is append-only")
+
+
+def spiceinit_lines(sim_dir: Path) -> list[str]:
+    """The ngspice init lines of ``<sim_dir>/spiceinit`` (blank and ``*`` comment lines dropped)."""
+    return [ln.strip() for ln in (sim_dir / "spiceinit").read_text().splitlines() if ln.strip() and not ln.startswith("*")]
+
+
+def run_local_probe(d: Path) -> subprocess.CompletedProcess:
+    """Run ``<d>/request.json`` as ONE local ``klt sim`` (never a grid); save ``report.json`` and ``klt.stderr`` in ``d``."""
+    p = subprocess.run(
+        ["klt", "sim", str(d / "request.json"), "--backend", "local", "-o", str(d / "out"), "--format", "json"],
+        capture_output=True,
+        text=True,
+        timeout=3600,
+    )
+    (d / "report.json").write_text(p.stdout)
+    (d / "klt.stderr").write_text(p.stderr)
+    return p

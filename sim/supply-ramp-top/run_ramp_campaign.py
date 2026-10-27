@@ -215,9 +215,7 @@ def cmd_crosscheck(args) -> int:
     (d / "variant.txt").write_text(variant + "\n")
     req = build_request("netlist.spice", rate, man, "local")
     req["corners"] = {"process": ["tt"], "supply_v": {"vset": [3.3]}, "temperature_c": [27]}
-    req["options"]["ngspice_init"] = [
-        ln.strip() for ln in (SIM_DIR / "spiceinit").read_text().splitlines() if ln.strip() and not ln.startswith("*")
-    ]
+    req["options"]["ngspice_init"] = sim_common.spiceinit_lines(SIM_DIR)
     (d / "request.json").write_text(json.dumps(req, indent=2) + "\n")
     say(f"[crosscheck] one local corner (tt/27C/3.30V, 10 kV/s, {variant}) on local ngspice")
     p = subprocess.run(
@@ -555,9 +553,7 @@ def cmd_record(args) -> int:
         rec_dir = HERE / "records"
         corners_dir = evidence_store.stage_dir_for(SLUG, record_id)  # git-ignored scratch; stored below
         snap_dir = HERE / "netlist-snapshots" / record_id
-        for pth in (rec_dir / f"{record_id}.md", rec_dir / f"{record_id}.json", corners_dir, snap_dir, evidence_store.manifest_path(SLUG, record_id)):
-            if pth.exists():
-                raise SystemExit(f"{pth} exists -- sim/ is append-only")
+        sim_common.refuse_existing((rec_dir / f"{record_id}.md", rec_dir / f"{record_id}.json", corners_dir, snap_dir, evidence_store.manifest_path(SLUG, record_id)))
         res = analyze_variant(variant, run_dir, man, corners_dir, write=True)
         pts = res["points"]
         pairs = grade_pairs(pts, man)
