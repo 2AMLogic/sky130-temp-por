@@ -107,7 +107,7 @@ evidence here was produced by the pinned commit through a throwaway wrapper
 outside the repo, so `check_klt_pin()` stays silent:
 
 ```
-uvx --from "git+https://github.com/2AMLogic/klayout-tools@0ce8c64842d9" klt "$@"
+uvx --from "klayout-tools==0.8.0" klt "$@"
 ```
 
 Put a `klt` script exec'ing that first on `PATH`. Deck: the curated `sky130`
