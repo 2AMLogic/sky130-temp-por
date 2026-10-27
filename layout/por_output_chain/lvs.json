@@ -5,10 +5,16 @@
   "reference": "por_output_chain.ref.spice",
   "top": "POR_OUTPUT_CHAIN",
   "reference_top": "POR_OUTPUT_CHAIN",
+  "reference_conversion": {
+    "form": "subckt-call",
+    "deck": "sky130",
+    "device_map": null
+  },
   "parameter_tolerance": null,
   "options": {
     "combine_devices": false,
     "combine_devices_per_circuit": null,
+    "combine_devices_max_attempts": 5,
     "flatten_layout": false,
     "flatten_reference": false,
     "netgen_setup": null,
@@ -16,6 +22,8 @@
     "compare_parameters": null,
     "power_connectivity": null,
     "anchor_top_level_pins": null,
+    "strict_top_level_pin_count": false,
+    "compare_mos_flavour": false,
     "supply_nets": [
       "GND",
       "VCC",
@@ -23,9 +31,11 @@
       "VGND",
       "VPWR",
       "VSS"
-    ]
+    ],
+    "finfet_bulk": null
   },
   "hints_applied": null,
+  "constant_nets_applied": null,
   "status": "match",
   "power_connectivity": {
     "status": "unchecked",
@@ -106,16 +116,16 @@
     "engine_version": "0.30.12",
     "netgen_binary": null,
     "layout_sha256": "ed9cb90f3c150de5c0351566cd044a69fea5c335a4f986989aa0a738e026ef77",
-    "reference_sha256": "be6f4fab572b8304504cf9ccc87d7e64f983c6fffd12f96383e4f7d714ee804a",
+    "reference_sha256": "10a61821ec86367db543c14a0deef7afdf1b4b14cd7ed9dfb74c29ab3a656127",
     "extracted_netlist": null
   },
   "provenance": {
-    "klt_version": "0.6.0+g0ce8c64842d9",
+    "klt_version": "0.7.1.dev1610+g758c6e224053",
     "klayout_version": "0.30.12",
     "pdk": null,
     "deck": {
       "name": "sky130",
-      "content_hash": "sha256:f8f2c3f48eada473dc34a7a8926c0b04fef446fb351a70a636ce43a9ca9c70ba",
+      "content_hash": "sha256:773f73886500d88310f3c3ebe671aad84de425473e9eb6b7ae5a22902416e973",
       "released": false
     },
     "input": {

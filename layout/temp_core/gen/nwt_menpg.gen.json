@@ -6,14 +6,14 @@
   "pdk": {
     "name": "sky130A",
     "variant": "sky130A",
-    "version": "open_pdks c6d73a35f524070e85faff4a6a9eef49553ebc2b"
+    "version": "open_pdks f6eeac7dad085ffcc829ccfd721f7b4ce39edcf7"
   },
   "dbu_um": 0.001,
   "bbox_um": {
-    "x0": -0.15,
-    "y0": -0.15,
-    "x1": 1.99,
-    "y1": 1.99
+    "x0": -0.2,
+    "y0": -0.2,
+    "x1": 2.04,
+    "y1": 2.04
   },
   "device_count": 8,
   "ports": [
@@ -82,12 +82,15 @@
   },
   "warnings": [],
   "provenance": {
-    "klt_version": "0.6.0+g0ce8c64842d9",
+    "klt_version": "0.7.1.dev1610+g758c6e224053",
     "klayout_version": "0.30.12",
     "pdk": {
       "name": "sky130A",
-      "source": "search root: ~/.volare",
-      "version": "open_pdks c6d73a35f524070e85faff4a6a9eef49553ebc2b"
+      "source": "search root: ~/.ciel",
+      "version": "open_pdks f6eeac7dad085ffcc829ccfd721f7b4ce39edcf7",
+      "ambiguous_sources": [
+        "search root: ~/.volare"
+      ]
     },
     "deck": null,
     "input": null

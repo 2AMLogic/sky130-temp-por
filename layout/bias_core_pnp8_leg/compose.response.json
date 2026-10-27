@@ -6,12 +6,12 @@
   "pdk": {
     "name": "sky130A",
     "variant": "sky130A",
-    "version": "open_pdks c6d73a35f524070e85faff4a6a9eef49553ebc2b"
+    "version": "open_pdks f6eeac7dad085ffcc829ccfd721f7b4ce39edcf7"
   },
   "dbu_um": 0.001,
   "bbox_um": {
     "x0": -5.0,
-    "y0": -0.97,
+    "y0": -1.2750000000000001,
     "x1": 23.5,
     "y1": 10.084999999999999
   },
@@ -52,16 +52,16 @@
       "generator": "bjt_array",
       "cell_name": "pnp8",
       "source_path": "gen/array.gds",
-      "source_digest": "sha256:1258a42bedfa71e787d33c4965d5694750fd621d16f5fe4e442a3225d796c80d",
+      "source_digest": "sha256:77703d978991f9d46dce36f9233d6a02ffab3c64f3f1c29a67739c26e4a3463a",
       "offset_um": {
         "x": 0.0,
         "y": 0.0
       },
       "bbox_um": {
-        "x0": -0.97,
-        "y0": -0.97,
-        "x1": 19.05,
-        "y1": 8.17
+        "x0": -1.2750000000000001,
+        "y0": -1.2750000000000001,
+        "x1": 19.355,
+        "y1": 8.475
       },
       "orientation": "none",
       "abuts": []
@@ -71,7 +71,7 @@
       "source": "cell",
       "generator": null,
       "cell_name": "promo_stub",
-      "source_path": "/home/ubuntu/GitHub/sky130-temp-por/.loom/worktrees/issue-81/layout/bias_core_pnp8_leg/promo_stub.gds",
+      "source_path": "promo_stub.gds",
       "source_digest": "sha256:902ff80454f309f31943b44b8a7f942a6d96817455a784cbefd7f85d019f84ab",
       "offset_um": {
         "x": -5.0,
@@ -91,7 +91,7 @@
       "source": "cell",
       "generator": null,
       "cell_name": "promo_stub",
-      "source_path": "/home/ubuntu/GitHub/sky130-temp-por/.loom/worktrees/issue-81/layout/bias_core_pnp8_leg/promo_stub.gds",
+      "source_path": "promo_stub.gds",
       "source_digest": "sha256:902ff80454f309f31943b44b8a7f942a6d96817455a784cbefd7f85d019f84ab",
       "offset_um": {
         "x": 22.0,
@@ -153,27 +153,10 @@
         }
       ],
       "routed": true,
-      "route_length_um": 40.58,
+      "route_length_um": 40.76,
       "status": "routed",
       "landed_on_block": true,
       "legs": [
-        {
-          "pins": [
-            {
-              "block": "array",
-              "port": "Q5_B"
-            },
-            {
-              "block": "array",
-              "port": "COLL_E"
-            }
-          ],
-          "routed": true,
-          "route_length_um": 2.8699999999999983,
-          "reason": null,
-          "channel_track": 0,
-          "landed_on_block": true
-        },
         {
           "pins": [
             {
@@ -186,7 +169,24 @@
             }
           ],
           "routed": true,
-          "route_length_um": 2.869999999999999,
+          "route_length_um": 3.049999999999998,
+          "reason": null,
+          "channel_track": 0,
+          "landed_on_block": true
+        },
+        {
+          "pins": [
+            {
+              "block": "array",
+              "port": "Q5_B"
+            },
+            {
+              "block": "array",
+              "port": "COLL_E"
+            }
+          ],
+          "routed": true,
+          "route_length_um": 3.049999999999999,
           "reason": null,
           "channel_track": 0,
           "landed_on_block": true
@@ -305,7 +305,7 @@
             }
           ],
           "routed": true,
-          "route_length_um": 8.560000000000002,
+          "route_length_um": 8.380000000000004,
           "reason": null,
           "channel_track": 0,
           "landed_on_block": true
@@ -526,12 +526,15 @@
   },
   "warnings": [],
   "provenance": {
-    "klt_version": "0.6.0+g0ce8c64842d9",
+    "klt_version": "0.7.1.dev1610+g758c6e224053",
     "klayout_version": "0.30.12",
     "pdk": {
       "name": "sky130A",
-      "source": "search root: ~/.volare",
-      "version": "open_pdks c6d73a35f524070e85faff4a6a9eef49553ebc2b"
+      "source": "search root: ~/.ciel",
+      "version": "open_pdks f6eeac7dad085ffcc829ccfd721f7b4ce39edcf7",
+      "ambiguous_sources": [
+        "search root: ~/.volare"
+      ]
     },
     "deck": null,
     "input": null

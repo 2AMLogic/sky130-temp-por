@@ -6,6 +6,7 @@
   "dbu_um": 0.001,
   "netlist_path": "bias_core_pnp8_leg.spice",
   "netlist_sha256": "73cc738b0d93cc97baec17d8fad0ba2a986864fb58405fccc292d70658fca87f",
+  "netlist_normalized_sha256": "7eddf5b3a04c0e3cdee647b9cb38a45b0b9078a108fcc565236cd13edccdfeb4",
   "status": "extracted",
   "device_count": 8,
   "net_count": 2,
@@ -14,12 +15,23 @@
     "pnp": 8
   },
   "dummy_devices_dropped": 0,
-  "ignored_layers": [],
+  "ignored_layers": [
+    {
+      "layer": 93,
+      "datatype": 44,
+      "shapes": 8
+    }
+  ],
   "device_recognition_only_layers": [
     {
       "layer": 82,
       "datatype": 44,
       "shapes": 8
+    },
+    {
+      "layer": 94,
+      "datatype": 20,
+      "shapes": 9
     }
   ],
   "device_classes": [
@@ -222,7 +234,7 @@
         {
           "text": "vss",
           "x_um": 17.87,
-          "y_um": 4.065
+          "y_um": 3.225
         },
         {
           "text": "vss",
@@ -232,31 +244,39 @@
       ]
     }
   ],
-  "warnings": [],
+  "warnings": [
+    "1 layer (93/44) carrying 8 shapes is outside 'sky130' deck's connectivity graph -- this geometry is invisible to extraction, so a net routed only through it extracts as multiple disconnected nets instead of one, which will silently mismatch a downstream `klt lvs` reference netlist -- see ignored_layers[] for the full per-layer shape counts. See docs/cli/extract.md's 'ignored_layers' field documentation."
+  ],
   "black_box_regions": [],
   "abstracted_cells": [],
   "unmodelled_poly": [],
   "merged_net_labels": [],
   "voltage_domain_warnings": [],
   "missing_flavour_markers": [],
+  "unsupported_devices": [],
   "unbiased_pmos_body_nets": [],
   "single_terminal_nets": [],
   "dead_metal": [],
   "matched_device_groups": [],
   "def_pin_promotion": null,
+  "pin_renames": null,
+  "rename_declared_pins": false,
+  "declared_pins": null,
+  "def_pins": null,
   "label_layers": null,
+  "probes": [],
   "pdk": null,
   "provenance": {
-    "klt_version": "0.6.0+g0ce8c64842d9",
+    "klt_version": "0.7.1.dev1610+g758c6e224053",
     "klayout_version": "0.30.12",
     "pdk": null,
     "deck": {
       "name": "sky130",
-      "content_hash": "sha256:f8f2c3f48eada473dc34a7a8926c0b04fef446fb351a70a636ce43a9ca9c70ba",
+      "content_hash": "sha256:773f73886500d88310f3c3ebe671aad84de425473e9eb6b7ae5a22902416e973",
       "released": false
     },
     "input": {
-      "content_hash": "sha256:82914ec8cc0d81b4d43d450f75bfb2234be7fcb50353586e4d27d688da18de9f",
+      "content_hash": "sha256:4124bb9ee58e8a1ca90e85fc62f7d39e7ee6dd2ea912db61fc6dd44900d4ca9a",
       "role": "layout"
     }
   },
@@ -267,5 +287,17 @@
     "extract__device__count": 8,
     "extract__net__count": 2,
     "extract__pin__count": 2
+  },
+  "timing": {
+    "stages": {
+      "read_layout": 0.001,
+      "device_extraction": 0.005,
+      "diagnostics": 0.0,
+      "netlist_write": 0.0,
+      "netlist_hash": 0.0,
+      "netlist_normalized_hash": 0.0
+    },
+    "total_seconds": 0.087,
+    "unattributed_seconds": 0.08
   }
 }

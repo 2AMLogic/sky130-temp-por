@@ -6,14 +6,14 @@
   "pdk": {
     "name": "sky130A",
     "variant": "sky130A",
-    "version": "open_pdks c6d73a35f524070e85faff4a6a9eef49553ebc2b"
+    "version": "open_pdks f6eeac7dad085ffcc829ccfd721f7b4ce39edcf7"
   },
   "dbu_um": 0.001,
   "bbox_um": {
-    "x0": -0.97,
-    "y0": -0.97,
-    "x1": 5.19,
-    "y1": 4.37
+    "x0": -1.2750000000000001,
+    "y0": -1.2750000000000001,
+    "x1": 5.495,
+    "y1": 4.675
   },
   "ports": [
     {
@@ -39,16 +39,16 @@
       "generator": "bjt_array",
       "cell_name": "xq1_array",
       "source_path": "gen/array.gds",
-      "source_digest": "sha256:e37885e0274865fa7d72e5d17e3361b33f2569053b723d25422143b399e75302",
+      "source_digest": "sha256:99ecedd197bc139e4670ffe80c9b2531208d422146d4553dd6dac97aa9da4410",
       "offset_um": {
         "x": 0.0,
         "y": 0.0
       },
       "bbox_um": {
-        "x0": -0.97,
-        "y0": -0.97,
-        "x1": 5.19,
-        "y1": 4.37
+        "x0": -1.2750000000000001,
+        "y0": -1.2750000000000001,
+        "x1": 5.495,
+        "y1": 4.675
       },
       "orientation": "none",
       "abuts": []
@@ -68,7 +68,7 @@
         }
       ],
       "routed": true,
-      "route_length_um": 0.9700000000000006,
+      "route_length_um": 1.1500000000000008,
       "status": "routed",
       "landed_on_block": true,
       "legs": [
@@ -84,7 +84,7 @@
             }
           ],
           "routed": true,
-          "route_length_um": 0.9700000000000006,
+          "route_length_um": 1.1500000000000008,
           "reason": null,
           "channel_track": 0,
           "landed_on_block": true
@@ -116,12 +116,15 @@
   },
   "warnings": [],
   "provenance": {
-    "klt_version": "0.6.0+g0ce8c64842d9",
+    "klt_version": "0.7.1.dev1610+g758c6e224053",
     "klayout_version": "0.30.12",
     "pdk": {
       "name": "sky130A",
-      "source": "search root: ~/.volare",
-      "version": "open_pdks c6d73a35f524070e85faff4a6a9eef49553ebc2b"
+      "source": "search root: ~/.ciel",
+      "version": "open_pdks f6eeac7dad085ffcc829ccfd721f7b4ce39edcf7",
+      "ambiguous_sources": [
+        "search root: ~/.volare"
+      ]
     },
     "deck": null,
     "input": null

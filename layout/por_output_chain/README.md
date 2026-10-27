@@ -1,5 +1,7 @@
 # `por_output_chain`
 
+> **Re-generated in #243 at `klt 758c6e224053` (the `layout/pdk.json` pin).** Committed streams and `drc/lvs/extract.json` now come from the pin; "Tool build" / `klt 0.6.0` statements below record the original run. See `layout/README.md`.
+
 Standalone proof layout of `design/netlist/por_output_chain.spice`'s whole
 `.subckt por_output_chain VDD VSS IBIAS POR_RAW RESETn` (see
 `design/por_output_chain.md`): the POR output chain that turns `POR_RAW` into

@@ -123,14 +123,14 @@ Q$42 VSS|vss VSS|vss NC|ec pnp AE=11.56P PE=13.6U AB=12.96P PB=14.4U AC=12.96P
 + PC=14.4U NE=1
 * device instance $43 r0 *1 1154.61,1 sky130_fd_pr__model__cap_mim
 C$43 NZ PG 2.9712e-13
-* device instance $44 r0 *1 2568.06,-16 res_xhigh_po
+* device instance $44 r0 *1 2568.03,-16 res_xhigh_po
 X$44 VSS|vss PTAT_TRIM VSS|vss res_xhigh_po r=450880 L=450.88U W=2U
-* device instance $45 r0 *1 1467.2,-11.5 res_xhigh_po
+* device instance $45 r0 *1 1467.17,-11.5 res_xhigh_po
 X$45 PTAT PTAT_TRIM VSS|vss res_xhigh_po r=2652600 L=2652.6U W=2U
-* device instance $46 r0 *1 643.9,-7 res_xhigh_po
+* device instance $46 r0 *1 643.87,-7 res_xhigh_po
 X$46 N2 NZ VSS|vss res_xhigh_po r=1000000 L=1000U W=2U
-* device instance $47 r0 *1 206.635,-2.5 res_xhigh_po
+* device instance $47 r0 *1 206.605,-2.5 res_xhigh_po
 X$47 NB NC|ec VSS|vss res_xhigh_po r=119470 L=119.47U W=2U
-* device instance $48 r0 *1 205.425,2 res_xhigh_po
+* device instance $48 r0 *1 205.395,2 res_xhigh_po
 X$48 NA|na CTAT VSS|vss res_xhigh_po r=111050 L=111.05U W=2U
 .ENDS temp_core

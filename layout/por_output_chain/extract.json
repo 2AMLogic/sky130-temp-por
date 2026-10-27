@@ -6,6 +6,7 @@
   "dbu_um": 0.001,
   "netlist_path": "por_output_chain.spice",
   "netlist_sha256": "ed9cb90f3c150de5c0351566cd044a69fea5c335a4f986989aa0a738e026ef77",
+  "netlist_normalized_sha256": "61a6560f64ee1d6319b8cecf3b5ca517915d4ce60adbdeb83a118cd28368f3f4",
   "status": "extracted",
   "device_count": 33,
   "net_count": 18,
@@ -16,12 +17,28 @@
     "sky130_fd_pr__model__cap_mim": 5
   },
   "dummy_devices_dropped": 0,
-  "ignored_layers": [],
+  "ignored_layers": [
+    {
+      "layer": 93,
+      "datatype": 44,
+      "shapes": 28
+    },
+    {
+      "layer": 95,
+      "datatype": 20,
+      "shapes": 28
+    }
+  ],
   "device_recognition_only_layers": [
     {
       "layer": 89,
       "datatype": 44,
       "shapes": 5
+    },
+    {
+      "layer": 94,
+      "datatype": 20,
+      "shapes": 21
     }
   ],
   "device_classes": [
@@ -938,7 +955,7 @@
       "name": "IBIAS",
       "pin": true,
       "device_count": 3,
-      "net_id": 12,
+      "net_id": 13,
       "pin_index": 0,
       "label_positions_um": [
         {
@@ -948,7 +965,7 @@
         },
         {
           "text": "IBIAS",
-          "x_um": 14.93,
+          "x_um": 14.855,
           "y_um": 13.0
         }
       ]
@@ -957,7 +974,7 @@
       "name": "ND1",
       "pin": true,
       "device_count": 4,
-      "net_id": 7,
+      "net_id": 10,
       "pin_index": 1,
       "label_positions_um": [
         {
@@ -971,12 +988,12 @@
       "name": "NDG",
       "pin": true,
       "device_count": 5,
-      "net_id": 4,
+      "net_id": 8,
       "pin_index": 2,
       "label_positions_um": [
         {
           "text": "NDG",
-          "x_um": 77.945,
+          "x_um": 77.87,
           "y_um": 37.0
         }
       ]
@@ -1013,12 +1030,12 @@
       "name": "NDL",
       "pin": true,
       "device_count": 5,
-      "net_id": 13,
+      "net_id": 3,
       "pin_index": 5,
       "label_positions_um": [
         {
           "text": "NDL",
-          "x_um": 68.66,
+          "x_um": 68.585,
           "y_um": 22.6
         }
       ]
@@ -1027,7 +1044,7 @@
       "name": "NNAND",
       "pin": true,
       "device_count": 2,
-      "net_id": 8,
+      "net_id": 9,
       "pin_index": 6,
       "label_positions_um": [
         {
@@ -1060,7 +1077,7 @@
       "label_positions_um": [
         {
           "text": "PDN",
-          "x_um": 63.705,
+          "x_um": 63.63,
           "y_um": 34.6
         }
       ]
@@ -1074,7 +1091,7 @@
       "label_positions_um": [
         {
           "text": "PGDG",
-          "x_um": 108.835,
+          "x_um": 108.76,
           "y_um": 23.8
         }
       ]
@@ -1088,7 +1105,7 @@
       "label_positions_um": [
         {
           "text": "PGDGB",
-          "x_um": 95.205,
+          "x_um": 95.13,
           "y_um": 39.4
         }
       ]
@@ -1097,7 +1114,7 @@
       "name": "POR_RAW",
       "pin": true,
       "device_count": 2,
-      "net_id": 10,
+      "net_id": 4,
       "pin_index": 11,
       "label_positions_um": [
         {
@@ -1121,7 +1138,7 @@
       "label_positions_um": [
         {
           "text": "RESETn",
-          "x_um": 129.85,
+          "x_um": 129.925,
           "y_um": 43.0
         },
         {
@@ -1135,12 +1152,12 @@
       "name": "RSTB",
       "pin": true,
       "device_count": 6,
-      "net_id": 9,
+      "net_id": 12,
       "pin_index": 13,
       "label_positions_um": [
         {
           "text": "RSTB",
-          "x_um": 154.67,
+          "x_um": 154.595,
           "y_um": 35.8
         }
       ]
@@ -1154,7 +1171,7 @@
       "label_positions_um": [
         {
           "text": "TIM",
-          "x_um": 103.835,
+          "x_um": 103.76,
           "y_um": 38.2
         }
       ]
@@ -1163,12 +1180,12 @@
       "name": "TRIP",
       "pin": true,
       "device_count": 4,
-      "net_id": 3,
+      "net_id": 7,
       "pin_index": 15,
       "label_positions_um": [
         {
           "text": "TRIP",
-          "x_um": 135.315,
+          "x_um": 135.24,
           "y_um": 19.0
         }
       ]
@@ -1212,31 +1229,40 @@
       ]
     }
   ],
-  "warnings": [],
+  "warnings": [
+    "5 drawn capacitors ('sky130_fd_pr__model__cap_mim') written as a fixed-value 'C' card (the deck's nominal area+perimeter value) -- PDK process corners (e.g. mimcap_ff/mimcap_ss) do not apply to it, so schematic-vs-extracted deltas at non-typical corners include a capacitor-corner term; pass --pdk to bind the PDK capacitor subcircuit instead. See docs/cli/extract.md's 'SPICE model binding' section.",
+    "2 layers (93/44, 95/20) carrying 56 shapes are outside 'sky130' deck's connectivity graph -- this geometry is invisible to extraction, so a net routed only through it extracts as multiple disconnected nets instead of one, which will silently mismatch a downstream `klt lvs` reference netlist -- see ignored_layers[] for the full per-layer shape counts. See docs/cli/extract.md's 'ignored_layers' field documentation."
+  ],
   "black_box_regions": [],
   "abstracted_cells": [],
   "unmodelled_poly": [],
   "merged_net_labels": [],
   "voltage_domain_warnings": [],
   "missing_flavour_markers": [],
+  "unsupported_devices": [],
   "unbiased_pmos_body_nets": [],
   "single_terminal_nets": [],
   "dead_metal": [],
   "matched_device_groups": [],
   "def_pin_promotion": null,
+  "pin_renames": null,
+  "rename_declared_pins": false,
+  "declared_pins": null,
+  "def_pins": null,
   "label_layers": null,
+  "probes": [],
   "pdk": null,
   "provenance": {
-    "klt_version": "0.6.0+g0ce8c64842d9",
+    "klt_version": "0.7.1.dev1610+g758c6e224053",
     "klayout_version": "0.30.12",
     "pdk": null,
     "deck": {
       "name": "sky130",
-      "content_hash": "sha256:f8f2c3f48eada473dc34a7a8926c0b04fef446fb351a70a636ce43a9ca9c70ba",
+      "content_hash": "sha256:773f73886500d88310f3c3ebe671aad84de425473e9eb6b7ae5a22902416e973",
       "released": false
     },
     "input": {
-      "content_hash": "sha256:4139c5aeee30990ef3eec60024f25df9640122d44449671c5a379ea59637134a",
+      "content_hash": "sha256:972f931b040aad0c476d4a98e1d82a2298e04ccdae64138cdefb74dcf3aae967",
       "role": "layout"
     }
   },
@@ -1247,5 +1273,17 @@
     "extract__device__count": 33,
     "extract__net__count": 18,
     "extract__pin__count": 18
+  },
+  "timing": {
+    "stages": {
+      "read_layout": 0.001,
+      "device_extraction": 0.05,
+      "diagnostics": 0.0,
+      "netlist_write": 0.001,
+      "netlist_hash": 0.0,
+      "netlist_normalized_hash": 0.0
+    },
+    "total_seconds": 0.149,
+    "unattributed_seconds": 0.096
   }
 }

@@ -6,13 +6,13 @@
   "pdk": {
     "name": "sky130A",
     "variant": "sky130A",
-    "version": "open_pdks c6d73a35f524070e85faff4a6a9eef49553ebc2b"
+    "version": "open_pdks f6eeac7dad085ffcc829ccfd721f7b4ce39edcf7"
   },
   "dbu_um": 0.001,
   "bbox_um": {
     "x0": -5.0,
-    "y0": -0.97,
-    "x1": 9.81,
+    "y0": -1.2750000000000001,
+    "x1": 10.115,
     "y1": 6.085
   },
   "ports": [
@@ -68,16 +68,16 @@
       "generator": "bjt_array",
       "cell_name": "xq1_xqr",
       "source_path": "gen/array.gds",
-      "source_digest": "sha256:9fe7a56648bbc3ba3a90a6ca160cae7781e993aafc5afb048b68d4e22bb58ab6",
+      "source_digest": "sha256:c44da92e773404d2a9f1a2fe4a5527fe71eb81e08bfc4c6286fe96bfaeeb1cf5",
       "offset_um": {
         "x": 0.0,
         "y": 0.0
       },
       "bbox_um": {
-        "x0": -0.97,
-        "y0": -0.97,
-        "x1": 9.81,
-        "y1": 4.37
+        "x0": -1.2750000000000001,
+        "y0": -1.2750000000000001,
+        "x1": 10.115,
+        "y1": 4.675
       },
       "orientation": "none",
       "abuts": []
@@ -87,7 +87,7 @@
       "source": "cell",
       "generator": null,
       "cell_name": "promo_stub",
-      "source_path": "/home/ubuntu/GitHub/sky130-temp-por/.loom/worktrees/issue-81/layout/bias_core_xq1_xqr/promo_stub.gds",
+      "source_path": "promo_stub.gds",
       "source_digest": "sha256:902ff80454f309f31943b44b8a7f942a6d96817455a784cbefd7f85d019f84ab",
       "offset_um": {
         "x": -5.0,
@@ -125,7 +125,7 @@
         }
       ],
       "routed": true,
-      "route_length_um": 19.700000000000003,
+      "route_length_um": 19.880000000000003,
       "status": "routed",
       "landed_on_block": true,
       "legs": [
@@ -158,7 +158,7 @@
             }
           ],
           "routed": true,
-          "route_length_um": 0.9700000000000006,
+          "route_length_um": 1.1500000000000008,
           "reason": null,
           "channel_track": 0,
           "landed_on_block": true
@@ -219,12 +219,15 @@
   },
   "warnings": [],
   "provenance": {
-    "klt_version": "0.6.0+g0ce8c64842d9",
+    "klt_version": "0.7.1.dev1610+g758c6e224053",
     "klayout_version": "0.30.12",
     "pdk": {
       "name": "sky130A",
-      "source": "search root: ~/.volare",
-      "version": "open_pdks c6d73a35f524070e85faff4a6a9eef49553ebc2b"
+      "source": "search root: ~/.ciel",
+      "version": "open_pdks f6eeac7dad085ffcc829ccfd721f7b4ce39edcf7",
+      "ambiguous_sources": [
+        "search root: ~/.volare"
+      ]
     },
     "deck": null,
     "input": null

@@ -5,11 +5,11 @@
   "file": "layout/bias_core/bias_core.gds",
   "provenance": {
     "input": {
-      "content_hash": "sha256:9c414f9103f2174a7aebddce2a796c5a52fb9ffc1156158f97afbafe987ab68e",
+      "content_hash": "sha256:a044bcd3ce64e0f4a290c261de9962c25f003dc63f9bb2be98b9368601e6dae3",
       "role": "layout"
     },
     "spec": {
-      "content_hash": "sha256:cf55fc8987c8175816112bec4544df791dcf4f4e0f28c4a7e02f8a38d7ecda21",
+      "content_hash": "sha256:03b5918cb288b9988b6f47430d4454d9dc1b821d20301e03871e10f1cd01924f",
       "role": "cell-descriptor"
     },
     "erc_spec": {
@@ -82,7 +82,7 @@
       "net": "VDD",
       "block": "passives",
       "port": "vdd",
-      "x_um": 5526.860000000001,
+      "x_um": 5528.37,
       "y_um": -46.5,
       "port_layer": "70/20",
       "probe_source": "sibling_compose_response",
@@ -123,10 +123,10 @@
       "port_layer": "67/20",
       "probe_source": "sibling_compose_response",
       "declared_matches_source": true,
-      "island_cluster_id": 8,
+      "island_cluster_id": 7,
       "island_name": "VSS,vss",
       "all_matched_cluster_ids": [
-        8
+        7
       ],
       "all_matched_names": [
         "VSS,vss"
@@ -141,10 +141,10 @@
       "port_layer": "67/20",
       "probe_source": "sibling_compose_response",
       "declared_matches_source": true,
-      "island_cluster_id": 8,
+      "island_cluster_id": 7,
       "island_name": "VSS,vss",
       "all_matched_cluster_ids": [
-        8
+        7
       ],
       "all_matched_names": [
         "VSS,vss"
@@ -159,10 +159,10 @@
       "port_layer": "67/20",
       "probe_source": "sibling_compose_response",
       "declared_matches_source": true,
-      "island_cluster_id": 8,
+      "island_cluster_id": 7,
       "island_name": "VSS,vss",
       "all_matched_cluster_ids": [
-        8
+        7
       ],
       "all_matched_names": [
         "VSS,vss"
@@ -177,10 +177,10 @@
       "port_layer": "67/20",
       "probe_source": "assembly_declaration",
       "declared_matches_source": null,
-      "island_cluster_id": 8,
+      "island_cluster_id": 7,
       "island_name": "VSS,vss",
       "all_matched_cluster_ids": [
-        8
+        7
       ],
       "all_matched_names": [
         "VSS,vss"
@@ -226,7 +226,7 @@
       "net": "n2",
       "block": "passives",
       "port": "n2",
-      "x_um": 375.39,
+      "x_um": 376.25500000000005,
       "y_um": -49.0,
       "port_layer": "67/20",
       "probe_source": "sibling_compose_response",
@@ -267,10 +267,10 @@
       "port_layer": "67/20",
       "probe_source": "assembly_declaration_unpromoted_sibling_port",
       "declared_matches_source": null,
-      "island_cluster_id": 4,
+      "island_cluster_id": 5,
       "island_name": "nb",
       "all_matched_cluster_ids": [
-        4
+        5
       ],
       "all_matched_names": [
         "nb"
@@ -281,14 +281,14 @@
       "block": "mirror_amp",
       "port": "nb",
       "x_um": 83.42,
-      "y_um": 122.36,
+      "y_um": 122.21000000000001,
       "port_layer": "67/20",
       "probe_source": "sibling_compose_response",
       "declared_matches_source": true,
-      "island_cluster_id": 4,
+      "island_cluster_id": 5,
       "island_name": "nb",
       "all_matched_cluster_ids": [
-        4
+        5
       ],
       "all_matched_names": [
         "nb"
@@ -298,7 +298,7 @@
       "net": "ec",
       "block": "passives",
       "port": "ec",
-      "x_um": 371.96999999999997,
+      "x_um": 372.365,
       "y_um": -49.0,
       "port_layer": "67/20",
       "probe_source": "sibling_compose_response",
@@ -334,7 +334,7 @@
       "net": "VREF",
       "block": "passives",
       "port": "vref",
-      "x_um": 1419.23,
+      "x_um": 1420.535,
       "y_um": -49.0,
       "port_layer": "67/20",
       "probe_source": "sibling_compose_response",
@@ -370,15 +370,15 @@
       "net": "nokx",
       "block": "passives",
       "port": "nokx",
-      "x_um": 5530.360000000001,
+      "x_um": 5531.87,
       "y_um": -42.29,
       "port_layer": "71/20",
       "probe_source": "sibling_compose_response",
       "declared_matches_source": true,
-      "island_cluster_id": 7,
+      "island_cluster_id": 22,
       "island_name": "nokx",
       "all_matched_cluster_ids": [
-        7
+        22
       ],
       "all_matched_names": [
         "nokx"
@@ -393,10 +393,10 @@
       "port_layer": "67/20",
       "probe_source": "sibling_compose_response",
       "declared_matches_source": true,
-      "island_cluster_id": 7,
+      "island_cluster_id": 22,
       "island_name": "nokx",
       "all_matched_cluster_ids": [
-        7
+        22
       ],
       "all_matched_names": [
         "nokx"
@@ -442,7 +442,7 @@
       "net": "pg",
       "block": "passives",
       "port": "pg",
-      "x_um": 1405.52,
+      "x_um": 1406.5900000000001,
       "y_um": -28.29,
       "port_layer": "71/20",
       "probe_source": "sibling_compose_response",
@@ -460,15 +460,15 @@
       "net": "er",
       "block": "passives",
       "port": "er",
-      "x_um": 5523.65,
+      "x_um": 5524.924999999999,
       "y_um": -49.0,
       "port_layer": "67/20",
       "probe_source": "sibling_compose_response",
       "declared_matches_source": true,
-      "island_cluster_id": 3,
+      "island_cluster_id": 1,
       "island_name": "er",
       "all_matched_cluster_ids": [
-        3
+        1
       ],
       "all_matched_names": [
         "er"
@@ -483,10 +483,10 @@
       "port_layer": "67/20",
       "probe_source": "sibling_compose_response",
       "declared_matches_source": true,
-      "island_cluster_id": 3,
+      "island_cluster_id": 1,
       "island_name": "er",
       "all_matched_cluster_ids": [
-        3
+        1
       ],
       "all_matched_names": [
         "er"
@@ -496,15 +496,15 @@
       "net": "nbtop",
       "block": "passives",
       "port": "nbtop",
-      "x_um": 0.21000000000000002,
+      "x_um": 0.195,
       "y_um": -49.0,
       "port_layer": "67/20",
       "probe_source": "sibling_compose_response",
       "declared_matches_source": true,
-      "island_cluster_id": 1,
+      "island_cluster_id": 4,
       "island_name": "nbtop",
       "all_matched_cluster_ids": [
-        1
+        4
       ],
       "all_matched_names": [
         "nbtop"
@@ -519,10 +519,10 @@
       "port_layer": "67/20",
       "probe_source": "sibling_compose_response",
       "declared_matches_source": true,
-      "island_cluster_id": 1,
+      "island_cluster_id": 4,
       "island_name": "nbtop",
       "all_matched_cluster_ids": [
-        1
+        4
       ],
       "all_matched_names": [
         "nbtop"
@@ -533,14 +533,14 @@
       "block": "settle_flag",
       "port": "nbtop",
       "x_um": 5461.42,
-      "y_um": 114.36,
+      "y_um": 114.21,
       "port_layer": "67/20",
       "probe_source": "sibling_compose_response",
       "declared_matches_source": true,
-      "island_cluster_id": 1,
+      "island_cluster_id": 4,
       "island_name": "nbtop",
       "all_matched_cluster_ids": [
-        1
+        4
       ],
       "all_matched_names": [
         "nbtop"
@@ -555,10 +555,10 @@
       "port_layer": "67/20",
       "probe_source": "sibling_compose_response",
       "declared_matches_source": true,
-      "island_cluster_id": 22,
+      "island_cluster_id": 8,
       "island_name": "na",
       "all_matched_cluster_ids": [
-        22
+        8
       ],
       "all_matched_names": [
         "na"
@@ -573,10 +573,10 @@
       "port_layer": "67/20",
       "probe_source": "sibling_compose_response",
       "declared_matches_source": true,
-      "island_cluster_id": 22,
+      "island_cluster_id": 8,
       "island_name": "na",
       "all_matched_cluster_ids": [
-        22
+        8
       ],
       "all_matched_names": [
         "na"
@@ -587,14 +587,14 @@
       "block": "settle_flag",
       "port": "na",
       "x_um": 5470.58,
-      "y_um": 114.36,
+      "y_um": 114.21,
       "port_layer": "67/20",
       "probe_source": "sibling_compose_response",
       "declared_matches_source": true,
-      "island_cluster_id": 22,
+      "island_cluster_id": 8,
       "island_name": "na",
       "all_matched_cluster_ids": [
-        22
+        8
       ],
       "all_matched_names": [
         "na"
@@ -605,7 +605,7 @@
       "block": "startup",
       "port": "pb",
       "x_um": 1325.42,
-      "y_um": 105.11,
+      "y_um": 105.26,
       "port_layer": "67/20",
       "probe_source": "sibling_compose_response",
       "declared_matches_source": true,
@@ -681,10 +681,10 @@
       "port_layer": "67/20",
       "probe_source": "assembly_declaration",
       "declared_matches_source": null,
-      "island_cluster_id": 8,
+      "island_cluster_id": 7,
       "island_name": "VSS,vss",
       "all_matched_cluster_ids": [
-        8
+        7
       ],
       "all_matched_names": [
         "VSS,vss"
@@ -780,7 +780,7 @@
       "net": "VSS",
       "probe_count": 5,
       "island_cluster_ids": [
-        8
+        7
       ],
       "island_names": [
         "VSS,vss"
@@ -804,7 +804,7 @@
       "net": "er",
       "probe_count": 2,
       "island_cluster_ids": [
-        3
+        1
       ],
       "island_names": [
         "er"
@@ -828,7 +828,7 @@
       "net": "na",
       "probe_count": 3,
       "island_cluster_ids": [
-        22
+        8
       ],
       "island_names": [
         "na"
@@ -840,7 +840,7 @@
       "net": "nb",
       "probe_count": 2,
       "island_cluster_ids": [
-        4
+        5
       ],
       "island_names": [
         "nb"
@@ -852,7 +852,7 @@
       "net": "nbtop",
       "probe_count": 3,
       "island_cluster_ids": [
-        1
+        4
       ],
       "island_names": [
         "nbtop"
@@ -876,7 +876,7 @@
       "net": "nokx",
       "probe_count": 2,
       "island_cluster_ids": [
-        7
+        22
       ],
       "island_names": [
         "nokx"

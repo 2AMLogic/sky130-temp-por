@@ -5,7 +5,8 @@
   "top": "por_comparator",
   "dbu_um": 0.001,
   "netlist_path": "por_comparator.spice",
-  "netlist_sha256": "7f5c91061848f5d2f08de917d7db1f0379117f411597bc85a93590f557898cab",
+  "netlist_sha256": "e8ffbd454cc910635f9a5490b5b77f2bea49f6210d5133a7e0a06f9d399168ed",
+  "netlist_normalized_sha256": "89c93964e1be1ec9f1b87b9fbdb8f17b46728b33be01c4c193666ba530c50023",
   "status": "extracted",
   "device_count": 21,
   "net_count": 15,
@@ -16,7 +17,18 @@
     "res_xhigh_po": 3
   },
   "dummy_devices_dropped": 4,
-  "ignored_layers": [],
+  "ignored_layers": [
+    {
+      "layer": 93,
+      "datatype": 44,
+      "shapes": 16
+    },
+    {
+      "layer": 95,
+      "datatype": 20,
+      "shapes": 25
+    }
+  ],
   "device_recognition_only_layers": [
     {
       "layer": 66,
@@ -31,7 +43,7 @@
     {
       "layer": 94,
       "datatype": 20,
-      "shapes": 3
+      "shapes": 14
     }
   ],
   "device_classes": [
@@ -631,7 +643,7 @@
       "name": "BIAS_OK",
       "pin": true,
       "device_count": 3,
-      "net_id": 10,
+      "net_id": 11,
       "pin_index": 0,
       "label_positions_um": [
         {
@@ -664,7 +676,7 @@
       "name": "CMPO",
       "pin": true,
       "device_count": 5,
-      "net_id": 8,
+      "net_id": 9,
       "pin_index": 2,
       "label_positions_um": [
         {
@@ -711,7 +723,7 @@
       "name": "NA",
       "pin": true,
       "device_count": 4,
-      "net_id": 7,
+      "net_id": 8,
       "pin_index": 5,
       "label_positions_um": [
         {
@@ -725,12 +737,12 @@
       "name": "NBG",
       "pin": true,
       "device_count": 4,
-      "net_id": 11,
+      "net_id": 6,
       "pin_index": 6,
       "label_positions_um": [
         {
           "text": "NBG",
-          "x_um": 11.47,
+          "x_um": 11.395,
           "y_um": 6.5
         }
       ]
@@ -739,7 +751,7 @@
       "name": "POR_RAW",
       "pin": true,
       "device_count": 2,
-      "net_id": 9,
+      "net_id": 10,
       "pin_index": 7,
       "label_positions_um": [
         {
@@ -763,7 +775,7 @@
       "label_positions_um": [
         {
           "text": "SNS",
-          "x_um": 73.37,
+          "x_um": 73.438,
           "y_um": 15.0
         }
       ]
@@ -778,7 +790,7 @@
         {
           "text": "SNSB",
           "x_um": 6870.41,
-          "y_um": 8.3
+          "y_um": 8.33
         }
       ]
     },
@@ -786,7 +798,7 @@
       "name": "TN",
       "pin": true,
       "device_count": 3,
-      "net_id": 6,
+      "net_id": 7,
       "pin_index": 10,
       "label_positions_um": [
         {
@@ -800,7 +812,7 @@
       "name": "VDD",
       "pin": true,
       "device_count": 11,
-      "net_id": 20,
+      "net_id": 21,
       "pin_index": 11,
       "label_positions_um": [
         {
@@ -819,7 +831,7 @@
       "name": "VDDA",
       "pin": true,
       "device_count": 3,
-      "net_id": 21,
+      "net_id": 20,
       "pin_index": 12,
       "label_positions_um": [
         {
@@ -839,7 +851,7 @@
         {
           "text": "VREF",
           "x_um": 55.16,
-          "y_um": 19.305
+          "y_um": 19.38
         },
         {
           "text": "VREF",
@@ -869,7 +881,8 @@
     }
   ],
   "warnings": [
-    "12 routing-stack clusters (12 shapes on 67/20) join no extracted net -- no via lands on this geometry and no same-layer wiring touches it, so it is invisible to the extracted netlist and to every downstream `klt lvs`/`klt sim` view; deliberate dead metal (artwork, fill) is expected here, unexplained dead metal usually means the connection you intended is missing -- see dead_metal[] for the per-cluster layer/bbox/shape count."
+    "12 routing-stack clusters (12 shapes on 67/20) join no extracted net -- no via lands on this geometry and no same-layer wiring touches it, so it is invisible to the extracted netlist and to every downstream `klt lvs`/`klt sim` view; deliberate dead metal (artwork, fill) is expected here, unexplained dead metal usually means the connection you intended is missing -- see dead_metal[] for the per-cluster layer/bbox/shape count.",
+    "2 layers (93/44, 95/20) carrying 41 shapes are outside 'sky130' deck's connectivity graph -- this geometry is invisible to extraction, so a net routed only through it extracts as multiple disconnected nets instead of one, which will silently mismatch a downstream `klt lvs` reference netlist -- see ignored_layers[] for the full per-layer shape counts. See docs/cli/extract.md's 'ignored_layers' field documentation."
   ],
   "black_box_regions": [],
   "abstracted_cells": [],
@@ -877,6 +890,7 @@
   "merged_net_labels": [],
   "voltage_domain_warnings": [],
   "missing_flavour_markers": [],
+  "unsupported_devices": [],
   "unbiased_pmos_body_nets": [],
   "single_terminal_nets": [],
   "dead_metal": [
@@ -899,9 +913,9 @@
       "datatype": 20,
       "bbox_um": {
         "left": 44.47,
-        "bottom": 19.79,
+        "bottom": 19.64,
         "right": 44.89,
-        "top": 20.21
+        "top": 20.06
       },
       "shapes": 1,
       "area_um2": 0.1764
@@ -938,9 +952,9 @@
       "datatype": 20,
       "bbox_um": {
         "left": 50.47,
-        "bottom": 2.4,
+        "bottom": 2.55,
         "right": 50.89,
-        "top": 2.82
+        "top": 2.97
       },
       "shapes": 1,
       "area_um2": 0.1764
@@ -977,9 +991,9 @@
       "datatype": 20,
       "bbox_um": {
         "left": 51.19,
-        "bottom": 19.79,
+        "bottom": 19.64,
         "right": 51.61,
-        "top": 20.21
+        "top": 20.06
       },
       "shapes": 1,
       "area_um2": 0.1764
@@ -1016,9 +1030,9 @@
       "datatype": 20,
       "bbox_um": {
         "left": 57.19,
-        "bottom": 2.4,
+        "bottom": 2.55,
         "right": 57.61,
-        "top": 2.82
+        "top": 2.97
       },
       "shapes": 1,
       "area_um2": 0.1764
@@ -1039,19 +1053,24 @@
   ],
   "matched_device_groups": [],
   "def_pin_promotion": null,
+  "pin_renames": null,
+  "rename_declared_pins": false,
+  "declared_pins": null,
+  "def_pins": null,
   "label_layers": null,
+  "probes": [],
   "pdk": null,
   "provenance": {
-    "klt_version": "0.6.0+g0ce8c64842d9",
+    "klt_version": "0.7.1.dev1610+g758c6e224053",
     "klayout_version": "0.30.12",
     "pdk": null,
     "deck": {
       "name": "sky130",
-      "content_hash": "sha256:f8f2c3f48eada473dc34a7a8926c0b04fef446fb351a70a636ce43a9ca9c70ba",
+      "content_hash": "sha256:773f73886500d88310f3c3ebe671aad84de425473e9eb6b7ae5a22902416e973",
       "released": false
     },
     "input": {
-      "content_hash": "sha256:7037dc72300fc1f679eb9ba33d8b65165ecf9af92dea913dbb5a2832a6284726",
+      "content_hash": "sha256:696e3ad4f09e8f06479ab030f52a32663e917ddaa5258b3ca2d9702704cd0581",
       "role": "layout"
     }
   },
@@ -1062,5 +1081,17 @@
     "extract__device__count": 21,
     "extract__net__count": 15,
     "extract__pin__count": 15
+  },
+  "timing": {
+    "stages": {
+      "read_layout": 0.001,
+      "device_extraction": 0.04,
+      "diagnostics": 0.0,
+      "netlist_write": 0.001,
+      "netlist_hash": 0.0,
+      "netlist_normalized_hash": 0.001
+    },
+    "total_seconds": 0.162,
+    "unattributed_seconds": 0.119
   }
 }

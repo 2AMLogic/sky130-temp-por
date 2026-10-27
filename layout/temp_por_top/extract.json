@@ -6,7 +6,7 @@
   "dbu_um": 0.001,
   "netlist_path": "temp_por_top.spice",
   "netlist_sha256": "36c13e22d38fdba691c9342bb80bfff189c559be266fcdbfd84f0b81941ce714",
-  "netlist_normalized_sha256": "e0fd61243599fe681e64a87fb17d64fcf259eb3e6678c0368c5f1d2872bbea3f",
+  "netlist_normalized_sha256": "bdd1028a925aef734700b0969700d28fa704a80737c5cfe61c97d993cbba2b4c",
   "status": "extracted",
   "device_count": 152,
   "net_count": 71,
@@ -19,7 +19,18 @@
     "sky130_fd_pr__model__cap_mim": 8
   },
   "dummy_devices_dropped": 4,
-  "ignored_layers": [],
+  "ignored_layers": [
+    {
+      "layer": 93,
+      "datatype": 44,
+      "shapes": 130
+    },
+    {
+      "layer": 95,
+      "datatype": 20,
+      "shapes": 129
+    }
+  ],
   "device_recognition_only_layers": [
     {
       "layer": 66,
@@ -44,7 +55,7 @@
     {
       "layer": 94,
       "datatype": 20,
-      "shapes": 12
+      "shapes": 113
     }
   ],
   "device_classes": [
@@ -4946,7 +4957,7 @@
       "name": "BIAS_OKB",
       "pin": false,
       "device_count": 6,
-      "net_id": 38,
+      "net_id": 39,
       "pin_index": null,
       "label_positions_um": [
         {
@@ -4999,7 +5010,7 @@
       "name": "CMPO",
       "pin": false,
       "device_count": 5,
-      "net_id": 35,
+      "net_id": 36,
       "pin_index": null,
       "label_positions_um": [
         {
@@ -5013,7 +5024,7 @@
       "name": "CTAT",
       "pin": true,
       "device_count": 2,
-      "net_id": 76,
+      "net_id": 74,
       "pin_index": 1,
       "label_positions_um": [
         {
@@ -5037,7 +5048,7 @@
       "name": "ENB",
       "pin": false,
       "device_count": 8,
-      "net_id": 69,
+      "net_id": 67,
       "pin_index": null,
       "label_positions_um": [
         {
@@ -5051,7 +5062,7 @@
       "name": "EN|RESETn",
       "pin": true,
       "device_count": 8,
-      "net_id": 59,
+      "net_id": 53,
       "pin_index": 2,
       "label_positions_um": [
         {
@@ -5062,7 +5073,7 @@
         {
           "text": "EN",
           "x_um": 0.67,
-          "y_um": 712.665
+          "y_um": 712.74
         },
         {
           "text": "RESETn",
@@ -5071,7 +5082,7 @@
         },
         {
           "text": "RESETn",
-          "x_um": 129.85,
+          "x_um": 129.925,
           "y_um": 563.0
         },
         {
@@ -5110,7 +5121,7 @@
         },
         {
           "text": "IBIAS",
-          "x_um": 14.93,
+          "x_um": 14.855,
           "y_um": 533.0
         },
         {
@@ -5181,7 +5192,7 @@
       "name": "N1",
       "pin": false,
       "device_count": 5,
-      "net_id": 42,
+      "net_id": 28,
       "pin_index": null,
       "label_positions_um": [
         {
@@ -5195,13 +5206,13 @@
       "name": "N1",
       "pin": false,
       "device_count": 4,
-      "net_id": 68,
+      "net_id": 76,
       "pin_index": null,
       "label_positions_um": [
         {
           "text": "N1",
           "x_um": 51.86,
-          "y_um": 709.665
+          "y_um": 709.74
         }
       ]
     },
@@ -5223,7 +5234,7 @@
       "name": "NA",
       "pin": false,
       "device_count": 4,
-      "net_id": 30,
+      "net_id": 31,
       "pin_index": null,
       "label_positions_um": [
         {
@@ -5243,7 +5254,7 @@
         {
           "text": "NA",
           "x_um": 76.5,
-          "y_um": 722.17
+          "y_um": 722.095
         },
         {
           "text": "na",
@@ -5262,7 +5273,7 @@
         {
           "text": "NB",
           "x_um": 85.13,
-          "y_um": 722.92
+          "y_um": 722.845
         }
       ]
     },
@@ -5270,12 +5281,12 @@
       "name": "NBG",
       "pin": false,
       "device_count": 4,
-      "net_id": 32,
+      "net_id": 33,
       "pin_index": null,
       "label_positions_um": [
         {
           "text": "NBG",
-          "x_um": 11.47,
+          "x_um": 11.395,
           "y_um": 306.5
         }
       ]
@@ -5284,7 +5295,7 @@
       "name": "NBG",
       "pin": false,
       "device_count": 5,
-      "net_id": 70,
+      "net_id": 68,
       "pin_index": null,
       "label_positions_um": [
         {
@@ -5304,7 +5315,7 @@
         {
           "text": "NC",
           "x_um": 266.58,
-          "y_um": 704.135
+          "y_um": 704.112
         },
         {
           "text": "ec",
@@ -5322,7 +5333,7 @@
       "name": "ND",
       "pin": false,
       "device_count": 4,
-      "net_id": 72,
+      "net_id": 70,
       "pin_index": null,
       "label_positions_um": [
         {
@@ -5336,7 +5347,7 @@
       "name": "ND1",
       "pin": false,
       "device_count": 4,
-      "net_id": 55,
+      "net_id": 57,
       "pin_index": null,
       "label_positions_um": [
         {
@@ -5350,12 +5361,12 @@
       "name": "NDG",
       "pin": false,
       "device_count": 5,
-      "net_id": 52,
+      "net_id": 54,
       "pin_index": null,
       "label_positions_um": [
         {
           "text": "NDG",
-          "x_um": 77.945,
+          "x_um": 77.87,
           "y_um": 557.0
         }
       ]
@@ -5392,12 +5403,12 @@
       "name": "NDL",
       "pin": false,
       "device_count": 5,
-      "net_id": 58,
+      "net_id": 51,
       "pin_index": null,
       "label_positions_um": [
         {
           "text": "NDL",
-          "x_um": 68.66,
+          "x_um": 68.585,
           "y_um": 542.6
         }
       ]
@@ -5406,7 +5417,7 @@
       "name": "NNAND",
       "pin": false,
       "device_count": 2,
-      "net_id": 56,
+      "net_id": 58,
       "pin_index": null,
       "label_positions_um": [
         {
@@ -5420,13 +5431,13 @@
       "name": "NR",
       "pin": false,
       "device_count": 4,
-      "net_id": 67,
+      "net_id": 75,
       "pin_index": null,
       "label_positions_um": [
         {
           "text": "NR",
           "x_um": 27.16,
-          "y_um": 710.915
+          "y_um": 710.99
         }
       ]
     },
@@ -5434,7 +5445,7 @@
       "name": "NT",
       "pin": false,
       "device_count": 6,
-      "net_id": 74,
+      "net_id": 72,
       "pin_index": null,
       "label_positions_um": [
         {
@@ -5468,7 +5479,7 @@
         {
           "text": "NZ",
           "x_um": 1144.11,
-          "y_um": 699.0
+          "y_um": 698.978
         }
       ]
     },
@@ -5490,7 +5501,7 @@
       "name": "PCAS",
       "pin": false,
       "device_count": 6,
-      "net_id": 71,
+      "net_id": 69,
       "pin_index": null,
       "label_positions_um": [
         {
@@ -5509,7 +5520,7 @@
       "label_positions_um": [
         {
           "text": "PDN",
-          "x_um": 63.705,
+          "x_um": 63.63,
           "y_um": 554.6
         }
       ]
@@ -5518,7 +5529,7 @@
       "name": "PG",
       "pin": false,
       "device_count": 9,
-      "net_id": 73,
+      "net_id": 71,
       "pin_index": null,
       "label_positions_um": [
         {
@@ -5532,12 +5543,12 @@
       "name": "PGDG",
       "pin": false,
       "device_count": 6,
-      "net_id": 53,
+      "net_id": 55,
       "pin_index": null,
       "label_positions_um": [
         {
           "text": "PGDG",
-          "x_um": 108.835,
+          "x_um": 108.76,
           "y_um": 543.8
         }
       ]
@@ -5546,12 +5557,12 @@
       "name": "PGDGB",
       "pin": false,
       "device_count": 4,
-      "net_id": 54,
+      "net_id": 56,
       "pin_index": null,
       "label_positions_um": [
         {
           "text": "PGDGB",
-          "x_um": 95.205,
+          "x_um": 95.13,
           "y_um": 559.4
         }
       ]
@@ -5560,7 +5571,7 @@
       "name": "POR_RAW",
       "pin": true,
       "device_count": 4,
-      "net_id": 31,
+      "net_id": 32,
       "pin_index": 6,
       "label_positions_um": [
         {
@@ -5594,7 +5605,7 @@
       "name": "PTAT",
       "pin": true,
       "device_count": 3,
-      "net_id": 75,
+      "net_id": 73,
       "pin_index": 7,
       "label_positions_um": [
         {
@@ -5632,12 +5643,12 @@
       "name": "RSTB",
       "pin": false,
       "device_count": 6,
-      "net_id": 57,
+      "net_id": 59,
       "pin_index": null,
       "label_positions_um": [
         {
           "text": "RSTB",
-          "x_um": 154.67,
+          "x_um": 154.595,
           "y_um": 555.8
         }
       ]
@@ -5646,12 +5657,12 @@
       "name": "SNS",
       "pin": false,
       "device_count": 3,
-      "net_id": 40,
+      "net_id": 41,
       "pin_index": null,
       "label_positions_um": [
         {
           "text": "SNS",
-          "x_um": 73.37,
+          "x_um": 73.438,
           "y_um": 315.0
         }
       ]
@@ -5660,13 +5671,13 @@
       "name": "SNSB",
       "pin": false,
       "device_count": 3,
-      "net_id": 28,
+      "net_id": 29,
       "pin_index": null,
       "label_positions_um": [
         {
           "text": "SNSB",
           "x_um": 6870.41,
-          "y_um": 308.3
+          "y_um": 308.33
         }
       ]
     },
@@ -5679,7 +5690,7 @@
       "label_positions_um": [
         {
           "text": "TIM",
-          "x_um": 103.835,
+          "x_um": 103.76,
           "y_um": 558.2
         }
       ]
@@ -5688,7 +5699,7 @@
       "name": "TN",
       "pin": false,
       "device_count": 3,
-      "net_id": 29,
+      "net_id": 30,
       "pin_index": null,
       "label_positions_um": [
         {
@@ -5702,12 +5713,12 @@
       "name": "TRIP",
       "pin": false,
       "device_count": 4,
-      "net_id": 51,
+      "net_id": 52,
       "pin_index": null,
       "label_positions_um": [
         {
           "text": "TRIP",
-          "x_um": 135.315,
+          "x_um": 135.24,
           "y_um": 539.0
         }
       ]
@@ -5795,7 +5806,7 @@
         },
         {
           "text": "vdd",
-          "x_um": 1401.17,
+          "x_um": 1401.095,
           "y_um": 104.0
         },
         {
@@ -5810,7 +5821,7 @@
         },
         {
           "text": "vdd",
-          "x_um": 5526.86,
+          "x_um": 5528.37,
           "y_um": -46.5
         }
       ]
@@ -5825,7 +5836,7 @@
         {
           "text": "VREF",
           "x_um": 55.16,
-          "y_um": 319.305
+          "y_um": 319.38
         },
         {
           "text": "VREF",
@@ -5839,7 +5850,7 @@
         },
         {
           "text": "VREF",
-          "x_um": 808.215,
+          "x_um": 807.562,
           "y_um": 126.0
         },
         {
@@ -5849,7 +5860,7 @@
         },
         {
           "text": "vref",
-          "x_um": 1419.23,
+          "x_um": 1420.535,
           "y_um": -49.0
         }
       ]
@@ -5929,7 +5940,7 @@
         {
           "text": "vss",
           "x_um": 217.87,
-          "y_um": 104.065
+          "y_um": 103.225
         },
         {
           "text": "vss",
@@ -5939,7 +5950,7 @@
         {
           "text": "vss",
           "x_um": 294.25,
-          "y_um": 700.035
+          "y_um": 699.195
         },
         {
           "text": "vss",
@@ -5948,7 +5959,7 @@
         },
         {
           "text": "vss",
-          "x_um": 310.875,
+          "x_um": 310.965,
           "y_um": 699.7
         },
         {
@@ -5992,12 +6003,12 @@
         },
         {
           "text": "ec",
-          "x_um": 371.97,
+          "x_um": 372.365,
           "y_um": -49.0
         },
         {
           "text": "ec",
-          "x_um": 374.015,
+          "x_um": 374.212,
           "y_um": 110.0
         }
       ]
@@ -6016,12 +6027,12 @@
         },
         {
           "text": "er",
-          "x_um": 2754.335,
+          "x_um": 2754.972,
           "y_um": -54.0
         },
         {
           "text": "er",
-          "x_um": 5523.65,
+          "x_um": 5524.925,
           "y_um": -49.0
         }
       ]
@@ -6086,7 +6097,7 @@
       "name": "n1",
       "pin": false,
       "device_count": 4,
-      "net_id": 19,
+      "net_id": 18,
       "pin_index": null,
       "label_positions_um": [
         {
@@ -6100,7 +6111,7 @@
       "name": "n2",
       "pin": false,
       "device_count": 4,
-      "net_id": 2,
+      "net_id": 4,
       "pin_index": null,
       "label_positions_um": [
         {
@@ -6115,12 +6126,12 @@
         },
         {
           "text": "n2",
-          "x_um": 123.752,
+          "x_um": 124.185,
           "y_um": -30.0
         },
         {
           "text": "n2",
-          "x_um": 375.39,
+          "x_um": 376.255,
           "y_um": -49.0
         }
       ]
@@ -6139,7 +6150,7 @@
         },
         {
           "text": "na",
-          "x_um": 50.83,
+          "x_um": 50.905,
           "y_um": 166.0
         },
         {
@@ -6155,7 +6166,7 @@
         {
           "text": "na",
           "x_um": 5470.58,
-          "y_um": 114.36
+          "y_um": 114.21
         }
       ]
     },
@@ -6163,23 +6174,23 @@
       "name": "nb",
       "pin": false,
       "device_count": 3,
-      "net_id": 4,
+      "net_id": 3,
       "pin_index": null,
       "label_positions_um": [
         {
           "text": "nb",
           "x_um": -10.0,
-          "y_um": 68.47
+          "y_um": 68.545
         },
         {
           "text": "nb",
-          "x_um": 19.84,
+          "x_um": 20.03,
           "y_um": -49.0
         },
         {
           "text": "nb",
           "x_um": 83.42,
-          "y_um": 122.36
+          "y_um": 122.21
         }
       ]
     },
@@ -6193,7 +6204,7 @@
         {
           "text": "nbg",
           "x_um": 32.9,
-          "y_um": 113.665
+          "y_um": 113.74
         }
       ]
     },
@@ -6201,17 +6212,17 @@
       "name": "nbtop",
       "pin": false,
       "device_count": 3,
-      "net_id": 3,
+      "net_id": 2,
       "pin_index": null,
       "label_positions_um": [
         {
           "text": "nbtop",
           "x_um": -12.0,
-          "y_um": 41.195
+          "y_um": 41.202
         },
         {
           "text": "nbtop",
-          "x_um": 0.21,
+          "x_um": 0.195,
           "y_um": -49.0
         },
         {
@@ -6222,7 +6233,7 @@
         {
           "text": "nbtop",
           "x_um": 5461.42,
-          "y_um": 114.36
+          "y_um": 114.21
         }
       ]
     },
@@ -6255,7 +6266,7 @@
         },
         {
           "text": "nkg",
-          "x_um": 5462.862,
+          "x_um": 5462.788,
           "y_um": 107.0
         }
       ]
@@ -6278,13 +6289,13 @@
       "name": "nokl",
       "pin": false,
       "device_count": 4,
-      "net_id": 18,
+      "net_id": 8,
       "pin_index": null,
       "label_positions_um": [
         {
           "text": "nokl",
           "x_um": 5464.5,
-          "y_um": 109.515
+          "y_um": 109.59
         }
       ]
     },
@@ -6306,7 +6317,7 @@
       "name": "nokx",
       "pin": false,
       "device_count": 5,
-      "net_id": 7,
+      "net_id": 19,
       "pin_index": null,
       "label_positions_um": [
         {
@@ -6321,13 +6332,13 @@
         },
         {
           "text": "nokx",
-          "x_um": 5530.0,
-          "y_um": 75.117
+          "x_um": 5531.87,
+          "y_um": -42.29
         },
         {
           "text": "nokx",
-          "x_um": 5530.36,
-          "y_um": -42.29
+          "x_um": 5531.87,
+          "y_um": 75.832
         }
       ]
     },
@@ -6354,8 +6365,8 @@
       "label_positions_um": [
         {
           "text": "nz",
-          "x_um": 1393.415,
-          "y_um": -44.25
+          "x_um": 1394.365,
+          "y_um": -44.247
         }
       ]
     },
@@ -6374,17 +6385,17 @@
         {
           "text": "pb",
           "x_um": 36.9,
-          "y_um": 111.805
+          "y_um": 111.73
         },
         {
           "text": "pb",
-          "x_um": 667.112,
+          "x_um": 667.037,
           "y_um": 118.0
         },
         {
           "text": "pb",
           "x_um": 1325.42,
-          "y_um": 105.11
+          "y_um": 105.26
         },
         {
           "text": "pb",
@@ -6427,7 +6438,7 @@
         },
         {
           "text": "pg",
-          "x_um": 1405.52,
+          "x_um": 1406.59,
           "y_um": -28.29
         }
       ]
@@ -6458,7 +6469,8 @@
     "net 'VDD|vdd' merges 2 distinct labels (VDD, vdd) onto one net -- KLayout joins multiple labels found on the same electrical net (as '|' here and in the written netlist, matching NetlistSpiceWriter's own node-name escaping); this usually means two differently-named nets were shorted together in the layout -- see docs/cli/extract.md's 'Merged net labels' section.",
     "net 'VREF|vref' merges 2 distinct labels (VREF, vref) onto one net -- KLayout joins multiple labels found on the same electrical net (as '|' here and in the written netlist, matching NetlistSpiceWriter's own node-name escaping); this usually means two differently-named nets were shorted together in the layout -- see docs/cli/extract.md's 'Merged net labels' section.",
     "net 'VSS|vss' merges 2 distinct labels (VSS, vss) onto one net -- KLayout joins multiple labels found on the same electrical net (as '|' here and in the written netlist, matching NetlistSpiceWriter's own node-name escaping); this usually means two differently-named nets were shorted together in the layout -- see docs/cli/extract.md's 'Merged net labels' section.",
-    "8 drawn capacitors ('sky130_fd_pr__model__cap_mim') written as a fixed-value 'C' card (the deck's nominal area+perimeter value) -- PDK process corners (e.g. mimcap_ff/mimcap_ss) do not apply to it, so schematic-vs-extracted deltas at non-typical corners include a capacitor-corner term; pass --pdk to bind the PDK capacitor subcircuit instead. See docs/cli/extract.md's 'SPICE model binding' section."
+    "8 drawn capacitors ('sky130_fd_pr__model__cap_mim') written as a fixed-value 'C' card (the deck's nominal area+perimeter value) -- PDK process corners (e.g. mimcap_ff/mimcap_ss) do not apply to it, so schematic-vs-extracted deltas at non-typical corners include a capacitor-corner term; pass --pdk to bind the PDK capacitor subcircuit instead. See docs/cli/extract.md's 'SPICE model binding' section.",
+    "2 layers (93/44, 95/20) carrying 259 shapes are outside 'sky130' deck's connectivity graph -- this geometry is invisible to extraction, so a net routed only through it extracts as multiple disconnected nets instead of one, which will silently mismatch a downstream `klt lvs` reference netlist -- see ignored_layers[] for the full per-layer shape counts. See docs/cli/extract.md's 'ignored_layers' field documentation."
   ],
   "black_box_regions": [],
   "abstracted_cells": [],
@@ -6546,9 +6558,9 @@
       "datatype": 20,
       "bbox_um": {
         "left": 44.47,
-        "bottom": 319.79,
+        "bottom": 319.64,
         "right": 44.89,
-        "top": 320.21
+        "top": 320.06
       },
       "shapes": 1,
       "area_um2": 0.1764
@@ -6585,9 +6597,9 @@
       "datatype": 20,
       "bbox_um": {
         "left": 50.47,
-        "bottom": 302.4,
+        "bottom": 302.55,
         "right": 50.89,
-        "top": 302.82
+        "top": 302.97
       },
       "shapes": 1,
       "area_um2": 0.1764
@@ -6624,9 +6636,9 @@
       "datatype": 20,
       "bbox_um": {
         "left": 51.19,
-        "bottom": 319.79,
+        "bottom": 319.64,
         "right": 51.61,
-        "top": 320.21
+        "top": 320.06
       },
       "shapes": 1,
       "area_um2": 0.1764
@@ -6663,9 +6675,9 @@
       "datatype": 20,
       "bbox_um": {
         "left": 57.19,
-        "bottom": 302.4,
+        "bottom": 302.55,
         "right": 57.61,
-        "top": 302.82
+        "top": 302.97
       },
       "shapes": 1,
       "area_um2": 0.1764
@@ -6703,7 +6715,7 @@
       "released": false
     },
     "input": {
-      "content_hash": "sha256:87c49a903e50f9d93968eb68360123a60a6c064478f3b9309670e0c22ca65352",
+      "content_hash": "sha256:1af73f5f94333939d5a16268144a396055e88ae9ed1f78f9644676332ca40539",
       "role": "layout"
     }
   },
@@ -6798,14 +6810,14 @@
   },
   "timing": {
     "stages": {
-      "read_layout": 0.003,
-      "device_extraction": 0.175,
+      "read_layout": 0.005,
+      "device_extraction": 0.185,
       "diagnostics": 0.0,
       "netlist_write": 0.002,
       "netlist_hash": 0.0,
       "netlist_normalized_hash": 0.002
     },
-    "total_seconds": 0.324,
-    "unattributed_seconds": 0.141
+    "total_seconds": 0.338,
+    "unattributed_seconds": 0.142
   }
 }

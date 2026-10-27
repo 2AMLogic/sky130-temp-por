@@ -6,13 +6,13 @@
   "pdk": {
     "name": "sky130A",
     "variant": "sky130A",
-    "version": "open_pdks c6d73a35f524070e85faff4a6a9eef49553ebc2b"
+    "version": "open_pdks f6eeac7dad085ffcc829ccfd721f7b4ce39edcf7"
   },
   "dbu_um": 0.001,
   "bbox_um": {
     "x0": -10.0,
-    "y0": -15.82,
-    "x1": 7998.28,
+    "y0": -15.97,
+    "x1": 7998.47,
     "y1": 37.5
   },
   "ports": [
@@ -108,16 +108,16 @@
       "generator": "mos_array",
       "cell_name": "menn",
       "source_path": "gen/menn.gds",
-      "source_digest": "sha256:6fe1d931f0cf19b050c5bf34bf7eac054dc63e11f041aba0eeee989ebe95ee4a",
+      "source_digest": "sha256:6b3021e9b745ef5e25a765b1d4d95e97a544dc115db340b8d9f6b6a8e8e0b6ea",
       "offset_um": {
         "x": 0.0,
         "y": 0.0
       },
       "bbox_um": {
-        "x0": 0.0,
-        "y0": 0.0,
-        "x1": 1.34,
-        "y1": 1.82
+        "x0": -0.125,
+        "y0": -0.15,
+        "x1": 1.465,
+        "y1": 1.97
       },
       "orientation": "none",
       "abuts": []
@@ -128,16 +128,16 @@
       "generator": "mos_array",
       "cell_name": "mdnb",
       "source_path": "gen/mdnb.gds",
-      "source_digest": "sha256:a940667b34b22abd9493bd1b6fa2d276a953a2df925af79ebd5cb8e3412aaf45",
+      "source_digest": "sha256:009f3de4d3757047db57cc5cbc1fef1e5cf7d35de30a707a32c2d615e4233289",
       "offset_um": {
         "x": 8.0,
         "y": 0.0
       },
       "bbox_um": {
-        "x0": 8.0,
-        "y0": 0.0,
-        "x1": 9.34,
-        "y1": 2.82
+        "x0": 7.875,
+        "y0": -0.15,
+        "x1": 9.465,
+        "y1": 2.97
       },
       "orientation": "none",
       "abuts": []
@@ -148,16 +148,16 @@
       "generator": "mos_array",
       "cell_name": "mbd",
       "source_path": "gen/mbd.gds",
-      "source_digest": "sha256:ddb897d9f881e86f10d9d2e0583ca33d438dfebd3a387b0405859ef954f5c11d",
+      "source_digest": "sha256:b88c167d00df39e7aaffc49113c1acd66697b6d93e65158ac2a83d8a6a0fbbae",
       "offset_um": {
         "x": 14.0,
         "y": 0.0
       },
       "bbox_um": {
-        "x0": 14.0,
-        "y0": 0.0,
-        "x1": 16.84,
-        "y1": 2.82
+        "x0": 13.875,
+        "y0": -0.15,
+        "x1": 16.965,
+        "y1": 2.97
       },
       "orientation": "none",
       "abuts": []
@@ -168,16 +168,16 @@
       "generator": "mos_array",
       "cell_name": "mpass",
       "source_path": "gen/mpass.gds",
-      "source_digest": "sha256:1c3d2ea72f5211caa1288ebfbb0f64448b9c41c2ade606683a01cd84a88b0627",
+      "source_digest": "sha256:c09b83edb5b39359f3c82dea3916206b0deabfcda098ac29119cbe1f5290d7f2",
       "offset_um": {
         "x": 22.0,
         "y": 0.0
       },
       "bbox_um": {
-        "x0": 22.0,
-        "y0": 0.0,
-        "x1": 23.34,
-        "y1": 2.82
+        "x0": 21.875,
+        "y0": -0.15,
+        "x1": 23.465,
+        "y1": 2.97
       },
       "orientation": "none",
       "abuts": []
@@ -188,16 +188,16 @@
       "generator": "mos_array",
       "cell_name": "mdib",
       "source_path": "gen/mdib.gds",
-      "source_digest": "sha256:d981d61f11005305edc929ed4063f47a50685e99fd35c15edf271b827f635fee",
+      "source_digest": "sha256:75f4691ee549ca784c2e39b33050a6becd455d6f3853413f372649f319322848",
       "offset_um": {
         "x": 28.0,
         "y": 0.0
       },
       "bbox_um": {
-        "x0": 28.0,
-        "y0": 0.0,
-        "x1": 29.84,
-        "y1": 1.82
+        "x0": 27.875,
+        "y0": -0.15,
+        "x1": 29.965,
+        "y1": 1.97
       },
       "orientation": "none",
       "abuts": []
@@ -208,16 +208,16 @@
       "generator": "mos_array",
       "cell_name": "mtail",
       "source_path": "gen/mtail.gds",
-      "source_digest": "sha256:df095b8ba30250818f3922bec13b6f354b26e2354dd9cb659447020f149464c8",
+      "source_digest": "sha256:fc12218ab342d1c9b5e13118bc0f1d0852e035918eee3a9ac757c9a5fb5dd7ba",
       "offset_um": {
         "x": 36.0,
         "y": 0.0
       },
       "bbox_um": {
-        "x0": 36.0,
-        "y0": 0.0,
-        "x1": 46.84,
-        "y1": 1.82
+        "x0": 35.875,
+        "y0": -0.15,
+        "x1": 46.965,
+        "y1": 1.97
       },
       "orientation": "none",
       "abuts": []
@@ -228,16 +228,16 @@
       "generator": "mos_array",
       "cell_name": "mina_b",
       "source_path": "gen/mina_b.gds",
-      "source_digest": "sha256:a58152132a8e10138dc8489e2a24be735dd6f32a69661ed0f638836ddb23aa60",
+      "source_digest": "sha256:d70a5cf69229188c71b37e810becb9547b7e9353e2fa00205425805b20679307",
       "offset_um": {
         "x": 52.0,
         "y": 0.0
       },
       "bbox_um": {
-        "x0": 49.76,
-        "y0": 0.0,
-        "x1": 58.32,
-        "y1": 2.82
+        "x0": 49.635,
+        "y0": -0.15,
+        "x1": 58.445,
+        "y1": 2.97
       },
       "orientation": "none",
       "abuts": []
@@ -248,16 +248,16 @@
       "generator": "mos_array",
       "cell_name": "mdcmpo",
       "source_path": "gen/mdcmpo.gds",
-      "source_digest": "sha256:ab5e1210f57cae40dc4858f5b73fb03f89341ac2e5ffbc1b1b9e0e2aab2f6e8a",
+      "source_digest": "sha256:48e2a9d0139c67d79b4bfe8e5e24637b5151f6f0592a9a1a1cfdbcd0d33ab2c2",
       "offset_um": {
         "x": 64.0,
         "y": 0.0
       },
       "bbox_um": {
-        "x0": 64.0,
-        "y0": 0.0,
-        "x1": 65.84,
-        "y1": 2.82
+        "x0": 63.875,
+        "y0": -0.15,
+        "x1": 65.965,
+        "y1": 2.97
       },
       "orientation": "none",
       "abuts": []
@@ -268,16 +268,16 @@
       "generator": "mos_array",
       "cell_name": "mi1n",
       "source_path": "gen/mi1n.gds",
-      "source_digest": "sha256:2bd3b55d4b8b457cc0ec91fdce7063a5dc3db71d2d94a9fed16126fb1b662eb4",
+      "source_digest": "sha256:616ac7e10769158d5737aeb073f1772022142a3cd00661d9a27b4fd8c827edda",
       "offset_um": {
         "x": 70.0,
         "y": 0.0
       },
       "bbox_um": {
-        "x0": 70.0,
-        "y0": 0.0,
-        "x1": 71.34,
-        "y1": 1.82
+        "x0": 69.875,
+        "y0": -0.15,
+        "x1": 71.465,
+        "y1": 1.97
       },
       "orientation": "none",
       "abuts": []
@@ -288,16 +288,16 @@
       "generator": "mos_array",
       "cell_name": "mi2n",
       "source_path": "gen/mi2n.gds",
-      "source_digest": "sha256:618b139a80749a82c0860f3e96a70ead36dca25e56e088ec38c74d2a3e6f7e3b",
+      "source_digest": "sha256:7871a05c50a24b47ed0699b96f9352d611904cd0bc054ffa59281289e50611fc",
       "offset_um": {
         "x": 78.0,
         "y": 0.0
       },
       "bbox_um": {
-        "x0": 78.0,
-        "y0": 0.0,
-        "x1": 79.34,
-        "y1": 1.82
+        "x0": 77.875,
+        "y0": -0.15,
+        "x1": 79.465,
+        "y1": 1.97
       },
       "orientation": "none",
       "abuts": []
@@ -308,14 +308,14 @@
       "generator": "mos_array",
       "cell_name": "menp",
       "source_path": "gen/menp.gds",
-      "source_digest": "sha256:291a6936da88732dad4db32fb2616855153042b5e86aeef1d65a2a5e01f8c99e",
+      "source_digest": "sha256:702cf2c5b2fb0d76fe0e2fecb930b3807bc4fd937d7902002627e51705b2f2d8",
       "offset_um": {
         "x": 0.0,
         "y": 22.61
       },
       "bbox_um": {
         "x0": -0.15,
-        "y0": 19.64,
+        "y0": 19.34,
         "x1": 1.49,
         "y1": 22.759999999999998
       },
@@ -328,14 +328,14 @@
       "generator": "mos_array",
       "cell_name": "mensrc",
       "source_path": "gen/mensrc.gds",
-      "source_digest": "sha256:7620149cc175f9e32f2a5441d5a506206f00c0ea62037f26c69b6caa1bc17365",
+      "source_digest": "sha256:21ec2d16b4f2db1efbd731289438e15c80c61aed6fe5ae1a38a97ac210c17236",
       "offset_um": {
         "x": 40.0,
         "y": 24.61
       },
       "bbox_um": {
         "x0": 39.85,
-        "y0": 19.64,
+        "y0": 19.34,
         "x1": 41.49,
         "y1": 24.759999999999998
       },
@@ -348,14 +348,14 @@
       "generator": "mos_array",
       "cell_name": "mla_b",
       "source_path": "gen/mla_b.gds",
-      "source_digest": "sha256:1fbf083adad373743f215fe06ed72dad5269e9153a2fe30b6ea45df37a8a7c57",
+      "source_digest": "sha256:6867f44844193a64ceda752376b2e2609bd69e68a6b26e04d9b79db6c580bfb0",
       "offset_um": {
         "x": 46.0,
         "y": 24.61
       },
       "bbox_um": {
         "x0": 43.61,
-        "y0": 19.64,
+        "y0": 19.34,
         "x1": 52.47,
         "y1": 24.759999999999998
       },
@@ -368,14 +368,14 @@
       "generator": "mos_array",
       "cell_name": "mi1p",
       "source_path": "gen/mi1p.gds",
-      "source_digest": "sha256:ef4316a187749a4a0447f7a676eb5c3fc429395b7fec3a478b8a4ae0d08c61df",
+      "source_digest": "sha256:180119d248c6028e99a9437a6990b53c55c722f2082e3e1fb1e40cfcc3a5c3f2",
       "offset_um": {
         "x": 70.0,
         "y": 22.61
       },
       "bbox_um": {
         "x0": 69.85,
-        "y0": 19.64,
+        "y0": 19.34,
         "x1": 71.49,
         "y1": 22.759999999999998
       },
@@ -388,14 +388,14 @@
       "generator": "mos_array",
       "cell_name": "mi2p",
       "source_path": "gen/mi2p.gds",
-      "source_digest": "sha256:dd8e330b8ba396d2dc08c3d6af607fd957fd8d1fdf080b5d850a55d1424b852d",
+      "source_digest": "sha256:e7931c2f4f3c7675fe7a3f744658f150e2d7c1aa5a94f75aea19d725e108fd74",
       "offset_um": {
         "x": 78.0,
         "y": 22.61
       },
       "bbox_um": {
         "x0": 77.85,
-        "y0": 19.64,
+        "y0": 19.34,
         "x1": 79.49,
         "y1": 22.759999999999998
       },
@@ -408,16 +408,16 @@
       "generator": "guard_ring",
       "cell_name": "nwt_menp",
       "source_path": "gen/nwt_menp.gds",
-      "source_digest": "sha256:c6e2de4fd271a18a143d023b1e65e5e3a011390c4de96bbab40e4fab0176a5f8",
+      "source_digest": "sha256:283cdc2fcefe30f275c8221557f446748ae89ab7ca0bc97c9c8fc16499154cf8",
       "offset_um": {
         "x": -2.04,
         "y": 19.84
       },
       "bbox_um": {
-        "x0": -2.19,
-        "y0": 19.69,
-        "x1": -0.050000000000000044,
-        "y1": 21.83
+        "x0": -2.24,
+        "y0": 19.64,
+        "x1": 0.0,
+        "y1": 21.88
       },
       "orientation": "none",
       "abuts": []
@@ -428,16 +428,16 @@
       "generator": "guard_ring",
       "cell_name": "nwt_mensrc",
       "source_path": "gen/nwt_mensrc.gds",
-      "source_digest": "sha256:c35e30de099f20505b0afdeda7a5b144e92d2183259eb2da128e1bdf3f5a061e",
+      "source_digest": "sha256:1d014eb7ad829c60b4cb50554f9fa444c68ed8e0a84bcc75919a144c76c4d054",
       "offset_um": {
         "x": 37.96,
         "y": 19.84
       },
       "bbox_um": {
-        "x0": 37.81,
-        "y0": 19.69,
-        "x1": 39.95,
-        "y1": 21.83
+        "x0": 37.76,
+        "y0": 19.64,
+        "x1": 40.0,
+        "y1": 21.88
       },
       "orientation": "none",
       "abuts": []
@@ -448,16 +448,16 @@
       "generator": "guard_ring",
       "cell_name": "nwt_mla_b",
       "source_path": "gen/nwt_mla_b.gds",
-      "source_digest": "sha256:4bb2e4662f03fbb77479edd8ffb95faa6d942efb9b9eed9e06690a3c8534aa6b",
+      "source_digest": "sha256:d0a34aa27f5998131a24365fc0785c28943bcc280a60ae377f0d695b71025580",
       "offset_um": {
         "x": 52.52,
         "y": 19.84
       },
       "bbox_um": {
-        "x0": 52.370000000000005,
-        "y0": 19.69,
-        "x1": 54.510000000000005,
-        "y1": 21.83
+        "x0": 52.32,
+        "y0": 19.64,
+        "x1": 54.56,
+        "y1": 21.88
       },
       "orientation": "none",
       "abuts": []
@@ -468,16 +468,16 @@
       "generator": "guard_ring",
       "cell_name": "nwt_mi1p",
       "source_path": "gen/nwt_mi1p.gds",
-      "source_digest": "sha256:99931bd4968d0eee5b5ebb975a583aecd4d06361800bc00e4e276215fd15c185",
+      "source_digest": "sha256:f73f7c00b2e52edd732a4fc451d5ba28fb9f7c8db6407fe6952fc689193645ff",
       "offset_um": {
         "x": 67.96,
         "y": 19.84
       },
       "bbox_um": {
-        "x0": 67.80999999999999,
-        "y0": 19.69,
-        "x1": 69.94999999999999,
-        "y1": 21.83
+        "x0": 67.75999999999999,
+        "y0": 19.64,
+        "x1": 70.0,
+        "y1": 21.88
       },
       "orientation": "none",
       "abuts": []
@@ -488,16 +488,16 @@
       "generator": "guard_ring",
       "cell_name": "nwt_mi2p",
       "source_path": "gen/nwt_mi2p.gds",
-      "source_digest": "sha256:70f44975c8698af1e00163f2e826c79b22a507721fa0b27d955e0f134ca77fa0",
+      "source_digest": "sha256:b1d93d53b616588fe23674e283ace348797f1a61bf76c17d8f9bfd17829dd4f9",
       "offset_um": {
         "x": 75.96,
         "y": 19.84
       },
       "bbox_um": {
-        "x0": 75.80999999999999,
-        "y0": 19.69,
-        "x1": 77.94999999999999,
-        "y1": 21.83
+        "x0": 75.75999999999999,
+        "y0": 19.64,
+        "x1": 78.0,
+        "y1": 21.88
       },
       "orientation": "none",
       "abuts": []
@@ -508,16 +508,16 @@
       "generator": "guard_ring",
       "cell_name": "pst1",
       "source_path": "gen/pst1.gds",
-      "source_digest": "sha256:b4fe8937cadb232c50046c0ba870d416ba9e9206bcf38dcc3581a9ed8b9a43f5",
+      "source_digest": "sha256:1a25615057e66e40f4bdb2ed139001d1c7faf52b150f8b4b0954a03f8c9c842f",
       "offset_um": {
         "x": 4.0,
         "y": -3.5
       },
       "bbox_um": {
-        "x0": 4.0,
-        "y0": -3.5,
-        "x1": 5.84,
-        "y1": -1.66
+        "x0": 3.875,
+        "y0": -3.625,
+        "x1": 5.965,
+        "y1": -1.535
       },
       "orientation": "none",
       "abuts": []
@@ -528,16 +528,16 @@
       "generator": "guard_ring",
       "cell_name": "pst2",
       "source_path": "gen/pst2.gds",
-      "source_digest": "sha256:2bd9a23ed4e88b0a24d87216ce5b60ef13b068ab18df931502373da6a3ba9bab",
+      "source_digest": "sha256:5d3cb5b6d22a80cb803520b96e1f9e3ad44e73e8fe3c196e3b69f486687430bd",
       "offset_um": {
         "x": 18.0,
         "y": -3.5
       },
       "bbox_um": {
-        "x0": 18.0,
-        "y0": -3.5,
-        "x1": 19.84,
-        "y1": -1.66
+        "x0": 17.875,
+        "y0": -3.625,
+        "x1": 19.965,
+        "y1": -1.535
       },
       "orientation": "none",
       "abuts": []
@@ -548,16 +548,16 @@
       "generator": "guard_ring",
       "cell_name": "pst3",
       "source_path": "gen/pst3.gds",
-      "source_digest": "sha256:0ac0cacb2567ad146767fe95b7b7e3e80c87c6b05c01a64700778f1d95f0467a",
+      "source_digest": "sha256:012d84679bca91c1a0401627ceefe4a522f8d74268765a6997c43ea68cf5d50e",
       "offset_um": {
         "x": 32.0,
         "y": -3.5
       },
       "bbox_um": {
-        "x0": 32.0,
-        "y0": -3.5,
-        "x1": 33.84,
-        "y1": -1.66
+        "x0": 31.875,
+        "y0": -3.625,
+        "x1": 33.965,
+        "y1": -1.535
       },
       "orientation": "none",
       "abuts": []
@@ -568,16 +568,16 @@
       "generator": "guard_ring",
       "cell_name": "pst4",
       "source_path": "gen/pst4.gds",
-      "source_digest": "sha256:5aa8b21f155637a9a67e0b36cc2169a82025c753989bd4eeb2cb3817536b7136",
+      "source_digest": "sha256:c430605af0da4a67c5882cc8a6854c53c8f9e9731f7a576e92e62637539ed87e",
       "offset_um": {
         "x": 58.0,
         "y": -3.5
       },
       "bbox_um": {
-        "x0": 58.0,
-        "y0": -3.5,
-        "x1": 59.84,
-        "y1": -1.66
+        "x0": 57.875,
+        "y0": -3.625,
+        "x1": 59.965,
+        "y1": -1.535
       },
       "orientation": "none",
       "abuts": []
@@ -588,16 +588,16 @@
       "generator": "guard_ring",
       "cell_name": "pst5",
       "source_path": "gen/pst5.gds",
-      "source_digest": "sha256:361c28b4dfbb8319d4b6bef77b6886829aba29c8edf180c6ba1dd9de2ffdb7de",
+      "source_digest": "sha256:b757c3cb1b4d4a0752d506da78f0cfac65de982422e89f010802a6ad71ad7ae2",
       "offset_um": {
         "x": 74.0,
         "y": -3.5
       },
       "bbox_um": {
-        "x0": 74.0,
-        "y0": -3.5,
-        "x1": 75.84,
-        "y1": -1.66
+        "x0": 73.875,
+        "y0": -3.625,
+        "x1": 75.965,
+        "y1": -1.535
       },
       "orientation": "none",
       "abuts": []
@@ -608,16 +608,16 @@
       "generator": "res_array",
       "cell_name": "rtop",
       "source_path": "gen/rtop.gds",
-      "source_digest": "sha256:dd8c06df06c21889bdc6a44681bbe87b0a20cec5de6464966e295678ff00c769",
+      "source_digest": "sha256:bf5347c0d7ed5ce6a5f1853e12a9be57c7b03056e55f929c37d0b8195f5c9afc",
       "offset_um": {
         "x": 100.0,
         "y": 20.0
       },
       "bbox_um": {
-        "x0": 100.0,
-        "y0": 20.0,
-        "x1": 7998.28,
-        "y1": 22.0
+        "x0": 99.75,
+        "y0": 19.7,
+        "x1": 7998.47,
+        "y1": 22.3
       },
       "orientation": "none",
       "abuts": []
@@ -628,16 +628,16 @@
       "generator": "res_array",
       "cell_name": "rbot",
       "source_path": "gen/rbot.gds",
-      "source_digest": "sha256:35429939354963e817788fd58d84df282d430c38fac1702fe0f9f42f92989a74",
+      "source_digest": "sha256:9b7d586e9509aab58ab0e22b583510d50caac24f5361e3d85d7db0b6ab6b8771",
       "offset_um": {
         "x": 100.0,
         "y": 12.0
       },
       "bbox_um": {
-        "x0": 100.0,
-        "y0": 12.0,
-        "x1": 6870.07,
-        "y1": 14.0
+        "x0": 99.75,
+        "y0": 11.7,
+        "x1": 6870.26,
+        "y1": 14.3
       },
       "orientation": "none",
       "abuts": []
@@ -648,16 +648,16 @@
       "generator": "res_array",
       "cell_name": "rhys",
       "source_path": "gen/rhys.gds",
-      "source_digest": "sha256:4b4285178a205d80e84eb327b8184085833e49b4364e4049604daf1e3581ada6",
+      "source_digest": "sha256:ff32238965829d6d5541135e230c4fb28b971e3aec5149df613cfe49a7e71d4b",
       "offset_um": {
         "x": 6869.65,
         "y": 4.0
       },
       "bbox_um": {
-        "x0": 6869.65,
-        "y0": 4.0,
-        "x1": 7645.49,
-        "y1": 6.0
+        "x0": 6869.4,
+        "y0": 3.7,
+        "x1": 7645.679999999999,
+        "y1": 6.300000000000001
       },
       "orientation": "none",
       "abuts": []
@@ -668,16 +668,16 @@
       "generator": "mos_array",
       "cell_name": "mhsw",
       "source_path": "gen/mhsw.gds",
-      "source_digest": "sha256:040090d77e163487bdf5dca72fc9cd45a34efc501d102fe02c1cf2ed1162aea7",
+      "source_digest": "sha256:d89d57e9dad9da010251972c0275c205bf9a9cac416162d69049606929f5d61d",
       "offset_um": {
         "x": 6880.0,
         "y": -5.0
       },
       "bbox_um": {
-        "x0": 6878.66,
-        "y0": -15.82,
-        "x1": 6880.0,
-        "y1": -5.0
+        "x0": 6878.535,
+        "y0": -15.97,
+        "x1": 6880.125,
+        "y1": -4.85
       },
       "orientation": "rotate_180",
       "abuts": []
@@ -688,16 +688,16 @@
       "generator": "guard_ring",
       "cell_name": "pst_far",
       "source_path": "gen/pst_far.gds",
-      "source_digest": "sha256:9bfc44658ac59cbf090f214a143cbb4d901328766cd128f8abb63bd20e71a1ae",
+      "source_digest": "sha256:fdb8620b7643a85e2a875eb70aea76333498f82ce849947d102a267733816926",
       "offset_um": {
         "x": 6883.0,
         "y": -13.0
       },
       "bbox_um": {
-        "x0": 6883.0,
-        "y0": -13.0,
-        "x1": 6884.84,
-        "y1": -11.16
+        "x0": 6882.875,
+        "y0": -13.125,
+        "x1": 6884.965,
+        "y1": -11.035
       },
       "orientation": "none",
       "abuts": []
@@ -707,7 +707,7 @@
       "source": "cell",
       "generator": null,
       "cell_name": "promo_stub",
-      "source_path": "/home/ubuntu/GitHub/sky130-temp-por/.loom/worktrees/issue-82/layout/por_comparator/promo_stub.gds",
+      "source_path": "promo_stub.gds",
       "source_digest": "sha256:902ff80454f309f31943b44b8a7f942a6d96817455a784cbefd7f85d019f84ab",
       "offset_um": {
         "x": -6.0,
@@ -727,7 +727,7 @@
       "source": "cell",
       "generator": null,
       "cell_name": "promo_stub",
-      "source_path": "/home/ubuntu/GitHub/sky130-temp-por/.loom/worktrees/issue-82/layout/por_comparator/promo_stub.gds",
+      "source_path": "promo_stub.gds",
       "source_digest": "sha256:902ff80454f309f31943b44b8a7f942a6d96817455a784cbefd7f85d019f84ab",
       "offset_um": {
         "x": -6.0,
@@ -747,7 +747,7 @@
       "source": "cell",
       "generator": null,
       "cell_name": "promo_stub",
-      "source_path": "/home/ubuntu/GitHub/sky130-temp-por/.loom/worktrees/issue-82/layout/por_comparator/promo_stub.gds",
+      "source_path": "promo_stub.gds",
       "source_digest": "sha256:902ff80454f309f31943b44b8a7f942a6d96817455a784cbefd7f85d019f84ab",
       "offset_um": {
         "x": -10.0,
@@ -767,7 +767,7 @@
       "source": "cell",
       "generator": null,
       "cell_name": "promo_stub_v",
-      "source_path": "/home/ubuntu/GitHub/sky130-temp-por/.loom/worktrees/issue-82/layout/por_comparator/promo_stub_v.gds",
+      "source_path": "promo_stub_v.gds",
       "source_digest": "sha256:d424bed4ea0c150c3b587f778629b56bbddafe6074de3201ed45fcc12436409c",
       "offset_um": {
         "x": 16.545,
@@ -787,7 +787,7 @@
       "source": "cell",
       "generator": null,
       "cell_name": "promo_stub",
-      "source_path": "/home/ubuntu/GitHub/sky130-temp-por/.loom/worktrees/issue-82/layout/por_comparator/promo_stub.gds",
+      "source_path": "promo_stub.gds",
       "source_digest": "sha256:902ff80454f309f31943b44b8a7f942a6d96817455a784cbefd7f85d019f84ab",
       "offset_um": {
         "x": 88.0,
@@ -807,7 +807,7 @@
       "source": "cell",
       "generator": null,
       "cell_name": "promo_stub_v",
-      "source_path": "/home/ubuntu/GitHub/sky130-temp-por/.loom/worktrees/issue-82/layout/por_comparator/promo_stub_v.gds",
+      "source_path": "promo_stub_v.gds",
       "source_digest": "sha256:d424bed4ea0c150c3b587f778629b56bbddafe6074de3201ed45fcc12436409c",
       "offset_um": {
         "x": 55.245,
@@ -853,7 +853,7 @@
         }
       ],
       "routed": true,
-      "route_length_um": 194.31,
+      "route_length_um": 193.26,
       "status": "routed",
       "landed_on_block": true,
       "legs": [
@@ -886,7 +886,7 @@
             }
           ],
           "routed": true,
-          "route_length_um": 21.43,
+          "route_length_um": 21.28,
           "reason": null,
           "channel_track": 0,
           "landed_on_block": true
@@ -903,7 +903,7 @@
             }
           ],
           "routed": true,
-          "route_length_um": 33.03,
+          "route_length_um": 32.730000000000004,
           "reason": null,
           "channel_track": 0,
           "landed_on_block": true
@@ -920,7 +920,7 @@
             }
           ],
           "routed": true,
-          "route_length_um": 49.39,
+          "route_length_um": 49.09,
           "reason": null,
           "channel_track": 0,
           "landed_on_block": true
@@ -937,7 +937,7 @@
             }
           ],
           "routed": true,
-          "route_length_um": 68.03,
+          "route_length_um": 67.73,
           "reason": null,
           "channel_track": 0,
           "landed_on_block": true
@@ -965,7 +965,7 @@
         }
       ],
       "routed": true,
-      "route_length_um": 66.23,
+      "route_length_um": 65.48,
       "status": "routed",
       "landed_on_block": true,
       "legs": [
@@ -981,7 +981,7 @@
             }
           ],
           "routed": true,
-          "route_length_um": 18.39,
+          "route_length_um": 18.090000000000003,
           "reason": null,
           "channel_track": 0,
           "landed_on_block": true
@@ -998,7 +998,7 @@
             }
           ],
           "routed": true,
-          "route_length_um": 15.06,
+          "route_length_um": 14.91,
           "reason": null,
           "channel_track": 0,
           "landed_on_block": true
@@ -1015,7 +1015,7 @@
             }
           ],
           "routed": true,
-          "route_length_um": 32.78,
+          "route_length_um": 32.480000000000004,
           "reason": null,
           "channel_track": 0,
           "landed_on_block": true
@@ -1043,7 +1043,7 @@
         }
       ],
       "routed": true,
-      "route_length_um": 66.64,
+      "route_length_um": 66.04,
       "status": "routed",
       "landed_on_block": true,
       "legs": [
@@ -1059,7 +1059,7 @@
             }
           ],
           "routed": true,
-          "route_length_um": 15.68,
+          "route_length_um": 15.53,
           "reason": null,
           "channel_track": 0,
           "landed_on_block": true
@@ -1076,7 +1076,7 @@
             }
           ],
           "routed": true,
-          "route_length_um": 16.18,
+          "route_length_um": 16.03,
           "reason": null,
           "channel_track": 0,
           "landed_on_block": true
@@ -1093,7 +1093,7 @@
             }
           ],
           "routed": true,
-          "route_length_um": 34.78,
+          "route_length_um": 34.480000000000004,
           "reason": null,
           "channel_track": 0,
           "landed_on_block": true
@@ -1256,7 +1256,7 @@
         }
       ],
       "routed": true,
-      "route_length_um": 76.79,
+      "route_length_um": 76.49000000000001,
       "status": "routed",
       "landed_on_block": true,
       "legs": [
@@ -1289,7 +1289,7 @@
             }
           ],
           "routed": true,
-          "route_length_um": 25.71,
+          "route_length_um": 25.56,
           "reason": null,
           "channel_track": 0,
           "landed_on_block": true
@@ -1306,7 +1306,7 @@
             }
           ],
           "routed": true,
-          "route_length_um": 23.470000000000006,
+          "route_length_um": 23.320000000000004,
           "reason": null,
           "channel_track": 0,
           "landed_on_block": true
@@ -1338,7 +1338,7 @@
         }
       ],
       "routed": true,
-      "route_length_um": 106.94999999999999,
+      "route_length_um": 106.50000000000001,
       "status": "routed",
       "landed_on_block": true,
       "legs": [
@@ -1354,7 +1354,7 @@
             }
           ],
           "routed": true,
-          "route_length_um": 18.39,
+          "route_length_um": 18.090000000000003,
           "reason": null,
           "channel_track": 0,
           "landed_on_block": true
@@ -1405,7 +1405,7 @@
             }
           ],
           "routed": true,
-          "route_length_um": 32.190000000000005,
+          "route_length_um": 32.040000000000006,
           "reason": null,
           "channel_track": 0,
           "landed_on_block": true
@@ -1486,7 +1486,7 @@
         }
       ],
       "routed": true,
-      "route_length_um": 76.07999999999997,
+      "route_length_um": 75.88499999999998,
       "status": "routed",
       "landed_on_block": true,
       "legs": [
@@ -1502,7 +1502,7 @@
             }
           ],
           "routed": true,
-          "route_length_um": 65.67999999999999,
+          "route_length_um": 65.515,
           "reason": null,
           "channel_track": 0,
           "landed_on_block": true
@@ -1519,7 +1519,7 @@
             }
           ],
           "routed": true,
-          "route_length_um": 10.399999999999977,
+          "route_length_um": 10.369999999999976,
           "reason": null,
           "channel_track": 0,
           "landed_on_block": true
@@ -1539,7 +1539,7 @@
         }
       ],
       "routed": true,
-      "route_length_um": 33.39,
+      "route_length_um": 33.24,
       "status": "routed",
       "landed_on_block": true,
       "legs": [
@@ -1555,7 +1555,7 @@
             }
           ],
           "routed": true,
-          "route_length_um": 33.39,
+          "route_length_um": 33.24,
           "reason": null,
           "channel_track": 0,
           "landed_on_block": true
@@ -1587,7 +1587,7 @@
         }
       ],
       "routed": true,
-      "route_length_um": 6908.91,
+      "route_length_um": 6908.46,
       "status": "routed",
       "landed_on_block": true,
       "legs": [
@@ -1620,7 +1620,7 @@
             }
           ],
           "routed": true,
-          "route_length_um": 18.39,
+          "route_length_um": 18.090000000000003,
           "reason": null,
           "channel_track": 0,
           "landed_on_block": true
@@ -1637,7 +1637,7 @@
             }
           ],
           "routed": true,
-          "route_length_um": 33.43000000000001,
+          "route_length_um": 33.28000000000001,
           "reason": null,
           "channel_track": 0,
           "landed_on_block": true
@@ -1678,7 +1678,7 @@
         }
       ],
       "routed": true,
-      "route_length_um": 35.909999999999854,
+      "route_length_um": 35.92500000000018,
       "status": "routed",
       "landed_on_block": true,
       "legs": [
@@ -1694,7 +1694,7 @@
             }
           ],
           "routed": true,
-          "route_length_um": 10.5,
+          "route_length_um": 10.530000000000655,
           "reason": null,
           "channel_track": 0,
           "landed_on_block": true
@@ -1711,7 +1711,7 @@
             }
           ],
           "routed": true,
-          "route_length_um": 25.409999999999854,
+          "route_length_um": 25.394999999999527,
           "reason": null,
           "channel_track": 0,
           "landed_on_block": true
@@ -1824,7 +1824,7 @@
         }
       ],
       "routed": true,
-      "route_length_um": 8143.33,
+      "route_length_um": 8143.285,
       "status": "routed",
       "landed_on_block": true,
       "legs": [
@@ -1993,7 +1993,7 @@
             }
           ],
           "routed": true,
-          "route_length_um": 7935.59,
+          "route_length_um": 7935.545,
           "reason": null,
           "channel_track": 0,
           "landed_on_block": true
@@ -2073,7 +2073,7 @@
         }
       ],
       "routed": true,
-      "route_length_um": 7905.9800000000005,
+      "route_length_um": 7905.935,
       "status": "routed",
       "landed_on_block": true,
       "legs": [
@@ -2344,7 +2344,7 @@
             }
           ],
           "routed": true,
-          "route_length_um": 809.9099999999999,
+          "route_length_um": 809.8649999999998,
           "reason": null,
           "channel_track": 0,
           "landed_on_block": true
@@ -2447,12 +2447,15 @@
     "block 'mi2p' is placed 0.00um from block 'nwt_mi2p' (strategy: explicit), closer than nwt_mi2p's own declared drc_hints.min_spacing_um of 0.40um"
   ],
   "provenance": {
-    "klt_version": "0.6.0+g0ce8c64842d9",
+    "klt_version": "0.7.1.dev1610+g758c6e224053",
     "klayout_version": "0.30.12",
     "pdk": {
       "name": "sky130A",
-      "source": "search root: ~/.volare",
-      "version": "open_pdks c6d73a35f524070e85faff4a6a9eef49553ebc2b"
+      "source": "search root: ~/.ciel",
+      "version": "open_pdks f6eeac7dad085ffcc829ccfd721f7b4ce39edcf7",
+      "ambiguous_sources": [
+        "search root: ~/.volare"
+      ]
     },
     "deck": null,
     "input": null

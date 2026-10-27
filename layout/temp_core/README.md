@@ -1,5 +1,7 @@
 # `temp_core`
 
+> **Re-generated in #243 at `klt 758c6e224053` (the `layout/pdk.json` pin).** Committed streams and `drc/lvs/extract.json` now come from the pin; "Tool build" / `klt 0.6.0` statements below record the original run. See `layout/README.md`.
+
 Standalone layout of the whole `.subckt temp_core VDD VSS IBIAS EN PTAT CTAT`
 in `design/netlist/temp_core.spice` (see `design/temp_core.md`). This is the
 PTAT/CTAT sensing core: the 1:8 PNP pair, the error amplifier, the PTAT
@@ -326,3 +328,11 @@ through the substrate.
    `sim/` is untouched.
 9. **Not a signoff citation.** `manifests/` cites nothing from this
    directory, and item 2 stays `unmet`.
+
+## ERC note (#243)
+
+`klt erc` with `layout/bias_core/erc-supply-spec.json` reports 2
+`erc.missing_tie` on the n-wells of `XMI1`/`XMI2`. Their bulk is `NT` in
+`design/netlist/temp_core.spice`, so a VDD tap would contradict the schematic
+and break LVS. This is expected, not a missing tap; the spec's `ties[]` can only
+grade a well against a supply net.

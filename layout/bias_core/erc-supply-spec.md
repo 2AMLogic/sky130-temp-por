@@ -102,7 +102,7 @@ Declared: one nwell -> `VDD` tie.
   marker distinguishes them, so `well_excludes_boxes` (literal geometry,
   #2540) is not used.
 - Measured at `klt 0.6.0+g0ce8c64842d9` against the committed GDS
-  (sha256 `9c414f91...7ab68e`). Blanket probe, no exclusion: 2
+  (sha256 `9c414f91...7ab68e`, the pre-#243 stream; the stream was regenerated at `klt 758c6e224053` in #243, sha256 `a044bcd3...e6dae3`, and the finding set is unchanged). Blanket probe, no exclusion: 2
   `erc.missing_tie` findings, "tap is not connected to declared net
   'VDD'", on exactly the merged nwell shapes that interact with 82/44:
   `bias_core_xq1_xqr` (149.85, 99.85)-(158.99, 103.55) um and
@@ -129,7 +129,7 @@ item 11 `met`, with the p_substrate class carried in the citation's
 
 ## Provenance
 
-The committed `erc.json` was generated with `klt 0.6.0+g0ce8c64842d9`
+The committed `erc.json` was regenerated in #243 with `klt 0.7.1.dev1610+g758c6e224053` (earlier: `klt 0.6.0+g0ce8c64842d9`)
 (klayout-tools `main` @ `0ce8c64842d9cbcd7689d40ebfa3774355c1da4c`,
 clean build), the commit pinned in `layout/pdk.json` and installed by
 `.github/workflows/signoff-manifest.yml`, against `layout/pdk.json`'s

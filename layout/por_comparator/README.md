@@ -1,5 +1,7 @@
 # `por_comparator`
 
+> **Re-generated in #243 at `klt 758c6e224053` (the `layout/pdk.json` pin).** Committed streams and `drc/lvs/extract.json` now come from the pin; "Tool build" / `klt 0.6.0` statements below record the original run. See `layout/README.md`.
+
 Standalone proof layout of `design/netlist/por_comparator.spice`'s whole
 `.subckt por_comparator VDD VSS IBIAS VREF BIAS_OK POR_RAW` — the POR
 comparator leaf cell: bias-gating network, the NMOS differential pair with

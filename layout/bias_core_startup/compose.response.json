@@ -6,13 +6,13 @@
   "pdk": {
     "name": "sky130A",
     "variant": "sky130A",
-    "version": "open_pdks c6d73a35f524070e85faff4a6a9eef49553ebc2b"
+    "version": "open_pdks f6eeac7dad085ffcc829ccfd721f7b4ce39edcf7"
   },
   "dbu_um": 0.001,
   "bbox_um": {
     "x0": -40.0,
-    "y0": 0.0,
-    "x1": 54.040000000000006,
+    "y0": -0.15,
+    "x1": 54.165000000000006,
     "y1": 13.17
   },
   "ports": [
@@ -25,7 +25,7 @@
         "name": null
       },
       "x_um": -24.58,
-      "y_um": 5.109999999999999,
+      "y_um": 5.26,
       "width_um": 0.42000000000000004,
       "direction_deg": 90,
       "block": "ka",
@@ -97,16 +97,16 @@
       "generator": "mos_array",
       "cell_name": "kpd",
       "source_path": "gen/kpd.gds",
-      "source_digest": "sha256:251ae5360b62baf4f5d17cd1fcf04dd9bab43771e5c45813b9145534043710cf",
+      "source_digest": "sha256:4ef7220011babdc9860925304b21597e5caada0f0cd7393a42951152eec4a17c",
       "offset_um": {
         "x": 0.0,
         "y": 0.0
       },
       "bbox_um": {
-        "x0": 0.0,
-        "y0": 0.0,
-        "x1": 4.84,
-        "y1": 8.82
+        "x0": -0.125,
+        "y0": -0.15,
+        "x1": 4.965,
+        "y1": 8.97
       },
       "orientation": "none",
       "abuts": []
@@ -117,16 +117,16 @@
       "generator": "mos_array",
       "cell_name": "ks4",
       "source_path": "gen/ks4.gds",
-      "source_digest": "sha256:79fdae7a92ec719fd4c0a71144d2ee443804ad49ec08747622c244a83f4cee34",
+      "source_digest": "sha256:cafe1b1f462fa64c1a70e280df7e621fcc4fe91c438921ef447309d09dcac6bc",
       "offset_um": {
         "x": 5.84,
         "y": 3.5
       },
       "bbox_um": {
-        "x0": 5.84,
-        "y0": 3.5,
-        "x1": 14.68,
-        "y1": 5.32
+        "x0": 5.715,
+        "y0": 3.35,
+        "x1": 14.805,
+        "y1": 5.47
       },
       "orientation": "none",
       "abuts": []
@@ -137,16 +137,16 @@
       "generator": "mos_array",
       "cell_name": "ks3",
       "source_path": "gen/ks3.gds",
-      "source_digest": "sha256:93422c2d42f8f899ecd56624ebe8ed13966c2bc3e5c6afdfde8e4d4d56ebdcf3",
+      "source_digest": "sha256:cb57d6e56ed589454da092604def90d8e4baaa85d09228c20b9047cc51257dc8",
       "offset_um": {
         "x": 15.68,
         "y": 3.5
       },
       "bbox_um": {
-        "x0": 15.68,
-        "y0": 3.5,
-        "x1": 24.52,
-        "y1": 5.32
+        "x0": 15.555,
+        "y0": 3.35,
+        "x1": 24.645,
+        "y1": 5.47
       },
       "orientation": "none",
       "abuts": []
@@ -157,16 +157,16 @@
       "generator": "mos_array",
       "cell_name": "ks2",
       "source_path": "gen/ks2.gds",
-      "source_digest": "sha256:5d96fb80868436db68ea6614865305bb04bba70f32324bdf645fcf2919429af5",
+      "source_digest": "sha256:488053749cc50a4c6f16eb7f11415d9c0d95a061413569aeaba04642493f784a",
       "offset_um": {
         "x": 25.52,
         "y": 3.5
       },
       "bbox_um": {
-        "x0": 25.52,
-        "y0": 3.5,
-        "x1": 34.36,
-        "y1": 5.32
+        "x0": 25.395,
+        "y0": 3.35,
+        "x1": 34.485,
+        "y1": 5.47
       },
       "orientation": "none",
       "abuts": []
@@ -177,16 +177,16 @@
       "generator": "mos_array",
       "cell_name": "ks1",
       "source_path": "gen/ks1.gds",
-      "source_digest": "sha256:b50891b8c6f8f15d1081b9a28626c71593391d9b7220e28aa1eee9ae363c1794",
+      "source_digest": "sha256:49e5dcbaef358f0cf51ab5542ac967947e50b2876f69dcdfb4475f1c5304cc26",
       "offset_um": {
         "x": 35.36,
         "y": 3.5
       },
       "bbox_um": {
-        "x0": 35.36,
-        "y0": 3.5,
-        "x1": 44.2,
-        "y1": 5.32
+        "x0": 35.235,
+        "y0": 3.35,
+        "x1": 44.325,
+        "y1": 5.47
       },
       "orientation": "none",
       "abuts": []
@@ -197,16 +197,16 @@
       "generator": "mos_array",
       "cell_name": "ks0",
       "source_path": "gen/ks0.gds",
-      "source_digest": "sha256:bae499fd037198d7650a5aa8121f99011537615377a2dbe3d6ca71678d3c5190",
+      "source_digest": "sha256:bcf55374643d152bd6f3d5851501aef9f94aba21d924bb1924237e024caaa5cb",
       "offset_um": {
         "x": 45.2,
         "y": 3.5
       },
       "bbox_um": {
-        "x0": 45.2,
-        "y0": 3.5,
-        "x1": 54.040000000000006,
-        "y1": 5.32
+        "x0": 45.075,
+        "y0": 3.35,
+        "x1": 54.165000000000006,
+        "y1": 5.47
       },
       "orientation": "none",
       "abuts": []
@@ -217,16 +217,16 @@
       "generator": "mos_array",
       "cell_name": "kick",
       "source_path": "gen/kick.gds",
-      "source_digest": "sha256:c69cb7b91012b3864383fc25e8ff4e16e2979d7684dffbac13bf018ff63b6dd8",
+      "source_digest": "sha256:bb19673f133f9915673e044f513c9db97ac77ed2487e57c5f171b6ae1e8e048b",
       "offset_um": {
         "x": -1.0,
         "y": 3.5
       },
       "bbox_um": {
-        "x0": -5.84,
-        "y0": 3.5,
-        "x1": -1.0,
-        "y1": 5.32
+        "x0": -5.965,
+        "y0": 3.35,
+        "x1": -0.875,
+        "y1": 5.47
       },
       "orientation": "mirror_x",
       "abuts": []
@@ -237,16 +237,16 @@
       "generator": "mos_array",
       "cell_name": "kan",
       "source_path": "gen/kan.gds",
-      "source_digest": "sha256:e8e3f2af6e3965bcbc025db659ab96aabc5276e301ea822bde510cbfd84091da",
+      "source_digest": "sha256:2fb76a153ac061a2cad6b71b167161981ad57b0f796308aca77d31d0a8a8c7d5",
       "offset_um": {
         "x": -14.16,
         "y": 3.0
       },
       "bbox_um": {
-        "x0": -19.0,
-        "y0": 3.0,
-        "x1": -14.16,
-        "y1": 5.82
+        "x0": -19.125,
+        "y0": 2.85,
+        "x1": -14.035,
+        "y1": 5.970000000000001
       },
       "orientation": "mirror_x",
       "abuts": []
@@ -257,7 +257,7 @@
       "generator": "mos_array",
       "cell_name": "ka",
       "source_path": "gen/ka.gds",
-      "source_digest": "sha256:2de9185da20e278ce2f3d3805491799e2e4e2cc96a880c4704d524dd8a82ffcf",
+      "source_digest": "sha256:96146d0505ce4554108ef14af8dd6b62b2212e748707b3b4eb991c20dc3e06e0",
       "offset_um": {
         "x": -27.0,
         "y": 3.5
@@ -266,7 +266,7 @@
         "x0": -27.15,
         "y0": 3.35,
         "x1": -22.009999999999998,
-        "y1": 5.47
+        "y1": 5.77
       },
       "orientation": "none",
       "abuts": []
@@ -277,16 +277,16 @@
       "generator": "guard_ring",
       "cell_name": "nwell_tap",
       "source_path": "gen/nwell_tap.gds",
-      "source_digest": "sha256:917b4852d8b992ea5749af4a0121fc3295cec7dc043ccedaf495c8e71ca9bb31",
+      "source_digest": "sha256:d7cdc4034658817fd4a89bc4b2f803ea2da82df2312a55d10ca07353261a6a5b",
       "offset_um": {
         "x": -29.04,
         "y": 3.08
       },
       "bbox_um": {
-        "x0": -29.189999999999998,
-        "y0": 2.93,
-        "x1": -27.05,
-        "y1": 5.07
+        "x0": -29.24,
+        "y0": 2.88,
+        "x1": -27.0,
+        "y1": 5.12
       },
       "orientation": "none",
       "abuts": []
@@ -297,16 +297,16 @@
       "generator": "guard_ring",
       "cell_name": "psub_tap",
       "source_path": "gen/psub_tap.gds",
-      "source_digest": "sha256:8d690ae9ef0edc8789c498803a1f81fc529b589db89bd3cf8c3fd909369fe6fd",
+      "source_digest": "sha256:48fb0538075931152163dd84ee26d62c20bf153a72328912c55104c086bdd258",
       "offset_um": {
         "x": -35.0,
         "y": 3.5
       },
       "bbox_um": {
-        "x0": -35.0,
-        "y0": 3.5,
-        "x1": -33.16,
-        "y1": 5.34
+        "x0": -35.125,
+        "y0": 3.375,
+        "x1": -33.035,
+        "y1": 5.465
       },
       "orientation": "none",
       "abuts": []
@@ -316,7 +316,7 @@
       "source": "cell",
       "generator": null,
       "cell_name": "promo_stub",
-      "source_path": "/home/ubuntu/GitHub/sky130-temp-por/.loom/worktrees/issue-81/layout/bias_core_startup/promo_stub.gds",
+      "source_path": "promo_stub.gds",
       "source_digest": "sha256:902ff80454f309f31943b44b8a7f942a6d96817455a784cbefd7f85d019f84ab",
       "offset_um": {
         "x": -40.0,
@@ -336,7 +336,7 @@
       "source": "cell",
       "generator": null,
       "cell_name": "promo_stub",
-      "source_path": "/home/ubuntu/GitHub/sky130-temp-por/.loom/worktrees/issue-81/layout/bias_core_startup/promo_stub.gds",
+      "source_path": "promo_stub.gds",
       "source_digest": "sha256:902ff80454f309f31943b44b8a7f942a6d96817455a784cbefd7f85d019f84ab",
       "offset_um": {
         "x": -40.0,
@@ -398,7 +398,7 @@
             }
           ],
           "routed": true,
-          "route_length_um": 5.319999999999993,
+          "route_length_um": 5.4699999999999935,
           "reason": null,
           "channel_track": 0,
           "landed_on_block": true
@@ -432,7 +432,7 @@
             }
           ],
           "routed": true,
-          "route_length_um": 93.92000000000002,
+          "route_length_um": 93.77000000000001,
           "reason": null,
           "channel_track": 0,
           "landed_on_block": true
@@ -490,7 +490,7 @@
         }
       ],
       "routed": true,
-      "route_length_um": 6.740000000000002,
+      "route_length_um": 6.890000000000002,
       "status": "routed",
       "landed_on_block": true,
       "legs": [
@@ -523,7 +523,7 @@
             }
           ],
           "routed": true,
-          "route_length_um": 5.319999999999993,
+          "route_length_um": 5.4699999999999935,
           "reason": null,
           "channel_track": 0,
           "landed_on_block": true
@@ -547,7 +547,7 @@
         }
       ],
       "routed": true,
-      "route_length_um": 6.740000000000002,
+      "route_length_um": 6.890000000000002,
       "status": "routed",
       "landed_on_block": true,
       "legs": [
@@ -580,7 +580,7 @@
             }
           ],
           "routed": true,
-          "route_length_um": 5.32,
+          "route_length_um": 5.470000000000001,
           "reason": null,
           "channel_track": 0,
           "landed_on_block": true
@@ -604,7 +604,7 @@
         }
       ],
       "routed": true,
-      "route_length_um": 6.739999999999998,
+      "route_length_um": 6.889999999999999,
       "status": "routed",
       "landed_on_block": true,
       "legs": [
@@ -637,7 +637,7 @@
             }
           ],
           "routed": true,
-          "route_length_um": 5.319999999999997,
+          "route_length_um": 5.469999999999997,
           "reason": null,
           "channel_track": 0,
           "landed_on_block": true
@@ -661,7 +661,7 @@
         }
       ],
       "routed": true,
-      "route_length_um": 6.74,
+      "route_length_um": 6.890000000000001,
       "status": "routed",
       "landed_on_block": true,
       "legs": [
@@ -694,7 +694,7 @@
             }
           ],
           "routed": true,
-          "route_length_um": 5.3199999999999985,
+          "route_length_um": 5.469999999999999,
           "reason": null,
           "channel_track": 0,
           "landed_on_block": true
@@ -722,7 +722,7 @@
         }
       ],
       "routed": true,
-      "route_length_um": 61.755,
+      "route_length_um": 61.455000000000005,
       "status": "routed",
       "landed_on_block": true,
       "legs": [
@@ -755,7 +755,7 @@
             }
           ],
           "routed": true,
-          "route_length_um": 20.28,
+          "route_length_um": 20.130000000000003,
           "reason": null,
           "channel_track": 0,
           "landed_on_block": true
@@ -772,7 +772,7 @@
             }
           ],
           "routed": true,
-          "route_length_um": 40.055,
+          "route_length_um": 39.905,
           "reason": null,
           "channel_track": 0,
           "landed_on_block": true
@@ -800,7 +800,7 @@
         }
       ],
       "routed": true,
-      "route_length_um": 61.68000000000001,
+      "route_length_um": 61.980000000000004,
       "status": "routed",
       "landed_on_block": true,
       "legs": [
@@ -834,7 +834,7 @@
           ],
           "routed": false,
           "route_length_um": null,
-          "reason": "crosses already-routed net 'nkg'"
+          "reason": "backbone's 0.17um-wide drawn path crosses 2.425um through its own pin's block 'kan' -- more than that pin's own 0.42um edge margin (including 0.085um for the route's own half-width), so the route plows through, or clips the edge of, the block's interior (e.g. a same-facing port pair reaching a pin on the block's far side, crossing another pin on the way, or a connecting jog running close enough alongside the block's own edge that the drawn wire's width still overlaps it) rather than approaching the pin cleanly"
         },
         {
           "pins": [
@@ -865,7 +865,7 @@
             }
           ],
           "routed": true,
-          "route_length_um": 16.26,
+          "route_length_um": 16.560000000000002,
           "reason": null,
           "channel_track": 0,
           "landed_on_block": true
@@ -893,7 +893,7 @@
         }
       ],
       "routed": true,
-      "route_length_um": 31.180000000000003,
+      "route_length_um": 31.029999999999998,
       "status": "routed",
       "landed_on_block": true,
       "legs": [
@@ -909,7 +909,7 @@
             }
           ],
           "routed": true,
-          "route_length_um": 23.78,
+          "route_length_um": 23.479999999999997,
           "reason": null,
           "channel_track": 0,
           "landed_on_block": true
@@ -926,7 +926,7 @@
             }
           ],
           "routed": true,
-          "route_length_um": 3.8200000000000003,
+          "route_length_um": 3.9700000000000006,
           "reason": null,
           "channel_track": 0,
           "landed_on_block": true
@@ -1010,12 +1010,15 @@
     "block 'ka' is placed 0.00um from block 'nwell_tap' (strategy: explicit), closer than nwell_tap's own declared drc_hints.min_spacing_um of 0.40um"
   ],
   "provenance": {
-    "klt_version": "0.6.0+g0ce8c64842d9",
+    "klt_version": "0.7.1.dev1610+g758c6e224053",
     "klayout_version": "0.30.12",
     "pdk": {
       "name": "sky130A",
-      "source": "search root: ~/.volare",
-      "version": "open_pdks c6d73a35f524070e85faff4a6a9eef49553ebc2b"
+      "source": "search root: ~/.ciel",
+      "version": "open_pdks f6eeac7dad085ffcc829ccfd721f7b4ce39edcf7",
+      "ambiguous_sources": [
+        "search root: ~/.volare"
+      ]
     },
     "deck": null,
     "input": null
