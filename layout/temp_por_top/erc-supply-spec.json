@@ -1,0 +1,43 @@
+{
+  "stackup": [
+    { "name": "poly", "layer": "66/20", "role": "gate", "active_layer": "65/20" },
+    { "name": "li1", "layer": "67/20", "label_layer": "67/5" },
+    { "name": "met1", "layer": "68/20", "label_layer": "68/5" },
+    { "name": "met2", "layer": "69/20" },
+    { "name": "met3", "layer": "70/20", "label_layer": "70/5" },
+    { "name": "met4", "layer": "71/20" },
+    { "name": "met5", "layer": "72/20" }
+  ],
+  "vias": [
+    { "name": "licon1", "layer": "66/44", "between": ["poly", "li1"] },
+    { "name": "mcon", "layer": "67/44", "between": ["li1", "met1"] },
+    { "name": "via1", "layer": "68/44", "between": ["met1", "met2"] },
+    { "name": "via2", "layer": "69/44", "between": ["met2", "met3"] },
+    { "name": "via3", "layer": "70/44", "between": ["met3", "met4"] },
+    { "name": "via4", "layer": "71/44", "between": ["met4", "met5"] }
+  ],
+  "devices": [
+    { "name": "res_poly_body", "body_layer": "66/13", "on": "poly" },
+    { "name": "mim_m3_top_plate_contact", "body_layer": "89/44", "on": "via3" }
+  ],
+  "nets": [
+    { "name": "VDD", "kind": "supply" },
+    { "name": "VSS", "kind": "supply" }
+  ],
+  "ties": [
+    {
+      "name": "nwell_vdd",
+      "well_layer": "64/20",
+      "well_excludes": ["82/44"],
+      "tap_layer": "65/44",
+      "tap_is_dedicated": true,
+      "connect_to": "li1",
+      "net": "VDD"
+    }
+  ],
+  "ties_disclosure": {
+    "kind": "unexpressible",
+    "reason": "The native p-substrate (VSS) tie class is deliberately not declared and was NOT checked: sky130's p-type substrate is a native substrate with no drawn pwell/tub layer in this stream, so there is no well geometry to name for erc.missing_tie (klayout-tools#2186's documented remaining limitation). Only the nwell -> VDD class is graded; see erc-supply-spec.md.",
+    "undeclared_classes": ["p_substrate"]
+  }
+}

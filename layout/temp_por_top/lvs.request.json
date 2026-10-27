@@ -1,0 +1,25 @@
+{
+  "layout": {
+    "netlist": "temp_por_top.spice",
+    "deck": "sky130"
+  },
+  "reference": {
+    "netlist": "temp_por_top.ref.spice",
+    "form": "subckt-call",
+    "deck": "sky130",
+    "top": "temp_por_top"
+  },
+  "options": {
+    "flatten_reference": true,
+    "flatten_layout": true,
+    "compare_parameters": {
+      "pnp": [
+        "NE"
+      ],
+      "res_xhigh_po": [
+        "L",
+        "W"
+      ]
+    }
+  }
+}

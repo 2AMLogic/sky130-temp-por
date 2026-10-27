@@ -446,5 +446,13 @@ As of issue #81, all six `bias_core_*` sub-blocks and the `bias_core`
 full-cell assembly are DRC-clean and LVS `match` at the `0ce8c64842d9` pin.
 `por_comparator` (#82), `por_output_chain` (#97, minus the native device it
 cannot yet draw) and `temp_core` (#104) are DRC-clean and LVS `match` as
-well. With every leaf laid out, `temp_por_top` is what remains, tracked from
-[#4](https://github.com/2AMLogic/sky130-temp-por/issues/4).
+well. `temp_por_top` (#240) places the four leaf streams and wires the nets
+`design/temp_por_top.sch` connects; see
+[`temp_por_top/README.md`](temp_por_top/README.md) for its results and what
+blocks a clean sign-off (tracked from
+[#4](https://github.com/2AMLogic/sky130-temp-por/issues/4)).
+
+`cell.json` accepts an `extract` block (`top_cell_pins`, `hierarchical_cells`)
+forwarded to `klt extract`; a cell that places several composed siblings needs
+it (see `compose-cell.py`'s docstring). `layout/bin/attest-layout.py` writes
+the T1 item 2 envelope.

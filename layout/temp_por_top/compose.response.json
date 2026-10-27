@@ -1,0 +1,638 @@
+{
+  "schema_version": 1,
+  "generator": "gen-compose",
+  "cell_name": "temp_por_top",
+  "gds_path": "temp_por_top.gds",
+  "pdk": {
+    "name": "sky130A",
+    "variant": "sky130A",
+    "version": "open_pdks f6eeac7dad085ffcc829ccfd721f7b4ce39edcf7"
+  },
+  "dbu_um": 0.001,
+  "bbox_um": {
+    "x0": -104.0,
+    "y0": -54.2,
+    "x1": 7998.325,
+    "y1": 759.79
+  },
+  "ports": [
+    {
+      "name": "VDD",
+      "net": "VDD",
+      "layer": {
+        "layer": 67,
+        "datatype": 20
+      },
+      "x_um": -100.0,
+      "y_um": 10.0,
+      "width_um": 0.17,
+      "direction_deg": 180,
+      "block": "bias",
+      "port": "VDD"
+    },
+    {
+      "name": "VSS",
+      "net": "VSS",
+      "layer": {
+        "layer": 67,
+        "datatype": 20
+      },
+      "x_um": -104.0,
+      "y_um": 14.0,
+      "width_um": 0.17,
+      "direction_deg": 180,
+      "block": "bias",
+      "port": "VSS"
+    },
+    {
+      "name": "RESETn",
+      "net": "RESETn",
+      "layer": {
+        "layer": 67,
+        "datatype": 20
+      },
+      "x_um": -10.0,
+      "y_um": 723.72,
+      "width_um": 0.17,
+      "direction_deg": 180,
+      "block": "temp",
+      "port": "EN"
+    },
+    {
+      "name": "PTAT",
+      "net": "PTAT",
+      "layer": {
+        "layer": 67,
+        "datatype": 20
+      },
+      "x_um": -10.0,
+      "y_um": 724.72,
+      "width_um": 0.17,
+      "direction_deg": 180,
+      "block": "temp",
+      "port": "PTAT"
+    },
+    {
+      "name": "CTAT",
+      "net": "CTAT",
+      "layer": {
+        "layer": 67,
+        "datatype": 20
+      },
+      "x_um": -10.0,
+      "y_um": 712.72,
+      "width_um": 0.17,
+      "direction_deg": 180,
+      "block": "temp",
+      "port": "CTAT"
+    }
+  ],
+  "blocks": [
+    {
+      "id": "bias",
+      "source": "cell",
+      "generator": null,
+      "cell_name": "bias_core",
+      "source_path": "../bias_core/bias_core.gds",
+      "source_digest": "sha256:44d3d2cf47a00a297eb99f04b2e2919b41fc2d3dbe90973f81ae8f20a9096c85",
+      "offset_um": {
+        "x": 0.0,
+        "y": 0.0
+      },
+      "bbox_um": {
+        "x0": -104.0,
+        "y0": -54.2,
+        "x1": 5533.86,
+        "y1": 200.085
+      },
+      "orientation": "none",
+      "abuts": [],
+      "derived_ports": [
+        {
+          "name": "VREF",
+          "label_um": {
+            "x": 808.215,
+            "y": 126.0
+          },
+          "layer": {
+            "layer": 70,
+            "datatype": 20
+          },
+          "landing": {
+            "x_um": 808.0,
+            "y_um": 126.0,
+            "layer": {
+              "layer": 70,
+              "datatype": 20
+            },
+            "up_to": "metal6",
+            "via_count": 2,
+            "via_array": [
+              1,
+              1
+            ],
+            "candidates_evaluated": 1,
+            "truncated": false
+          }
+        }
+      ]
+    },
+    {
+      "id": "cmp",
+      "source": "cell",
+      "generator": null,
+      "cell_name": "por_comparator",
+      "source_path": "../por_comparator/por_comparator.gds",
+      "source_digest": "sha256:c55ae9a6de7c21c244fa4768a4defaf04fb7a1dbb60dd679c255a5369059a1fb",
+      "offset_um": {
+        "x": 0.0,
+        "y": 300.0
+      },
+      "bbox_um": {
+        "x0": -10.0,
+        "y0": 271.915,
+        "x1": 7998.325,
+        "y1": 337.5
+      },
+      "orientation": "none",
+      "abuts": []
+    },
+    {
+      "id": "por",
+      "source": "cell",
+      "generator": null,
+      "cell_name": "por_output_chain",
+      "source_path": "../por_output_chain/por_output_chain.gds",
+      "source_digest": "sha256:418b307e03d5e14a1ed7138392da5acb204926d362c5b06a78d9ae7efe664e41",
+      "offset_um": {
+        "x": 0.0,
+        "y": 520.0
+      },
+      "bbox_um": {
+        "x0": -10.0,
+        "y0": 513.79,
+        "x1": 327.82,
+        "y1": 579.02
+      },
+      "orientation": "none",
+      "abuts": []
+    },
+    {
+      "id": "temp",
+      "source": "cell",
+      "generator": null,
+      "cell_name": "temp_core",
+      "source_path": "../temp_core/temp_core.gds",
+      "source_digest": "sha256:7548dbf76a0d813394ab1991412d97cc49c355608ef5fd5ad2a65dab60b5f941",
+      "offset_um": {
+        "x": 0.0,
+        "y": 700.0
+      },
+      "bbox_um": {
+        "x0": -10.0,
+        "y0": 678.915,
+        "x1": 2793.92,
+        "y1": 759.79
+      },
+      "orientation": "none",
+      "abuts": []
+    }
+  ],
+  "nets": [
+    {
+      "net": "VDD",
+      "pins": [
+        {
+          "block": "bias",
+          "port": "VDD"
+        },
+        {
+          "block": "cmp",
+          "port": "VDD"
+        },
+        {
+          "block": "por",
+          "port": "VDD"
+        },
+        {
+          "block": "temp",
+          "port": "VDD"
+        }
+      ],
+      "routed": true,
+      "route_length_um": 1519.58,
+      "status": "routed",
+      "landed_on_block": true,
+      "legs": [
+        {
+          "pins": [
+            {
+              "block": "bias",
+              "port": "VDD"
+            },
+            {
+              "block": "cmp",
+              "port": "VDD"
+            }
+          ],
+          "routed": true,
+          "route_length_um": 513.0,
+          "reason": null,
+          "channel_track": 0,
+          "landed_on_block": true
+        },
+        {
+          "pins": [
+            {
+              "block": "cmp",
+              "port": "VDD"
+            },
+            {
+              "block": "por",
+              "port": "VDD"
+            }
+          ],
+          "routed": true,
+          "route_length_um": 537.81,
+          "reason": null,
+          "channel_track": 0,
+          "landed_on_block": true
+        },
+        {
+          "pins": [
+            {
+              "block": "por",
+              "port": "VDD"
+            },
+            {
+              "block": "temp",
+              "port": "VDD"
+            }
+          ],
+          "routed": true,
+          "route_length_um": 468.7700000000001,
+          "reason": null,
+          "channel_track": 0,
+          "landed_on_block": true
+        }
+      ]
+    },
+    {
+      "net": "VSS",
+      "pins": [
+        {
+          "block": "bias",
+          "port": "VSS"
+        },
+        {
+          "block": "cmp",
+          "port": "VSS"
+        },
+        {
+          "block": "por",
+          "port": "VSS"
+        },
+        {
+          "block": "temp",
+          "port": "VSS"
+        }
+      ],
+      "routed": true,
+      "route_length_um": 1746.0,
+      "status": "routed",
+      "landed_on_block": true,
+      "legs": [
+        {
+          "pins": [
+            {
+              "block": "bias",
+              "port": "VSS"
+            },
+            {
+              "block": "cmp",
+              "port": "VSS"
+            }
+          ],
+          "routed": true,
+          "route_length_um": 570.0,
+          "reason": null,
+          "channel_track": 0,
+          "landed_on_block": true
+        },
+        {
+          "pins": [
+            {
+              "block": "cmp",
+              "port": "VSS"
+            },
+            {
+              "block": "por",
+              "port": "VSS"
+            }
+          ],
+          "routed": true,
+          "route_length_um": 608.0,
+          "reason": null,
+          "channel_track": 0,
+          "landed_on_block": true
+        },
+        {
+          "pins": [
+            {
+              "block": "por",
+              "port": "VSS"
+            },
+            {
+              "block": "temp",
+              "port": "VSS"
+            }
+          ],
+          "routed": true,
+          "route_length_um": 568.0,
+          "reason": null,
+          "channel_track": 0,
+          "landed_on_block": true
+        }
+      ]
+    },
+    {
+      "net": "IBIAS",
+      "pins": [
+        {
+          "block": "bias",
+          "port": "IBIAS"
+        },
+        {
+          "block": "cmp",
+          "port": "IBIAS"
+        },
+        {
+          "block": "por",
+          "port": "IBIAS"
+        },
+        {
+          "block": "temp",
+          "port": "IBIAS"
+        }
+      ],
+      "routed": true,
+      "route_length_um": 2173.1400000000003,
+      "status": "routed",
+      "landed_on_block": true,
+      "legs": [
+        {
+          "pins": [
+            {
+              "block": "bias",
+              "port": "IBIAS"
+            },
+            {
+              "block": "cmp",
+              "port": "IBIAS"
+            }
+          ],
+          "routed": true,
+          "route_length_um": 720.29,
+          "reason": null,
+          "channel_track": 0,
+          "landed_on_block": true
+        },
+        {
+          "pins": [
+            {
+              "block": "cmp",
+              "port": "IBIAS"
+            },
+            {
+              "block": "por",
+              "port": "IBIAS"
+            }
+          ],
+          "routed": true,
+          "route_length_um": 791.63,
+          "reason": null,
+          "channel_track": 0,
+          "landed_on_block": true
+        },
+        {
+          "pins": [
+            {
+              "block": "por",
+              "port": "IBIAS"
+            },
+            {
+              "block": "temp",
+              "port": "IBIAS"
+            }
+          ],
+          "routed": true,
+          "route_length_um": 661.22,
+          "reason": null,
+          "channel_track": 0,
+          "landed_on_block": true
+        }
+      ]
+    },
+    {
+      "net": "VREF",
+      "pins": [
+        {
+          "block": "bias",
+          "port": "VREF"
+        },
+        {
+          "block": "cmp",
+          "port": "VREF"
+        }
+      ],
+      "routed": true,
+      "route_length_um": 1699.6599999999999,
+      "status": "routed",
+      "landed_on_block": true,
+      "legs": [
+        {
+          "pins": [
+            {
+              "block": "bias",
+              "port": "VREF"
+            },
+            {
+              "block": "cmp",
+              "port": "VREF"
+            }
+          ],
+          "routed": true,
+          "route_length_um": 1699.6599999999999,
+          "reason": null,
+          "channel_track": 0,
+          "landed_on_block": true
+        }
+      ]
+    },
+    {
+      "net": "BIAS_OK",
+      "pins": [
+        {
+          "block": "bias",
+          "port": "BIAS_OK"
+        },
+        {
+          "block": "cmp",
+          "port": "BIAS_OK"
+        }
+      ],
+      "routed": true,
+      "route_length_um": 6261.585,
+      "status": "routed",
+      "landed_on_block": true,
+      "legs": [
+        {
+          "pins": [
+            {
+              "block": "bias",
+              "port": "BIAS_OK"
+            },
+            {
+              "block": "cmp",
+              "port": "BIAS_OK"
+            }
+          ],
+          "routed": true,
+          "route_length_um": 6261.585,
+          "reason": null,
+          "channel_track": 0,
+          "landed_on_block": true
+        }
+      ]
+    },
+    {
+      "net": "POR_RAW",
+      "pins": [
+        {
+          "block": "cmp",
+          "port": "POR_RAW"
+        },
+        {
+          "block": "por",
+          "port": "POR_RAW"
+        }
+      ],
+      "routed": true,
+      "route_length_um": 1021.3,
+      "status": "routed",
+      "landed_on_block": true,
+      "legs": [
+        {
+          "pins": [
+            {
+              "block": "cmp",
+              "port": "POR_RAW"
+            },
+            {
+              "block": "por",
+              "port": "POR_RAW"
+            }
+          ],
+          "routed": true,
+          "route_length_um": 1021.3,
+          "reason": null,
+          "channel_track": 0,
+          "landed_on_block": true
+        }
+      ]
+    },
+    {
+      "net": "RESETn",
+      "pins": [
+        {
+          "block": "por",
+          "port": "RESETn"
+        },
+        {
+          "block": "temp",
+          "port": "EN"
+        }
+      ],
+      "routed": true,
+      "route_length_um": 1124.68,
+      "status": "routed",
+      "landed_on_block": true,
+      "legs": [
+        {
+          "pins": [
+            {
+              "block": "por",
+              "port": "RESETn"
+            },
+            {
+              "block": "temp",
+              "port": "EN"
+            }
+          ],
+          "routed": true,
+          "route_length_um": 1124.68,
+          "reason": null,
+          "channel_track": 0,
+          "landed_on_block": true
+        }
+      ]
+    }
+  ],
+  "pins": [
+    {
+      "net": "VDD",
+      "block": "bias",
+      "port": "VDD",
+      "labelled": true
+    },
+    {
+      "net": "VSS",
+      "block": "bias",
+      "port": "VSS",
+      "labelled": true
+    },
+    {
+      "net": "RESETn",
+      "block": "temp",
+      "port": "EN",
+      "labelled": true
+    },
+    {
+      "net": "PTAT",
+      "block": "temp",
+      "port": "PTAT",
+      "labelled": true
+    },
+    {
+      "net": "CTAT",
+      "block": "temp",
+      "port": "CTAT",
+      "labelled": true
+    }
+  ],
+  "unrouted_nets": [],
+  "drc_hints": {
+    "min_spacing_um": null,
+    "matched_groups": [],
+    "notes": [
+      "pin 'VDD' (block 'bias' port 'VDD') is also wired by a connectivity[] net of the same name -- reported in ports[] only; its label is supplied by the router, no duplicate label was written",
+      "pin 'VSS' (block 'bias' port 'VSS') is also wired by a connectivity[] net of the same name -- reported in ports[] only; its label is supplied by the router, no duplicate label was written",
+      "pin 'RESETn' (block 'temp' port 'EN') is also wired by a connectivity[] net of the same name -- reported in ports[] only; its label is supplied by the router, no duplicate label was written"
+    ]
+  },
+  "warnings": [],
+  "provenance": {
+    "klt_version": "0.7.1.dev1610+g758c6e224053",
+    "klayout_version": "0.30.12",
+    "pdk": {
+      "name": "sky130A",
+      "source": "search root: ~/.ciel",
+      "version": "open_pdks f6eeac7dad085ffcc829ccfd721f7b4ce39edcf7",
+      "ambiguous_sources": [
+        "search root: ~/.volare"
+      ]
+    },
+    "deck": null,
+    "input": null
+  }
+}
