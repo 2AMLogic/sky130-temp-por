@@ -4,6 +4,8 @@ Chronological record of recently merged pull requests and closed issues. This fi
 
 ### 2026-10-28
 
+- **PR #265**: fix: name both graded tie classes in temp_por_top ERC ties_disclosure
+- **Issue #263** (closed): temp_por_top ERC spec: ties_disclosure still says only nwell->VDD is graded
 - **PR #262**: feat: add block-specific ERC supply spec for temp_por_top NT wells
 - **PR #261**: fix: grade signoff items 3, 4, 11 against temp_por_top, not bias_core
 - **Issue #259** (closed): T1 status: correct README and signoff-report claim that items 3, 4 and 11 are met — they grade the bias_core sub-block; block-level temp_por_top LVS is partial and ERC has 2 findings
