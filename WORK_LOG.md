@@ -2,6 +2,14 @@
 
 Chronological record of recently merged pull requests and closed issues. This file is maintained by the Loom Guide role.
 
+### 2026-10-28
+
+- **PR #262**: feat: add block-specific ERC supply spec for temp_por_top NT wells
+- **PR #261**: fix: grade signoff items 3, 4, 11 against temp_por_top, not bias_core
+- **Issue #259** (closed): T1 status: correct README and signoff-report claim that items 3, 4 and 11 are met — they grade the bias_core sub-block; block-level temp_por_top LVS is partial and ERC has 2 findings
+- **PR #258**: refactor: hoist selftest record scaffolding and wave fixture writer into sim_common
+- **Issue #254** (closed): Consolidate duplicated selftest record scaffolding and fixture writer into sim_common
+
 ### 2026-10-27
 
 - **PR #256**: fix: make package.json check scripts run self-checks.yml steps instead of exiting 0
