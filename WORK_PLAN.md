@@ -19,19 +19,19 @@ _None._
 
 `loom:important`; taken before unlabelled work.
 
-_None._
+- **#260**: T1 item 11 (power delivery): block-level temp_por_top ERC spec that accounts for the NT-biased temp_core nwells (2 erc.missing_tie)
 
 ## Ready
 
 Human-approved issues ready for implementation (`loom:issue`).
 
-_None._
+- **#260**: T1 item 11 (power delivery): block-level temp_por_top ERC spec that accounts for the NT-biased temp_core nwells (2 erc.missing_tie)
 
 ## In Progress
 
 Issues currently being built (`loom:building`).
 
-_None._
+- **#263**: temp_por_top ERC spec: ties_disclosure still says only nwell->VDD is graded
 
 ## PRs Awaiting Review
 
@@ -43,7 +43,7 @@ _None._
 
 PRs that passed review and are queued for Champion auto-merge (`loom:pr`).
 
-_None._
+- **#265**: fix: name both graded tie classes in temp_por_top ERC ties_disclosure
 
 ## Proposed
 
@@ -54,6 +54,7 @@ Issues carrying `loom:curated`.
 - **#181**: glitch-top: re-run failed vdd_level request vdd_slew_v1.2_h0.0002_s200000 (45 ERROR points) *(curated)*
 - **#189**: Re-qualify cited sky130 evidence under open_pdks f6eeac7 (split from #188) *(curated)*
 - **#229**: Live fleet verification of campaign-driver evidence storage (follow-on from PR #226) *(curated)*
+- **#260**: T1 item 11 (power delivery): block-level temp_por_top ERC spec that accounts for the NT-biased temp_core nwells (2 erc.missing_tie) *(curated)*
 
 ## Proposed (Architect / Hermit)
 
@@ -70,12 +71,12 @@ Issues carrying `loom:curated`.
 |------|-------|
 | Operator merge-risk holds | 0 |
 | Very important | 0 |
-| Important | 0 |
-| Ready (`loom:issue`) | 0 |
-| In Progress (`loom:building`) | 0 |
+| Important | 1 |
+| Ready (`loom:issue`) | 1 |
+| In Progress (`loom:building`) | 1 |
 | PRs awaiting review | 0 |
-| Approved PRs awaiting merge | 0 |
-| Curated | 5 |
+| Approved PRs awaiting merge | 1 |
+| Curated | 6 |
 | Architect / Hermit proposals | 3 |
 | Active epics | 1 |
 <!-- guide:plan-body:end -->
