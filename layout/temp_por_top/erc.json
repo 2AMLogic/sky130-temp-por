@@ -5778,7 +5778,7 @@
     "well_assertion_coverage": []
   },
   "ties_disclosure": {
-    "reason": "The native p-substrate (VSS) tie class is deliberately not declared and was NOT checked: sky130's p-type substrate is a native substrate with no drawn pwell/tub layer in this stream, so there is no well geometry to name for erc.missing_tie (klayout-tools#2186's documented remaining limitation). Only the nwell -> VDD class is graded; see erc-supply-spec.md.",
+    "reason": "The native p-substrate (VSS) tie class is deliberately not declared and was NOT checked: sky130's p-type substrate is a native substrate with no drawn pwell/tub layer in this stream, so there is no well geometry to name for erc.missing_tie (klayout-tools#2186's documented remaining limitation). Only the nwell -> VDD and nwell -> NT classes are graded; see erc-supply-spec.md.",
     "kind": "unexpressible",
     "undeclared_classes": [
       "p_substrate"
@@ -5796,7 +5796,7 @@
       "role": "layout"
     },
     "spec": {
-      "content_hash": "sha256:fedcf0f2b50e2482aa4b2c508542b2fb51ef22d2a7a951a2939d47ef65b98a32"
+      "content_hash": "sha256:48a47ea56c8657ee13184e3d771cd3209cc49dc8aa73103f210bae6b7309b542"
     },
     "devices": [
       {
