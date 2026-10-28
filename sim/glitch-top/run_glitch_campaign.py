@@ -745,26 +745,19 @@ def cmd_record(args) -> int:
 def cmd_selftest(args) -> int:
     gi = source_state()
     now = datetime.now(timezone.utc)
-    record_id = f"{now:%Y%m%d}-{now:%H%M%S}-{gi['sha']}-checker-selftest"
-    rec_dir = HERE / "records"
-    rec_dir.mkdir(exist_ok=True)
-    for ext in (".md", ".json"):
-        if (rec_dir / f"{record_id}{ext}").exists():
-            raise SystemExit("record exists -- append-only")
+    record_id = sim_common.selftest_record_id(now, gi["sha"])
     results = gc.run_selftest(HERE / "selftest")
     ok = all(r["ok"] for r in results)
     doc = {"record_id": record_id, "timestamp": now.strftime("%Y-%m-%dT%H:%M:%SZ"), "author": args.author or cr.default_author(), "supersedes": args.supersedes,
            "kind": "glitch checker self-test (synthetic behavioural stand-ins, no simulation)", "git": gi, "cases": results, "overall_pass": ok}
-    (rec_dir / f"{record_id}.json").write_text(json.dumps(doc, indent=1, sort_keys=True) + "\n")
     L = [f"# Record {record_id}", "", f"- **Record ID**: {record_id}", "- **Experiment**: `glitch-top` -- checker self-test",
          "- **Claim**: proves `glitch_checker.py` produces PASS / FAIL / ERROR / NONPHYSICAL / UNRESOLVED with the intended precedence for both glitch classes on controlled synthetic waveforms with known answers (clean cases and controls PASS, so the checker is not vacuous). No simulation is involved.",
          f"- **Repo state**: `{gi['sha']}` on `{gi['branch']}`" + (" (working tree dirty at run time)" if gi["dirty"] else " (clean working tree)"),
          "", "| case | class | expected | got | failure codes | ok |", "|---|---|---|---|---|---|"]
     for r in results:
         L.append(f"| {r['case']} | {r['class']} | {r['expected_verdict']} | {r['verdict']} | {', '.join(r['fail_codes']) or '-'} | {'yes' if r['ok'] else 'NO'} |")
-    L += ["", f"**Overall: {'PASS' if ok else 'FAIL'}**", "", f"- **Timestamp / author**: {doc['timestamp']}, {doc['author']}", f"- **Supersedes**: {args.supersedes or '(none)'}", "",
-          "Written by `sim/glitch-top/run_glitch_campaign.py selftest`. Append-only.", ""]
-    (rec_dir / f"{record_id}.md").write_text("\n".join(L))
+    L += sim_common.selftest_footer_lines(doc, ok, "sim/glitch-top/run_glitch_campaign.py selftest")
+    sim_common.write_selftest_record(HERE / "records", record_id, doc, L)
     print(f"selftest record {record_id}: {'PASS' if ok else 'FAIL'}")
     return 0 if ok else 2
 

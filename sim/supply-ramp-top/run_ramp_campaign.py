@@ -667,16 +667,12 @@ def cmd_record(args) -> int:
 def cmd_selftest(args) -> int:
     git_info = cr.git_state()
     now = datetime.now(timezone.utc)
-    record_id = f"{now:%Y%m%d}-{now:%H%M%S}-{git_info['sha']}-checker-selftest"
+    record_id = sim_common.selftest_record_id(now, git_info["sha"])
     results = rc.run_selftest(HERE / "selftest")
     # the committed double-release fixture is re-read from disk and re-graded: the on-disk waveform is the evidence
     fixture = HERE / "selftest" / "double_release.wave.json"
     again = rc.analyze(rc.load_wave(fixture), 3.3, 1e4)
     ok = all(r["ok"] for r in results) and again["resetn"]["n_release"] == 2 and "repeated_release" in again["fail_codes"]
-    rec_dir = HERE / "records"
-    rec_dir.mkdir(exist_ok=True)
-    if (rec_dir / f"{record_id}.md").exists():
-        raise SystemExit("record exists")
     doc = {
         "record_id": record_id,
         "timestamp": now.strftime("%Y-%m-%dT%H:%M:%SZ"),
@@ -688,7 +684,6 @@ def cmd_selftest(args) -> int:
         "double_release_fixture": {"path": "sim/supply-ramp-top/selftest/double_release.wave.json", "regraded_from_disk": {"verdict": again["verdict"], "n_release": again["resetn"]["n_release"], "n_reassert": again["resetn"]["n_reassert"], "fail_codes": again["fail_codes"]}},
         "overall_pass": ok,
     }
-    (rec_dir / f"{record_id}.json").write_text(json.dumps(doc, indent=1, sort_keys=True) + "\n")
     L = [f"# Record {record_id}", "", f"- **Record ID**: {record_id}", "- **Experiment**: `supply-ramp-top` -- transition-checker self-test",
          "- **Claim**: proves `ramp_checker.py` detects the failure modes the campaign grades -- including a SECOND RELEASE -- on controlled synthetic waveforms with known answers (a clean single release must PASS, so the checker is not vacuous). No simulation is involved; the campaign records use the same code.",
          f"- **Repo state**: `{git_info['sha']}` on `{git_info['branch']}`" + (" (working tree dirty at run time)" if git_info["dirty"] else " (clean working tree)"),
@@ -698,9 +693,8 @@ def cmd_selftest(args) -> int:
         L.append(f"| {r['case']} | {r['expected_verdict']} | {r['verdict']} | {', '.join(r['fail_codes']) or '-'} | {r['n_release']} | {r['n_reassert']} | {'yes' if r['ok'] else 'NO'} |")
     d = doc["double_release_fixture"]["regraded_from_disk"]
     L += ["", f"The committed double-release waveform, re-read from disk and re-graded: verdict **{d['verdict']}**, {d['n_release']} releases, {d['n_reassert']} re-assert, codes {d['fail_codes']}.",
-          "", f"**Overall: {'PASS' if ok else 'FAIL'}**", "", f"- **Timestamp / author**: {doc['timestamp']}, {doc['author']}", f"- **Supersedes**: {args.supersedes or '(none)'}", "",
-          "Written by `sim/supply-ramp-top/run_ramp_campaign.py selftest`. Append-only.", ""]
-    (rec_dir / f"{record_id}.md").write_text("\n".join(L))
+          *sim_common.selftest_footer_lines(doc, ok, "sim/supply-ramp-top/run_ramp_campaign.py selftest")]
+    sim_common.write_selftest_record(HERE / "records", record_id, doc, L)
     print(f"selftest record {record_id}: {'PASS' if ok else 'FAIL'}")
     return 0 if ok else 2
 

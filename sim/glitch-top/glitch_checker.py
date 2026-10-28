@@ -65,8 +65,6 @@ never used as a current.
 
 from __future__ import annotations
 
-import gzip
-import json
 import math
 import sys
 from pathlib import Path
@@ -75,7 +73,7 @@ HERE = Path(__file__).resolve().parent
 sys.path.insert(0, str(HERE.parent / "bin"))
 sys.path.insert(0, str(HERE.parent / "brownout-top"))
 import brownout_checker as bc  # noqa: E402  (primitives + class-B grading core; stimulus twin of the SPICE BVDD)
-from sim_common import decimate, load_wave, write_gz_rows  # noqa: E402,F401
+from sim_common import decimate, load_wave, write_gz_rows, write_wave_fixture  # noqa: E402,F401
 
 schmitt, crossings, dwell_below, interp_at, _mean = bc.schmitt, bc.crossings, bc.dwell_below, bc.interp_at, bc._mean
 FRAC_IL, FRAC_IH, FRAC_MID, FRAC_MUST = bc.FRAC_IL, bc.FRAC_IH, bc.FRAC_MID, bc.FRAC_MUST
@@ -554,8 +552,7 @@ def run_selftest(fixture_dir: Path | None = None) -> list[dict]:
             doc = {"plotname": "Synthetic (controlled) -- sim/glitch-top/glitch_checker.py", "class": cls, "stimulus": st,
                    "variables": [{"index": i, "name": c} for i, c in enumerate(names)],
                    "points": [[wave[c][k] for c in names] for k in range(len(wave["time"]))]}
-            with open(fixture_dir / f"{name}.wave.json.gz", "wb") as raw, gzip.GzipFile(fileobj=raw, mode="wb", compresslevel=9, mtime=0) as gz:
-                gz.write(json.dumps(doc, separators=(",", ":")).encode())
+            write_wave_fixture(fixture_dir / f"{name}.wave.json.gz", doc)
     return out
 
 
