@@ -1,6 +1,9 @@
 {
-  "schema_version": 1,
-  "file": "layout/temp_por_top/temp_por_top.gds",
+  "schema_version": 2,
+  "file": {
+    "path": "layout/temp_por_top/temp_por_top.gds",
+    "scope": "repo"
+  },
   "spec": "layout/temp_por_top/erc-supply-spec.json",
   "pdk": null,
   "findings_only": false,
@@ -4163,43 +4166,22 @@
       "unlabelled_area_um2": null,
       "unlabelled_bbox": null,
       "unlabelled_allowed_islands": null
-    }
-  ],
-  "erc_findings": [
-    {
-      "rule": "erc.missing_tie",
-      "description": "well/tub tap is not connected to declared net 'VDD'",
-      "net": "VDD",
-      "other_net": null,
-      "gate_id": null,
-      "layer": "nwell_vdd",
-      "bbox": {
-        "left": 80470,
-        "bottom": 724960,
-        "right": 87700,
-        "top": 758380
-      },
-      "islands": null
     },
     {
-      "rule": "erc.missing_tie",
-      "description": "well/tub tap is not connected to declared net 'VDD'",
-      "net": "VDD",
-      "other_net": null,
-      "gate_id": null,
-      "layer": "nwell_vdd",
-      "bbox": {
-        "left": 71840,
-        "bottom": 724960,
-        "right": 79070,
-        "top": 758380
-      },
-      "islands": null
+      "name": "NT",
+      "matched_islands": 1,
+      "expected_islands": 1,
+      "roles": [],
+      "unlabelled_islands": null,
+      "unlabelled_area_um2": null,
+      "unlabelled_bbox": null,
+      "unlabelled_allowed_islands": null
     }
   ],
-  "erc_finding_count": 2,
-  "erc_status": "violations",
-  "status": "violations",
+  "erc_findings": [],
+  "erc_finding_count": 0,
+  "erc_status": "clean",
+  "status": "not_checked",
   "coverage": {
     "scope": "antenna",
     "schema_version": 1,
@@ -5758,7 +5740,9 @@
       "erc.floating_gate:[\"gate7\"]",
       "erc.floating_gate:[\"gate8\"]",
       "erc.floating_gate:[\"gate9\"]",
+      "erc.missing_tie:[\"nwell_nt\"]",
       "erc.missing_tie:[\"nwell_vdd\"]",
+      "erc.net_connectivity:[\"NT\"]",
       "erc.net_connectivity:[\"VDD\"]",
       "erc.net_connectivity:[\"VSS\"]"
     ],
@@ -5767,13 +5751,20 @@
       {
         "id": "erc.missing_tie:[\"p_substrate\"]",
         "reason": "ties_disclosed_unexpressible"
+      },
+      {
+        "id": "erc.supply_short",
+        "reason": "substrate_continuity_not_modelled"
       }
     ],
     "unknown": [],
     "nothing_checked": false,
     "nothing_checked_reasons": [],
     "checked_by_assertion": [],
-    "checked_by_well_assertion": [],
+    "checked_by_well_assertion": [
+      "erc.missing_tie:[\"nwell_nt\"]",
+      "erc.missing_tie:[\"nwell_vdd\"]"
+    ],
     "layers_in_stream_without_declaration": [
       "69/5",
       "71/5",
@@ -5794,7 +5785,9 @@
     ]
   },
   "provenance": {
-    "klt_version": "0.7.1.dev1610+g758c6e224053",
+    "klt_version": "0.8.1.dev604+g4f345a577997",
+    "klt_git_commit": "4f345a577997d2c31d4fa55e0092efbb3ee24f41",
+    "klt_reinstall_spec": "klayout-tools @ git+https://github.com/2AMLogic/klayout-tools@4f345a577997d2c31d4fa55e0092efbb3ee24f41",
     "klayout_version": "0.30.12",
     "pdk": null,
     "deck": null,
@@ -5803,7 +5796,7 @@
       "role": "layout"
     },
     "spec": {
-      "content_hash": "sha256:3a7e42def72757dbff28db10a85359ada42d4127c5e4f2cb574b9b92ffb0f132"
+      "content_hash": "sha256:fedcf0f2b50e2482aa4b2c508542b2fb51ef22d2a7a951a2939d47ef65b98a32"
     },
     "devices": [
       {

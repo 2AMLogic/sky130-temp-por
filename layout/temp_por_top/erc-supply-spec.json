@@ -22,17 +22,29 @@
   ],
   "nets": [
     { "name": "VDD", "kind": "supply" },
-    { "name": "VSS", "kind": "supply" }
+    { "name": "VSS", "kind": "supply" },
+    { "name": "NT", "kind": "signal" }
   ],
   "ties": [
     {
       "name": "nwell_vdd",
       "well_layer": "64/20",
       "well_excludes": ["82/44"],
+      "well_excludes_boxes": [[71.84, 724.96, 79.07, 758.38], [80.47, 724.96, 87.7, 758.38]],
       "tap_layer": "65/44",
       "tap_is_dedicated": true,
       "connect_to": "li1",
       "net": "VDD"
+    },
+    {
+      "name": "nwell_nt",
+      "well_layer": "64/20",
+      "well_excludes": ["82/44"],
+      "well_requires_boxes": [[71.84, 724.96, 79.07, 758.38], [80.47, 724.96, 87.7, 758.38]],
+      "tap_layer": "65/44",
+      "tap_is_dedicated": true,
+      "connect_to": "li1",
+      "net": "NT"
     }
   ],
   "ties_disclosure": {
