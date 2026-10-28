@@ -266,6 +266,34 @@ def parse_samples(log: str, vectors) -> list[dict[str, float]]:
     return [s for s in samples if wanted <= set(s)]
 
 
+def selftest_record_id(now, sha: str) -> str:
+    """Record id of a checker self-test record (`<date>-<time>-<sha>-checker-selftest`)."""
+    return f"{now:%Y%m%d}-{now:%H%M%S}-{sha}-checker-selftest"
+
+
+def selftest_footer_lines(doc: dict, ok: bool, script: str) -> list[str]:
+    """Closing lines shared by every self-test record's markdown: verdict, timestamp/author, supersedes."""
+    return ["", f"**Overall: {'PASS' if ok else 'FAIL'}**", "", f"- **Timestamp / author**: {doc['timestamp']}, {doc['author']}",
+            f"- **Supersedes**: {doc['supersedes'] or '(none)'}", "", f"Written by `{script}`. Append-only.", ""]
+
+
+def write_selftest_record(rec_dir: Path, record_id: str, doc: dict, md_lines: list[str]) -> None:
+    """Write a self-test record's `.json` + `.md`, refusing to touch an existing record (records/ is append-only)."""
+    rec_dir.mkdir(exist_ok=True)
+    for ext in (".md", ".json"):
+        if (rec_dir / f"{record_id}{ext}").exists():
+            raise SystemExit("record exists -- append-only")
+    (rec_dir / f"{record_id}.json").write_text(json.dumps(doc, indent=1, sort_keys=True) + "\n")
+    (rec_dir / f"{record_id}.md").write_text("\n".join(md_lines))
+
+
+def write_wave_fixture(path: Path, doc: dict) -> None:
+    """Write a synthetic-waveform fixture as compact gzipped JSON.  mtime=0 keeps it byte-identical on every
+    run, so a self-test never dirties the committed fixtures."""
+    with open(path, "wb") as raw, gzip.GzipFile(fileobj=raw, mode="wb", compresslevel=9, mtime=0) as gz:
+        gz.write(json.dumps(doc, separators=(",", ":")).encode())
+
+
 def render_record_id_experiment(record_id: str, slug: str, title: str) -> list[str]:
     """`Record ID` + `Experiment` lines shared verbatim across every
     experiment's `render_record()`.

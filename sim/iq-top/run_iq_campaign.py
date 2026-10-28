@@ -568,7 +568,7 @@ def cmd_selftest(args) -> int:
     man = sim_common.load_manifest(MANIFEST)
     git_info = cr.git_state()
     now = datetime.now(timezone.utc)
-    record_id = f"{now:%Y%m%d}-{now:%H%M%S}-{git_info['sha']}-checker-selftest"
+    record_id = sim_common.selftest_record_id(now, git_info["sha"])
     (HERE / "selftest").mkdir(exist_ok=True)
     rows = qc.run_selftest(man, HERE / "selftest")
     ok = all(r["ok"] for r in rows)
@@ -578,13 +578,8 @@ def cmd_selftest(args) -> int:
         w = qc.load_wave(HERE / "selftest" / f"{name}.wave.json")
         again[name] = qc.grade(w, state, 3.3, man)["status"]
     ok = ok and again["settled_constant_total"] == "ok" and again["drifting_total"] == "unsettled"
-    rec_dir = HERE / "records"
-    rec_dir.mkdir(exist_ok=True)
-    if (rec_dir / f"{record_id}.md").exists():
-        raise SystemExit("record exists")
     doc = {"record_id": record_id, "timestamp": now.strftime("%Y-%m-%dT%H:%M:%SZ"), "author": args.author or cr.default_author(), "supersedes": args.supersedes,
            "kind": "settling/physicality checker self-test (synthetic currents, no simulation)", "git": git_info, "cases": rows, "fixtures_regraded_from_disk": again, "overall_pass": ok}
-    (rec_dir / f"{record_id}.json").write_text(json.dumps(doc, indent=1, sort_keys=True) + "\n")
     L = [f"# Record {record_id}", "", f"- **Record ID**: {record_id}", "- **Experiment**: `iq-top` -- settling/physicality checker self-test",
          "- **Claim**: proves `iq_checker.py` does not pass a drifting or non-released current as settled, and does pass a clean constant one (so it is not vacuous), on synthetic currents with known answers. No simulation involved; the campaign records use the same code and thresholds (`experiment.json` `measurement`).",
          f"- **Repo state**: `{git_info['sha']}` on `{git_info['branch']}`" + (" (working tree dirty at run time)" if git_info["dirty"] else " (clean working tree)"),
@@ -593,9 +588,9 @@ def cmd_selftest(args) -> int:
     for r in rows:
         f = lambda x: "-" if x is None else f"{x:.3e}"  # noqa: E731
         L.append(f"| {r['case']} | {r['state']} | {r['expected']} | {r['got']} | {f(r['drift_rel'])} | {f(r['pk_pk_rel'])} | {'yes' if r['ok'] else 'NO'} | {'; '.join(r['reasons']) or '-'} |")
-    L += ["", f"Committed fixtures re-read from disk and re-graded: {again}.", "", f"**Overall: {'PASS' if ok else 'FAIL'}**", "",
-          f"- **Timestamp / author**: {doc['timestamp']}, {doc['author']}", f"- **Supersedes**: {args.supersedes or '(none)'}", "", "Written by `sim/iq-top/run_iq_campaign.py selftest`. Append-only.", ""]
-    (rec_dir / f"{record_id}.md").write_text("\n".join(L))
+    L += ["", f"Committed fixtures re-read from disk and re-graded: {again}."]
+    L += sim_common.selftest_footer_lines(doc, ok, "sim/iq-top/run_iq_campaign.py selftest")
+    sim_common.write_selftest_record(HERE / "records", record_id, doc, L)
     print(f"selftest record {record_id}: {'PASS' if ok else 'FAIL'}")
     return 0 if ok else 2
 

@@ -55,8 +55,6 @@ voltage ``v(xdut.ibias)`` is recorded separately and is never used as a current.
 
 from __future__ import annotations
 
-import gzip
-import json
 import math
 import sys
 from pathlib import Path
@@ -70,6 +68,7 @@ from sim_common import (  # noqa: E402,F401
     load_wave,
     schmitt,
     write_gz_rows,
+    write_wave_fixture,
 )
 
 # --- exploratory grading constants (mirrored in experiment.json "grading") ---
@@ -495,9 +494,7 @@ def run_selftest(fixture_dir: Path | None = None) -> list[dict]:
             doc = {"plotname": "Synthetic (controlled) -- sim/brownout-top/brownout_checker.py", "stimulus": st,
                    "variables": [{"index": i, "name": c} for i, c in enumerate(names)],
                    "points": [[wave[c][k] for c in names] for k in range(len(wave["time"]))]}
-            # mtime=0: byte-identical on every run, so a self-test never dirties the committed fixtures
-            with open(fixture_dir / f"{name}.wave.json.gz", "wb") as raw, gzip.GzipFile(fileobj=raw, mode="wb", compresslevel=9, mtime=0) as gz:
-                gz.write(json.dumps(doc, separators=(",", ":")).encode())
+            write_wave_fixture(fixture_dir / f"{name}.wave.json.gz", doc)
     return out
 
 
