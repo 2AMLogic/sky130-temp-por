@@ -58,8 +58,7 @@ Issues carrying `loom:curated`.
 ## Proposed (Architect / Hermit)
 
 - **#137**: Run the two-key ratification ceremony on DR-004 and DR-005 *(architect)*
-- **#203**: Consolidate duplicated .end-stripping idiom into sim_common (10 copies) *(hermit)*
-- **#247**: Consolidate duplicated probe, append-only guard, and spiceinit loader into sim_common *(hermit)*
+- **#254**: Consolidate duplicated selftest record scaffolding and fixture writer into sim_common *(hermit)*
 
 ## Epics
 
