@@ -4,6 +4,13 @@ Chronological record of recently merged pull requests and closed issues. This fi
 
 ### 2026-10-27
 
+- **PR #256**: fix: make package.json check scripts run self-checks.yml steps instead of exiting 0
+- **Issue #255** (closed): Hermit: package.json check scripts always exit 0; run the real self-checks or fail loudly
+- **PR #253**: chore(klt): bump klayout-tools pin to 0.8.0 and re-render signoff evidence
+- **Issue #252** (closed): Bump klayout-tools pin 758c6e224053 → 0.8.0
+- **PR #251**: refactor: hoist probe, append-only guard and spiceinit loader into sim_common
+- **Issue #247** (closed): Consolidate duplicated probe, append-only guard, and spiceinit loader into sim_common
+- **Issue #203** (closed): Consolidate duplicated .end-stripping idiom into sim_common (10 copies)
 - **PR #248**: fix: regenerate layout streams under the pinned klt and re-sync bias_core ports
 - **Issue #243** (closed): Re-generate leaf layout streams under the pinned klt: committed leaf GDS now show 351 poly.endcap.diff.1 DRC violations
 - **PR #246**: refactor: build campaign fleet requests through sim_common.base_request
