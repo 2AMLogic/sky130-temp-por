@@ -118,47 +118,40 @@ part of the claim and travel with it):
   (or to a leaf stream the top embeds) turns the row `stale_evidence`.
   **What it does not claim:** presence and reproducibility only. The top's
   recorded checks are *not* clean and are not cited — DRC is
-  clean (0 violations, #243: leaf streams regenerated at the pinned klt), ERC 2
-  `erc.missing_tie` (the two `temp_core` nwells of `XMI1`/`XMI2`, bulk `NT` by design), and an LVS `match` (152/152
+  clean (0 violations, #243: leaf streams regenerated at the pinned klt), ERC
+  clean (#260), and an LVS `match` (152/152
   devices, 71/71 nets) that excludes the native-Vt `XMASSIST` (#97). See
   `layout/temp_por_top/README.md`.
-- **Item 3 — DRC clean: `met`** via `layout/bias_core/drc.json` (`status:
+- **Item 3 — DRC clean: `met`** via `layout/temp_por_top/drc.json` (`status:
   clean`, 0 violations), pinned to
-  `content_hash sha256:a044bcd3…e6dae3`, the sha256 of the committed
-  `layout/bias_core/bias_core.gds` the run executed on (#81's fully
-  wired composition), so the citation is provably fresh against the
-  current artifact (CI re-asserts this). **Scope disclosure, per item 3's
-  own claimant-enforced rule:** the cited report covers the `bias_core`
-  full-cell assembly (the most complete committed layout artifact, 50
-  devices), *not* a block-level GDS. Its graded coverage gaps are quoted
-  verbatim in the committed report's `citation.coverage` block: 9 drawn
-  layers with no rule (the pin-text purposes `67/5`…`72/5`, plus `66/13`
-  `poly.res`, `79/20` `urpm`, `82/44`); 46 skipped rules, all
-  `angle`/`ongrid` checks for layers this stream does not draw plus the
-  `capm2.*`/`met4.enclosing.capm2.1` second-MiM rules; and `deck_scope`
-  listing the 18 deck chapters the run was measured inside. At the #81 pin
-  the `met5.*`, `via4.*` and `capm.*` rules are evaluated (they were
-  skipped or rule-free before).
-  A `met` verdict here does not assert those gaps were acceptable — it
-  asserts the run was clean inside the coverage it had, and this README is
-  where the gaps are disclosed.
-- **Item 4 — LVS clean: `met`** via `layout/bias_core/lvs.json`. The
-  `bias_core` full-cell composition's LVS against
-  `design/netlist/bias_core.spice`'s `.subckt bias_core` reports `status:
-  match`, **50/50 devices and 27/27 nets**, 0 errors. Issue #81 wired the
-  remaining cross-block nets on the met3/met4/met5 routing roles that
-  klayout-tools#2738 added (layer plan in `layout/bias_core/README.md`);
-  before it, the compare stood at 21/50 devices and 14/27 nets. **Not
-  proven by this envelope:** it is the `bias_core` assembly, not a
-  block-level (`temp_por_top`) layout (item 2's `temp_por_top` stream is
-  not cited here: its DRC/ERC are not clean and its LVS excludes `XMASSIST`). It also carries five
-  disclosed warnings: the `PNP` compare is scoped to `NE`, so `AE` is not
-  verified; the subckt-call reference has `R=0`/`C=0` placeholders on the
-  4 `res_xhigh_po` and 2 MiM caps, so their values are not compared; and
-  resistor `L/W/A/P` and MiM `A/P` are secondary parameters KLayout does
-  not compare. The match is a topology match. The envelope carries no
-  `power_connectivity` verdict, because that sub-check does not arise for
-  an analog SPICE-reference compare.
+  `content_hash sha256:1af73f5f…ca40539`, the sha256 of the committed
+  `layout/temp_por_top/temp_por_top.gds` the run executed on, so the
+  citation is provably fresh against the current artifact (CI re-asserts
+  this). T1 is block-scoped (#259), so this grades the block's own layout,
+  not a sub-block. **Scope disclosure, per item 3's own claimant-enforced
+  rule:** the graded coverage gaps are quoted verbatim in the committed
+  report's `citation.coverage` block: 9 drawn layers with no rule (the
+  pin-text purposes `67/5`…`72/5`, plus `66/13` `poly.res` and `82/44`,
+  `83/20`); the skipped rules are `angle`/`ongrid` checks for layers this
+  stream does not draw plus the `capm2.*`/`met4.enclosing.capm2.1`
+  second-MiM rules; and `deck_scope` lists the deck chapters the run was
+  measured inside. A `met` verdict here does not assert those gaps were
+  acceptable — it asserts the run was clean inside the coverage it had, and
+  this README is where the gaps are disclosed.
+- **Item 4 — LVS clean: `met`** via `layout/temp_por_top/lvs.json`. The
+  block-level `temp_por_top` LVS reports `status: match`, **152/152
+  devices and 71/71 nets**. **Not proven by this envelope:** it is not a
+  full-block compare. The native-Vt `XMASSIST` device is excluded via
+  `lvs.drop_prefixes` because klt cannot draw or compare it
+  (klayout-tools#2912, #97); see `layout/temp_por_top/README.md`. It also
+  carries disclosed warnings: the `PNP` compare is scoped to `NE`, so `AE`
+  is not verified; the reference has `R=0`/`C=0` placeholders on the
+  `res_xhigh_po` and MiM caps, so their values are not compared; and the
+  reference is flattened. The match is a topology match. The envelope
+  carries no `power_connectivity` verdict, because that sub-check does not
+  arise for an analog SPICE-reference compare. The `bias_core` sub-block
+  LVS (50/50 devices, 27/27 nets) is sub-block evidence and is no longer
+  cited.
 - **Items 5, 6, 7, 8 — `unmet` (`no_evidence`)**, each for a real reason:
   the target spec is only **partially ratified** (DR-003 is `ratified`, scoped,
   issue #78: operating temperature and supply are final; six rows, including
@@ -202,62 +195,18 @@ part of the claim and travel with it):
     `unittest` suites, and "CI passed" is not a check (a `gh run view`
     query would need credentials and a network). Hygiene here means the
     files exist and the cheap audits run clean.
-- **Item 11 — Power delivery (structural): `met`** (`reason: null`, #90).
-  Through #81 this row rendered `unmet` / `supply_spec_incomplete`
-  because the cited spec declared no `ties[]` and no `ties_disclosure`, so
-  `erc.missing_tie` was never computed. #90 declares the one expressible
-  tie class and discloses the other (below); the row now grades `met` at
-  the pinned build, and its citation carries
-  `power_delivery.disclosed_undeclared_tie_classes:
-  [{class: p_substrate, reason: ties_disclosed_unexpressible}]`, so the
-  verdict is visibly a *disclosed-partial* one, not a full tie sweep.
-  Cited: `layout/bias_core/erc-supply-spec.json` (rationale in
-  `layout/bias_core/erc-supply-spec.md`, because klt at this pin rejects
-  an inline `_comment`) and `layout/bias_core/erc.json`, pinned to the
-  committed GDS's `sha256:a044bcd3…e6dae3`, the same pin as item 3.
-  **What the ERC citation establishes:** with `VDD`/`VSS` declared
-  `kind: "supply"`, `erc_status: "clean"`, with zero
-  `erc.unconnected_net` and zero `erc.supply_short` over 18 gate nets.
-  Each supply resolves to exactly **one** island, and those islands
-  contain the blocks' real supply pads. The pad-point island census
-  (`layout/bin/pad-island-census.py` →
-  `layout/bias_core/pad-island-census.json`, pinned to the GDS sha256)
-  probes all 39 declared pads of the 15 connectivity/pin nets and finds
-  each net to be exactly one island (`VDD,vdd`, `VSS,vss`, …). The spec's
-  stackup now includes met5/via4 (the `pb` route), and its `devices[]`
-  cuts the poly-resistor bodies (`66/13`) and the MiM top-plate via3
-  (`89/44`) out of the conductor graph. Without those cuts the graph
-  bridged the resistor and capacitor terminals: island names like
-  `VDD,nokx` appeared, which LVS shows are not shorts. The run omits
-  `--pdk` deliberately, so the top-level `status` is `not_checked` and the
-  command exits `4`. The item grades `erc_status`, not the exit code.
-  **Tie evidence added by #90 (measured at `klt 0.6.0+g0ce8c64842d9`):**
-  `ties[0]` (`nwell_vdd`) grades every drawn `nwell` (64/20) shape,
-  except those touching the sky130 PNP marker (`82/44`,
-  `well_excludes`), for a `tap` (65/44, `tap_is_dedicated`) contact wired
-  through `li1` to `VDD`. A blanket probe (no exclusion) re-run at this
-  GDS gave **2** `erc.missing_tie` findings of the 18 merged nwell shapes,
-  exactly the PNP device-group tubs of `bias_core_xq1_xqr` (bbox
-  (149.85, 99.85)-(158.99, 103.55) um) and `bias_core_pnp8_leg`
-  ((199.85, 99.85)-(218.23, 107.35) um), the only two merged nwell shapes
-  that interact with `82/44`. With the exclusion: 0 findings,
-  `erc_status: clean`, `erc.missing_tie:["nwell_vdd"]` under
-  `erc_coverage.checked`, no `skipped`. (A first probe with
-  `tap_requires: ["93/44"]` gave 19 findings only because the stream draws
-  no nsdm; it is not the committed declaration.)
-  **What it does not establish:**
-  1. The native p-substrate (VSS) tie class is **disclosed, not checked**:
-     `ties_disclosure.undeclared_classes: ["p_substrate"]` renders as
-     `erc_coverage.inapplicable: erc.missing_tie:["p_substrate"]`
-     (`ties_disclosed_unexpressible`), because sky130's substrate has no
-     drawn well layer to name (klayout-tools#2186's documented
-     limitation). The two excluded PNP tubs are likewise **not** tie-graded
-     (they tie to their own nodes by design); the item is silent on them.
-     The `nwell_vdd` zero-finding result covers the other 16 nwell shapes
-     only.
-  2. The LVS half rests on item 4's topology match. The supplies
-     appear in its `net_correspondence` paired to the reference's
-     `VDD`/`VSS`, but device values are not compared (see item 4).
+- **Item 11 — Power delivery (structural): `met`**
+  (#259, #260). It cites the block-level
+  `layout/temp_por_top/erc.json` (pinned to the GDS
+  `sha256:1af73f5f…ca40539`, the same pin as item 3) and item 4's
+  `layout/temp_por_top/lvs.json`. The ERC run uses the block-specific supply
+  spec (`layout/temp_por_top/erc-supply-spec.json`, with the `NT` well tie
+  for the `temp_core` nwells of `XMI1`/`XMI2`) and reports
+  `erc_status: clean`. VDD and VSS are each one island at the top. The LVS
+  half carries the same `XMASSIST` exclusion as item 4. Until #259 this row
+  cited `layout/bias_core/`, which overclaimed: T1 is block-scoped, and the
+  `bias_core` evidence (`layout/bias_core/erc.json`,
+  `pad-island-census.json`) is sub-block evidence only and is not cited.
 
 A nearly-all-`unmet` manifest is a correct result — "the honest
 machine-readable statement of the gap" — and that is what these rows are.
@@ -287,7 +236,7 @@ push/PR:
    1's freshness checks need that toolchain; run them locally after changing
    `sim/` or `design/`), and
 5. re-hashes the committed artifact behind each `content_hash` pin
-   (`layout/bias_core/bias_core.gds`) and the compare netlists behind each
+   (`layout/temp_por_top/temp_por_top.gds`) and the compare netlists behind each
    unpinned LVS citation (checked against the envelope's recorded
    `environment.layout_sha256` / `reference_sha256`) — so a layout change
    that lands without re-rendering the manifest and report together fails

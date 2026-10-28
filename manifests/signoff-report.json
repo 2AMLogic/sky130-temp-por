@@ -117,11 +117,11 @@
       "reason": null,
       "graded_by_build": true,
       "citation": {
-        "file": "layout/bias_core/drc.json",
+        "file": "layout/temp_por_top/drc.json",
         "command": null,
         "kind": "drc",
         "check_status": "clean",
-        "content_hash": "sha256:a044bcd3ce64e0f4a290c261de9962c25f003dc63f9bb2be98b9368601e6dae3",
+        "content_hash": "sha256:1af73f5f94333939d5a16268144a396055e88ae9ed1f78f9644676332ca40539",
         "input_verified": true,
         "exit_status": 0,
         "coverage": {
@@ -133,7 +133,8 @@
             "70/5",
             "71/5",
             "72/5",
-            "82/44"
+            "82/44",
+            "83/20"
           ],
           "rules_skipped": [
             "areaid_re.ongrid.1",
@@ -217,11 +218,11 @@
       "reason": null,
       "graded_by_build": true,
       "citation": {
-        "file": "layout/bias_core/lvs.json",
+        "file": "layout/temp_por_top/lvs.json",
         "command": null,
         "kind": "lvs",
         "check_status": "match",
-        "content_hash": "sha256:e4a8ba053136c8f6fee964486b2a91d56c1a2e390ef396522c2f568d21850246",
+        "content_hash": "sha256:36c13e22d38fdba691c9342bb80bfff189c559be266fcdbfd84f0b81941ce714",
         "input_verified": true,
         "exit_status": 0
       }
@@ -366,29 +367,29 @@
       "reason": null,
       "graded_by_build": true,
       "citation": {
-        "file": "layout/bias_core/erc.json",
+        "file": "layout/temp_por_top/erc.json",
         "command": null,
         "kind": "erc",
         "check_status": "not_checked",
-        "content_hash": "sha256:a044bcd3ce64e0f4a290c261de9962c25f003dc63f9bb2be98b9368601e6dae3",
+        "content_hash": "sha256:1af73f5f94333939d5a16268144a396055e88ae9ed1f78f9644676332ca40539",
         "input_verified": true,
         "exit_status": 0,
         "parts": [
           {
-            "file": "layout/bias_core/erc.json",
+            "file": "layout/temp_por_top/erc.json",
             "command": null,
             "kind": "erc",
             "check_status": "not_checked",
-            "content_hash": "sha256:a044bcd3ce64e0f4a290c261de9962c25f003dc63f9bb2be98b9368601e6dae3",
+            "content_hash": "sha256:1af73f5f94333939d5a16268144a396055e88ae9ed1f78f9644676332ca40539",
             "input_verified": true,
             "exit_status": 0
           },
           {
-            "file": "layout/bias_core/lvs.json",
+            "file": "layout/temp_por_top/lvs.json",
             "command": null,
             "kind": "lvs",
             "check_status": "match",
-            "content_hash": "sha256:e4a8ba053136c8f6fee964486b2a91d56c1a2e390ef396522c2f568d21850246",
+            "content_hash": "sha256:36c13e22d38fdba691c9342bb80bfff189c559be266fcdbfd84f0b81941ce714",
             "input_verified": true,
             "exit_status": 0
           }
@@ -404,7 +405,10 @@
           "tapcell_master": null,
           "power_connectivity_status": "unchecked",
           "ties_checked_by_assertion": [],
-          "ties_checked_by_well_assertion": [],
+          "ties_checked_by_well_assertion": [
+            "erc.missing_tie:[\"nwell_nt\"]",
+            "erc.missing_tie:[\"nwell_vdd\"]"
+          ],
           "supply_unlabelled_islands": {},
           "disclosed_undeclared_tie_classes": [
             {

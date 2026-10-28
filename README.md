@@ -12,10 +12,15 @@ open-source xschem + ngspice flow.
 in progress.** `design/` has a full, netlist-checked schematic hierarchy
 (four leaf cells plus the assembled `temp_por_top`); `sim/` has testbench
 harnesses with recorded PVT-corner results; `layout/` has all six
-`bias_core` sub-blocks fully assembled and routed, with clean DRC and a
-50-device/27-net LVS match. Structural power-delivery evidence now grades
-T1 item 11 `met`: ERC checks declared nwell-to-VDD ties, with p-substrate
-ties disclosed as unexpressible and the two PNP tubs excluded from tie grading.
+`bias_core` sub-blocks fully assembled and routed (clean DRC and a
+50-device/27-net LVS match at sub-block level), plus the assembled
+`temp_por_top` block layout. The signoff report grades the block against its
+own layout, `layout/temp_por_top/`: **7/11 T1 items met** (1, 2, 3, 4, 9, 10, 11).
+Item 3 is [`drc.json`](layout/temp_por_top/drc.json) `clean`. Item 4 is
+[`lvs.json`](layout/temp_por_top/lvs.json) `match` (152/152 devices) with the
+native-Vt `XMASSIST` excluded, so it is not a full-block compare (#97). Item 11
+(structural power delivery) is `met`: [`erc.json`](layout/temp_por_top/erc.json)
+is clean against the block-specific supply spec (#260). Items 5 to 8 are unmet.
 `spec/` is partially ratified: DR-003 finalized the operating-temperature
 and supply rows through the two-key process, while the remaining target rows
 are still explicit placeholders (`spec/README.md`,
@@ -85,14 +90,16 @@ measured silicon. **Current position: schematic complete and netlisted,
 with per-cell PVT sim results recorded in `sim/`; spec ratification and
 layout are both advancing in parallel rather than in strict ladder order —
 DR-003 has ratified the operating-temperature and supply rows while the
-remaining target rows stay open, and `layout/` has a fully
-routed `bias_core` assembly with clean DRC and a 50-device/27-net LVS match.
-Leaf layouts also exist for `temp_core`, `por_comparator`, and
-`por_output_chain`; the output-chain LVS comparison still excludes the native
-startup-assist device pending tool support. Structural power-delivery item 11
-is `met` with the tie-coverage disclosures above. Whole-block layout and the
-remaining verification evidence are incomplete, so no single ladder rung is
-complete yet.**
+remaining target rows stay open, and `layout/` has the
+assembled `temp_por_top` block, with clean DRC and an LVS match that excludes
+the native startup-assist device (`XMASSIST`, #97) pending tool support. Its
+ERC is clean against the block-specific supply spec (#260), so structural
+power-delivery item 11 is `met`; the signoff report renders 7/11 T1 items met
+(`manifests/signoff-report.json`). The `bias_core` assembly (clean DRC,
+50-device/27-net LVS match) and the leaf layouts for `temp_core`,
+`por_comparator` and `por_output_chain` are sub-block evidence only and are not
+cited. Whole-block verification evidence is incomplete, so no single ladder
+rung is complete yet.**
 
 ## Repo layout
 
