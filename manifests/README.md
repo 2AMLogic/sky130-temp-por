@@ -118,8 +118,8 @@ part of the claim and travel with it):
   (or to a leaf stream the top embeds) turns the row `stale_evidence`.
   **What it does not claim:** presence and reproducibility only. The top's
   recorded checks are *not* clean and are not cited — DRC is
-  clean (0 violations, #243: leaf streams regenerated at the pinned klt), ERC 2
-  `erc.missing_tie` (the two `temp_core` nwells of `XMI1`/`XMI2`, bulk `NT` by design), and an LVS `match` (152/152
+  clean (0 violations, #243: leaf streams regenerated at the pinned klt), ERC
+  clean (#260), and an LVS `match` (152/152
   devices, 71/71 nets) that excludes the native-Vt `XMASSIST` (#97). See
   `layout/temp_por_top/README.md`.
 - **Item 3 — DRC clean: `met`** via `layout/temp_por_top/drc.json` (`status:
@@ -195,22 +195,18 @@ part of the claim and travel with it):
     `unittest` suites, and "CI passed" is not a check (a `gh run view`
     query would need credentials and a network). Hygiene here means the
     files exist and the cheap audits run clean.
-- **Item 11 — Power delivery (structural): `unmet`**
-  (`reason: supply_not_continuous`, #259). It cites the block-level
+- **Item 11 — Power delivery (structural): `met`**
+  (#259, #260). It cites the block-level
   `layout/temp_por_top/erc.json` (pinned to the GDS
   `sha256:1af73f5f…ca40539`, the same pin as item 3) and item 4's
-  `layout/temp_por_top/lvs.json`. The ERC run uses the `bias_core` supply
-  spec (`layout/temp_por_top/erc-supply-spec.json`) and reports
-  `erc_status: violations`: **2 `erc.missing_tie`** findings, the
-  `temp_core` nwells of `XMI1`/`XMI2` (bulk `NT` by design, so they have no
-  VDD tap). VDD and VSS are each one island at the top. Fixing the ERC spec
-  or the finding is #260; this item stays `unmet` until it lands. The
-  native p-substrate (VSS) tie class is disclosed, not checked
-  (klayout-tools#2186). The LVS half carries the same `XMASSIST` exclusion
-  as item 4. Until #259 this row cited `layout/bias_core/` and rendered
-  `met`, which overclaimed: T1 is block-scoped, and the `bias_core`
-  evidence (`layout/bias_core/erc.json`, `pad-island-census.json`) is
-  sub-block evidence only and is not cited.
+  `layout/temp_por_top/lvs.json`. The ERC run uses the block-specific supply
+  spec (`layout/temp_por_top/erc-supply-spec.json`, with the `NT` well tie
+  for the `temp_core` nwells of `XMI1`/`XMI2`) and reports
+  `erc_status: clean`. VDD and VSS are each one island at the top. The LVS
+  half carries the same `XMASSIST` exclusion as item 4. Until #259 this row
+  cited `layout/bias_core/`, which overclaimed: T1 is block-scoped, and the
+  `bias_core` evidence (`layout/bias_core/erc.json`,
+  `pad-island-census.json`) is sub-block evidence only and is not cited.
 
 A nearly-all-`unmet` manifest is a correct result — "the honest
 machine-readable statement of the gap" — and that is what these rows are.

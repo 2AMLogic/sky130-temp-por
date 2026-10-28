@@ -57,4 +57,4 @@ The rebuilt GDS is byte-identical to the committed one.
 
 Items 3, 4 and 11 of the signoff manifest cite this block's `drc.json`,
 `lvs.json` and `erc.json` (#259), and render as the signoff report states: 3 and
-4 `met` (4 with the `XMASSIST` exclusion above), 11 `unmet` on the ERC findings.
+4 `met` (4 with the `XMASSIST` exclusion above), 11 `met` on the clean ERC.
