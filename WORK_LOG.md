@@ -2,6 +2,10 @@
 
 Chronological record of recently merged pull requests and closed issues. This file is maintained by the Loom Guide role.
 
+### 2026-11-02
+
+- **Issue #260** (closed): T1 item 11 (power delivery): block-level temp_por_top ERC spec that accounts for the NT-biased temp_core nwells (2 erc.missing_tie)
+
 ### 2026-10-28
 
 - **PR #265**: fix: name both graded tie classes in temp_por_top ERC ties_disclosure
