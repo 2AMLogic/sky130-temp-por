@@ -19,13 +19,13 @@ _None._
 
 `loom:important`; taken before unlabelled work.
 
-- **#260**: T1 item 11 (power delivery): block-level temp_por_top ERC spec that accounts for the NT-biased temp_core nwells (2 erc.missing_tie)
+_None._
 
 ## Ready
 
 Human-approved issues ready for implementation (`loom:issue`).
 
-- **#260**: T1 item 11 (power delivery): block-level temp_por_top ERC spec that accounts for the NT-biased temp_core nwells (2 erc.missing_tie)
+_None._
 
 ## In Progress
 
@@ -55,7 +55,6 @@ Issues carrying `loom:curated`.
 - **#181**: glitch-top: re-run failed vdd_level request vdd_slew_v1.2_h0.0002_s200000 (45 ERROR points) *(curated)*
 - **#189**: Re-qualify cited sky130 evidence under open_pdks f6eeac7 (split from #188) *(curated)*
 - **#229**: Live fleet verification of campaign-driver evidence storage (follow-on from PR #226) *(curated)*
-- **#260**: T1 item 11 (power delivery): block-level temp_por_top ERC spec that accounts for the NT-biased temp_core nwells (2 erc.missing_tie) *(curated)*
 
 ## Proposed (Architect / Hermit)
 
@@ -71,12 +70,12 @@ Issues carrying `loom:curated`.
 |------|-------|
 | Operator merge-risk holds | 0 |
 | Very important | 0 |
-| Important | 1 |
-| Ready (`loom:issue`) | 1 |
+| Important | 0 |
+| Ready (`loom:issue`) | 0 |
 | In Progress (`loom:building`) | 0 |
 | PRs awaiting review | 0 |
 | Approved PRs awaiting merge | 0 |
-| Curated | 7 |
+| Curated | 6 |
 | Architect / Hermit proposals | 1 |
 | Active epics | 1 |
 <!-- guide:plan-body:end -->
