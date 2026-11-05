@@ -6,7 +6,7 @@ real verb's outputs are shaped, so request construction, report-to-result
 mapping, record rendering and the no-local-fallback failure path are all
 exercised without a fleet.
 
-Run: python3 -I -m unittest sim/bin/test_corner_run_batch.py
+Run: python3 -I sim/bin/test_corner_run_batch.py
  or: python3 -m pytest sim/bin/
 """
 from __future__ import annotations
@@ -283,7 +283,7 @@ class SubmitWithStubbedKlt(unittest.TestCase):
             "corners": results[:1],
             "spread_checks": [],
             "overall_pass": True,
-            "links": {k: "x" for k in ("testbench", "netlist_snapshot", "corners_dir", "json", "manifest")},
+            "links": {k: "x" for k in ("testbench", "netlist_snapshot", "corners_dir", "json", "manifest", "artifact_manifest", "artifact_summary")},
             "backend": "batch",
             "batch": fleet["batch"],
         }
