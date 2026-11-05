@@ -58,6 +58,12 @@ jobs:
       - name: PDK pin enforcement tests (refuse a tree whose revision is not the sim/pdk.json pin)
         run: python3 -I sim/bin/test_pdk_pin.py
 
+      - name: Corner-run batch-backend tests (stub klt, no SPICE, no PDK)
+        run: python3 -I sim/bin/test_corner_run_batch.py
+
+      - name: sim_common waveform tests
+        run: python3 -I sim/bin/test_sim_common_waveform.py
+
       - name: Pad-island census unit tests
         run: python3 -m unittest layout/bin/test_pad_island_census.py
 
