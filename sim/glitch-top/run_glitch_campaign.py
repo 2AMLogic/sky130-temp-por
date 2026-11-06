@@ -37,7 +37,6 @@ import os
 import re
 import shutil
 import sys
-import time
 from datetime import datetime, timezone
 from pathlib import Path
 
@@ -226,19 +225,11 @@ def build_request(req: dict, man: dict, backend: str, capacity_wait_s: float = 0
 def submit_one(req: dict, head: str, man: dict, run_dir: Path, capacity_wait_s: float = 0) -> dict:
     """Write netlist + request and run ``klt sim --backend batch``; an earlier attempt is archived, never overwritten."""
     d = run_dir / req["tag"]
-
-    def refused(p, n):
-        # the fleet has a shared instance cap that klt does not wait on; a refused LAUNCH is retried later
-        # (bounded; never replaced by a local grid).  Every refusal is kept as evidence.
-        if "BATCH_MAX_CONCURRENT_INSTANCES" in p.stdout + p.stderr and capacity_wait_s and n <= 40:
-            (d / f"launch-refused-{n}.txt").write_text(p.stdout + p.stderr)
-            time.sleep(min(180, capacity_wait_s))
-            return True
-        return False
-
     res = sim_common.submit_prepared(
         d, build_netlist(head, req), build_request(req, man, "batch", capacity_wait_s),
-        f"{req['tag']}: {len(corners_of(man))} points -> batch fleet", req["tag"], retry=refused)
+        f"{req['tag']}: {len(corners_of(man))} points -> batch fleet", req["tag"],
+        # a refused LAUNCH is retried later (bounded; never replaced by a local grid)
+        retry=sim_common.cap_retry(d, req["tag"], min(180, capacity_wait_s), max_retries=40) if capacity_wait_s else None)
     return {"tag": req["tag"], **res}
 
 

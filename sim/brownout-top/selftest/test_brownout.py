@@ -552,35 +552,26 @@ class TightenedRerunRunner(unittest.TestCase):
         self.assertFalse(rb.concurrency_capped(json.dumps({"corners": [], "status": "pass"})))
         self.assertFalse(rb.concurrency_capped("not json"))
 
-    def _fake_submits(self, run_dir, bodies):
+    def _fake_klt(self, bodies):
+        """Replace `klt sim`: an error envelope goes to stderr and stdout stays empty, as real klt does."""
         calls = []
 
-        def once(req, head, man, rd, cw, vk):
-            d = rd / req["tag"]
-            d.mkdir(parents=True, exist_ok=True)
-            if (d / "report.json").is_file():  # same archiving contract as the real submit
-                n = len(list(d.glob("attempt*"))) + 1
-                (d / f"attempt{n}").mkdir()
-                for name in ("report.json", "klt.stderr"):
-                    (d / name).rename(d / f"attempt{n}" / name)
+        def run(*a, **k):
             body = bodies[len(calls)]
-            refused = "corners" not in body
-            # as real klt does: an error envelope goes to stderr and stdout (report.json) stays empty
-            (d / "report.json").write_text("" if refused else body)
-            (d / "klt.stderr").write_text(body if refused else "")
             calls.append(1)
-            return {"tag": req["tag"], "n": len(calls)}
-        return once, calls
+            refused = "corners" not in body
+            return subprocess.CompletedProcess([], 1 if refused else 0, "" if refused else body, body if refused else "")
+        return mock.patch.object(rb.sim_common.subprocess, "run", side_effect=run), calls
 
     def test_slot_wait_resubmits_and_archives_every_refusal(self):
         with tempfile.TemporaryDirectory() as td:
             run_dir, req = Path(td), rb.plan_requests(MAN)[-1]
-            once, calls = self._fake_submits(run_dir, [self.CAP, self.CAP, json.dumps({"status": "pass", "corners": []})])
+            patch, calls = self._fake_klt([self.CAP, self.CAP, json.dumps({"status": "pass", "corners": []})])
             t = [0.0]
-            with mock.patch.object(rb, "_submit_once", side_effect=once):
+            with patch, mock.patch.object(rb, "build_netlist", return_value="* n\n"):
                 res = rb.submit_one(req, "", MAN, run_dir, 0, "reltol2e-4", slot_wait_s=3600, slot_poll_s=300,
                                     _sleep=lambda s: t.__setitem__(0, t[0] + s), _clock=lambda: t[0])
-            self.assertEqual((len(calls), res["n"]), (3, 3))
+            self.assertEqual((len(calls), res["status"]), (3, "pass"))
             self.assertEqual(len(list((run_dir / req["tag"]).glob("attempt*/report.json"))), 2)
             info = rb.analyze_request(req, run_dir, MAN, run_dir / "corners", write=False)["info"]
             self.assertEqual(len(info["failed_earlier_attempts"]), 2)  # refusals stay in the accounting
@@ -589,14 +580,14 @@ class TightenedRerunRunner(unittest.TestCase):
     def test_slot_wait_gives_up_after_budget_and_without_opt_in(self):
         with tempfile.TemporaryDirectory() as td:
             run_dir, req = Path(td), rb.plan_requests(MAN)[-1]
-            once, calls = self._fake_submits(run_dir, [self.CAP] * 10)
+            patch, calls = self._fake_klt([self.CAP] * 10)
             t = [0.0]
-            with mock.patch.object(rb, "_submit_once", side_effect=once):
+            with patch, mock.patch.object(rb, "build_netlist", return_value="* n\n"):
                 rb.submit_one(req, "", MAN, run_dir, 0, None, slot_wait_s=700, slot_poll_s=300,
                               _sleep=lambda s: t.__setitem__(0, t[0] + s), _clock=lambda: t[0])
             self.assertEqual(len(calls), 3)  # t=0, 300, 600; the next wait would pass the budget
-            once2, calls2 = self._fake_submits(run_dir / "b", [self.CAP] * 3)
-            with mock.patch.object(rb, "_submit_once", side_effect=once2):
+            patch2, calls2 = self._fake_klt([self.CAP] * 3)
+            with patch2, mock.patch.object(rb, "build_netlist", return_value="* n\n"):
                 rb.submit_one(req, "", MAN, run_dir / "b", 0, None)
             self.assertEqual(len(calls2), 1)
 

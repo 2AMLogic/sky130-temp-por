@@ -510,6 +510,65 @@ def report_usable(report_path: Path) -> bool:
         return False
 
 
+CONCURRENCY_CAP_MARKER = "BATCH_MAX_CONCURRENT_INSTANCES"
+
+
+def concurrency_capped(*texts: str) -> bool:
+    """True when any text is klt's error envelope for the shared fleet's concurrent-instance cap refusal.
+
+    klt's capacity_wait_s only waits out Spot capacity refusals, not this cap
+    (2AMLogic/klayout-tools#2917).  The refusal creates no instance and runs no
+    corner.  Strict on purpose: a report that carries per-corner results is never a
+    refusal, even if it mentions the marker.
+    """
+    for text in texts:
+        try:
+            body = json.loads(text)
+        except (json.JSONDecodeError, TypeError):
+            continue
+        if isinstance(body, dict) and "corners" not in body and CONCURRENCY_CAP_MARKER in str((body.get("error") or {}).get("message", "")):
+            return True
+    return False
+
+
+def cap_retry(d: Path, label: str, poll_s: float, budget_s: float | None = None, max_retries: int | None = None,
+              evidence: str = "launch-refused", sleep=None, clock=None):
+    """`retry` hook for submit_prepared: wait out a fleet concurrency-cap refusal and resubmit (never a local grid).
+
+    Retries while the run was refused at the cap and the bounds allow another wait:
+    at most `max_retries` retries and/or `budget_s` seconds in total (the next
+    wait must fit in the budget).  Every refusal is kept as evidence in `d`:
+    evidence="launch-refused" -> launch-refused-N.txt (stdout+stderr);
+    evidence="attempt" -> attemptN/report.json + klt.stderr, as an archived earlier attempt.
+    `sleep`/`clock` are injectable for tests.
+    """
+    import time
+    sleep, clock = sleep or time.sleep, clock or time.monotonic
+    start = clock()
+
+    def retry(p, n):
+        # klt writes its --format json error envelope to stderr, not stdout: check both
+        if not concurrency_capped(p.stdout, p.stderr):
+            return False
+        if max_retries is not None and n > max_retries:
+            return False
+        if budget_s is not None and clock() - start + poll_s > budget_s:
+            return False
+        if evidence == "attempt":
+            k = 1
+            while (d / f"attempt{k}").exists():
+                k += 1
+            (d / f"attempt{k}").mkdir(parents=True)
+            (d / f"attempt{k}" / "report.json").write_text(p.stdout)
+            (d / f"attempt{k}" / "klt.stderr").write_text(p.stderr)
+        else:
+            (d / f"launch-refused-{n}.txt").write_text(p.stdout + p.stderr)
+        say(f"[wait]   {label}: fleet concurrency cap reached; resubmitting in {poll_s:.0f} s")
+        sleep(poll_s)
+        return True
+    return retry
+
+
 def submit_prepared(d: Path, netlist: str, request: dict, submit_msg: str, done_label: str, retry=None) -> dict:
     """Archive d's earlier attempt, write netlist.spice + request.json, run `klt sim --backend batch`.
 

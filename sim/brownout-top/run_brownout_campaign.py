@@ -212,21 +212,7 @@ def build_request(req: dict, man: dict, backend: str, capacity_wait_s: float = 0
     )
 
 
-CONCURRENCY_CAP_MARKER = "BATCH_MAX_CONCURRENT_INSTANCES"
-
-
-def concurrency_capped(report_text: str) -> bool:
-    """True when klt's error envelope is the shared fleet's concurrent-instance cap refusal.
-
-    klt's capacity_wait_s only waits out Spot capacity refusals, not this cap
-    (2AMLogic/klayout-tools#2917), so ``run --slot-wait`` waits for it here.  The refusal
-    creates no instance and runs no corner; it is archived as an earlier attempt.
-    """
-    try:
-        body = json.loads(report_text)
-    except (json.JSONDecodeError, TypeError):
-        return False
-    return "corners" not in body and CONCURRENCY_CAP_MARKER in str((body.get("error") or {}).get("message", ""))
+concurrency_capped = sim_common.concurrency_capped  # shared with the other campaigns (klayout-tools#2917)
 
 
 def submit_one(req: dict, head: str, man: dict, run_dir: Path, capacity_wait_s: float = 0, variant_key: str | None = None,
@@ -235,25 +221,11 @@ def submit_one(req: dict, head: str, man: dict, run_dir: Path, capacity_wait_s: 
 
     Every refused attempt is archived (attemptN/), never overwritten or hidden.
     """
-    import time
-    sleep, clock = _sleep or time.sleep, _clock or time.monotonic
-    start = clock()
-    while True:
-        res = _submit_once(req, head, man, run_dir, capacity_wait_s, variant_key)
-        d = run_dir / req["tag"]
-        # klt writes its --format json error envelope to stderr, not stdout: check both
-        capped = any(concurrency_capped((d / n).read_text()) for n in ("report.json", "klt.stderr") if (d / n).is_file())
-        if not (slot_wait_s > 0 and capped and clock() - start + slot_poll_s <= slot_wait_s):
-            return res
-        say(f"[wait]   {req['tag']}: fleet concurrency cap reached; resubmitting in {slot_poll_s:.0f} s")
-        sleep(slot_poll_s)
-
-
-def _submit_once(req: dict, head: str, man: dict, run_dir: Path, capacity_wait_s: float = 0, variant_key: str | None = None) -> dict:
-    """Write netlist + request and run ``klt sim --backend batch``; an earlier attempt is archived, never overwritten."""
+    d = run_dir / req["tag"]
+    retry = sim_common.cap_retry(d, req["tag"], slot_poll_s, budget_s=slot_wait_s, evidence="attempt", sleep=_sleep, clock=_clock) if slot_wait_s > 0 else None
     res = sim_common.submit_prepared(
-        run_dir / req["tag"], build_netlist(head, req, man, variant_key), build_request(req, man, "batch", capacity_wait_s),
-        f"{req['tag']}: {declared_counts(man)['points_per_request']} points -> batch fleet", req["tag"])
+        d, build_netlist(head, req, man, variant_key), build_request(req, man, "batch", capacity_wait_s),
+        f"{req['tag']}: {declared_counts(man)['points_per_request']} points -> batch fleet", req["tag"], retry=retry)
     return {"tag": req["tag"], **res}
 
 
