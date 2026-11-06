@@ -4,6 +4,8 @@ Chronological record of recently merged pull requests and closed issues. This fi
 
 ### 2026-11-06
 
+- **PR #278**: chore(manifests): re-attest item 9 after runner drift
+- **Issue #276** (closed): Re-attest item 9 after sim_common cap_retry refactor (#275)
 - **PR #275**: refactor(sim): share fleet concurrency-cap retry in sim_common
 - **Issue #274** (closed): Consolidate three copies of fleet concurrency-cap retry into sim_common
 
