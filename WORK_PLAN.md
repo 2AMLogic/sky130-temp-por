@@ -25,7 +25,7 @@ _None._
 
 Human-approved issues ready for implementation (`loom:issue`).
 
-- **#229**: Live fleet verification of campaign-driver evidence storage (follow-on from PR #226)
+_None._
 
 ## In Progress
 
@@ -55,7 +55,6 @@ Issues carrying `loom:curated`.
 - **#181**: glitch-top: re-run failed vdd_level request vdd_slew_v1.2_h0.0002_s200000 (45 ERROR points) *(curated)*
 - **#189**: Re-qualify cited sky130 evidence under open_pdks f6eeac7 (split from #188) *(curated)*
 - **#191**: Remove docs/guard-repro reproducer: stale, unreferenced test of a Loom-managed hook *(curated)*
-- **#229**: Live fleet verification of campaign-driver evidence storage (follow-on from PR #226) *(curated)*
 
 ## Proposed (Architect / Hermit)
 
@@ -72,11 +71,11 @@ Issues carrying `loom:curated`.
 | Operator merge-risk holds | 0 |
 | Very important | 0 |
 | Important | 0 |
-| Ready (`loom:issue`) | 1 |
+| Ready (`loom:issue`) | 0 |
 | In Progress (`loom:building`) | 0 |
 | PRs awaiting review | 0 |
 | Approved PRs awaiting merge | 0 |
-| Curated | 7 |
+| Curated | 6 |
 | Architect / Hermit proposals | 1 |
 | Active epics | 1 |
 <!-- guide:plan-body:end -->

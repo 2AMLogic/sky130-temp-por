@@ -8,6 +8,7 @@ Chronological record of recently merged pull requests and closed issues. This fi
 
 ### 2026-11-06
 
+- **Issue #229** (closed): Live fleet verification of campaign-driver evidence storage (follow-on from PR #226)
 - **PR #281**: test: run brownout campaign tests in self-checks CI, stub PDK lookup
 - **Issue #280** (closed): Wire sim/brownout-top/selftest/test_brownout.py into self-checks CI; fix its 4 PDK-bound tests
 - **PR #278**: chore(manifests): re-attest item 9 after runner drift
