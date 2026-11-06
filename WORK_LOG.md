@@ -2,6 +2,16 @@
 
 Chronological record of recently merged pull requests and closed issues. This file is maintained by the Loom Guide role.
 
+### 2026-11-06
+
+- **PR #275**: refactor(sim): share fleet concurrency-cap retry in sim_common
+- **Issue #274** (closed): Consolidate three copies of fleet concurrency-cap retry into sim_common
+
+### 2026-11-05
+
+- **PR #273**: ci: run corner-run batch and sim_common waveform tests in self-checks
+- **Issue #272** (closed): Wire unrun sim/bin tests into self-checks CI (one already failing)
+
 ### 2026-11-02
 
 - **Issue #260** (closed): T1 item 11 (power delivery): block-level temp_por_top ERC spec that accounts for the NT-biased temp_core nwells (2 erc.missing_tie)
