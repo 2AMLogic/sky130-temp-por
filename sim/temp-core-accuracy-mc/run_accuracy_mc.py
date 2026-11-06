@@ -41,7 +41,6 @@ import os
 import re
 import statistics
 import subprocess
-import time
 import sys
 from datetime import datetime, timezone
 from pathlib import Path
@@ -247,29 +246,15 @@ def cmd_run(args):
         d = run_dir / term / proc if proc else run_dir / term
         if usable(d / "report.json"):
             return {"term": term, "proc": proc, "skipped": "usable report exists"}
-        d.mkdir(parents=True, exist_ok=True)
-        (d / "netlist.spice").write_text(build_netlist(term))
         seed = args.seed + (PROCS.index(proc) if proc else 0)
-        (d / "request.json").write_text(json.dumps(build_request(term, "batch", args.n, seed, ([proc], SUPPLIES) if proc else None), indent=2) + "\n")
+        req = build_request(term, "batch", args.n, seed, ([proc], SUPPLIES) if proc else None)
         units = (1 if term == "nominal" else args.n) * len(SUPPLIES) * (1 if proc else len(PROCS))
-        say(f"[submit] {term}/{proc or 'all-proc'}: {units} ngspice units -> batch fleet")
-        for attempt in range(1, 61):
-            p = subprocess.run(["klt", "sim", str(d / "request.json"), "--backend", "batch", "-o", str(d / "out"), "--format", "json"],
-                               capture_output=True, text=True, timeout=3 * 3600)
-            # the fleet has a shared instance cap; a refused LAUNCH is retried later (never replaced by a local grid)
-            if "BATCH_MAX_CONCURRENT_INSTANCES" in p.stdout + p.stderr and attempt < 60:
-                (d / f"launch-refused-{attempt}.txt").write_text(p.stdout + p.stderr)
-                time.sleep(180)
-                continue
-            break
-        (d / "report.json").write_text(p.stdout)
-        (d / "klt.stderr").write_text(p.stderr)
-        try:
-            st = json.loads(p.stdout).get("status", "?")
-        except json.JSONDecodeError:
-            st = "NO-JSON"
-        say(f"[done]   {term}/{proc or 'all-proc'}: exit {p.returncode}, status {st}")
-        return {"term": term, "proc": proc, "exit": p.returncode, "status": st}
+        name = f"{term}/{proc or 'all-proc'}"
+        # the fleet has a shared instance cap; a refused LAUNCH is retried later (never replaced by a local grid)
+        res = sim_common.submit_prepared(
+            d, build_netlist(term), req, f"{name}: {units} ngspice units -> batch fleet", name,
+            retry=sim_common.cap_retry(d, name, 180, max_retries=59))
+        return {"term": term, "proc": proc, **res}
 
     units_list = [(t, None) if t == "nominal" else (t, pr) for t in terms for pr in ([None] if t == "nominal" else PROCS)]
     results = []

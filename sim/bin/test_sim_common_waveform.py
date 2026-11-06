@@ -9,11 +9,14 @@ Run: python3 -I sim/bin/test_sim_common_waveform.py
 from __future__ import annotations
 
 import gzip
+import json
 import random
 import sys
 import tempfile
+import subprocess
 import unittest
 from pathlib import Path
+from unittest import mock
 
 sys.path.insert(0, str(Path(__file__).resolve().parent))
 import sim_common as sc  # noqa: E402
@@ -169,6 +172,50 @@ class WriteGzRowsTest(unittest.TestCase):
             sc.write_gz_rows(p, "# h", [[0.0, 1.23456789], [1e-3, 2.0]])
             with gzip.open(p, "rt") as fh:
                 self.assertEqual(fh.read(), "# h\n0,1.23457\n0.001,2\n")
+
+
+CAP = json.dumps({"error": {"message": "8 instance(s) already running + 1 requested exceeds BATCH_MAX_CONCURRENT_INSTANCES=8"}})
+OK = json.dumps({"status": "pass", "corners": []})
+
+
+def _proc(stdout="", stderr=""):
+    return subprocess.CompletedProcess([], 0, stdout, stderr)
+
+
+class ConcurrencyCapRetryTest(unittest.TestCase):
+    def test_detection_is_strict(self):
+        self.assertTrue(sc.concurrency_capped("", CAP))
+        self.assertFalse(sc.concurrency_capped(json.dumps({"error": {"message": "no capacity in any of the 3 pools"}})))
+        # a report with real results that merely mentions the marker is not a refusal
+        self.assertFalse(sc.concurrency_capped(json.dumps({"corners": [], "error": {"message": "BATCH_MAX_CONCURRENT_INSTANCES"}})))
+        self.assertFalse(sc.concurrency_capped("not json", ""))
+
+    def _run(self, outcomes, **kw):
+        runs = iter(outcomes)
+        t = [0.0]
+        with tempfile.TemporaryDirectory() as td, mock.patch.object(sc.subprocess, "run", side_effect=lambda *a, **k: next(runs)) as m:
+            d = Path(td) / "r"
+            retry = sc.cap_retry(d, "x", 300, sleep=lambda s: t.__setitem__(0, t[0] + s), clock=lambda: t[0], **kw)
+            res = sc.submit_prepared(d, "* n\n", {"a": 1}, "m", "x", retry=retry)
+            found = sorted(str(p.relative_to(d)) for p in d.rglob("*") if p.is_file() and "out" not in p.parts)
+            return res, m.call_count, found
+
+    def test_attempt_evidence_and_budget(self):
+        res, calls, files = self._run([_proc("", CAP), _proc("", CAP), _proc(OK)], budget_s=3600, evidence="attempt")
+        self.assertEqual((calls, res["status"]), (3, "pass"))
+        self.assertEqual(files, ["attempt1/klt.stderr", "attempt1/report.json", "attempt2/klt.stderr", "attempt2/report.json",
+                                 "klt.stderr", "netlist.spice", "report.json", "request.json"])
+        _, calls, _ = self._run([_proc("", CAP)] * 10, budget_s=700, evidence="attempt")
+        self.assertEqual(calls, 3)  # t=0, 300, 600; the next wait would pass the budget
+
+    def test_launch_refused_evidence_and_max_retries(self):
+        _, calls, files = self._run([_proc("", CAP)] * 10, max_retries=2)
+        self.assertEqual(calls, 3)
+        self.assertEqual([f for f in files if f.startswith("launch-refused")], ["launch-refused-1.txt", "launch-refused-2.txt"])
+
+    def test_non_refusal_is_not_retried(self):
+        _, calls, _ = self._run([_proc(OK)] * 3, budget_s=3600)
+        self.assertEqual(calls, 1)
 
 
 if __name__ == "__main__":
