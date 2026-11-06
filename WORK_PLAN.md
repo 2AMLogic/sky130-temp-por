@@ -26,6 +26,7 @@ _None._
 Human-approved issues ready for implementation (`loom:issue`).
 
 - **#229**: Live fleet verification of campaign-driver evidence storage (follow-on from PR #226)
+- **#276**: Re-attest item 9 after sim_common cap_retry refactor (#275)
 
 ## In Progress
 
@@ -56,6 +57,7 @@ Issues carrying `loom:curated`.
 - **#189**: Re-qualify cited sky130 evidence under open_pdks f6eeac7 (split from #188) *(curated)*
 - **#191**: Remove docs/guard-repro reproducer: stale, unreferenced test of a Loom-managed hook *(curated)*
 - **#229**: Live fleet verification of campaign-driver evidence storage (follow-on from PR #226) *(curated)*
+- **#276**: Re-attest item 9 after sim_common cap_retry refactor (#275) *(curated)*
 
 ## Proposed (Architect / Hermit)
 
@@ -72,11 +74,11 @@ Issues carrying `loom:curated`.
 | Operator merge-risk holds | 0 |
 | Very important | 0 |
 | Important | 0 |
-| Ready (`loom:issue`) | 1 |
+| Ready (`loom:issue`) | 2 |
 | In Progress (`loom:building`) | 0 |
 | PRs awaiting review | 0 |
 | Approved PRs awaiting merge | 0 |
-| Curated | 7 |
+| Curated | 8 |
 | Architect / Hermit proposals | 1 |
 | Active epics | 1 |
 <!-- guide:plan-body:end -->
