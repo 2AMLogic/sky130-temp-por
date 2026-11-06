@@ -15,6 +15,7 @@ import sys
 import tempfile
 import unittest
 from pathlib import Path
+from types import SimpleNamespace
 from unittest import mock
 
 HERE = Path(__file__).resolve().parent
@@ -27,7 +28,8 @@ MAN = json.loads((HERE.parent / "experiment.json").read_text())
 
 
 def _fake_store():
-    """Hermetic stand-in for the artifact store: no broker, no klt. The fail-closed behavior itself
+    """Hermetic stand-in for the artifact store (no broker, no klt) and for the host PDK lookup
+    (cmd_record resolves $PDK_ROOT/sky130A, absent on CI). The fail-closed behavior itself
     is tested separately (test_record_fails_closed_without_broker) against the real preflight."""
     def store(bench, record_id, stage_dir):
         return (rb.REPO_ROOT / "manifests" / "artifacts" / f"{bench}-{record_id}.manifest.json",
@@ -35,6 +37,8 @@ def _fake_store():
     stack = contextlib.ExitStack()
     stack.enter_context(mock.patch.object(rb.evidence_store, "preflight_or_exit", return_value=None))
     stack.enter_context(mock.patch.object(rb.evidence_store, "store_or_exit", side_effect=store))
+    fake_pdk = SimpleNamespace(variant="sky130A", installed_commit="0" * 40, matches_pin=True)
+    stack.enter_context(mock.patch.object(rb.cr, "resolve_pdk", return_value=fake_pdk))
     return stack
 
 

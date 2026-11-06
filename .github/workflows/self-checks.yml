@@ -88,6 +88,9 @@ jobs:
       - name: Brown-out checker synthetic verdict cases (16 cases, no records written)
         run: python3 -I sim/brownout-top/brownout_checker.py
 
+      - name: Brown-out campaign runner unit tests (no simulation, no PDK, no records written)
+        run: python3 -I sim/brownout-top/selftest/test_brownout.py
+
       - name: Glitch checker synthetic verdict cases and campaign unit tests (no simulation, no records written)
         run: |
           python3 -I sim/glitch-top/glitch_checker.py
