@@ -929,7 +929,8 @@ def cmd_compare(args):
                 fleet[name][t] = {"jobs": {k: {kk: v.get(kk) for kk in ("job_id", "instance_type", "lifecycle", "runner_klt_version", "elapsed_seconds", "state")}
                                            for k, v in ent["jobs"].items()},
                                   "missing_procs": ent["missing_procs"], "engine_version": env0.get("engine_version"),
-                                  "pdk": env0.get("pdk") or env0.get("models")}
+                                  "models_lib_sha256": env0.get("models_lib_sha256"),
+                                  "models_lib_sha256_scope": env0.get("models_lib_sha256_scope")}
             if t != "nominal" and anal.get(t):
                 write_samples_csv(cdir / name / f"samples-{t}.csv", t, ent, anal[t])
         nom = ents["nominal"]
@@ -975,6 +976,7 @@ def cmd_compare(args):
            "runs_git": gits, "graded_at_git": grade_git, "pdk_pin": pdk["open_pdks_commit"], "klt": metas["baseline"].get("klt_client"),
            "backend": metas["baseline"].get("klt_sim_backend_env"), "n_per_corner": metas["baseline"]["n"], "seed": metas["baseline"]["seed"],
            "capacity_wait_s": {k: m.get("capacity_wait_s") for k, m in metas.items()},
+           "resumes": {k: {"resumes": m.get("resumes", [])} for k, m in metas.items()},
            "dr007_projection_ratio": DR007_PROJECTION, "headline": head, "per_corner": {f"{k[0]}_{k[1]:.2f}V": r for k, r in cmp_rows.items()},
            "guard_counts": {n: {t: {f"{k[0]}_{k[1]:.2f}V": c for k, c in g.items()} for t, g in gt.items()} for n, gt in guards.items()},
            "nominal_invalid_corners": nom_bad, "none_control_max_dev_V": ctrl, "fleet": fleet,
@@ -997,6 +999,9 @@ def render_compare_md(rec, graded, variant, guards, cmp_rows, head):
          f"the 2026-10-11 record `{DR007_RECORD}` was made under `c6d73a3` and is NOT the baseline here.",
          f"- **Tools**: {rec['klt']} (client); backend `{rec['backend']}`; `batch.capacity_wait_s` {rec['capacity_wait_s']}",
          "- **Fleet jobs**: " + "; ".join(f"{n}/{t}[{k}]={j['job_id']}" for n, ft in rec["fleet"].items() for t, f in ft.items() for k, j in f["jobs"].items()),
+         "- **Model library identity**: the request names the PDK `sky130A` and the library path; the report records the library sha256 `" + (next((f["models_lib_sha256"] for ft in rec["fleet"].values() for f in ft.values() if f.get("models_lib_sha256")), "?")) + "` with scope `client` (hashed on the submitting host, whose `~/.ciel/sky130A` resolves to the pinned open_pdks version). It is NOT an independent check of the library the fleet runner loaded.",
+         "- **Resumes**: " + ("; ".join(f"{n}: resumed {r['started_utc']} (terms {r['terms']}) at `{r['git']['sha']}`" for n, m in rec["resumes"].items() for r in m.get("resumes", [])) or "none")
+         + ". A unit whose fleet job ended without usable results (e.g. `batch_job_interrupted`, a Spot reclaim) is resubmitted to the fleet and its earlier attempt is archived under `attemptN/` in the git-ignored run directory; no unit was run locally.",
          f"- **Repo state**: baseline run `{rec['runs_git']['baseline']['sha']}`, variant run `{rec['runs_git'][variant]['sha']}` (working trees clean at run time); graded at `{rec['graded_at_git']['sha']}`",
          f"- **PVT + MC**: process tt/ss/ff/sf/fs (`_mm`) x 2.97/3.30/3.63 V = 15 corners; -40..125 C swept in-process, evaluated at -40/27/125 C; `vary: mismatch`, **N = {N} per corner**, seed {rec['seed']}; terms `nominal`, `none` (control), `mirror`.",
          "- **Convention / error definition / guards**: identical to the base experiment (3 sigma = 3 x sample sd per corner; error vs same-corner nominal through the nominal PTAT slope; same operating-point guards, invalid samples excluded and counted). Variant statistics use the variant's OWN nominal.", ""]
