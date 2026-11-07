@@ -49,6 +49,22 @@ that sweep.
 <id> --supersedes <old record id>`); the record states the grading SHA next to
 the run SHA.
 
+## Measured: DR-007 degenerated-mirror variant (issue #284)
+
+`run --variant mirror-degen` rewrites the generated deck only (XMP1..3 L4 W8 -> W32, plus a series
+`res_xhigh_po` W2 L660, about 679 kOhm, per leg) and `compare` grades a baseline + variant pair of
+`nominal`, `none` and `mirror` terms into one record. Record
+`records/20261107-235128-679442ca.md` (N = 100 per corner, pin `f6eeac7`, batch fleet) reports the
+measured mirror-term ratio next to DR-007's 0.10x projection (about 0.09 untrimmed worst corner, 0.08
+1-point trim) and the per-corner guard failures, including the 2.97 V corners. DR-007 itself is
+unedited; its update belongs to the ratification lane. Example:
+
+```bash
+python3 sim/temp-core-accuracy-mc/run_accuracy_mc.py run --run-id <id> --n 100 --wait-for-capacity 600 --term nominal --term none --term mirror
+python3 sim/temp-core-accuracy-mc/run_accuracy_mc.py run --run-id <id> --variant mirror-degen --n 100 --wait-for-capacity 600 --term nominal --term none --term mirror
+python3 sim/temp-core-accuracy-mc/run_accuracy_mc.py compare --run-id <id>
+```
+
 ## Cold start (from a clean checkout)
 
 Prerequisites are machine-level: `ngspice`, the pinned sky130A PDK
