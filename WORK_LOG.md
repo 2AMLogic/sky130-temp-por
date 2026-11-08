@@ -6,6 +6,11 @@ Chronological record of recently merged pull requests and closed issues. This fi
 
 - [2026-08](work_log/WORK_LOG_2026-08.md)
 
+### 2026-11-07
+
+- **PR #286**: sim: measure DR-007 mirror-degen mirror-term ratio on the batch fleet
+- **Issue #284** (closed): sim: measure DR-007's degenerated-mirror projection with a mirror-term MC variant run
+
 ### 2026-11-06
 
 - **Issue #229** (closed): Live fleet verification of campaign-driver evidence storage (follow-on from PR #226)
