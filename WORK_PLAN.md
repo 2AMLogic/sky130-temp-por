@@ -54,7 +54,6 @@ Issues carrying `loom:curated`.
 - **#153**: brownout-top: re-grade NONPHYSICAL brown-out points with a tightened-solver fleet re-run *(curated)*
 - **#181**: glitch-top: re-run failed vdd_level request vdd_slew_v1.2_h0.0002_s200000 (45 ERROR points) *(curated)*
 - **#189**: Re-qualify cited sky130 evidence under open_pdks f6eeac7 (split from #188) *(curated)*
-- **#191**: Remove docs/guard-repro reproducer: stale, unreferenced test of a Loom-managed hook *(curated)*
 
 ## Proposed (Architect / Hermit)
 
@@ -75,7 +74,7 @@ Issues carrying `loom:curated`.
 | In Progress (`loom:building`) | 0 |
 | PRs awaiting review | 0 |
 | Approved PRs awaiting merge | 0 |
-| Curated | 6 |
+| Curated | 5 |
 | Architect / Hermit proposals | 1 |
 | Active epics | 1 |
 <!-- guide:plan-body:end -->
