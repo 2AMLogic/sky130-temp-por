@@ -18,6 +18,21 @@ the **envelope's own directory**:
   freshness gate an LVS citation has, since its shape carries no
   `provenance.input.content_hash` for a manifest pin to bind to.
 
+Two shapes of indirection above those hashes are walked (#302), and both
+are checked here because getting either wrong is silent:
+
+- an item's `evidence` entry is either one citation object or a **list** of
+  them (item 11 cites `erc.json` and `lvs.json` together);
+- an envelope's `file` is either a plain string relative to the envelope's
+  own directory (`drc.json`) or the schema-2 object
+  `{"path": ..., "scope": "repo"}` whose `path` is repo-root-relative
+  (`erc.json`).
+
+An entry, citation or `file` form the checker cannot resolve is an
+`UNMAPPABLE` failure, not a skip. That rule is about those repo-controlled
+*shapes* only — a readable envelope with no recognized hash shape still
+counts zero and stays green, which is what `UnmappedEnvelopeTest` pins.
+
 `klt signoff --attest` envelopes are deliberately **out** of scope since
 #303: items 1, 9 and 10 mark their toolchain-bound commands
 `"local_only": true`, so `klt signoff --attest N ... --check` now runs
@@ -53,6 +68,8 @@ _spec.loader.exec_module(cc)
 MANIFEST = "manifests/test-manifest.json"
 DRC = "layout/temp_por_top/drc.json"
 LVS = "layout/temp_por_top/lvs.json"
+ERC = "layout/temp_por_top/erc.json"
+GDS = "layout/temp_por_top/temp_por_top.gds"
 
 
 def _sha(data: bytes) -> str:
@@ -110,6 +127,19 @@ def _lvs_envelope(layout: bytes, reference: bytes) -> bytes:
         "environment": {
             "layout_sha256": hashlib.sha256(layout).hexdigest(),
             "reference_sha256": hashlib.sha256(reference).hexdigest()}}).encode()
+
+
+def _erc_envelope(gds: bytes, path: str = GDS) -> bytes:
+    """`klt erc`'s schema-2 shape: `file` is a `{path, scope}` object.
+
+    Unlike `drc.json`'s plain string, `path` is relative to the repo root,
+    not to the envelope's directory — the distinction this file pins in
+    `DictFileReferenceTest`.
+    """
+    return json.dumps({"schema_version": 2, "status": "not_checked",
+                       "file": {"path": path, "scope": "repo"},
+                       "provenance": {"input": {"content_hash": _sha(gds),
+                                                "role": "layout"}}}).encode()
 
 
 class DrcArtifactBranchTest(unittest.TestCase):
@@ -288,6 +318,223 @@ class MixedEnvelopeTest(unittest.TestCase):
         self.assertTrue(any("item 3" in ln and "artifact" in ln for ln in lines))
         self.assertTrue(any("item 4" in ln and "compare-layout" in ln for ln in lines))
         self.assertFalse(any("compare-reference" in ln for ln in lines))
+
+
+class DictFileReferenceTest(unittest.TestCase):
+    """A schema-2 `{"path": ..., "scope": "repo"}` top-level `file` (#302).
+
+    `erc.json` records this form while `drc.json` records a plain string.
+    Before #302 the dict form was never reached (item 11, its only user, was
+    skipped whole); reaching it naively would have raised `TypeError` on
+    `envelope_dir / {...}` rather than checking anything.
+    """
+
+    def test_repo_scoped_dict_file_is_counted(self):
+        gds = b"GDS-BYTES\n"
+        files = {ERC: _erc_envelope(gds), GDS: gds}
+        with _repo(files, {"11": {"file": ERC}}):
+            rc, out, err = _run()
+        self.assertEqual(rc, 0, err)
+        self.assertIn("1 recorded artifact hash(es)", out)
+
+    def test_dict_path_resolves_against_the_repo_root_not_the_envelope(self):
+        """The two `file` forms resolve against different roots.
+
+        The envelope is deliberately parked outside the artifact's directory:
+        resolving `path` against the envelope's own directory would look for
+        `manifests/layout/temp_por_top/temp_por_top.gds` and report a present
+        artifact as missing.
+        """
+        gds = b"GDS-BYTES\n"
+        envelope = "manifests/erc.json"
+        files = {envelope: _erc_envelope(gds), GDS: gds}
+        with _repo(files, {"11": {"file": envelope}}) as root:
+            self.assertFalse((root / "manifests" / GDS).exists())
+            rc, out, err = _run()
+        self.assertEqual(rc, 0, err)
+        self.assertIn("1 recorded artifact hash(es)", out)
+
+    def test_redrawn_artifact_behind_a_dict_file_is_stale(self):
+        gds = b"GDS-BYTES\n"
+        files = {ERC: _erc_envelope(gds), GDS: b"REDRAWN\n"}
+        with _repo(files, {"11": {"file": ERC}}):
+            rc, _out, err = _run()
+        self.assertEqual(rc, 1)
+        self.assertIn("STALE", err)
+        self.assertIn("item 11", err)
+        self.assertIn("artifact", err)
+        self.assertIn(hashlib.sha256(b"REDRAWN\n").hexdigest(), err)
+
+    def test_external_scope_is_unmappable_not_a_crash(self):
+        """`{"path": null, "scope": "external"}` names nothing committed.
+
+        klt reports a file outside the repo this way. There is no artifact to
+        re-hash, and the recorded hash says so — but the citation claimed a
+        hash, so counting zero would hide it.
+        """
+        envelope = {"schema_version": 2, "status": "not_checked",
+                    "file": {"path": None, "scope": "external"},
+                    "provenance": {"input": {"content_hash": _sha(b"x")}}}
+        files = {ERC: json.dumps(envelope).encode()}
+        with _repo(files, {"11": {"file": ERC}}):
+            rc, _out, err = _run()
+        self.assertEqual(rc, 1)
+        self.assertIn("UNMAPPABLE", err)
+        self.assertIn("item 11", err)
+        self.assertIn("external", err)
+        self.assertNotIn("STALE", err)
+
+    def test_dict_file_with_no_recorded_hash_counts_zero(self):
+        """Half-recorded stays green, exactly as for the string form.
+
+        No `content_hash` means no pair to compare, so the unresolvable
+        `file` is never consulted: `UNMAPPABLE` is about citations that
+        claimed a hash, not about every odd key in an envelope.
+        """
+        envelope = {"schema_version": 2,
+                    "file": {"path": None, "scope": "external"}}
+        files = {ERC: json.dumps(envelope).encode()}
+        with _repo(files, {"11": {"file": ERC}}):
+            rc, out, err = _run()
+        self.assertEqual(rc, 0, err)
+        self.assertIn("0 recorded artifact hash(es)", out)
+
+
+class ListValuedEvidenceEntryTest(unittest.TestCase):
+    """An item whose evidence is a list of citations (item 11, #302).
+
+    `klt signoff` accepts a list for a multi-envelope item. The checker used
+    to skip any non-dict entry, so item 11 contributed 0 pairs while the
+    summary line still read clean — the silent-skip failure this fixes.
+    """
+
+    def _item_11(self):
+        gds, layout, reference = b"GDS-BYTES\n", b"* layout\n", b"* reference\n"
+        files = {ERC: _erc_envelope(gds), GDS: gds,
+                 LVS: _lvs_envelope(layout, reference),
+                 "layout/temp_por_top/temp_por_top.spice": layout,
+                 "layout/temp_por_top/temp_por_top.ref.spice": reference}
+        return files, gds, layout, reference
+
+    def test_every_citation_in_the_list_is_counted(self):
+        files, _gds, _layout, _reference = self._item_11()
+        entry = [{"file": ERC}, {"file": LVS}]
+        with _repo(files, {"11": entry}):
+            rc, out, err = _run()
+        self.assertEqual(rc, 0, err)
+        # erc.json's artifact pair plus both halves of lvs.json's compare.
+        self.assertIn("3 recorded artifact hash(es)", out)
+
+    def test_a_stale_second_citation_is_reported(self):
+        files, _gds, layout, _reference = self._item_11()
+        files["layout/temp_por_top/temp_por_top.ref.spice"] = b"* regenerated\n"
+        entry = [{"file": ERC}, {"file": LVS}]
+        with _repo(files, {"11": entry}):
+            rc, _out, err = _run()
+        self.assertEqual(rc, 1)
+        lines = [ln for ln in err.splitlines() if "STALE" in ln]
+        self.assertEqual(len(lines), 1, err)
+        self.assertIn("compare-reference", lines[0])
+        self.assertIn(LVS, lines[0])
+
+    def test_both_citations_are_walked_not_just_the_first(self):
+        """One STALE line per drifted artifact, from both envelopes.
+
+        A loop that stopped at the first citation — or that checked only the
+        last — would report one line here, not two.
+        """
+        files, _gds, _layout, _reference = self._item_11()
+        files[GDS] = b"REDRAWN\n"
+        files["layout/temp_por_top/temp_por_top.spice"] = b"* re-extracted\n"
+        entry = [{"file": ERC}, {"file": LVS}]
+        with _repo(files, {"11": entry}):
+            rc, _out, err = _run()
+        self.assertEqual(rc, 1)
+        lines = [ln for ln in err.splitlines() if "STALE" in ln]
+        self.assertEqual(len(lines), 2, err)
+        self.assertTrue(any(ERC in ln and "artifact" in ln for ln in lines))
+        self.assertTrue(any(LVS in ln and "compare-layout" in ln for ln in lines))
+
+    def test_a_single_citation_object_still_works(self):
+        """The dict form is unchanged: normalization must not require a list."""
+        gds = b"GDS-BYTES\n"
+        files = {DRC: _drc_envelope(gds), GDS: gds}
+        with _repo(files, {"3": {"file": DRC}}):
+            rc, out, err = _run()
+        self.assertEqual(rc, 0, err)
+        self.assertIn("1 recorded artifact hash(es)", out)
+
+
+class UnmappableEntryTest(unittest.TestCase):
+    """A manifest entry the checker cannot map fails loudly (#302, AC 2).
+
+    `.loom/docs/ci-principles.md`: a check that cannot run must never look
+    like one that passed. These shapes are repo-controlled and few, so
+    failing is cheap and silence is not.
+    """
+
+    def test_empty_list_entry_fails_rather_than_counting_zero(self):
+        gds = b"GDS-BYTES\n"
+        files = {DRC: _drc_envelope(gds), GDS: gds}
+        with _repo(files, {"3": {"file": DRC}, "11": []}):
+            rc, _out, err = _run()
+        self.assertEqual(rc, 1)
+        self.assertIn("UNMAPPABLE", err)
+        self.assertIn("item 11", err)
+        self.assertIn("empty list", err)
+
+    def test_scalar_entry_is_unmappable(self):
+        with _repo({}, {"11": DRC}):
+            rc, _out, err = _run()
+        self.assertEqual(rc, 1)
+        self.assertIn("UNMAPPABLE", err)
+        self.assertIn("item 11", err)
+        self.assertIn("str", err)
+
+    def test_citation_without_a_string_file_is_unmappable(self):
+        """The exact shape the old `isinstance(entry.get("file"), str)` hid."""
+        with _repo({}, {"11": {"content_hash": _sha(b"x")}}):
+            rc, _out, err = _run()
+        self.assertEqual(rc, 1)
+        self.assertIn("UNMAPPABLE", err)
+        self.assertIn("item 11", err)
+        self.assertIn("no string `file`", err)
+
+    def test_non_dict_citation_inside_a_list_is_unmappable(self):
+        gds = b"GDS-BYTES\n"
+        files = {ERC: _erc_envelope(gds), GDS: gds}
+        with _repo(files, {"11": [{"file": ERC}, "layout/stray.json"]}):
+            rc, _out, err = _run()
+        self.assertEqual(rc, 1)
+        self.assertIn("UNMAPPABLE", err)
+        self.assertIn("item 11", err)
+
+    def test_unmappable_is_not_reported_as_stale(self):
+        """Nothing drifted, so the remedy is not "re-render the evidence"."""
+        with _repo({}, {"11": 11}):
+            rc, _out, err = _run()
+        self.assertEqual(rc, 1)
+        self.assertNotIn("STALE", err)
+        self.assertNotIn("re-render the evidence", err)
+
+
+class RealManifestTest(unittest.TestCase):
+    """The committed manifest's own shapes, not a synthetic fixture."""
+
+    def test_item_11_is_a_list_and_erc_records_a_dict_file(self):
+        """Pins why both branches above exist, against the real files.
+
+        If the manifest or `klt erc`'s envelope shape ever changes, this
+        fails here rather than silently making the new branches dead code.
+        """
+        root = Path(__file__).resolve().parent.parent
+        manifest = json.loads((root / "manifests" / "sky130-temp-por.json").read_text())
+        entry = manifest["evidence"]["11"]
+        self.assertIsInstance(entry, list)
+        self.assertEqual([c["file"] for c in entry], [ERC, LVS])
+        erc = json.loads((root / ERC).read_text())
+        self.assertIsInstance(erc["file"], dict)
+        self.assertEqual(erc["file"]["scope"], "repo")
 
 
 if __name__ == "__main__":
