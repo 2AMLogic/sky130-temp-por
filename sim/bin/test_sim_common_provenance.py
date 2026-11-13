@@ -186,11 +186,9 @@ VERSION_LITERAL_PATTERNS = (
 
 # A runner may be waived ONLY with an open issue that removes it.  `test_waivers_are_not
 # _stale` fails once a waived file is clean, so a waiver cannot outlive its fix.
-WAIVED_RUNNERS = {
-    "sim/temp-core-accuracy-mc/run_accuracy_mc.py":
-        "issue #312 -- hardcoded open_pdks commit (and a `'?'` ngspice fallback) in "
-        "render_md(); out of scope for #306, which fixes run_solver_sweep.py only",
-}
+# Empty is the healthy state: every runner derives its tool versions.  The dict stays so
+# the waiver mechanism (and `test_waivers_are_not_stale`) remains available and tested.
+WAIVED_RUNNERS: dict[str, str] = {}
 
 
 def scan_version_literals(text: str) -> list[tuple[int, str, str]]:
