@@ -79,6 +79,9 @@ jobs:
       - name: Accuracy-MC record provenance lines (PDK/Tools derived from the run, no literals)
         run: python3 -I sim/temp-core-accuracy-mc/test_record_provenance.py
 
+      - name: Accuracy-MC `none` negative control is three-state (a corner that compared nothing can never render PASS)
+        run: python3 -I sim/temp-core-accuracy-mc/test_none_control.py
+
       - name: Pad-island census unit tests
         run: python3 -m unittest layout/bin/test_pad_island_census.py
 

@@ -34,7 +34,12 @@ that sweep.
 2. Exactly one device group has mismatch live in a term run; the others are
    instantiated through `mmoff_*` wrapper subckts that zero the model library's
    mismatch-sigma `.param`s in the wrapper scope. Controls: `none` (everything
-   wrapped) must equal `nominal` exactly; every term row must be nonzero.
+   wrapped) must equal `nominal` exactly; every term row must be nonzero. The
+   `none` control is graded **three-state** -- PASS / FAIL / NOT VERIFIED: a
+   corner with no valid sample or no usable nominal point compared nothing, so
+   it can never read 0 V, and one such corner makes the whole control NOT
+   VERIFIED (named in the record) however flat the compared corners are
+   (`test_none_control.py`).
 3. Temperature is swept **inside** each ngspice process (`dc temp -40 125 1`):
    klt derives the per-sample seed from the corner index, so a klt temperature
    axis would give a different device realisation at each temperature.
