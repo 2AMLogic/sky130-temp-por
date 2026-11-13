@@ -256,27 +256,12 @@ def analyze_variant(variant: str, run_dir: Path, man: dict, corners_dir: Path) -
         attempts = sim_common.attempt_messages(d, run_dir, REPO_ROOT)
         if attempts:
             rq["failed_earlier_attempts"] = attempts
-        rp = d / "report.json"
-        if not rp.is_file():
-            rq["outcome"] = "NOT SUBMITTED / no report"
+        rep, why = sim_common.load_request_report(d, run_dir, REPO_ROOT)
+        if rep is None:
+            rq["outcome"] = why
             requests.append(rq)
             continue
-        try:
-            rep = json.loads(rp.read_text())
-        except json.JSONDecodeError:
-            rq["outcome"] = "NO JSON (klt failed before a report existed): " + scrub((d / "klt.stderr").read_text()[-600:], run_dir)
-            requests.append(rq)
-            continue
-        if "corners" not in rep:
-            rq["outcome"] = "klt error (no corners reported): " + scrub(str((rep.get("error") or {}).get("message", rep))[:500], run_dir)
-            requests.append(rq)
-            continue
-        remote = (rep.get("environment") or {}).get("remote") or {}
-        rq.update(
-            outcome=rep.get("status"), job_id=remote.get("job_id"), instance_type=remote.get("instance_type"),
-            lifecycle=remote.get("lifecycle"), runner_klt_version=remote.get("runner_klt_version"),
-            elapsed_seconds=remote.get("elapsed_seconds"), state=remote.get("state"), corner_count=rep.get("corner_count"),
-        )
+        rq.update(sim_common.fleet_job_fields(rep))
         requests.append(rq)
         for c in rep["corners"]:
             proc, temp = c["process"], c["temperature_c"]

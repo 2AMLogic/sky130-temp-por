@@ -240,39 +240,16 @@ def analyze_variant(variant: str, run_dir: Path, man: dict, corners_dir: Path, w
     for rate, primary in all_rates(man):
         tag = rate_tag(rate)
         d = run_dir / variant / tag
-        rep_path = d / "report.json"
         req_rec = {"rate_v_per_s": rate, "tag": tag, "primary_rate": primary, "tstop_s": tstop_for(rate)}
         attempts = sim_common.attempt_messages(d, run_dir, REPO_ROOT)
         if attempts:
             req_rec["failed_earlier_attempts"] = attempts
-        if not rep_path.is_file():
-            req_rec["outcome"] = "NOT SUBMITTED / no report"
+        rep, why = sim_common.load_request_report(d, run_dir, REPO_ROOT)
+        if rep is None:
+            req_rec["outcome"] = why
             requests.append(req_rec)
             continue
-        try:
-            rep = json.loads(rep_path.read_text())
-        except json.JSONDecodeError:
-            req_rec["outcome"] = "NO JSON (klt failed before a report existed): " + scrub((d / "klt.stderr").read_text()[-600:], run_dir)
-            requests.append(req_rec)
-            continue
-        if "corners" not in rep:
-            req_rec["outcome"] = "klt error (no corners reported): " + scrub(str((rep.get("error") or {}).get("message", rep))[:500], run_dir)
-            requests.append(req_rec)
-            continue
-        remote = (rep.get("environment") or {}).get("remote") or {}
-        req_rec.update(
-            {
-                "outcome": rep.get("status"),
-                "job_id": remote.get("job_id"),
-                "instance_type": remote.get("instance_type"),
-                "lifecycle": remote.get("lifecycle"),
-                "runner_klt_version": remote.get("runner_klt_version"),
-                "client_klt_version": remote.get("client_klt_version"),
-                "elapsed_seconds": remote.get("elapsed_seconds"),
-                "state": remote.get("state"),
-                "corner_count": rep.get("corner_count"),
-            }
-        )
+        req_rec.update(sim_common.fleet_job_fields(rep))
         pdk_info = (rep.get("provenance") or {}).get("pdk", pdk_info)
         requests.append(req_rec)
         for c in rep.get("corners", []):

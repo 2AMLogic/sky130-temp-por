@@ -436,7 +436,7 @@ class Comparison(unittest.TestCase):
                "points": [_cpt("a", "p1", "NONPHYSICAL", 10.0, phys=False), _cpt("a", "p2", "PASS", 10.0, phys=True), _cpt("b", "p1", "FAIL", 5.0, phys=True)]}
         rerun = [_cpt("a", "p1", "NONPHYSICAL", 30.0, phys=False), _cpt("a", "p2", "PASS", 30.0, phys=True),
                  {"tag": "b", "id": "p1", "process": "tt", "temperature_c": 27, "supply_v": 3.3, "outcome": "NOT_COVERED", "reason": "not in the rerun set"}]
-        reqs = [{"tag": "a", "job_id": "klt-sim-new-a", "elapsed_seconds": 300, "outcome": "pass"}, {"tag": "b", "job_id": None, "outcome": "NOT SUBMITTED (no report on disk)"}]
+        reqs = [{"tag": "a", "job_id": "klt-sim-new-a", "elapsed_seconds": 300, "outcome": "pass"}, {"tag": "b", "job_id": None, "outcome": "NOT SUBMITTED / no report"}]
         cmp = rb.build_comparison(src, rerun, reqs, {"key": "reltol2e-4", "options_extra": ["reltol=2e-4"]}, ["a"])
         rows = {(r["tag"], r["id"]): r for r in cmp["rows"]}
         self.assertEqual(rows[("a", "p1")]["role"], "target")
