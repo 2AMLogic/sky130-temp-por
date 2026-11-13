@@ -373,8 +373,14 @@ def load_term(run_dir, term):
     """-> {'report': dict|None, 'refusal': ..., 'missing_procs': [...], 'corners': {(proc, supply): {sample|None: {meas...} | {'_error': str}}}}
 
     nominal is one request; every mismatch term is one request PER PROCESS section (the fleet job limit is ~1 h at
-    concurrency 1), merged here.  A process whose request has no usable report is listed in missing_procs."""
-    ent = {"report": None, "refusal": None, "missing_procs": [], "jobs": {}, "corners": {}}
+    concurrency 1), merged here.  A process whose request has no usable report is listed in missing_procs.
+
+    `report['environment']` is the FIRST usable process section only, so it is not a safe source of
+    fleet-wide provenance: a full run is one job per process per term (36 jobs), and the other
+    sections' runners may be on different installs.  `jobs` and `engines` therefore keep every
+    process job's own `environment.remote` and `environment.engine_version` -- the per-job
+    provenance `observed_provenance()` joins over (issue #312)."""
+    ent = {"report": None, "refusal": None, "missing_procs": [], "jobs": {}, "engines": {}, "corners": {}}
     dirs = [(None, run_dir / term)] if term == "nominal" else [(p, run_dir / term / p) for p in PROCS]
     reps = []
     for proc, d in dirs:
@@ -403,6 +409,7 @@ def load_term(run_dir, term):
         for proc, rep in reps:
             ent["report"]["corners"] += rep["corners"]
             ent["jobs"][proc or "all"] = rep["environment"].get("remote", {})
+            ent["engines"][proc or "all"] = rep["environment"].get("engine_version")
             for c in rep["corners"]:
                 pr_, supply, smp = parse_cid(c["corner_id"])
                 vals = {m["name"]: m.get("value") for m in c["measurements"]}
@@ -655,6 +662,12 @@ def cmd_record(args):
     grade_git = cr.git_state()  # the analysis code that graded the run (may be later than the run SHA on a re-grade)
     if grade_git.get("dirty") and not args.allow_dirty:
         sys.exit("the grading tree is DIRTY: commit the analysis code first so the record is provenance-clean")
+    # Resolved before anything is written: a record whose PDK line cannot be derived is a
+    # record that must not exist, and failing here leaves no half-written record behind.
+    # This makes `record` require an installed PDK, as the seven campaign runners and
+    # `run_solver_sweep.py` already do -- the alternative, rendering `unknown` for the
+    # host half, would weaken every record to spare a host that cannot reproduce the run.
+    pdk = cr.resolve_pdk(cr.load_pin())
     ents ={t: load_term(run_dir, t) for t in ["nominal", *RUN_TERMS]}
     nominal = ents["nominal"]
     for d in ("records", "netlist-snapshots", "corners"):
@@ -716,6 +729,9 @@ def cmd_record(args):
             (cdir / f"nominal_{proc}_{supply:.2f}v.log").write_text(
                 f"corner {c['corner_id']}  term nominal  klt status={c.get('status')}  guards={'ok' if not why else why}\n"
                 + "\n".join(f"{k} = {v}" for k, v in vals.items()) + "\n")
+    # Fleet-side provenance off the reports themselves, so the header states what ran
+    # rather than what was current when this code was written (issue #312).
+    prov = observed_provenance(ents)
     not_run = [t for t in RUN_TERMS if ents[t]["report"] is None] + (["nominal"] if nominal["report"] is None else [])
     partial = {t: ents[t]["missing_procs"] for t in RUN_TERMS if ents[t]["report"] is not None and ents[t]["missing_procs"]}
     xcheck = transient_crosscheck(nominal) if nominal["report"] else None
@@ -742,12 +758,93 @@ def cmd_record(args):
                               for k, v in a.items()} for t, a in anal.items() if a},
            "supersedes": args.supersedes or "(none)", "author": cr.default_author()}
     (rec_dir / "records" / f"{rid}.json").write_text(json.dumps(rec, indent=2, default=str) + "\n")
-    (rec_dir / "records" / f"{rid}.md").write_text(render_md(rec, anal, summ, summ_ctat, rss, ctrl, xcheck, not_run, fleet, meta, args) + "\n")
+    (rec_dir / "records" / f"{rid}.md").write_text(render_md(rec, anal, summ, summ_ctat, rss, ctrl, xcheck, not_run, fleet, meta, args, pdk, prov) + "\n")
     print(rid)
     return 0
 
 
-def render_md(rec, anal, summ, summ_ctat, rss, ctrl, xcheck, not_run, fleet, meta, args):
+def runner_pdks(ent):
+    """The PDK install of EVERY fleet machine that ran a process section of this term.
+
+    NOT the client-resolved `provenance.pdk`: the runner executes against its own
+    `/opt/pdk`, stamped under `environment.remote.worker_environment.pdk`, and the two
+    genuinely diverge -- `sim/bias-core-smoke/records/20261023-171642-e69f5b2e.json`
+    recorded a grid executed under open_pdks `c6d73a35...` while the client had merely
+    resolved `f6eeac7d...`.  That runner stamp is exactly the value this runner used to
+    state as a literal labelled "(sim/pdk.json pin)" (issue #312), which it never was.
+
+    One entry per process job, off `ent['jobs']` rather than the merged
+    `report['environment']` -- that merged section is the first usable process only, so a
+    term's other four runners (and any different install among them) were invisible.
+    Yields `{}` for a job with no stamp, so an unreported one becomes `unknown` via
+    `sim_common.joined_versions()` rather than borrowing the client's or another job's.
+    """
+    return [((j or {}).get("worker_environment") or {}).get("pdk") or {}
+            for j in (ent.get("jobs") or {}).values()]
+
+
+def observed_provenance(ents):
+    """The fleet-side halves of the record header, derived from the run's own reports.
+
+    Joined over every PROCESS JOB of every term -- a full run is 7 mismatch terms x 5
+    process sections + nominal = 36 fleet jobs, each free to land on a runner with its own
+    PDK install and engine.  Both values go through `sim_common.joined_versions()`, so each
+    is the sorted SET of what was actually observed and reads `unknown` when no job
+    reported one -- never first-found-only, and never a literal that goes stale (#312).
+    Engines are tagged `ngspice-<n>` *before* joining because the report carries the bare
+    number ("46") and `ngspice-unknown` is not a version.
+
+    `*_jobs` / `*_reporting` are the coverage of each value: how many jobs reported one at
+    all, out of how many ran.  Rendering uses them to keep a PARTIAL answer from reading
+    like a unanimous one; see `render_pdk_tools_lines()`.
+    """
+    jv = sim_common.joined_versions
+    pdks = [p for e in ents.values() for p in runner_pdks(e)]
+    engines = [{"tag": f"ngspice-{v}"} if v else {}
+               for e in ents.values() for v in (e.get("engines") or {}).values()]
+    return {"fleet_pdk": jv(pdks, "stamp_text"),
+            "fleet_pdk_jobs": len(pdks), "fleet_pdk_reporting": sum(1 for p in pdks if p.get("stamp_text")),
+            "fleet_engine": jv(engines, "tag"),
+            "fleet_engine_jobs": len(engines), "fleet_engine_reporting": sum(1 for e in engines if e.get("tag"))}
+
+
+def coverage_note(prov, which):
+    """A ` (from N of M fleet jobs; ...)` suffix when only SOME jobs reported `which`, else `""`.
+
+    A set joined over 36 jobs of which 3 answered is not the same claim as one all 36
+    agreed on, and the header sentence ("the fleet runners that executed the grid
+    reported ...") reads as the latter.  The note is deliberately absent in the two
+    unambiguous cases: every job reported (the value speaks for itself), and none did
+    (the value is already `unknown`, which says exactly that).
+    """
+    n, m = prov[f"{which}_reporting"], prov[f"{which}_jobs"]
+    return f" (from {n} of {m} fleet jobs; the rest reported none)" if 0 < n < m else ""
+
+
+def render_pdk_tools_lines(rec, pdk, prov, fleet):
+    """The record's `PDK` and `Tools` header lines.
+
+    The grid ran on the fleet but the record is written here, so the PDK line names both
+    halves explicitly and lets neither stand in for the other: the recording host's
+    resolved install (with the same pin-state ternary
+    `sim_common.render_pdk_tools_repo_state()` uses) and the stamp the fleet runners
+    reported.  Before issue #312 this line stated one literal commit labelled
+    "(sim/pdk.json pin)" that was in fact neither the pin nor this host's install, but the
+    October fleet runners' stamp -- so the claim was wrong in both halves at once.
+    """
+    pin_state = "matches sim/pdk.json pin" if pdk.matches_pin else "**MISMATCH vs sim/pdk.json pin**"
+    jobs = ", ".join(f"{t}[{k}]={j['job_id']}" for t, f in fleet.items() for k, j in f["jobs"].items())
+    return [
+        f"- **PDK**: {pdk.variant} @ open_pdks `{pdk.installed_commit}` ({pin_state}) on the host"
+        f" that wrote this record, models `{pdk.pin['ngspice_lib']}` (`_mm` sections for"
+        f" mismatch); the fleet runners that executed the grid reported `{prov['fleet_pdk']}`"
+        + coverage_note(prov, "fleet_pdk"),
+        f"- **Tools**: {rec['klt']} (client); backend `{rec['backend']}`; fleet engine"
+        f" {prov['fleet_engine']}{coverage_note(prov, 'fleet_engine')}; fleet jobs: {jobs}",
+    ]
+
+
+def render_md(rec, anal, summ, summ_ctat, rss, ctrl, xcheck, not_run, fleet, meta, args, pdk, prov):
     rid, git = rec["record_id"], rec["git"]
     N = meta["n"]
     L = [f"# Record {rid}", "",
@@ -755,9 +852,7 @@ def render_md(rec, anal, summ, summ_ctat, rss, ctrl, xcheck, not_run, fleet, met
          f"- **Experiment**: `{SLUG}` -- full-signal-path mismatch Monte Carlo of `temp_core`: temperature error in degC, per-term attribution (issue #105; DR-003 row 2 `[TBD-1]`)",
          "- **Claim**: NOT a spec claim and no `spec/` edit. Evidence toward `[TBD-1]`: the PTAT-referred temperature error of `temp_core` under local device mismatch, untrimmed and with a 1-point (27 C) gain trim, with the contribution of each mismatch term separated.",
          f"- **Netlist provenance**: schematic-derived committed `design/netlist/{{bias_core,temp_core}}.spice` in a generated testbench (`netlist-snapshots/{rid}/`); per-term device switching by `mmoff_*` wrapper subckts (see README)",
-         "- **PDK**: sky130A @ open_pdks `c6d73a35f524070e85faff4a6a9eef49553ebc2b` (sim/pdk.json pin), models `libs.tech/combined/sky130.lib.spice` (`_mm` sections for mismatch)",
-         f"- **Tools**: {rec['klt']} (client); backend `{rec['backend']}`; fleet engine ngspice-{next((f['engine_version'] for f in fleet.values() if f.get('engine_version')), '?')}; fleet jobs: "
-         + ", ".join(f"{t}[{k}]={j['job_id']}" for t, f in fleet.items() for k, j in f["jobs"].items()),
+         *render_pdk_tools_lines(rec, pdk, prov, fleet),
          f"- **Repo state**: `{git['sha']}` on `{git['branch']}` (working tree {'DIRTY' if git['dirty'] else 'clean'} at run time)"
          + "".join(f"; resumed {r['started_utc']} at `{r['git']['sha']}` ({'DIRTY' if r['git']['dirty'] else 'clean'})" for r in meta.get("resumes", []))
          + f"; graded (analysis code) at `{rec['graded_at_git']['sha']}` (working tree {'DIRTY' if rec['graded_at_git']['dirty'] else 'clean'})",
