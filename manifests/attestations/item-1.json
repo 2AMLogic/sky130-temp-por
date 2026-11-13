@@ -31,7 +31,7 @@
         "role": "source",
         "path": "design/netlist.py",
         "passed": true,
-        "content_hash": "sha256:74d1db798b3233ee2b591ab221076a62140a6416282554bf85da843360ae1cef"
+        "content_hash": "sha256:5ce9d6bd38407c7924bcefce9f43b43e33e54179b6f95174e155d39ecf926e32"
       },
       {
         "check": "present",
@@ -204,7 +204,7 @@
     ]
   },
   "provenance": {
-    "klt_version": "0.7.1.dev2517+g6bb7cf233677",
+    "klt_version": "0.8.0",
     "klayout_version": null,
     "pdk": null,
     "deck": null,
