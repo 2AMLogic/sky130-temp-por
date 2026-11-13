@@ -103,8 +103,15 @@ part of the claim and travel with it):
   evaluate `expr()`), against the sky130 PDK; no `--xschem-binary` pin and no
   `--backend batch`. **Limits:** it shows the committed netlists are what the
   committed schematics export, not that the circuit is right. CI cannot
-  re-run the freshness check (no xschem or PDK on a stock runner); it only
-  verifies the committed envelope's `content_hash`. After editing anything in
+  re-run the five `python3 design/netlist.py --check` freshness checks (no
+  xschem or PDK on a stock runner), so a schematic edit that stops
+  reproducing its netlist is still caught only locally. What CI *does*
+  enforce, since #299: `manifests/check-citations.py` re-hashes all 17 files
+  this envelope recorded a `content_hash` for and fails if any has been
+  edited since. That is the gap that let `design/netlist.py` sit stale in
+  this envelope from `6d11c6ec` until #298 with every job green — the
+  manifest pins the envelope to its *inventory* file's hash, never to the
+  sources, so nothing in the graded chain noticed. After editing anything in
   the inventory, re-run `klt signoff --attest 1 --inventory
   manifests/inventories/item-1.json -o manifests/attestations/item-1.json`
   locally, then re-cite and re-render.
@@ -185,7 +192,9 @@ part of the claim and travel with it):
     no klt check). The `pins` block (PDK `c6d73a35…`, ngspice 46, xschem
     3.4.7, klt) is recorded as claimed; klt checks it is non-empty, not that
     the installed tools match. It needs xschem and the PDK, so CI cannot
-    re-attest it (below).
+    re-attest it (below) — but since #299 CI does re-hash all 40 files this
+    envelope recorded a hash for, which is how 8 of them were found stale on
+    `main`.
   - **Item 10** (`item-10.json`, 10/10 checks): `README.md`, `LICENSE` and
     both workflows present, plus six stdlib-only audit commands
     `self-checks.yml` also runs (netlist pinout invariants, JSON
@@ -232,15 +241,37 @@ push/PR:
    checklist) fails the build, and
 4. re-attests item 10 (`klt signoff --attest 10 ... --check`), and item 9
    only where xschem exists: a stock runner has neither xschem nor the PDK,
-   so the step prints a `::warning::` and skips (item 9's `--check` and item
-   1's freshness checks need that toolchain; run them locally after changing
-   `sim/` or `design/`), and
-5. re-hashes the committed artifact behind each `content_hash` pin
-   (`layout/temp_por_top/temp_por_top.gds`) and the compare netlists behind each
-   unpinned LVS citation (checked against the envelope's recorded
-   `environment.layout_sha256` / `reference_sha256`) — so a layout change
-   that lands without re-rendering the manifest and report together fails
-   instead of rotting.
+   so the step prints a `::warning::` and skips. Since #299 that skip is no
+   longer a hole in *file* freshness — step 5 re-hashes every file items 1
+   and 9 recorded a hash for, toolchain or not. What the skip still leaves
+   uncovered is the part that genuinely needs the toolchain: item 9's cold
+   start and item 1's five `python3 design/netlist.py --check` runs. Run
+   those locally after changing `sim/` or `design/`, and
+5. re-hashes every committed file a cited envelope recorded a hash for, via
+   `manifests/check-citations.py`:
+   - the artifact behind each `content_hash` pin
+     (`layout/temp_por_top/temp_por_top.gds`), resolved against the
+     envelope's own directory;
+   - the two compare netlists behind each unpinned LVS citation, against the
+     envelope's recorded `environment.layout_sha256` /
+     `reference_sha256`; and
+   - since #299, every `attestation.checks[]` entry of items 1, 9 and 10
+     that carries both a `path` and a `content_hash` — 61 repo-root-relative
+     files today (17 + 40 + 4). Checks with no recorded hash (`command`,
+     `pin`) are skipped rather than counted, because this script cannot
+     re-run them.
+
+   The third bullet closes a gap the rest of the chain structurally cannot
+   see: the manifest pins an attestation envelope to its *inventory* file's
+   hash, so editing an attested source left the pin, the re-rendered report
+   and the byte-compare all green while the envelope described files that no
+   longer existed — item 1's `design/netlist.py` was stale from `6d11c6ec`
+   until #298 repaired it, and 8 of item 9's 40 recorded files were stale on
+   `main` when this check first ran. A layout change, or a design or
+   testbench edit, that lands without re-rendering or re-attesting its
+   evidence now fails instead of rotting.
+   `manifests/test_check_citations.py` covers the checker in
+   `self-checks.yml`.
 
 When the layout or design evidence moves, regenerate the report
 (`Regenerate` above), update any affected citation or pin in the manifest,
