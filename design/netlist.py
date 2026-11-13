@@ -116,15 +116,10 @@ def corner_run():
     importer of this module, keeps working without pulling the sim harness in
     just to run the pinout invariants over the committed netlists.
 
-    An already-registered ``corner_run`` is reused rather than re-executed --
-    the same ``sys.modules.get("corner_run") or load_corner_run()`` form
-    ``sim_common.netlist_tb_head`` uses. ``load_corner_run()`` execs a *fresh*
-    module every call, so a second copy would give a second ``Pdk`` class that
-    is not the one the rest of the harness resolves against.
+    ``load_corner_run()`` itself guarantees one copy per process (issue #304),
+    so repeated calls return the same module -- and therefore the same ``Pdk``
+    class the rest of the harness resolves against.
     """
-    module = sys.modules.get("corner_run")
-    if module is not None:
-        return module
     sim_bin = str(REPO_ROOT / "sim" / "bin")
     if sim_bin not in sys.path:
         sys.path.insert(0, sim_bin)

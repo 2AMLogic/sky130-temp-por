@@ -81,6 +81,11 @@ BRANCH_GUARD = "na_nb_T_spread_V"
 # through the -40 C and 125 C errors, in degC. Samples passing every guard but exceeding this are listed.
 OFFTREND_SCAN_DEGC = 2.0
 
+# `none` negative control: the switching wrappers zero every mismatch source, so a sample must
+# reproduce its corner's nominal curve bit-for-bit.  Anything below this is "exactly the
+# no-mismatch curve"; see none_control() for why a NOT-COMPARED corner is not 0 V.
+CONTROL_FLAT_V = 1e-9
+
 # ---------------------------------------------------------------------------------------------
 # terms: which temp_core instances belong to which attribution group.  Everything in bias_core and
 # every temp_core device not listed is group "other".
@@ -357,8 +362,14 @@ def load_term(run_dir, term):
     """-> {'report': dict|None, 'refusal': ..., 'missing_procs': [...], 'corners': {(proc, supply): {sample|None: {meas...} | {'_error': str}}}}
 
     nominal is one request; every mismatch term is one request PER PROCESS section (the fleet job limit is ~1 h at
-    concurrency 1), merged here.  A process whose request has no usable report is listed in missing_procs."""
-    ent = {"report": None, "refusal": None, "missing_procs": [], "jobs": {}, "corners": {}}
+    concurrency 1), merged here.  A process whose request has no usable report is listed in missing_procs.
+
+    `report['environment']` is the FIRST usable process section only, so it is not a safe source of
+    fleet-wide provenance: a full run is one job per process per term (36 jobs), and the other
+    sections' runners may be on different installs.  `jobs` and `engines` therefore keep every
+    process job's own `environment.remote` and `environment.engine_version` -- the per-job
+    provenance `observed_provenance()` joins over (issue #312)."""
+    ent = {"report": None, "refusal": None, "missing_procs": [], "jobs": {}, "engines": {}, "corners": {}}
     dirs = [(None, run_dir / term)] if term == "nominal" else [(p, run_dir / term / p) for p in PROCS]
     reps = []
     for proc, d in dirs:
@@ -387,6 +398,7 @@ def load_term(run_dir, term):
         for proc, rep in reps:
             ent["report"]["corners"] += rep["corners"]
             ent["jobs"][proc or "all"] = rep["environment"].get("remote", {})
+            ent["engines"][proc or "all"] = rep["environment"].get("engine_version")
             for c in rep["corners"]:
                 pr_, supply, smp = parse_cid(c["corner_id"])
                 vals = {m["name"]: m.get("value") for m in c["measurements"]}
@@ -489,6 +501,70 @@ def analyse_term(ent, nominal_ent, branch_guard=True):
     return res
 
 
+def none_control(an):
+    """Grade the `none` negative control three-state: PASS / FAIL / NOT VERIFIED (issue #310).
+
+    `analyse_term` leaves ``max_dev_from_nominal_V`` at ``None`` for a corner with no valid
+    sample or no usable nominal point -- nothing was compared there.  Folding that to 0.0 V
+    (``max_dev or 0.0``, the pre-#310 behaviour) turned "nothing was compared" into
+    "0 V deviation" and rendered the control as PASS, so an all-invalid `none` term could
+    certify the per-term attribution it is supposed to police, and corners that dropped out
+    of a partially failed run silently left the max.
+
+    A corner that was not compared therefore makes the whole control **NOT VERIFIED**,
+    whatever the compared corners show; the max is reported over the compared corners only
+    (``None`` when there are none) and the uncompared corners are named.
+    """
+    not_compared = sorted(f"{p}_{v:.2f}V" for (p, v), cs in an.items() if cs["max_dev_from_nominal_V"] is None)
+    devs = [cs["max_dev_from_nominal_V"] for cs in an.values() if cs["max_dev_from_nominal_V"] is not None]
+    max_dev = max(devs) if devs else None
+    return {"max_dev_from_nominal_V": max_dev,
+            "n_corners": len(an),
+            "n_corners_compared": len(devs),
+            "corners_not_compared": not_compared,
+            "flat_threshold_V": CONTROL_FLAT_V,
+            "verdict": ("NOT VERIFIED" if not_compared or max_dev is None
+                        else "PASS" if max_dev < CONTROL_FLAT_V else "FAIL")}
+
+
+def control_line(ctrl):
+    """The record's negative-control bullet, three-state (issue #310).
+
+    A `none` term that compared nothing -- or compared only some of its corners -- can never
+    render PASS here, because the max it would report is not a measurement of the corners
+    that dropped out.  `ctrl` is `none_control()`'s dict, or `{}` when the term is absent.
+    """
+    head = "- Negative control (`none`: `_mm` section + Monte Carlo, every device wrapped to sigma = 0): "
+    if not ctrl:
+        return head + "**NOT AVAILABLE** (term not run / no usable result); the per-term attribution is not independently checked by this record."
+    if ctrl["verdict"] == "NOT VERIFIED":
+        return (head + f"**NOT VERIFIED**: {len(ctrl['corners_not_compared'])} of {ctrl['n_corners']} corners compared nothing "
+                "(no valid sample, or no usable nominal point): " + ", ".join(ctrl["corners_not_compared"]) + ". "
+                + (f"Over the {ctrl['n_corners_compared']} corners that were compared, max |PTAT(sample) - PTAT(nominal)| = {ctrl['max_dev_from_nominal_V']:.3g} V, "
+                   "but a max over a subset cannot certify the switching wrappers on the corners that dropped out"
+                   if ctrl["n_corners_compared"] else "No corner was compared at all, so there is no measurement here")
+                + " -- the per-term attribution cannot be trusted on this record's control.")
+    return (head + f"max |PTAT(sample) - PTAT(nominal)| over all samples, all {ctrl['n_corners']} corners and all temperatures "
+            f"= {ctrl['max_dev_from_nominal_V']:.3g} V "
+            + (f"(PASS: exactly the no-mismatch curve, below {ctrl['flat_threshold_V']:g} V; the switching wrappers zero every mismatch source, and nothing else varies)"
+               if ctrl["verdict"] == "PASS" else "(**FAIL**: the control is not flat; the per-term attribution cannot be trusted)"))
+
+
+def compare_control_line(name, c):
+    """The variant-compare record's per-deck `none == nominal` control bullet (same three states)."""
+    head = f"- `none == nominal` control, {name} deck: "
+    if c is None:
+        return head + "**NOT AVAILABLE** (term not run / no usable result); not verified."
+    if c["verdict"] == "NOT VERIFIED":
+        return (head + f"**NOT VERIFIED** -- {len(c['corners_not_compared'])} of {c['n_corners']} corners compared nothing "
+                "(no valid sample, or no usable nominal point): " + ", ".join(c["corners_not_compared"]) + "; "
+                + (f"max |PTAT(sample) - PTAT(nominal)| over the {c['n_corners_compared']} compared corners = {c['max_dev_from_nominal_V']:.3g} V, which does not cover the rest"
+                   if c["n_corners_compared"] else "no corner was compared at all")
+                + ". Attribution cannot be trusted on this control.")
+    return (head + f"max |PTAT(sample) - PTAT(nominal)| over all {c['n_corners']} corners = {c['max_dev_from_nominal_V']:.3g} V "
+            + (f"(PASS: below {c['flat_threshold_V']:g} V)" if c["verdict"] == "PASS" else "(**FAIL**: attribution cannot be trusted)"))
+
+
 def worst_over_T(corner_stats, sig, mode):
     ts = TEMPS if mode == "untrimmed" else [T_LO, T_HI]
     c = [(corner_stats["stats"][(sig, mode, t)]["k3sd"], t) for t in ts if (sig, mode, t) in corner_stats["stats"]]
@@ -575,6 +651,12 @@ def cmd_record(args):
     grade_git = cr.git_state()  # the analysis code that graded the run (may be later than the run SHA on a re-grade)
     if grade_git.get("dirty") and not args.allow_dirty:
         sys.exit("the grading tree is DIRTY: commit the analysis code first so the record is provenance-clean")
+    # Resolved before anything is written: a record whose PDK line cannot be derived is a
+    # record that must not exist, and failing here leaves no half-written record behind.
+    # This makes `record` require an installed PDK, as the seven campaign runners and
+    # `run_solver_sweep.py` already do -- the alternative, rendering `unknown` for the
+    # host half, would weaken every record to spare a host that cannot reproduce the run.
+    pdk = cr.resolve_pdk(cr.load_pin())
     ents ={t: load_term(run_dir, t) for t in ["nominal", *RUN_TERMS]}
     nominal = ents["nominal"]
     for d in ("records", "netlist-snapshots", "corners"):
@@ -636,15 +718,14 @@ def cmd_record(args):
             (cdir / f"nominal_{proc}_{supply:.2f}v.log").write_text(
                 f"corner {c['corner_id']}  term nominal  klt status={c.get('status')}  guards={'ok' if not why else why}\n"
                 + "\n".join(f"{k} = {v}" for k, v in vals.items()) + "\n")
+    # Fleet-side provenance off the reports themselves, so the header states what ran
+    # rather than what was current when this code was written (issue #312).
+    prov = observed_provenance(ents)
     not_run = [t for t in RUN_TERMS if ents[t]["report"] is None] + (["nominal"] if nominal["report"] is None else [])
     partial = {t: ents[t]["missing_procs"] for t in RUN_TERMS if ents[t]["report"] is not None and ents[t]["missing_procs"]}
     xcheck = transient_crosscheck(nominal) if nominal["report"] else None
-    # --- negative control + liveness
-    ctrl = {}
-    if "none" in anal and anal["none"]:
-        ctrl["none_max_dev_from_nominal_V"] = max((cs["max_dev_from_nominal_V"] or 0.0) for cs in anal["none"].values())
-        ctrl["none_max_sd_V"] = 0.0
-    live = {t: (summ[t]["untrimmed"]["pooled_worst"] if t in summ and summ[t]["untrimmed"] else None) for t in TERMS if t in summ}
+    # --- negative control (liveness rows are rendered straight from `summ`)
+    ctrl = none_control(anal["none"]) if anal.get("none") else {}
     rss = None
     if all(t in summ and summ[t]["untrimmed"] for t in TERMS) and "all" in summ and summ["all"]["untrimmed"]:
         rss = {}
@@ -666,12 +747,93 @@ def cmd_record(args):
                               for k, v in a.items()} for t, a in anal.items() if a},
            "supersedes": args.supersedes or "(none)", "author": cr.default_author()}
     (rec_dir / "records" / f"{rid}.json").write_text(json.dumps(rec, indent=2, default=str) + "\n")
-    (rec_dir / "records" / f"{rid}.md").write_text(render_md(rec, anal, summ, summ_ctat, rss, ctrl, xcheck, not_run, fleet, meta, args) + "\n")
+    (rec_dir / "records" / f"{rid}.md").write_text(render_md(rec, anal, summ, summ_ctat, rss, ctrl, xcheck, not_run, fleet, meta, args, pdk, prov) + "\n")
     print(rid)
     return 0
 
 
-def render_md(rec, anal, summ, summ_ctat, rss, ctrl, xcheck, not_run, fleet, meta, args):
+def runner_pdks(ent):
+    """The PDK install of EVERY fleet machine that ran a process section of this term.
+
+    NOT the client-resolved `provenance.pdk`: the runner executes against its own
+    `/opt/pdk`, stamped under `environment.remote.worker_environment.pdk`, and the two
+    genuinely diverge -- `sim/bias-core-smoke/records/20261023-171642-e69f5b2e.json`
+    recorded a grid executed under open_pdks `c6d73a35...` while the client had merely
+    resolved `f6eeac7d...`.  That runner stamp is exactly the value this runner used to
+    state as a literal labelled "(sim/pdk.json pin)" (issue #312), which it never was.
+
+    One entry per process job, off `ent['jobs']` rather than the merged
+    `report['environment']` -- that merged section is the first usable process only, so a
+    term's other four runners (and any different install among them) were invisible.
+    Yields `{}` for a job with no stamp, so an unreported one becomes `unknown` via
+    `sim_common.joined_versions()` rather than borrowing the client's or another job's.
+    """
+    return [((j or {}).get("worker_environment") or {}).get("pdk") or {}
+            for j in (ent.get("jobs") or {}).values()]
+
+
+def observed_provenance(ents):
+    """The fleet-side halves of the record header, derived from the run's own reports.
+
+    Joined over every PROCESS JOB of every term -- a full run is 7 mismatch terms x 5
+    process sections + nominal = 36 fleet jobs, each free to land on a runner with its own
+    PDK install and engine.  Both values go through `sim_common.joined_versions()`, so each
+    is the sorted SET of what was actually observed and reads `unknown` when no job
+    reported one -- never first-found-only, and never a literal that goes stale (#312).
+    Engines are tagged `ngspice-<n>` *before* joining because the report carries the bare
+    number ("46") and `ngspice-unknown` is not a version.
+
+    `*_jobs` / `*_reporting` are the coverage of each value: how many jobs reported one at
+    all, out of how many ran.  Rendering uses them to keep a PARTIAL answer from reading
+    like a unanimous one; see `render_pdk_tools_lines()`.
+    """
+    jv = sim_common.joined_versions
+    pdks = [p for e in ents.values() for p in runner_pdks(e)]
+    engines = [{"tag": f"ngspice-{v}"} if v else {}
+               for e in ents.values() for v in (e.get("engines") or {}).values()]
+    return {"fleet_pdk": jv(pdks, "stamp_text"),
+            "fleet_pdk_jobs": len(pdks), "fleet_pdk_reporting": sum(1 for p in pdks if p.get("stamp_text")),
+            "fleet_engine": jv(engines, "tag"),
+            "fleet_engine_jobs": len(engines), "fleet_engine_reporting": sum(1 for e in engines if e.get("tag"))}
+
+
+def coverage_note(prov, which):
+    """A ` (from N of M fleet jobs; ...)` suffix when only SOME jobs reported `which`, else `""`.
+
+    A set joined over 36 jobs of which 3 answered is not the same claim as one all 36
+    agreed on, and the header sentence ("the fleet runners that executed the grid
+    reported ...") reads as the latter.  The note is deliberately absent in the two
+    unambiguous cases: every job reported (the value speaks for itself), and none did
+    (the value is already `unknown`, which says exactly that).
+    """
+    n, m = prov[f"{which}_reporting"], prov[f"{which}_jobs"]
+    return f" (from {n} of {m} fleet jobs; the rest reported none)" if 0 < n < m else ""
+
+
+def render_pdk_tools_lines(rec, pdk, prov, fleet):
+    """The record's `PDK` and `Tools` header lines.
+
+    The grid ran on the fleet but the record is written here, so the PDK line names both
+    halves explicitly and lets neither stand in for the other: the recording host's
+    resolved install (with the same pin-state ternary
+    `sim_common.render_pdk_tools_repo_state()` uses) and the stamp the fleet runners
+    reported.  Before issue #312 this line stated one literal commit labelled
+    "(sim/pdk.json pin)" that was in fact neither the pin nor this host's install, but the
+    October fleet runners' stamp -- so the claim was wrong in both halves at once.
+    """
+    pin_state = "matches sim/pdk.json pin" if pdk.matches_pin else "**MISMATCH vs sim/pdk.json pin**"
+    jobs = ", ".join(f"{t}[{k}]={j['job_id']}" for t, f in fleet.items() for k, j in f["jobs"].items())
+    return [
+        f"- **PDK**: {pdk.variant} @ open_pdks `{pdk.installed_commit}` ({pin_state}) on the host"
+        f" that wrote this record, models `{pdk.pin['ngspice_lib']}` (`_mm` sections for"
+        f" mismatch); the fleet runners that executed the grid reported `{prov['fleet_pdk']}`"
+        + coverage_note(prov, "fleet_pdk"),
+        f"- **Tools**: {rec['klt']} (client); backend `{rec['backend']}`; fleet engine"
+        f" {prov['fleet_engine']}{coverage_note(prov, 'fleet_engine')}; fleet jobs: {jobs}",
+    ]
+
+
+def render_md(rec, anal, summ, summ_ctat, rss, ctrl, xcheck, not_run, fleet, meta, args, pdk, prov):
     rid, git = rec["record_id"], rec["git"]
     N = meta["n"]
     L = [f"# Record {rid}", "",
@@ -679,9 +841,7 @@ def render_md(rec, anal, summ, summ_ctat, rss, ctrl, xcheck, not_run, fleet, met
          f"- **Experiment**: `{SLUG}` -- full-signal-path mismatch Monte Carlo of `temp_core`: temperature error in degC, per-term attribution (issue #105; DR-003 row 2 `[TBD-1]`)",
          "- **Claim**: NOT a spec claim and no `spec/` edit. Evidence toward `[TBD-1]`: the PTAT-referred temperature error of `temp_core` under local device mismatch, untrimmed and with a 1-point (27 C) gain trim, with the contribution of each mismatch term separated.",
          f"- **Netlist provenance**: schematic-derived committed `design/netlist/{{bias_core,temp_core}}.spice` in a generated testbench (`netlist-snapshots/{rid}/`); per-term device switching by `mmoff_*` wrapper subckts (see README)",
-         "- **PDK**: sky130A @ open_pdks `c6d73a35f524070e85faff4a6a9eef49553ebc2b` (sim/pdk.json pin), models `libs.tech/combined/sky130.lib.spice` (`_mm` sections for mismatch)",
-         f"- **Tools**: {rec['klt']} (client); backend `{rec['backend']}`; fleet engine ngspice-{next((f['engine_version'] for f in fleet.values() if f.get('engine_version')), '?')}; fleet jobs: "
-         + ", ".join(f"{t}[{k}]={j['job_id']}" for t, f in fleet.items() for k, j in f["jobs"].items()),
+         *render_pdk_tools_lines(rec, pdk, prov, fleet),
          f"- **Repo state**: `{git['sha']}` on `{git['branch']}` (working tree {'DIRTY' if git['dirty'] else 'clean'} at run time)"
          + "".join(f"; resumed {r['started_utc']} at `{r['git']['sha']}` ({'DIRTY' if r['git']['dirty'] else 'clean'})" for r in meta.get("resumes", []))
          + f"; graded (analysis code) at `{rec['graded_at_git']['sha']}` (working tree {'DIRTY' if rec['graded_at_git']['dirty'] else 'clean'})",
@@ -809,11 +969,7 @@ def render_md(rec, anal, summ, summ_ctat, rss, ctrl, xcheck, not_run, fleet, met
           "Corners whose NOMINAL reference failed a guard (all their samples are excluded): " + (", ".join(sorted(set(bad_nom))) or "none") + ".", ""]
     # controls
     L += ["## Controls and cross-checks", ""]
-    if ctrl:
-        L.append(f"- Negative control (`none`: `_mm` section + Monte Carlo, every device wrapped to sigma = 0): max |PTAT(sample) - PTAT(nominal)| over all samples, corners and temperatures = {ctrl['none_max_dev_from_nominal_V']:.3g} V "
-                 + ("(PASS: exactly the no-mismatch curve; the switching wrappers zero every mismatch source, and nothing else varies)" if ctrl['none_max_dev_from_nominal_V'] < 1e-9 else "(**FAIL**: the control is not flat; the per-term attribution cannot be trusted)"))
-    else:
-        L.append("- Negative control (`none`) NOT AVAILABLE.")
+    L.append(control_line(ctrl))
     for t in TERMS:
         if t in summ and summ[t]["untrimmed"]:
             L.append(f"- Liveness `{t}`: pooled untrimmed 3 sigma = {summ[t]['untrimmed']['pooled_worst']:.3g} degC " + ("(nonzero: that term's mismatch is live)" if summ[t]['untrimmed']['pooled_worst'] > 0 else "(**ZERO: term inert**)"))
@@ -959,7 +1115,7 @@ def cmd_compare(args):
     ctrl = {}
     for name in graded:
         a = graded[name][1]["none"]
-        ctrl[name] = max((cs["max_dev_from_nominal_V"] or 0.0 for cs in a.values()), default=None) if a else None
+        ctrl[name] = none_control(a) if a else None
     rec = {"record_id": rid, "experiment": SLUG, "issue": 284, "kind": "variant-compare", "variant": variant,
            "variant_description": VARIANT_DESC[variant], "timestamp": now.strftime("%Y-%m-%dT%H:%M:%SZ"), "run_id": args.run_id,
            "runs_git": gits, "graded_at_git": grade_git, "pdk_pin": pdk["open_pdks_commit"], "klt": metas["baseline"].get("klt_client"),
@@ -968,7 +1124,7 @@ def cmd_compare(args):
            "resumes": {k: {"resumes": m.get("resumes", [])} for k, m in metas.items()},
            "dr007_projection_ratio": DR007_PROJECTION, "headline": head, "per_corner": {f"{k[0]}_{k[1]:.2f}V": r for k, r in cmp_rows.items()},
            "guard_counts": {n: {t: {f"{k[0]}_{k[1]:.2f}V": c for k, c in g.items()} for t, g in gt.items()} for n, gt in guards.items()},
-           "nominal_invalid_corners": nom_bad, "none_control_max_dev_V": ctrl, "fleet": fleet,
+           "nominal_invalid_corners": nom_bad, "none_control": ctrl, "fleet": fleet,
            "dimensions": {"degen_W": DEGEN_W, "degen_L": DEGEN_L, "mirror_W_new": MIRROR_W_NEW}, "author": cr.default_author()}
     (rec_dir / "records" / f"{rid}.json").write_text(json.dumps(rec, indent=2, default=str) + "\n")
     (rec_dir / "records" / f"{rid}.md").write_text(render_compare_md(rec, graded, variant, guards, cmp_rows, head) + "\n")
@@ -1033,11 +1189,7 @@ def render_compare_md(rec, graded, variant, guards, cmp_rows, head):
         L.append(f"- Corners whose nominal reference failed a guard ({name}; all their samples excluded): " + (", ".join(sorted(set(rec["nominal_invalid_corners"][name]))) or "none"))
     L += ["", "## Controls", ""]
     for name in ("baseline", variant):
-        c = rec["none_control_max_dev_V"][name]
-        if c is None:
-            L.append(f"- `none == nominal` control, {name} deck: NOT AVAILABLE (term not run / no usable result); not verified.")
-        else:
-            L.append(f"- `none == nominal` control, {name} deck: max |PTAT(sample) - PTAT(nominal)| = {c:.3g} V " + ("(PASS)" if c < 1e-9 else "(**FAIL**: attribution cannot be trusted)"))
+        L.append(compare_control_line(name, rec["none_control"][name]))
     for t in ("mirror",):
         for name in ("baseline", variant):
             sm = graded[name][2][t]

@@ -31,7 +31,7 @@ and/or `corner-run.py` itself):
 
     load_corner_run()    the importlib shim that loads corner-run.py (its
                           filename has a dash, so it can't be `import`ed
-                          normally)
+                          normally); one copy per process, like `import`
     parse_samples()        parses the repeated `op`+`print` blocks of a
                           Monte Carlo loop's ngspice log into per-sample
                           dicts
@@ -222,30 +222,39 @@ def build_mismatch_points(
 def load_corner_run() -> ModuleType:
     """Import sim/bin/corner-run.py (the dash makes it non-importable normally).
 
+    One copy per process: an already-registered `sys.modules["corner_run"]` is
+    returned as-is, so every caller resolves against the same `Pdk`,
+    `HarnessError` etc. A second exec would give a second set of classes that
+    the rest of the harness does not match (issue #304); `import` gives that
+    guarantee for free and this shim has to supply it itself.
+
     Registers the loaded module in `sys.modules` under its spec name
     ("corner_run") *before* `exec_module` runs -- required because
     `@dataclass`-decorated classes inside corner-run.py resolve type
     annotations through `sys.modules[cls.__module__]`, which fails on an
-    unregistered module.
+    unregistered module. A failed exec un-registers the half-built module so
+    the next call retries a fresh load rather than handing back a broken one.
     """
+    loaded = sys.modules.get("corner_run")
+    if loaded is not None:
+        return loaded
     path = BIN_DIR / "corner-run.py"
     spec = importlib.util.spec_from_file_location("corner_run", path)
     if spec is None or spec.loader is None:  # pragma: no cover - defensive
         raise RuntimeError(f"cannot load {path}")
     module = importlib.util.module_from_spec(spec)
     sys.modules[spec.name] = module
-    spec.loader.exec_module(module)
+    try:
+        spec.loader.exec_module(module)
+    except BaseException:
+        del sys.modules[spec.name]
+        raise
     return module
-
-
-@functools.lru_cache(maxsize=1)
-def _corner_run() -> ModuleType:
-    return load_corner_run()
 
 
 def corner_id(proc: str, temp: float, vf: float) -> str:
     """Record/run-directory key for one (process, temperature, supply) corner, e.g. tt_27c_1.80v."""
-    return f"{proc}_{_corner_run().fmt_temp(temp)}c_{vf:.2f}v"
+    return f"{proc}_{load_corner_run().fmt_temp(temp)}c_{vf:.2f}v"
 
 
 def fmt(x, spec: str = ".4g", unit: str = "") -> str:
@@ -605,7 +614,7 @@ def joined_versions(items, key: str) -> str:
 def host_tool_versions() -> dict:
     """`corner-run.tool_versions()` read once per process -- each call shells out to
     `ngspice -v` and `xschem --version`, and a record needs the same answer throughout."""
-    return _corner_run().tool_versions()
+    return load_corner_run().tool_versions()
 
 
 def host_ngspice_tag() -> str:
@@ -913,7 +922,7 @@ def load_dut_netlist(path: Path = DUT_NETLIST) -> str:
 
 def netlist_tb_head(sch: Path, out_dir: Path, pdk) -> str:
     """Netlist a testbench via `klt netlist`; keep only the testbench part (the DUT comes from the committed export)."""
-    cr = sys.modules.get("corner_run") or load_corner_run()
+    cr = load_corner_run()
     produced = cr.netlist_with_klt(sch, out_dir, pdk)
     text = produced.read_text().replace(str(BIN_DIR.parent.parent) + os.sep, "")
     head = text.split("\n* expanding")[0]
