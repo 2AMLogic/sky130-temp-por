@@ -36,10 +36,12 @@ that sweep.
    mismatch-sigma `.param`s in the wrapper scope. Controls: `none` (everything
    wrapped) must equal `nominal` exactly; every term row must be nonzero. The
    `none` control is graded **three-state** -- PASS / FAIL / NOT VERIFIED: a
-   corner with no valid sample or no usable nominal point compared nothing, so
-   it can never read 0 V, and one such corner makes the whole control NOT
-   VERIFIED (named in the record) however flat the compared corners are
-   (`test_none_control.py`).
+   corner with no valid sample, no usable nominal point, or no report at all
+   compared nothing, so it can never read 0 V, and one such corner makes the
+   whole control NOT VERIFIED (named in the record) however flat the compared
+   corners are. Grading is against the expected 5 x 3 corner grid, so a process
+   section that produced no report leaves its three corners uncompared rather
+   than shrinking the corner count (`test_none_control.py`).
 3. Temperature is swept **inside** each ngspice process (`dc temp -40 125 1`):
    klt derives the per-sample seed from the corner index, so a klt temperature
    axis would give a different device realisation at each temperature.

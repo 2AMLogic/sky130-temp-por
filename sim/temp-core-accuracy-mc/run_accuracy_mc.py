@@ -59,6 +59,7 @@ say = sim_common.say
 
 PROCS = ["tt", "ss", "ff", "sf", "fs"]
 SUPPLIES = [2.97, 3.3, 3.63]
+GRID = [(p, v) for p in PROCS for v in SUPPLIES]  # the 15 corners every term is expected to cover
 TEMPS = [-40, 27, 125]  # the three evaluation temperatures (sweep is -40..125 step 1)
 T_LO, T_HI, T_REF = -40, 125, 27
 DEFAULT_N = 30
@@ -518,12 +519,23 @@ def none_control(an):
     A corner that was not compared therefore makes the whole control **NOT VERIFIED**,
     whatever the compared corners show; the max is reported over the compared corners only
     (``None`` when there are none) and the uncompared corners are named.
+
+    Grading runs over the **expected** corner grid ``PROCS x SUPPLIES``, not over the keys
+    `an` happens to carry (issue #318).  A process section whose request produced no usable
+    report is recorded in ``missing_procs`` and contributes no key at all, so its corners
+    reach `analyse_term` as absent rather than as present-with-nothing-compared; grading only
+    what was present let a `none` term that lost a whole process section read PASS over "all
+    12 corners", certifying three corners that were never simulated.  An absent corner counts
+    exactly like one whose ``max_dev_from_nominal_V`` is ``None``.  The grid is a floor, never
+    a filter: a key outside it is still graded, so no data handed in is silently dropped.
     """
-    not_compared = sorted(f"{p}_{v:.2f}V" for (p, v), cs in an.items() if cs["max_dev_from_nominal_V"] is None)
-    devs = [cs["max_dev_from_nominal_V"] for cs in an.values() if cs["max_dev_from_nominal_V"] is not None]
+    keys = GRID + sorted(k for k in an if k not in set(GRID))
+    maxes = {k: (an[k]["max_dev_from_nominal_V"] if k in an else None) for k in keys}
+    not_compared = sorted(f"{p}_{v:.2f}V" for (p, v) in keys if maxes[(p, v)] is None)
+    devs = [d for d in maxes.values() if d is not None]
     max_dev = max(devs) if devs else None
     return {"max_dev_from_nominal_V": max_dev,
-            "n_corners": len(an),
+            "n_corners": len(keys),
             "n_corners_compared": len(devs),
             "corners_not_compared": not_compared,
             "flat_threshold_V": CONTROL_FLAT_V,
@@ -543,7 +555,7 @@ def control_line(ctrl):
         return head + "**NOT AVAILABLE** (term not run / no usable result); the per-term attribution is not independently checked by this record."
     if ctrl["verdict"] == "NOT VERIFIED":
         return (head + f"**NOT VERIFIED**: {len(ctrl['corners_not_compared'])} of {ctrl['n_corners']} corners compared nothing "
-                "(no valid sample, or no usable nominal point): " + ", ".join(ctrl["corners_not_compared"]) + ". "
+                "(no valid sample, no usable nominal point, or no report at all): " + ", ".join(ctrl["corners_not_compared"]) + ". "
                 + (f"Over the {ctrl['n_corners_compared']} corners that were compared, max |PTAT(sample) - PTAT(nominal)| = {ctrl['max_dev_from_nominal_V']:.3g} V, "
                    "but a max over a subset cannot certify the switching wrappers on the corners that dropped out"
                    if ctrl["n_corners_compared"] else "No corner was compared at all, so there is no measurement here")
@@ -561,7 +573,7 @@ def compare_control_line(name, c):
         return head + "**NOT AVAILABLE** (term not run / no usable result); not verified."
     if c["verdict"] == "NOT VERIFIED":
         return (head + f"**NOT VERIFIED** -- {len(c['corners_not_compared'])} of {c['n_corners']} corners compared nothing "
-                "(no valid sample, or no usable nominal point): " + ", ".join(c["corners_not_compared"]) + "; "
+                "(no valid sample, no usable nominal point, or no report at all): " + ", ".join(c["corners_not_compared"]) + "; "
                 + (f"max |PTAT(sample) - PTAT(nominal)| over the {c['n_corners_compared']} compared corners = {c['max_dev_from_nominal_V']:.3g} V, which does not cover the rest"
                    if c["n_corners_compared"] else "no corner was compared at all")
                 + ". Attribution cannot be trusted on this control.")
