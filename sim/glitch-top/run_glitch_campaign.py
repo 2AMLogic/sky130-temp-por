@@ -205,7 +205,10 @@ def build_netlist(head: str, req: dict) -> str:
     return banner + head + "\n" + dut
 
 
-def build_request(req: dict, man: dict, backend: str, capacity_wait_s: float = 0) -> dict:
+DEFAULT_TIMEOUT_S = 7200
+
+
+def build_request(req: dict, man: dict, backend: str, capacity_wait_s: float = 0, timeout_s: int = DEFAULT_TIMEOUT_S) -> dict:
     tstop, tmax = tstop_of(req, man), tmax_of(req, man)
     c = man["corners"]
     t0 = req["t0"]
@@ -218,15 +221,15 @@ def build_request(req: dict, man: dict, backend: str, capacity_wait_s: float = 0
             {"name": "resetn_end", "spice": f".meas tran resetn_end FIND v(resetn) AT={(tstop - 0.1e-3):.9g}", "unit": "V"},
             {"name": "resetn_min_after_t0", "spice": f".meas tran resetn_min_after_t0 MIN v(resetn) FROM={t0:g} TO={tstop:.9g}", "unit": "V"},
         ],
-        7200, capacity_wait_s,
+        timeout_s, capacity_wait_s,
     )
 
 
-def submit_one(req: dict, head: str, man: dict, run_dir: Path, capacity_wait_s: float = 0) -> dict:
+def submit_one(req: dict, head: str, man: dict, run_dir: Path, capacity_wait_s: float = 0, timeout_s: int = DEFAULT_TIMEOUT_S) -> dict:
     """Write netlist + request and run ``klt sim --backend batch``; an earlier attempt is archived, never overwritten."""
     d = run_dir / req["tag"]
     res = sim_common.submit_prepared(
-        d, build_netlist(head, req), build_request(req, man, "batch", capacity_wait_s),
+        d, build_netlist(head, req), build_request(req, man, "batch", capacity_wait_s, timeout_s),
         f"{req['tag']}: {len(corners_of(man))} points -> batch fleet", req["tag"],
         # a refused LAUNCH is retried later (bounded; never replaced by a local grid)
         retry=sim_common.cap_retry(d, req["tag"], min(180, capacity_wait_s), max_retries=40) if capacity_wait_s else None)
@@ -318,13 +321,13 @@ def cmd_run(args) -> int:
         say(f"retrying {len(reqs)} request(s) without a usable report, capacity_wait_s={args.capacity_wait}")
     head = tb_netlist_head(run_dir / ("retry" if args.retry_failed else "."), pdk)
     meta = {"run_id": run_id, "started_utc": now.strftime("%Y-%m-%dT%H:%M:%SZ"), "source": gi, "klt_client": sim_common.klt_version(),
-            "klt_sim_backend_env": os.environ.get("KLT_SIM_BACKEND"), "declared": declared_counts(man), "submitted_tags": [r["tag"] for r in reqs]}
+            "klt_sim_backend_env": os.environ.get("KLT_SIM_BACKEND"), "request_timeout_s": args.timeout_s, "declared": declared_counts(man), "submitted_tags": [r["tag"] for r in reqs]}
     if not args.retry_failed:
         (run_dir / "run.json").write_text(json.dumps(meta, indent=2) + "\n")
     say(f"run id {run_id}: {len(reqs)} request(s)")
     results = []
     with concurrent.futures.ThreadPoolExecutor(max_workers=max(1, min(2, args.jobs))) as ex:
-        futs = [ex.submit(submit_one, r, head, man, run_dir, args.capacity_wait) for r in reqs]
+        futs = [ex.submit(submit_one, r, head, man, run_dir, args.capacity_wait, args.timeout_s) for r in reqs]
         for f in futs:
             try:
                 results.append(f.result())
@@ -664,7 +667,7 @@ def cmd_record(args) -> int:
     ph = man["grading"]
     wrote = []
     for cls in CLASSES:
-        record_id = f"{now:%Y%m%d}-{now:%H%M%S}-{gi['sha']}-{cls}"
+        record_id = f"{now:%Y%m%d}-{now:%H%M%S}-{gi['sha']}-{cls}" + (f"-{args.suffix}" if isinstance(args.suffix, str) and args.suffix else "")
         rec_dir = HERE / "records"
         corners_dir = evidence_store.stage_dir_for(SLUG, record_id)  # git-ignored scratch; stored below
         snap_dir = HERE / "netlist-snapshots" / record_id
@@ -764,6 +767,7 @@ def main(argv: list[str]) -> int:
     r.add_argument("--only-class", choices=CLASSES)
     r.add_argument("--retry-failed", action="store_true")
     r.add_argument("--capacity-wait", type=float, default=0)
+    r.add_argument("--timeout-s", type=int, default=DEFAULT_TIMEOUT_S, help="per-unit options.timeout_s; the fleet whole-job ceiling is 3600 s, so a re-run of a timed-out request needs <= 3480")
     r.add_argument("--allow-dirty", action="store_true")
     x = sub.add_parser("probe")
     x.add_argument("--tag", required=True)
@@ -774,6 +778,7 @@ def main(argv: list[str]) -> int:
     c.add_argument("--author")
     c.add_argument("--supersedes")
     c.add_argument("--allow-dirty", action="store_true")
+    c.add_argument("--suffix", help="append -<suffix> to each record id (e.g. rerun181 for a --only re-run record)")
     c.add_argument("--allow-deck-drift", action="store_true")
     s = sub.add_parser("selftest")
     s.add_argument("--author")

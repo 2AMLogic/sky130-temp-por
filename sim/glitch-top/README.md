@@ -134,6 +134,17 @@ All 18 declared requests / 810 points were submitted to the Spot fleet and grade
   points are `ERROR`. Two other requests (`por_raw_edge_r1000_w0.0002_e1em05`,
   `vdd_cube_v1.2_h0.0002_s50000`) hung client-side until the driver's 4 h cap, were
   recorded as failed submits and were re-submitted once with `--retry-failed` (same run id).
+* Re-run of `vdd_slew_v1.2_h0.0002_s200000` (record `20261113-082829-da28d31-vdd_level-rerun181`,
+  fleet job `klt-sim-5ec0d877dd8b`, request `options.timeout_s` lowered from 7200 to 3480 via
+  `run --timeout-s`): the job completed in about 7.7 min, so the original `batch_job_timeout` was a
+  request-configuration artifact, not slow decks. All 45 points are now `NONPHYSICAL`: all 45 rows
+  carry a saved-node range violation (`pre-dip` or `post-dip` tag), and 9 of the 45 additionally
+  show supply current reversed at the end (the record's breakdown line also counts 5 reversed at
+  baseline; its node-violation counters read 0 although the rows tag all 45, so the breakdown
+  line under-reports node violations and the per-row tags are the measured data). This record
+  was not compared point-by-point with the other `NONPHYSICAL` cells of the campaign:
+  **still not covered**, no behavioural verdict and no immunity claim. The original record is
+  unchanged. The record is a subset record (`NOT_COVERED` for every other request).
 * The 5 class-B FAILs and the class-A UNRESOLVED cells are per-point in the records; no
   numeric envelope is claimed.
 
