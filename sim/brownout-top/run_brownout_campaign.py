@@ -444,51 +444,13 @@ def cmd_probe(args) -> int:
 # --------------------------------------------------------------------------
 
 
-def classify_error(corner: dict, log_text: str) -> str:
-    if "could not find a valid modelname" in log_text:
-        return "model_not_found"
-    codes = [d.get("code") for d in corner.get("diagnostics", [])]
-    if any(c and "timeout" in c for c in codes):
-        return "timeout"
-    return ("error:" + ",".join(sorted({c for c in codes if c}))) if codes else "error"
-
-
-def point_log(corner: dict, header: list[str], run_dir: Path) -> str:
-    art = corner.get("artifacts") or {}
-    deck = Path(art["deck"]).read_text() if art.get("deck") and Path(art["deck"]).is_file() else "(no deck retrieved)"
-    log = Path(art["log"]).read_text() if art.get("log") and Path(art["log"]).is_file() else "(no ngspice log retrieved)"
-    lines = list(header) + [""]
-    lines += ["# ==== klt sim deck (exact input given to ngspice on the runner) ====", *[f"| {ln}" for ln in deck.splitlines()], ""]
-    lines += ["# ==== klt diagnostics ====", *[f"| {dg.get('severity')}/{dg.get('code')}: {dg.get('message')}" for dg in corner.get("diagnostics", [])], ""]
-    lines += ["# ==== ngspice stdout+stderr ====", log.rstrip(), ""]
-    return scrub("\n".join(lines), run_dir)
-
-
-def attempt_message(ad: Path) -> str:
-    """One archived attempt's outcome: the report's error/status, else klt's stderr error envelope."""
-    for name in ("report.json", "klt.stderr"):
-        f = ad / name
-        if not f.is_file():
-            continue
-        try:
-            body = json.loads(f.read_text())
-        except json.JSONDecodeError:
-            continue
-        if isinstance(body, dict) and (body.get("error") or body.get("status")):
-            return (body.get("error") or {}).get("message") or ("report status " + str(body.get("status")))
-    tail = (ad / "klt.stderr").read_text()[-300:].strip() if (ad / "klt.stderr").is_file() else ""
-    return "unparseable report" + (f": {tail}" if tail else "")
-
-
 def analyze_request(req: dict, run_dir: Path, man: dict, corners_dir: Path, write: bool) -> dict:
     """All 45 declared points of one request.  Every declared point appears, covered or not."""
     d = run_dir / req["tag"]
     st = stim_of(req)
     declared = corners_of(man)
     info = {"tag": req["tag"], "kind": req["kind"], "stimulus": st, "tstop_s": tstop_of(req, man), "tmax_s": tmax_of(req, man)}
-    attempts = []
-    for ad in sorted(d.glob("attempt*"), key=lambda x: int(x.name[7:]) if x.name[7:].isdigit() else 0):
-        attempts.append(scrub(attempt_message(ad), run_dir)[:400])
+    attempts = sim_common.attempt_messages(d, run_dir, REPO_ROOT)
     if attempts:
         info["failed_earlier_attempts"] = attempts
     rep, why = None, None
@@ -539,7 +501,7 @@ def analyze_request(req: dict, run_dir: Path, man: dict, corners_dir: Path, writ
         res = bc.analyze(wave, vf, st, man["stimulus"]["observation_after_recovery_s"])
         if wave is None:
             res["detail"] = load_err or "no waveform artifact for this corner"
-            res["error_class"] = classify_error(c, log_text)
+            res["error_class"] = sim_common.classify_error(c, log_text)
         pt["outcome"] = res["verdict"]
         pt["check"] = res
         if wave is not None and res["verdict"] != "ERROR":
@@ -554,7 +516,7 @@ def analyze_request(req: dict, run_dir: Path, man: dict, corners_dir: Path, writ
                       f"# process={proc} temp={cr.fmt_temp(temp)}C start_supply={vf:.2f}V vlow={st['vlow']:g} hold={st['th']:g}s fall={st['sf']:g}V/s recovery={st['sr']:g}V/s tstop={tstop_of(req, man):.6g}s",
                       f"# klt status: {c.get('status')}   runtime on runner: {c.get('runtime_s')} s   outcome: {pt['outcome']}"]
             (corners_dir / req["tag"]).mkdir(parents=True, exist_ok=True)
-            (corners_dir / req["tag"] / f"{cid}.log").write_text(point_log(c, header, run_dir))
+            (corners_dir / req["tag"] / f"{cid}.log").write_text(sim_common.point_log(c, header, run_dir, REPO_ROOT))
         pts.append(pt)
     for p, t, v in declared:
         cid = corner_id(p, t, v)

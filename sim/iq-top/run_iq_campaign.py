@@ -224,15 +224,7 @@ def analyze_state(state: str, run_dir: Path, man: dict, traces: dict) -> dict:
     pts: dict[str, dict] = {}
     for p, t, v in grid(man):
         pts[corner_id(p, t, v)] = {"id": corner_id(p, t, v), "process": p, "temperature_c": t, "supply_v": v, "status": "nonconverged", "reason": "NOT SUBMITTED / no report"}
-    attempts = []
-    for ad in sorted(d.glob("attempt*")):
-        try:
-            body = json.loads((ad / "report.json").read_text()) if (ad / "report.json").is_file() else {}
-            msg = (body.get("error") or {}).get("message") or ("report status " + str(body.get("status")))
-        except json.JSONDecodeError:
-            msg = "unparseable report"
-        stderr = (ad / "klt.stderr").read_text()[-400:] if (ad / "klt.stderr").is_file() else ""
-        attempts.append(scrub(msg + (" | stderr: " + stderr if stderr.strip() else ""), run_dir, )[:700])
+    attempts = sim_common.attempt_messages(d, run_dir, REPO_ROOT)
     if attempts:
         req["failed_earlier_attempts"] = attempts
     if not rep_path.is_file():
