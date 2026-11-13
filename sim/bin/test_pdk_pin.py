@@ -8,7 +8,8 @@ other, including a tree with no ``versions`` component ("unknown").
 
 Since issue #292 ``find_pdk()`` is a thin wrapper over corner-run.py's own
 ``load_pin``/``resolve_pdk``, so these cases also cover the one shared
-resolver both entry points go through.
+resolver both entry points go through -- and, since issue #304, that there is
+exactly *one* loaded copy of it per process to go through.
 
 Run: python3 -I sim/bin/test_pdk_pin.py
 """
@@ -167,6 +168,33 @@ class PinTests(unittest.TestCase):
         with self.assertRaises(netlist.PdkNotFound) as cm:
             netlist.find_pdk()
         self.assertIn(PIN["ngspice_lib"], str(cm.exception))
+
+
+class LoaderSingleCopyTests(unittest.TestCase):
+    """`load_corner_run()` hands every caller the one registered copy (issue #304).
+
+    The shim execs `corner-run.py` by path, so nothing but the loader itself
+    stops a second exec. A second copy means a second `Pdk`/`HarnessError`:
+    the module-level `cr = load_corner_run()` every campaign runner holds
+    would stop being the module `corner_id()`, `netlist_tb_head()` and
+    `design/netlist.py`'s `corner_run()` resolve against, and an exception
+    raised through one would not be caught by the other's class name.
+    """
+
+    def test_loader_returns_the_registered_module(self):
+        self.assertIs(sys.modules["corner_run"], cr)
+        self.assertIs(sim_common.load_corner_run(), cr)
+
+    def test_corner_id_does_not_register_a_second_copy(self):
+        self.assertEqual(sim_common.corner_id("tt", 27.0, 1.8), "tt_27c_1.80v")
+        self.assertIs(sys.modules["corner_run"], cr)
+        self.assertIs(sim_common.load_corner_run(), cr)
+
+    def test_resolver_entry_points_share_one_class_set(self):
+        sim_common.corner_id("tt", 27.0, 1.8)
+        self.assertIs(netlist.corner_run(), cr)
+        self.assertIs(netlist.corner_run().Pdk, cr.Pdk)
+        self.assertIs(netlist.corner_run().HarnessError, cr.HarnessError)
 
 
 if __name__ == "__main__":
