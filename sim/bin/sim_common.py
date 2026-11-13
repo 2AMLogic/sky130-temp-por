@@ -340,6 +340,30 @@ def render_log(header_lines, pdk, rc, timed_out, stamp, sections, raw) -> str:
     return "\n".join(lines)
 
 
+def point_log(corner: dict, header: list[str], run_dir: Path, repo_root: Path) -> str:
+    """One graded point's `.log` for a fleet corner: caller's `header`, the exact deck klt
+    gave ngspice, klt's diagnostics, and the raw ngspice output.  Scrubbed (the committed
+    copy must not carry build or home paths)."""
+    art = corner.get("artifacts") or {}
+    deck = Path(art["deck"]).read_text() if art.get("deck") and Path(art["deck"]).is_file() else "(no deck retrieved)"
+    log = Path(art["log"]).read_text() if art.get("log") and Path(art["log"]).is_file() else "(no ngspice log retrieved)"
+    lines = list(header) + [""]
+    lines += ["# ==== klt sim deck (exact input given to ngspice on the runner) ====", *[f"| {ln}" for ln in deck.splitlines()], ""]
+    lines += ["# ==== klt diagnostics ====", *[f"| {dg.get('severity')}/{dg.get('code')}: {dg.get('message')}" for dg in corner.get("diagnostics", [])], ""]
+    lines += ["# ==== ngspice stdout+stderr ====", log.rstrip(), ""]
+    return scrub("\n".join(lines), run_dir, repo_root)
+
+
+def classify_error(corner: dict, log_text: str) -> str:
+    """`error_class` for a corner that produced no usable result (display only, never a grade)."""
+    if "could not find a valid modelname" in log_text:
+        return "model_not_found"
+    codes = [d.get("code") for d in corner.get("diagnostics", [])]
+    if any(c and "timeout" in c for c in codes):
+        return "timeout"
+    return ("error:" + ",".join(sorted({c for c in codes if c}))) if codes else "error"
+
+
 def mean(values: list[float]) -> float:
     return sum(values) / len(values)
 
@@ -567,6 +591,47 @@ def cap_retry(d: Path, label: str, poll_s: float, budget_s: float | None = None,
         sleep(poll_s)
         return True
     return retry
+
+
+def _json_document(text: str):
+    """Parse a JSON document that may be preceded by non-JSON noise (klt prints a plain
+    line ahead of its error envelope).  None when nothing parses."""
+    for candidate in (text, text[text.index("{"):] if "{" in text else None):
+        if candidate is None:
+            continue
+        try:
+            return json.loads(candidate)
+        except json.JSONDecodeError:
+            continue
+    return None
+
+
+def attempt_message(ad: Path) -> str:
+    """One archived attempt's outcome: the report's error/status, else klt's stderr error envelope."""
+    for name in ("report.json", "klt.stderr"):
+        f = ad / name
+        if not f.is_file():
+            continue
+        body = _json_document(f.read_text())
+        if isinstance(body, dict) and (body.get("error") or body.get("status")):
+            return (body.get("error") or {}).get("message") or ("report status " + str(body.get("status")))
+    tail = (ad / "klt.stderr").read_text()[-300:].strip() if (ad / "klt.stderr").is_file() else ""
+    return "unparseable report" + (f": {tail}" if tail else "")
+
+
+def attempt_messages(d: Path, run_dir: Path, repo_root: Path, cap: int = 400) -> list[str]:
+    """A request's `failed_earlier_attempts`: one scrubbed line per `attemptN/` under `d`, oldest first.
+
+    `cap_retry`/`submit_prepared` archive each superseded submit as `attemptN/report.json`
+    (klt's stdout) + `attemptN/klt.stderr`; both are read, because klt writes its
+    `--format json` error envelope to stderr when it refuses before any report exists.
+    Sorted numerically, so attempt10 follows attempt9 rather than attempt1.
+    """
+    def order(p: Path) -> tuple[int, str]:
+        n = p.name[len("attempt"):]
+        return (int(n) if n.isdigit() else 0, p.name)
+
+    return [scrub(attempt_message(ad), run_dir, repo_root)[:cap] for ad in sorted(d.glob("attempt*"), key=order)]
 
 
 def submit_prepared(d: Path, netlist: str, request: dict, submit_msg: str, done_label: str, retry=None) -> dict:
