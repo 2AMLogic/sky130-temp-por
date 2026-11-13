@@ -1,0 +1,82 @@
+{
+  "backend": "batch",
+  "models": {
+    "pdk": "sky130A"
+  },
+  "decks": [
+    {
+      "id": "tt_mm_-40c_nosupply",
+      "deck": "units/tt_mm_-40c_nosupply/tb_pnp_mismatch.spice",
+      "inputs": [
+        {
+          "path": "units/tt_mm_-40c_nosupply/spiceinit",
+          "name": ".spiceinit"
+        }
+      ],
+      "timeout_s": 3600
+    },
+    {
+      "id": "tt_mm_27c_nosupply",
+      "deck": "units/tt_mm_27c_nosupply/tb_pnp_mismatch.spice",
+      "inputs": [
+        {
+          "path": "units/tt_mm_27c_nosupply/spiceinit",
+          "name": ".spiceinit"
+        }
+      ],
+      "timeout_s": 3600
+    },
+    {
+      "id": "tt_mm_125c_nosupply",
+      "deck": "units/tt_mm_125c_nosupply/tb_pnp_mismatch.spice",
+      "inputs": [
+        {
+          "path": "units/tt_mm_125c_nosupply/spiceinit",
+          "name": ".spiceinit"
+        }
+      ],
+      "timeout_s": 3600
+    },
+    {
+      "id": "tt_27c_nosupply_mm-off",
+      "deck": "units/tt_27c_nosupply_mm-off/tb_pnp_mismatch.spice",
+      "inputs": [
+        {
+          "path": "units/tt_27c_nosupply_mm-off/spiceinit",
+          "name": ".spiceinit"
+        }
+      ],
+      "timeout_s": 3600
+    },
+    {
+      "id": "tt_mm_27c_nosupply_seed-b",
+      "deck": "units/tt_mm_27c_nosupply_seed-b/tb_pnp_mismatch.spice",
+      "inputs": [
+        {
+          "path": "units/tt_mm_27c_nosupply_seed-b/spiceinit",
+          "name": ".spiceinit"
+        }
+      ],
+      "timeout_s": 3600
+    },
+    {
+      "id": "mc_27c_nosupply",
+      "deck": "units/mc_27c_nosupply/tb_pnp_mismatch.spice",
+      "inputs": [
+        {
+          "path": "units/mc_27c_nosupply/spiceinit",
+          "name": ".spiceinit"
+        }
+      ],
+      "timeout_s": 3600
+    }
+  ],
+  "options": {
+    "timeout_s": 3600,
+    "max_workers": 6
+  },
+  "batch": {
+    "runner_version_check": "warn",
+    "capacity_wait_s": 600.0
+  }
+}

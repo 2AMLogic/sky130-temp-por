@@ -1,0 +1,193 @@
+* tb_pnp_mismatch.spice -- sky130 substrate-PNP local-mismatch Monte Carlo
+* (issue #17: sim-harness port; adapted from sky130-bandgap's
+* sim/pnp-mismatch/, whose own testbench targets bandgap-core-specific
+* device sizes this repo's design does not use -- see the topology note
+* below).
+*
+* Confirms the ported harness's local-mismatch (MC_MM_SWITCH=1) AND global
+* process (MC_PR_SWITCH=1) Monte Carlo mechanisms both produce non-degenerate
+* samples against THIS repo's own PNP topology, per issue #17's own
+* acceptance criteria edge case. Deliberately NOT run through
+* sim/bin/corner-run.py: that runner drives one deterministic .op per PVT
+* point and has no notion of resampling a deck N times, which is exactly
+* what a distribution claim needs. Driven instead by
+* sim/pnp-mismatch/run_pnp_mismatch.py.
+*
+* ---------------------------------------------------------------------------
+* sky130 mismatch mechanism (verified against the pinned PDK, not assumed --
+* identical mechanism sky130-bandgap's own sim/pnp-mismatch/ already
+* confirmed working on this same PDK pin)
+* ---------------------------------------------------------------------------
+* In sky130A the per-instance mismatch terms live inside the device
+* subcircuits in libs.tech/combined/continuous/models_bjt.spice:
+*
+*   .subckt sky130_fd_pr__pnp_05v5_W3p40L3p40 c b e mult=1
+*   .param mm_bf = {sw_mm_..._bf * mismatch_factor * MC_MM_SWITCH
+*                   * AGAUSS(0,1.0,1)/sqrt(mult)}
+*          mm_is = {sw_mm_..._is * mismatch_factor * MC_MM_SWITCH
+*                   * AGAUSS(0,1.0,1)/sqrt(mult)}
+*   ... is = '<W0p68L0p68 Is expr> * 0.13 * (1+mm_is)'   (area-matching scale)
+*       bf = '<W0p68L0p68 Bf expr> * 0.45 * (1+mm_bf)'
+*
+* The gate is MC_MM_SWITCH (local/intra-die mismatch) and, independently,
+* MC_PR_SWITCH (global/inter-die process Monte Carlo) -- neither is settable
+* from the deck itself: every plain corner section of
+* libs.tech/combined/sky130.lib.spice sets both to 0, the `*_mm` sections set
+* MC_MM_SWITCH=1 (MC_PR_SWITCH stays 0), and the `mc` section sets
+* MC_PR_SWITCH=1 (MC_MM_SWITCH stays 0). The section name is therefore the
+* switch. This run script exercises BOTH: `tt_mm` for the local-mismatch
+* points, `mc` for the global-process point, `tt` for the control point
+* (which must return sigma == 0 exactly for both switches).
+*
+* AGAUSS() is evaluated per subcircuit *instance*, so separate instantiations
+* of the same subcircuit already draw independently -- no per-device
+* parameter plumbing needed. ngspice re-draws on `reset`, which is what makes
+* the control loop below a genuine Monte Carlo; `setseed` makes it
+* reproducible.
+*
+* ---------------------------------------------------------------------------
+* Topology -- THIS repo's own PNP usage, not a re-run of sky130-bandgap's
+* ---------------------------------------------------------------------------
+* Confirmed by grep across design/netlist/*.spice (issue #17 port time):
+* every PNP instance in this repo's design is
+* `sky130_fd_pr__pnp_05v5_W3p40L3p40` (the LARGE fixed emitter size) --
+* design/bias_core.md's own device-mapping table explains why: sky130 ships
+* only two fixed PNP emitter sizes and the small one (W0p68L0p68) is not used
+* anywhere in this design, so sky130-bandgap's own small/large area-ratioed
+* mismatch pair does not map onto this repo's actual circuit. What this
+* design DOES have, in both bias_core and temp_core
+* (design/netlist/bias_core.spice, design/netlist/temp_core.spice): a single
+* PNP (`XQ1`) diode-connected c=VSS b=VSS e=<node>, and an 8-way PARALLEL
+* array of identical PNPs (`XQ8A`..`XQ8H`, same connection convention, all
+* eight emitters tied to one shared node) built as eight separate X
+* instances -- not one instance with `mult=8` -- exactly as
+* design/bias_core.md documents ("mult only scales the mismatch terms, not
+* Is, the identical quirk gf180's pnp_10p00x10p00 has"). This IS the real
+* 8:1-ratio PTAT ΔVBE core the design's own topology depends on, so this
+* deck reproduces it directly rather than inventing a device-size ratio this
+* design does not have:
+*
+*   (a) "identical" pair: two single-unit W3p40L3p40 devices at equal
+*       emitter current -- the pair-offset any single-unit leg in this
+*       design sees (e.g. XQ1 vs one leg of the XQ8x array, or XQR).
+*   (b) "array1v8" pair: one single-unit device vs 8 PARALLEL units sharing
+*       one node, fed the SAME total branch current as the single unit (so
+*       each of the 8 legs carries 1/8th the single device's current
+*       density) -- the actual XQ1-vs-XQ8A..H topology, where a shared
+*       mirrored branch current is split 8 ways. This 8x current-density
+*       ratio is what generates the real VT*ln(8) PTAT ΔVBE term the design
+*       depends on. The 8-parallel array's *combined* random Is deviation is
+*       the average of 8 independent per-instance draws, so its relative
+*       mismatch sigma is expected to land near 1/sqrt(8) of a single
+*       device's -- a real, falsifiable prediction of this exact topology
+*       (see run_pnp_mismatch.py's analytic_sigma()).
+*
+* Every DUT is diode-connected the way this design's PNPs actually are:
+* collector and base tied to VSS (=0 here), emitter driven by an ideal
+* current source, so VEB = v(emitter node). Subcircuit pin order is (c b e),
+* hence `X<name> 0 0 <emitter-node>`.
+*
+* Bias currents: 1 uA and 10 uA total branch current for both the identical
+* pair (per device) and the array1v8 pair (split 8 ways in the array leg) --
+* the same two rungs sky130-bandgap's own mismatch record used (its own
+* cross-reference: rungs of a 100 nA..100 uA half-decade characterization
+* ladder), kept here for cross-repo comparability. This repo's own
+* per-branch bias currents have not been characterized against sky130 models
+* yet (spec/porting-plan.md Sec4 item 2, not yet filed) -- these are
+* generic, round convenience points, not a claim about this design's actual
+* bias point.
+*
+* No supply rail exists in this deck: every DUT is referred to its own
+* emitter node and biased by an ideal current source, the same as
+* sky130-bandgap's own sim/pnp-mismatch/ (see that repo's tb_pnp_mismatch.spice
+* for the identical justification, which applies unchanged here).
+*
+* ---------------------------------------------------------------------------
+* Inputs supplied by the run script (this deck is not standalone)
+* ---------------------------------------------------------------------------
+*   corner.spice  -- generated: `.lib <sky130.lib.spice> <section>` + `.temp`
+*   $mc_seed      -- ngspice variable, set from the generated .spiceinit
+*   $mc_runs      -- ngspice variable, set from the generated .spiceinit
+* The defaults below apply only if the deck is driven by hand.
+
+.include corner.spice
+
+* ---- identical pair: W3p40L3p40 x2, 1 uA ----
+Ia1a 0 ea1a 1u
+XA1a 0 0 ea1a sky130_fd_pr__pnp_05v5_W3p40L3p40
+Ia1b 0 ea1b 1u
+XA1b 0 0 ea1b sky130_fd_pr__pnp_05v5_W3p40L3p40
+
+* ---- identical pair: W3p40L3p40 x2, 10 uA ----
+Ia10a 0 ea10a 10u
+XA10a 0 0 ea10a sky130_fd_pr__pnp_05v5_W3p40L3p40
+Ia10b 0 ea10b 10u
+XA10b 0 0 ea10b sky130_fd_pr__pnp_05v5_W3p40L3p40
+
+* ---- array1v8 pair: single vs 8-parallel W3p40L3p40, SAME total branch
+* current shared 8 ways (matching bias_core's/temp_core's real topology:
+* XQ1 carries the full branch current alone, XQ8A..H share the same total
+* current 8 ways -- an 8x lower per-device current density in the array,
+* which is what generates the real VT*ln(8) PTAT term. Scaling the array's
+* current source UP by 8x instead (equalizing per-device current density)
+* would cancel that ratio to ~0 -- exactly the kind of mistake
+* run_pnp_mismatch.py's own signal_vs_sigma check exists to catch, not
+* silently accept. ----
+Ir1a 0 er1a 1u
+XR1a 0 0 er1a sky130_fd_pr__pnp_05v5_W3p40L3p40
+Ir1b 0 er1b 1u
+XR1b0 0 0 er1b sky130_fd_pr__pnp_05v5_W3p40L3p40
+XR1b1 0 0 er1b sky130_fd_pr__pnp_05v5_W3p40L3p40
+XR1b2 0 0 er1b sky130_fd_pr__pnp_05v5_W3p40L3p40
+XR1b3 0 0 er1b sky130_fd_pr__pnp_05v5_W3p40L3p40
+XR1b4 0 0 er1b sky130_fd_pr__pnp_05v5_W3p40L3p40
+XR1b5 0 0 er1b sky130_fd_pr__pnp_05v5_W3p40L3p40
+XR1b6 0 0 er1b sky130_fd_pr__pnp_05v5_W3p40L3p40
+XR1b7 0 0 er1b sky130_fd_pr__pnp_05v5_W3p40L3p40
+
+* ---- array1v8 pair: single vs 8-parallel W3p40L3p40, SAME total branch
+* current shared 8 ways (see the note above) ----
+Ir10a 0 er10a 10u
+XR10a 0 0 er10a sky130_fd_pr__pnp_05v5_W3p40L3p40
+Ir10b 0 er10b 10u
+XR10b0 0 0 er10b sky130_fd_pr__pnp_05v5_W3p40L3p40
+XR10b1 0 0 er10b sky130_fd_pr__pnp_05v5_W3p40L3p40
+XR10b2 0 0 er10b sky130_fd_pr__pnp_05v5_W3p40L3p40
+XR10b3 0 0 er10b sky130_fd_pr__pnp_05v5_W3p40L3p40
+XR10b4 0 0 er10b sky130_fd_pr__pnp_05v5_W3p40L3p40
+XR10b5 0 0 er10b sky130_fd_pr__pnp_05v5_W3p40L3p40
+XR10b6 0 0 er10b sky130_fd_pr__pnp_05v5_W3p40L3p40
+XR10b7 0 0 er10b sky130_fd_pr__pnp_05v5_W3p40L3p40
+
+.control
+if $?mc_seed
+  setseed $mc_seed
+else
+  setseed 20260825
+end
+if $?mc_runs
+  let nruns = $mc_runs
+else
+  let nruns = 300
+end
+set width  = 512
+set height = 100000
+let run = 0
+dowhile run < nruns
+  reset
+  op
+  let da1   = v(ea1a)  - v(ea1b)
+  let da10  = v(ea10a) - v(ea10b)
+  let dr1   = v(er1a)  - v(er1b)
+  let dr10  = v(er10a) - v(er10b)
+  let vr1a  = v(er1a)
+  let vr1b  = v(er1b)
+  let vr10a = v(er10a)
+  let vr10b = v(er10b)
+  print da1 da10 dr1 dr10 vr1a vr1b vr10a vr10b
+  let run = run + 1
+end
+quit
+.endc
+
+.end

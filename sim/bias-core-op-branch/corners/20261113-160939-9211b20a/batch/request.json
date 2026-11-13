@@ -1,0 +1,1666 @@
+{
+  "backend": "batch",
+  "models": {
+    "pdk": "sky130A"
+  },
+  "decks": [
+    {
+      "id": "sweep-klu_tt_27c_2.97v",
+      "deck": "units/sweep-klu_tt_27c_2.97v/deck.spice",
+      "inputs": [
+        {
+          "path": "units/sweep-klu_tt_27c_2.97v/spiceinit",
+          "name": ".spiceinit"
+        }
+      ],
+      "timeout_s": 600
+    },
+    {
+      "id": "sweep-klu_tt_27c_2.98v",
+      "deck": "units/sweep-klu_tt_27c_2.98v/deck.spice",
+      "inputs": [
+        {
+          "path": "units/sweep-klu_tt_27c_2.98v/spiceinit",
+          "name": ".spiceinit"
+        }
+      ],
+      "timeout_s": 600
+    },
+    {
+      "id": "sweep-klu_tt_27c_2.99v",
+      "deck": "units/sweep-klu_tt_27c_2.99v/deck.spice",
+      "inputs": [
+        {
+          "path": "units/sweep-klu_tt_27c_2.99v/spiceinit",
+          "name": ".spiceinit"
+        }
+      ],
+      "timeout_s": 600
+    },
+    {
+      "id": "sweep-klu_tt_27c_3.00v",
+      "deck": "units/sweep-klu_tt_27c_3.00v/deck.spice",
+      "inputs": [
+        {
+          "path": "units/sweep-klu_tt_27c_3.00v/spiceinit",
+          "name": ".spiceinit"
+        }
+      ],
+      "timeout_s": 600
+    },
+    {
+      "id": "sweep-klu_tt_27c_3.01v",
+      "deck": "units/sweep-klu_tt_27c_3.01v/deck.spice",
+      "inputs": [
+        {
+          "path": "units/sweep-klu_tt_27c_3.01v/spiceinit",
+          "name": ".spiceinit"
+        }
+      ],
+      "timeout_s": 600
+    },
+    {
+      "id": "sweep-klu_tt_27c_3.02v",
+      "deck": "units/sweep-klu_tt_27c_3.02v/deck.spice",
+      "inputs": [
+        {
+          "path": "units/sweep-klu_tt_27c_3.02v/spiceinit",
+          "name": ".spiceinit"
+        }
+      ],
+      "timeout_s": 600
+    },
+    {
+      "id": "sweep-klu_tt_27c_3.03v",
+      "deck": "units/sweep-klu_tt_27c_3.03v/deck.spice",
+      "inputs": [
+        {
+          "path": "units/sweep-klu_tt_27c_3.03v/spiceinit",
+          "name": ".spiceinit"
+        }
+      ],
+      "timeout_s": 600
+    },
+    {
+      "id": "sweep-klu_tt_27c_3.04v",
+      "deck": "units/sweep-klu_tt_27c_3.04v/deck.spice",
+      "inputs": [
+        {
+          "path": "units/sweep-klu_tt_27c_3.04v/spiceinit",
+          "name": ".spiceinit"
+        }
+      ],
+      "timeout_s": 600
+    },
+    {
+      "id": "sweep-klu_tt_27c_3.05v",
+      "deck": "units/sweep-klu_tt_27c_3.05v/deck.spice",
+      "inputs": [
+        {
+          "path": "units/sweep-klu_tt_27c_3.05v/spiceinit",
+          "name": ".spiceinit"
+        }
+      ],
+      "timeout_s": 600
+    },
+    {
+      "id": "sweep-klu_tt_27c_3.06v",
+      "deck": "units/sweep-klu_tt_27c_3.06v/deck.spice",
+      "inputs": [
+        {
+          "path": "units/sweep-klu_tt_27c_3.06v/spiceinit",
+          "name": ".spiceinit"
+        }
+      ],
+      "timeout_s": 600
+    },
+    {
+      "id": "sweep-klu_tt_27c_3.07v",
+      "deck": "units/sweep-klu_tt_27c_3.07v/deck.spice",
+      "inputs": [
+        {
+          "path": "units/sweep-klu_tt_27c_3.07v/spiceinit",
+          "name": ".spiceinit"
+        }
+      ],
+      "timeout_s": 600
+    },
+    {
+      "id": "sweep-klu_tt_27c_3.08v",
+      "deck": "units/sweep-klu_tt_27c_3.08v/deck.spice",
+      "inputs": [
+        {
+          "path": "units/sweep-klu_tt_27c_3.08v/spiceinit",
+          "name": ".spiceinit"
+        }
+      ],
+      "timeout_s": 600
+    },
+    {
+      "id": "sweep-klu_tt_27c_3.09v",
+      "deck": "units/sweep-klu_tt_27c_3.09v/deck.spice",
+      "inputs": [
+        {
+          "path": "units/sweep-klu_tt_27c_3.09v/spiceinit",
+          "name": ".spiceinit"
+        }
+      ],
+      "timeout_s": 600
+    },
+    {
+      "id": "sweep-klu_tt_27c_3.10v",
+      "deck": "units/sweep-klu_tt_27c_3.10v/deck.spice",
+      "inputs": [
+        {
+          "path": "units/sweep-klu_tt_27c_3.10v/spiceinit",
+          "name": ".spiceinit"
+        }
+      ],
+      "timeout_s": 600
+    },
+    {
+      "id": "sweep-klu_tt_27c_3.11v",
+      "deck": "units/sweep-klu_tt_27c_3.11v/deck.spice",
+      "inputs": [
+        {
+          "path": "units/sweep-klu_tt_27c_3.11v/spiceinit",
+          "name": ".spiceinit"
+        }
+      ],
+      "timeout_s": 600
+    },
+    {
+      "id": "sweep-klu_tt_27c_3.12v",
+      "deck": "units/sweep-klu_tt_27c_3.12v/deck.spice",
+      "inputs": [
+        {
+          "path": "units/sweep-klu_tt_27c_3.12v/spiceinit",
+          "name": ".spiceinit"
+        }
+      ],
+      "timeout_s": 600
+    },
+    {
+      "id": "sweep-klu_tt_27c_3.13v",
+      "deck": "units/sweep-klu_tt_27c_3.13v/deck.spice",
+      "inputs": [
+        {
+          "path": "units/sweep-klu_tt_27c_3.13v/spiceinit",
+          "name": ".spiceinit"
+        }
+      ],
+      "timeout_s": 600
+    },
+    {
+      "id": "sweep-klu_tt_27c_3.14v",
+      "deck": "units/sweep-klu_tt_27c_3.14v/deck.spice",
+      "inputs": [
+        {
+          "path": "units/sweep-klu_tt_27c_3.14v/spiceinit",
+          "name": ".spiceinit"
+        }
+      ],
+      "timeout_s": 600
+    },
+    {
+      "id": "sweep-klu_tt_27c_3.15v",
+      "deck": "units/sweep-klu_tt_27c_3.15v/deck.spice",
+      "inputs": [
+        {
+          "path": "units/sweep-klu_tt_27c_3.15v/spiceinit",
+          "name": ".spiceinit"
+        }
+      ],
+      "timeout_s": 600
+    },
+    {
+      "id": "sweep-klu_tt_27c_3.16v",
+      "deck": "units/sweep-klu_tt_27c_3.16v/deck.spice",
+      "inputs": [
+        {
+          "path": "units/sweep-klu_tt_27c_3.16v/spiceinit",
+          "name": ".spiceinit"
+        }
+      ],
+      "timeout_s": 600
+    },
+    {
+      "id": "sweep-klu_tt_27c_3.17v",
+      "deck": "units/sweep-klu_tt_27c_3.17v/deck.spice",
+      "inputs": [
+        {
+          "path": "units/sweep-klu_tt_27c_3.17v/spiceinit",
+          "name": ".spiceinit"
+        }
+      ],
+      "timeout_s": 600
+    },
+    {
+      "id": "sweep-klu_tt_27c_3.18v",
+      "deck": "units/sweep-klu_tt_27c_3.18v/deck.spice",
+      "inputs": [
+        {
+          "path": "units/sweep-klu_tt_27c_3.18v/spiceinit",
+          "name": ".spiceinit"
+        }
+      ],
+      "timeout_s": 600
+    },
+    {
+      "id": "sweep-klu_tt_27c_3.19v",
+      "deck": "units/sweep-klu_tt_27c_3.19v/deck.spice",
+      "inputs": [
+        {
+          "path": "units/sweep-klu_tt_27c_3.19v/spiceinit",
+          "name": ".spiceinit"
+        }
+      ],
+      "timeout_s": 600
+    },
+    {
+      "id": "sweep-klu_tt_27c_3.20v",
+      "deck": "units/sweep-klu_tt_27c_3.20v/deck.spice",
+      "inputs": [
+        {
+          "path": "units/sweep-klu_tt_27c_3.20v/spiceinit",
+          "name": ".spiceinit"
+        }
+      ],
+      "timeout_s": 600
+    },
+    {
+      "id": "sweep-klu_tt_27c_3.21v",
+      "deck": "units/sweep-klu_tt_27c_3.21v/deck.spice",
+      "inputs": [
+        {
+          "path": "units/sweep-klu_tt_27c_3.21v/spiceinit",
+          "name": ".spiceinit"
+        }
+      ],
+      "timeout_s": 600
+    },
+    {
+      "id": "sweep-klu_tt_27c_3.22v",
+      "deck": "units/sweep-klu_tt_27c_3.22v/deck.spice",
+      "inputs": [
+        {
+          "path": "units/sweep-klu_tt_27c_3.22v/spiceinit",
+          "name": ".spiceinit"
+        }
+      ],
+      "timeout_s": 600
+    },
+    {
+      "id": "sweep-klu_tt_27c_3.23v",
+      "deck": "units/sweep-klu_tt_27c_3.23v/deck.spice",
+      "inputs": [
+        {
+          "path": "units/sweep-klu_tt_27c_3.23v/spiceinit",
+          "name": ".spiceinit"
+        }
+      ],
+      "timeout_s": 600
+    },
+    {
+      "id": "sweep-klu_tt_27c_3.24v",
+      "deck": "units/sweep-klu_tt_27c_3.24v/deck.spice",
+      "inputs": [
+        {
+          "path": "units/sweep-klu_tt_27c_3.24v/spiceinit",
+          "name": ".spiceinit"
+        }
+      ],
+      "timeout_s": 600
+    },
+    {
+      "id": "sweep-klu_tt_27c_3.25v",
+      "deck": "units/sweep-klu_tt_27c_3.25v/deck.spice",
+      "inputs": [
+        {
+          "path": "units/sweep-klu_tt_27c_3.25v/spiceinit",
+          "name": ".spiceinit"
+        }
+      ],
+      "timeout_s": 600
+    },
+    {
+      "id": "sweep-klu_tt_27c_3.26v",
+      "deck": "units/sweep-klu_tt_27c_3.26v/deck.spice",
+      "inputs": [
+        {
+          "path": "units/sweep-klu_tt_27c_3.26v/spiceinit",
+          "name": ".spiceinit"
+        }
+      ],
+      "timeout_s": 600
+    },
+    {
+      "id": "sweep-klu_tt_27c_3.27v",
+      "deck": "units/sweep-klu_tt_27c_3.27v/deck.spice",
+      "inputs": [
+        {
+          "path": "units/sweep-klu_tt_27c_3.27v/spiceinit",
+          "name": ".spiceinit"
+        }
+      ],
+      "timeout_s": 600
+    },
+    {
+      "id": "sweep-klu_tt_27c_3.28v",
+      "deck": "units/sweep-klu_tt_27c_3.28v/deck.spice",
+      "inputs": [
+        {
+          "path": "units/sweep-klu_tt_27c_3.28v/spiceinit",
+          "name": ".spiceinit"
+        }
+      ],
+      "timeout_s": 600
+    },
+    {
+      "id": "sweep-klu_tt_27c_3.29v",
+      "deck": "units/sweep-klu_tt_27c_3.29v/deck.spice",
+      "inputs": [
+        {
+          "path": "units/sweep-klu_tt_27c_3.29v/spiceinit",
+          "name": ".spiceinit"
+        }
+      ],
+      "timeout_s": 600
+    },
+    {
+      "id": "sweep-klu_tt_27c_3.30v",
+      "deck": "units/sweep-klu_tt_27c_3.30v/deck.spice",
+      "inputs": [
+        {
+          "path": "units/sweep-klu_tt_27c_3.30v/spiceinit",
+          "name": ".spiceinit"
+        }
+      ],
+      "timeout_s": 600
+    },
+    {
+      "id": "sweep-klu_tt_27c_3.31v",
+      "deck": "units/sweep-klu_tt_27c_3.31v/deck.spice",
+      "inputs": [
+        {
+          "path": "units/sweep-klu_tt_27c_3.31v/spiceinit",
+          "name": ".spiceinit"
+        }
+      ],
+      "timeout_s": 600
+    },
+    {
+      "id": "sweep-klu_tt_27c_3.32v",
+      "deck": "units/sweep-klu_tt_27c_3.32v/deck.spice",
+      "inputs": [
+        {
+          "path": "units/sweep-klu_tt_27c_3.32v/spiceinit",
+          "name": ".spiceinit"
+        }
+      ],
+      "timeout_s": 600
+    },
+    {
+      "id": "sweep-klu_tt_27c_3.33v",
+      "deck": "units/sweep-klu_tt_27c_3.33v/deck.spice",
+      "inputs": [
+        {
+          "path": "units/sweep-klu_tt_27c_3.33v/spiceinit",
+          "name": ".spiceinit"
+        }
+      ],
+      "timeout_s": 600
+    },
+    {
+      "id": "sweep-klu_tt_27c_3.34v",
+      "deck": "units/sweep-klu_tt_27c_3.34v/deck.spice",
+      "inputs": [
+        {
+          "path": "units/sweep-klu_tt_27c_3.34v/spiceinit",
+          "name": ".spiceinit"
+        }
+      ],
+      "timeout_s": 600
+    },
+    {
+      "id": "sweep-klu_tt_27c_3.35v",
+      "deck": "units/sweep-klu_tt_27c_3.35v/deck.spice",
+      "inputs": [
+        {
+          "path": "units/sweep-klu_tt_27c_3.35v/spiceinit",
+          "name": ".spiceinit"
+        }
+      ],
+      "timeout_s": 600
+    },
+    {
+      "id": "sweep-klu_tt_27c_3.36v",
+      "deck": "units/sweep-klu_tt_27c_3.36v/deck.spice",
+      "inputs": [
+        {
+          "path": "units/sweep-klu_tt_27c_3.36v/spiceinit",
+          "name": ".spiceinit"
+        }
+      ],
+      "timeout_s": 600
+    },
+    {
+      "id": "sweep-klu_tt_27c_3.37v",
+      "deck": "units/sweep-klu_tt_27c_3.37v/deck.spice",
+      "inputs": [
+        {
+          "path": "units/sweep-klu_tt_27c_3.37v/spiceinit",
+          "name": ".spiceinit"
+        }
+      ],
+      "timeout_s": 600
+    },
+    {
+      "id": "sweep-klu_tt_27c_3.38v",
+      "deck": "units/sweep-klu_tt_27c_3.38v/deck.spice",
+      "inputs": [
+        {
+          "path": "units/sweep-klu_tt_27c_3.38v/spiceinit",
+          "name": ".spiceinit"
+        }
+      ],
+      "timeout_s": 600
+    },
+    {
+      "id": "sweep-klu_tt_27c_3.39v",
+      "deck": "units/sweep-klu_tt_27c_3.39v/deck.spice",
+      "inputs": [
+        {
+          "path": "units/sweep-klu_tt_27c_3.39v/spiceinit",
+          "name": ".spiceinit"
+        }
+      ],
+      "timeout_s": 600
+    },
+    {
+      "id": "sweep-klu_tt_27c_3.40v",
+      "deck": "units/sweep-klu_tt_27c_3.40v/deck.spice",
+      "inputs": [
+        {
+          "path": "units/sweep-klu_tt_27c_3.40v/spiceinit",
+          "name": ".spiceinit"
+        }
+      ],
+      "timeout_s": 600
+    },
+    {
+      "id": "sweep-klu_tt_27c_3.41v",
+      "deck": "units/sweep-klu_tt_27c_3.41v/deck.spice",
+      "inputs": [
+        {
+          "path": "units/sweep-klu_tt_27c_3.41v/spiceinit",
+          "name": ".spiceinit"
+        }
+      ],
+      "timeout_s": 600
+    },
+    {
+      "id": "sweep-klu_tt_27c_3.42v",
+      "deck": "units/sweep-klu_tt_27c_3.42v/deck.spice",
+      "inputs": [
+        {
+          "path": "units/sweep-klu_tt_27c_3.42v/spiceinit",
+          "name": ".spiceinit"
+        }
+      ],
+      "timeout_s": 600
+    },
+    {
+      "id": "sweep-klu_tt_27c_3.43v",
+      "deck": "units/sweep-klu_tt_27c_3.43v/deck.spice",
+      "inputs": [
+        {
+          "path": "units/sweep-klu_tt_27c_3.43v/spiceinit",
+          "name": ".spiceinit"
+        }
+      ],
+      "timeout_s": 600
+    },
+    {
+      "id": "sweep-klu_tt_27c_3.44v",
+      "deck": "units/sweep-klu_tt_27c_3.44v/deck.spice",
+      "inputs": [
+        {
+          "path": "units/sweep-klu_tt_27c_3.44v/spiceinit",
+          "name": ".spiceinit"
+        }
+      ],
+      "timeout_s": 600
+    },
+    {
+      "id": "sweep-klu_tt_27c_3.45v",
+      "deck": "units/sweep-klu_tt_27c_3.45v/deck.spice",
+      "inputs": [
+        {
+          "path": "units/sweep-klu_tt_27c_3.45v/spiceinit",
+          "name": ".spiceinit"
+        }
+      ],
+      "timeout_s": 600
+    },
+    {
+      "id": "sweep-klu_tt_27c_3.46v",
+      "deck": "units/sweep-klu_tt_27c_3.46v/deck.spice",
+      "inputs": [
+        {
+          "path": "units/sweep-klu_tt_27c_3.46v/spiceinit",
+          "name": ".spiceinit"
+        }
+      ],
+      "timeout_s": 600
+    },
+    {
+      "id": "sweep-klu_tt_27c_3.47v",
+      "deck": "units/sweep-klu_tt_27c_3.47v/deck.spice",
+      "inputs": [
+        {
+          "path": "units/sweep-klu_tt_27c_3.47v/spiceinit",
+          "name": ".spiceinit"
+        }
+      ],
+      "timeout_s": 600
+    },
+    {
+      "id": "sweep-klu_tt_27c_3.48v",
+      "deck": "units/sweep-klu_tt_27c_3.48v/deck.spice",
+      "inputs": [
+        {
+          "path": "units/sweep-klu_tt_27c_3.48v/spiceinit",
+          "name": ".spiceinit"
+        }
+      ],
+      "timeout_s": 600
+    },
+    {
+      "id": "sweep-klu_tt_27c_3.49v",
+      "deck": "units/sweep-klu_tt_27c_3.49v/deck.spice",
+      "inputs": [
+        {
+          "path": "units/sweep-klu_tt_27c_3.49v/spiceinit",
+          "name": ".spiceinit"
+        }
+      ],
+      "timeout_s": 600
+    },
+    {
+      "id": "sweep-klu_tt_27c_3.50v",
+      "deck": "units/sweep-klu_tt_27c_3.50v/deck.spice",
+      "inputs": [
+        {
+          "path": "units/sweep-klu_tt_27c_3.50v/spiceinit",
+          "name": ".spiceinit"
+        }
+      ],
+      "timeout_s": 600
+    },
+    {
+      "id": "sweep-klu_tt_27c_3.51v",
+      "deck": "units/sweep-klu_tt_27c_3.51v/deck.spice",
+      "inputs": [
+        {
+          "path": "units/sweep-klu_tt_27c_3.51v/spiceinit",
+          "name": ".spiceinit"
+        }
+      ],
+      "timeout_s": 600
+    },
+    {
+      "id": "sweep-klu_tt_27c_3.52v",
+      "deck": "units/sweep-klu_tt_27c_3.52v/deck.spice",
+      "inputs": [
+        {
+          "path": "units/sweep-klu_tt_27c_3.52v/spiceinit",
+          "name": ".spiceinit"
+        }
+      ],
+      "timeout_s": 600
+    },
+    {
+      "id": "sweep-klu_tt_27c_3.53v",
+      "deck": "units/sweep-klu_tt_27c_3.53v/deck.spice",
+      "inputs": [
+        {
+          "path": "units/sweep-klu_tt_27c_3.53v/spiceinit",
+          "name": ".spiceinit"
+        }
+      ],
+      "timeout_s": 600
+    },
+    {
+      "id": "sweep-klu_tt_27c_3.54v",
+      "deck": "units/sweep-klu_tt_27c_3.54v/deck.spice",
+      "inputs": [
+        {
+          "path": "units/sweep-klu_tt_27c_3.54v/spiceinit",
+          "name": ".spiceinit"
+        }
+      ],
+      "timeout_s": 600
+    },
+    {
+      "id": "sweep-klu_tt_27c_3.55v",
+      "deck": "units/sweep-klu_tt_27c_3.55v/deck.spice",
+      "inputs": [
+        {
+          "path": "units/sweep-klu_tt_27c_3.55v/spiceinit",
+          "name": ".spiceinit"
+        }
+      ],
+      "timeout_s": 600
+    },
+    {
+      "id": "sweep-klu_tt_27c_3.56v",
+      "deck": "units/sweep-klu_tt_27c_3.56v/deck.spice",
+      "inputs": [
+        {
+          "path": "units/sweep-klu_tt_27c_3.56v/spiceinit",
+          "name": ".spiceinit"
+        }
+      ],
+      "timeout_s": 600
+    },
+    {
+      "id": "sweep-klu_tt_27c_3.57v",
+      "deck": "units/sweep-klu_tt_27c_3.57v/deck.spice",
+      "inputs": [
+        {
+          "path": "units/sweep-klu_tt_27c_3.57v/spiceinit",
+          "name": ".spiceinit"
+        }
+      ],
+      "timeout_s": 600
+    },
+    {
+      "id": "sweep-klu_tt_27c_3.58v",
+      "deck": "units/sweep-klu_tt_27c_3.58v/deck.spice",
+      "inputs": [
+        {
+          "path": "units/sweep-klu_tt_27c_3.58v/spiceinit",
+          "name": ".spiceinit"
+        }
+      ],
+      "timeout_s": 600
+    },
+    {
+      "id": "sweep-klu_tt_27c_3.59v",
+      "deck": "units/sweep-klu_tt_27c_3.59v/deck.spice",
+      "inputs": [
+        {
+          "path": "units/sweep-klu_tt_27c_3.59v/spiceinit",
+          "name": ".spiceinit"
+        }
+      ],
+      "timeout_s": 600
+    },
+    {
+      "id": "sweep-klu_tt_27c_3.60v",
+      "deck": "units/sweep-klu_tt_27c_3.60v/deck.spice",
+      "inputs": [
+        {
+          "path": "units/sweep-klu_tt_27c_3.60v/spiceinit",
+          "name": ".spiceinit"
+        }
+      ],
+      "timeout_s": 600
+    },
+    {
+      "id": "sweep-klu_tt_27c_3.61v",
+      "deck": "units/sweep-klu_tt_27c_3.61v/deck.spice",
+      "inputs": [
+        {
+          "path": "units/sweep-klu_tt_27c_3.61v/spiceinit",
+          "name": ".spiceinit"
+        }
+      ],
+      "timeout_s": 600
+    },
+    {
+      "id": "sweep-klu_tt_27c_3.62v",
+      "deck": "units/sweep-klu_tt_27c_3.62v/deck.spice",
+      "inputs": [
+        {
+          "path": "units/sweep-klu_tt_27c_3.62v/spiceinit",
+          "name": ".spiceinit"
+        }
+      ],
+      "timeout_s": 600
+    },
+    {
+      "id": "sweep-klu_tt_27c_3.63v",
+      "deck": "units/sweep-klu_tt_27c_3.63v/deck.spice",
+      "inputs": [
+        {
+          "path": "units/sweep-klu_tt_27c_3.63v/spiceinit",
+          "name": ".spiceinit"
+        }
+      ],
+      "timeout_s": 600
+    },
+    {
+      "id": "sweep-sparse_tt_27c_2.97v",
+      "deck": "units/sweep-sparse_tt_27c_2.97v/deck.spice",
+      "inputs": [
+        {
+          "path": "units/sweep-sparse_tt_27c_2.97v/spiceinit",
+          "name": ".spiceinit"
+        }
+      ],
+      "timeout_s": 600
+    },
+    {
+      "id": "sweep-sparse_tt_27c_2.98v",
+      "deck": "units/sweep-sparse_tt_27c_2.98v/deck.spice",
+      "inputs": [
+        {
+          "path": "units/sweep-sparse_tt_27c_2.98v/spiceinit",
+          "name": ".spiceinit"
+        }
+      ],
+      "timeout_s": 600
+    },
+    {
+      "id": "sweep-sparse_tt_27c_2.99v",
+      "deck": "units/sweep-sparse_tt_27c_2.99v/deck.spice",
+      "inputs": [
+        {
+          "path": "units/sweep-sparse_tt_27c_2.99v/spiceinit",
+          "name": ".spiceinit"
+        }
+      ],
+      "timeout_s": 600
+    },
+    {
+      "id": "sweep-sparse_tt_27c_3.00v",
+      "deck": "units/sweep-sparse_tt_27c_3.00v/deck.spice",
+      "inputs": [
+        {
+          "path": "units/sweep-sparse_tt_27c_3.00v/spiceinit",
+          "name": ".spiceinit"
+        }
+      ],
+      "timeout_s": 600
+    },
+    {
+      "id": "sweep-sparse_tt_27c_3.01v",
+      "deck": "units/sweep-sparse_tt_27c_3.01v/deck.spice",
+      "inputs": [
+        {
+          "path": "units/sweep-sparse_tt_27c_3.01v/spiceinit",
+          "name": ".spiceinit"
+        }
+      ],
+      "timeout_s": 600
+    },
+    {
+      "id": "sweep-sparse_tt_27c_3.02v",
+      "deck": "units/sweep-sparse_tt_27c_3.02v/deck.spice",
+      "inputs": [
+        {
+          "path": "units/sweep-sparse_tt_27c_3.02v/spiceinit",
+          "name": ".spiceinit"
+        }
+      ],
+      "timeout_s": 600
+    },
+    {
+      "id": "sweep-sparse_tt_27c_3.03v",
+      "deck": "units/sweep-sparse_tt_27c_3.03v/deck.spice",
+      "inputs": [
+        {
+          "path": "units/sweep-sparse_tt_27c_3.03v/spiceinit",
+          "name": ".spiceinit"
+        }
+      ],
+      "timeout_s": 600
+    },
+    {
+      "id": "sweep-sparse_tt_27c_3.04v",
+      "deck": "units/sweep-sparse_tt_27c_3.04v/deck.spice",
+      "inputs": [
+        {
+          "path": "units/sweep-sparse_tt_27c_3.04v/spiceinit",
+          "name": ".spiceinit"
+        }
+      ],
+      "timeout_s": 600
+    },
+    {
+      "id": "sweep-sparse_tt_27c_3.05v",
+      "deck": "units/sweep-sparse_tt_27c_3.05v/deck.spice",
+      "inputs": [
+        {
+          "path": "units/sweep-sparse_tt_27c_3.05v/spiceinit",
+          "name": ".spiceinit"
+        }
+      ],
+      "timeout_s": 600
+    },
+    {
+      "id": "sweep-sparse_tt_27c_3.06v",
+      "deck": "units/sweep-sparse_tt_27c_3.06v/deck.spice",
+      "inputs": [
+        {
+          "path": "units/sweep-sparse_tt_27c_3.06v/spiceinit",
+          "name": ".spiceinit"
+        }
+      ],
+      "timeout_s": 600
+    },
+    {
+      "id": "sweep-sparse_tt_27c_3.07v",
+      "deck": "units/sweep-sparse_tt_27c_3.07v/deck.spice",
+      "inputs": [
+        {
+          "path": "units/sweep-sparse_tt_27c_3.07v/spiceinit",
+          "name": ".spiceinit"
+        }
+      ],
+      "timeout_s": 600
+    },
+    {
+      "id": "sweep-sparse_tt_27c_3.08v",
+      "deck": "units/sweep-sparse_tt_27c_3.08v/deck.spice",
+      "inputs": [
+        {
+          "path": "units/sweep-sparse_tt_27c_3.08v/spiceinit",
+          "name": ".spiceinit"
+        }
+      ],
+      "timeout_s": 600
+    },
+    {
+      "id": "sweep-sparse_tt_27c_3.09v",
+      "deck": "units/sweep-sparse_tt_27c_3.09v/deck.spice",
+      "inputs": [
+        {
+          "path": "units/sweep-sparse_tt_27c_3.09v/spiceinit",
+          "name": ".spiceinit"
+        }
+      ],
+      "timeout_s": 600
+    },
+    {
+      "id": "sweep-sparse_tt_27c_3.10v",
+      "deck": "units/sweep-sparse_tt_27c_3.10v/deck.spice",
+      "inputs": [
+        {
+          "path": "units/sweep-sparse_tt_27c_3.10v/spiceinit",
+          "name": ".spiceinit"
+        }
+      ],
+      "timeout_s": 600
+    },
+    {
+      "id": "sweep-sparse_tt_27c_3.11v",
+      "deck": "units/sweep-sparse_tt_27c_3.11v/deck.spice",
+      "inputs": [
+        {
+          "path": "units/sweep-sparse_tt_27c_3.11v/spiceinit",
+          "name": ".spiceinit"
+        }
+      ],
+      "timeout_s": 600
+    },
+    {
+      "id": "sweep-sparse_tt_27c_3.12v",
+      "deck": "units/sweep-sparse_tt_27c_3.12v/deck.spice",
+      "inputs": [
+        {
+          "path": "units/sweep-sparse_tt_27c_3.12v/spiceinit",
+          "name": ".spiceinit"
+        }
+      ],
+      "timeout_s": 600
+    },
+    {
+      "id": "sweep-sparse_tt_27c_3.13v",
+      "deck": "units/sweep-sparse_tt_27c_3.13v/deck.spice",
+      "inputs": [
+        {
+          "path": "units/sweep-sparse_tt_27c_3.13v/spiceinit",
+          "name": ".spiceinit"
+        }
+      ],
+      "timeout_s": 600
+    },
+    {
+      "id": "sweep-sparse_tt_27c_3.14v",
+      "deck": "units/sweep-sparse_tt_27c_3.14v/deck.spice",
+      "inputs": [
+        {
+          "path": "units/sweep-sparse_tt_27c_3.14v/spiceinit",
+          "name": ".spiceinit"
+        }
+      ],
+      "timeout_s": 600
+    },
+    {
+      "id": "sweep-sparse_tt_27c_3.15v",
+      "deck": "units/sweep-sparse_tt_27c_3.15v/deck.spice",
+      "inputs": [
+        {
+          "path": "units/sweep-sparse_tt_27c_3.15v/spiceinit",
+          "name": ".spiceinit"
+        }
+      ],
+      "timeout_s": 600
+    },
+    {
+      "id": "sweep-sparse_tt_27c_3.16v",
+      "deck": "units/sweep-sparse_tt_27c_3.16v/deck.spice",
+      "inputs": [
+        {
+          "path": "units/sweep-sparse_tt_27c_3.16v/spiceinit",
+          "name": ".spiceinit"
+        }
+      ],
+      "timeout_s": 600
+    },
+    {
+      "id": "sweep-sparse_tt_27c_3.17v",
+      "deck": "units/sweep-sparse_tt_27c_3.17v/deck.spice",
+      "inputs": [
+        {
+          "path": "units/sweep-sparse_tt_27c_3.17v/spiceinit",
+          "name": ".spiceinit"
+        }
+      ],
+      "timeout_s": 600
+    },
+    {
+      "id": "sweep-sparse_tt_27c_3.18v",
+      "deck": "units/sweep-sparse_tt_27c_3.18v/deck.spice",
+      "inputs": [
+        {
+          "path": "units/sweep-sparse_tt_27c_3.18v/spiceinit",
+          "name": ".spiceinit"
+        }
+      ],
+      "timeout_s": 600
+    },
+    {
+      "id": "sweep-sparse_tt_27c_3.19v",
+      "deck": "units/sweep-sparse_tt_27c_3.19v/deck.spice",
+      "inputs": [
+        {
+          "path": "units/sweep-sparse_tt_27c_3.19v/spiceinit",
+          "name": ".spiceinit"
+        }
+      ],
+      "timeout_s": 600
+    },
+    {
+      "id": "sweep-sparse_tt_27c_3.20v",
+      "deck": "units/sweep-sparse_tt_27c_3.20v/deck.spice",
+      "inputs": [
+        {
+          "path": "units/sweep-sparse_tt_27c_3.20v/spiceinit",
+          "name": ".spiceinit"
+        }
+      ],
+      "timeout_s": 600
+    },
+    {
+      "id": "sweep-sparse_tt_27c_3.21v",
+      "deck": "units/sweep-sparse_tt_27c_3.21v/deck.spice",
+      "inputs": [
+        {
+          "path": "units/sweep-sparse_tt_27c_3.21v/spiceinit",
+          "name": ".spiceinit"
+        }
+      ],
+      "timeout_s": 600
+    },
+    {
+      "id": "sweep-sparse_tt_27c_3.22v",
+      "deck": "units/sweep-sparse_tt_27c_3.22v/deck.spice",
+      "inputs": [
+        {
+          "path": "units/sweep-sparse_tt_27c_3.22v/spiceinit",
+          "name": ".spiceinit"
+        }
+      ],
+      "timeout_s": 600
+    },
+    {
+      "id": "sweep-sparse_tt_27c_3.23v",
+      "deck": "units/sweep-sparse_tt_27c_3.23v/deck.spice",
+      "inputs": [
+        {
+          "path": "units/sweep-sparse_tt_27c_3.23v/spiceinit",
+          "name": ".spiceinit"
+        }
+      ],
+      "timeout_s": 600
+    },
+    {
+      "id": "sweep-sparse_tt_27c_3.24v",
+      "deck": "units/sweep-sparse_tt_27c_3.24v/deck.spice",
+      "inputs": [
+        {
+          "path": "units/sweep-sparse_tt_27c_3.24v/spiceinit",
+          "name": ".spiceinit"
+        }
+      ],
+      "timeout_s": 600
+    },
+    {
+      "id": "sweep-sparse_tt_27c_3.25v",
+      "deck": "units/sweep-sparse_tt_27c_3.25v/deck.spice",
+      "inputs": [
+        {
+          "path": "units/sweep-sparse_tt_27c_3.25v/spiceinit",
+          "name": ".spiceinit"
+        }
+      ],
+      "timeout_s": 600
+    },
+    {
+      "id": "sweep-sparse_tt_27c_3.26v",
+      "deck": "units/sweep-sparse_tt_27c_3.26v/deck.spice",
+      "inputs": [
+        {
+          "path": "units/sweep-sparse_tt_27c_3.26v/spiceinit",
+          "name": ".spiceinit"
+        }
+      ],
+      "timeout_s": 600
+    },
+    {
+      "id": "sweep-sparse_tt_27c_3.27v",
+      "deck": "units/sweep-sparse_tt_27c_3.27v/deck.spice",
+      "inputs": [
+        {
+          "path": "units/sweep-sparse_tt_27c_3.27v/spiceinit",
+          "name": ".spiceinit"
+        }
+      ],
+      "timeout_s": 600
+    },
+    {
+      "id": "sweep-sparse_tt_27c_3.28v",
+      "deck": "units/sweep-sparse_tt_27c_3.28v/deck.spice",
+      "inputs": [
+        {
+          "path": "units/sweep-sparse_tt_27c_3.28v/spiceinit",
+          "name": ".spiceinit"
+        }
+      ],
+      "timeout_s": 600
+    },
+    {
+      "id": "sweep-sparse_tt_27c_3.29v",
+      "deck": "units/sweep-sparse_tt_27c_3.29v/deck.spice",
+      "inputs": [
+        {
+          "path": "units/sweep-sparse_tt_27c_3.29v/spiceinit",
+          "name": ".spiceinit"
+        }
+      ],
+      "timeout_s": 600
+    },
+    {
+      "id": "sweep-sparse_tt_27c_3.30v",
+      "deck": "units/sweep-sparse_tt_27c_3.30v/deck.spice",
+      "inputs": [
+        {
+          "path": "units/sweep-sparse_tt_27c_3.30v/spiceinit",
+          "name": ".spiceinit"
+        }
+      ],
+      "timeout_s": 600
+    },
+    {
+      "id": "sweep-sparse_tt_27c_3.31v",
+      "deck": "units/sweep-sparse_tt_27c_3.31v/deck.spice",
+      "inputs": [
+        {
+          "path": "units/sweep-sparse_tt_27c_3.31v/spiceinit",
+          "name": ".spiceinit"
+        }
+      ],
+      "timeout_s": 600
+    },
+    {
+      "id": "sweep-sparse_tt_27c_3.32v",
+      "deck": "units/sweep-sparse_tt_27c_3.32v/deck.spice",
+      "inputs": [
+        {
+          "path": "units/sweep-sparse_tt_27c_3.32v/spiceinit",
+          "name": ".spiceinit"
+        }
+      ],
+      "timeout_s": 600
+    },
+    {
+      "id": "sweep-sparse_tt_27c_3.33v",
+      "deck": "units/sweep-sparse_tt_27c_3.33v/deck.spice",
+      "inputs": [
+        {
+          "path": "units/sweep-sparse_tt_27c_3.33v/spiceinit",
+          "name": ".spiceinit"
+        }
+      ],
+      "timeout_s": 600
+    },
+    {
+      "id": "sweep-sparse_tt_27c_3.34v",
+      "deck": "units/sweep-sparse_tt_27c_3.34v/deck.spice",
+      "inputs": [
+        {
+          "path": "units/sweep-sparse_tt_27c_3.34v/spiceinit",
+          "name": ".spiceinit"
+        }
+      ],
+      "timeout_s": 600
+    },
+    {
+      "id": "sweep-sparse_tt_27c_3.35v",
+      "deck": "units/sweep-sparse_tt_27c_3.35v/deck.spice",
+      "inputs": [
+        {
+          "path": "units/sweep-sparse_tt_27c_3.35v/spiceinit",
+          "name": ".spiceinit"
+        }
+      ],
+      "timeout_s": 600
+    },
+    {
+      "id": "sweep-sparse_tt_27c_3.36v",
+      "deck": "units/sweep-sparse_tt_27c_3.36v/deck.spice",
+      "inputs": [
+        {
+          "path": "units/sweep-sparse_tt_27c_3.36v/spiceinit",
+          "name": ".spiceinit"
+        }
+      ],
+      "timeout_s": 600
+    },
+    {
+      "id": "sweep-sparse_tt_27c_3.37v",
+      "deck": "units/sweep-sparse_tt_27c_3.37v/deck.spice",
+      "inputs": [
+        {
+          "path": "units/sweep-sparse_tt_27c_3.37v/spiceinit",
+          "name": ".spiceinit"
+        }
+      ],
+      "timeout_s": 600
+    },
+    {
+      "id": "sweep-sparse_tt_27c_3.38v",
+      "deck": "units/sweep-sparse_tt_27c_3.38v/deck.spice",
+      "inputs": [
+        {
+          "path": "units/sweep-sparse_tt_27c_3.38v/spiceinit",
+          "name": ".spiceinit"
+        }
+      ],
+      "timeout_s": 600
+    },
+    {
+      "id": "sweep-sparse_tt_27c_3.39v",
+      "deck": "units/sweep-sparse_tt_27c_3.39v/deck.spice",
+      "inputs": [
+        {
+          "path": "units/sweep-sparse_tt_27c_3.39v/spiceinit",
+          "name": ".spiceinit"
+        }
+      ],
+      "timeout_s": 600
+    },
+    {
+      "id": "sweep-sparse_tt_27c_3.40v",
+      "deck": "units/sweep-sparse_tt_27c_3.40v/deck.spice",
+      "inputs": [
+        {
+          "path": "units/sweep-sparse_tt_27c_3.40v/spiceinit",
+          "name": ".spiceinit"
+        }
+      ],
+      "timeout_s": 600
+    },
+    {
+      "id": "sweep-sparse_tt_27c_3.41v",
+      "deck": "units/sweep-sparse_tt_27c_3.41v/deck.spice",
+      "inputs": [
+        {
+          "path": "units/sweep-sparse_tt_27c_3.41v/spiceinit",
+          "name": ".spiceinit"
+        }
+      ],
+      "timeout_s": 600
+    },
+    {
+      "id": "sweep-sparse_tt_27c_3.42v",
+      "deck": "units/sweep-sparse_tt_27c_3.42v/deck.spice",
+      "inputs": [
+        {
+          "path": "units/sweep-sparse_tt_27c_3.42v/spiceinit",
+          "name": ".spiceinit"
+        }
+      ],
+      "timeout_s": 600
+    },
+    {
+      "id": "sweep-sparse_tt_27c_3.43v",
+      "deck": "units/sweep-sparse_tt_27c_3.43v/deck.spice",
+      "inputs": [
+        {
+          "path": "units/sweep-sparse_tt_27c_3.43v/spiceinit",
+          "name": ".spiceinit"
+        }
+      ],
+      "timeout_s": 600
+    },
+    {
+      "id": "sweep-sparse_tt_27c_3.44v",
+      "deck": "units/sweep-sparse_tt_27c_3.44v/deck.spice",
+      "inputs": [
+        {
+          "path": "units/sweep-sparse_tt_27c_3.44v/spiceinit",
+          "name": ".spiceinit"
+        }
+      ],
+      "timeout_s": 600
+    },
+    {
+      "id": "sweep-sparse_tt_27c_3.45v",
+      "deck": "units/sweep-sparse_tt_27c_3.45v/deck.spice",
+      "inputs": [
+        {
+          "path": "units/sweep-sparse_tt_27c_3.45v/spiceinit",
+          "name": ".spiceinit"
+        }
+      ],
+      "timeout_s": 600
+    },
+    {
+      "id": "sweep-sparse_tt_27c_3.46v",
+      "deck": "units/sweep-sparse_tt_27c_3.46v/deck.spice",
+      "inputs": [
+        {
+          "path": "units/sweep-sparse_tt_27c_3.46v/spiceinit",
+          "name": ".spiceinit"
+        }
+      ],
+      "timeout_s": 600
+    },
+    {
+      "id": "sweep-sparse_tt_27c_3.47v",
+      "deck": "units/sweep-sparse_tt_27c_3.47v/deck.spice",
+      "inputs": [
+        {
+          "path": "units/sweep-sparse_tt_27c_3.47v/spiceinit",
+          "name": ".spiceinit"
+        }
+      ],
+      "timeout_s": 600
+    },
+    {
+      "id": "sweep-sparse_tt_27c_3.48v",
+      "deck": "units/sweep-sparse_tt_27c_3.48v/deck.spice",
+      "inputs": [
+        {
+          "path": "units/sweep-sparse_tt_27c_3.48v/spiceinit",
+          "name": ".spiceinit"
+        }
+      ],
+      "timeout_s": 600
+    },
+    {
+      "id": "sweep-sparse_tt_27c_3.49v",
+      "deck": "units/sweep-sparse_tt_27c_3.49v/deck.spice",
+      "inputs": [
+        {
+          "path": "units/sweep-sparse_tt_27c_3.49v/spiceinit",
+          "name": ".spiceinit"
+        }
+      ],
+      "timeout_s": 600
+    },
+    {
+      "id": "sweep-sparse_tt_27c_3.50v",
+      "deck": "units/sweep-sparse_tt_27c_3.50v/deck.spice",
+      "inputs": [
+        {
+          "path": "units/sweep-sparse_tt_27c_3.50v/spiceinit",
+          "name": ".spiceinit"
+        }
+      ],
+      "timeout_s": 600
+    },
+    {
+      "id": "sweep-sparse_tt_27c_3.51v",
+      "deck": "units/sweep-sparse_tt_27c_3.51v/deck.spice",
+      "inputs": [
+        {
+          "path": "units/sweep-sparse_tt_27c_3.51v/spiceinit",
+          "name": ".spiceinit"
+        }
+      ],
+      "timeout_s": 600
+    },
+    {
+      "id": "sweep-sparse_tt_27c_3.52v",
+      "deck": "units/sweep-sparse_tt_27c_3.52v/deck.spice",
+      "inputs": [
+        {
+          "path": "units/sweep-sparse_tt_27c_3.52v/spiceinit",
+          "name": ".spiceinit"
+        }
+      ],
+      "timeout_s": 600
+    },
+    {
+      "id": "sweep-sparse_tt_27c_3.53v",
+      "deck": "units/sweep-sparse_tt_27c_3.53v/deck.spice",
+      "inputs": [
+        {
+          "path": "units/sweep-sparse_tt_27c_3.53v/spiceinit",
+          "name": ".spiceinit"
+        }
+      ],
+      "timeout_s": 600
+    },
+    {
+      "id": "sweep-sparse_tt_27c_3.54v",
+      "deck": "units/sweep-sparse_tt_27c_3.54v/deck.spice",
+      "inputs": [
+        {
+          "path": "units/sweep-sparse_tt_27c_3.54v/spiceinit",
+          "name": ".spiceinit"
+        }
+      ],
+      "timeout_s": 600
+    },
+    {
+      "id": "sweep-sparse_tt_27c_3.55v",
+      "deck": "units/sweep-sparse_tt_27c_3.55v/deck.spice",
+      "inputs": [
+        {
+          "path": "units/sweep-sparse_tt_27c_3.55v/spiceinit",
+          "name": ".spiceinit"
+        }
+      ],
+      "timeout_s": 600
+    },
+    {
+      "id": "sweep-sparse_tt_27c_3.56v",
+      "deck": "units/sweep-sparse_tt_27c_3.56v/deck.spice",
+      "inputs": [
+        {
+          "path": "units/sweep-sparse_tt_27c_3.56v/spiceinit",
+          "name": ".spiceinit"
+        }
+      ],
+      "timeout_s": 600
+    },
+    {
+      "id": "sweep-sparse_tt_27c_3.57v",
+      "deck": "units/sweep-sparse_tt_27c_3.57v/deck.spice",
+      "inputs": [
+        {
+          "path": "units/sweep-sparse_tt_27c_3.57v/spiceinit",
+          "name": ".spiceinit"
+        }
+      ],
+      "timeout_s": 600
+    },
+    {
+      "id": "sweep-sparse_tt_27c_3.58v",
+      "deck": "units/sweep-sparse_tt_27c_3.58v/deck.spice",
+      "inputs": [
+        {
+          "path": "units/sweep-sparse_tt_27c_3.58v/spiceinit",
+          "name": ".spiceinit"
+        }
+      ],
+      "timeout_s": 600
+    },
+    {
+      "id": "sweep-sparse_tt_27c_3.59v",
+      "deck": "units/sweep-sparse_tt_27c_3.59v/deck.spice",
+      "inputs": [
+        {
+          "path": "units/sweep-sparse_tt_27c_3.59v/spiceinit",
+          "name": ".spiceinit"
+        }
+      ],
+      "timeout_s": 600
+    },
+    {
+      "id": "sweep-sparse_tt_27c_3.60v",
+      "deck": "units/sweep-sparse_tt_27c_3.60v/deck.spice",
+      "inputs": [
+        {
+          "path": "units/sweep-sparse_tt_27c_3.60v/spiceinit",
+          "name": ".spiceinit"
+        }
+      ],
+      "timeout_s": 600
+    },
+    {
+      "id": "sweep-sparse_tt_27c_3.61v",
+      "deck": "units/sweep-sparse_tt_27c_3.61v/deck.spice",
+      "inputs": [
+        {
+          "path": "units/sweep-sparse_tt_27c_3.61v/spiceinit",
+          "name": ".spiceinit"
+        }
+      ],
+      "timeout_s": 600
+    },
+    {
+      "id": "sweep-sparse_tt_27c_3.62v",
+      "deck": "units/sweep-sparse_tt_27c_3.62v/deck.spice",
+      "inputs": [
+        {
+          "path": "units/sweep-sparse_tt_27c_3.62v/spiceinit",
+          "name": ".spiceinit"
+        }
+      ],
+      "timeout_s": 600
+    },
+    {
+      "id": "sweep-sparse_tt_27c_3.63v",
+      "deck": "units/sweep-sparse_tt_27c_3.63v/deck.spice",
+      "inputs": [
+        {
+          "path": "units/sweep-sparse_tt_27c_3.63v/spiceinit",
+          "name": ".spiceinit"
+        }
+      ],
+      "timeout_s": 600
+    },
+    {
+      "id": "temp-klu_tt_22c_2.97v",
+      "deck": "units/temp-klu_tt_22c_2.97v/deck.spice",
+      "inputs": [
+        {
+          "path": "units/temp-klu_tt_22c_2.97v/spiceinit",
+          "name": ".spiceinit"
+        }
+      ],
+      "timeout_s": 600
+    },
+    {
+      "id": "temp-klu_tt_24c_2.97v",
+      "deck": "units/temp-klu_tt_24c_2.97v/deck.spice",
+      "inputs": [
+        {
+          "path": "units/temp-klu_tt_24c_2.97v/spiceinit",
+          "name": ".spiceinit"
+        }
+      ],
+      "timeout_s": 600
+    },
+    {
+      "id": "temp-klu_tt_25c_2.97v",
+      "deck": "units/temp-klu_tt_25c_2.97v/deck.spice",
+      "inputs": [
+        {
+          "path": "units/temp-klu_tt_25c_2.97v/spiceinit",
+          "name": ".spiceinit"
+        }
+      ],
+      "timeout_s": 600
+    },
+    {
+      "id": "temp-klu_tt_26c_2.97v",
+      "deck": "units/temp-klu_tt_26c_2.97v/deck.spice",
+      "inputs": [
+        {
+          "path": "units/temp-klu_tt_26c_2.97v/spiceinit",
+          "name": ".spiceinit"
+        }
+      ],
+      "timeout_s": 600
+    },
+    {
+      "id": "temp-klu_tt_27c_2.97v",
+      "deck": "units/temp-klu_tt_27c_2.97v/deck.spice",
+      "inputs": [
+        {
+          "path": "units/temp-klu_tt_27c_2.97v/spiceinit",
+          "name": ".spiceinit"
+        }
+      ],
+      "timeout_s": 600
+    },
+    {
+      "id": "temp-klu_tt_28c_2.97v",
+      "deck": "units/temp-klu_tt_28c_2.97v/deck.spice",
+      "inputs": [
+        {
+          "path": "units/temp-klu_tt_28c_2.97v/spiceinit",
+          "name": ".spiceinit"
+        }
+      ],
+      "timeout_s": 600
+    },
+    {
+      "id": "temp-klu_tt_29c_2.97v",
+      "deck": "units/temp-klu_tt_29c_2.97v/deck.spice",
+      "inputs": [
+        {
+          "path": "units/temp-klu_tt_29c_2.97v/spiceinit",
+          "name": ".spiceinit"
+        }
+      ],
+      "timeout_s": 600
+    },
+    {
+      "id": "temp-klu_tt_30c_2.97v",
+      "deck": "units/temp-klu_tt_30c_2.97v/deck.spice",
+      "inputs": [
+        {
+          "path": "units/temp-klu_tt_30c_2.97v/spiceinit",
+          "name": ".spiceinit"
+        }
+      ],
+      "timeout_s": 600
+    },
+    {
+      "id": "temp-klu_tt_32c_2.97v",
+      "deck": "units/temp-klu_tt_32c_2.97v/deck.spice",
+      "inputs": [
+        {
+          "path": "units/temp-klu_tt_32c_2.97v/spiceinit",
+          "name": ".spiceinit"
+        }
+      ],
+      "timeout_s": 600
+    },
+    {
+      "id": "variant-srcstep_tt_27c_2.97v",
+      "deck": "units/variant-srcstep_tt_27c_2.97v/deck.spice",
+      "inputs": [
+        {
+          "path": "units/variant-srcstep_tt_27c_2.97v/spiceinit",
+          "name": ".spiceinit"
+        }
+      ],
+      "timeout_s": 600
+    },
+    {
+      "id": "variant-srcstep_tt_27c_3.63v",
+      "deck": "units/variant-srcstep_tt_27c_3.63v/deck.spice",
+      "inputs": [
+        {
+          "path": "units/variant-srcstep_tt_27c_3.63v/spiceinit",
+          "name": ".spiceinit"
+        }
+      ],
+      "timeout_s": 600
+    },
+    {
+      "id": "variant-nodeset_tt_27c_2.97v",
+      "deck": "units/variant-nodeset_tt_27c_2.97v/deck.spice",
+      "inputs": [
+        {
+          "path": "units/variant-nodeset_tt_27c_2.97v/spiceinit",
+          "name": ".spiceinit"
+        }
+      ],
+      "timeout_s": 600
+    },
+    {
+      "id": "variant-nodeset_tt_27c_3.63v",
+      "deck": "units/variant-nodeset_tt_27c_3.63v/deck.spice",
+      "inputs": [
+        {
+          "path": "units/variant-nodeset_tt_27c_3.63v/spiceinit",
+          "name": ".spiceinit"
+        }
+      ],
+      "timeout_s": 600
+    },
+    {
+      "id": "control-repeat1_tt_27c_2.97v",
+      "deck": "units/control-repeat1_tt_27c_2.97v/deck.spice",
+      "inputs": [
+        {
+          "path": "units/control-repeat1_tt_27c_2.97v/spiceinit",
+          "name": ".spiceinit"
+        }
+      ],
+      "timeout_s": 600
+    },
+    {
+      "id": "control-repeat2_tt_27c_2.97v",
+      "deck": "units/control-repeat2_tt_27c_2.97v/deck.spice",
+      "inputs": [
+        {
+          "path": "units/control-repeat2_tt_27c_2.97v/spiceinit",
+          "name": ".spiceinit"
+        }
+      ],
+      "timeout_s": 600
+    },
+    {
+      "id": "control-repeat3_tt_27c_2.97v",
+      "deck": "units/control-repeat3_tt_27c_2.97v/deck.spice",
+      "inputs": [
+        {
+          "path": "units/control-repeat3_tt_27c_2.97v/spiceinit",
+          "name": ".spiceinit"
+        }
+      ],
+      "timeout_s": 600
+    }
+  ],
+  "options": {
+    "timeout_s": 600,
+    "max_workers": 8
+  },
+  "batch": {
+    "runner_version_check": "warn",
+    "capacity_wait_s": 600.0
+  }
+}

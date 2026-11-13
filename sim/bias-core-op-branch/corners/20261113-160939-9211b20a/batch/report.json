@@ -1,0 +1,2782 @@
+{
+  "schema_version": 3,
+  "mode": "decks",
+  "backend": "batch",
+  "engine": "ngspice",
+  "status": "pass",
+  "unit_count": 150,
+  "passed": 150,
+  "errored": 0,
+  "timed_out": 0,
+  "units": [
+    {
+      "id": "sweep-klu_tt_27c_2.97v",
+      "status": "pass",
+      "exit_code": 0,
+      "timed_out": false,
+      "duration_s": 3.271,
+      "engine_version": "47",
+      "deck": "deck.spice",
+      "deck_sha256": "660efc523c544bb57ef3fbdc60190afd9528b8801506d1cf592f8167db583395",
+      "stdout": "sweep-klu_tt_27c_2.97v/stdout.bin",
+      "stderr": "sweep-klu_tt_27c_2.97v/stderr.bin",
+      "outputs": [],
+      "missing_outputs": [],
+      "host_resolved": [
+        "$PDK_ROOT/sky130A/libs.tech/combined/sky130.lib.spice"
+      ],
+      "diagnostics": []
+    },
+    {
+      "id": "sweep-klu_tt_27c_2.98v",
+      "status": "pass",
+      "exit_code": 0,
+      "timed_out": false,
+      "duration_s": 3.287,
+      "engine_version": "47",
+      "deck": "deck.spice",
+      "deck_sha256": "cb714b03a7439c628e33e93a754a768e6347f235d59d8cb36ee984c1aebec903",
+      "stdout": "sweep-klu_tt_27c_2.98v/stdout.bin",
+      "stderr": "sweep-klu_tt_27c_2.98v/stderr.bin",
+      "outputs": [],
+      "missing_outputs": [],
+      "host_resolved": [
+        "$PDK_ROOT/sky130A/libs.tech/combined/sky130.lib.spice"
+      ],
+      "diagnostics": []
+    },
+    {
+      "id": "sweep-klu_tt_27c_2.99v",
+      "status": "pass",
+      "exit_code": 0,
+      "timed_out": false,
+      "duration_s": 3.222,
+      "engine_version": "47",
+      "deck": "deck.spice",
+      "deck_sha256": "b71444dc235f7776742a181abae49b805e8652e5eff78cf03e8e06611e695524",
+      "stdout": "sweep-klu_tt_27c_2.99v/stdout.bin",
+      "stderr": "sweep-klu_tt_27c_2.99v/stderr.bin",
+      "outputs": [],
+      "missing_outputs": [],
+      "host_resolved": [
+        "$PDK_ROOT/sky130A/libs.tech/combined/sky130.lib.spice"
+      ],
+      "diagnostics": []
+    },
+    {
+      "id": "sweep-klu_tt_27c_3.00v",
+      "status": "pass",
+      "exit_code": 0,
+      "timed_out": false,
+      "duration_s": 3.286,
+      "engine_version": "47",
+      "deck": "deck.spice",
+      "deck_sha256": "a69a814a6864b1bf9192be1d0033a05432acdd0ff16bf9a8732fb28e51818978",
+      "stdout": "sweep-klu_tt_27c_3.00v/stdout.bin",
+      "stderr": "sweep-klu_tt_27c_3.00v/stderr.bin",
+      "outputs": [],
+      "missing_outputs": [],
+      "host_resolved": [
+        "$PDK_ROOT/sky130A/libs.tech/combined/sky130.lib.spice"
+      ],
+      "diagnostics": []
+    },
+    {
+      "id": "sweep-klu_tt_27c_3.01v",
+      "status": "pass",
+      "exit_code": 0,
+      "timed_out": false,
+      "duration_s": 2.741,
+      "engine_version": "47",
+      "deck": "deck.spice",
+      "deck_sha256": "b02a3640ca42994e3a32908d6c319af2665099e06d4cf8e0142aa6e1f819d1f0",
+      "stdout": "sweep-klu_tt_27c_3.01v/stdout.bin",
+      "stderr": "sweep-klu_tt_27c_3.01v/stderr.bin",
+      "outputs": [],
+      "missing_outputs": [],
+      "host_resolved": [
+        "$PDK_ROOT/sky130A/libs.tech/combined/sky130.lib.spice"
+      ],
+      "diagnostics": []
+    },
+    {
+      "id": "sweep-klu_tt_27c_3.02v",
+      "status": "pass",
+      "exit_code": 0,
+      "timed_out": false,
+      "duration_s": 2.686,
+      "engine_version": "47",
+      "deck": "deck.spice",
+      "deck_sha256": "80d94298d03d793d69d5d88d86b5e11e1815789c857fd5ae641e69e353f515aa",
+      "stdout": "sweep-klu_tt_27c_3.02v/stdout.bin",
+      "stderr": "sweep-klu_tt_27c_3.02v/stderr.bin",
+      "outputs": [],
+      "missing_outputs": [],
+      "host_resolved": [
+        "$PDK_ROOT/sky130A/libs.tech/combined/sky130.lib.spice"
+      ],
+      "diagnostics": []
+    },
+    {
+      "id": "sweep-klu_tt_27c_3.03v",
+      "status": "pass",
+      "exit_code": 0,
+      "timed_out": false,
+      "duration_s": 2.64,
+      "engine_version": "47",
+      "deck": "deck.spice",
+      "deck_sha256": "229fd4af9a1e151d70a3ccb2de5191893d3d2b49423e6e4f2af6ae2639aba526",
+      "stdout": "sweep-klu_tt_27c_3.03v/stdout.bin",
+      "stderr": "sweep-klu_tt_27c_3.03v/stderr.bin",
+      "outputs": [],
+      "missing_outputs": [],
+      "host_resolved": [
+        "$PDK_ROOT/sky130A/libs.tech/combined/sky130.lib.spice"
+      ],
+      "diagnostics": []
+    },
+    {
+      "id": "sweep-klu_tt_27c_3.04v",
+      "status": "pass",
+      "exit_code": 0,
+      "timed_out": false,
+      "duration_s": 2.695,
+      "engine_version": "47",
+      "deck": "deck.spice",
+      "deck_sha256": "16c0f6cebd3ce1521769be3fb5bc6d0152640024475e8ff61acc83ef1dcc086d",
+      "stdout": "sweep-klu_tt_27c_3.04v/stdout.bin",
+      "stderr": "sweep-klu_tt_27c_3.04v/stderr.bin",
+      "outputs": [],
+      "missing_outputs": [],
+      "host_resolved": [
+        "$PDK_ROOT/sky130A/libs.tech/combined/sky130.lib.spice"
+      ],
+      "diagnostics": []
+    },
+    {
+      "id": "sweep-klu_tt_27c_3.05v",
+      "status": "pass",
+      "exit_code": 0,
+      "timed_out": false,
+      "duration_s": 2.632,
+      "engine_version": "47",
+      "deck": "deck.spice",
+      "deck_sha256": "99445bdd50a805560cd4f55d9a02e25dfb5002675582756c470c4b96101da301",
+      "stdout": "sweep-klu_tt_27c_3.05v/stdout.bin",
+      "stderr": "sweep-klu_tt_27c_3.05v/stderr.bin",
+      "outputs": [],
+      "missing_outputs": [],
+      "host_resolved": [
+        "$PDK_ROOT/sky130A/libs.tech/combined/sky130.lib.spice"
+      ],
+      "diagnostics": []
+    },
+    {
+      "id": "sweep-klu_tt_27c_3.06v",
+      "status": "pass",
+      "exit_code": 0,
+      "timed_out": false,
+      "duration_s": 2.687,
+      "engine_version": "47",
+      "deck": "deck.spice",
+      "deck_sha256": "1bc2029eb92a1d72274d2b59dcf29cf8e660986b1c0552d80c1e8e9c4143a4eb",
+      "stdout": "sweep-klu_tt_27c_3.06v/stdout.bin",
+      "stderr": "sweep-klu_tt_27c_3.06v/stderr.bin",
+      "outputs": [],
+      "missing_outputs": [],
+      "host_resolved": [
+        "$PDK_ROOT/sky130A/libs.tech/combined/sky130.lib.spice"
+      ],
+      "diagnostics": []
+    },
+    {
+      "id": "sweep-klu_tt_27c_3.07v",
+      "status": "pass",
+      "exit_code": 0,
+      "timed_out": false,
+      "duration_s": 2.627,
+      "engine_version": "47",
+      "deck": "deck.spice",
+      "deck_sha256": "0872efd46923d9a50cd17aa13a1687f111a01ebd9ea4bf62009cc3d9534fbb58",
+      "stdout": "sweep-klu_tt_27c_3.07v/stdout.bin",
+      "stderr": "sweep-klu_tt_27c_3.07v/stderr.bin",
+      "outputs": [],
+      "missing_outputs": [],
+      "host_resolved": [
+        "$PDK_ROOT/sky130A/libs.tech/combined/sky130.lib.spice"
+      ],
+      "diagnostics": []
+    },
+    {
+      "id": "sweep-klu_tt_27c_3.08v",
+      "status": "pass",
+      "exit_code": 0,
+      "timed_out": false,
+      "duration_s": 2.703,
+      "engine_version": "47",
+      "deck": "deck.spice",
+      "deck_sha256": "73810ca2276314e555d1011ba8302ea870615e5fb126e6dde8bf55ac25831ce3",
+      "stdout": "sweep-klu_tt_27c_3.08v/stdout.bin",
+      "stderr": "sweep-klu_tt_27c_3.08v/stderr.bin",
+      "outputs": [],
+      "missing_outputs": [],
+      "host_resolved": [
+        "$PDK_ROOT/sky130A/libs.tech/combined/sky130.lib.spice"
+      ],
+      "diagnostics": []
+    },
+    {
+      "id": "sweep-klu_tt_27c_3.09v",
+      "status": "pass",
+      "exit_code": 0,
+      "timed_out": false,
+      "duration_s": 2.692,
+      "engine_version": "47",
+      "deck": "deck.spice",
+      "deck_sha256": "1424c55a21aac9b1b4355e6eaadbfba8896de000fd63b50baf6a38767b4a5c19",
+      "stdout": "sweep-klu_tt_27c_3.09v/stdout.bin",
+      "stderr": "sweep-klu_tt_27c_3.09v/stderr.bin",
+      "outputs": [],
+      "missing_outputs": [],
+      "host_resolved": [
+        "$PDK_ROOT/sky130A/libs.tech/combined/sky130.lib.spice"
+      ],
+      "diagnostics": []
+    },
+    {
+      "id": "sweep-klu_tt_27c_3.10v",
+      "status": "pass",
+      "exit_code": 0,
+      "timed_out": false,
+      "duration_s": 2.67,
+      "engine_version": "47",
+      "deck": "deck.spice",
+      "deck_sha256": "d631216269004de76b31fc532e150350e9b5eefbe90a95bb5e2e92f1e5ba62c9",
+      "stdout": "sweep-klu_tt_27c_3.10v/stdout.bin",
+      "stderr": "sweep-klu_tt_27c_3.10v/stderr.bin",
+      "outputs": [],
+      "missing_outputs": [],
+      "host_resolved": [
+        "$PDK_ROOT/sky130A/libs.tech/combined/sky130.lib.spice"
+      ],
+      "diagnostics": []
+    },
+    {
+      "id": "sweep-klu_tt_27c_3.11v",
+      "status": "pass",
+      "exit_code": 0,
+      "timed_out": false,
+      "duration_s": 2.657,
+      "engine_version": "47",
+      "deck": "deck.spice",
+      "deck_sha256": "619956bee6e83559737b8e9e002b9b0d60e8627e26b0ec60f5049cffcac694cd",
+      "stdout": "sweep-klu_tt_27c_3.11v/stdout.bin",
+      "stderr": "sweep-klu_tt_27c_3.11v/stderr.bin",
+      "outputs": [],
+      "missing_outputs": [],
+      "host_resolved": [
+        "$PDK_ROOT/sky130A/libs.tech/combined/sky130.lib.spice"
+      ],
+      "diagnostics": []
+    },
+    {
+      "id": "sweep-klu_tt_27c_3.12v",
+      "status": "pass",
+      "exit_code": 0,
+      "timed_out": false,
+      "duration_s": 2.698,
+      "engine_version": "47",
+      "deck": "deck.spice",
+      "deck_sha256": "1b1be979d55805c2a3fb76323b79f14845632d5f0983eb650d3d04e5dd52c83b",
+      "stdout": "sweep-klu_tt_27c_3.12v/stdout.bin",
+      "stderr": "sweep-klu_tt_27c_3.12v/stderr.bin",
+      "outputs": [],
+      "missing_outputs": [],
+      "host_resolved": [
+        "$PDK_ROOT/sky130A/libs.tech/combined/sky130.lib.spice"
+      ],
+      "diagnostics": []
+    },
+    {
+      "id": "sweep-klu_tt_27c_3.13v",
+      "status": "pass",
+      "exit_code": 0,
+      "timed_out": false,
+      "duration_s": 2.775,
+      "engine_version": "47",
+      "deck": "deck.spice",
+      "deck_sha256": "8f262fae39f27e5e9075415b8070223ba2e92779b19a822c25b394c462f82030",
+      "stdout": "sweep-klu_tt_27c_3.13v/stdout.bin",
+      "stderr": "sweep-klu_tt_27c_3.13v/stderr.bin",
+      "outputs": [],
+      "missing_outputs": [],
+      "host_resolved": [
+        "$PDK_ROOT/sky130A/libs.tech/combined/sky130.lib.spice"
+      ],
+      "diagnostics": []
+    },
+    {
+      "id": "sweep-klu_tt_27c_3.14v",
+      "status": "pass",
+      "exit_code": 0,
+      "timed_out": false,
+      "duration_s": 2.691,
+      "engine_version": "47",
+      "deck": "deck.spice",
+      "deck_sha256": "a3e381fb1f1309845ff6105ccd0d07e0ab10d46c473fcd2ded874b910343f4b9",
+      "stdout": "sweep-klu_tt_27c_3.14v/stdout.bin",
+      "stderr": "sweep-klu_tt_27c_3.14v/stderr.bin",
+      "outputs": [],
+      "missing_outputs": [],
+      "host_resolved": [
+        "$PDK_ROOT/sky130A/libs.tech/combined/sky130.lib.spice"
+      ],
+      "diagnostics": []
+    },
+    {
+      "id": "sweep-klu_tt_27c_3.15v",
+      "status": "pass",
+      "exit_code": 0,
+      "timed_out": false,
+      "duration_s": 2.659,
+      "engine_version": "47",
+      "deck": "deck.spice",
+      "deck_sha256": "c118fae541abbebb2b5e9e12c5e1cda511add88eefb1b2442c105dfe0d35e0fe",
+      "stdout": "sweep-klu_tt_27c_3.15v/stdout.bin",
+      "stderr": "sweep-klu_tt_27c_3.15v/stderr.bin",
+      "outputs": [],
+      "missing_outputs": [],
+      "host_resolved": [
+        "$PDK_ROOT/sky130A/libs.tech/combined/sky130.lib.spice"
+      ],
+      "diagnostics": []
+    },
+    {
+      "id": "sweep-klu_tt_27c_3.16v",
+      "status": "pass",
+      "exit_code": 0,
+      "timed_out": false,
+      "duration_s": 2.707,
+      "engine_version": "47",
+      "deck": "deck.spice",
+      "deck_sha256": "fdfdfc24fb4ca566546abc013db91f1a94dca8cdb352274cb34deea1e368685c",
+      "stdout": "sweep-klu_tt_27c_3.16v/stdout.bin",
+      "stderr": "sweep-klu_tt_27c_3.16v/stderr.bin",
+      "outputs": [],
+      "missing_outputs": [],
+      "host_resolved": [
+        "$PDK_ROOT/sky130A/libs.tech/combined/sky130.lib.spice"
+      ],
+      "diagnostics": []
+    },
+    {
+      "id": "sweep-klu_tt_27c_3.17v",
+      "status": "pass",
+      "exit_code": 0,
+      "timed_out": false,
+      "duration_s": 2.65,
+      "engine_version": "47",
+      "deck": "deck.spice",
+      "deck_sha256": "20afe5cb1f0f5428f6c471394c86ecabc67e12a59cface5d406f70da5869c8cc",
+      "stdout": "sweep-klu_tt_27c_3.17v/stdout.bin",
+      "stderr": "sweep-klu_tt_27c_3.17v/stderr.bin",
+      "outputs": [],
+      "missing_outputs": [],
+      "host_resolved": [
+        "$PDK_ROOT/sky130A/libs.tech/combined/sky130.lib.spice"
+      ],
+      "diagnostics": []
+    },
+    {
+      "id": "sweep-klu_tt_27c_3.18v",
+      "status": "pass",
+      "exit_code": 0,
+      "timed_out": false,
+      "duration_s": 2.716,
+      "engine_version": "47",
+      "deck": "deck.spice",
+      "deck_sha256": "64552a157f36cb218127e1fd1da3edb020e0bfea8ca0343cf226e097853131b3",
+      "stdout": "sweep-klu_tt_27c_3.18v/stdout.bin",
+      "stderr": "sweep-klu_tt_27c_3.18v/stderr.bin",
+      "outputs": [],
+      "missing_outputs": [],
+      "host_resolved": [
+        "$PDK_ROOT/sky130A/libs.tech/combined/sky130.lib.spice"
+      ],
+      "diagnostics": []
+    },
+    {
+      "id": "sweep-klu_tt_27c_3.19v",
+      "status": "pass",
+      "exit_code": 0,
+      "timed_out": false,
+      "duration_s": 2.691,
+      "engine_version": "47",
+      "deck": "deck.spice",
+      "deck_sha256": "aa14ef9bc9e613785d89262e5edbb8858bd6e887c91c32b1ac5a72b87c5b30d0",
+      "stdout": "sweep-klu_tt_27c_3.19v/stdout.bin",
+      "stderr": "sweep-klu_tt_27c_3.19v/stderr.bin",
+      "outputs": [],
+      "missing_outputs": [],
+      "host_resolved": [
+        "$PDK_ROOT/sky130A/libs.tech/combined/sky130.lib.spice"
+      ],
+      "diagnostics": []
+    },
+    {
+      "id": "sweep-klu_tt_27c_3.20v",
+      "status": "pass",
+      "exit_code": 0,
+      "timed_out": false,
+      "duration_s": 2.695,
+      "engine_version": "47",
+      "deck": "deck.spice",
+      "deck_sha256": "f7a8028cde2d2d157638b7bfc43827aa81f0af80f85766787182aff58e9b80b8",
+      "stdout": "sweep-klu_tt_27c_3.20v/stdout.bin",
+      "stderr": "sweep-klu_tt_27c_3.20v/stderr.bin",
+      "outputs": [],
+      "missing_outputs": [],
+      "host_resolved": [
+        "$PDK_ROOT/sky130A/libs.tech/combined/sky130.lib.spice"
+      ],
+      "diagnostics": []
+    },
+    {
+      "id": "sweep-klu_tt_27c_3.21v",
+      "status": "pass",
+      "exit_code": 0,
+      "timed_out": false,
+      "duration_s": 2.64,
+      "engine_version": "47",
+      "deck": "deck.spice",
+      "deck_sha256": "cf3293fc20731c2c16f0340f6ff3f5efcacb1a2bed313a2358ed00e22e325cc6",
+      "stdout": "sweep-klu_tt_27c_3.21v/stdout.bin",
+      "stderr": "sweep-klu_tt_27c_3.21v/stderr.bin",
+      "outputs": [],
+      "missing_outputs": [],
+      "host_resolved": [
+        "$PDK_ROOT/sky130A/libs.tech/combined/sky130.lib.spice"
+      ],
+      "diagnostics": []
+    },
+    {
+      "id": "sweep-klu_tt_27c_3.22v",
+      "status": "pass",
+      "exit_code": 0,
+      "timed_out": false,
+      "duration_s": 2.69,
+      "engine_version": "47",
+      "deck": "deck.spice",
+      "deck_sha256": "8443ab486bd705ea66b4607f8c04b802d167386aab884d261acd0cbe47d39652",
+      "stdout": "sweep-klu_tt_27c_3.22v/stdout.bin",
+      "stderr": "sweep-klu_tt_27c_3.22v/stderr.bin",
+      "outputs": [],
+      "missing_outputs": [],
+      "host_resolved": [
+        "$PDK_ROOT/sky130A/libs.tech/combined/sky130.lib.spice"
+      ],
+      "diagnostics": []
+    },
+    {
+      "id": "sweep-klu_tt_27c_3.23v",
+      "status": "pass",
+      "exit_code": 0,
+      "timed_out": false,
+      "duration_s": 2.65,
+      "engine_version": "47",
+      "deck": "deck.spice",
+      "deck_sha256": "86b0010647c736c7077e160835e3ae6676de7af3bb10d51971862ff409713404",
+      "stdout": "sweep-klu_tt_27c_3.23v/stdout.bin",
+      "stderr": "sweep-klu_tt_27c_3.23v/stderr.bin",
+      "outputs": [],
+      "missing_outputs": [],
+      "host_resolved": [
+        "$PDK_ROOT/sky130A/libs.tech/combined/sky130.lib.spice"
+      ],
+      "diagnostics": []
+    },
+    {
+      "id": "sweep-klu_tt_27c_3.24v",
+      "status": "pass",
+      "exit_code": 0,
+      "timed_out": false,
+      "duration_s": 2.639,
+      "engine_version": "47",
+      "deck": "deck.spice",
+      "deck_sha256": "a6a20fbd5ddfb83fa3680ba17870a5a73672a176e5dc812bbdd92d8cfee1c549",
+      "stdout": "sweep-klu_tt_27c_3.24v/stdout.bin",
+      "stderr": "sweep-klu_tt_27c_3.24v/stderr.bin",
+      "outputs": [],
+      "missing_outputs": [],
+      "host_resolved": [
+        "$PDK_ROOT/sky130A/libs.tech/combined/sky130.lib.spice"
+      ],
+      "diagnostics": []
+    },
+    {
+      "id": "sweep-klu_tt_27c_3.25v",
+      "status": "pass",
+      "exit_code": 0,
+      "timed_out": false,
+      "duration_s": 2.681,
+      "engine_version": "47",
+      "deck": "deck.spice",
+      "deck_sha256": "48db3e36c9cbc6a55c2bbdba0a3a308045e7e2947977075ca13350bf96ce5134",
+      "stdout": "sweep-klu_tt_27c_3.25v/stdout.bin",
+      "stderr": "sweep-klu_tt_27c_3.25v/stderr.bin",
+      "outputs": [],
+      "missing_outputs": [],
+      "host_resolved": [
+        "$PDK_ROOT/sky130A/libs.tech/combined/sky130.lib.spice"
+      ],
+      "diagnostics": []
+    },
+    {
+      "id": "sweep-klu_tt_27c_3.26v",
+      "status": "pass",
+      "exit_code": 0,
+      "timed_out": false,
+      "duration_s": 2.611,
+      "engine_version": "47",
+      "deck": "deck.spice",
+      "deck_sha256": "bc4d8a4d7b044b1d6a345682ccd489a60bf4881caf261891b122d4c9883fa2f8",
+      "stdout": "sweep-klu_tt_27c_3.26v/stdout.bin",
+      "stderr": "sweep-klu_tt_27c_3.26v/stderr.bin",
+      "outputs": [],
+      "missing_outputs": [],
+      "host_resolved": [
+        "$PDK_ROOT/sky130A/libs.tech/combined/sky130.lib.spice"
+      ],
+      "diagnostics": []
+    },
+    {
+      "id": "sweep-klu_tt_27c_3.27v",
+      "status": "pass",
+      "exit_code": 0,
+      "timed_out": false,
+      "duration_s": 2.629,
+      "engine_version": "47",
+      "deck": "deck.spice",
+      "deck_sha256": "a343a4f0b86af360d7eec4e4b0f79889f5ee149f720a6f71500e8dcc74cfe1dc",
+      "stdout": "sweep-klu_tt_27c_3.27v/stdout.bin",
+      "stderr": "sweep-klu_tt_27c_3.27v/stderr.bin",
+      "outputs": [],
+      "missing_outputs": [],
+      "host_resolved": [
+        "$PDK_ROOT/sky130A/libs.tech/combined/sky130.lib.spice"
+      ],
+      "diagnostics": []
+    },
+    {
+      "id": "sweep-klu_tt_27c_3.28v",
+      "status": "pass",
+      "exit_code": 0,
+      "timed_out": false,
+      "duration_s": 2.643,
+      "engine_version": "47",
+      "deck": "deck.spice",
+      "deck_sha256": "2afb4f476a1e699500b3694ab41b83bb0df80b61f010cfdd773244a2d3c5a159",
+      "stdout": "sweep-klu_tt_27c_3.28v/stdout.bin",
+      "stderr": "sweep-klu_tt_27c_3.28v/stderr.bin",
+      "outputs": [],
+      "missing_outputs": [],
+      "host_resolved": [
+        "$PDK_ROOT/sky130A/libs.tech/combined/sky130.lib.spice"
+      ],
+      "diagnostics": []
+    },
+    {
+      "id": "sweep-klu_tt_27c_3.29v",
+      "status": "pass",
+      "exit_code": 0,
+      "timed_out": false,
+      "duration_s": 2.686,
+      "engine_version": "47",
+      "deck": "deck.spice",
+      "deck_sha256": "d669f875e675bf5b5554673ed70acc9cd1ccc887448afd05ace1dfa19f2c1e6d",
+      "stdout": "sweep-klu_tt_27c_3.29v/stdout.bin",
+      "stderr": "sweep-klu_tt_27c_3.29v/stderr.bin",
+      "outputs": [],
+      "missing_outputs": [],
+      "host_resolved": [
+        "$PDK_ROOT/sky130A/libs.tech/combined/sky130.lib.spice"
+      ],
+      "diagnostics": []
+    },
+    {
+      "id": "sweep-klu_tt_27c_3.30v",
+      "status": "pass",
+      "exit_code": 0,
+      "timed_out": false,
+      "duration_s": 2.7,
+      "engine_version": "47",
+      "deck": "deck.spice",
+      "deck_sha256": "c76709c743d89ef1176ae5de9b7b178ca66daa04e0050f89cb1052156a064691",
+      "stdout": "sweep-klu_tt_27c_3.30v/stdout.bin",
+      "stderr": "sweep-klu_tt_27c_3.30v/stderr.bin",
+      "outputs": [],
+      "missing_outputs": [],
+      "host_resolved": [
+        "$PDK_ROOT/sky130A/libs.tech/combined/sky130.lib.spice"
+      ],
+      "diagnostics": []
+    },
+    {
+      "id": "sweep-klu_tt_27c_3.31v",
+      "status": "pass",
+      "exit_code": 0,
+      "timed_out": false,
+      "duration_s": 2.625,
+      "engine_version": "47",
+      "deck": "deck.spice",
+      "deck_sha256": "0005170e1de242d63de3de5461721065b09842d1dccffd664243d89681ddd9ef",
+      "stdout": "sweep-klu_tt_27c_3.31v/stdout.bin",
+      "stderr": "sweep-klu_tt_27c_3.31v/stderr.bin",
+      "outputs": [],
+      "missing_outputs": [],
+      "host_resolved": [
+        "$PDK_ROOT/sky130A/libs.tech/combined/sky130.lib.spice"
+      ],
+      "diagnostics": []
+    },
+    {
+      "id": "sweep-klu_tt_27c_3.32v",
+      "status": "pass",
+      "exit_code": 0,
+      "timed_out": false,
+      "duration_s": 2.679,
+      "engine_version": "47",
+      "deck": "deck.spice",
+      "deck_sha256": "4e66101eaf00048e87aaa37b07b966e6d4ef004b7ed71bdc01fb304810864540",
+      "stdout": "sweep-klu_tt_27c_3.32v/stdout.bin",
+      "stderr": "sweep-klu_tt_27c_3.32v/stderr.bin",
+      "outputs": [],
+      "missing_outputs": [],
+      "host_resolved": [
+        "$PDK_ROOT/sky130A/libs.tech/combined/sky130.lib.spice"
+      ],
+      "diagnostics": []
+    },
+    {
+      "id": "sweep-klu_tt_27c_3.33v",
+      "status": "pass",
+      "exit_code": 0,
+      "timed_out": false,
+      "duration_s": 2.683,
+      "engine_version": "47",
+      "deck": "deck.spice",
+      "deck_sha256": "b5fff3033d0d7b928dcd9d26f0ab0cfdc4ca37c8ad1315a1bd0122daceacd38c",
+      "stdout": "sweep-klu_tt_27c_3.33v/stdout.bin",
+      "stderr": "sweep-klu_tt_27c_3.33v/stderr.bin",
+      "outputs": [],
+      "missing_outputs": [],
+      "host_resolved": [
+        "$PDK_ROOT/sky130A/libs.tech/combined/sky130.lib.spice"
+      ],
+      "diagnostics": []
+    },
+    {
+      "id": "sweep-klu_tt_27c_3.34v",
+      "status": "pass",
+      "exit_code": 0,
+      "timed_out": false,
+      "duration_s": 2.686,
+      "engine_version": "47",
+      "deck": "deck.spice",
+      "deck_sha256": "5b87980986b06c81f02dd30c6cd609fce8fe646574483b5b7d6177bf6e0e0f72",
+      "stdout": "sweep-klu_tt_27c_3.34v/stdout.bin",
+      "stderr": "sweep-klu_tt_27c_3.34v/stderr.bin",
+      "outputs": [],
+      "missing_outputs": [],
+      "host_resolved": [
+        "$PDK_ROOT/sky130A/libs.tech/combined/sky130.lib.spice"
+      ],
+      "diagnostics": []
+    },
+    {
+      "id": "sweep-klu_tt_27c_3.35v",
+      "status": "pass",
+      "exit_code": 0,
+      "timed_out": false,
+      "duration_s": 2.649,
+      "engine_version": "47",
+      "deck": "deck.spice",
+      "deck_sha256": "504f66e99b012be4d703b02d3f6e6bb73870c03607a17571331937250350eeba",
+      "stdout": "sweep-klu_tt_27c_3.35v/stdout.bin",
+      "stderr": "sweep-klu_tt_27c_3.35v/stderr.bin",
+      "outputs": [],
+      "missing_outputs": [],
+      "host_resolved": [
+        "$PDK_ROOT/sky130A/libs.tech/combined/sky130.lib.spice"
+      ],
+      "diagnostics": []
+    },
+    {
+      "id": "sweep-klu_tt_27c_3.36v",
+      "status": "pass",
+      "exit_code": 0,
+      "timed_out": false,
+      "duration_s": 2.675,
+      "engine_version": "47",
+      "deck": "deck.spice",
+      "deck_sha256": "49ac1d1a01a177240ca900f212ac6cf7dec109879f4d4b75ac68883bb2f2871d",
+      "stdout": "sweep-klu_tt_27c_3.36v/stdout.bin",
+      "stderr": "sweep-klu_tt_27c_3.36v/stderr.bin",
+      "outputs": [],
+      "missing_outputs": [],
+      "host_resolved": [
+        "$PDK_ROOT/sky130A/libs.tech/combined/sky130.lib.spice"
+      ],
+      "diagnostics": []
+    },
+    {
+      "id": "sweep-klu_tt_27c_3.37v",
+      "status": "pass",
+      "exit_code": 0,
+      "timed_out": false,
+      "duration_s": 2.671,
+      "engine_version": "47",
+      "deck": "deck.spice",
+      "deck_sha256": "afc9da88e224de0725c8253984faa74f4ede0ec3b3484e0800e0b16801e60863",
+      "stdout": "sweep-klu_tt_27c_3.37v/stdout.bin",
+      "stderr": "sweep-klu_tt_27c_3.37v/stderr.bin",
+      "outputs": [],
+      "missing_outputs": [],
+      "host_resolved": [
+        "$PDK_ROOT/sky130A/libs.tech/combined/sky130.lib.spice"
+      ],
+      "diagnostics": []
+    },
+    {
+      "id": "sweep-klu_tt_27c_3.38v",
+      "status": "pass",
+      "exit_code": 0,
+      "timed_out": false,
+      "duration_s": 2.682,
+      "engine_version": "47",
+      "deck": "deck.spice",
+      "deck_sha256": "572979f33833f337b270b4b4593369562e55b6fcf9f29d1a70f1cdc2982e99dc",
+      "stdout": "sweep-klu_tt_27c_3.38v/stdout.bin",
+      "stderr": "sweep-klu_tt_27c_3.38v/stderr.bin",
+      "outputs": [],
+      "missing_outputs": [],
+      "host_resolved": [
+        "$PDK_ROOT/sky130A/libs.tech/combined/sky130.lib.spice"
+      ],
+      "diagnostics": []
+    },
+    {
+      "id": "sweep-klu_tt_27c_3.39v",
+      "status": "pass",
+      "exit_code": 0,
+      "timed_out": false,
+      "duration_s": 2.626,
+      "engine_version": "47",
+      "deck": "deck.spice",
+      "deck_sha256": "19bb9bea892a261a7d0b43167452e144b8fe82bdcacb37cf532f1fe2f1980f08",
+      "stdout": "sweep-klu_tt_27c_3.39v/stdout.bin",
+      "stderr": "sweep-klu_tt_27c_3.39v/stderr.bin",
+      "outputs": [],
+      "missing_outputs": [],
+      "host_resolved": [
+        "$PDK_ROOT/sky130A/libs.tech/combined/sky130.lib.spice"
+      ],
+      "diagnostics": []
+    },
+    {
+      "id": "sweep-klu_tt_27c_3.40v",
+      "status": "pass",
+      "exit_code": 0,
+      "timed_out": false,
+      "duration_s": 2.668,
+      "engine_version": "47",
+      "deck": "deck.spice",
+      "deck_sha256": "af7e2f18ea9f1259a2a65978f70c44ebf89102ea385e4da19ed0c8023b1d71c0",
+      "stdout": "sweep-klu_tt_27c_3.40v/stdout.bin",
+      "stderr": "sweep-klu_tt_27c_3.40v/stderr.bin",
+      "outputs": [],
+      "missing_outputs": [],
+      "host_resolved": [
+        "$PDK_ROOT/sky130A/libs.tech/combined/sky130.lib.spice"
+      ],
+      "diagnostics": []
+    },
+    {
+      "id": "sweep-klu_tt_27c_3.41v",
+      "status": "pass",
+      "exit_code": 0,
+      "timed_out": false,
+      "duration_s": 2.656,
+      "engine_version": "47",
+      "deck": "deck.spice",
+      "deck_sha256": "1eb17df64c23f0f481cf404970f4c4b90d0c69508f7f2ec2d8611b6a8b087f8f",
+      "stdout": "sweep-klu_tt_27c_3.41v/stdout.bin",
+      "stderr": "sweep-klu_tt_27c_3.41v/stderr.bin",
+      "outputs": [],
+      "missing_outputs": [],
+      "host_resolved": [
+        "$PDK_ROOT/sky130A/libs.tech/combined/sky130.lib.spice"
+      ],
+      "diagnostics": []
+    },
+    {
+      "id": "sweep-klu_tt_27c_3.42v",
+      "status": "pass",
+      "exit_code": 0,
+      "timed_out": false,
+      "duration_s": 2.708,
+      "engine_version": "47",
+      "deck": "deck.spice",
+      "deck_sha256": "cb35bdb7f8c8b8d8ab6ba4be4e7cd3bf0e5b1a2c3781ee811733c12ec9ca8227",
+      "stdout": "sweep-klu_tt_27c_3.42v/stdout.bin",
+      "stderr": "sweep-klu_tt_27c_3.42v/stderr.bin",
+      "outputs": [],
+      "missing_outputs": [],
+      "host_resolved": [
+        "$PDK_ROOT/sky130A/libs.tech/combined/sky130.lib.spice"
+      ],
+      "diagnostics": []
+    },
+    {
+      "id": "sweep-klu_tt_27c_3.43v",
+      "status": "pass",
+      "exit_code": 0,
+      "timed_out": false,
+      "duration_s": 2.69,
+      "engine_version": "47",
+      "deck": "deck.spice",
+      "deck_sha256": "c070f97e363e1646a19089fa5adff5619803350c7d343de83570de9794f0be89",
+      "stdout": "sweep-klu_tt_27c_3.43v/stdout.bin",
+      "stderr": "sweep-klu_tt_27c_3.43v/stderr.bin",
+      "outputs": [],
+      "missing_outputs": [],
+      "host_resolved": [
+        "$PDK_ROOT/sky130A/libs.tech/combined/sky130.lib.spice"
+      ],
+      "diagnostics": []
+    },
+    {
+      "id": "sweep-klu_tt_27c_3.44v",
+      "status": "pass",
+      "exit_code": 0,
+      "timed_out": false,
+      "duration_s": 2.686,
+      "engine_version": "47",
+      "deck": "deck.spice",
+      "deck_sha256": "7cb0a6926c1adb60a0dfff89ef80f860f4f04041d67ed671034f3ed3da7e19c2",
+      "stdout": "sweep-klu_tt_27c_3.44v/stdout.bin",
+      "stderr": "sweep-klu_tt_27c_3.44v/stderr.bin",
+      "outputs": [],
+      "missing_outputs": [],
+      "host_resolved": [
+        "$PDK_ROOT/sky130A/libs.tech/combined/sky130.lib.spice"
+      ],
+      "diagnostics": []
+    },
+    {
+      "id": "sweep-klu_tt_27c_3.45v",
+      "status": "pass",
+      "exit_code": 0,
+      "timed_out": false,
+      "duration_s": 2.672,
+      "engine_version": "47",
+      "deck": "deck.spice",
+      "deck_sha256": "ac9199bab3e13a287d6288a452257ac52e7096c2b1bbbe3ad065a08c1976caac",
+      "stdout": "sweep-klu_tt_27c_3.45v/stdout.bin",
+      "stderr": "sweep-klu_tt_27c_3.45v/stderr.bin",
+      "outputs": [],
+      "missing_outputs": [],
+      "host_resolved": [
+        "$PDK_ROOT/sky130A/libs.tech/combined/sky130.lib.spice"
+      ],
+      "diagnostics": []
+    },
+    {
+      "id": "sweep-klu_tt_27c_3.46v",
+      "status": "pass",
+      "exit_code": 0,
+      "timed_out": false,
+      "duration_s": 2.622,
+      "engine_version": "47",
+      "deck": "deck.spice",
+      "deck_sha256": "8042c3f419a3926acec39d6ac2692808cb53b37a6d09ec46291f39dc9b884f73",
+      "stdout": "sweep-klu_tt_27c_3.46v/stdout.bin",
+      "stderr": "sweep-klu_tt_27c_3.46v/stderr.bin",
+      "outputs": [],
+      "missing_outputs": [],
+      "host_resolved": [
+        "$PDK_ROOT/sky130A/libs.tech/combined/sky130.lib.spice"
+      ],
+      "diagnostics": []
+    },
+    {
+      "id": "sweep-klu_tt_27c_3.47v",
+      "status": "pass",
+      "exit_code": 0,
+      "timed_out": false,
+      "duration_s": 2.66,
+      "engine_version": "47",
+      "deck": "deck.spice",
+      "deck_sha256": "78029a89c76e1e1b6f4b6e8fbe45b809be2da6212319cfcd5bf2f885788a654f",
+      "stdout": "sweep-klu_tt_27c_3.47v/stdout.bin",
+      "stderr": "sweep-klu_tt_27c_3.47v/stderr.bin",
+      "outputs": [],
+      "missing_outputs": [],
+      "host_resolved": [
+        "$PDK_ROOT/sky130A/libs.tech/combined/sky130.lib.spice"
+      ],
+      "diagnostics": []
+    },
+    {
+      "id": "sweep-klu_tt_27c_3.48v",
+      "status": "pass",
+      "exit_code": 0,
+      "timed_out": false,
+      "duration_s": 2.629,
+      "engine_version": "47",
+      "deck": "deck.spice",
+      "deck_sha256": "8cc4cd2060f0e2a25ea3e3625e40aa60d71acdccc3a6d612d3cc2967691005c4",
+      "stdout": "sweep-klu_tt_27c_3.48v/stdout.bin",
+      "stderr": "sweep-klu_tt_27c_3.48v/stderr.bin",
+      "outputs": [],
+      "missing_outputs": [],
+      "host_resolved": [
+        "$PDK_ROOT/sky130A/libs.tech/combined/sky130.lib.spice"
+      ],
+      "diagnostics": []
+    },
+    {
+      "id": "sweep-klu_tt_27c_3.49v",
+      "status": "pass",
+      "exit_code": 0,
+      "timed_out": false,
+      "duration_s": 2.646,
+      "engine_version": "47",
+      "deck": "deck.spice",
+      "deck_sha256": "e68c0a2b14e3132b2cf78bc408cbbf527429f6cd367dcc36684594ad6fa384e1",
+      "stdout": "sweep-klu_tt_27c_3.49v/stdout.bin",
+      "stderr": "sweep-klu_tt_27c_3.49v/stderr.bin",
+      "outputs": [],
+      "missing_outputs": [],
+      "host_resolved": [
+        "$PDK_ROOT/sky130A/libs.tech/combined/sky130.lib.spice"
+      ],
+      "diagnostics": []
+    },
+    {
+      "id": "sweep-klu_tt_27c_3.50v",
+      "status": "pass",
+      "exit_code": 0,
+      "timed_out": false,
+      "duration_s": 2.642,
+      "engine_version": "47",
+      "deck": "deck.spice",
+      "deck_sha256": "deea0118f69ce499777202603bbdb6bb677d1fd1616f09821d9c3e26c438bfa9",
+      "stdout": "sweep-klu_tt_27c_3.50v/stdout.bin",
+      "stderr": "sweep-klu_tt_27c_3.50v/stderr.bin",
+      "outputs": [],
+      "missing_outputs": [],
+      "host_resolved": [
+        "$PDK_ROOT/sky130A/libs.tech/combined/sky130.lib.spice"
+      ],
+      "diagnostics": []
+    },
+    {
+      "id": "sweep-klu_tt_27c_3.51v",
+      "status": "pass",
+      "exit_code": 0,
+      "timed_out": false,
+      "duration_s": 2.614,
+      "engine_version": "47",
+      "deck": "deck.spice",
+      "deck_sha256": "fe84b58ead592587f33e9154a551de348524841773329420959e1fd2787ef99a",
+      "stdout": "sweep-klu_tt_27c_3.51v/stdout.bin",
+      "stderr": "sweep-klu_tt_27c_3.51v/stderr.bin",
+      "outputs": [],
+      "missing_outputs": [],
+      "host_resolved": [
+        "$PDK_ROOT/sky130A/libs.tech/combined/sky130.lib.spice"
+      ],
+      "diagnostics": []
+    },
+    {
+      "id": "sweep-klu_tt_27c_3.52v",
+      "status": "pass",
+      "exit_code": 0,
+      "timed_out": false,
+      "duration_s": 2.644,
+      "engine_version": "47",
+      "deck": "deck.spice",
+      "deck_sha256": "e44fa53fb44eada5fcf6d453ce2ed028b9c3bf2b2425b71950b2eaf9e8bec6af",
+      "stdout": "sweep-klu_tt_27c_3.52v/stdout.bin",
+      "stderr": "sweep-klu_tt_27c_3.52v/stderr.bin",
+      "outputs": [],
+      "missing_outputs": [],
+      "host_resolved": [
+        "$PDK_ROOT/sky130A/libs.tech/combined/sky130.lib.spice"
+      ],
+      "diagnostics": []
+    },
+    {
+      "id": "sweep-klu_tt_27c_3.53v",
+      "status": "pass",
+      "exit_code": 0,
+      "timed_out": false,
+      "duration_s": 2.644,
+      "engine_version": "47",
+      "deck": "deck.spice",
+      "deck_sha256": "03763abcda0d0a7479c7c6c7a210514cb218874763daa99ddbefaa7c79ba9c05",
+      "stdout": "sweep-klu_tt_27c_3.53v/stdout.bin",
+      "stderr": "sweep-klu_tt_27c_3.53v/stderr.bin",
+      "outputs": [],
+      "missing_outputs": [],
+      "host_resolved": [
+        "$PDK_ROOT/sky130A/libs.tech/combined/sky130.lib.spice"
+      ],
+      "diagnostics": []
+    },
+    {
+      "id": "sweep-klu_tt_27c_3.54v",
+      "status": "pass",
+      "exit_code": 0,
+      "timed_out": false,
+      "duration_s": 2.653,
+      "engine_version": "47",
+      "deck": "deck.spice",
+      "deck_sha256": "52a7146f7cf65f9055f06776882e9a24849abc4251b11507f396b7ee40bf9b66",
+      "stdout": "sweep-klu_tt_27c_3.54v/stdout.bin",
+      "stderr": "sweep-klu_tt_27c_3.54v/stderr.bin",
+      "outputs": [],
+      "missing_outputs": [],
+      "host_resolved": [
+        "$PDK_ROOT/sky130A/libs.tech/combined/sky130.lib.spice"
+      ],
+      "diagnostics": []
+    },
+    {
+      "id": "sweep-klu_tt_27c_3.55v",
+      "status": "pass",
+      "exit_code": 0,
+      "timed_out": false,
+      "duration_s": 2.66,
+      "engine_version": "47",
+      "deck": "deck.spice",
+      "deck_sha256": "28a264a9554effffcf8771ef335ef654c4a946e45758f960d2b124b3064289bb",
+      "stdout": "sweep-klu_tt_27c_3.55v/stdout.bin",
+      "stderr": "sweep-klu_tt_27c_3.55v/stderr.bin",
+      "outputs": [],
+      "missing_outputs": [],
+      "host_resolved": [
+        "$PDK_ROOT/sky130A/libs.tech/combined/sky130.lib.spice"
+      ],
+      "diagnostics": []
+    },
+    {
+      "id": "sweep-klu_tt_27c_3.56v",
+      "status": "pass",
+      "exit_code": 0,
+      "timed_out": false,
+      "duration_s": 2.678,
+      "engine_version": "47",
+      "deck": "deck.spice",
+      "deck_sha256": "14b996b5339e18588518e77bed32ba0c3c9eb2eaf55c53b79545fc42daf4913f",
+      "stdout": "sweep-klu_tt_27c_3.56v/stdout.bin",
+      "stderr": "sweep-klu_tt_27c_3.56v/stderr.bin",
+      "outputs": [],
+      "missing_outputs": [],
+      "host_resolved": [
+        "$PDK_ROOT/sky130A/libs.tech/combined/sky130.lib.spice"
+      ],
+      "diagnostics": []
+    },
+    {
+      "id": "sweep-klu_tt_27c_3.57v",
+      "status": "pass",
+      "exit_code": 0,
+      "timed_out": false,
+      "duration_s": 2.687,
+      "engine_version": "47",
+      "deck": "deck.spice",
+      "deck_sha256": "e579b07ddbad97578034ca0a07843a3aba054ce07ea7b2ab48ca11f18f8561a9",
+      "stdout": "sweep-klu_tt_27c_3.57v/stdout.bin",
+      "stderr": "sweep-klu_tt_27c_3.57v/stderr.bin",
+      "outputs": [],
+      "missing_outputs": [],
+      "host_resolved": [
+        "$PDK_ROOT/sky130A/libs.tech/combined/sky130.lib.spice"
+      ],
+      "diagnostics": []
+    },
+    {
+      "id": "sweep-klu_tt_27c_3.58v",
+      "status": "pass",
+      "exit_code": 0,
+      "timed_out": false,
+      "duration_s": 2.732,
+      "engine_version": "47",
+      "deck": "deck.spice",
+      "deck_sha256": "3606536efe9035dc1955d55a49d971276dcdf37be394f35f7ad9fa7dc61158e8",
+      "stdout": "sweep-klu_tt_27c_3.58v/stdout.bin",
+      "stderr": "sweep-klu_tt_27c_3.58v/stderr.bin",
+      "outputs": [],
+      "missing_outputs": [],
+      "host_resolved": [
+        "$PDK_ROOT/sky130A/libs.tech/combined/sky130.lib.spice"
+      ],
+      "diagnostics": []
+    },
+    {
+      "id": "sweep-klu_tt_27c_3.59v",
+      "status": "pass",
+      "exit_code": 0,
+      "timed_out": false,
+      "duration_s": 2.69,
+      "engine_version": "47",
+      "deck": "deck.spice",
+      "deck_sha256": "d93c7c19780a0afd435bd4611a6e6383ca2fb04960ae252e19205d4122eb71de",
+      "stdout": "sweep-klu_tt_27c_3.59v/stdout.bin",
+      "stderr": "sweep-klu_tt_27c_3.59v/stderr.bin",
+      "outputs": [],
+      "missing_outputs": [],
+      "host_resolved": [
+        "$PDK_ROOT/sky130A/libs.tech/combined/sky130.lib.spice"
+      ],
+      "diagnostics": []
+    },
+    {
+      "id": "sweep-klu_tt_27c_3.60v",
+      "status": "pass",
+      "exit_code": 0,
+      "timed_out": false,
+      "duration_s": 2.667,
+      "engine_version": "47",
+      "deck": "deck.spice",
+      "deck_sha256": "906275f18410707fa81c4659362a23412b491dfbe97b7fbaf958e2fb3c1150d7",
+      "stdout": "sweep-klu_tt_27c_3.60v/stdout.bin",
+      "stderr": "sweep-klu_tt_27c_3.60v/stderr.bin",
+      "outputs": [],
+      "missing_outputs": [],
+      "host_resolved": [
+        "$PDK_ROOT/sky130A/libs.tech/combined/sky130.lib.spice"
+      ],
+      "diagnostics": []
+    },
+    {
+      "id": "sweep-klu_tt_27c_3.61v",
+      "status": "pass",
+      "exit_code": 0,
+      "timed_out": false,
+      "duration_s": 2.725,
+      "engine_version": "47",
+      "deck": "deck.spice",
+      "deck_sha256": "2740cee0ef91a6650028852a73b2717c88004eed817f4436bdb3f7320b6fe0b5",
+      "stdout": "sweep-klu_tt_27c_3.61v/stdout.bin",
+      "stderr": "sweep-klu_tt_27c_3.61v/stderr.bin",
+      "outputs": [],
+      "missing_outputs": [],
+      "host_resolved": [
+        "$PDK_ROOT/sky130A/libs.tech/combined/sky130.lib.spice"
+      ],
+      "diagnostics": []
+    },
+    {
+      "id": "sweep-klu_tt_27c_3.62v",
+      "status": "pass",
+      "exit_code": 0,
+      "timed_out": false,
+      "duration_s": 2.676,
+      "engine_version": "47",
+      "deck": "deck.spice",
+      "deck_sha256": "a5a6652ecd079e377380f402b1d68fd3ab59dfd9d851c4fbc2714d0de23655c0",
+      "stdout": "sweep-klu_tt_27c_3.62v/stdout.bin",
+      "stderr": "sweep-klu_tt_27c_3.62v/stderr.bin",
+      "outputs": [],
+      "missing_outputs": [],
+      "host_resolved": [
+        "$PDK_ROOT/sky130A/libs.tech/combined/sky130.lib.spice"
+      ],
+      "diagnostics": []
+    },
+    {
+      "id": "sweep-klu_tt_27c_3.63v",
+      "status": "pass",
+      "exit_code": 0,
+      "timed_out": false,
+      "duration_s": 2.669,
+      "engine_version": "47",
+      "deck": "deck.spice",
+      "deck_sha256": "797d6a283c9b6e1e20bd3e4345c85abc1e48e1e5c0ae193c201f7b517019aa0c",
+      "stdout": "sweep-klu_tt_27c_3.63v/stdout.bin",
+      "stderr": "sweep-klu_tt_27c_3.63v/stderr.bin",
+      "outputs": [],
+      "missing_outputs": [],
+      "host_resolved": [
+        "$PDK_ROOT/sky130A/libs.tech/combined/sky130.lib.spice"
+      ],
+      "diagnostics": []
+    },
+    {
+      "id": "sweep-sparse_tt_27c_2.97v",
+      "status": "pass",
+      "exit_code": 0,
+      "timed_out": false,
+      "duration_s": 2.719,
+      "engine_version": "47",
+      "deck": "deck.spice",
+      "deck_sha256": "3a6894c0adbb11e385336ed5b75135a021314975a5823f7eb4588e040dd21bbd",
+      "stdout": "sweep-sparse_tt_27c_2.97v/stdout.bin",
+      "stderr": "sweep-sparse_tt_27c_2.97v/stderr.bin",
+      "outputs": [],
+      "missing_outputs": [],
+      "host_resolved": [
+        "$PDK_ROOT/sky130A/libs.tech/combined/sky130.lib.spice"
+      ],
+      "diagnostics": []
+    },
+    {
+      "id": "sweep-sparse_tt_27c_2.98v",
+      "status": "pass",
+      "exit_code": 0,
+      "timed_out": false,
+      "duration_s": 2.72,
+      "engine_version": "47",
+      "deck": "deck.spice",
+      "deck_sha256": "da1394564138167fa2e67212c3fb99b5e3c5fd2ddbfb7bbe5c529f3b1ef8b622",
+      "stdout": "sweep-sparse_tt_27c_2.98v/stdout.bin",
+      "stderr": "sweep-sparse_tt_27c_2.98v/stderr.bin",
+      "outputs": [],
+      "missing_outputs": [],
+      "host_resolved": [
+        "$PDK_ROOT/sky130A/libs.tech/combined/sky130.lib.spice"
+      ],
+      "diagnostics": []
+    },
+    {
+      "id": "sweep-sparse_tt_27c_2.99v",
+      "status": "pass",
+      "exit_code": 0,
+      "timed_out": false,
+      "duration_s": 2.694,
+      "engine_version": "47",
+      "deck": "deck.spice",
+      "deck_sha256": "4fb3cff9a57d509d6ac9705bcca7bc0377ca19e7c07d34895bdb27400149fd9b",
+      "stdout": "sweep-sparse_tt_27c_2.99v/stdout.bin",
+      "stderr": "sweep-sparse_tt_27c_2.99v/stderr.bin",
+      "outputs": [],
+      "missing_outputs": [],
+      "host_resolved": [
+        "$PDK_ROOT/sky130A/libs.tech/combined/sky130.lib.spice"
+      ],
+      "diagnostics": []
+    },
+    {
+      "id": "sweep-sparse_tt_27c_3.00v",
+      "status": "pass",
+      "exit_code": 0,
+      "timed_out": false,
+      "duration_s": 2.675,
+      "engine_version": "47",
+      "deck": "deck.spice",
+      "deck_sha256": "e9cefa0605a1d19de39bfff27290b7b6199c826f4df00dfc45ff447cc6a1748e",
+      "stdout": "sweep-sparse_tt_27c_3.00v/stdout.bin",
+      "stderr": "sweep-sparse_tt_27c_3.00v/stderr.bin",
+      "outputs": [],
+      "missing_outputs": [],
+      "host_resolved": [
+        "$PDK_ROOT/sky130A/libs.tech/combined/sky130.lib.spice"
+      ],
+      "diagnostics": []
+    },
+    {
+      "id": "sweep-sparse_tt_27c_3.01v",
+      "status": "pass",
+      "exit_code": 0,
+      "timed_out": false,
+      "duration_s": 2.717,
+      "engine_version": "47",
+      "deck": "deck.spice",
+      "deck_sha256": "efbe6a0b974cb13ebf7a6324b1b61c761e2f6d18fda43daed784655efd7b9bf7",
+      "stdout": "sweep-sparse_tt_27c_3.01v/stdout.bin",
+      "stderr": "sweep-sparse_tt_27c_3.01v/stderr.bin",
+      "outputs": [],
+      "missing_outputs": [],
+      "host_resolved": [
+        "$PDK_ROOT/sky130A/libs.tech/combined/sky130.lib.spice"
+      ],
+      "diagnostics": []
+    },
+    {
+      "id": "sweep-sparse_tt_27c_3.02v",
+      "status": "pass",
+      "exit_code": 0,
+      "timed_out": false,
+      "duration_s": 2.72,
+      "engine_version": "47",
+      "deck": "deck.spice",
+      "deck_sha256": "8a075582f203654a3f713084607dd478711854a02f7585cc9819eea64569fc8f",
+      "stdout": "sweep-sparse_tt_27c_3.02v/stdout.bin",
+      "stderr": "sweep-sparse_tt_27c_3.02v/stderr.bin",
+      "outputs": [],
+      "missing_outputs": [],
+      "host_resolved": [
+        "$PDK_ROOT/sky130A/libs.tech/combined/sky130.lib.spice"
+      ],
+      "diagnostics": []
+    },
+    {
+      "id": "sweep-sparse_tt_27c_3.03v",
+      "status": "pass",
+      "exit_code": 0,
+      "timed_out": false,
+      "duration_s": 2.66,
+      "engine_version": "47",
+      "deck": "deck.spice",
+      "deck_sha256": "9e387697bbf68d5f5ff1b55a0a840e3493dfbcf2c4caa0bdad79bbb3ff9660e3",
+      "stdout": "sweep-sparse_tt_27c_3.03v/stdout.bin",
+      "stderr": "sweep-sparse_tt_27c_3.03v/stderr.bin",
+      "outputs": [],
+      "missing_outputs": [],
+      "host_resolved": [
+        "$PDK_ROOT/sky130A/libs.tech/combined/sky130.lib.spice"
+      ],
+      "diagnostics": []
+    },
+    {
+      "id": "sweep-sparse_tt_27c_3.04v",
+      "status": "pass",
+      "exit_code": 0,
+      "timed_out": false,
+      "duration_s": 2.673,
+      "engine_version": "47",
+      "deck": "deck.spice",
+      "deck_sha256": "65e260512e2d58b4ecac8caa04223fbf6e7ed09df6bde257acf4e9a09e5754af",
+      "stdout": "sweep-sparse_tt_27c_3.04v/stdout.bin",
+      "stderr": "sweep-sparse_tt_27c_3.04v/stderr.bin",
+      "outputs": [],
+      "missing_outputs": [],
+      "host_resolved": [
+        "$PDK_ROOT/sky130A/libs.tech/combined/sky130.lib.spice"
+      ],
+      "diagnostics": []
+    },
+    {
+      "id": "sweep-sparse_tt_27c_3.05v",
+      "status": "pass",
+      "exit_code": 0,
+      "timed_out": false,
+      "duration_s": 2.709,
+      "engine_version": "47",
+      "deck": "deck.spice",
+      "deck_sha256": "4dd947876af00a07b1fdb1399ee0af50df28fc0edfca58d028ccc198802991dd",
+      "stdout": "sweep-sparse_tt_27c_3.05v/stdout.bin",
+      "stderr": "sweep-sparse_tt_27c_3.05v/stderr.bin",
+      "outputs": [],
+      "missing_outputs": [],
+      "host_resolved": [
+        "$PDK_ROOT/sky130A/libs.tech/combined/sky130.lib.spice"
+      ],
+      "diagnostics": []
+    },
+    {
+      "id": "sweep-sparse_tt_27c_3.06v",
+      "status": "pass",
+      "exit_code": 0,
+      "timed_out": false,
+      "duration_s": 2.693,
+      "engine_version": "47",
+      "deck": "deck.spice",
+      "deck_sha256": "f84e100454f5ab547720e746d53af7a98aed5a3187e35eda2905f35d5a2e1f27",
+      "stdout": "sweep-sparse_tt_27c_3.06v/stdout.bin",
+      "stderr": "sweep-sparse_tt_27c_3.06v/stderr.bin",
+      "outputs": [],
+      "missing_outputs": [],
+      "host_resolved": [
+        "$PDK_ROOT/sky130A/libs.tech/combined/sky130.lib.spice"
+      ],
+      "diagnostics": []
+    },
+    {
+      "id": "sweep-sparse_tt_27c_3.07v",
+      "status": "pass",
+      "exit_code": 0,
+      "timed_out": false,
+      "duration_s": 2.662,
+      "engine_version": "47",
+      "deck": "deck.spice",
+      "deck_sha256": "e59b2d3071396331eece604aa600010c7764fe35993ee307841d90d501deb96b",
+      "stdout": "sweep-sparse_tt_27c_3.07v/stdout.bin",
+      "stderr": "sweep-sparse_tt_27c_3.07v/stderr.bin",
+      "outputs": [],
+      "missing_outputs": [],
+      "host_resolved": [
+        "$PDK_ROOT/sky130A/libs.tech/combined/sky130.lib.spice"
+      ],
+      "diagnostics": []
+    },
+    {
+      "id": "sweep-sparse_tt_27c_3.08v",
+      "status": "pass",
+      "exit_code": 0,
+      "timed_out": false,
+      "duration_s": 2.646,
+      "engine_version": "47",
+      "deck": "deck.spice",
+      "deck_sha256": "615faea697ebe671ec05b76f26f03e8bb887d205e8b4f784931d4f5fe30e4e2f",
+      "stdout": "sweep-sparse_tt_27c_3.08v/stdout.bin",
+      "stderr": "sweep-sparse_tt_27c_3.08v/stderr.bin",
+      "outputs": [],
+      "missing_outputs": [],
+      "host_resolved": [
+        "$PDK_ROOT/sky130A/libs.tech/combined/sky130.lib.spice"
+      ],
+      "diagnostics": []
+    },
+    {
+      "id": "sweep-sparse_tt_27c_3.09v",
+      "status": "pass",
+      "exit_code": 0,
+      "timed_out": false,
+      "duration_s": 2.634,
+      "engine_version": "47",
+      "deck": "deck.spice",
+      "deck_sha256": "57069c8b885e812a5d7d534fe40d21e24d93eb3f7011235aeb30f7d58577ca3b",
+      "stdout": "sweep-sparse_tt_27c_3.09v/stdout.bin",
+      "stderr": "sweep-sparse_tt_27c_3.09v/stderr.bin",
+      "outputs": [],
+      "missing_outputs": [],
+      "host_resolved": [
+        "$PDK_ROOT/sky130A/libs.tech/combined/sky130.lib.spice"
+      ],
+      "diagnostics": []
+    },
+    {
+      "id": "sweep-sparse_tt_27c_3.10v",
+      "status": "pass",
+      "exit_code": 0,
+      "timed_out": false,
+      "duration_s": 2.681,
+      "engine_version": "47",
+      "deck": "deck.spice",
+      "deck_sha256": "ba30b5b40d5426b7d9a417a98a0339b0df8d0021a41cf2d2cf53d24453fa491e",
+      "stdout": "sweep-sparse_tt_27c_3.10v/stdout.bin",
+      "stderr": "sweep-sparse_tt_27c_3.10v/stderr.bin",
+      "outputs": [],
+      "missing_outputs": [],
+      "host_resolved": [
+        "$PDK_ROOT/sky130A/libs.tech/combined/sky130.lib.spice"
+      ],
+      "diagnostics": []
+    },
+    {
+      "id": "sweep-sparse_tt_27c_3.11v",
+      "status": "pass",
+      "exit_code": 0,
+      "timed_out": false,
+      "duration_s": 2.67,
+      "engine_version": "47",
+      "deck": "deck.spice",
+      "deck_sha256": "0640302524dedea17abd7a7501fe717e9d95890b53870484a663c027133b005f",
+      "stdout": "sweep-sparse_tt_27c_3.11v/stdout.bin",
+      "stderr": "sweep-sparse_tt_27c_3.11v/stderr.bin",
+      "outputs": [],
+      "missing_outputs": [],
+      "host_resolved": [
+        "$PDK_ROOT/sky130A/libs.tech/combined/sky130.lib.spice"
+      ],
+      "diagnostics": []
+    },
+    {
+      "id": "sweep-sparse_tt_27c_3.12v",
+      "status": "pass",
+      "exit_code": 0,
+      "timed_out": false,
+      "duration_s": 2.733,
+      "engine_version": "47",
+      "deck": "deck.spice",
+      "deck_sha256": "f97e8dc7123dd79a0266a16c625d6b04aa2169df222abe8de6980ce2ffd5c52f",
+      "stdout": "sweep-sparse_tt_27c_3.12v/stdout.bin",
+      "stderr": "sweep-sparse_tt_27c_3.12v/stderr.bin",
+      "outputs": [],
+      "missing_outputs": [],
+      "host_resolved": [
+        "$PDK_ROOT/sky130A/libs.tech/combined/sky130.lib.spice"
+      ],
+      "diagnostics": []
+    },
+    {
+      "id": "sweep-sparse_tt_27c_3.13v",
+      "status": "pass",
+      "exit_code": 0,
+      "timed_out": false,
+      "duration_s": 2.794,
+      "engine_version": "47",
+      "deck": "deck.spice",
+      "deck_sha256": "4e6fe5316984e06eccd9d7396b6bc01bd4535c4d2f5eda06faa6e0149229b5f4",
+      "stdout": "sweep-sparse_tt_27c_3.13v/stdout.bin",
+      "stderr": "sweep-sparse_tt_27c_3.13v/stderr.bin",
+      "outputs": [],
+      "missing_outputs": [],
+      "host_resolved": [
+        "$PDK_ROOT/sky130A/libs.tech/combined/sky130.lib.spice"
+      ],
+      "diagnostics": []
+    },
+    {
+      "id": "sweep-sparse_tt_27c_3.14v",
+      "status": "pass",
+      "exit_code": 0,
+      "timed_out": false,
+      "duration_s": 2.722,
+      "engine_version": "47",
+      "deck": "deck.spice",
+      "deck_sha256": "3bb135796a2a52a0ab0c099d8800022f505461862d14b5b84e72c1546f6c68cb",
+      "stdout": "sweep-sparse_tt_27c_3.14v/stdout.bin",
+      "stderr": "sweep-sparse_tt_27c_3.14v/stderr.bin",
+      "outputs": [],
+      "missing_outputs": [],
+      "host_resolved": [
+        "$PDK_ROOT/sky130A/libs.tech/combined/sky130.lib.spice"
+      ],
+      "diagnostics": []
+    },
+    {
+      "id": "sweep-sparse_tt_27c_3.15v",
+      "status": "pass",
+      "exit_code": 0,
+      "timed_out": false,
+      "duration_s": 2.663,
+      "engine_version": "47",
+      "deck": "deck.spice",
+      "deck_sha256": "683832e67e4b43ded71b442410dafb6d9f2a5b95dae05897e468b53d852162c4",
+      "stdout": "sweep-sparse_tt_27c_3.15v/stdout.bin",
+      "stderr": "sweep-sparse_tt_27c_3.15v/stderr.bin",
+      "outputs": [],
+      "missing_outputs": [],
+      "host_resolved": [
+        "$PDK_ROOT/sky130A/libs.tech/combined/sky130.lib.spice"
+      ],
+      "diagnostics": []
+    },
+    {
+      "id": "sweep-sparse_tt_27c_3.16v",
+      "status": "pass",
+      "exit_code": 0,
+      "timed_out": false,
+      "duration_s": 2.653,
+      "engine_version": "47",
+      "deck": "deck.spice",
+      "deck_sha256": "693cf32d54622e81081c5e1f95a5a4eb8df147f14d167d38cb9105533161033f",
+      "stdout": "sweep-sparse_tt_27c_3.16v/stdout.bin",
+      "stderr": "sweep-sparse_tt_27c_3.16v/stderr.bin",
+      "outputs": [],
+      "missing_outputs": [],
+      "host_resolved": [
+        "$PDK_ROOT/sky130A/libs.tech/combined/sky130.lib.spice"
+      ],
+      "diagnostics": []
+    },
+    {
+      "id": "sweep-sparse_tt_27c_3.17v",
+      "status": "pass",
+      "exit_code": 0,
+      "timed_out": false,
+      "duration_s": 2.72,
+      "engine_version": "47",
+      "deck": "deck.spice",
+      "deck_sha256": "6952451b7185b1b5c3cc995f7ca12e2765224bd4d553c33f2f05c040cecc616b",
+      "stdout": "sweep-sparse_tt_27c_3.17v/stdout.bin",
+      "stderr": "sweep-sparse_tt_27c_3.17v/stderr.bin",
+      "outputs": [],
+      "missing_outputs": [],
+      "host_resolved": [
+        "$PDK_ROOT/sky130A/libs.tech/combined/sky130.lib.spice"
+      ],
+      "diagnostics": []
+    },
+    {
+      "id": "sweep-sparse_tt_27c_3.18v",
+      "status": "pass",
+      "exit_code": 0,
+      "timed_out": false,
+      "duration_s": 2.726,
+      "engine_version": "47",
+      "deck": "deck.spice",
+      "deck_sha256": "7c3f72e227acb3c11f0ab9aaac2fbb98a6053eb689fb6c702b9f50210f2b12b6",
+      "stdout": "sweep-sparse_tt_27c_3.18v/stdout.bin",
+      "stderr": "sweep-sparse_tt_27c_3.18v/stderr.bin",
+      "outputs": [],
+      "missing_outputs": [],
+      "host_resolved": [
+        "$PDK_ROOT/sky130A/libs.tech/combined/sky130.lib.spice"
+      ],
+      "diagnostics": []
+    },
+    {
+      "id": "sweep-sparse_tt_27c_3.19v",
+      "status": "pass",
+      "exit_code": 0,
+      "timed_out": false,
+      "duration_s": 2.721,
+      "engine_version": "47",
+      "deck": "deck.spice",
+      "deck_sha256": "309629299eafd11b106bb6b373b25d481fe282a82b016966d46f68d9ee09018e",
+      "stdout": "sweep-sparse_tt_27c_3.19v/stdout.bin",
+      "stderr": "sweep-sparse_tt_27c_3.19v/stderr.bin",
+      "outputs": [],
+      "missing_outputs": [],
+      "host_resolved": [
+        "$PDK_ROOT/sky130A/libs.tech/combined/sky130.lib.spice"
+      ],
+      "diagnostics": []
+    },
+    {
+      "id": "sweep-sparse_tt_27c_3.20v",
+      "status": "pass",
+      "exit_code": 0,
+      "timed_out": false,
+      "duration_s": 2.719,
+      "engine_version": "47",
+      "deck": "deck.spice",
+      "deck_sha256": "53e4b191573859737906936b0c9d26a9a61088d33dab3b93c69a9837fdf6b6a6",
+      "stdout": "sweep-sparse_tt_27c_3.20v/stdout.bin",
+      "stderr": "sweep-sparse_tt_27c_3.20v/stderr.bin",
+      "outputs": [],
+      "missing_outputs": [],
+      "host_resolved": [
+        "$PDK_ROOT/sky130A/libs.tech/combined/sky130.lib.spice"
+      ],
+      "diagnostics": []
+    },
+    {
+      "id": "sweep-sparse_tt_27c_3.21v",
+      "status": "pass",
+      "exit_code": 0,
+      "timed_out": false,
+      "duration_s": 2.704,
+      "engine_version": "47",
+      "deck": "deck.spice",
+      "deck_sha256": "fb535179e4f20fcc9455d57da3bfa9af27e946d79eca1f27ee5e3324ecbc8cd4",
+      "stdout": "sweep-sparse_tt_27c_3.21v/stdout.bin",
+      "stderr": "sweep-sparse_tt_27c_3.21v/stderr.bin",
+      "outputs": [],
+      "missing_outputs": [],
+      "host_resolved": [
+        "$PDK_ROOT/sky130A/libs.tech/combined/sky130.lib.spice"
+      ],
+      "diagnostics": []
+    },
+    {
+      "id": "sweep-sparse_tt_27c_3.22v",
+      "status": "pass",
+      "exit_code": 0,
+      "timed_out": false,
+      "duration_s": 2.717,
+      "engine_version": "47",
+      "deck": "deck.spice",
+      "deck_sha256": "398e71d64fc40296c852a8fd217abb3724debdfcd4f1f899869b691a4664b86f",
+      "stdout": "sweep-sparse_tt_27c_3.22v/stdout.bin",
+      "stderr": "sweep-sparse_tt_27c_3.22v/stderr.bin",
+      "outputs": [],
+      "missing_outputs": [],
+      "host_resolved": [
+        "$PDK_ROOT/sky130A/libs.tech/combined/sky130.lib.spice"
+      ],
+      "diagnostics": []
+    },
+    {
+      "id": "sweep-sparse_tt_27c_3.23v",
+      "status": "pass",
+      "exit_code": 0,
+      "timed_out": false,
+      "duration_s": 2.655,
+      "engine_version": "47",
+      "deck": "deck.spice",
+      "deck_sha256": "d3cb79de684bed9c103ed8d6c47b76693a23a43d270e8f9c2e821ff65e6965f4",
+      "stdout": "sweep-sparse_tt_27c_3.23v/stdout.bin",
+      "stderr": "sweep-sparse_tt_27c_3.23v/stderr.bin",
+      "outputs": [],
+      "missing_outputs": [],
+      "host_resolved": [
+        "$PDK_ROOT/sky130A/libs.tech/combined/sky130.lib.spice"
+      ],
+      "diagnostics": []
+    },
+    {
+      "id": "sweep-sparse_tt_27c_3.24v",
+      "status": "pass",
+      "exit_code": 0,
+      "timed_out": false,
+      "duration_s": 2.663,
+      "engine_version": "47",
+      "deck": "deck.spice",
+      "deck_sha256": "57454c0906412bf26d19820ee0888add82d77b6353aa629aef425e16ff9bf637",
+      "stdout": "sweep-sparse_tt_27c_3.24v/stdout.bin",
+      "stderr": "sweep-sparse_tt_27c_3.24v/stderr.bin",
+      "outputs": [],
+      "missing_outputs": [],
+      "host_resolved": [
+        "$PDK_ROOT/sky130A/libs.tech/combined/sky130.lib.spice"
+      ],
+      "diagnostics": []
+    },
+    {
+      "id": "sweep-sparse_tt_27c_3.25v",
+      "status": "pass",
+      "exit_code": 0,
+      "timed_out": false,
+      "duration_s": 2.663,
+      "engine_version": "47",
+      "deck": "deck.spice",
+      "deck_sha256": "b3d4e8edba80d667c892ca067a631e15440bbacbceef81e7b9bd3f79df5f511a",
+      "stdout": "sweep-sparse_tt_27c_3.25v/stdout.bin",
+      "stderr": "sweep-sparse_tt_27c_3.25v/stderr.bin",
+      "outputs": [],
+      "missing_outputs": [],
+      "host_resolved": [
+        "$PDK_ROOT/sky130A/libs.tech/combined/sky130.lib.spice"
+      ],
+      "diagnostics": []
+    },
+    {
+      "id": "sweep-sparse_tt_27c_3.26v",
+      "status": "pass",
+      "exit_code": 0,
+      "timed_out": false,
+      "duration_s": 2.724,
+      "engine_version": "47",
+      "deck": "deck.spice",
+      "deck_sha256": "738db7dde2c24cebb78372a488e6612d125cc70e317c2c3f2337da4e5be89e82",
+      "stdout": "sweep-sparse_tt_27c_3.26v/stdout.bin",
+      "stderr": "sweep-sparse_tt_27c_3.26v/stderr.bin",
+      "outputs": [],
+      "missing_outputs": [],
+      "host_resolved": [
+        "$PDK_ROOT/sky130A/libs.tech/combined/sky130.lib.spice"
+      ],
+      "diagnostics": []
+    },
+    {
+      "id": "sweep-sparse_tt_27c_3.27v",
+      "status": "pass",
+      "exit_code": 0,
+      "timed_out": false,
+      "duration_s": 2.684,
+      "engine_version": "47",
+      "deck": "deck.spice",
+      "deck_sha256": "57386e2ff7c9c73712d2b992e538c1f853b62b2725e8d4a05ce26ee9759746b7",
+      "stdout": "sweep-sparse_tt_27c_3.27v/stdout.bin",
+      "stderr": "sweep-sparse_tt_27c_3.27v/stderr.bin",
+      "outputs": [],
+      "missing_outputs": [],
+      "host_resolved": [
+        "$PDK_ROOT/sky130A/libs.tech/combined/sky130.lib.spice"
+      ],
+      "diagnostics": []
+    },
+    {
+      "id": "sweep-sparse_tt_27c_3.28v",
+      "status": "pass",
+      "exit_code": 0,
+      "timed_out": false,
+      "duration_s": 2.731,
+      "engine_version": "47",
+      "deck": "deck.spice",
+      "deck_sha256": "ba70e471670af6534c61a84382be35cddf990ce627c0c99a9c6d58f38b317b22",
+      "stdout": "sweep-sparse_tt_27c_3.28v/stdout.bin",
+      "stderr": "sweep-sparse_tt_27c_3.28v/stderr.bin",
+      "outputs": [],
+      "missing_outputs": [],
+      "host_resolved": [
+        "$PDK_ROOT/sky130A/libs.tech/combined/sky130.lib.spice"
+      ],
+      "diagnostics": []
+    },
+    {
+      "id": "sweep-sparse_tt_27c_3.29v",
+      "status": "pass",
+      "exit_code": 0,
+      "timed_out": false,
+      "duration_s": 2.717,
+      "engine_version": "47",
+      "deck": "deck.spice",
+      "deck_sha256": "de44374f41a751c7176a5bf0b31ac7ee521e2eeb196c78245b5cf5b72ee3b6f3",
+      "stdout": "sweep-sparse_tt_27c_3.29v/stdout.bin",
+      "stderr": "sweep-sparse_tt_27c_3.29v/stderr.bin",
+      "outputs": [],
+      "missing_outputs": [],
+      "host_resolved": [
+        "$PDK_ROOT/sky130A/libs.tech/combined/sky130.lib.spice"
+      ],
+      "diagnostics": []
+    },
+    {
+      "id": "sweep-sparse_tt_27c_3.30v",
+      "status": "pass",
+      "exit_code": 0,
+      "timed_out": false,
+      "duration_s": 2.705,
+      "engine_version": "47",
+      "deck": "deck.spice",
+      "deck_sha256": "1f9325d0c3355f0048a7ea30578962bb92431f7d819d9db51554a533c86deaad",
+      "stdout": "sweep-sparse_tt_27c_3.30v/stdout.bin",
+      "stderr": "sweep-sparse_tt_27c_3.30v/stderr.bin",
+      "outputs": [],
+      "missing_outputs": [],
+      "host_resolved": [
+        "$PDK_ROOT/sky130A/libs.tech/combined/sky130.lib.spice"
+      ],
+      "diagnostics": []
+    },
+    {
+      "id": "sweep-sparse_tt_27c_3.31v",
+      "status": "pass",
+      "exit_code": 0,
+      "timed_out": false,
+      "duration_s": 2.658,
+      "engine_version": "47",
+      "deck": "deck.spice",
+      "deck_sha256": "6f27b713560ce3ceeb1e1737e9795b1a4007a04ab8bebc86563273014885ce5d",
+      "stdout": "sweep-sparse_tt_27c_3.31v/stdout.bin",
+      "stderr": "sweep-sparse_tt_27c_3.31v/stderr.bin",
+      "outputs": [],
+      "missing_outputs": [],
+      "host_resolved": [
+        "$PDK_ROOT/sky130A/libs.tech/combined/sky130.lib.spice"
+      ],
+      "diagnostics": []
+    },
+    {
+      "id": "sweep-sparse_tt_27c_3.32v",
+      "status": "pass",
+      "exit_code": 0,
+      "timed_out": false,
+      "duration_s": 2.708,
+      "engine_version": "47",
+      "deck": "deck.spice",
+      "deck_sha256": "a8fd023a10ccf3e314c5528ff44ce8a07442a5796f15100e8c0fd3dac80bab46",
+      "stdout": "sweep-sparse_tt_27c_3.32v/stdout.bin",
+      "stderr": "sweep-sparse_tt_27c_3.32v/stderr.bin",
+      "outputs": [],
+      "missing_outputs": [],
+      "host_resolved": [
+        "$PDK_ROOT/sky130A/libs.tech/combined/sky130.lib.spice"
+      ],
+      "diagnostics": []
+    },
+    {
+      "id": "sweep-sparse_tt_27c_3.33v",
+      "status": "pass",
+      "exit_code": 0,
+      "timed_out": false,
+      "duration_s": 2.633,
+      "engine_version": "47",
+      "deck": "deck.spice",
+      "deck_sha256": "7b0d7a47d35e80b9382738a0fdde0c241936ab0fffba26cc1fc31304f0defd24",
+      "stdout": "sweep-sparse_tt_27c_3.33v/stdout.bin",
+      "stderr": "sweep-sparse_tt_27c_3.33v/stderr.bin",
+      "outputs": [],
+      "missing_outputs": [],
+      "host_resolved": [
+        "$PDK_ROOT/sky130A/libs.tech/combined/sky130.lib.spice"
+      ],
+      "diagnostics": []
+    },
+    {
+      "id": "sweep-sparse_tt_27c_3.34v",
+      "status": "pass",
+      "exit_code": 0,
+      "timed_out": false,
+      "duration_s": 2.694,
+      "engine_version": "47",
+      "deck": "deck.spice",
+      "deck_sha256": "89ed84fd7cf376156b78d0cb49bba0ab8c7930e3ac626061b2a7a191da17a484",
+      "stdout": "sweep-sparse_tt_27c_3.34v/stdout.bin",
+      "stderr": "sweep-sparse_tt_27c_3.34v/stderr.bin",
+      "outputs": [],
+      "missing_outputs": [],
+      "host_resolved": [
+        "$PDK_ROOT/sky130A/libs.tech/combined/sky130.lib.spice"
+      ],
+      "diagnostics": []
+    },
+    {
+      "id": "sweep-sparse_tt_27c_3.35v",
+      "status": "pass",
+      "exit_code": 0,
+      "timed_out": false,
+      "duration_s": 2.677,
+      "engine_version": "47",
+      "deck": "deck.spice",
+      "deck_sha256": "af95ba88d907e07790f5bc961b3bc6ae685983d1fad14f4c71655dc18b15da30",
+      "stdout": "sweep-sparse_tt_27c_3.35v/stdout.bin",
+      "stderr": "sweep-sparse_tt_27c_3.35v/stderr.bin",
+      "outputs": [],
+      "missing_outputs": [],
+      "host_resolved": [
+        "$PDK_ROOT/sky130A/libs.tech/combined/sky130.lib.spice"
+      ],
+      "diagnostics": []
+    },
+    {
+      "id": "sweep-sparse_tt_27c_3.36v",
+      "status": "pass",
+      "exit_code": 0,
+      "timed_out": false,
+      "duration_s": 2.697,
+      "engine_version": "47",
+      "deck": "deck.spice",
+      "deck_sha256": "ae3f8fc21b3715d9c8f179c70842e4a073fb49bb014c58a7ac53358c2f4a7f95",
+      "stdout": "sweep-sparse_tt_27c_3.36v/stdout.bin",
+      "stderr": "sweep-sparse_tt_27c_3.36v/stderr.bin",
+      "outputs": [],
+      "missing_outputs": [],
+      "host_resolved": [
+        "$PDK_ROOT/sky130A/libs.tech/combined/sky130.lib.spice"
+      ],
+      "diagnostics": []
+    },
+    {
+      "id": "sweep-sparse_tt_27c_3.37v",
+      "status": "pass",
+      "exit_code": 0,
+      "timed_out": false,
+      "duration_s": 2.634,
+      "engine_version": "47",
+      "deck": "deck.spice",
+      "deck_sha256": "d190e16761e9f5fbe66caf92579335d9a9d25dfb36c9dab97ef9fbbfc0c1825f",
+      "stdout": "sweep-sparse_tt_27c_3.37v/stdout.bin",
+      "stderr": "sweep-sparse_tt_27c_3.37v/stderr.bin",
+      "outputs": [],
+      "missing_outputs": [],
+      "host_resolved": [
+        "$PDK_ROOT/sky130A/libs.tech/combined/sky130.lib.spice"
+      ],
+      "diagnostics": []
+    },
+    {
+      "id": "sweep-sparse_tt_27c_3.38v",
+      "status": "pass",
+      "exit_code": 0,
+      "timed_out": false,
+      "duration_s": 2.646,
+      "engine_version": "47",
+      "deck": "deck.spice",
+      "deck_sha256": "a2f6848596631c879b5614118441767ea54e14b4b8bc0e3e3f95cb2c98e4727a",
+      "stdout": "sweep-sparse_tt_27c_3.38v/stdout.bin",
+      "stderr": "sweep-sparse_tt_27c_3.38v/stderr.bin",
+      "outputs": [],
+      "missing_outputs": [],
+      "host_resolved": [
+        "$PDK_ROOT/sky130A/libs.tech/combined/sky130.lib.spice"
+      ],
+      "diagnostics": []
+    },
+    {
+      "id": "sweep-sparse_tt_27c_3.39v",
+      "status": "pass",
+      "exit_code": 0,
+      "timed_out": false,
+      "duration_s": 2.72,
+      "engine_version": "47",
+      "deck": "deck.spice",
+      "deck_sha256": "20eb52f218a818e6154b78b7ac3f2f4df8a8b88b0961bae73a67d1479e76a93e",
+      "stdout": "sweep-sparse_tt_27c_3.39v/stdout.bin",
+      "stderr": "sweep-sparse_tt_27c_3.39v/stderr.bin",
+      "outputs": [],
+      "missing_outputs": [],
+      "host_resolved": [
+        "$PDK_ROOT/sky130A/libs.tech/combined/sky130.lib.spice"
+      ],
+      "diagnostics": []
+    },
+    {
+      "id": "sweep-sparse_tt_27c_3.40v",
+      "status": "pass",
+      "exit_code": 0,
+      "timed_out": false,
+      "duration_s": 2.656,
+      "engine_version": "47",
+      "deck": "deck.spice",
+      "deck_sha256": "8ee682be52adc34ff5bceea1fe7d86cc0c63d138d5d426fe7573689e0888e07c",
+      "stdout": "sweep-sparse_tt_27c_3.40v/stdout.bin",
+      "stderr": "sweep-sparse_tt_27c_3.40v/stderr.bin",
+      "outputs": [],
+      "missing_outputs": [],
+      "host_resolved": [
+        "$PDK_ROOT/sky130A/libs.tech/combined/sky130.lib.spice"
+      ],
+      "diagnostics": []
+    },
+    {
+      "id": "sweep-sparse_tt_27c_3.41v",
+      "status": "pass",
+      "exit_code": 0,
+      "timed_out": false,
+      "duration_s": 2.664,
+      "engine_version": "47",
+      "deck": "deck.spice",
+      "deck_sha256": "f7d345db26ecd1c1ed0c6a311f71a228337b4deb94d902e6656748466ea52132",
+      "stdout": "sweep-sparse_tt_27c_3.41v/stdout.bin",
+      "stderr": "sweep-sparse_tt_27c_3.41v/stderr.bin",
+      "outputs": [],
+      "missing_outputs": [],
+      "host_resolved": [
+        "$PDK_ROOT/sky130A/libs.tech/combined/sky130.lib.spice"
+      ],
+      "diagnostics": []
+    },
+    {
+      "id": "sweep-sparse_tt_27c_3.42v",
+      "status": "pass",
+      "exit_code": 0,
+      "timed_out": false,
+      "duration_s": 2.688,
+      "engine_version": "47",
+      "deck": "deck.spice",
+      "deck_sha256": "bffe9ea0717d311086710cc8311814859542cd218bc7d3076714f33531f24e3e",
+      "stdout": "sweep-sparse_tt_27c_3.42v/stdout.bin",
+      "stderr": "sweep-sparse_tt_27c_3.42v/stderr.bin",
+      "outputs": [],
+      "missing_outputs": [],
+      "host_resolved": [
+        "$PDK_ROOT/sky130A/libs.tech/combined/sky130.lib.spice"
+      ],
+      "diagnostics": []
+    },
+    {
+      "id": "sweep-sparse_tt_27c_3.43v",
+      "status": "pass",
+      "exit_code": 0,
+      "timed_out": false,
+      "duration_s": 2.705,
+      "engine_version": "47",
+      "deck": "deck.spice",
+      "deck_sha256": "0b6ea7870c231523070e595574616f12e21c4acd78888bd5b557547f425ce6fc",
+      "stdout": "sweep-sparse_tt_27c_3.43v/stdout.bin",
+      "stderr": "sweep-sparse_tt_27c_3.43v/stderr.bin",
+      "outputs": [],
+      "missing_outputs": [],
+      "host_resolved": [
+        "$PDK_ROOT/sky130A/libs.tech/combined/sky130.lib.spice"
+      ],
+      "diagnostics": []
+    },
+    {
+      "id": "sweep-sparse_tt_27c_3.44v",
+      "status": "pass",
+      "exit_code": 0,
+      "timed_out": false,
+      "duration_s": 2.677,
+      "engine_version": "47",
+      "deck": "deck.spice",
+      "deck_sha256": "f7cccc205a02ce1188351a677807f0171294fa6a26dd72d04d717af6a3ee498b",
+      "stdout": "sweep-sparse_tt_27c_3.44v/stdout.bin",
+      "stderr": "sweep-sparse_tt_27c_3.44v/stderr.bin",
+      "outputs": [],
+      "missing_outputs": [],
+      "host_resolved": [
+        "$PDK_ROOT/sky130A/libs.tech/combined/sky130.lib.spice"
+      ],
+      "diagnostics": []
+    },
+    {
+      "id": "sweep-sparse_tt_27c_3.45v",
+      "status": "pass",
+      "exit_code": 0,
+      "timed_out": false,
+      "duration_s": 2.659,
+      "engine_version": "47",
+      "deck": "deck.spice",
+      "deck_sha256": "ca3ad049912236bf6b88dda6cc0c1cbaab9201b5726f2b862591076ec97f9001",
+      "stdout": "sweep-sparse_tt_27c_3.45v/stdout.bin",
+      "stderr": "sweep-sparse_tt_27c_3.45v/stderr.bin",
+      "outputs": [],
+      "missing_outputs": [],
+      "host_resolved": [
+        "$PDK_ROOT/sky130A/libs.tech/combined/sky130.lib.spice"
+      ],
+      "diagnostics": []
+    },
+    {
+      "id": "sweep-sparse_tt_27c_3.46v",
+      "status": "pass",
+      "exit_code": 0,
+      "timed_out": false,
+      "duration_s": 2.646,
+      "engine_version": "47",
+      "deck": "deck.spice",
+      "deck_sha256": "a9125c538c34453d5aaf477c6a0053dfd7a8598ccb218e0e6a5c64d128356823",
+      "stdout": "sweep-sparse_tt_27c_3.46v/stdout.bin",
+      "stderr": "sweep-sparse_tt_27c_3.46v/stderr.bin",
+      "outputs": [],
+      "missing_outputs": [],
+      "host_resolved": [
+        "$PDK_ROOT/sky130A/libs.tech/combined/sky130.lib.spice"
+      ],
+      "diagnostics": []
+    },
+    {
+      "id": "sweep-sparse_tt_27c_3.47v",
+      "status": "pass",
+      "exit_code": 0,
+      "timed_out": false,
+      "duration_s": 2.712,
+      "engine_version": "47",
+      "deck": "deck.spice",
+      "deck_sha256": "83fc3cd6ebac0fa6f0e816fb87e382db459563fbdc50c85bb61ae645c939882b",
+      "stdout": "sweep-sparse_tt_27c_3.47v/stdout.bin",
+      "stderr": "sweep-sparse_tt_27c_3.47v/stderr.bin",
+      "outputs": [],
+      "missing_outputs": [],
+      "host_resolved": [
+        "$PDK_ROOT/sky130A/libs.tech/combined/sky130.lib.spice"
+      ],
+      "diagnostics": []
+    },
+    {
+      "id": "sweep-sparse_tt_27c_3.48v",
+      "status": "pass",
+      "exit_code": 0,
+      "timed_out": false,
+      "duration_s": 2.72,
+      "engine_version": "47",
+      "deck": "deck.spice",
+      "deck_sha256": "85129ab0534179348e1b8f77524caaa9254886c7cd006fc7632440094d854ea6",
+      "stdout": "sweep-sparse_tt_27c_3.48v/stdout.bin",
+      "stderr": "sweep-sparse_tt_27c_3.48v/stderr.bin",
+      "outputs": [],
+      "missing_outputs": [],
+      "host_resolved": [
+        "$PDK_ROOT/sky130A/libs.tech/combined/sky130.lib.spice"
+      ],
+      "diagnostics": []
+    },
+    {
+      "id": "sweep-sparse_tt_27c_3.49v",
+      "status": "pass",
+      "exit_code": 0,
+      "timed_out": false,
+      "duration_s": 2.706,
+      "engine_version": "47",
+      "deck": "deck.spice",
+      "deck_sha256": "a5c9e5a04b9f253efd172c2b92f1182ace14203b1d4490cd59cf1abc9fd2f055",
+      "stdout": "sweep-sparse_tt_27c_3.49v/stdout.bin",
+      "stderr": "sweep-sparse_tt_27c_3.49v/stderr.bin",
+      "outputs": [],
+      "missing_outputs": [],
+      "host_resolved": [
+        "$PDK_ROOT/sky130A/libs.tech/combined/sky130.lib.spice"
+      ],
+      "diagnostics": []
+    },
+    {
+      "id": "sweep-sparse_tt_27c_3.50v",
+      "status": "pass",
+      "exit_code": 0,
+      "timed_out": false,
+      "duration_s": 2.742,
+      "engine_version": "47",
+      "deck": "deck.spice",
+      "deck_sha256": "a4363c1ee1c43cbf4ec3f3e55c03d6df12e975916c98798ace35c86e125fc56d",
+      "stdout": "sweep-sparse_tt_27c_3.50v/stdout.bin",
+      "stderr": "sweep-sparse_tt_27c_3.50v/stderr.bin",
+      "outputs": [],
+      "missing_outputs": [],
+      "host_resolved": [
+        "$PDK_ROOT/sky130A/libs.tech/combined/sky130.lib.spice"
+      ],
+      "diagnostics": []
+    },
+    {
+      "id": "sweep-sparse_tt_27c_3.51v",
+      "status": "pass",
+      "exit_code": 0,
+      "timed_out": false,
+      "duration_s": 2.67,
+      "engine_version": "47",
+      "deck": "deck.spice",
+      "deck_sha256": "1a63484bce421d01972eff08d1a704ebd6e2237b5fff3e3695dbfcc1bac6413a",
+      "stdout": "sweep-sparse_tt_27c_3.51v/stdout.bin",
+      "stderr": "sweep-sparse_tt_27c_3.51v/stderr.bin",
+      "outputs": [],
+      "missing_outputs": [],
+      "host_resolved": [
+        "$PDK_ROOT/sky130A/libs.tech/combined/sky130.lib.spice"
+      ],
+      "diagnostics": []
+    },
+    {
+      "id": "sweep-sparse_tt_27c_3.52v",
+      "status": "pass",
+      "exit_code": 0,
+      "timed_out": false,
+      "duration_s": 2.678,
+      "engine_version": "47",
+      "deck": "deck.spice",
+      "deck_sha256": "50535251dcfb8d63bf77f95731d7c3fdf77b26eed63cb377b356ddcdfb171c9b",
+      "stdout": "sweep-sparse_tt_27c_3.52v/stdout.bin",
+      "stderr": "sweep-sparse_tt_27c_3.52v/stderr.bin",
+      "outputs": [],
+      "missing_outputs": [],
+      "host_resolved": [
+        "$PDK_ROOT/sky130A/libs.tech/combined/sky130.lib.spice"
+      ],
+      "diagnostics": []
+    },
+    {
+      "id": "sweep-sparse_tt_27c_3.53v",
+      "status": "pass",
+      "exit_code": 0,
+      "timed_out": false,
+      "duration_s": 2.683,
+      "engine_version": "47",
+      "deck": "deck.spice",
+      "deck_sha256": "425ec6ff708d7418b07cceedd516a88e7624b0e07178a2294651881743db9984",
+      "stdout": "sweep-sparse_tt_27c_3.53v/stdout.bin",
+      "stderr": "sweep-sparse_tt_27c_3.53v/stderr.bin",
+      "outputs": [],
+      "missing_outputs": [],
+      "host_resolved": [
+        "$PDK_ROOT/sky130A/libs.tech/combined/sky130.lib.spice"
+      ],
+      "diagnostics": []
+    },
+    {
+      "id": "sweep-sparse_tt_27c_3.54v",
+      "status": "pass",
+      "exit_code": 0,
+      "timed_out": false,
+      "duration_s": 2.665,
+      "engine_version": "47",
+      "deck": "deck.spice",
+      "deck_sha256": "670c72064a0ba28fcbe8efcee8ccf633171cc78c0246cf4e6049d942d78f5eb3",
+      "stdout": "sweep-sparse_tt_27c_3.54v/stdout.bin",
+      "stderr": "sweep-sparse_tt_27c_3.54v/stderr.bin",
+      "outputs": [],
+      "missing_outputs": [],
+      "host_resolved": [
+        "$PDK_ROOT/sky130A/libs.tech/combined/sky130.lib.spice"
+      ],
+      "diagnostics": []
+    },
+    {
+      "id": "sweep-sparse_tt_27c_3.55v",
+      "status": "pass",
+      "exit_code": 0,
+      "timed_out": false,
+      "duration_s": 2.662,
+      "engine_version": "47",
+      "deck": "deck.spice",
+      "deck_sha256": "87caf5d3bba4b7eb65a9cd9364a117e2e8ace52c60b9393620f2feac4adb7ece",
+      "stdout": "sweep-sparse_tt_27c_3.55v/stdout.bin",
+      "stderr": "sweep-sparse_tt_27c_3.55v/stderr.bin",
+      "outputs": [],
+      "missing_outputs": [],
+      "host_resolved": [
+        "$PDK_ROOT/sky130A/libs.tech/combined/sky130.lib.spice"
+      ],
+      "diagnostics": []
+    },
+    {
+      "id": "sweep-sparse_tt_27c_3.56v",
+      "status": "pass",
+      "exit_code": 0,
+      "timed_out": false,
+      "duration_s": 2.681,
+      "engine_version": "47",
+      "deck": "deck.spice",
+      "deck_sha256": "744d0abb6f57531e534bdaf8b3205244772e3005ca0d292970d4a1ffa8916871",
+      "stdout": "sweep-sparse_tt_27c_3.56v/stdout.bin",
+      "stderr": "sweep-sparse_tt_27c_3.56v/stderr.bin",
+      "outputs": [],
+      "missing_outputs": [],
+      "host_resolved": [
+        "$PDK_ROOT/sky130A/libs.tech/combined/sky130.lib.spice"
+      ],
+      "diagnostics": []
+    },
+    {
+      "id": "sweep-sparse_tt_27c_3.57v",
+      "status": "pass",
+      "exit_code": 0,
+      "timed_out": false,
+      "duration_s": 2.711,
+      "engine_version": "47",
+      "deck": "deck.spice",
+      "deck_sha256": "0e9a805dd6ebaa7a826e5e93cf9924ff6ab474a4e04098d2f594b388844ec9c3",
+      "stdout": "sweep-sparse_tt_27c_3.57v/stdout.bin",
+      "stderr": "sweep-sparse_tt_27c_3.57v/stderr.bin",
+      "outputs": [],
+      "missing_outputs": [],
+      "host_resolved": [
+        "$PDK_ROOT/sky130A/libs.tech/combined/sky130.lib.spice"
+      ],
+      "diagnostics": []
+    },
+    {
+      "id": "sweep-sparse_tt_27c_3.58v",
+      "status": "pass",
+      "exit_code": 0,
+      "timed_out": false,
+      "duration_s": 2.685,
+      "engine_version": "47",
+      "deck": "deck.spice",
+      "deck_sha256": "4b7339157985c713de17d604e83e413714d489a2d8abb3b60cb3beaf26f3fac9",
+      "stdout": "sweep-sparse_tt_27c_3.58v/stdout.bin",
+      "stderr": "sweep-sparse_tt_27c_3.58v/stderr.bin",
+      "outputs": [],
+      "missing_outputs": [],
+      "host_resolved": [
+        "$PDK_ROOT/sky130A/libs.tech/combined/sky130.lib.spice"
+      ],
+      "diagnostics": []
+    },
+    {
+      "id": "sweep-sparse_tt_27c_3.59v",
+      "status": "pass",
+      "exit_code": 0,
+      "timed_out": false,
+      "duration_s": 2.64,
+      "engine_version": "47",
+      "deck": "deck.spice",
+      "deck_sha256": "8d36b21b05d8ec404355c1bea0e93f5cc4b82cc97e208b92610bf63df7a8262f",
+      "stdout": "sweep-sparse_tt_27c_3.59v/stdout.bin",
+      "stderr": "sweep-sparse_tt_27c_3.59v/stderr.bin",
+      "outputs": [],
+      "missing_outputs": [],
+      "host_resolved": [
+        "$PDK_ROOT/sky130A/libs.tech/combined/sky130.lib.spice"
+      ],
+      "diagnostics": []
+    },
+    {
+      "id": "sweep-sparse_tt_27c_3.60v",
+      "status": "pass",
+      "exit_code": 0,
+      "timed_out": false,
+      "duration_s": 2.668,
+      "engine_version": "47",
+      "deck": "deck.spice",
+      "deck_sha256": "e9899813377fb333350d3bbcb2d9a15d351ea0ac992c22c26b1ecc7e9eacdec9",
+      "stdout": "sweep-sparse_tt_27c_3.60v/stdout.bin",
+      "stderr": "sweep-sparse_tt_27c_3.60v/stderr.bin",
+      "outputs": [],
+      "missing_outputs": [],
+      "host_resolved": [
+        "$PDK_ROOT/sky130A/libs.tech/combined/sky130.lib.spice"
+      ],
+      "diagnostics": []
+    },
+    {
+      "id": "sweep-sparse_tt_27c_3.61v",
+      "status": "pass",
+      "exit_code": 0,
+      "timed_out": false,
+      "duration_s": 2.658,
+      "engine_version": "47",
+      "deck": "deck.spice",
+      "deck_sha256": "f2968d0ee8d5e4f5dbd64670c6129e63ebf59bb05cf97c3302316ca69f9bb149",
+      "stdout": "sweep-sparse_tt_27c_3.61v/stdout.bin",
+      "stderr": "sweep-sparse_tt_27c_3.61v/stderr.bin",
+      "outputs": [],
+      "missing_outputs": [],
+      "host_resolved": [
+        "$PDK_ROOT/sky130A/libs.tech/combined/sky130.lib.spice"
+      ],
+      "diagnostics": []
+    },
+    {
+      "id": "sweep-sparse_tt_27c_3.62v",
+      "status": "pass",
+      "exit_code": 0,
+      "timed_out": false,
+      "duration_s": 2.661,
+      "engine_version": "47",
+      "deck": "deck.spice",
+      "deck_sha256": "c8c9ac6ee211022a24737a2657562a7a4a9fde6d20b574cd709693a59e7fe592",
+      "stdout": "sweep-sparse_tt_27c_3.62v/stdout.bin",
+      "stderr": "sweep-sparse_tt_27c_3.62v/stderr.bin",
+      "outputs": [],
+      "missing_outputs": [],
+      "host_resolved": [
+        "$PDK_ROOT/sky130A/libs.tech/combined/sky130.lib.spice"
+      ],
+      "diagnostics": []
+    },
+    {
+      "id": "sweep-sparse_tt_27c_3.63v",
+      "status": "pass",
+      "exit_code": 0,
+      "timed_out": false,
+      "duration_s": 2.78,
+      "engine_version": "47",
+      "deck": "deck.spice",
+      "deck_sha256": "70b4e9fbf6ef07efc990d5fd4156ffdb462c2c478a1d314b5e1fe806b6408b66",
+      "stdout": "sweep-sparse_tt_27c_3.63v/stdout.bin",
+      "stderr": "sweep-sparse_tt_27c_3.63v/stderr.bin",
+      "outputs": [],
+      "missing_outputs": [],
+      "host_resolved": [
+        "$PDK_ROOT/sky130A/libs.tech/combined/sky130.lib.spice"
+      ],
+      "diagnostics": []
+    },
+    {
+      "id": "temp-klu_tt_22c_2.97v",
+      "status": "pass",
+      "exit_code": 0,
+      "timed_out": false,
+      "duration_s": 2.684,
+      "engine_version": "47",
+      "deck": "deck.spice",
+      "deck_sha256": "64036e818317bfb9c93cd687b85cf511941e0d4aedaa1282eeaa1f71e2ce84a3",
+      "stdout": "temp-klu_tt_22c_2.97v/stdout.bin",
+      "stderr": "temp-klu_tt_22c_2.97v/stderr.bin",
+      "outputs": [],
+      "missing_outputs": [],
+      "host_resolved": [
+        "$PDK_ROOT/sky130A/libs.tech/combined/sky130.lib.spice"
+      ],
+      "diagnostics": []
+    },
+    {
+      "id": "temp-klu_tt_24c_2.97v",
+      "status": "pass",
+      "exit_code": 0,
+      "timed_out": false,
+      "duration_s": 2.726,
+      "engine_version": "47",
+      "deck": "deck.spice",
+      "deck_sha256": "6ec5e97836ec508d972e3b5847d8986164ad0fc9390614e959a53f9ef6d8f30d",
+      "stdout": "temp-klu_tt_24c_2.97v/stdout.bin",
+      "stderr": "temp-klu_tt_24c_2.97v/stderr.bin",
+      "outputs": [],
+      "missing_outputs": [],
+      "host_resolved": [
+        "$PDK_ROOT/sky130A/libs.tech/combined/sky130.lib.spice"
+      ],
+      "diagnostics": []
+    },
+    {
+      "id": "temp-klu_tt_25c_2.97v",
+      "status": "pass",
+      "exit_code": 0,
+      "timed_out": false,
+      "duration_s": 2.695,
+      "engine_version": "47",
+      "deck": "deck.spice",
+      "deck_sha256": "45280e4dec2c9cabd0ffe5c4d6ca7c2def9eab75824f6b94c4674662e683dcc4",
+      "stdout": "temp-klu_tt_25c_2.97v/stdout.bin",
+      "stderr": "temp-klu_tt_25c_2.97v/stderr.bin",
+      "outputs": [],
+      "missing_outputs": [],
+      "host_resolved": [
+        "$PDK_ROOT/sky130A/libs.tech/combined/sky130.lib.spice"
+      ],
+      "diagnostics": []
+    },
+    {
+      "id": "temp-klu_tt_26c_2.97v",
+      "status": "pass",
+      "exit_code": 0,
+      "timed_out": false,
+      "duration_s": 2.658,
+      "engine_version": "47",
+      "deck": "deck.spice",
+      "deck_sha256": "e5d6977026a21ee363207cd19013795105fb5c6ce0efd313ead13e088dcf1e55",
+      "stdout": "temp-klu_tt_26c_2.97v/stdout.bin",
+      "stderr": "temp-klu_tt_26c_2.97v/stderr.bin",
+      "outputs": [],
+      "missing_outputs": [],
+      "host_resolved": [
+        "$PDK_ROOT/sky130A/libs.tech/combined/sky130.lib.spice"
+      ],
+      "diagnostics": []
+    },
+    {
+      "id": "temp-klu_tt_27c_2.97v",
+      "status": "pass",
+      "exit_code": 0,
+      "timed_out": false,
+      "duration_s": 2.696,
+      "engine_version": "47",
+      "deck": "deck.spice",
+      "deck_sha256": "3c7c83c28cc21902c116b6f3b08dfd6f438826f6a55312121cf8e00bf8e264c8",
+      "stdout": "temp-klu_tt_27c_2.97v/stdout.bin",
+      "stderr": "temp-klu_tt_27c_2.97v/stderr.bin",
+      "outputs": [],
+      "missing_outputs": [],
+      "host_resolved": [
+        "$PDK_ROOT/sky130A/libs.tech/combined/sky130.lib.spice"
+      ],
+      "diagnostics": []
+    },
+    {
+      "id": "temp-klu_tt_28c_2.97v",
+      "status": "pass",
+      "exit_code": 0,
+      "timed_out": false,
+      "duration_s": 2.698,
+      "engine_version": "47",
+      "deck": "deck.spice",
+      "deck_sha256": "736b31b09181027256e39d45bf6e27ff047fa585748f45809441608460716760",
+      "stdout": "temp-klu_tt_28c_2.97v/stdout.bin",
+      "stderr": "temp-klu_tt_28c_2.97v/stderr.bin",
+      "outputs": [],
+      "missing_outputs": [],
+      "host_resolved": [
+        "$PDK_ROOT/sky130A/libs.tech/combined/sky130.lib.spice"
+      ],
+      "diagnostics": []
+    },
+    {
+      "id": "temp-klu_tt_29c_2.97v",
+      "status": "pass",
+      "exit_code": 0,
+      "timed_out": false,
+      "duration_s": 2.688,
+      "engine_version": "47",
+      "deck": "deck.spice",
+      "deck_sha256": "ba1500af3f55bfa2a8ed2c2470f4a90f93a74bc5ef9fd262d8922f20a269d21d",
+      "stdout": "temp-klu_tt_29c_2.97v/stdout.bin",
+      "stderr": "temp-klu_tt_29c_2.97v/stderr.bin",
+      "outputs": [],
+      "missing_outputs": [],
+      "host_resolved": [
+        "$PDK_ROOT/sky130A/libs.tech/combined/sky130.lib.spice"
+      ],
+      "diagnostics": []
+    },
+    {
+      "id": "temp-klu_tt_30c_2.97v",
+      "status": "pass",
+      "exit_code": 0,
+      "timed_out": false,
+      "duration_s": 2.654,
+      "engine_version": "47",
+      "deck": "deck.spice",
+      "deck_sha256": "634e880ec4595b45658671f507ce6a587911bd482723633026e886a605bcd0c1",
+      "stdout": "temp-klu_tt_30c_2.97v/stdout.bin",
+      "stderr": "temp-klu_tt_30c_2.97v/stderr.bin",
+      "outputs": [],
+      "missing_outputs": [],
+      "host_resolved": [
+        "$PDK_ROOT/sky130A/libs.tech/combined/sky130.lib.spice"
+      ],
+      "diagnostics": []
+    },
+    {
+      "id": "temp-klu_tt_32c_2.97v",
+      "status": "pass",
+      "exit_code": 0,
+      "timed_out": false,
+      "duration_s": 2.694,
+      "engine_version": "47",
+      "deck": "deck.spice",
+      "deck_sha256": "9dd9bc2895cd8bada2ec4d75a9c1aef2e36b183ef88c2bd4a7a07f866048547a",
+      "stdout": "temp-klu_tt_32c_2.97v/stdout.bin",
+      "stderr": "temp-klu_tt_32c_2.97v/stderr.bin",
+      "outputs": [],
+      "missing_outputs": [],
+      "host_resolved": [
+        "$PDK_ROOT/sky130A/libs.tech/combined/sky130.lib.spice"
+      ],
+      "diagnostics": []
+    },
+    {
+      "id": "variant-srcstep_tt_27c_2.97v",
+      "status": "pass",
+      "exit_code": 0,
+      "timed_out": false,
+      "duration_s": 2.661,
+      "engine_version": "47",
+      "deck": "deck.spice",
+      "deck_sha256": "7533d8179685238a44537f2700d2e6285fcd3a46491e30c65d18b92beb6589f0",
+      "stdout": "variant-srcstep_tt_27c_2.97v/stdout.bin",
+      "stderr": "variant-srcstep_tt_27c_2.97v/stderr.bin",
+      "outputs": [],
+      "missing_outputs": [],
+      "host_resolved": [
+        "$PDK_ROOT/sky130A/libs.tech/combined/sky130.lib.spice"
+      ],
+      "diagnostics": []
+    },
+    {
+      "id": "variant-srcstep_tt_27c_3.63v",
+      "status": "pass",
+      "exit_code": 0,
+      "timed_out": false,
+      "duration_s": 2.643,
+      "engine_version": "47",
+      "deck": "deck.spice",
+      "deck_sha256": "4300478c5b31fea869cf3105a48bf5a49c92344b268d688e681164fc79c921cd",
+      "stdout": "variant-srcstep_tt_27c_3.63v/stdout.bin",
+      "stderr": "variant-srcstep_tt_27c_3.63v/stderr.bin",
+      "outputs": [],
+      "missing_outputs": [],
+      "host_resolved": [
+        "$PDK_ROOT/sky130A/libs.tech/combined/sky130.lib.spice"
+      ],
+      "diagnostics": []
+    },
+    {
+      "id": "variant-nodeset_tt_27c_2.97v",
+      "status": "pass",
+      "exit_code": 0,
+      "timed_out": false,
+      "duration_s": 2.691,
+      "engine_version": "47",
+      "deck": "deck.spice",
+      "deck_sha256": "d3ef3c08e00569f24e6ff3ce4d7ff56d91d6ac7718171064ead95ae671f271b9",
+      "stdout": "variant-nodeset_tt_27c_2.97v/stdout.bin",
+      "stderr": "variant-nodeset_tt_27c_2.97v/stderr.bin",
+      "outputs": [],
+      "missing_outputs": [],
+      "host_resolved": [
+        "$PDK_ROOT/sky130A/libs.tech/combined/sky130.lib.spice"
+      ],
+      "diagnostics": []
+    },
+    {
+      "id": "variant-nodeset_tt_27c_3.63v",
+      "status": "pass",
+      "exit_code": 0,
+      "timed_out": false,
+      "duration_s": 2.645,
+      "engine_version": "47",
+      "deck": "deck.spice",
+      "deck_sha256": "116994ed131d496635ffdb7a250773e4a52505c7a35c3cf9914c69553ebf0386",
+      "stdout": "variant-nodeset_tt_27c_3.63v/stdout.bin",
+      "stderr": "variant-nodeset_tt_27c_3.63v/stderr.bin",
+      "outputs": [],
+      "missing_outputs": [],
+      "host_resolved": [
+        "$PDK_ROOT/sky130A/libs.tech/combined/sky130.lib.spice"
+      ],
+      "diagnostics": []
+    },
+    {
+      "id": "control-repeat1_tt_27c_2.97v",
+      "status": "pass",
+      "exit_code": 0,
+      "timed_out": false,
+      "duration_s": 2.689,
+      "engine_version": "47",
+      "deck": "deck.spice",
+      "deck_sha256": "bf4dd6ad44389a63875014b34c7c33413d51c6b1c41f5f93365baa2a2e52dae2",
+      "stdout": "control-repeat1_tt_27c_2.97v/stdout.bin",
+      "stderr": "control-repeat1_tt_27c_2.97v/stderr.bin",
+      "outputs": [],
+      "missing_outputs": [],
+      "host_resolved": [
+        "$PDK_ROOT/sky130A/libs.tech/combined/sky130.lib.spice"
+      ],
+      "diagnostics": []
+    },
+    {
+      "id": "control-repeat2_tt_27c_2.97v",
+      "status": "pass",
+      "exit_code": 0,
+      "timed_out": false,
+      "duration_s": 2.646,
+      "engine_version": "47",
+      "deck": "deck.spice",
+      "deck_sha256": "429d284c45df927d399f27b79a3f01b0351567d3a489172f4198af924d7ce1cf",
+      "stdout": "control-repeat2_tt_27c_2.97v/stdout.bin",
+      "stderr": "control-repeat2_tt_27c_2.97v/stderr.bin",
+      "outputs": [],
+      "missing_outputs": [],
+      "host_resolved": [
+        "$PDK_ROOT/sky130A/libs.tech/combined/sky130.lib.spice"
+      ],
+      "diagnostics": []
+    },
+    {
+      "id": "control-repeat3_tt_27c_2.97v",
+      "status": "pass",
+      "exit_code": 0,
+      "timed_out": false,
+      "duration_s": 2.666,
+      "engine_version": "47",
+      "deck": "deck.spice",
+      "deck_sha256": "3749a89a07f7604fd43b2f6bdcf59de148b37b53d3b6d24c96129273aa2c2d94",
+      "stdout": "control-repeat3_tt_27c_2.97v/stdout.bin",
+      "stderr": "control-repeat3_tt_27c_2.97v/stderr.bin",
+      "outputs": [],
+      "missing_outputs": [],
+      "host_resolved": [
+        "$PDK_ROOT/sky130A/libs.tech/combined/sky130.lib.spice"
+      ],
+      "diagnostics": []
+    }
+  ],
+  "outdir": "<build>/batch/out",
+  "environment": {
+    "engine": "ngspice",
+    "engine_version": "47",
+    "ngspice_binary": "/usr/local/bin/ngspice",
+    "klt_version": "0.9.0",
+    "max_workers": 4,
+    "engine_host": "worker",
+    "remote": {
+      "provider": "aws-batch-fleet",
+      "job_id": "klt-sim-1e0599fd9b6a",
+      "region": "us-east-1",
+      "instance_id": "i-099960863cba14eb5",
+      "instance_type": "c7i.8xlarge",
+      "availability_zone": "us-east-1c",
+      "ami_id": "ami-0f6bb304291339ed0",
+      "lifecycle": "spot",
+      "spot": true,
+      "state": "done",
+      "exit_code": "0",
+      "concurrency": "2",
+      "physical_cores": "16",
+      "elapsed_seconds": 114,
+      "runner_klt_version": "0.9.0",
+      "client_klt_version": "0.9.2.dev887+gec7400b7d8e5",
+      "runner_compatibility": "match",
+      "runner_request_features": {
+        "required": [
+          "decks"
+        ],
+        "missing": [],
+        "status": "supported"
+      },
+      "worker_environment": {
+        "capture": "ok",
+        "simulator": {
+          "requested_binary": "ngspice",
+          "binary_source": "PATH",
+          "selected_path": "/usr/local/bin/ngspice",
+          "version_banner": "******\n** ngspice-47 : Circuit level simulation program\n** Compiled with KLU Direct Linear Solver\n** The U. C. Berkeley CAD Group\n** Copyright 1985-1994, Regents of the University of California.\n** Copyright 2001-2026, The ngspice team.\n** Please get your ngspice manual from https://ngspice.sourceforge.io/docs.html\n** Please file your bug-reports at http://ngspice.sourceforge.net/bugrep.html\n** Creation Date: Thu Nov 12 22:47:40 UTC 2026\n******\n",
+          "version_probe": "ok"
+        },
+        "pdk": {
+          "variant": "sky130A",
+          "root": "/opt/pdk",
+          "stamp_scheme": "sources-sha256",
+          "stamp_sha256": "4ca10280ae9f293aa1ff69f0060a52e0026929111bda881503717469b429ce67",
+          "stamp_text": "open_pdks f6eeac7dad085ffcc829ccfd721f7b4ce39edcf7",
+          "models_staged": false,
+          "stamp_scope": "executed"
+        },
+        "cpu_model": "Intel(R) Xeon(R) Platinum 8488C",
+        "omp_num_threads": null,
+        "image_manifest": null,
+        "model_inputs": null,
+        "diagnostics": [],
+        "pdk_stamp_comparison": {
+          "status": "not_comparable",
+          "reason": "client_stamp_unavailable"
+        }
+      },
+      "runner_model_inputs": null,
+      "models_lib_comparison": {
+        "status": "not_comparable",
+        "reason": "runner_hash_unavailable"
+      }
+    },
+    "client_ngspice_binary": "<home>/.local/bin/ngspice"
+  }
+}
