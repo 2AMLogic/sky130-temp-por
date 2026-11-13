@@ -375,9 +375,64 @@ def verdict_for_point(cid, scen, res, ctx=None):
                          for k, g in rows.items()}}
 
 
+def observed_provenance(summary, res):
+    """Everything the record's `PDK` / `Tools` lines say about tools, derived from what
+    this run observed -- never a literal (issue #306).
+
+    `summary` is the per-combo block `cmd_record()` assembles (a NOT-RUN combo carries no
+    `fleet` key at all); `res` is `load_results()`'s per-combo entry, whose klt
+    `report.json` announces the fleet's own PDK under `provenance.pdk`.  Every field
+    falls back to the string `unknown` -- the convention `sim_common.joined_versions()`
+    enforces -- rather than to a default version, so a tool nobody observed reads as
+    unobserved instead of as whatever was current when this code was written.
+    """
+    fleets = [s.get("fleet") for s in summary.values()]
+    jv = sim_common.joined_versions
+    # `ngspice_engine_version` is the bare engine number ("46"); tag it here so a sweep
+    # served by two engines reads as a set of engine tokens, not a list of numbers.
+    engines = [{"tag": f"ngspice-{v}"} for s in summary.values() if (v := s.get("ngspice_engine_version"))]
+    # The client raises its version-mismatch warning only for a job whose runner klt
+    # differs from the client's own, so the record states it only when that was observed.
+    skew = sorted({(f["runner_klt_version"], f["client_klt_version"]) for f in fleets
+                   if f and f.get("runner_klt_version") and f.get("client_klt_version")
+                   and f["runner_klt_version"] != f["client_klt_version"]})
+    return {
+        "fleet_ngspice": jv(engines, "tag"),
+        "fleet_runner_klt": jv(fleets, "runner_klt_version"),
+        "fleet_instance_type": jv(fleets, "instance_type"),
+        "fleet_pdk": jv((((e["report"] or {}).get("provenance") or {}).get("pdk") for e in res.values()), "version"),
+        "klt_skew": skew,
+    }
+
+
+def render_provenance_lines(prov, pdk, klt_client, backend):
+    """The record's `PDK` and `Tools` header lines, from `observed_provenance()` and the
+    PDK `corner-run` resolved on the host writing the record.
+
+    The grid itself ran on the fleet, so the PDK line names both halves explicitly: the
+    recording host's resolved install (with the same pin-state ternary
+    `sim_common.render_pdk_tools_repo_state()` uses) and whatever the fleet jobs' own
+    `report.json` announced.  Neither is invented when absent.
+    """
+    pin_state = "matches sim/pdk.json pin" if pdk.matches_pin else "**MISMATCH vs sim/pdk.json pin**"
+    skew_note = ""
+    if prov["klt_skew"]:
+        pairs = "; ".join(f"runner {r} vs client {c}" for r, c in prov["klt_skew"])
+        skew_note = f" (client/runner klt mismatch warning observed on at least one job: {pairs}; reported per job below)"
+    return [
+        f"- **PDK**: {pdk.variant} @ open_pdks `{pdk.installed_commit}` ({pin_state}) on the host that wrote this"
+        f" record, models `{pdk.pin['ngspice_lib']}`; the fleet jobs' own `report.json` announced `{prov['fleet_pdk']}`",
+        f"- **Tools**: {klt_client} (client); fleet `{prov['fleet_ngspice']}` on Spot `{prov['fleet_instance_type']}`,"
+        f" fleet runner klt `{prov['fleet_runner_klt']}`{skew_note}; backend `{backend}`",
+    ]
+
+
 def cmd_record(args):
     run_dir = BUILD / args.run_id
     meta = json.loads((run_dir / "run.json").read_text())
+    # Resolved before anything is written: a record whose PDK line cannot be derived is a
+    # record that must not exist, and failing here leaves no half-written record behind.
+    pdk = cr.resolve_pdk(cr.load_pin())
     # Headline provenance = the LATEST invocation of this run (a run.json whose first
     # invocation predates a client upgrade or carried an uncommitted driver edit would
     # otherwise headline a state that submitted nothing). Every invocation's own state
@@ -485,13 +540,15 @@ def cmd_record(args):
     }
     (rec_dir / "records" / f"{rid}.json").write_text(json.dumps(rec, indent=2, default=str) + "\n")
 
+    prov_lines = render_provenance_lines(
+        observed_provenance(summary, res), pdk, klt_client, meta["klt_sim_backend_env"])
+
     L = [f"# Record {rid}", "",
          f"- **Record ID**: {rid}",
          f"- **Experiment**: `{SLUG}` -- solver / ramp-rate discrimination of the six temp_core cold-start FAILs (issue #86)",
          "- **Claim**: NOT a spec claim. Decides, per point, whether each of the six Overall-FAIL points of `sim/temp-core-startup/` and `sim/temp-core-startup-en-delayed/` (record `ee63b45`, dirty tree) is a solver artifact (non-physical branch landing that moves with integration settings) or a real failure, by re-running the FULL 45-point PVT matrix under five solver/ramp variants for each of the two EN scenarios and checking the physicality guards (isup > 0, loop nodes inside the rails +1 V) and the unchanged `experiment.json` windows.",
          "- **Netlist provenance**: schematic-derived committed `design/netlist/{bias_core,temp_core}.spice` (unchanged since the `ee63b45` records; `git diff ee63b45 HEAD -- design/netlist/` is empty) in a generated testbench (see `netlist-snapshots/%s/`)" % rid,
-         "- **PDK**: sky130A @ open_pdks `c6d73a35f524070e85faff4a6a9eef49553ebc2b` (matches sim/pdk.json pin), models `libs.tech/combined/sky130.lib.spice` (sha256 48de7c67...)",
-         f"- **Tools**: {klt_client} (client); fleet ngspice-{next((s.get('ngspice_engine_version') for s in summary.values() if s.get('ngspice_engine_version')), '?')} on Spot `c7i/m7i.4xlarge`, fleet runner klt 0.5.0 (version mismatch warning from the client, reported per job below); backend `{meta['klt_sim_backend_env']}`",
+         *prov_lines,
          f"- **Repo state**: `{git['sha']}` on `{git['branch']}` (working tree {'DIRTY' if git['dirty'] else 'clean'} at run time)"
          + "".join(f"; resumed {r['started_utc']} at `{r['git']['sha']}` (working tree {'DIRTY' if r['git']['dirty'] else 'clean'})" for r in meta.get("resumes", [])),
          f"- **Coverage**: {10 - len(not_run)} of 10 (scenario, variant) combos ran" + (f"; NOT-RUN (fleet refusal): {', '.join(not_run)}. This record is PARTIAL and does not by itself complete issue #86" if not_run else ""),
