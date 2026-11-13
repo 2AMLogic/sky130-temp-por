@@ -298,8 +298,7 @@ push/PR:
 5. re-hashes every committed file a *citation* envelope recorded a hash for,
    via `manifests/check-citations.py`:
    - the artifact behind each `content_hash` pin
-     (`layout/temp_por_top/temp_por_top.gds`), resolved against the
-     envelope's own directory; and
+     (`layout/temp_por_top/temp_por_top.gds`); and
    - the two compare netlists behind each unpinned LVS citation, against the
      envelope's recorded `environment.layout_sha256` /
      `reference_sha256`.
@@ -312,6 +311,39 @@ push/PR:
    that no longer exists.
    `manifests/test_check_citations.py` covers the checker in
    `self-checks.yml`.
+
+   **Both shapes of indirection above those hashes are walked (#302).** An
+   item's `evidence` entry is either one citation object or a **list** of
+   them — item 11 cites `erc.json` and `lvs.json` together — and every
+   citation in a list is checked. An envelope's `file`, in turn, is either a
+   plain path string relative to the envelope's own directory (`drc.json`'s
+   `"temp_por_top.gds"`) or the schema-2 object
+   `{"path": ..., "scope": "repo"}`, whose `path` is relative to the repo
+   root (`erc.json`). The two resolve against different roots, so the
+   distinction is load-bearing rather than cosmetic.
+
+   Until #302 the checker skipped any entry that was not a citation object,
+   which silently dropped item 11 in full while the summary line still read
+   clean. Nothing was actually unhashed — item 11's `erc.json` pins the same
+   GDS as item 3 and its `lvs.json` is item 4's — so the coverage was
+   incidental to two other items rather than stated, which is the shape a
+   real gap arrives in. The run now reports **6** pairs where it reported 3.
+
+   **An entry the checker cannot map is an `UNMAPPABLE` failure, not a
+   skip** (`.loom/docs/ci-principles.md`): an evidence entry that is neither
+   a citation object nor a non-empty list of them, a citation naming no
+   string `file`, or a `file` object that is not `scope: "repo"` with a
+   string path (`klt` reports a file outside the repo as
+   `{"path": null, "scope": "external"}`, which carries nothing committed to
+   re-hash). These shapes are few and repo-controlled, so failing costs
+   nothing and silence costs the whole item. The label is deliberately not
+   `STALE` — nothing drifted, so "re-render the evidence" is the wrong
+   remedy; fix the manifest entry or the envelope instead.
+
+   This says nothing about an envelope's *contents*: a readable envelope
+   carrying no recognized hash shape still contributes zero pairs and stays
+   green, which is how the attestation envelopes of items 1, 2, 9 and 10
+   pass through here while step 4's `--check` owns them.
 
    **Decision (#303): `check-citations.py` does not re-hash
    `attestation.checks[]`.** #299 gave it a second branch that did, because
