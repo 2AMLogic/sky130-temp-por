@@ -49,7 +49,7 @@ sys.path.insert(0, str(SIM_DIR / "brownout-top"))
 
 import evidence_store  # noqa: E402
 import glitch_checker as gc  # noqa: E402
-import run_brownout_campaign as rb  # noqa: E402  (generic helpers: provenance, per-point logs, error classes)
+import run_brownout_campaign as rb  # noqa: E402  (generic helpers: provenance, corner ids, outcomes, scrub)
 import sim_common  # noqa: E402
 
 cr = sim_common.load_corner_run()
@@ -382,14 +382,7 @@ def analyze_request(req: dict, run_dir: Path, man: dict, corners_dir: Path, writ
     t_obs = man["stimulus"]["observation_after_recovery_s"]
     declared = corners_of(man)
     info = {"tag": req["tag"], "class": cls, "kind": req["kind"], "stimulus": st, "tstop_s": tstop_of(req, man), "tmax_s": tmax_of(req, man)}
-    attempts = []
-    for ad in sorted(d.glob("attempt*")):
-        try:
-            body = json.loads((ad / "report.json").read_text()) if (ad / "report.json").is_file() else {}
-            msg = (body.get("error") or {}).get("message") or ("report status " + str(body.get("status")))
-        except json.JSONDecodeError:
-            msg = "unparseable report"
-        attempts.append(scrub(msg, run_dir)[:400])
+    attempts = sim_common.attempt_messages(d, run_dir, REPO_ROOT)
     if attempts:
         info["failed_earlier_attempts"] = attempts
     rep, why = None, None
@@ -443,7 +436,7 @@ def analyze_request(req: dict, run_dir: Path, man: dict, corners_dir: Path, writ
             res = {"verdict": "ERROR", "fail_codes": [], "unresolved_reasons": [], "class": cls, "detail": "deck_attribution: " + "; ".join(attr), "error_class": "deck_attribution"}
         elif wave is None:
             res["detail"] = load_err or "no waveform artifact for this corner"
-            res["error_class"] = rb.classify_error(c, log_text)
+            res["error_class"] = sim_common.classify_error(c, log_text)
         pt["outcome"] = res["verdict"]
         pt["check"] = res
         if wave is not None and res["verdict"] != "ERROR":
@@ -464,7 +457,7 @@ def analyze_request(req: dict, run_dir: Path, man: dict, corners_dir: Path, writ
                       f"# process={proc} temp={cr.fmt_temp(temp)}C start_supply={vf:.2f}V {desc} tstop={tstop_of(req, man):.6g}s",
                       f"# klt status: {c.get('status')}   runtime on runner: {c.get('runtime_s')} s   outcome: {pt['outcome']}"]
             (corners_dir / req["tag"]).mkdir(parents=True, exist_ok=True)
-            (corners_dir / req["tag"] / f"{cid}.log").write_text(rb.point_log(c, header, run_dir))
+            (corners_dir / req["tag"] / f"{cid}.log").write_text(sim_common.point_log(c, header, run_dir, REPO_ROOT))
         pts.append(pt)
     for p, t, v in declared:
         cid = corner_id(p, t, v)

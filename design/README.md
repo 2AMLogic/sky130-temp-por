@@ -140,7 +140,12 @@ deck belongs to the testbench.
 `netlist.py` then rewrites the absolute paths xschem records in its
 `sch_path`/`sym_path` comments to repo-relative form and prepends a
 provenance header, making the export **deterministic**: the same sources
-produce byte-identical netlists on any machine.
+produce byte-identical netlists on any machine. For the same reason
+`normalize()` also drops `klt netlist`'s own `** klt-netlist-inputs:` line
+(klt 0.9.x and later): it names the installed `xschem_version`, so committing
+it would pin `design/netlist/*.spice` to one toolchain — and the PDK revision
+it reports is already enforced, harder, by `find_pdk()` against `sim/pdk.json`
+(issue #295).
 
 ### What `--check` verifies
 

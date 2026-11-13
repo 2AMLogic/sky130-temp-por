@@ -234,26 +234,6 @@ def cmd_crosscheck(args) -> int:
 # --------------------------------------------------------------------------
 
 
-def point_log(corner: dict, d_out: Path, header: list[str], run_dir: Path) -> str:
-    art = corner.get("artifacts") or {}
-    deck = Path(art["deck"]).read_text() if art.get("deck") and Path(art["deck"]).is_file() else "(no deck retrieved)"
-    log = Path(art["log"]).read_text() if art.get("log") and Path(art["log"]).is_file() else "(no ngspice log retrieved)"
-    lines = list(header) + [""]
-    lines += ["# ==== klt sim deck (exact input given to ngspice on the runner) ====", *[f"| {ln}" for ln in deck.splitlines()], ""]
-    lines += ["# ==== klt diagnostics ====", *[f"| {dg.get('severity')}/{dg.get('code')}: {dg.get('message')}" for dg in corner.get("diagnostics", [])], ""]
-    lines += ["# ==== ngspice stdout+stderr ====", log.rstrip(), ""]
-    return scrub("\n".join(lines), run_dir)
-
-
-def classify_error(corner: dict, log_text: str) -> str:
-    if "could not find a valid modelname" in log_text:
-        return "model_not_found (no valid model bin for a drawn device geometry)"
-    codes = [d.get("code") for d in corner.get("diagnostics", [])]
-    if any(c and "timeout" in c for c in codes):
-        return "timeout"
-    return "error:" + ",".join(sorted({c for c in codes if c})) if codes else "error"
-
-
 def analyze_variant(variant: str, run_dir: Path, man: dict, corners_dir: Path, write: bool) -> dict:
     points, requests = [], []
     pdk_info = {}
@@ -262,14 +242,7 @@ def analyze_variant(variant: str, run_dir: Path, man: dict, corners_dir: Path, w
         d = run_dir / variant / tag
         rep_path = d / "report.json"
         req_rec = {"rate_v_per_s": rate, "tag": tag, "primary_rate": primary, "tstop_s": tstop_for(rate)}
-        attempts = []
-        for ad in sorted(d.glob("attempt*")):
-            try:
-                body = json.loads((ad / "report.json").read_text()) if (ad / "report.json").is_file() else {}
-                msg = (body.get("error") or {}).get("message") or ("report status " + str(body.get("status")))
-            except json.JSONDecodeError:
-                msg = "unparseable report"
-            attempts.append(scrub(msg, run_dir)[:400])
+        attempts = sim_common.attempt_messages(d, run_dir, REPO_ROOT)
         if attempts:
             req_rec["failed_earlier_attempts"] = attempts
         if not rep_path.is_file():
@@ -350,7 +323,7 @@ def analyze_variant(variant: str, run_dir: Path, man: dict, corners_dir: Path, w
                         rc.write_trace(corners_dir / tag / f"{cid}.trace.csv.gz", rows)
             if res is None:
                 pt["outcome"] = "ERROR"
-                pt["error_class"] = classify_error(c, log_text)
+                pt["error_class"] = sim_common.classify_error(c, log_text)
                 pt["check"] = None
             else:
                 pt["outcome"] = res["verdict"]
@@ -362,7 +335,7 @@ def analyze_variant(variant: str, run_dir: Path, man: dict, corners_dir: Path, w
                     f"# klt status: {c.get('status')}   runtime on runner: {c.get('runtime_s')} s   outcome: {pt['outcome']}",
                 ]
                 (corners_dir / tag).mkdir(parents=True, exist_ok=True)
-                (corners_dir / tag / f"{cid}.log").write_text(point_log(c, run_dir, header, run_dir))
+                (corners_dir / tag / f"{cid}.log").write_text(sim_common.point_log(c, header, run_dir, REPO_ROOT))
             points.append(pt)
     return {"points": points, "requests": requests, "fleet_pdk_report": pdk_info}
 

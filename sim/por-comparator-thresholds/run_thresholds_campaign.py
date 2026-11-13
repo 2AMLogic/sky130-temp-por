@@ -253,19 +253,7 @@ def analyze_variant(variant: str, run_dir: Path, man: dict, corners_dir: Path) -
         tag = rate_tag(rate)
         d = run_dir / variant / tag
         rq = {"rate_v_per_s": rate, "tag": tag, "primary_rate": primary, "tstop_s": tstop_for(rate, man)}
-        attempts = []
-        for ad in sorted(d.glob("attempt*"), key=lambda p: int(p.name[7:] or 0)):
-            body = None
-            # klt --format json writes a launch-failure error document to stderr with an empty stdout
-            for src in ("report.json", "klt.stderr"):
-                try:
-                    txt = (ad / src).read_text()
-                    body = json.loads(txt[txt.index("{"):]) if "{" in txt else None
-                except (json.JSONDecodeError, OSError, ValueError):
-                    body = None
-                if body:
-                    break
-            attempts.append(scrub((body.get("error") or {}).get("message") or f"report status {body.get('status')}", run_dir)[:400] if body else "unparseable report")
+        attempts = sim_common.attempt_messages(d, run_dir, REPO_ROOT)
         if attempts:
             rq["failed_earlier_attempts"] = attempts
         rp = d / "report.json"
