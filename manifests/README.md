@@ -51,6 +51,18 @@ so that workflow is self-hashed: make every workflow edit first, regenerate
 the item-10 envelope last, and confirm `--check` returns `match` before the
 final commit. `-o` writes only a passing envelope.
 
+A command spec may carry `"local_only": true` (item 1's five `derived[].check`
+entries and item 9's `cold_start` do, because they need xschem and the sky130
+PDK). The field is an *inventory* field, not a CLI flag, so it does not appear
+in `klt signoff --help`. It changes nothing about which files are hashed: a
+re-attestation (`-o`) runs the command as usual, and a `--check` skips it on
+**every** host — not only one lacking the toolchain — reporting
+`[SKIP] … (local_only, not run; committed outcome: …)` and carrying the
+attest-time outcome into `fresh_status`, so a committed failure still fails the
+gate. Marking a command `local_only` therefore makes `--check` runnable
+unconditionally in CI; it never makes a skipped command look like a passing
+one. See "CI: freshness is enforced, not remembered" below.
+
 ## Regenerate
 
 From the repo root (evidence paths in the manifest are repo-root-relative
@@ -102,19 +114,24 @@ part of the claim and travel with it):
   worker's PATH xschem, XSCHEM V3.4.7 (>= 3.4.5 is required; 3.4.4 does not
   evaluate `expr()`), against the sky130 PDK; no `--xschem-binary` pin and no
   `--backend batch`. **Limits:** it shows the committed netlists are what the
-  committed schematics export, not that the circuit is right. CI cannot
-  re-run the five `python3 design/netlist.py --check` freshness checks (no
-  xschem or PDK on a stock runner), so a schematic edit that stops
-  reproducing its netlist is still caught only locally. What CI *does*
-  enforce, since #299: `manifests/check-citations.py` re-hashes all 17 files
-  this envelope recorded a `content_hash` for and fails if any has been
-  edited since. That is the gap that let `design/netlist.py` sit stale in
-  this envelope from `6d11c6ec` until #298 with every job green — the
-  manifest pins the envelope to its *inventory* file's hash, never to the
-  sources, so nothing in the graded chain noticed. After editing anything in
-  the inventory, re-run `klt signoff --attest 1 --inventory
-  manifests/inventories/item-1.json -o manifests/attestations/item-1.json`
-  locally, then re-cite and re-render.
+  committed schematics export, not that the circuit is right. The five
+  `python3 design/netlist.py --check` freshness commands need xschem and the
+  PDK, so they are marked `"local_only": true` in the inventory and are
+  **never run under `--check` on any host** — including a worker that has
+  xschem (see "CI: freshness is enforced" below). A schematic edit that stops
+  reproducing its netlist is therefore caught only by re-attesting, or by
+  running `python3 design/netlist.py --check` directly. What `--check` *does*
+  enforce, on a stock runner and since #303 unconditionally: all 17 files
+  this envelope recorded a `content_hash` for are re-hashed, and the
+  inventory pin, the check count and every committed outcome are diffed, so
+  an edited source turns the `signoff` job red. That is the gap that let
+  `design/netlist.py` sit stale in this envelope from `6d11c6ec` until #298
+  with every job green — the manifest pins the envelope to its *inventory*
+  file's hash, never to the sources, so nothing in the graded chain noticed.
+  After editing anything in the inventory, re-run `klt signoff --attest 1
+  --inventory manifests/inventories/item-1.json -o
+  manifests/attestations/item-1.json` locally (that run *does* execute the
+  five freshness checks), then re-cite and re-render.
 - **Item 2 — Layout: `met`** via the hand-written artifact-anchored
   envelope `attestations/item-2.json` (#240; `klt signoff --attest` does not
   cover item 2, so `layout/bin/attest-layout.py` writes it). It binds, as a set
@@ -191,10 +208,14 @@ part of the claim and travel with it):
     result is right (the PVT-corner results are in `sim/*/records/`, graded by
     no klt check). The `pins` block (PDK `c6d73a35…`, ngspice 46, xschem
     3.4.7, klt) is recorded as claimed; klt checks it is non-empty, not that
-    the installed tools match. It needs xschem and the PDK, so CI cannot
-    re-attest it (below) — but since #299 CI does re-hash all 40 files this
-    envelope recorded a hash for, which is how 8 of them were found stale on
-    `main`.
+    the installed tools match. The cold start needs xschem and the PDK, so it is
+    marked `"local_only": true` and is **never run under `--check` on any
+    host**; re-attesting runs it, as does `python3 sim/bin/corner-run.py
+    sim/bias-core-smoke --dry-run` on its own. CI does re-attest the rest of
+    the envelope unconditionally (since #303): all 40 files this envelope
+    recorded a hash for are re-hashed — which is how 8 of them were found
+    stale on `main` — and the inventory pin, the check count and every
+    committed outcome are diffed.
   - **Item 10** (`item-10.json`, 10/10 checks): `README.md`, `LICENSE` and
     both workflows present, plus six stdlib-only audit commands
     `self-checks.yml` also runs (netlist pinout invariants, JSON
@@ -239,39 +260,72 @@ push/PR:
    any drift (a cited envelope's status changed, a report was regenerated
    against a new artifact, a stale pinned hash, a bumped `klt` with a new
    checklist) fails the build, and
-4. re-attests item 10 (`klt signoff --attest 10 ... --check`), and item 9
-   only where xschem exists: a stock runner has neither xschem nor the PDK,
-   so the step prints a `::warning::` and skips. Since #299 that skip is no
-   longer a hole in *file* freshness — step 5 re-hashes every file items 1
-   and 9 recorded a hash for, toolchain or not. What the skip still leaves
-   uncovered is the part that genuinely needs the toolchain: item 9's cold
-   start and item 1's five `python3 design/netlist.py --check` runs. Run
-   those locally after changing `sim/` or `design/`, and
-5. re-hashes every committed file a cited envelope recorded a hash for, via
-   `manifests/check-citations.py`:
+4. re-attests items 10, 9 and 1 against their committed envelopes
+   (`klt signoff --attest N ... --check`), **unconditionally — no toolchain
+   guard, no skipped step**. Each `--check` re-hashes every file that item's
+   inventory lists (4 + 40 + 17 = 61 today) and diffs the whole envelope:
+   the inventory pin, the check count, and every committed check outcome. So
+   an edit to any attested design source, testbench or hygiene file that
+   lands without a re-attestation turns this job red.
+
+   **What `--check` does not run, and on no host:** item 1's five `python3
+   design/netlist.py --check` freshness commands and item 9's cold start are
+   marked `"local_only": true` in their inventories. klt skips *every*
+   `local_only` command whenever `--check` is given — this is not
+   conditional on the toolchain being absent, so a local `--check` on a
+   worker that *has* xschem does not run them either (#303). Each is
+   reported as
+
+   ```
+   [SKIP] cold_start cold_start: python3 sim/bin/corner-run.py sim/bias-core-smoke --dry-run (local_only, not run; committed outcome: pass)
+   ```
+
+   carrying the attest-time outcome, never counted as passed by that run. A
+   check that cannot run must never look like one that passed
+   (`.loom/docs/ci-principles.md`), and this is what that looks like in the
+   job log.
+
+   **Re-verify the skipped commands locally** after changing `design/` or
+   `sim/`, by either route:
+   - re-attest, which does run them (and refuses to write a failing
+     envelope): `klt signoff --attest 1 --inventory
+     manifests/inventories/item-1.json -o manifests/attestations/item-1.json`
+     (likewise `--attest 9`); or
+   - run them directly: `python3 design/netlist.py --check` and
+     `python3 sim/bin/corner-run.py sim/bias-core-smoke --dry-run`.
+
+   Both need xschem >= 3.4.5 and the sky130 PDK. And
+5. re-hashes every committed file a *citation* envelope recorded a hash for,
+   via `manifests/check-citations.py`:
    - the artifact behind each `content_hash` pin
      (`layout/temp_por_top/temp_por_top.gds`), resolved against the
-     envelope's own directory;
+     envelope's own directory; and
    - the two compare netlists behind each unpinned LVS citation, against the
      envelope's recorded `environment.layout_sha256` /
-     `reference_sha256`; and
-   - since #299, every `attestation.checks[]` entry of items 1, 9 and 10
-     that carries both a `path` and a `content_hash` — 61 repo-root-relative
-     files today (17 + 40 + 4). Checks with no recorded hash (`command`,
-     `pin`) are skipped rather than counted, because this script cannot
-     re-run them.
+     `reference_sha256`.
 
-   The third bullet closes a gap the rest of the chain structurally cannot
-   see: the manifest pins an attestation envelope to its *inventory* file's
-   hash, so editing an attested source left the pin, the re-rendered report
-   and the byte-compare all green while the envelope described files that no
-   longer existed — item 1's `design/netlist.py` was stale from `6d11c6ec`
-   until #298 repaired it, and 8 of item 9's 40 recorded files were stale on
-   `main` when this check first ran. A layout change, or a design or
-   testbench edit, that lands without re-rendering or re-attesting its
-   evidence now fails instead of rotting.
+   This closes the same class of gap for the citation shapes that step 4's
+   `--check` closes for the attestation shapes: `klt signoff --manifest`
+   grades a citation against the hash the envelope *recorded*, never against
+   the file on disk, so a redrawn GDS would otherwise leave the pin, the
+   re-rendered report and the byte-compare all agreeing with an artifact
+   that no longer exists.
    `manifests/test_check_citations.py` covers the checker in
    `self-checks.yml`.
+
+   **Decision (#303): `check-citations.py` does not re-hash
+   `attestation.checks[]`.** #299 gave it a second branch that did, because
+   items 1 and 9 could not be re-attested in CI at all. Marking their
+   toolchain-bound commands `local_only` removed that premise: step 4 now
+   re-hashes the same 61 files on the same runner, and more besides. Keeping
+   both would be two mechanisms for one behaviour, and the repo-owned one
+   hides the pinned tool's feature this canary exists to exercise, so the
+   attestation branch was removed and the script narrowed back to the
+   citation shapes. The one thing lost is klt's drift diff naming the
+   drifted file by index (`attestation.checks.17.content_hash`) rather than
+   by path, where the repo-owned checker printed a `STALE <path>` line; that
+   is a diagnostics gap in the tool, filed as klayout-tools#5460 per the
+   friction protocol, not worked around here.
 
 When the layout or design evidence moves, regenerate the report
 (`Regenerate` above), update any affected citation or pin in the manifest,
@@ -308,7 +362,10 @@ Two workflows run on every push to `main` and every PR:
     stay human-curated and are not checked).
 
 Not covered: `python3 design/netlist.py --check` (committed netlists match the
-schematics) needs xschem and the sky130 PDK, so it is not runnable on a stock
-runner -- run it locally after schematic edits. Also not covered: any SPICE
+schematics) and item 9's cold start need xschem and the sky130 PDK, so they are
+not runnable on a stock runner -- they are marked `local_only` in their
+inventories and are skipped by every `klt signoff --attest ... --check`, on this
+or any host. Run them locally after schematic or `sim/` edits (or re-attest,
+which runs them). Also not covered: any SPICE
 campaign, `layout/bin/compose-cell.py --check` / layout composition, DRC/LVS,
 and JSON schema validation (only well-formedness is checked).

@@ -55,7 +55,7 @@ jobs:
       - name: Artifact manifests are well-formed, artifact-only and byte-free
         run: python3 -I .github/scripts/check_artifact_manifests.py
 
-      - name: Citation-freshness checker selftest (attested-file re-hash, citation branches, skipped checks)
+      - name: Citation-freshness checker selftest (DRC/extract artifact and LVS compare branches)
         run: python3 -I manifests/test_check_citations.py
 
       - name: PDK pin enforcement tests (refuse a tree whose revision is not the sim/pdk.json pin)

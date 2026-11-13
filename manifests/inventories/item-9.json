@@ -2,7 +2,7 @@
   "schema_version": 1,
   "kind": "t1-attestation-inventory",
   "t1_item": 9,
-  "description": "Testbenches shipped: every sim/<experiment>/ testbench schematic, experiment manifest and campaign runner, plus the corner runner and the PDK pin (sim/pdk.json is hashed here, so a PDK re-pin drifts this attestation). The cold start is the runner's --dry-run on the smoke experiment: it netlists the testbench with xschem and prints the corner list and one deck, writing nothing under sim/. It does not run ngspice; the full PVT matrices are recorded under sim/*/records/. It needs xschem and the sky130 PDK, so it cannot run on a stock CI runner. See manifests/README.md.",
+  "description": "Testbenches shipped: every sim/<experiment>/ testbench schematic, experiment manifest and campaign runner, plus the corner runner and the PDK pin (sim/pdk.json is hashed here, so a PDK re-pin drifts this attestation). The cold start is the runner's --dry-run on the smoke experiment: it netlists the testbench with xschem and prints the corner list and one deck, writing nothing under sim/. It does not run ngspice; the full PVT matrices are recorded under sim/*/records/. It needs xschem and the sky130 PDK, which a stock CI runner has not, so the cold start is marked local_only: `klt signoff --attest 9 ... --check` never runs it on any host -- it reports [SKIP] and carries the committed outcome, while still re-hashing every file listed here. Re-attesting (`--attest 9 ... -o`) does run it, as does `python3 sim/bin/corner-run.py sim/bias-core-smoke --dry-run` on its own. See manifests/README.md.",
   "testbenches": [
     "sim/bias-core-op-branch/run_op_branch.py",
     "sim/bias-core-smoke/experiment.json",
@@ -51,7 +51,8 @@
       "sim/bin/corner-run.py",
       "sim/bias-core-smoke",
       "--dry-run"
-    ]
+    ],
+    "local_only": true
   },
   "pins": {
     "pdk": {
