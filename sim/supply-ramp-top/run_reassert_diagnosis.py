@@ -352,28 +352,18 @@ def load_case(case, run_dir, man, corners_dir, write):
     d = run_dir / case["id"]
     rec = dict(case)
     rec.update({"tstop_s": camp.tstop_for(case["rate"])})
-    rp = d / "report.json"
     attempts = sim_common.attempt_messages(d, run_dir, camp.REPO_ROOT)
     if attempts:
         rec["failed_earlier_attempts"] = attempts
-    if not rp.is_file():
-        rec["outcome"] = "NOT SUBMITTED"
+    rep, why = sim_common.load_request_report(d, run_dir, camp.REPO_ROOT)
+    if rep is None:
+        rec["outcome"] = why
         rec["check"] = None
         return rec
-    try:
-        rep = json.loads(rp.read_text())
-    except json.JSONDecodeError:
-        rec["outcome"] = "NO JSON from klt: " + camp.scrub((d / "klt.stderr").read_text()[-500:], run_dir)
-        rec["check"] = None
-        return rec
-    if "corners" not in rep:
-        rec["outcome"] = "klt error (no corners reported): " + camp.scrub(str((rep.get("error") or {}).get("message", rep))[:500], run_dir)
-        rec["check"] = None
-        return rec
-    remote = (rep.get("environment") or {}).get("remote") or {}
-    rec.update({"job_id": remote.get("job_id"), "state": remote.get("state"), "instance_type": remote.get("instance_type"),
-                "lifecycle": remote.get("lifecycle"), "runner_klt_version": remote.get("runner_klt_version"),
-                "elapsed_seconds": remote.get("elapsed_seconds"), "klt_status": rep.get("status")})
+    rec.update(sim_common.fleet_job_fields(rep))
+    # `outcome` is reused below for this case's verdict, so the report's own status is
+    # also kept under `klt_status` -- the key this renderer's records have always used.
+    rec["klt_status"] = rep.get("status")
     pt = man["reassert_diagnosis"]["points"][case["point"]]
     vf = pt["supply_v"]
     c = (rep.get("corners") or [None])[0]
