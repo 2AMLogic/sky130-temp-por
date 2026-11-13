@@ -5,7 +5,9 @@ Run: python3 -I sim/supply-ramp-top/test_reassert_diagnosis.py
 """
 from __future__ import annotations
 
+import json
 import sys
+import tempfile
 import unittest
 from pathlib import Path
 
@@ -72,6 +74,62 @@ class VerdictTest(unittest.TestCase):
     def test_unresolved_grid_never_counts_as_physical(self):
         runs = [run("b", "exact", physical=False, n_re=1), run("t7", "solver", resolved=False), run("rt", "solver", resolved=False)]
         self.assertEqual(rd.verdict_for_point(runs)[0], "unresolved")
+
+
+class FleetNgspiceTest(unittest.TestCase):
+    """`load_case()` must read the fleet's ngspice version out of the case's own klt log.
+
+    Until issue #297 this driver was the one fleet runner that did not, and its record
+    stated a constant (`ngspice-46 (per fleet log)`) that had gone stale by two releases.
+    """
+
+    def _case(self, tmp, log_body):
+        """A klt report for one case whose corner carries `log_body` as its log and no
+        waveform (so `load_case` returns right after reading the provenance)."""
+        man = rd.sim_common.load_manifest(rd.MANIFEST)
+        case = rd.build_matrix(man)[0]
+        d = Path(tmp) / case["id"]
+        d.mkdir(parents=True)
+        log = d / "corner.log"
+        if log_body is not None:
+            log.write_text(log_body)
+        (d / "report.json").write_text(json.dumps({
+            "status": "ok", "environment": {"remote": {"job_id": "j1", "runner_klt_version": "0.9.0"}},
+            "corners": [{"artifacts": {"log": str(log)} if log_body is not None else {}}],
+        }))
+        return rd.load_case(case, Path(tmp), man, Path(tmp) / "corners", False)
+
+    def test_version_comes_from_the_log(self):
+        with tempfile.TemporaryDirectory() as tmp:
+            rec = self._case(tmp, "Note: Compatibility modes selected\nngspice-47 done\n")
+        self.assertEqual(rec["ngspice"], "ngspice-47")
+        self.assertEqual(rec["runner_klt_version"], "0.9.0")
+
+    def test_log_without_a_banner_is_none(self):
+        with tempfile.TemporaryDirectory() as tmp:
+            rec = self._case(tmp, "no version banner here\n")
+        self.assertIsNone(rec["ngspice"])
+
+    def test_missing_log_is_none_not_a_literal(self):
+        with tempfile.TemporaryDirectory() as tmp:
+            rec = self._case(tmp, None)
+        self.assertIsNone(rec["ngspice"])
+
+    def test_record_block_reports_unknown_when_nothing_was_observed(self):
+        """A case set with no ngspice banner anywhere must say so, not name a version."""
+        _, tools = rd.sim_common.record_pdk_tools(
+            _Pdk(), {"open_pdks_commit": "a" * 40}, {"klt_client": "klt 0.9.0"},
+            [{"ngspice": None}], [{"runner_klt_version": None}],
+            lib_file=None, root=None, host_tools=False, fleet_note=None, xschem_note=None,
+        )
+        self.assertEqual(tools["fleet_ngspice"], "unknown")
+        self.assertEqual(tools["fleet_runner_klt"], "unknown")
+
+
+class _Pdk:
+    variant = "sky130A"
+    installed_commit = "a" * 40
+    matches_pin = True
 
 
 if __name__ == "__main__":

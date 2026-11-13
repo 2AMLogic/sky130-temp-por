@@ -407,7 +407,12 @@ def cmd_record(args) -> int:
             with gzip.open(cdir / f"{n}.traces.json.gz", "wt") as fh:
                 json.dump(traces[n], fh)
     allp = [p for n in names for p in per[n]["points"].values()]
-    ngs = sorted({p["ngspice"] for p in allp if p.get("ngspice")})
+    # Like the parent campaign, this record states the fleet/host split in its own top-level
+    # `fleet_note` (jobs included) and its DUT in `provenance`, so `tools` does not repeat them.
+    pdk_d, tools_d = sim_common.record_pdk_tools(
+        pdk, pin, meta, allp, [per[n]["requests"] for n in names],
+        fleet_note=None, xschem_note=None,
+    )
     bo = [r["baseline_vs_original_rel"] for r in cmp_["rows"] if "baseline_vs_original_rel" in r]
     both_ok = [r["id"] for r in cmp_["rows"] if "baseline_vs_original_rel" in r]
     flips = [r["id"] for r in cmp_["rows"] if r["original_status"] and r["runs"]["baseline"]["status"] != r["original_status"]]
@@ -427,12 +432,12 @@ def cmd_record(args) -> int:
     record = {
         "record_id": record_id, "kind": "solver-sensitivity replicate (issue #160)", "timestamp": now.strftime("%Y-%m-%dT%H:%M:%SZ"), "author": args.author or cr.default_author(), "supersedes": args.supersedes,
         "variants": names, "variant_options": {n: sens(man)["variants"][n]["options"] for n in names}, "manifest_sensitivity": sens(man),
-        "pdk": {"variant": pdk.variant, "installed_commit": pdk.installed_commit, "pinned_commit": pin["open_pdks_commit"], "matches_pin": pdk.matches_pin, "lib_file": rc.MODEL_LIB + " (resolved on the runner as /opt/pdk/sky130A/...)"},
-        "tools": {"ngspice": f"{cr.first_line(['ngspice', '-v'])} (host; the grid ran on the fleet)", "xschem": cr.first_line(["xschem", "--version"]), "platform": cr.tool_versions()["platform"], "python": cr.tool_versions()["python"], "klt_client": meta["klt_client"]},
+        "pdk": pdk_d,
+        "tools": tools_d,
         "git": gi, "run_git": meta["git"],
         "provenance": {"dut_sha256": meta["dut_sha256"], "testbench_sha256": meta["testbench_sha256"], "manifest_sha256": meta["manifest_sha256"], "hashes": meta.get("hashes", {})},
         "fleet_pdk_note": "the fleet runner does not report its PDK commit; the host pin is " + pin["open_pdks_commit"] + " and the runner resolves the library under /opt/pdk/sky130A (commit unavailable, not verified)",
-        "fleet_note": f"jobs { {n: reqs[n].get('job_id') for n in names} }; runner klt {', '.join(sorted({reqs[n].get('runner_klt_version') for n in names if reqs[n].get('runner_klt_version')})) or 'unknown'}; fleet ngspice {', '.join(ngs) or 'unknown'}; client {meta['klt_client']}; batch.runner_version_check=warn",
+        "fleet_note": f"jobs { {n: reqs[n].get('job_id') for n in names} }; runner klt {tools_d['fleet_runner_klt']}; fleet ngspice {tools_d['fleet_ngspice']}; client {meta['klt_client']}; batch.runner_version_check=warn",
         "requests": reqs, "points": {n: per[n]["points"] for n in names}, "comparison": cmp_, "baseline_vs_original_text": bvo, "limitations": limits,
         "original_record": "sim/iq-top/records/20261009-191705-df85523.json",
         "links": {"record": f"sim/iq-top/records/{record_id}.md", "json": f"sim/iq-top/records/{record_id}.json", "corners_dir": f"sim/iq-top/corners/{record_id}/", "netlist_snapshots": f"sim/iq-top/netlist-snapshots/{record_id}/",

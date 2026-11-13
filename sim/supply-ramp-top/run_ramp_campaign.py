@@ -31,7 +31,6 @@ import functools
 import gzip
 import json
 import os
-import re
 import shutil
 import subprocess
 import sys
@@ -90,8 +89,9 @@ def tb_netlist_head(run_dir: Path, pdk) -> str:
     """Netlist the testbench schematic with xschem; keep only the testbench part.
 
     The DUT subcircuits come from the committed design/netlist/temp_por_top.spice
-    export (xschem 3.4.4 on this host leaves ``expr()`` device-parameter forms
-    that ngspice cannot evaluate; the committed export was produced by 3.4.7).
+    export: host xschem leaves ``expr()`` device-parameter forms that ngspice
+    cannot evaluate, which the committed export does not carry.  The versions in
+    play are recorded per run in the record's ``tools`` block, never stated here.
     """
     return sim_common.netlist_tb_head(TB_SCH, run_dir / "tb", pdk)
 
@@ -310,7 +310,6 @@ def analyze_variant(variant: str, run_dir: Path, man: dict, corners_dir: Path, w
             art = c.get("artifacts") or {}
             wave_path = Path(art["waveform"]) if art.get("waveform") else None
             log_text = Path(art["log"]).read_text() if art.get("log") and Path(art["log"]).is_file() else ""
-            ngv = re.findall(r"(ngspice-\d+) done", log_text)
             pt = {
                 "id": cid,
                 "variant": variant,
@@ -322,7 +321,7 @@ def analyze_variant(variant: str, run_dir: Path, man: dict, corners_dir: Path, w
                 "supply_v": vf,
                 "klt_status": c.get("status"),
                 "runtime_s": c.get("runtime_s"),
-                "ngspice": ngv[0] if ngv else None,
+                "ngspice": sim_common.fleet_ngspice(log_text),
                 "measurements": {m["name"]: m.get("value") for m in c.get("measurements", [])},
                 "diagnostics": [{"severity": dg.get("severity"), "code": dg.get("code"), "message": scrub(dg.get("message", ""), run_dir)[:400]} for dg in c.get("diagnostics", [])],
             }
@@ -577,19 +576,18 @@ def cmd_record(args) -> int:
                 if fl and fl["check"]:
                     fc = fl["check"]
                     xc = {
-                        "local": {"ngspice": "ngspice-42 (host)", "t_release_s": la["resetn"]["t_release_s"], "end_v": la["resetn"]["end_v"], "por_raw_vdd_v": la["por_raw"]["vdd_at_rise_v"], "verdict": la["transition_verdict"]},
+                        "local": {"ngspice": f"{sim_common.host_ngspice_tag()} (host)", "t_release_s": la["resetn"]["t_release_s"], "end_v": la["resetn"]["end_v"], "por_raw_vdd_v": la["por_raw"]["vdd_at_rise_v"], "verdict": la["transition_verdict"]},
                         "fleet": {"ngspice": fl["ngspice"], "t_release_s": fc["resetn"]["t_release_s"], "end_v": fc["resetn"]["end_v"], "por_raw_vdd_v": fc["por_raw"]["vdd_at_rise_v"], "verdict": fc["transition_verdict"]},
                     }
                     xc["text"] = (
                         f"tt / 27 C / 3.30 V / 10 kV/s, variant {variant}: local {xc['local']['ngspice']} released at {xc['local']['t_release_s'] * 1e3:.5g} ms "
                         f"(RESETn end {xc['local']['end_v']:.5g} V, POR_RAW rose at VDD={xc['local']['por_raw_vdd_v']:.4g} V); fleet {xc['fleet']['ngspice']} released at "
                         f"{xc['fleet']['t_release_s'] * 1e3:.5g} ms (end {xc['fleet']['end_v']:.5g} V, VDD={xc['fleet']['por_raw_vdd_v']:.4g} V). "
-                        "The fleet PDK commit is not reported by runner klt 0.5.0; agreement of the two engines here is the only evidence that the fleet model library matches the pin."
+                        "The fleet PDK commit is not reported by the runner; agreement of the two engines here is the only evidence that the fleet model library matches the pin."
                     )
         n_wave = sum(1 for p in pts if p["check"] and "resetn" in p["check"])
         v = man["variants"][variant]
-        ngs = sorted({p["ngspice"] for p in pts if p["ngspice"]})
-        runners = sorted({r.get("runner_klt_version") for r in res["requests"] if r.get("runner_klt_version")})
+        pdk_d, tools_d = sim_common.record_pdk_tools(pdk, pin, meta, pts, res["requests"])
         art_manifest, art_summary = evidence_store.store_or_exit(SLUG, record_id, corners_dir)
         record = {
             "record_id": record_id,
@@ -598,18 +596,8 @@ def cmd_record(args) -> int:
             "supersedes": args.supersedes,
             "experiment": {k: man[k] for k in ("slug", "title", "claim", "provenance", "provenance_source", "statistical_convention")},
             "variant": {"name": variant, "description": v["description"], "netlist_edit": v["netlist_edit"]},
-            "pdk": {"root": "<host $PDK_ROOT>", "variant": pdk.variant, "installed_commit": pdk.installed_commit, "pinned_commit": pin["open_pdks_commit"], "matches_pin": pdk.matches_pin, "lib_file": MODEL_LIB + " (resolved on the runner as /opt/pdk/sky130A/...)"},
-            "tools": {
-                "ngspice": f"{cr.first_line(['ngspice', '-v'])} (host; the grid ran on the fleet)",
-                "xschem": cr.first_line(["xschem", "--version"]),
-                "platform": cr.tool_versions()["platform"],
-                "python": cr.tool_versions()["python"],
-                "klt_client": meta["klt_client"],
-                "fleet_runner_klt": ", ".join(runners) or "unknown",
-                "fleet_ngspice": ", ".join(ngs) or "unknown",
-                "fleet_note": "client/runner klt version skew accepted with batch.runner_version_check=warn; the 0.5.0 runner ignores options.ngspice_init and expr measurements, so only .meas cards and a netlist-carried `set ng_nomodcheck` are used",
-                "xschem_note": "host xschem is 3.4.4 and leaves expr() device parameters unevaluated (the committed design/netlist export was made with 3.4.7), so only the testbench is netlisted by xschem here and the DUT is spliced from the committed design/netlist/temp_por_top.spice",
-            },
+            "pdk": pdk_d,
+            "tools": tools_d,
             "git": git_info,
             "matrix": {
                 "process": man["corners"]["process"],

@@ -428,9 +428,8 @@ def analyze_request(req: dict, run_dir: Path, man: dict, corners_dir: Path, writ
         wave_path = Path(art["waveform"]) if art.get("waveform") else None
         log_text = Path(art["log"]).read_text() if art.get("log") and Path(art["log"]).is_file() else ""
         deck_text = Path(art["deck"]).read_text() if art.get("deck") and Path(art["deck"]).is_file() else ""
-        ngv = re.findall(r"(ngspice-\d+) done", log_text)
         pt = {"id": cid, "tag": req["tag"], "class": cls, "process": proc, "temperature_c": temp, "supply_v": vf, "klt_status": c.get("status"), "runtime_s": c.get("runtime_s"),
-              "ngspice": ngv[0] if ngv else None, "measurements": {m["name"]: m.get("value") for m in c.get("measurements", [])},
+              "ngspice": sim_common.fleet_ngspice(log_text), "measurements": {m["name"]: m.get("value") for m in c.get("measurements", [])},
               "diagnostics": [{"severity": dg.get("severity"), "code": dg.get("code"), "message": scrub(dg.get("message", ""), run_dir)[:400]} for dg in c.get("diagnostics", [])]}
         wave, load_err = None, None
         if wave_path is not None and wave_path.is_file():
@@ -688,8 +687,8 @@ def cmd_record(args) -> int:
             if (run_dir / "run.json").is_file():
                 shutil.copyfile(run_dir / "run.json", snap_dir / "run.json")
         fails = sim_common.submit_failures(requests)
-        ngs = sorted({p["ngspice"] for p in points if p.get("ngspice")})
-        runners = sorted({q.get("runner_klt_version") for q in requests if q.get("runner_klt_version")})
+        pdk_d, tools_d = sim_common.record_pdk_tools(pdk, pin, meta, points, requests)
+        pdk_d["fleet_pdk_report"] = fleet_pdk
         cnt = declared_counts(man, cls)
         n_graded = sum(1 for p in points if p["outcome"] != "NOT_COVERED")
         art_manifest, art_summary = evidence_store.store_or_exit(SLUG, record_id, corners_dir) if staged else (None, None)
@@ -698,13 +697,8 @@ def cmd_record(args) -> int:
             "experiment": {k: man[k] for k in ("slug", "title", "claim", "provenance", "provenance_source", "statistical_convention")},
             "class_info": man["classes"][cls],
             "injection": man["injection"] if cls == gc.CLASS_A else None,
-            "pdk": {"root": "<host $PDK_ROOT>", "variant": pdk.variant, "installed_commit": pdk.installed_commit, "pinned_commit": pin["open_pdks_commit"], "matches_pin": pdk.matches_pin,
-                    "lib_file": MODEL_LIB + " (resolved on the runner as /opt/pdk/sky130A/...)", "fleet_pdk_report": fleet_pdk},
-            "tools": {"ngspice": f"{cr.first_line(['ngspice', '-v'])} (host; the grid ran on the fleet)", "xschem": cr.first_line(["xschem", "--version"]),
-                      "platform": cr.tool_versions()["platform"], "python": cr.tool_versions()["python"], "klt_client": meta.get("klt_client"),
-                      "fleet_runner_klt": ", ".join(runners) or "unknown", "fleet_ngspice": ", ".join(ngs) or "unknown",
-                      "fleet_note": sim_common.FLEET_NOTE,
-                      "xschem_note": sim_common.XSCHEM_NOTE},
+            "pdk": pdk_d,
+            "tools": tools_d,
             "git": gi, "run_source": meta.get("source", {}), "deck_drift": drift, "run_meta": {k: meta.get(k) for k in ("run_id", "started_utc", "submitted_tags", "retries")},
             "matrix": {"process": man["corners"]["process"], "temperature_c": man["corners"]["temperature_c"], "supply_v": man["corners"]["supply_v"],
                        "n_requests": cnt["requests"], "points_per_request": cnt["points_per_request"], "n_points": cnt["points"],
