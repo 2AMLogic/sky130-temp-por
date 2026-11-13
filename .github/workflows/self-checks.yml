@@ -96,6 +96,9 @@ jobs:
           python3 -I sim/glitch-top/glitch_checker.py
           python3 -I sim/glitch-top/selftest/test_glitch.py
 
+      - name: Netlist normalize() drops klt's provenance line and nothing else
+        run: python3 -I design/test_netlist_normalize.py
+
       - name: Committed netlists satisfy the pinout invariants
         run: python3 design/check_committed_netlists.py
 

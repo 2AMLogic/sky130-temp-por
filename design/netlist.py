@@ -82,6 +82,18 @@ RATIFIED_TOP_PORTS = ["VDD", "VSS", "PTAT", "CTAT", "RESETn"]
 SYM_PIN_RE = re.compile(r"^B\s+\d+\s+\S+\s+\S+\s+\S+\s+\S+\s*\{(.*)\}\s*$")
 SCH_PIN_RE = re.compile(r"^C\s+\{devices/(i|o|io)pin\.sym\}\s+.*?\{(.*)\}\s*$")
 
+# ``klt netlist`` (>= 0.9.x) prepends a provenance comment naming its own
+# inputs, e.g.
+#   ** klt-netlist-inputs: {"pdk_variant": "sky130A", "rcfile": "xschemrc",
+#                           "xschem_version": "3.4.7"}
+# :func:`normalize` drops that whole line instead of committing it (issue
+# #295). Its *presence* depends on the klt version and its *content* on the
+# installed xschem version, so committing it would pin design/netlist/*.spice
+# to one toolchain and break this module's byte-identical-on-any-machine
+# promise. Nothing is lost: the PDK revision the line names is already
+# enforced -- harder -- by :func:`find_pdk` against sim/pdk.json.
+KLT_INPUTS_PREFIX = "** klt-netlist-inputs:"
+
 # -- inlined SPICE .subckt parsing (see module docstring: ported from
 # gf180-temp-por/layout/lvs_reference.py's logical_lines/subckt_ports,
 # stdlib-only, no PDK dependency) --------------------------------------
@@ -190,11 +202,19 @@ def cells() -> list[str]:
 
 
 def normalize(text: str) -> str:
-    """Make xschem output machine-independent (and therefore diffable)."""
+    """Make xschem/klt output machine-independent (and therefore diffable).
+
+    Absolute repo paths become repo-relative, trailing whitespace goes, and
+    any whole line starting with :data:`KLT_INPUTS_PREFIX` is dropped (see
+    that constant for why it must not reach a committed netlist). Only a
+    line *starting* with the marker is removed -- a line that merely
+    contains the text is left alone, since that would be circuit content.
+    """
     text = text.replace(str(REPO_ROOT) + os.sep, "")
     # Trailing whitespace is not load bearing and varies with symbol text.
-    text = "\n".join(line.rstrip() for line in text.splitlines())
-    return text.rstrip("\n") + "\n"
+    lines = [line.rstrip() for line in text.splitlines()]
+    lines = [line for line in lines if not line.startswith(KLT_INPUTS_PREFIX)]
+    return "\n".join(lines).rstrip("\n") + "\n"
 
 
 def export_cell(cell: str, outdir: Path, pdk) -> str:
