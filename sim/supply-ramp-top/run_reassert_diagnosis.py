@@ -22,7 +22,6 @@ Stages:  matrix | run | record
 from __future__ import annotations
 
 import argparse
-import concurrent.futures
 import json
 import math
 import os
@@ -106,11 +105,11 @@ def netlist_for(head: str, man: dict, case: dict) -> str:
     return pre + "\n".join(extra) + "\n" + marker + post
 
 
-def request_for(man: dict, case: dict, backend: str = "batch") -> dict:
+def request_for(man: dict, case: dict, backend: str = "batch", capacity_wait_s: float = 0) -> dict:
     d = man["reassert_diagnosis"]
     pt = d["points"][case["point"]]
     v = d["variants"][case["variant"]]
-    req = camp.build_request("netlist.spice", case["rate"], man, backend)
+    req = camp.build_request("netlist.spice", case["rate"], man, backend, capacity_wait_s)
     req["corners"] = {"process": [pt["process"]], "supply_v": {"vset": [pt["supply_v"]]}, "temperature_c": [pt["temperature_c"]]}
     tstop = camp.tstop_for(case["rate"])
     tmax = v.get("tmax_s", camp.TMAX_S)
@@ -131,30 +130,20 @@ def cmd_matrix(args) -> int:
     return 0
 
 
-def submit_case(case, head, man, run_dir):
-    res = sim_common.submit_prepared(
-        run_dir / case["id"], netlist_for(head, man, case), request_for(man, case),
+def submit_case(case, head, man, run_dir, capacity_wait_s=0):
+    return sim_common.submit_prepared(
+        run_dir / case["id"], netlist_for(head, man, case), request_for(man, case, capacity_wait_s=capacity_wait_s),
         f"{case['id']} -> batch fleet", case["id"])
-    return {"case": case["id"], **res}
 
 
 def cmd_run(args) -> int:
     man = sim_common.load_manifest(MANIFEST)
     pdk = cr.resolve_pdk(cr.load_pin())
     git_info = cr.git_state()
-    if git_info["dirty"] and not args.allow_dirty:
-        raise SystemExit("working tree is dirty: commit (and push) first so the fleet source SHA resolves")
-    now = datetime.now(timezone.utc)
-    run_id = args.run_id or f"{now:%Y%m%d-%H%M%S}-{git_info['sha']}"
-    run_dir = BUILD / run_id
+    sim_common.refuse_unsubmittable(git_info, args.allow_dirty)
     retry = args.retry_failed
-    if retry:
-        if not run_dir.exists():
-            raise SystemExit(f"{run_dir} does not exist")
-    else:
-        if run_dir.exists():
-            raise SystemExit(f"{run_dir} exists")
-        run_dir.mkdir(parents=True)
+    run_id, run_dir, now = sim_common.open_run(
+        BUILD, args.run_id, git_info["sha"], reuse="require" if retry else None)
     head = camp.tb_netlist_head(run_dir / ("retry" if retry else "."), pdk)
     cases = build_matrix(man)
     if args.only:
@@ -172,15 +161,9 @@ def cmd_run(args) -> int:
         meta = old
     else:
         mp.write_text(json.dumps(meta, indent=2) + "\n")
-    results = []
-    with concurrent.futures.ThreadPoolExecutor(max_workers=min(2, args.jobs)) as ex:
-        futs = [ex.submit(submit_case, c, head, man, run_dir) for c in cases]
-        for c, f in zip(cases, futs):
-            try:
-                results.append(f.result())
-            except Exception as err:  # noqa: BLE001 -- recorded
-                results.append({"case": c["id"], "error": repr(err)})
-                say(f"[error] {c['id']}: {err!r}")
+    results = sim_common.fan_out(
+        lambda c: submit_case(c, head, man, run_dir, args.wait_for_capacity), cases, args.jobs,
+        label=lambda c: c["id"], tag="case")
     key = "retry_results" if retry else "submit_results"
     meta.setdefault(key, [])
     meta[key] = (meta[key] + results) if retry else results
@@ -549,6 +532,8 @@ def main(argv):
     r.add_argument("--retry-failed", action="store_true")
     r.add_argument("--only", action="append")
     r.add_argument("--allow-dirty", action="store_true")
+    r.add_argument("--wait-for-capacity", type=float, default=0, metavar="S",
+                   help="batch.capacity_wait_s: seconds klt waits out a Spot/fleet capacity refusal instead of failing the submit")
     c = sub.add_parser("record")
     c.add_argument("--run-id", required=True)
     c.add_argument("--author")

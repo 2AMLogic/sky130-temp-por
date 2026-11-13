@@ -70,6 +70,9 @@ jobs:
       - name: sim_common archived-attempt reader tests (stderr error envelope, numeric attempt order)
         run: python3 -I sim/bin/test_sim_common_attempts.py
 
+      - name: sim_common campaign submit bootstrap tests (run-id/run-dir rule, bounded fan-out, submit-time tree guard)
+        run: python3 -I sim/bin/test_sim_common_bootstrap.py
+
       - name: sim_common per-request report triage tests (one wording per failure, client_klt_version always recorded)
         run: python3 -I sim/bin/test_sim_common_report_triage.py
 

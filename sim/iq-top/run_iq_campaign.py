@@ -22,13 +22,11 @@ state); temp-iq is derived as iq-total - por-iq, labelled incremental.
 from __future__ import annotations
 
 import argparse
-import concurrent.futures
 import functools
 import gzip
 import json
 import os
 import statistics
-import subprocess
 import sys
 from datetime import datetime, timezone
 from pathlib import Path
@@ -127,16 +125,9 @@ def cmd_run(args) -> int:
     man = sim_common.load_manifest(MANIFEST)
     pdk = cr.resolve_pdk(cr.load_pin())
     git_info = cr.git_state()
-    now = datetime.now(timezone.utc)
-    run_id = args.run_id or f"{now:%Y%m%d-%H%M%S}-{git_info['sha']}"
-    run_dir = BUILD / run_id
-    if args.retry_failed:
-        if not run_dir.exists():
-            raise SystemExit(f"{run_dir} does not exist")
-    else:
-        if run_dir.exists():
-            raise SystemExit(f"{run_dir} exists; refusing to reuse a run id")
-        run_dir.mkdir(parents=True)
+    sim_common.refuse_unsubmittable(git_info, args.allow_dirty)
+    run_id, run_dir, now = sim_common.open_run(
+        BUILD, args.run_id, git_info["sha"], reuse="require" if args.retry_failed else None)
     states = args.state or STATES
     rate = man["measurement"]["rate_v_per_s"]
     work = list(states)
@@ -153,14 +144,7 @@ def cmd_run(args) -> int:
         req = build_request("netlist.spice", man, "batch", args.capacity_wait)
         return sim_common.submit_request(state, rate, run_dir, build_netlist(heads[state], state, man), req, "", len(grid(man)))
 
-    results = []
-    with concurrent.futures.ThreadPoolExecutor(max_workers=min(2, args.jobs)) as ex:
-        for f in [ex.submit(one, s) for s in work]:
-            try:
-                results.append(f.result())
-            except Exception as err:  # noqa: BLE001 -- recorded, never swallowed
-                results.append({"error": repr(err)})
-                say(f"[error] submit raised: {err!r}")
+    results = sim_common.fan_out(one, work, args.jobs)
     old = json.loads((run_dir / "run.json").read_text())
     if args.retry_failed:
         old.setdefault("retries", []).append({"at_utc": datetime.now(timezone.utc).strftime("%Y-%m-%dT%H:%M:%SZ"), "capacity_wait_s": args.capacity_wait, "results": results})
@@ -185,9 +169,7 @@ def cmd_crosscheck(args) -> int:
         req["options"]["ngspice_init"] = sim_common.spiceinit_lines(SIM_DIR)
         (d / "request.json").write_text(json.dumps(req, indent=2) + "\n")
         say(f"[crosscheck] {state}: one local corner (tt/27C/3.30V) on local ngspice")
-        p = subprocess.run(["klt", "sim", str(d / "request.json"), "--backend", "local", "-o", str(d / "out"), "--format", "json"], capture_output=True, text=True, timeout=3600)
-        (d / "report.json").write_text(p.stdout)
-        (d / "klt.stderr").write_text(p.stderr)
+        p = sim_common.run_local_probe(d)
         say(f"[crosscheck] {state}: exit {p.returncode}")
     return 0
 
@@ -589,6 +571,7 @@ def main(argv: list[str]) -> int:
     r.add_argument("--run-id")
     r.add_argument("--retry-failed", action="store_true")
     r.add_argument("--capacity-wait", type=float, default=0)
+    r.add_argument("--allow-dirty", action="store_true", help="submit from a dirty tree (debugging only; such a run's source revision does not resolve)")
     x = sub.add_parser("crosscheck")
     x.add_argument("--run-id", required=True)
     x.add_argument("--state", action="append", choices=STATES)
