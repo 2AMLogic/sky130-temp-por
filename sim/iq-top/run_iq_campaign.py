@@ -27,7 +27,6 @@ import functools
 import gzip
 import json
 import os
-import re
 import statistics
 import subprocess
 import sys
@@ -253,8 +252,7 @@ def analyze_state(state: str, run_dir: Path, man: dict, traces: dict) -> dict:
             continue
         art = c.get("artifacts") or {}
         log_text = Path(art["log"]).read_text() if art.get("log") and Path(art["log"]).is_file() else ""
-        ngv = re.findall(r"(ngspice-\d+) done", log_text)
-        pt.update({"klt_status": c.get("status"), "runtime_s": c.get("runtime_s"), "ngspice": ngv[0] if ngv else None,
+        pt.update({"klt_status": c.get("status"), "runtime_s": c.get("runtime_s"), "ngspice": sim_common.fleet_ngspice(log_text),
                    "meas": {m["name"]: m.get("value") for m in c.get("measurements", [])},
                    "diagnostics": [f"{dg.get('severity')}/{dg.get('code')}: {scrub(dg.get('message', ''), run_dir)[:300]}" for dg in c.get("diagnostics", [])]})
         wp = Path(art["waveform"]) if art.get("waveform") else None
@@ -494,6 +492,7 @@ def cmd_record(args) -> int:
     # local cross-check
     xc = None
     parts = []
+    host_ng = sim_common.host_ngspice_tag()
     for st in STATES:
         xp = run_dir / "crosscheck" / STATE_TAG[st] / "report.json"
         if not xp.is_file():
@@ -505,7 +504,7 @@ def cmd_record(args) -> int:
             continue
         xcor = (xrep.get("corners") or [None])[0]
         if not xcor or not (xcor.get("artifacts") or {}).get("waveform"):
-            parts.append(f"{st}: local probe returned no waveform ({xcor and xcor.get('status')}); UNRESOLVED -- the single local ngspice-42 run was stopped by the operator after ~33 min / ~64 CPU-min without finishing (shared host), so this state has NO local cross-check and the fleet value for tt/27C/3.30V is not cross-checked.")
+            parts.append(f"{st}: local probe returned no waveform ({xcor and xcor.get('status')}); UNRESOLVED -- the local {host_ng} probe produced no usable result for this state, so this state has NO local cross-check and the fleet value for tt/27C/3.30V is not cross-checked.")
             continue
         try:
             g = qc.grade(qc.load_wave(Path(xcor["artifacts"]["waveform"])), st, 3.3, man)
@@ -513,29 +512,33 @@ def cmd_record(args) -> int:
             parts.append(f"{st}: local probe waveform invalid ({e}); no cross-check.")
             continue
         fl = per[st]["points"].get("tt_27c_3.30v", {})
-        txt = f"{st}: local ngspice-42 status **{g['status']}**, I = {ua(g.get('i_total_a'))} uA"
+        txt = f"{st}: local {host_ng} status **{g['status']}**, I = {ua(g.get('i_total_a'))} uA"
         if "contention_a" in g:
             txt += f", contention {ua(g['contention_a'])} uA"
         if fl.get("i_total_a") is not None and g.get("i_total_a"):
             rel = abs(fl["i_total_a"] - g["i_total_a"]) / abs(g["i_total_a"])
-            txt += f"; fleet {fl.get('ngspice') or ''} status {fl['status']}, I = {ua(fl['i_total_a'])} uA; |fleet - local|/local = {rel:.3%} (tolerance for 'matches': 2%, stated here because the engines differ: ngspice-42 local vs the fleet runner's)"
+            txt += f"; fleet {fl.get('ngspice') or ''} status {fl['status']}, I = {ua(fl['i_total_a'])} uA; |fleet - local|/local = {rel:.3%} (tolerance for 'matches': 2%, stated here because the engines differ: {host_ng} local vs the fleet runner's)"
         else:
             txt += "; no fleet value for this point to compare with (fleet did not return it), so this probe is the only value for the typical corner and is NOT a cross-check of anything"
         parts.append(txt + ".")
     if parts:
         xc = {"text": " ".join(parts)}
     all_pts = [p for st in STATES for p in per[st]["points"].values()]
-    ngs = sorted({p["ngspice"] for p in all_pts if p.get("ngspice")})
-    runners = sorted({per[s]["requests"].get("runner_klt_version") for s in STATES if per[s]["requests"].get("runner_klt_version")})
+    # This record states the fleet/host split in its own top-level `fleet_note` (jobs included)
+    # and names its DUT in `Netlist provenance`, so the shared notes are not repeated in `tools`.
+    pdk_d, tools_d = sim_common.record_pdk_tools(
+        pdk, pin, meta, all_pts, [per[s]["requests"] for s in STATES],
+        fleet_note=None, xschem_note=None,
+    )
     jobs = [per[s]["requests"].get("job_id") for s in STATES]
-    fleet_note = (f"batch jobs {jobs}; runner klt {', '.join(runners) or 'unknown'}; fleet ngspice {', '.join(ngs) or 'unknown'}; client {meta['klt_client']}; "
+    fleet_note = (f"batch jobs {jobs}; runner klt {tools_d['fleet_runner_klt']}; fleet ngspice {tools_d['fleet_ngspice']}; client {meta['klt_client']}; "
                   "client/runner version skew accepted with batch.runner_version_check=warn")
     art_manifest, art_summary = evidence_store.store_or_exit(SLUG, record_id, corners_dir)
     record = {
         "record_id": record_id, "timestamp": now.strftime("%Y-%m-%dT%H:%M:%SZ"), "author": args.author or cr.default_author(), "supersedes": args.supersedes,
         "experiment": {k: man[k] for k in ("slug", "title", "claim", "provenance", "provenance_source", "statistical_convention")},
-        "pdk": {"variant": pdk.variant, "installed_commit": pdk.installed_commit, "pinned_commit": pin["open_pdks_commit"], "matches_pin": pdk.matches_pin, "lib_file": MODEL_LIB + " (resolved on the runner as /opt/pdk/sky130A/...)"},
-        "tools": {"ngspice": f"{cr.first_line(['ngspice', '-v'])} (host; the grid ran on the fleet)", "xschem": cr.first_line(["xschem", "--version"]), "platform": cr.tool_versions()["platform"], "python": cr.tool_versions()["python"], "klt_client": meta["klt_client"]},
+        "pdk": pdk_d,
+        "tools": tools_d,
         "git": git_info, "fleet_note": fleet_note,
         "matrix": {**man["corners"], "n_points_per_state": 45, "n_with_value": sum(1 for p in all_pts if p.get("i_total_a") is not None), "n_ok": sum(1 for p in all_pts if p["status"] == "ok")},
         "definitions": DEFS, "requests": {s: per[s]["requests"] for s in STATES},

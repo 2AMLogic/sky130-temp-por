@@ -70,6 +70,9 @@ jobs:
       - name: sim_common archived-attempt reader tests (stderr error envelope, numeric attempt order)
         run: python3 -I sim/bin/test_sim_common_attempts.py
 
+      - name: sim_common record provenance builder tests (fleet/host tool versions are derived, never literals)
+        run: python3 -I sim/bin/test_sim_common_provenance.py
+
       - name: Pad-island census unit tests
         run: python3 -m unittest layout/bin/test_pad_island_census.py
 

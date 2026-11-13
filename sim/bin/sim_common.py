@@ -59,6 +59,12 @@ and/or `corner-run.py` itself):
     say()/rate_tag()/scrub()/report_usable()/submit_request()
                           batch-fleet campaign-runner helpers shared by
                           por-comparator-thresholds and supply-ramp-top
+    record_pdk_tools()      the record's `pdk` + `tools` provenance dicts,
+                          every tool version derived from what actually ran
+                          rather than hand-copied, plus the pieces it is
+                          built from -- fleet_ngspice() (the one klt-log
+                          banner regex), joined_versions(),
+                          host_tool_versions()/host_ngspice_tag()
 """
 
 from __future__ import annotations
@@ -492,6 +498,103 @@ def base_request(
 
 FLEET_NOTE = "client/runner klt skew accepted with batch.runner_version_check=warn; the runner ignores options.ngspice_init so a netlist-carried `set ng_nomodcheck` is used"
 XSCHEM_NOTE = "only the testbench is netlisted by xschem here; the DUT is spliced from the committed design/netlist/temp_por_top.spice (host xschem leaves expr() parameters unevaluated)"
+
+
+# --------------------------------------------------------------------------
+# record provenance: the shared `pdk` / `tools` block (issue #297)
+# --------------------------------------------------------------------------
+
+RUNNER_LIB_FILE = MODEL_LIB + " (resolved on the runner as /opt/pdk/sky130A/...)"
+HOST_PDK_ROOT = "<host $PDK_ROOT>"
+HOST_NGSPICE_SUFFIX = " (host; the grid ran on the fleet)"
+
+_FLEET_NGSPICE_RE = re.compile(r"(ngspice-\d+) done")
+
+
+def fleet_ngspice(log_text: str) -> str | None:
+    """The fleet runner's ngspice version as it announces itself in a per-corner klt log
+    (`... ngspice-47 done ...`), or None when the log carries no such banner.
+
+    Every fleet campaign runner reads its per-point `ngspice` field through this, so a
+    record states the engine that actually ran instead of a literal that goes stale."""
+    m = _FLEET_NGSPICE_RE.search(log_text)
+    return m.group(1) if m else None
+
+
+def joined_versions(items, key: str) -> str:
+    """Sorted, comma-joined set of `item[key]` across `items`, or `"unknown"` when none
+    carries one.  `items` may hold `None` entries (a request that never got a report)."""
+    return ", ".join(sorted({v for it in items if (v := (it or {}).get(key))})) or "unknown"
+
+
+@functools.lru_cache(maxsize=1)
+def host_tool_versions() -> dict:
+    """`corner-run.tool_versions()` read once per process -- each call shells out to
+    `ngspice -v` and `xschem --version`, and a record needs the same answer throughout."""
+    return _corner_run().tool_versions()
+
+
+def host_ngspice_tag() -> str:
+    """Just the `ngspice-NN` token of the host's own ngspice, for a local-probe-vs-fleet
+    cross-check sentence; `"unknown"` when the banner carries no version."""
+    m = re.search(r"ngspice-\d+", host_tool_versions()["ngspice"])
+    return m.group(0) if m else "unknown"
+
+
+def record_pdk_tools(
+    pdk,
+    pin: dict,
+    meta: dict,
+    points=(),
+    requests=(),
+    *,
+    lib_file: str | None = RUNNER_LIB_FILE,
+    root: str | None = HOST_PDK_ROOT,
+    host_tools: bool = True,
+    fleet_note: str | None = FLEET_NOTE,
+    xschem_note: str | None = XSCHEM_NOTE,
+    ngspice_key: str = "ngspice",
+    runner_key: str = "runner_klt_version",
+) -> tuple[dict, dict]:
+    """Build a record's `pdk` and `tools` provenance dicts.
+
+    Every tool version here is *observed*, never a literal: the fleet's ngspice from the
+    per-point banners the runners pull out of each corner's klt log (`fleet_ngspice()`),
+    the fleet runner's klt from each request's `runner_klt_version`, the host's from
+    `corner-run.tool_versions()`.  A hand-copied constant in one of these fields is how a
+    record ends up reporting a tool nobody ran (issue #297).
+
+    `points` / `requests` are the record's own lists (any iterable of dicts, `None`
+    entries tolerated); pass `ngspice_key` / `runner_key` when a runner names those
+    fields differently.  Pass `None` for `lib_file`, `root`, `fleet_note` or
+    `xschem_note` to leave that key out, and `host_tools=False` for a runner that never
+    invokes ngspice or xschem itself.  Runner-specific extras (`fleet_pdk_report`,
+    `fleet_klu_points`, `klt_sim_backend_env`, ...) are added by the caller on top of the
+    returned dicts.
+    """
+    pdk_d = {
+        "variant": pdk.variant,
+        "installed_commit": pdk.installed_commit,
+        "pinned_commit": pin["open_pdks_commit"],
+        "matches_pin": pdk.matches_pin,
+    }
+    if root is not None:
+        pdk_d["root"] = root
+    if lib_file is not None:
+        pdk_d["lib_file"] = lib_file
+
+    tv = host_tool_versions()
+    tools_d = {"platform": tv["platform"], "python": tv["python"], "klt_client": meta.get("klt_client")}
+    if host_tools:
+        tools_d["ngspice"] = tv["ngspice"] + HOST_NGSPICE_SUFFIX
+        tools_d["xschem"] = tv["xschem"]
+    tools_d["fleet_runner_klt"] = joined_versions(requests, runner_key)
+    tools_d["fleet_ngspice"] = joined_versions(points, ngspice_key)
+    if fleet_note is not None:
+        tools_d["fleet_note"] = fleet_note
+    if xschem_note is not None:
+        tools_d["xschem_note"] = xschem_note
+    return pdk_d, tools_d
 
 
 def deck_drift(repo_root: Path, deck_inputs, run_sha: str | None, grade_sha: str | None) -> list[str] | None:

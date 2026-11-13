@@ -39,7 +39,6 @@ import functools
 import hashlib
 import json
 import os
-import re
 import shutil
 import sys
 from datetime import datetime, timezone
@@ -487,9 +486,8 @@ def analyze_request(req: dict, run_dir: Path, man: dict, corners_dir: Path, writ
         art = c.get("artifacts") or {}
         wave_path = Path(art["waveform"]) if art.get("waveform") else None
         log_text = Path(art["log"]).read_text() if art.get("log") and Path(art["log"]).is_file() else ""
-        ngv = re.findall(r"(ngspice-\d+) done", log_text)
         pt = {"id": cid, "tag": req["tag"], "process": proc, "temperature_c": temp, "supply_v": vf, "klt_status": c.get("status"), "runtime_s": c.get("runtime_s"),
-              "ngspice": ngv[0] if ngv else None,
+              "ngspice": sim_common.fleet_ngspice(log_text),
               "netlist_klu_announced": True if "Using KLU as Direct Linear Solver" in log_text else (False if log_text else None), "measurements": {m["name"]: m.get("value") for m in c.get("measurements", [])},
               "diagnostics": [{"severity": dg.get("severity"), "code": dg.get("code"), "message": scrub(dg.get("message", ""), run_dir)[:400]} for dg in c.get("diagnostics", [])]}
         wave, load_err = None, None
@@ -886,8 +884,9 @@ def cmd_record(args) -> int:
         shutil.copyfile(cf, snap_dir / cf.name)
     cost_projections = [json.loads(cf.read_text()) for cf in cost_files]
     fails = sim_common.submit_failures(requests)
-    ngs = sorted({p["ngspice"] for p in points if p.get("ngspice")})
-    runners = sorted({q.get("runner_klt_version") for q in requests if q.get("runner_klt_version")})
+    pdk_d, tools_d = sim_common.record_pdk_tools(pdk, pin, meta, points, requests)
+    pdk_d["fleet_pdk_report"] = fleet_pdk
+    tools_d["fleet_klu_points"] = sum(1 for p in points if p.get("netlist_klu_announced"))
     cnt = declared_counts(man)
     n_graded = sum(1 for p in points if p["outcome"] != "NOT_COVERED")
     comparison = None
@@ -910,14 +909,8 @@ def cmd_record(args) -> int:
         "solver_variant": variant, "comparison": comparison, "cost_projections": cost_projections,
         "companion_of": (comparison or {}).get("source_record"),
         "experiment": {k: man[k] for k in ("slug", "title", "claim", "provenance", "provenance_source", "statistical_convention")},
-        "pdk": {"root": "<host $PDK_ROOT>", "variant": pdk.variant, "installed_commit": pdk.installed_commit, "pinned_commit": pin["open_pdks_commit"], "matches_pin": pdk.matches_pin,
-                "lib_file": MODEL_LIB + " (resolved on the runner as /opt/pdk/sky130A/...)", "fleet_pdk_report": fleet_pdk},
-        "tools": {"ngspice": f"{cr.first_line(['ngspice', '-v'])} (host; the grid ran on the fleet)", "xschem": cr.first_line(["xschem", "--version"]),
-                  "platform": cr.tool_versions()["platform"], "python": cr.tool_versions()["python"], "klt_client": meta.get("klt_client"),
-                  "fleet_runner_klt": ", ".join(runners) or "unknown", "fleet_ngspice": ", ".join(ngs) or "unknown",
-                  "fleet_note": sim_common.FLEET_NOTE,
-                  "fleet_klu_points": sum(1 for p in points if p.get("netlist_klu_announced")),
-                  "xschem_note": sim_common.XSCHEM_NOTE},
+        "pdk": pdk_d,
+        "tools": tools_d,
         "git": gi, "run_source": meta.get("source", {}), "deck_drift": drift, "run_meta": {k: meta.get(k) for k in ("run_id", "started_utc", "submitted_tags", "retries")},
         "matrix": {"process": man["corners"]["process"], "temperature_c": man["corners"]["temperature_c"], "supply_v": man["corners"]["supply_v"],
                    "n_requests": cnt["requests"], "points_per_request": cnt["points_per_request"], "n_points": cnt["points"],

@@ -30,7 +30,6 @@ import functools
 import gzip
 import json
 import os
-import re
 import shutil
 import subprocess
 import sys
@@ -284,11 +283,10 @@ def analyze_variant(variant: str, run_dir: Path, man: dict, corners_dir: Path) -
             cid = corner_id(proc, temp)
             art = c.get("artifacts") or {}
             log_text = Path(art["log"]).read_text() if art.get("log") and Path(art["log"]).is_file() else ""
-            ngv = re.findall(r"(ngspice-\d+) done", log_text)
             pt = {
                 "id": cid, "variant": variant, "rate_v_per_s": rate, "rate_tag": tag, "primary_rate": primary,
                 "process": proc, "temperature_c": temp, "klt_status": c.get("status"), "runtime_s": c.get("runtime_s"),
-                "ngspice": ngv[0] if ngv else None,
+                "ngspice": sim_common.fleet_ngspice(log_text),
                 "diagnostics": [{"severity": g.get("severity"), "code": g.get("code"), "message": scrub(g.get("message", ""), run_dir)[:400]} for g in c.get("diagnostics", [])],
             }
             wp = Path(art["waveform"]) if art.get("waveform") else None
@@ -498,8 +496,14 @@ def cmd_record(args) -> int:
         probe_text = ""
         if args.probe_note_file:
             probe_text = Path(args.probe_note_file).read_text().strip()
-        runners = sorted({r.get("runner_klt_version") for r in res["requests"] if r.get("runner_klt_version")})
-        ngs = sorted({p["ngspice"] for p in res["points"] if p["ngspice"]})
+        # This experiment's DUTs are per-variant (see `variant.dut_netlists` and the record's
+        # `Netlist provenance` line), so the shared xschem note -- which names one committed
+        # DUT export -- is not stated here.
+        pdk_d, tools_d = sim_common.record_pdk_tools(
+            pdk, pin, meta, res["points"], res["requests"],
+            lib_file=f"$PDK_ROOT/{pdk.variant}/{pin['ngspice_lib']} (fleet: models.pdk={pdk.variant}, models.lib={MODEL_LIB})",
+            xschem_note=None,
+        )
         v = man["variants"][variant]
         art_manifest, art_summary = evidence_store.store_or_exit(SLUG, record_id, corners_dir)
         record = {
@@ -509,15 +513,8 @@ def cmd_record(args) -> int:
             "supersedes": args.supersedes,
             "manifest_excerpt": {"title": man["title"], "claim": man["claim"], "primary_rate": man["rates"]["primary_v_per_s"][0]},
             "variant": {"name": variant, "description": v["description"], "bias_treatment": v["bias_treatment"], "schematic": "sim/" + SLUG + "/" + v["schematic"], "dut_netlists": v["dut_netlists"], "provenance": v.get("provenance"), "baseline_variant": v.get("baseline_variant")},
-            "pdk": {"root": "<host $PDK_ROOT>", "variant": pdk.variant, "installed_commit": pdk.installed_commit, "pinned_commit": pin["open_pdks_commit"], "matches_pin": pdk.matches_pin,
-                    "lib_file": f"$PDK_ROOT/{pdk.variant}/{pin['ngspice_lib']} (fleet: models.pdk={pdk.variant}, models.lib={MODEL_LIB})"},
-            "tools": {
-                "ngspice": f"{cr.first_line(['ngspice', '-v'])} (host; the grid ran on the fleet)",
-                "xschem": cr.first_line(["xschem", "--version"]),
-                "platform": cr.tool_versions()["platform"], "python": cr.tool_versions()["python"],
-                "klt_client": meta["klt_client"], "fleet_runner_klt": ", ".join(runners) or "unknown", "fleet_ngspice": ", ".join(ngs) or "unknown",
-                "fleet_note": "client/runner klt version skew accepted with batch.runner_version_check=warn; the runner ignores options.ngspice_init, so `set ng_nomodcheck` is carried in the netlist",
-            },
+            "pdk": pdk_d,
+            "tools": tools_d,
             "git": git_info,
             "run_git": meta.get("git"),
             "matrix": {"axis": axis, "process": procs, "temperature_c": man["corners"]["temperature_c"], "peak_v": man["sweep"]["peak_v"],

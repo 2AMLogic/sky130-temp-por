@@ -380,6 +380,8 @@ def load_case(case, run_dir, man, corners_dir, write):
     rec["diagnostics"] = [{"severity": g.get("severity"), "code": g.get("code"), "message": camp.scrub(g.get("message", ""), run_dir)[:300]} for g in (c or {}).get("diagnostics", [])]
     rec["runtime_s"] = (c or {}).get("runtime_s")
     art = (c or {}).get("artifacts") or {}
+    log_text = Path(art["log"]).read_text() if art.get("log") and Path(art["log"]).is_file() else ""
+    rec["ngspice"] = sim_common.fleet_ngspice(log_text)
     wp = Path(art["waveform"]) if art.get("waveform") else None
     if wp is None or not wp.is_file():
         rec["outcome"] = "ERROR (no waveform retrieved)"
@@ -405,8 +407,7 @@ def load_case(case, run_dir, man, corners_dir, write):
             write_ext_trace(corners_dir / f"{case['id']}.trace.csv.gz", names, erows)
             rec["trace_file"] = f"{case['id']}.trace.csv.gz"
             rec["trace_rows"] = len(erows)
-            art_log = Path(art["log"]).read_text() if art.get("log") and Path(art["log"]).is_file() else "(no log)"
-            (corners_dir / f"{case['id']}.log").write_text(camp.scrub(art_log, run_dir))
+            (corners_dir / f"{case['id']}.log").write_text(camp.scrub(log_text or "(no log)", run_dir))
     return rec
 
 
@@ -517,15 +518,20 @@ def cmd_record(args) -> int:
         runs = [c for c in cases if c["point"] == pname]
         v, basis, flags = verdict_for_point(runs)
         verdicts[pname] = {"verdict": v, "basis": basis, "per_case_flags": flags, "ordering_summary": ordering_summary(runs)}
-    ngs = sorted({x for c in cases for x in [c.get("runner_klt_version")] if x})
+    # This driver never invokes ngspice or xschem itself (see the module docstring), so it
+    # records no host engine versions and no library path -- only what the fleet reported.
+    pdk_d, tools_d = sim_common.record_pdk_tools(
+        pdk, pin, meta, cases, cases,
+        lib_file=None, root=None, host_tools=False, fleet_note=None, xschem_note=None,
+    )
+    tools_d["klt_sim_backend_env"] = meta.get("klt_sim_backend_env")
     d = man["reassert_diagnosis"]
     record = {
         "record_id": record_id, "run_id": args.run_id, "timestamp": now.strftime("%Y-%m-%dT%H:%M:%SZ"),
         "author": args.author or cr.default_author(), "supersedes": args.supersedes, "cites": SOURCE_RECORD,
         "claim": d["claim"], "git": git_info,
-        "pdk": {"variant": pdk.variant, "installed_commit": pdk.installed_commit, "pinned_commit": pin["open_pdks_commit"], "matches_pin": pdk.matches_pin},
-        "tools": {"klt_client": meta["klt_client"], "fleet_runner_klt": ", ".join(ngs) or "unknown", "fleet_ngspice": "ngspice-46 (per fleet log)",
-                  "klt_sim_backend_env": meta.get("klt_sim_backend_env"), "python": cr.tool_versions()["python"], "platform": cr.tool_versions()["platform"]},
+        "pdk": pdk_d,
+        "tools": tools_d,
         "run_meta": meta, "variants": d["variants"], "points": d["points"],
         "cases": cases, "verdicts": verdicts, "post_hoc_note": d.get("post_hoc_note"),
         "reference_physical_cases": [c["id"] for pname in d["points"] for c in [next((x for x in cases if x["point"] == pname and x["role"] == "solver" and x.get("check") and "resetn" in x["check"] and x["check"]["physical"]["ok"]), None)] if c],
