@@ -504,7 +504,7 @@ def cmd_record(args) -> int:
             continue
         xcor = (xrep.get("corners") or [None])[0]
         if not xcor or not (xcor.get("artifacts") or {}).get("waveform"):
-            parts.append(f"{st}: local probe returned no waveform ({xcor and xcor.get('status')}); UNRESOLVED -- the local {host_ng} probe produced no usable result for this state (a local iq probe on this shared host runs for tens of minutes and has been stopped before finishing), so this state has NO local cross-check and the fleet value for tt/27C/3.30V is not cross-checked.")
+            parts.append(f"{st}: local probe returned no waveform ({xcor and xcor.get('status')}); UNRESOLVED -- the local {host_ng} probe produced no usable result for this state, so this state has NO local cross-check and the fleet value for tt/27C/3.30V is not cross-checked.")
             continue
         try:
             g = qc.grade(qc.load_wave(Path(xcor["artifacts"]["waveform"])), st, 3.3, man)
