@@ -368,33 +368,18 @@ def analyze_request(req: dict, run_dir: Path, man: dict, corners_dir: Path, writ
     attempts = sim_common.attempt_messages(d, run_dir, REPO_ROOT)
     if attempts:
         info["failed_earlier_attempts"] = attempts
-    rep, why = None, None
-    rep_path = d / "report.json"
-    if not rep_path.is_file():
-        why = "NOT SUBMITTED (no report on disk)"
-    else:
-        try:
-            rep = json.loads(rep_path.read_text())
-        except json.JSONDecodeError:
-            why = "NO JSON (klt failed before a report existed): " + scrub((d / "klt.stderr").read_text()[-600:], run_dir)
-        else:
-            if "corners" not in rep:
-                why = "klt/fleet error, no corners reported: " + scrub(str((rep.get("error") or {}).get("message", rep))[:500], run_dir)
-                rep = None
+    rep, why = sim_common.load_request_report(d, run_dir, REPO_ROOT)
     pts = []
     if rep is None:
         info["outcome"] = why
         for p, t, v in declared:
             pts.append({"id": corner_id(p, t, v), "tag": req["tag"], "class": cls, "process": p, "temperature_c": t, "supply_v": v, "outcome": "NOT_COVERED", "reason": why})
         return {"info": info, "points": pts, "pdk_report": {}}
-    remote = (rep.get("environment") or {}).get("remote") or {}
     info["netlist_sha256_submitted"] = file_sha256(d / "netlist.spice")
     info["netlist_sha256_reported"] = (rep.get("environment") or {}).get("netlist_sha256")
     info["netlist_matches_report"] = info["netlist_sha256_submitted"] is not None and info["netlist_sha256_submitted"] == info["netlist_sha256_reported"]
-    info.update({"outcome": rep.get("status"), "job_id": remote.get("job_id"), "instance_type": remote.get("instance_type"), "lifecycle": remote.get("lifecycle"),
-                 "runner_klt_version": remote.get("runner_klt_version"), "client_klt_version": remote.get("client_klt_version"),
-                 "elapsed_seconds": remote.get("elapsed_seconds"), "state": remote.get("state"), "corner_count": rep.get("corner_count"),
-                 "request_id": (rep.get("environment") or {}).get("request_id") or rep.get("request_id")})
+    info.update(sim_common.fleet_job_fields(rep))
+    info["request_id"] = (rep.get("environment") or {}).get("request_id") or rep.get("request_id")
     seen = set()
     for c in rep.get("corners", []):
         proc, vf, temp = c["process"], c["supply_v"]["vset"], c["temperature_c"]

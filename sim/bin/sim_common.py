@@ -64,6 +64,12 @@ and/or `corner-run.py` itself):
                           `cmd_run` opens with: the run id + run-directory
                           rule, the bounded submit pool, and the
                           submit-time clean-tree guard
+    load_request_report()/fleet_job_fields()
+                          the per-request report triage every campaign
+                          grader runs before its corner loop: one gradeable
+                          report or one scrubbed reason it cannot be graded,
+                          then the one `environment.remote` field list a
+                          request record carries (issue #322)
     record_pdk_tools()      the record's `pdk` + `tools` provenance dicts,
                           every tool version derived from what actually ran
                           rather than hand-copied, plus the pieces it is
@@ -735,6 +741,69 @@ def report_usable(report_path: Path) -> bool:
         return report_path.is_file() and "corners" in json.loads(report_path.read_text())
     except json.JSONDecodeError:
         return False
+
+
+TRIAGE_CAP = 600
+
+# The one wording for "this request never reached the fleet".  Named, because a
+# grader that treats it differently from a post-submission failure (iq-top keeps its
+# pre-seeded per-point reason) must test for it without re-encoding the text, and
+# because the "NOT SUBMITTED" prefix is asserted on by
+# sim/iq-top/test_solver_sensitivity.py.
+NOT_SUBMITTED = "NOT SUBMITTED / no report"
+
+FLEET_JOB_KEYS = ("job_id", "instance_type", "lifecycle", "runner_klt_version",
+                  "client_klt_version", "elapsed_seconds", "state")
+
+
+def load_request_report(d: Path, run_dir: Path, repo_root: Path, cap: int = TRIAGE_CAP) -> tuple[dict | None, str | None]:
+    """One fleet request's gradeable klt report, or the scrubbed reason it cannot be graded.
+
+    Exactly one of the two is None: `(report, None)` when `d/report.json` parses and
+    carries per-corner results -- the same predicate `report_usable()` applies on the
+    retry path -- and `(None, why)` for each of the three ways a request yields nothing
+    to grade:
+
+        no report.json       "NOT SUBMITTED / no report"
+        unparseable          "NO JSON (klt failed before a report existed): <klt.stderr tail>"
+        report without corners "klt error (no corners reported): <report error message>"
+
+    Every campaign grader used to carry its own copy of this block.  The copies had
+    drifted into three wordings for a missing report, two for a report without
+    corners, and stderr-tail caps of 500/600/800 (issue #322); one wording and one
+    cap now serve all six.  The "NOT SUBMITTED" prefix is load-bearing --
+    `sim/iq-top/test_solver_sensitivity.py` asserts on it.  `klt.stderr` is read only
+    when it exists: klt can refuse before writing either file.
+    """
+    rep_path = d / "report.json"
+    if not rep_path.is_file():
+        return None, NOT_SUBMITTED
+    try:
+        rep = json.loads(rep_path.read_text())
+    except json.JSONDecodeError:
+        err = d / "klt.stderr"
+        tail = err.read_text()[-cap:] if err.is_file() else ""
+        return None, "NO JSON (klt failed before a report existed): " + scrub(tail, run_dir, repo_root)
+    if "corners" not in rep:
+        msg = str((rep.get("error") or {}).get("message", rep))[:cap]
+        return None, "klt error (no corners reported): " + scrub(msg, run_dir, repo_root)
+    return rep, None
+
+
+def fleet_job_fields(report: dict) -> dict:
+    """The fleet-job provenance a request record carries: `environment.remote` plus the report's own status.
+
+    One key list for every grader.  `client_klt_version` is in it on purpose: a request
+    record that omits it cannot show a client-versus-runner klt version skew, which is
+    exactly what two of the six copies did before issue #322.  Keys absent from the
+    report are recorded as None rather than dropped, so a record always has the same
+    shape whatever the fleet reported.
+    """
+    remote = (report.get("environment") or {}).get("remote") or {}
+    fields = {k: remote.get(k) for k in FLEET_JOB_KEYS}
+    fields["corner_count"] = report.get("corner_count")
+    fields["outcome"] = report.get("status")
+    return fields
 
 
 CONCURRENCY_CAP_MARKER = "BATCH_MAX_CONCURRENT_INSTANCES"

@@ -200,33 +200,23 @@ def classify_failure(corner: dict, log_text: str) -> str:
 def analyze_state(state: str, run_dir: Path, man: dict, traces: dict) -> dict:
     rate = man["measurement"]["rate_v_per_s"]
     d = run_dir / state / sim_common.rate_tag(rate)
-    rep_path = d / "report.json"
     req = {"state": state}
     pts: dict[str, dict] = {}
     for p, t, v in grid(man):
-        pts[corner_id(p, t, v)] = {"id": corner_id(p, t, v), "process": p, "temperature_c": t, "supply_v": v, "status": "nonconverged", "reason": "NOT SUBMITTED / no report"}
+        pts[corner_id(p, t, v)] = {"id": corner_id(p, t, v), "process": p, "temperature_c": t, "supply_v": v, "status": "nonconverged", "reason": sim_common.NOT_SUBMITTED}
     attempts = sim_common.attempt_messages(d, run_dir, REPO_ROOT)
     if attempts:
         req["failed_earlier_attempts"] = attempts
-    if not rep_path.is_file():
-        req["outcome"] = "NOT SUBMITTED / no report"
+    rep, why = sim_common.load_request_report(d, run_dir, REPO_ROOT)
+    if rep is None:
+        req["outcome"] = why
+        # A request that never reached the fleet leaves the pre-seeded "NOT SUBMITTED"
+        # per-point reason; one that was refused or failed after submission says so.
+        if why != sim_common.NOT_SUBMITTED:
+            for pt in pts.values():
+                pt["reason"] = "fleet refused/failed before any corner ran (see request outcome)"
         return {"requests": req, "points": pts}
-    try:
-        rep = json.loads(rep_path.read_text())
-    except json.JSONDecodeError:
-        req["outcome"] = "NO JSON (klt failed before a report existed): " + scrub((d / "klt.stderr").read_text()[-800:], run_dir)
-        for pt in pts.values():
-            pt["reason"] = "fleet refused/failed before any corner ran (see request outcome)"
-        return {"requests": req, "points": pts}
-    if "corners" not in rep:
-        req["outcome"] = "klt error (no corners reported): " + scrub(str((rep.get("error") or {}).get("message", rep))[:600], run_dir)
-        for pt in pts.values():
-            pt["reason"] = "fleet refused/failed before any corner ran (see request outcome)"
-        return {"requests": req, "points": pts}
-    remote = (rep.get("environment") or {}).get("remote") or {}
-    req.update({k: remote.get(k) for k in ("job_id", "instance_type", "lifecycle", "runner_klt_version", "client_klt_version", "elapsed_seconds", "state")})
-    req["outcome"] = rep.get("status")
-    req["corner_count"] = rep.get("corner_count")
+    req.update(sim_common.fleet_job_fields(rep))
     for c in rep.get("corners", []):
         cid = corner_id(c["process"], c["temperature_c"], c["supply_v"]["vset"])
         pt = pts.get(cid)
