@@ -9,6 +9,12 @@ Chronological record of recently merged pull requests and closed issues. This fi
 
 ### 2026-11-13
 
+- **PR #326**: refactor(sim): one shared per-request report triage for the six campaign graders
+- **Issue #322** (closed): Share the per-request report triage in sim_common (6 hand copies; 2 drop client_klt_version, 3 wordings for one failure)
+- **PR #324**: fix(sim): grade the accuracy-MC `none` control against the expected corner grid
+- **Issue #318** (closed): accuracy-MC `none` control: a process section with no report is absent from the corner count and cannot make the control NOT VERIFIED
+- **PR #315**: fix(sim): derive accuracy-MC record PDK and fleet engine from the run
+- **Issue #312** (closed): run_accuracy_mc.py writes a hardcoded open_pdks commit and a '?' ngspice fallback into its record header
 - **PR #317**: fix(sim): grade the accuracy-MC `none` control three-state so an empty one cannot PASS
 - **Issue #310** (closed): temp-core-accuracy-mc: negative control can PASS with zero compared samples; drop hardcoded none_max_sd_V and dead local
 - **PR #316**: fix(sim): make load_corner_run() return the one registered corner_run module

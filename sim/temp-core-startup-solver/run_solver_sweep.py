@@ -16,10 +16,8 @@ Stages:  run | probe | record
 from __future__ import annotations
 
 import argparse
-import concurrent.futures
 import json
 import os
-import subprocess
 import sys
 from datetime import datetime, timezone
 from pathlib import Path
@@ -110,23 +108,22 @@ def build_netlist(scenario, variant):
     return "\n".join(lines) + "\n"
 
 
-def build_request(backend, corners=None, timeout=3000):
+def build_request(backend, corners=None, timeout=3000, capacity_wait_s=0):
     p, t, v = (corners or (PROCS, TEMPS, SUPPLIES))
     return sim_common.base_request(
         "netlist.spice", backend,
         {"process": p, "supply_v": {"vset": v}, "temperature_c": t},
         {"kind": "tran", "args": f"{STEP:.6g} {TSTOP:.6g} uic"},
         [{"name": "vdd_end", "spice": f".meas tran vdd_end FIND v(vdd) AT={TSTOP:.6g}", "unit": "V"}],
-        timeout,
+        timeout, capacity_wait_s,
     )
 
 
 def cmd_run(args):
-    now = datetime.now(timezone.utc)
     git = cr.git_state()
-    run_id = args.run_id or f"{now:%Y%m%d-%H%M%S}-{git['sha']}"
-    run_dir = BUILD / run_id
-    run_dir.mkdir(parents=True, exist_ok=args.resume)
+    sim_common.refuse_unsubmittable(git, args.allow_dirty)
+    run_id, run_dir, now = sim_common.open_run(
+        BUILD, args.run_id, git["sha"], reuse="allow" if args.resume else None)
     combos = [(s, v) for s in (args.scenario or SCENARIOS) for v in (args.variant or list(VARIANTS))]
     this = {"started_utc": now.strftime("%Y-%m-%dT%H:%M:%SZ"), "klt_client": sim_common.klt_version(),
             "klt_sim_backend_env": os.environ.get("KLT_SIM_BACKEND"), "git": git, "combos": combos}
@@ -146,29 +143,14 @@ def cmd_run(args):
         d = run_dir / name
         if sim_common.report_usable(d / "report.json"):
             return {"combo": name, "skipped": "usable report exists"}
-        d.mkdir(parents=True, exist_ok=True)
-        (d / "netlist.spice").write_text(build_netlist(s, v))
-        (d / "request.json").write_text(json.dumps(build_request("batch"), indent=2) + "\n")
-        say(f"[submit] {name}: 45 points -> batch fleet")
-        p = subprocess.run(["klt", "sim", str(d / "request.json"), "--backend", "batch", "-o", str(d / "out"), "--format", "json"],
-                           capture_output=True, text=True, timeout=4 * 3600)
-        (d / "report.json").write_text(p.stdout)
-        (d / "klt.stderr").write_text(p.stderr)
-        try:
-            st = json.loads(p.stdout).get("status", "?")
-        except json.JSONDecodeError:
-            st = "NO-JSON"
-        say(f"[done]   {name}: exit {p.returncode}, status {st}")
-        return {"combo": name, "exit": p.returncode, "status": st}
+        # submit_prepared archives an unusable earlier report as attemptN/ instead of
+        # overwriting it, so a --resume keeps the refusal that made the resume necessary
+        res = sim_common.submit_prepared(
+            d, build_netlist(s, v), build_request("batch", capacity_wait_s=args.wait_for_capacity),
+            f"{name}: 45 points -> batch fleet", name)
+        return {"combo": name, **res}
 
-    results = []
-    with concurrent.futures.ThreadPoolExecutor(max_workers=min(2, args.jobs)) as ex:
-        for f in [ex.submit(one, c) for c in combos]:
-            try:
-                results.append(f.result())
-            except Exception as err:  # noqa: BLE001 -- recorded
-                results.append({"error": repr(err)})
-                say(f"[error] {err!r}")
+    results = sim_common.fan_out(one, combos, args.jobs)
     cur["submit_results"] = results
     (run_dir / "run.json").write_text(json.dumps(meta, indent=2) + "\n")
     print(f"raw outputs: {run_dir}")
@@ -654,6 +636,9 @@ def main():
     r.add_argument("--scenario", action="append", choices=SCENARIOS)
     r.add_argument("--variant", action="append", choices=list(VARIANTS))
     r.add_argument("--jobs", type=int, default=2)
+    r.add_argument("--allow-dirty", action="store_true", help="submit from a dirty tree (debugging only; such a run's source revision does not resolve)")
+    r.add_argument("--wait-for-capacity", type=float, default=0, metavar="S",
+                   help="batch.capacity_wait_s: seconds klt waits out a Spot/fleet capacity refusal instead of failing the submit")
     r.set_defaults(fn=cmd_run)
     p = sub.add_parser("probe")
     p.add_argument("--run-id", required=True)

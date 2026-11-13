@@ -19,7 +19,6 @@ Stages:  run | record | selftest-free unit tests live in test_solver_sensitivity
 from __future__ import annotations
 
 import argparse
-import concurrent.futures
 import copy
 import gzip
 import hashlib
@@ -211,24 +210,17 @@ def cmd_run(args) -> int:
     man = sim_common.load_manifest(rc.MANIFEST)
     pdk = cr.resolve_pdk(cr.load_pin())
     gi = cr.git_state()
-    if gi["dirty"] and not args.allow_dirty:
-        raise SystemExit("working tree is dirty: commit first so the record carries a clean resolvable source revision (or pass --allow-dirty, which the record will flag)")
+    sim_common.refuse_unsubmittable(gi, args.allow_dirty)
     if subprocess.run(["git", "rev-parse", "--verify", "--quiet", gi["sha"] + "^{commit}"], capture_output=True, cwd=rc.REPO_ROOT).returncode != 0:
         raise SystemExit(f"source revision {gi['sha']} does not resolve")
-    now = datetime.now(timezone.utc)
-    run_id = args.run_id or f"{now:%Y%m%d-%H%M%S}-{gi['sha']}"
-    run_dir = BUILD / run_id
+    run_id, run_dir, now = sim_common.open_run(
+        BUILD, args.run_id, gi["sha"], reuse="require" if args.retry_failed else None)
     names = args.variant or variant_names(man)
     if args.retry_failed:
-        if not run_dir.exists():
-            raise SystemExit(f"{run_dir} does not exist")
         work = [n for n in names if args.split_process or not sim_common.report_usable(run_dir / n / STATE / sim_common.rate_tag(man["measurement"]["rate_v_per_s"]) / "report.json")]
         say = sim_common.say
         say(f"retrying {len(work)} variant request(s) without a usable report, capacity_wait_s={args.capacity_wait}")
     else:
-        if run_dir.exists():
-            raise SystemExit(f"{run_dir} exists; refusing to reuse a run id")
-        run_dir.mkdir(parents=True)
         work = list(names)
     head = head_for_run(run_dir if not args.retry_failed else run_dir / "retry", pdk)
     rate = man["measurement"]["rate_v_per_s"]
@@ -247,6 +239,10 @@ def cmd_run(args) -> int:
     meta.setdefault("hashes", {}).update(hashes)
     meta_path.write_text(json.dumps(meta, indent=2) + "\n")
 
+    def label(item) -> str:
+        n, pr = item
+        return n if pr is None else f"{n}/split-{pr}"
+
     def one(item):
         n, pr = item
         if pr is None:
@@ -254,15 +250,8 @@ def cmd_run(args) -> int:
         npts = len(man["corners"]["temperature_c"]) * len(man["corners"]["supply_v"])
         return sim_common.submit_request(f"{n}/split-{pr}/{STATE}", rate, run_dir, decks[n], build_variant_request(man, args.capacity_wait, pr), f" [{n} process {pr}]", npts)
 
-    results = []
-    with concurrent.futures.ThreadPoolExecutor(max_workers=min(2, args.jobs)) as ex:
-        futs = {(n if pr is None else f"{n}/split-{pr}"): ex.submit(one, (n, pr)) for n in work for pr in procs}
-        for n, f in futs.items():
-            try:
-                results.append({"variant": n, **f.result()})
-            except Exception as err:  # noqa: BLE001 -- recorded, never swallowed
-                results.append({"variant": n, "error": repr(err)})
-                sim_common.say(f"[error] submit {n} raised: {err!r}")
+    results = sim_common.fan_out(one, [(n, pr) for n in work for pr in procs], args.jobs,
+                                 label=label, tag="variant")
     meta = json.loads(meta_path.read_text())
     key = "retries" if args.retry_failed else "submit_results"
     if args.retry_failed:

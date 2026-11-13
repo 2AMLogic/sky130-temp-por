@@ -25,7 +25,6 @@ A batch submit failure is reported in the record; there is no local fallback.
 from __future__ import annotations
 
 import argparse
-import concurrent.futures
 import functools
 import gzip
 import json
@@ -146,17 +145,12 @@ def cmd_run(args) -> int:
     man = sim_common.load_manifest(MANIFEST)
     pdk = cr.resolve_pdk(cr.load_pin())
     git_info = cr.git_state()
-    if git_info["dirty"] and not args.allow_dirty:
-        raise SystemExit("working tree is dirty: commit first (records must carry a clean-tree SHA); --allow-dirty is for debugging only")
-    now = datetime.now(timezone.utc)
-    run_id = args.run_id or f"{now:%Y%m%d-%H%M%S}-{git_info['sha']}"
-    run_dir = BUILD / run_id
-    if run_dir.exists() and not args.retry_failed:
-        raise SystemExit(f"{run_dir} exists; refusing to reuse a run id")
+    sim_common.refuse_unsubmittable(git_info, args.allow_dirty)
+    run_id, run_dir, now = sim_common.open_run(
+        BUILD, args.run_id, git_info["sha"], reuse="allow" if args.retry_failed else None)
     axis = args.axis
     if args.retry_failed and (run_dir / "run.json").is_file():
         axis = json.loads((run_dir / "run.json").read_text()).get("axis", "main")  # a retry keeps the run's own axis
-    run_dir.mkdir(parents=True, exist_ok=True)
     variants = args.variant or [v for v in man["variants"] if not v.endswith("-postlayout")]  # post-layout variants only on explicit --variant
     work = [(v, r) for v in variants for r, _ in all_rates(man)]
     if args.retry_failed:
@@ -174,15 +168,8 @@ def cmd_run(args) -> int:
         "work": [[v, r] for v, r in work],
     }
     say(f"run id {run_id}: {len(work)} request(s)")
-    results = []
-    with concurrent.futures.ThreadPoolExecutor(max_workers=min(2, args.jobs)) as ex:
-        futs = [ex.submit(submit, v, r, heads[v], man, run_dir, args.capacity_wait, axis) for v, r in work]
-        for f in futs:
-            try:
-                results.append(f.result())
-            except Exception as err:  # noqa: BLE001 -- recorded, never swallowed
-                results.append({"error": repr(err)})
-                say(f"[error] submit raised: {err!r}")
+    results = sim_common.fan_out(
+        lambda vr: submit(vr[0], vr[1], heads[vr[0]], man, run_dir, args.capacity_wait, axis), work, args.jobs)
     meta["submit_results"] = results
     path = run_dir / ("run.retry.json" if args.retry_failed else "run.json")
     path.write_text(json.dumps(meta, indent=2) + "\n")
