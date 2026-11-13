@@ -6,6 +6,10 @@ layout ciel installs) and checks that corner-run.py's ``--print-env`` and
 design/netlist.py's ``find_pdk()`` accept the pinned revision and refuse any
 other, including a tree with no ``versions`` component ("unknown").
 
+Since issue #292 ``find_pdk()`` is a thin wrapper over corner-run.py's own
+``load_pin``/``resolve_pdk``, so these cases also cover the one shared
+resolver both entry points go through.
+
 Run: python3 -I sim/bin/test_pdk_pin.py
 """
 from __future__ import annotations
@@ -35,6 +39,11 @@ def load(name: str, path: Path):
 
 
 netlist = load("pdk_pin_netlist", REPO / "design" / "netlist.py")
+
+sys.path.insert(0, str(BIN))
+import sim_common  # noqa: E402
+
+cr = sim_common.load_corner_run()  # the shared resolver (issue #292)
 
 
 def make_tree(base: Path, revision: str | None, variant: str = "sky130A") -> Path:
@@ -119,7 +128,45 @@ class PinTests(unittest.TestCase):
         root = make_tree(self.base, PINNED)
         (self.base / "ciel" / "sky130" / "versions" / f"{PINNED}.bak-1" / "sky130A").mkdir(parents=True)
         os.environ["PDK_ROOT"] = str(root)
-        self.assertEqual(netlist.installed_revision(root / "sky130A"), PINNED)
+        self.assertEqual(cr.installed_commit(root / "sky130A"), PINNED)
+        self.assertEqual(netlist.find_pdk().installed_commit, PINNED)
+
+    def test_find_pdk_uses_the_shared_resolver(self):
+        # find_pdk() must not carry its own copy of the resolution rules: no
+        # private Pdk/pin-loader/revision-reader, and the object it returns is
+        # corner-run.py's own Pdk (issue #292).
+        for gone in ("Pdk", "load_pdk_pin", "installed_revision", "ENDS_RE"):
+            self.assertFalse(
+                hasattr(netlist, gone),
+                f"design/netlist.py still defines {gone}",
+            )
+        os.environ["PDK_ROOT"] = str(make_tree(self.base, PINNED))
+        self.assertIsInstance(netlist.find_pdk(), cr.Pdk)
+
+    def test_find_pdk_honours_pin_defaults(self):
+        # sim/pdk.json's default_pdk_root/variant -- not a hardcoded
+        # ~/.ciel + sky130A -- decide what an unset PDK_ROOT/PDK resolves to.
+        root = make_tree(self.base, PINNED, PIN["variant"])
+        os.environ.pop("PDK_ROOT", None)
+        pin = dict(PIN, default_pdk_root=str(root))
+        original_load_pin = cr.load_pin
+        cr.load_pin = lambda: pin
+        try:
+            pdk = netlist.find_pdk()
+        finally:
+            cr.load_pin = original_load_pin
+        self.assertEqual(pdk.root, root)
+        self.assertEqual(pdk.variant, PIN["variant"])
+
+    def test_find_pdk_refuses_missing_model_library(self):
+        # The shared resolver also requires the pin's ngspice_lib file, and the
+        # refusal must still happen before klt netlist is ever invoked.
+        root = make_tree(self.base, PINNED)
+        (root / "sky130A" / PIN["ngspice_lib"]).resolve().unlink()
+        os.environ["PDK_ROOT"] = str(root)
+        with self.assertRaises(netlist.PdkNotFound) as cm:
+            netlist.find_pdk()
+        self.assertIn(PIN["ngspice_lib"], str(cm.exception))
 
 
 if __name__ == "__main__":
