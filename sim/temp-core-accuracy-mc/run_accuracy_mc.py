@@ -368,8 +368,14 @@ def load_term(run_dir, term):
     """-> {'report': dict|None, 'refusal': ..., 'missing_procs': [...], 'corners': {(proc, supply): {sample|None: {meas...} | {'_error': str}}}}
 
     nominal is one request; every mismatch term is one request PER PROCESS section (the fleet job limit is ~1 h at
-    concurrency 1), merged here.  A process whose request has no usable report is listed in missing_procs."""
-    ent = {"report": None, "refusal": None, "missing_procs": [], "jobs": {}, "corners": {}}
+    concurrency 1), merged here.  A process whose request has no usable report is listed in missing_procs.
+
+    `report['environment']` is the FIRST usable process section only, so it is not a safe source of
+    fleet-wide provenance: a full run is one job per process per term (36 jobs), and the other
+    sections' runners may be on different installs.  `jobs` and `engines` therefore keep every
+    process job's own `environment.remote` and `environment.engine_version` -- the per-job
+    provenance `observed_provenance()` joins over (issue #312)."""
+    ent = {"report": None, "refusal": None, "missing_procs": [], "jobs": {}, "engines": {}, "corners": {}}
     dirs = [(None, run_dir / term)] if term == "nominal" else [(p, run_dir / term / p) for p in PROCS]
     reps = []
     for proc, d in dirs:
@@ -398,6 +404,7 @@ def load_term(run_dir, term):
         for proc, rep in reps:
             ent["report"]["corners"] += rep["corners"]
             ent["jobs"][proc or "all"] = rep["environment"].get("remote", {})
+            ent["engines"][proc or "all"] = rep["environment"].get("engine_version")
             for c in rep["corners"]:
                 pr_, supply, smp = parse_cid(c["corner_id"])
                 vals = {m["name"]: m.get("value") for m in c["measurements"]}
@@ -691,8 +698,8 @@ def cmd_record(args):
     return 0
 
 
-def runner_pdk(ent):
-    """The PDK install of the fleet machine that actually ran this term, off its report.
+def runner_pdks(ent):
+    """The PDK install of EVERY fleet machine that ran a process section of this term.
 
     NOT the client-resolved `provenance.pdk`: the runner executes against its own
     `/opt/pdk`, stamped under `environment.remote.worker_environment.pdk`, and the two
@@ -701,27 +708,52 @@ def runner_pdk(ent):
     resolved `f6eeac7d...`.  That runner stamp is exactly the value this runner used to
     state as a literal labelled "(sim/pdk.json pin)" (issue #312), which it never was.
 
-    Returns `{}` when any link in the chain is absent, so an unreported stamp becomes
-    `unknown` via `sim_common.joined_versions()` rather than borrowing the client's.
+    One entry per process job, off `ent['jobs']` rather than the merged
+    `report['environment']` -- that merged section is the first usable process only, so a
+    term's other four runners (and any different install among them) were invisible.
+    Yields `{}` for a job with no stamp, so an unreported one becomes `unknown` via
+    `sim_common.joined_versions()` rather than borrowing the client's or another job's.
     """
-    env = (ent.get("report") or {}).get("environment") or {}
-    return ((env.get("remote") or {}).get("worker_environment") or {}).get("pdk") or {}
+    return [((j or {}).get("worker_environment") or {}).get("pdk") or {}
+            for j in (ent.get("jobs") or {}).values()]
 
 
 def observed_provenance(ents):
     """The fleet-side halves of the record header, derived from the run's own reports.
 
-    Both values go through `sim_common.joined_versions()`, so each is the sorted SET of
-    what was actually observed and reads `unknown` when no term reported one -- never
-    first-found-only, and never a literal that goes stale (issue #312).  Engines are
-    tagged `ngspice-<n>` *before* joining because the report carries the bare number
-    ("46") and `ngspice-unknown` is not a version.
+    Joined over every PROCESS JOB of every term -- a full run is 7 mismatch terms x 5
+    process sections + nominal = 36 fleet jobs, each free to land on a runner with its own
+    PDK install and engine.  Both values go through `sim_common.joined_versions()`, so each
+    is the sorted SET of what was actually observed and reads `unknown` when no job
+    reported one -- never first-found-only, and never a literal that goes stale (#312).
+    Engines are tagged `ngspice-<n>` *before* joining because the report carries the bare
+    number ("46") and `ngspice-unknown` is not a version.
+
+    `*_jobs` / `*_reporting` are the coverage of each value: how many jobs reported one at
+    all, out of how many ran.  Rendering uses them to keep a PARTIAL answer from reading
+    like a unanimous one; see `render_pdk_tools_lines()`.
     """
     jv = sim_common.joined_versions
-    engines = [{"tag": f"ngspice-{v}"} for e in ents.values()
-               if (v := ((e.get("report") or {}).get("environment") or {}).get("engine_version"))]
-    return {"fleet_pdk": jv((runner_pdk(e) for e in ents.values()), "stamp_text"),
-            "fleet_engine": jv(engines, "tag")}
+    pdks = [p for e in ents.values() for p in runner_pdks(e)]
+    engines = [{"tag": f"ngspice-{v}"} if v else {}
+               for e in ents.values() for v in (e.get("engines") or {}).values()]
+    return {"fleet_pdk": jv(pdks, "stamp_text"),
+            "fleet_pdk_jobs": len(pdks), "fleet_pdk_reporting": sum(1 for p in pdks if p.get("stamp_text")),
+            "fleet_engine": jv(engines, "tag"),
+            "fleet_engine_jobs": len(engines), "fleet_engine_reporting": sum(1 for e in engines if e.get("tag"))}
+
+
+def coverage_note(prov, which):
+    """A ` (from N of M fleet jobs; ...)` suffix when only SOME jobs reported `which`, else `""`.
+
+    A set joined over 36 jobs of which 3 answered is not the same claim as one all 36
+    agreed on, and the header sentence ("the fleet runners that executed the grid
+    reported ...") reads as the latter.  The note is deliberately absent in the two
+    unambiguous cases: every job reported (the value speaks for itself), and none did
+    (the value is already `unknown`, which says exactly that).
+    """
+    n, m = prov[f"{which}_reporting"], prov[f"{which}_jobs"]
+    return f" (from {n} of {m} fleet jobs; the rest reported none)" if 0 < n < m else ""
 
 
 def render_pdk_tools_lines(rec, pdk, prov, fleet):
@@ -740,9 +772,10 @@ def render_pdk_tools_lines(rec, pdk, prov, fleet):
     return [
         f"- **PDK**: {pdk.variant} @ open_pdks `{pdk.installed_commit}` ({pin_state}) on the host"
         f" that wrote this record, models `{pdk.pin['ngspice_lib']}` (`_mm` sections for"
-        f" mismatch); the fleet runners that executed the grid reported `{prov['fleet_pdk']}`",
+        f" mismatch); the fleet runners that executed the grid reported `{prov['fleet_pdk']}`"
+        + coverage_note(prov, "fleet_pdk"),
         f"- **Tools**: {rec['klt']} (client); backend `{rec['backend']}`; fleet engine"
-        f" {prov['fleet_engine']}; fleet jobs: {jobs}",
+        f" {prov['fleet_engine']}{coverage_note(prov, 'fleet_engine')}; fleet jobs: {jobs}",
     ]
 
 

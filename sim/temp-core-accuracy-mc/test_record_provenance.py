@@ -19,14 +19,19 @@ The sibling file `sim/temp-core-startup-solver/test_record_provenance.py` assert
 same contract for `run_solver_sweep.py` (issue #306); the source-level counterpart is
 `RunnerVersionLiteralTest` in `sim/bin/test_sim_common_provenance.py`.
 
-Stdlib only: no SPICE, no PDK, no run directory, no record written.
+Stdlib only: no SPICE, no PDK, no fleet, no record written.  `LoadTermContractTest`
+builds a run directory of stub `report.json` files under a temp dir so the real
+`load_term()` is exercised against the same shape the other tests stub.
 
 Run: python3 -I sim/temp-core-accuracy-mc/test_record_provenance.py
 """
 from __future__ import annotations
 
+import json
 import re
+import shutil
 import sys
+import tempfile
 import unittest
 from pathlib import Path
 
@@ -50,37 +55,53 @@ class _Pdk:
         self.pin = PIN
 
 
-def ran(engine="47", runner_pdk=RUNNER_PDK, client_pdk=CLIENT_PDK, job="klt-sim-dead"):
-    """One `ents` entry for a term whose fleet jobs produced a usable report.
+def job_env(engine="47", runner_pdk=RUNNER_PDK, job="klt-sim-dead"):
+    """One process section's `environment`, shaped like a real klt batch `report.json`.
 
-    The shape mirrors a real klt batch `report.json`, which carries *two* PDK values: the
-    runner's own install stamp under `environment.remote.worker_environment.pdk`, and the
-    client-resolved PDK under `provenance.pdk`.  They default to different commits on
-    purpose, so a reader that takes the client's value fails these tests instead of
-    silently reporting the wrong half (the real divergence is recorded in
-    `sim/bias-core-smoke/records/20261023-171642-e69f5b2e.json`).
+    Note where each half lives: the runner's own install stamp hangs off
+    `remote.worker_environment.pdk` (per job), while `engine_version` sits on the
+    environment itself -- which is why `load_term()` has to keep BOTH per process job.
     """
     return {
-        "report": {
-            "corners": [],
-            "environment": {
-                "engine": "ngspice",
-                "engine_version": engine,
-                "remote": {
-                    "job_id": job,
-                    "worker_environment": {"pdk": {"variant": "sky130A", "stamp_text": runner_pdk}},
-                },
-            },
-            "provenance": {"pdk": {"name": "sky130A", "version": client_pdk}},  # client side
+        "engine": "ngspice",
+        "engine_version": engine,
+        "remote": {
+            "job_id": job,
+            "worker_environment": {"pdk": {"variant": "sky130A", "stamp_text": runner_pdk}},
         },
-        "jobs": {"all": {"job_id": job}},
+    }
+
+
+def ran(engine="47", runner_pdk=RUNNER_PDK, client_pdk=CLIENT_PDK, job="klt-sim-dead", procs=None):
+    """One `ents` entry for a term whose fleet jobs produced a usable report.
+
+    A real klt batch `report.json` carries *two* PDK values: the runner's own install
+    stamp under `environment.remote.worker_environment.pdk`, and the client-resolved PDK
+    under `provenance.pdk`.  They default to different commits on purpose, so a reader
+    that takes the client's value fails these tests instead of silently reporting the
+    wrong half (the real divergence is recorded in
+    `sim/bias-core-smoke/records/20261023-171642-e69f5b2e.json`).
+
+    `procs` is `{name: {engine, runner_pdk, job}}` for a mismatch term, which is one fleet
+    job PER PROCESS section; it defaults to the single section the keyword args describe.
+    The entry mirrors `load_term()` exactly, **including** that `report['environment']` is
+    the FIRST process section alone -- that is what makes a first-found reader detectable
+    here, where a stub with one merged environment per term could not see it (issue #312).
+    """
+    envs = {k: job_env(**v) for k, v in (procs or {"all": {"engine": engine, "runner_pdk": runner_pdk, "job": job}}).items()}
+    first = next(iter(envs.values()))
+    return {
+        "report": {"corners": [], "environment": first,  # first process section ONLY, as load_term merges it
+                   "provenance": {"pdk": {"name": "sky130A", "version": client_pdk}}},  # client side
+        "jobs": {k: v["remote"] for k, v in envs.items()},
+        "engines": {k: v["engine_version"] for k, v in envs.items()},
         "missing_procs": [],
     }
 
 
 def not_run():
     """A term the fleet refused outright: no report, so nothing to observe."""
-    return {"report": None, "jobs": {}, "missing_procs": []}
+    return {"report": None, "jobs": {}, "engines": {}, "missing_procs": []}
 
 
 def lines(ents, pdk=None, klt="klayout-tools 0.9.0", backend="batch"):
@@ -122,6 +143,127 @@ class FleetEngineTest(unittest.TestCase):
     def test_partial_run_reports_only_the_terms_that_ran(self):
         prov, _ = lines({"nominal": ran(engine="46"), "amp": not_run(), "pnp": ran(engine="47")})
         self.assertEqual(prov["fleet_engine"], "ngspice-46, ngspice-47")
+
+
+class WithinTermJobsTest(unittest.TestCase):
+    """AC 2, one level down: a MISMATCH TERM IS ONE FLEET JOB PER PROCESS SECTION.
+
+    A full run is 7 mismatch terms x 5 process sections + nominal = 36 jobs.  Joining over
+    `report['environment']` samples the first usable process of each term -- 8 of those 36
+    -- so a runner on a different PDK or engine in any non-first section was dropped while
+    the header said "the fleet runners that executed the grid reported ...".  These cases
+    disagree WITHIN a term; the cross-term cases above could not see it.
+    """
+
+    FIVE = {"tt": {"engine": "46", "runner_pdk": "open_pdks " + "a" * 40, "job": "j0"},
+            "ss": {"engine": "47", "runner_pdk": "open_pdks " + "b" * 40, "job": "j1"},
+            "ff": {"engine": "47", "runner_pdk": "open_pdks " + "b" * 40, "job": "j2"},
+            "sf": {"engine": "47", "runner_pdk": "open_pdks " + "b" * 40, "job": "j3"},
+            "fs": {"engine": "47", "runner_pdk": "open_pdks " + "b" * 40, "job": "j4"}}
+
+    def test_process_jobs_of_one_term_disagreeing_report_every_stamp_and_engine(self):
+        prov, (pdk_line, tools) = lines({"pnp": ran(procs=self.FIVE)})
+        self.assertEqual(prov["fleet_pdk"], "open_pdks " + "a" * 40 + ", open_pdks " + "b" * 40)
+        self.assertEqual(prov["fleet_engine"], "ngspice-46, ngspice-47")
+        self.assertIn("b" * 40, pdk_line)      # the four non-first jobs, previously invisible
+        self.assertIn("ngspice-47", tools)
+
+    def test_every_process_job_is_counted_not_just_the_first(self):
+        prov, _ = lines({"pnp": ran(procs=self.FIVE)})
+        self.assertEqual(prov["fleet_pdk_jobs"], 5)
+        self.assertEqual(prov["fleet_engine_jobs"], 5)
+
+    def test_the_merged_first_process_environment_is_not_the_source(self):
+        """The exact defect: the merged `report['environment']` IS the `tt` section, so a
+        reader that uses it still passes every cross-term test while reporting only
+        `tt`'s stamp and engine."""
+        ent = ran(procs=self.FIVE)
+        self.assertEqual(ent["report"]["environment"]["engine_version"], "46")   # first section
+        prov = ram.observed_provenance({"pnp": ent})
+        self.assertNotEqual(prov["fleet_engine"], "ngspice-46")
+        self.assertNotEqual(prov["fleet_pdk"], "open_pdks " + "a" * 40)
+
+    def test_jobs_across_terms_and_processes_are_all_joined(self):
+        prov, _ = lines({"nominal": ran(engine="45", runner_pdk="open_pdks " + "c" * 40),
+                         "pnp": ran(procs=self.FIVE)})
+        self.assertEqual(prov["fleet_engine"], "ngspice-45, ngspice-46, ngspice-47")
+        self.assertEqual(prov["fleet_pdk_jobs"], 6)
+
+
+class CoverageNoteTest(unittest.TestCase):
+    """A value joined over the jobs that answered must not read as one they all agreed on.
+
+    Chosen behaviour (the open question in #315's review): annotate ONLY the ambiguous
+    case -- some jobs reported, others did not.  All-reported needs no caveat, and
+    none-reported already renders `unknown`, which says it plainly.
+    """
+
+    def test_a_partial_stamp_says_how_many_jobs_reported(self):
+        prov, (pdk_line, _) = lines({"pnp": ran(procs={
+            "tt": {"runner_pdk": "open_pdks " + "a" * 40, "job": "j0"},
+            "ss": {"runner_pdk": None, "job": "j1"},
+            "ff": {"runner_pdk": None, "job": "j2"}})})
+        self.assertEqual(prov["fleet_pdk_reporting"], 1)
+        self.assertEqual(prov["fleet_pdk_jobs"], 3)
+        self.assertIn("reported `open_pdks " + "a" * 40 + "` (from 1 of 3 fleet jobs; "
+                      "the rest reported none)", pdk_line)
+
+    def test_a_partial_engine_says_how_many_jobs_reported(self):
+        prov, (_, tools) = lines({"pnp": ran(procs={"tt": {"engine": "46", "job": "j0"},
+                                                    "ss": {"engine": None, "job": "j1"}})})
+        self.assertIn("fleet engine ngspice-46 (from 1 of 2 fleet jobs; the rest reported none);", tools)
+
+    def test_unanimous_coverage_adds_no_caveat(self):
+        _, (pdk_line, tools) = lines({"pnp": ran(procs={"tt": {"job": "j0"}, "ss": {"job": "j1"}})})
+        self.assertNotIn("fleet jobs;", pdk_line)
+        self.assertNotIn("fleet jobs;", tools)
+
+    def test_no_coverage_at_all_stays_plain_unknown(self):
+        _, (pdk_line, tools) = lines({"pnp": ran(procs={"tt": {"engine": None, "runner_pdk": None, "job": "j0"},
+                                                        "ss": {"engine": None, "runner_pdk": None, "job": "j1"}})})
+        self.assertIn("reported `unknown`", pdk_line)
+        self.assertNotIn("0 of 2", pdk_line)
+        self.assertIn("fleet engine unknown;", tools)
+
+
+class LoadTermContractTest(unittest.TestCase):
+    """The stub above is only evidence if the real `load_term()` produces that shape.
+
+    This is where the #315 defect actually lived: `observed_provenance()` read a key
+    (`report['environment']`) that `load_term()` fills from the first process section
+    only, and every stubbed test agreed with it.  Builds a run directory of `report.json`
+    files -- stdlib only, no SPICE, no PDK, no fleet -- and runs the real loader.
+    """
+
+    def _run_dir(self, term, procs):
+        d = Path(tempfile.mkdtemp())
+        self.addCleanup(shutil.rmtree, d, ignore_errors=True)
+        for name, spec in procs.items():
+            sub = d / term / name
+            sub.mkdir(parents=True)
+            (sub / "report.json").write_text(json.dumps({
+                "corners": [{"corner_id": f"{name}_mm/1.80V/x/mc0", "status": "ok",
+                             "measurements": [{"name": "ptat_m40", "value": 1.0}]}],
+                "environment": job_env(**spec)}))
+        return d
+
+    def test_load_term_keeps_every_process_job_s_stamp_and_engine(self):
+        d = self._run_dir("pnp", WithinTermJobsTest.FIVE)
+        ent = ram.load_term(d, "pnp")
+        self.assertEqual(sorted(ent["jobs"]), sorted(WithinTermJobsTest.FIVE))
+        self.assertEqual(sorted(set(ent["engines"].values())), ["46", "47"])
+        prov = ram.observed_provenance({"pnp": ent})
+        self.assertEqual(prov["fleet_engine"], "ngspice-46, ngspice-47")
+        self.assertEqual(prov["fleet_pdk"], "open_pdks " + "a" * 40 + ", open_pdks " + "b" * 40)
+        self.assertEqual(prov["fleet_pdk_jobs"], 5)
+
+    def test_a_missing_process_section_is_not_counted_as_a_job(self):
+        """`load_term()` lists it in `missing_procs`; it reported nothing, so it is not
+        one of the M jobs the coverage note divides by."""
+        d = self._run_dir("pnp", {k: v for k, v in WithinTermJobsTest.FIVE.items() if k != "fs"})
+        ent = ram.load_term(d, "pnp")
+        self.assertIn("fs", ent["missing_procs"])
+        self.assertEqual(ram.observed_provenance({"pnp": ent})["fleet_pdk_jobs"], 4)
 
 
 class PdkLineTest(unittest.TestCase):
@@ -197,7 +339,9 @@ class ToolsLineTest(unittest.TestCase):
         """A run the fleet refused outright is still a valid (NOT-RUN) record."""
         prov, both = lines({"nominal": not_run(), "pnp": not_run()})
         self.assertEqual(len(both), 2)
-        self.assertEqual(prov, {"fleet_pdk": "unknown", "fleet_engine": "unknown"})
+        self.assertEqual(prov["fleet_pdk"], "unknown")
+        self.assertEqual(prov["fleet_engine"], "unknown")
+        self.assertEqual((prov["fleet_pdk_jobs"], prov["fleet_engine_jobs"]), (0, 0))
         self.assertTrue(both[1].endswith("fleet jobs: "), both[1])
 
 
