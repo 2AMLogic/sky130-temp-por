@@ -26,7 +26,6 @@ A batch submit failure is reported in the record; there is no local fallback.
 from __future__ import annotations
 
 import argparse
-import concurrent.futures
 import functools
 import gzip
 import json
@@ -149,16 +148,9 @@ def cmd_run(args) -> int:
     man = sim_common.load_manifest(MANIFEST)
     pdk = cr.resolve_pdk(cr.load_pin())
     git_info = cr.git_state()
-    now = datetime.now(timezone.utc)
-    run_id = args.run_id or f"{now:%Y%m%d-%H%M%S}-{git_info['sha']}"
-    run_dir = BUILD / run_id
-    if args.retry_failed:
-        if not run_dir.exists():
-            raise SystemExit(f"{run_dir} does not exist")
-    else:
-        if run_dir.exists():
-            raise SystemExit(f"{run_dir} exists; refusing to reuse a run id")
-        run_dir.mkdir(parents=True)
+    sim_common.refuse_unsubmittable(git_info, args.allow_dirty)
+    run_id, run_dir, now = sim_common.open_run(
+        BUILD, args.run_id, git_info["sha"], reuse="require" if args.retry_failed else None)
     head = tb_netlist_head(run_dir, pdk) if not args.retry_failed else tb_netlist_head(run_dir / "retry", pdk)
     variants = args.variant or list(man["variants"])
     work = [(v, r) for v in variants for r, _ in all_rates(man)]
@@ -176,15 +168,8 @@ def cmd_run(args) -> int:
     if not args.retry_failed:
         (run_dir / "run.json").write_text(json.dumps(meta, indent=2) + "\n")
     say(f"run id {run_id}: {len(work)} requests ({len(variants)} variant(s) x {len(work) // len(variants)} rates)")
-    results = []
-    with concurrent.futures.ThreadPoolExecutor(max_workers=min(2, args.jobs)) as ex:
-        futs = [ex.submit(submit, v, r, head, man, run_dir, args.capacity_wait) for v, r in work]
-        for f in futs:
-            try:
-                results.append(f.result())
-            except Exception as err:  # noqa: BLE001 -- recorded, never swallowed
-                results.append({"error": repr(err)})
-                say(f"[error] submit raised: {err!r}")
+    results = sim_common.fan_out(
+        lambda vr: submit(vr[0], vr[1], head, man, run_dir, args.capacity_wait), work, args.jobs)
     meta["submit_results" if not args.retry_failed else "retry_results"] = results
     if args.retry_failed:
         old = json.loads((run_dir / "run.json").read_text())
@@ -669,6 +654,7 @@ def main(argv: list[str]) -> int:
     r.add_argument("--run-id")
     r.add_argument("--retry-failed", action="store_true", help="re-submit only requests with no usable report (fleet capacity refusals etc.); earlier attempts are archived")
     r.add_argument("--capacity-wait", type=float, default=0, help="batch.capacity_wait_s: seconds to wait out a Spot/fleet capacity refusal")
+    r.add_argument("--allow-dirty", action="store_true", help="submit from a dirty tree (debugging only; such a run's source revision does not resolve)")
     x = sub.add_parser("crosscheck")
     x.add_argument("--run-id", required=True)
     x.add_argument("--variant", choices=["as-drawn", "diag-mn1-l20"], default="as-drawn")

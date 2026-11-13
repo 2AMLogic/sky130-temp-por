@@ -59,6 +59,11 @@ and/or `corner-run.py` itself):
     say()/rate_tag()/scrub()/report_usable()/submit_request()
                           batch-fleet campaign-runner helpers shared by
                           por-comparator-thresholds and supply-ramp-top
+    open_run()/fan_out()/refuse_unsubmittable()
+                          the campaign submit bootstrap every fleet
+                          `cmd_run` opens with: the run id + run-directory
+                          rule, the bounded submit pool, and the
+                          submit-time clean-tree guard
     record_pdk_tools()      the record's `pdk` + `tools` provenance dicts,
                           every tool version derived from what actually ran
                           rather than hand-copied, plus the pieces it is
@@ -70,6 +75,7 @@ and/or `corner-run.py` itself):
 from __future__ import annotations
 
 import argparse
+import concurrent.futures
 import functools
 import gzip
 import importlib.util
@@ -82,6 +88,7 @@ import subprocess
 import sys
 import threading
 from dataclasses import dataclass
+from datetime import datetime, timezone
 from pathlib import Path
 from types import ModuleType
 
@@ -461,6 +468,73 @@ def scrub(text: str, run_dir: Path, repo_root: Path) -> str:
     return re.sub(r"/home/[^/\s]+", "<home>", text)
 
 
+def open_run(build_dir: Path, run_id_arg: str | None, git_sha: str, *,
+             reuse: str | None = None, sub: str | None = None,
+             create: bool = True) -> tuple[str, Path, datetime]:
+    """Open one campaign run: derive its id, apply the run-directory rule, return
+    ``(run_id, run_dir, now)``.
+
+    Every fleet campaign runner's ``cmd_run`` used to start with its own copy of this:
+    a ``<timestamp>-<short sha>`` run id (overridable with ``--run-id``),
+    ``<build_dir>/<run_id>`` as the run directory, and a rule about an existing
+    directory.  ``reuse`` selects that rule:
+
+    ``None``      a fresh run: refuse an existing directory (``sim/`` evidence is
+                  append-only, and a reused id would mix two runs into one) and
+                  create it.
+    ``"require"`` ``--retry-failed``: the directory must already exist, because the
+                  retry re-submits only the unusable requests of *that* run.
+    ``"allow"``   ``--resume`` (and a ``--retry-failed`` that tolerates a first run):
+                  create it when missing, accept it when present.
+
+    ``sub`` nests the run directory one level below the run id (``run_accuracy_mc.py``'s
+    ``--variant`` shares its baseline's run id).  ``create=False`` applies the rule but
+    leaves the ``mkdir`` to the caller (``run_brownout_campaign.py`` creates the
+    directory only once its request selection has been validated).
+    """
+    if reuse not in (None, "require", "allow"):
+        raise ValueError(f"reuse must be None, 'require' or 'allow', not {reuse!r}")
+    now = datetime.now(timezone.utc)
+    run_id = run_id_arg or f"{now:%Y%m%d-%H%M%S}-{git_sha}"
+    run_dir = (build_dir / run_id / sub) if sub else (build_dir / run_id)
+    if reuse == "require":
+        if not run_dir.exists():
+            raise SystemExit(f"{run_dir} does not exist")
+    else:
+        if reuse is None and run_dir.exists():
+            raise SystemExit(f"{run_dir} exists; refusing to reuse a run id")
+        if create:
+            run_dir.mkdir(parents=True, exist_ok=(reuse == "allow"))
+    return run_id, run_dir, now
+
+
+def fan_out(fn, units, jobs: int, *, label=None, tag: str | None = None) -> list[dict]:
+    """Run ``fn(unit)`` over ``units`` in the shared bounded pool, results in ``units`` order.
+
+    The pool is capped at 2 workers however large ``--jobs`` is -- these are fleet
+    submits against a vCPU-budgeted fleet, not local simulations -- and a ``jobs``
+    below 1 still gets one worker rather than a ``ThreadPoolExecutor`` ``ValueError``.
+    An exception from ``fn`` becomes an ``{"error": repr(err)}`` entry plus an
+    ``[error]`` log line: never swallowed, and never allowed to abandon the rest of the
+    campaign, because a submit failure is evidence the record reports.
+
+    ``label(unit)`` names a unit for the log line; with ``tag`` that name is also
+    prefixed to each of the unit's results as ``{tag: name, ...}`` (a key the result
+    itself carries wins, exactly as it did when the runners merged these by hand).
+    """
+    results: list[dict] = []
+    with concurrent.futures.ThreadPoolExecutor(max_workers=max(1, min(2, jobs))) as ex:
+        for unit, fut in [(u, ex.submit(fn, u)) for u in units]:
+            name = label(unit) if label else None
+            head = {tag: name} if tag else {}
+            try:
+                results.append({**head, **fut.result()})
+            except Exception as err:  # noqa: BLE001 -- recorded, never swallowed
+                results.append({**head, "error": repr(err)})
+                say(f"[error] submit{'' if name is None else ' ' + name} raised: {err!r}")
+    return results
+
+
 MODEL_LIB = "libs.tech/combined/sky130.lib.spice"
 
 
@@ -619,6 +693,23 @@ def snapshot_request_artifacts(src: Path, tag: str, snap_dir: Path, corners_dir:
 def submit_failures(requests: list[dict]) -> list[dict]:
     """Requests that never got a job id and ended in a non-passing outcome."""
     return [{"tag": q["tag"], "reason": q["outcome"]} for q in requests if q.get("job_id") is None and q.get("outcome") and q["outcome"] not in ("ok", "OK", "PASS")]
+
+
+def refuse_unsubmittable(gi: dict, allow_dirty: bool, *, require_pushed: bool = False) -> None:
+    """Exit unless the tree is clean: the submit-time twin of ``refuse_unrecordable``.
+
+    A fleet run's record cites its submit commit as the source revision of the evidence,
+    so a dirty tree leaves that citation unresolvable -- what
+    ``docs/characterization-report.md`` calls a provenance-weak record.
+    ``--allow-dirty`` overrides it for a debug run; the state is recorded either way.
+    ``require_pushed`` additionally demands that HEAD is on a remote branch, so the
+    fleet runners' own source SHA resolves (brown-out and glitch).
+    """
+    if require_pushed:
+        if (gi["dirty"] or not gi["pushed_to_remote"]) and not allow_dirty:
+            raise SystemExit(f"refusing to submit: dirty={gi['dirty']} pushed={gi['pushed_to_remote']} (commit + push first, or --allow-dirty; the state is recorded either way)")
+    elif gi["dirty"] and not allow_dirty:
+        raise SystemExit("refusing to submit from a dirty tree (commit first so the record cites a resolvable source revision, or --allow-dirty; the state is recorded either way)")
 
 
 def refuse_unrecordable(gi: dict, drift: list[str] | None, allow_dirty: bool, allow_deck_drift: bool) -> None:

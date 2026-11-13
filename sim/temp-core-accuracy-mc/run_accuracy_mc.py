@@ -34,13 +34,11 @@ Stages:  run | probe | record
 from __future__ import annotations
 
 import argparse
-import concurrent.futures
 import json
 import math
 import os
 import re
 import statistics
-import subprocess
 import sys
 from datetime import datetime, timezone
 from pathlib import Path
@@ -268,16 +266,14 @@ def variant_dir(base, variant):
 
 
 def cmd_run(args):
-    now = datetime.now(timezone.utc)
     git = cr.git_state()
-    if git.get("dirty") and not args.allow_dirty:
-        sys.exit("working tree is dirty: commit first so the record is provenance-clean (or --allow-dirty for a scratch run)")
-    run_id = args.run_id or f"{now:%Y%m%d-%H%M%S}-{git['sha']}"
+    sim_common.refuse_unsubmittable(git, args.allow_dirty)
     variant = args.variant
     if variant != "baseline" and not args.run_id:
         sys.exit("--variant needs --run-id: the variant shares the run id (and pin) of its baseline run")
-    run_dir = variant_dir(BUILD / run_id, variant)
-    run_dir.mkdir(parents=True, exist_ok=args.resume)
+    run_id, run_dir, now = sim_common.open_run(
+        BUILD, args.run_id, git["sha"], reuse="allow" if args.resume else None,
+        sub=None if variant == "baseline" else variant)
     terms = args.term or ["nominal", *RUN_TERMS]
     this = {"variant": variant, "capacity_wait_s": args.wait_for_capacity, "started_utc": now.strftime("%Y-%m-%dT%H:%M:%SZ"), "klt_client": sim_common.klt_version(),
             "klt_sim_backend_env": os.environ.get("KLT_SIM_BACKEND"), "git": git, "terms": terms,
@@ -314,14 +310,7 @@ def cmd_run(args):
         return {"term": term, "proc": proc, **res}
 
     units_list = [(t, None) if t == "nominal" else (t, pr) for t in terms for pr in ([None] if t == "nominal" else PROCS)]
-    results = []
-    with concurrent.futures.ThreadPoolExecutor(max_workers=min(2, args.jobs)) as ex:
-        for f in [ex.submit(one, u) for u in units_list]:
-            try:
-                results.append(f.result())
-            except Exception as err:  # noqa: BLE001 -- recorded
-                results.append({"error": repr(err)})
-                say(f"[error] {err!r}")
+    results = sim_common.fan_out(one, units_list, args.jobs)
     cur["submit_results"] = results
     (run_dir / "run.json").write_text(json.dumps(meta, indent=2) + "\n")
     print(f"raw outputs: {run_dir}")

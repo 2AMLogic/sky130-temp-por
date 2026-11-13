@@ -30,7 +30,6 @@ Append-only: ``record`` and ``selftest`` refuse to overwrite any existing path.
 from __future__ import annotations
 
 import argparse
-import concurrent.futures
 import functools
 import json
 import os
@@ -299,18 +298,9 @@ def cmd_run(args) -> int:
     man = sim_common.load_manifest(MANIFEST)
     pdk = cr.resolve_pdk(cr.load_pin())
     gi = source_state()
-    if (gi["dirty"] or not gi["pushed_to_remote"]) and not args.allow_dirty:
-        raise SystemExit(f"refusing to submit: dirty={gi['dirty']} pushed={gi['pushed_to_remote']} (commit + push first, or --allow-dirty; the state is recorded either way)")
-    now = datetime.now(timezone.utc)
-    run_id = args.run_id or f"{now:%Y%m%d-%H%M%S}-{gi['sha']}"
-    run_dir = BUILD / run_id
-    if args.retry_failed:
-        if not run_dir.exists():
-            raise SystemExit(f"{run_dir} does not exist")
-    else:
-        if run_dir.exists():
-            raise SystemExit(f"{run_dir} exists; refusing to reuse a run id")
-        run_dir.mkdir(parents=True)
+    sim_common.refuse_unsubmittable(gi, args.allow_dirty, require_pushed=True)
+    run_id, run_dir, now = sim_common.open_run(
+        BUILD, args.run_id, gi["sha"], reuse="require" if args.retry_failed else None)
     reqs = plan_requests(man, args.only_class)
     if args.only:
         reqs = [r for r in reqs if r["tag"] in args.only]
@@ -325,15 +315,8 @@ def cmd_run(args) -> int:
     if not args.retry_failed:
         (run_dir / "run.json").write_text(json.dumps(meta, indent=2) + "\n")
     say(f"run id {run_id}: {len(reqs)} request(s)")
-    results = []
-    with concurrent.futures.ThreadPoolExecutor(max_workers=max(1, min(2, args.jobs))) as ex:
-        futs = [ex.submit(submit_one, r, head, man, run_dir, args.capacity_wait, args.timeout_s) for r in reqs]
-        for f in futs:
-            try:
-                results.append(f.result())
-            except Exception as err:  # noqa: BLE001 -- recorded, never swallowed
-                results.append({"error": repr(err)})
-                say(f"[error] submit raised: {err!r}")
+    results = sim_common.fan_out(
+        lambda r: submit_one(r, head, man, run_dir, args.capacity_wait, args.timeout_s), reqs, args.jobs)
     old = json.loads((run_dir / "run.json").read_text()) if args.retry_failed else meta
     if args.retry_failed:
         old.setdefault("retries", []).append({"at_utc": datetime.now(timezone.utc).strftime("%Y-%m-%dT%H:%M:%SZ"), "capacity_wait_s": args.capacity_wait, "results": results})

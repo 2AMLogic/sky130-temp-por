@@ -34,7 +34,6 @@ Append-only: ``record`` and ``selftest`` refuse to overwrite any existing path.
 from __future__ import annotations
 
 import argparse
-import concurrent.futures
 import functools
 import hashlib
 import json
@@ -269,17 +268,14 @@ def cmd_run(args) -> int:
     man = sim_common.load_manifest(MANIFEST)
     pdk = cr.resolve_pdk(cr.load_pin())
     gi = source_state()
-    if (gi["dirty"] or not gi["pushed_to_remote"]) and not args.allow_dirty:
-        raise SystemExit(f"refusing to submit: dirty={gi['dirty']} pushed={gi['pushed_to_remote']} (commit + push first, or --allow-dirty; the state is recorded either way)")
+    sim_common.refuse_unsubmittable(gi, args.allow_dirty, require_pushed=True)
     variant_key = args.variant or "default"
     variant_of(man, variant_key)  # refuse an undeclared variant before anything is submitted
-    now = datetime.now(timezone.utc)
-    run_id = args.run_id or f"{now:%Y%m%d-%H%M%S}-{gi['sha']}"
-    run_dir = BUILD / run_id
+    # create=False: the run directory is created below, once the request selection is validated
+    run_id, run_dir, now = sim_common.open_run(
+        BUILD, args.run_id, gi["sha"], reuse="require" if args.retry_failed else None, create=False)
     meta = None
     if args.retry_failed:
-        if not run_dir.exists():
-            raise SystemExit(f"{run_dir} does not exist")
         meta = json.loads((run_dir / "run.json").read_text())
         prev = meta.get("solver_variant", "default")
         if prev != variant_key:
@@ -287,9 +283,6 @@ def cmd_run(args) -> int:
         drift = deck_drift((meta.get("source") or {}).get("sha_full"), gi.get("sha_full"))
         if drift is None or drift:
             raise SystemExit(f"refusing to continue run {run_id}: deck inputs differ from (or cannot be compared with) its first submit commit: {drift}")
-    else:
-        if run_dir.exists():
-            raise SystemExit(f"{run_dir} exists; refusing to reuse a run id")
     reqs = plan_requests(man)
     rerun = man.get("tightened_rerun") or {}
     if variant_key != "default" and rerun.get("variant") == variant_key:
@@ -313,15 +306,9 @@ def cmd_run(args) -> int:
                 "submitted_tags": [r["tag"] for r in reqs]}
         (run_dir / "run.json").write_text(json.dumps(meta, indent=2) + "\n")
     say(f"run id {run_id}: {len(reqs)} request(s), solver variant {variant_key}")
-    results = []
-    with concurrent.futures.ThreadPoolExecutor(max_workers=min(2, args.jobs)) as ex:
-        futs = [ex.submit(submit_one, r, head, man, run_dir, args.capacity_wait, variant_key, args.slot_wait, args.slot_poll) for r in reqs]
-        for f in futs:
-            try:
-                results.append(f.result())
-            except Exception as err:  # noqa: BLE001 -- recorded, never swallowed
-                results.append({"error": repr(err)})
-                say(f"[error] submit raised: {err!r}")
+    results = sim_common.fan_out(
+        lambda r: submit_one(r, head, man, run_dir, args.capacity_wait, variant_key, args.slot_wait, args.slot_poll),
+        reqs, args.jobs)
     old = json.loads((run_dir / "run.json").read_text()) if args.retry_failed else meta
     if args.retry_failed:
         old.setdefault("retries", []).append({"at_utc": datetime.now(timezone.utc).strftime("%Y-%m-%dT%H:%M:%SZ"), "capacity_wait_s": args.capacity_wait,
