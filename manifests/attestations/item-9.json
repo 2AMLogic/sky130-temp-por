@@ -303,7 +303,8 @@
         ],
         "cwd": ".",
         "exit_status": 0,
-        "passed": true
+        "passed": true,
+        "local_only": true
       },
       {
         "check": "pin",
@@ -336,7 +337,7 @@
         "path": "manifests/inventories/item-9.json",
         "scope": "repo"
       },
-      "content_hash": "sha256:99dd37adef89b248fb9901a23299a5759a66f9dbe4bb8ed6eb5e1262e92900b0"
+      "content_hash": "sha256:efae26afd0cb4623556d6bcda77990337a433d7d94a5e3c6fa2a5c3735910d1c"
     }
   }
 }

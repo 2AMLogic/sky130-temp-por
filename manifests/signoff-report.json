@@ -33,7 +33,7 @@
         "command": null,
         "kind": "generic",
         "check_status": "pass",
-        "content_hash": "sha256:9514e3cd3ab20e4b0fe0dd118d34476a8467f4122321eed100ae113a7a41e478",
+        "content_hash": "sha256:b1990815591dde58c272344f128ee5cdcf0695e6580c9ffaa15ba7a3ca2101be",
         "input_verified": true,
         "exit_status": 0,
         "artifact_binding": {
@@ -42,7 +42,7 @@
             "path": "manifests/inventories/item-1.json",
             "scope": "repo"
           },
-          "content_hash": "sha256:9514e3cd3ab20e4b0fe0dd118d34476a8467f4122321eed100ae113a7a41e478",
+          "content_hash": "sha256:b1990815591dde58c272344f128ee5cdcf0695e6580c9ffaa15ba7a3ca2101be",
           "input_verified": true,
           "summary": "T1 item 1 (Design sources): 22/22 attestation checks passed (klt signoff --attest)",
           "source": "manifests/inventories/item-1.json",
@@ -294,7 +294,7 @@
         "command": null,
         "kind": "generic",
         "check_status": "pass",
-        "content_hash": "sha256:99dd37adef89b248fb9901a23299a5759a66f9dbe4bb8ed6eb5e1262e92900b0",
+        "content_hash": "sha256:efae26afd0cb4623556d6bcda77990337a433d7d94a5e3c6fa2a5c3735910d1c",
         "input_verified": true,
         "exit_status": 0,
         "artifact_binding": {
@@ -303,7 +303,7 @@
             "path": "manifests/inventories/item-9.json",
             "scope": "repo"
           },
-          "content_hash": "sha256:99dd37adef89b248fb9901a23299a5759a66f9dbe4bb8ed6eb5e1262e92900b0",
+          "content_hash": "sha256:efae26afd0cb4623556d6bcda77990337a433d7d94a5e3c6fa2a5c3735910d1c",
           "input_verified": true,
           "summary": "T1 item 9 (Testbenches shipped): 43/43 attestation checks passed (klt signoff --attest)",
           "source": "manifests/inventories/item-9.json",
