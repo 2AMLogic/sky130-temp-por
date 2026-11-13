@@ -31,7 +31,6 @@ import gzip
 import json
 import os
 import shutil
-import subprocess
 import sys
 from datetime import datetime, timezone
 from pathlib import Path
@@ -203,13 +202,7 @@ def cmd_crosscheck(args) -> int:
     req["options"]["ngspice_init"] = sim_common.spiceinit_lines(SIM_DIR)
     (d / "request.json").write_text(json.dumps(req, indent=2) + "\n")
     say(f"[crosscheck] one local corner (tt/27C/3.30V, 10 kV/s, {variant}) on local ngspice")
-    p = subprocess.run(
-        ["klt", "sim", str(d / "request.json"), "--backend", "local", "-o", str(d / "out"), "--format", "json"],
-        capture_output=True,
-        text=True,
-        timeout=3600,
-    )
-    (d / "report.json").write_text(p.stdout)
+    p = sim_common.run_local_probe(d)
     print(f"exit {p.returncode}")
     return 0
 
