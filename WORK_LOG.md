@@ -6,6 +6,11 @@ Chronological record of recently merged pull requests and closed issues. This fi
 
 - [2026-08](work_log/WORK_LOG_2026-08.md)
 
+### 2026-11-11
+
+- **PR #288**: chore: remove retired guard reproducer now covered upstream
+- **Issue #191** (closed): Remove docs/guard-repro reproducer: stale, unreferenced test of a Loom-managed hook
+
 ### 2026-11-07
 
 - **PR #286**: sim: measure DR-007 mirror-degen mirror-term ratio on the batch fleet
