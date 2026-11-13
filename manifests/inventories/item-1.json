@@ -2,7 +2,7 @@
   "schema_version": 1,
   "kind": "t1-attestation-inventory",
   "t1_item": 1,
-  "description": "Design sources: the xschem schematics/symbols under design/ and the ngspice netlists derived from them. The freshness check is design/netlist.py --check (re-exports every cell with xschem and diffs the committed netlists); it needs xschem >= 3.4.5 (verified on 3.4.7) and the sky130 PDK, so it cannot run on a stock CI runner. See manifests/README.md.",
+  "description": "Design sources: the xschem schematics/symbols under design/ and the ngspice netlists derived from them. The freshness check is design/netlist.py --check (re-exports every cell with xschem and diffs the committed netlists); it needs xschem >= 3.4.5 (verified on 3.4.7) and the sky130 PDK, which a stock CI runner has not, so each derived check is marked local_only: `klt signoff --attest 1 ... --check` never runs it on any host -- it reports [SKIP] and carries the committed outcome, while still re-hashing every file listed here. Re-attesting (`--attest 1 ... -o`) does run it, as does `python3 design/netlist.py --check` on its own. See manifests/README.md.",
   "sources": [
     "design/bias_core.sch",
     "design/bias_core.sym",
@@ -26,7 +26,8 @@
           "python3",
           "design/netlist.py",
           "--check"
-        ]
+        ],
+        "local_only": true
       }
     },
     {
@@ -37,7 +38,8 @@
           "python3",
           "design/netlist.py",
           "--check"
-        ]
+        ],
+        "local_only": true
       }
     },
     {
@@ -48,7 +50,8 @@
           "python3",
           "design/netlist.py",
           "--check"
-        ]
+        ],
+        "local_only": true
       }
     },
     {
@@ -59,7 +62,8 @@
           "python3",
           "design/netlist.py",
           "--check"
-        ]
+        ],
+        "local_only": true
       }
     },
     {
@@ -70,7 +74,8 @@
           "python3",
           "design/netlist.py",
           "--check"
-        ]
+        ],
+        "local_only": true
       }
     }
   ]

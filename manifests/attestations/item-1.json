@@ -143,7 +143,8 @@
         ],
         "cwd": ".",
         "exit_status": 0,
-        "passed": true
+        "passed": true,
+        "local_only": true
       },
       {
         "check": "command",
@@ -157,7 +158,8 @@
         ],
         "cwd": ".",
         "exit_status": 0,
-        "passed": true
+        "passed": true,
+        "local_only": true
       },
       {
         "check": "command",
@@ -171,7 +173,8 @@
         ],
         "cwd": ".",
         "exit_status": 0,
-        "passed": true
+        "passed": true,
+        "local_only": true
       },
       {
         "check": "command",
@@ -185,7 +188,8 @@
         ],
         "cwd": ".",
         "exit_status": 0,
-        "passed": true
+        "passed": true,
+        "local_only": true
       },
       {
         "check": "command",
@@ -199,7 +203,8 @@
         ],
         "cwd": ".",
         "exit_status": 0,
-        "passed": true
+        "passed": true,
+        "local_only": true
       }
     ]
   },
@@ -213,7 +218,7 @@
         "path": "manifests/inventories/item-1.json",
         "scope": "repo"
       },
-      "content_hash": "sha256:9514e3cd3ab20e4b0fe0dd118d34476a8467f4122321eed100ae113a7a41e478"
+      "content_hash": "sha256:b1990815591dde58c272344f128ee5cdcf0695e6580c9ffaa15ba7a3ca2101be"
     }
   }
 }

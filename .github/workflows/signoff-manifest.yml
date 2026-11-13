@@ -58,14 +58,21 @@ jobs:
 
       - name: Re-attest item 9 (testbenches shipped) against its committed envelope
         run: |
-          # The cold-start command netlists a testbench with xschem and needs
-          # the sky130 PDK; a stock runner has neither, so the re-attestation
-          # cannot run here. Say so instead of skipping silently, and run it
-          # wherever the toolchain exists (manifests/README.md, "Attested
-          # evidence and its limits").
-          if ! command -v xschem >/dev/null 2>&1; then
-            echo "::warning::item 9 not re-attested: xschem and the sky130 PDK are not installed on this runner. Run 'klt signoff --attest 9 --inventory manifests/inventories/item-9.json --check manifests/attestations/item-9.json' locally."
-            exit 0
-          fi
+          # The cold-start command needs xschem and the sky130 PDK, which this
+          # runner has not. It is marked "local_only": true in the inventory, so
+          # --check reports it as "[SKIP] ... (local_only, not run)" and carries
+          # the committed outcome -- never as passed -- while still re-hashing
+          # every inventoried file and diffing the whole envelope. The step
+          # therefore runs unconditionally: no toolchain guard, no silent skip.
           klt signoff --attest 9 --inventory manifests/inventories/item-9.json \
             --check manifests/attestations/item-9.json
+
+      - name: Re-attest item 1 (design sources) against its committed envelope
+        run: |
+          # Same contract as item 9: the five `python3 design/netlist.py --check`
+          # freshness commands are "local_only": true (they need xschem and the
+          # PDK), so they report "[SKIP] ... (local_only, not run)" here while the
+          # 17 inventoried design sources and netlists are still re-hashed and the
+          # envelope is still diffed in full. See manifests/README.md.
+          klt signoff --attest 1 --inventory manifests/inventories/item-1.json \
+            --check manifests/attestations/item-1.json
