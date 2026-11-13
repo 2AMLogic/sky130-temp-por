@@ -9,7 +9,9 @@ the three properties that keep them honest:
 
   * a version appears only when a job reported it,
   * an unobserved version reads `unknown` -- never a default and never first-found-only,
-  * the client/runner mismatch sentence appears only when a mismatch was observed.
+  * the client/runner mismatch sentence appears only when a mismatch was observed,
+  * the fleet half of the PDK line is the *runner's* stamp, never the client-resolved
+    `provenance.pdk` -- those two genuinely differ on real runs.
 
 Stdlib only: no SPICE, no PDK, no run directory, no record written.
 
@@ -39,15 +41,41 @@ class _Pdk:
         self.pin = PIN
 
 
-def ran(runner="0.9.0", client="0.9.0", engine="47", instance="c7i.4xlarge", pdk_version="open_pdks " + "a" * 40):
-    """One `summary` entry for a combo that ran, plus its matching `res` entry."""
+RUNNER_PDK = "open_pdks " + "a" * 40   # what the runner actually simulated under
+CLIENT_PDK = "open_pdks " + "f" * 40   # what the *client* resolved -- never the fleet's
+
+
+def ran(runner="0.9.0", client="0.9.0", engine="47", instance="c7i.4xlarge",
+        runner_pdk=RUNNER_PDK, client_pdk=CLIENT_PDK):
+    """One `summary` entry for a combo that ran, plus its matching `res` entry.
+
+    The `res` entry mirrors the shape of a real klt batch `report.json` -- the same one
+    `sim/bin/test_corner_run_batch.py` builds -- which carries *two* PDK values:
+    the runner's own install stamp under `environment.remote.worker_environment.pdk`,
+    and the client-resolved PDK under `provenance.pdk`.  They default to different
+    commits on purpose, so a reader that takes the client's value fails these tests
+    instead of silently reporting the wrong half (the real divergence is recorded in
+    `sim/bias-core-smoke/records/20261023-171642-e69f5b2e.json`).
+    """
     s = {
         "status": "ran",
         "fleet": {"job_id": "klt-sim-dead", "instance_type": instance, "lifecycle": "spot",
                   "runner_klt_version": runner, "client_klt_version": client, "elapsed_seconds": 1},
         "ngspice_engine_version": engine,
     }
-    rep = {"report": {"provenance": {"pdk": {"name": "sky130A", "version": pdk_version}}}}
+    rep = {"report": {
+        "environment": {
+            "engine": "ngspice",
+            "engine_version": engine,
+            "remote": {
+                "job_id": "klt-sim-dead",
+                "runner_klt_version": runner,
+                "worker_environment": {"pdk": {"variant": "sky130A", "stamp_text": runner_pdk}},
+            },
+        },
+        "provenance": {"klt_version": runner,
+                       "pdk": {"name": "sky130A", "version": client_pdk}},  # client side
+    }}
     return s, rep
 
 
@@ -87,7 +115,7 @@ class ToolsLineTest(unittest.TestCase):
         self.assertIn("fleet `unknown`", tools)
         self.assertIn("on Spot `unknown`", tools)
         self.assertIn("fleet runner klt `unknown`", tools)
-        self.assertIn("announced `unknown`", pdk_line)
+        self.assertIn("reported `unknown`", pdk_line)
         self.assertNotIn("mismatch", tools)
         # The client's own klt string is a legitimate input and stays; nothing about the
         # FLEET may carry a version when no job reported one.
@@ -133,17 +161,34 @@ class PdkLineTest(unittest.TestCase):
         self.assertNotIn("(matches sim/pdk.json pin)", pdk_line)
         self.assertIn("b" * 40, pdk_line)
 
-    def test_the_fleet_pdk_is_the_one_the_jobs_announced(self):
-        """The grid ran on the fleet, so the fleet's own report is reported separately
+    def test_the_fleet_pdk_is_the_one_the_runners_reported(self):
+        """The grid ran on the fleet, so the runners' own stamp is reported separately
         from the recording host's install -- neither stands in for the other."""
-        _, (pdk_line, _) = build([ran(pdk_version="open_pdks " + "c" * 40), ran(pdk_version="open_pdks " + "c" * 40)])
-        self.assertIn("the fleet jobs' own `report.json` announced `open_pdks " + "c" * 40 + "`", pdk_line)
+        _, (pdk_line, _) = build([ran(runner_pdk="open_pdks " + "c" * 40), ran(runner_pdk="open_pdks " + "c" * 40)])
+        self.assertIn("the fleet runners that executed the grid reported `open_pdks " + "c" * 40 + "`", pdk_line)
+
+    def test_the_client_resolved_pdk_is_never_cited_as_the_fleet_s(self):
+        """The defect this change removes: `provenance.pdk` is the PDK the *client*
+        resolved, so citing it would make an unverified fleet read as pinned.  A real
+        run diverges exactly like this (record 20261023-171642-e69f5b2e)."""
+        ran_pdk, client_pdk = "open_pdks " + "c" * 40, "open_pdks " + "9" * 40
+        prov, (pdk_line, _) = build([ran(runner_pdk=ran_pdk, client_pdk=client_pdk)] * 2)
+        self.assertEqual(prov["fleet_pdk"], ran_pdk)
+        self.assertIn(ran_pdk, pdk_line)
+        self.assertNotIn(client_pdk, pdk_line)
+
+    def test_a_runner_that_reports_no_stamp_is_unknown_not_the_client_s(self):
+        """`unknown` beats borrowing the client's value when the runner stamped nothing."""
+        prov, (pdk_line, _) = build([ran(runner_pdk=None, client_pdk="open_pdks " + "9" * 40)])
+        self.assertEqual(prov["fleet_pdk"], "unknown")
+        self.assertIn("reported `unknown`", pdk_line)
+        self.assertNotIn("9" * 40, pdk_line)
 
     def test_disagreeing_fleet_pdks_are_both_reported(self):
-        _, (pdk_line, _) = build([ran(pdk_version="open_pdks " + "c" * 40), ran(pdk_version="open_pdks " + "d" * 40)])
+        _, (pdk_line, _) = build([ran(runner_pdk="open_pdks " + "c" * 40), ran(runner_pdk="open_pdks " + "d" * 40)])
         self.assertIn("open_pdks " + "c" * 40 + ", open_pdks " + "d" * 40, pdk_line)
 
-    def test_a_report_without_provenance_is_unknown(self):
+    def test_a_report_without_a_runner_environment_is_unknown(self):
         summary = {"c0": ran()[0]}
         res = {"c0": {"report": {"corners": []}}}
         prov = rss.observed_provenance(summary, res)
