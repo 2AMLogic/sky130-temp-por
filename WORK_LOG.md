@@ -4,7 +4,24 @@ Chronological record of recently merged pull requests and closed issues. This fi
 
 ## Archives
 
+- [2026-09](work_log/WORK_LOG_2026-09.md)
 - [2026-08](work_log/WORK_LOG_2026-08.md)
+
+### 2026-11-13
+
+- **PR #300**: refactor(sim): derive each record's fleet/host tool versions instead of hardcoding them
+- **Issue #297** (closed): Share the record pdk/tools provenance block across fleet runners (7 copies; 4 hardcode stale tool versions)
+- **PR #305**: feat(manifests): gate items 1 and 9 with klt's own local_only attest check
+- **PR #301**: feat(manifests): re-hash attestation.checks[] files so source edits fail CI
+- **Issue #299** (closed): signoff gate never re-hashes item 1 and item 9 attested files, so source edits silently stale the envelopes
+- **PR #298**: fix(netlist): strip klt's klt-netlist-inputs provenance line in normalize()
+- **Issue #295** (closed): design/netlist.py --check fails on main: committed netlists predate klt's klt-netlist-inputs provenance line
+- **PR #296**: refactor(sim): hoist the attemptN reader, point_log and classify_error into sim_common
+- **Issue #293** (closed): Consolidate six drifted attemptN readers (and point_log/classify_error) into sim_common
+- **PR #294**: refactor(netlist): resolve the PDK through corner-run.py instead of a private copy
+- **Issue #292** (closed): Dedupe PDK pin resolution: design/netlist.py re-implements corner-run.py's resolver (already drifted)
+- **PR #290**: sim(glitch-top): fleet re-run of vdd_slew_v1.2_h0.0002_s200000 with lowered request timeout
+- **Issue #181** (closed): glitch-top: re-run failed vdd_level request vdd_slew_v1.2_h0.0002_s200000 (45 ERROR points)
 
 ### 2026-11-11
 
@@ -265,9 +282,4 @@ Chronological record of recently merged pull requests and closed issues. This fi
 - **Issue #37** (closed): bias_core layout: bias/ratio resistors + Miller compensation caps
 - **Issue #36** (closed): bias_core layout: XQ1/XQR reference PNPs (collector-strap blocked in part)
 - **Issue #29** (closed): T1 item 5/10: ratify the target spec table as a decision-record PR
-
-### 2026-09-09
-
-- **PR #28**: sim: characterize sky130 native devices (nfet_05v0_nvt vs nfet_03v3_nvt) for MASSIST
-- **Issue #27** (closed): Characterize sky130's native devices (nfet_05v0_nvt vs nfet_03v3_nvt) for the POR startup-assist leg: Vth spread, minimum operating voltage, and MASSIST's always-on static current over PVT (porting-plan §2.6 / §4 item 2)
 
