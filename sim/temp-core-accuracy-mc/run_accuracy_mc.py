@@ -83,6 +83,11 @@ BRANCH_GUARD = "na_nb_T_spread_V"
 # through the -40 C and 125 C errors, in degC. Samples passing every guard but exceeding this are listed.
 OFFTREND_SCAN_DEGC = 2.0
 
+# `none` negative control: the switching wrappers zero every mismatch source, so a sample must
+# reproduce its corner's nominal curve bit-for-bit.  Anything below this is "exactly the
+# no-mismatch curve"; see none_control() for why a NOT-COMPARED corner is not 0 V.
+CONTROL_FLAT_V = 1e-9
+
 # ---------------------------------------------------------------------------------------------
 # terms: which temp_core instances belong to which attribution group.  Everything in bias_core and
 # every temp_core device not listed is group "other".
@@ -500,6 +505,70 @@ def analyse_term(ent, nominal_ent, branch_guard=True):
     return res
 
 
+def none_control(an):
+    """Grade the `none` negative control three-state: PASS / FAIL / NOT VERIFIED (issue #310).
+
+    `analyse_term` leaves ``max_dev_from_nominal_V`` at ``None`` for a corner with no valid
+    sample or no usable nominal point -- nothing was compared there.  Folding that to 0.0 V
+    (``max_dev or 0.0``, the pre-#310 behaviour) turned "nothing was compared" into
+    "0 V deviation" and rendered the control as PASS, so an all-invalid `none` term could
+    certify the per-term attribution it is supposed to police, and corners that dropped out
+    of a partially failed run silently left the max.
+
+    A corner that was not compared therefore makes the whole control **NOT VERIFIED**,
+    whatever the compared corners show; the max is reported over the compared corners only
+    (``None`` when there are none) and the uncompared corners are named.
+    """
+    not_compared = sorted(f"{p}_{v:.2f}V" for (p, v), cs in an.items() if cs["max_dev_from_nominal_V"] is None)
+    devs = [cs["max_dev_from_nominal_V"] for cs in an.values() if cs["max_dev_from_nominal_V"] is not None]
+    max_dev = max(devs) if devs else None
+    return {"max_dev_from_nominal_V": max_dev,
+            "n_corners": len(an),
+            "n_corners_compared": len(devs),
+            "corners_not_compared": not_compared,
+            "flat_threshold_V": CONTROL_FLAT_V,
+            "verdict": ("NOT VERIFIED" if not_compared or max_dev is None
+                        else "PASS" if max_dev < CONTROL_FLAT_V else "FAIL")}
+
+
+def control_line(ctrl):
+    """The record's negative-control bullet, three-state (issue #310).
+
+    A `none` term that compared nothing -- or compared only some of its corners -- can never
+    render PASS here, because the max it would report is not a measurement of the corners
+    that dropped out.  `ctrl` is `none_control()`'s dict, or `{}` when the term is absent.
+    """
+    head = "- Negative control (`none`: `_mm` section + Monte Carlo, every device wrapped to sigma = 0): "
+    if not ctrl:
+        return head + "**NOT AVAILABLE** (term not run / no usable result); the per-term attribution is not independently checked by this record."
+    if ctrl["verdict"] == "NOT VERIFIED":
+        return (head + f"**NOT VERIFIED**: {len(ctrl['corners_not_compared'])} of {ctrl['n_corners']} corners compared nothing "
+                "(no valid sample, or no usable nominal point): " + ", ".join(ctrl["corners_not_compared"]) + ". "
+                + (f"Over the {ctrl['n_corners_compared']} corners that were compared, max |PTAT(sample) - PTAT(nominal)| = {ctrl['max_dev_from_nominal_V']:.3g} V, "
+                   "but a max over a subset cannot certify the switching wrappers on the corners that dropped out"
+                   if ctrl["n_corners_compared"] else "No corner was compared at all, so there is no measurement here")
+                + " -- the per-term attribution cannot be trusted on this record's control.")
+    return (head + f"max |PTAT(sample) - PTAT(nominal)| over all samples, all {ctrl['n_corners']} corners and all temperatures "
+            f"= {ctrl['max_dev_from_nominal_V']:.3g} V "
+            + (f"(PASS: exactly the no-mismatch curve, below {ctrl['flat_threshold_V']:g} V; the switching wrappers zero every mismatch source, and nothing else varies)"
+               if ctrl["verdict"] == "PASS" else "(**FAIL**: the control is not flat; the per-term attribution cannot be trusted)"))
+
+
+def compare_control_line(name, c):
+    """The variant-compare record's per-deck `none == nominal` control bullet (same three states)."""
+    head = f"- `none == nominal` control, {name} deck: "
+    if c is None:
+        return head + "**NOT AVAILABLE** (term not run / no usable result); not verified."
+    if c["verdict"] == "NOT VERIFIED":
+        return (head + f"**NOT VERIFIED** -- {len(c['corners_not_compared'])} of {c['n_corners']} corners compared nothing "
+                "(no valid sample, or no usable nominal point): " + ", ".join(c["corners_not_compared"]) + "; "
+                + (f"max |PTAT(sample) - PTAT(nominal)| over the {c['n_corners_compared']} compared corners = {c['max_dev_from_nominal_V']:.3g} V, which does not cover the rest"
+                   if c["n_corners_compared"] else "no corner was compared at all")
+                + ". Attribution cannot be trusted on this control.")
+    return (head + f"max |PTAT(sample) - PTAT(nominal)| over all {c['n_corners']} corners = {c['max_dev_from_nominal_V']:.3g} V "
+            + (f"(PASS: below {c['flat_threshold_V']:g} V)" if c["verdict"] == "PASS" else "(**FAIL**: attribution cannot be trusted)"))
+
+
 def worst_over_T(corner_stats, sig, mode):
     ts = TEMPS if mode == "untrimmed" else [T_LO, T_HI]
     c = [(corner_stats["stats"][(sig, mode, t)]["k3sd"], t) for t in ts if (sig, mode, t) in corner_stats["stats"]]
@@ -650,12 +719,8 @@ def cmd_record(args):
     not_run = [t for t in RUN_TERMS if ents[t]["report"] is None] + (["nominal"] if nominal["report"] is None else [])
     partial = {t: ents[t]["missing_procs"] for t in RUN_TERMS if ents[t]["report"] is not None and ents[t]["missing_procs"]}
     xcheck = transient_crosscheck(nominal) if nominal["report"] else None
-    # --- negative control + liveness
-    ctrl = {}
-    if "none" in anal and anal["none"]:
-        ctrl["none_max_dev_from_nominal_V"] = max((cs["max_dev_from_nominal_V"] or 0.0) for cs in anal["none"].values())
-        ctrl["none_max_sd_V"] = 0.0
-    live = {t: (summ[t]["untrimmed"]["pooled_worst"] if t in summ and summ[t]["untrimmed"] else None) for t in TERMS if t in summ}
+    # --- negative control (liveness rows are rendered straight from `summ`)
+    ctrl = none_control(anal["none"]) if anal.get("none") else {}
     rss = None
     if all(t in summ and summ[t]["untrimmed"] for t in TERMS) and "all" in summ and summ["all"]["untrimmed"]:
         rss = {}
@@ -820,11 +885,7 @@ def render_md(rec, anal, summ, summ_ctat, rss, ctrl, xcheck, not_run, fleet, met
           "Corners whose NOMINAL reference failed a guard (all their samples are excluded): " + (", ".join(sorted(set(bad_nom))) or "none") + ".", ""]
     # controls
     L += ["## Controls and cross-checks", ""]
-    if ctrl:
-        L.append(f"- Negative control (`none`: `_mm` section + Monte Carlo, every device wrapped to sigma = 0): max |PTAT(sample) - PTAT(nominal)| over all samples, corners and temperatures = {ctrl['none_max_dev_from_nominal_V']:.3g} V "
-                 + ("(PASS: exactly the no-mismatch curve; the switching wrappers zero every mismatch source, and nothing else varies)" if ctrl['none_max_dev_from_nominal_V'] < 1e-9 else "(**FAIL**: the control is not flat; the per-term attribution cannot be trusted)"))
-    else:
-        L.append("- Negative control (`none`) NOT AVAILABLE.")
+    L.append(control_line(ctrl))
     for t in TERMS:
         if t in summ and summ[t]["untrimmed"]:
             L.append(f"- Liveness `{t}`: pooled untrimmed 3 sigma = {summ[t]['untrimmed']['pooled_worst']:.3g} degC " + ("(nonzero: that term's mismatch is live)" if summ[t]['untrimmed']['pooled_worst'] > 0 else "(**ZERO: term inert**)"))
@@ -970,7 +1031,7 @@ def cmd_compare(args):
     ctrl = {}
     for name in graded:
         a = graded[name][1]["none"]
-        ctrl[name] = max((cs["max_dev_from_nominal_V"] or 0.0 for cs in a.values()), default=None) if a else None
+        ctrl[name] = none_control(a) if a else None
     rec = {"record_id": rid, "experiment": SLUG, "issue": 284, "kind": "variant-compare", "variant": variant,
            "variant_description": VARIANT_DESC[variant], "timestamp": now.strftime("%Y-%m-%dT%H:%M:%SZ"), "run_id": args.run_id,
            "runs_git": gits, "graded_at_git": grade_git, "pdk_pin": pdk["open_pdks_commit"], "klt": metas["baseline"].get("klt_client"),
@@ -979,7 +1040,7 @@ def cmd_compare(args):
            "resumes": {k: {"resumes": m.get("resumes", [])} for k, m in metas.items()},
            "dr007_projection_ratio": DR007_PROJECTION, "headline": head, "per_corner": {f"{k[0]}_{k[1]:.2f}V": r for k, r in cmp_rows.items()},
            "guard_counts": {n: {t: {f"{k[0]}_{k[1]:.2f}V": c for k, c in g.items()} for t, g in gt.items()} for n, gt in guards.items()},
-           "nominal_invalid_corners": nom_bad, "none_control_max_dev_V": ctrl, "fleet": fleet,
+           "nominal_invalid_corners": nom_bad, "none_control": ctrl, "fleet": fleet,
            "dimensions": {"degen_W": DEGEN_W, "degen_L": DEGEN_L, "mirror_W_new": MIRROR_W_NEW}, "author": cr.default_author()}
     (rec_dir / "records" / f"{rid}.json").write_text(json.dumps(rec, indent=2, default=str) + "\n")
     (rec_dir / "records" / f"{rid}.md").write_text(render_compare_md(rec, graded, variant, guards, cmp_rows, head) + "\n")
@@ -1044,11 +1105,7 @@ def render_compare_md(rec, graded, variant, guards, cmp_rows, head):
         L.append(f"- Corners whose nominal reference failed a guard ({name}; all their samples excluded): " + (", ".join(sorted(set(rec["nominal_invalid_corners"][name]))) or "none"))
     L += ["", "## Controls", ""]
     for name in ("baseline", variant):
-        c = rec["none_control_max_dev_V"][name]
-        if c is None:
-            L.append(f"- `none == nominal` control, {name} deck: NOT AVAILABLE (term not run / no usable result); not verified.")
-        else:
-            L.append(f"- `none == nominal` control, {name} deck: max |PTAT(sample) - PTAT(nominal)| = {c:.3g} V " + ("(PASS)" if c < 1e-9 else "(**FAIL**: attribution cannot be trusted)"))
+        L.append(compare_control_line(name, rec["none_control"][name]))
     for t in ("mirror",):
         for name in ("baseline", variant):
             sm = graded[name][2][t]
