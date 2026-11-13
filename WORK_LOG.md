@@ -9,6 +9,10 @@ Chronological record of recently merged pull requests and closed issues. This fi
 
 ### 2026-11-13
 
+- **PR #330**: refactor(sim): submit the last two local ngspice grids through klt sim as deck-list requests
+- **Issue #319** (closed): Remove the local ngspice grid launchers from run_op_branch.py and run_pnp_mismatch.py: submit through klt sim like the other runners
+- **PR #320**: refactor(sim): share the campaign submit bootstrap across the nine fleet runners
+- **Issue #307** (closed): Share the campaign cmd_run bootstrap in sim_common (9 copies; 3 runners submit from a dirty tree, 1 bypasses submit_prepared)
 - **PR #326**: refactor(sim): one shared per-request report triage for the six campaign graders
 - **Issue #322** (closed): Share the per-request report triage in sim_common (6 hand copies; 2 drop client_klt_version, 3 wordings for one failure)
 - **PR #324**: fix(sim): grade the accuracy-MC `none` control against the expected corner grid
