@@ -52,11 +52,22 @@ experiment's own `.op` deck, so this script netlists
 `sim/bias-core-smoke/testbench/tb_bias_core_smoke.sch` unchanged (its
 `provenance_source`) and only varies what the runner injects around it.
 
+Execution model
+---------------
+150 cold `.op` solves is a grid, so it is ONE `klt sim` request submitted to the
+Spot batch fleet -- this script never launches ngspice over a grid itself and
+never falls back to a local grid when the fleet refuses (host rules, issue
+#319). It is a deck-list (`decks[]`) request rather than a corner request,
+because the object of study here IS the deck: see the "deck generation / fleet
+transport" section below for why no process x temperature x supply cross
+product can state this experiment's axes.
+
 Usage
 -----
-    sim/bias-core-op-branch/run_op_branch.py                # the full run
-    sim/bias-core-op-branch/run_op_branch.py --quick        # ~20 points
-    sim/bias-core-op-branch/run_op_branch.py --dry-run      # print the plan
+    sim/bias-core-op-branch/run_op_branch.py --wait-for-capacity 600  # the full run
+    sim/bias-core-op-branch/run_op_branch.py --quick        # ~26 points
+    sim/bias-core-op-branch/run_op_branch.py --dry-run      # print the plan + request
+    sim/bias-core-op-branch/run_op_branch.py --probe <point-id>   # ONE point, local
 
 Exit status: 0 every check passed, 2 a record was written but a check
 failed, 1 harness/setup error (no record written) -- same convention as
@@ -66,10 +77,9 @@ failed, 1 harness/setup error (no record written) -- same convention as
 from __future__ import annotations
 
 import argparse
-import concurrent.futures as cf
 import json
+import os
 import re
-import subprocess
 import sys
 from dataclasses import dataclass, field
 from datetime import datetime, timezone
@@ -79,10 +89,10 @@ HERE = Path(__file__).resolve().parent
 SIM_DIR = HERE.parent
 REPO_ROOT = SIM_DIR.parent
 BUILD_DIR = SIM_DIR / "build" / "bias-core-op-branch"
-SPICEINIT_FILE = SIM_DIR / "spiceinit"
 TESTBENCH = SIM_DIR / "bias-core-smoke" / "testbench" / "tb_bias_core_smoke.sch"
 
 sys.path.insert(0, str(SIM_DIR / "bin"))
+import sim_common  # noqa: E402
 from sim_common import (  # noqa: E402
     add_common_args,
     load_corner_run,
@@ -326,22 +336,44 @@ def build_points(quick: bool) -> list[Point]:
 
 
 # --------------------------------------------------------------------------
-# deck generation / ngspice
+# deck generation / fleet transport
 # --------------------------------------------------------------------------
+#
+# Execution model (host rules, issue #319): this is a 150-point grid, so it is ONE
+# `klt sim` request submitted to the Spot batch fleet -- this script never launches
+# ngspice over a grid itself and never falls back to a local grid when the fleet
+# refuses. `--probe` runs a SINGLE point locally (a debug check, not evidence).
+#
+# The request is a deck-list (`decks[]`) request rather than a corner request, because
+# this experiment's whole object of study IS the deck: its axes are a 10 mV supply
+# sweep, four numerical variants (one of which is a linear-solver choice klt's
+# `options.ngspice_options` allow-list cannot express) and three byte-identical repeats
+# of one point as a determinism control -- none of which a process x temperature x
+# supply cross product can state. `decks[]` ships each deck verbatim and returns its raw
+# stdout/stderr, so `evaluate()` parses exactly the text a local `ngspice -b` produced
+# and the artifact stays the one this harness mints (see sim_common.DECK_NOTE).
 
 
 def spiceinit_text(variant: Variant) -> str:
-    text = SPICEINIT_FILE.read_text()
-    if not variant.klu:
-        text = text.replace(
-            "option klu",
-            "* option klu -- DISABLED by sim/bias-core-op-branch/run_op_branch.py\n"
-            "* (variant `sparse`: ngspice falls back to its built-in sparse solver)",
-        )
-    return text
+    """The `.spiceinit` a point runs under: sim/spiceinit, with `option klu` commented
+    out for the `sparse` variant.
+
+    It is shipped into the fleet unit directory as a `decks[].inputs[]` entry. That is
+    load-bearing, not incidental: the fleet runner ignores `options.ngspice_init`, so an
+    input file read from the unit's own cwd is what carries the solver choice to the
+    engine. `solver_variant_reached[...]` in `cross_checks()` then re-derives the solver
+    from the run's own log, so a dropped setting fails the record instead of being
+    recorded as a variant nobody ran.
+    """
+    return sim_common.spiceinit_text(
+        SIM_DIR,
+        disable=() if variant.klu else ("option klu",),
+        by=f"sim/bias-core-op-branch/run_op_branch.py (variant `{variant.name}`: ngspice "
+        "falls back to its built-in sparse solver)",
+    )
 
 
-def build_deck(pdk, point: Point, body: list[str]) -> str:
+def build_deck(point: Point, body: list[str]) -> str:
     variant = VARIANTS[point.variant]
     head = [
         f"* {SLUG} point deck -- generated by sim/bias-core-op-branch/run_op_branch.py",
@@ -351,7 +383,7 @@ def build_deck(pdk, point: Point, body: list[str]) -> str:
         ".option wnflag=1",
     ]
     head += [f".option {o}" for o in variant.options]
-    head += [f".temp {point.temp_c:g}", f'.lib "{pdk.lib_file}" {PROCESS}']
+    head += [f".temp {point.temp_c:g}", f'.lib "{sim_common.runner_lib_ref()}" {PROCESS}']
     if variant.nodeset:
         head.append(".nodeset " + " ".join(variant.nodeset))
 
@@ -360,6 +392,62 @@ def build_deck(pdk, point: Point, body: list[str]) -> str:
     control.append(f"print {SUPPLY_VECTOR}")
     control += ["quit", ".endc", ".end", ""]
     return "\n".join(head + body + control)
+
+
+def deck_unit(point: Point, body: list[str], timeout: int) -> tuple[dict, dict[str, str]]:
+    """One point as a `decks[]` entry plus the files it needs, keyed by their path
+    relative to the request file's own directory (which is how klt resolves them)."""
+    base = f"units/{point.point_id}"
+    unit = {
+        "id": point.point_id,
+        "deck": f"{base}/deck.spice",
+        "inputs": [{"path": f"{base}/spiceinit", "name": ".spiceinit"}],
+        "timeout_s": timeout,
+    }
+    files = {
+        f"{base}/deck.spice": build_deck(point, body),
+        f"{base}/spiceinit": spiceinit_text(VARIANTS[point.variant]),
+    }
+    return unit, files
+
+
+def build_request(points: list[Point], body: list[str], pdk, backend: str, args) -> tuple[dict, dict[str, str]]:
+    units, files = [], {}
+    for point in points:
+        unit, unit_files = deck_unit(point, body, args.timeout)
+        units.append(unit)
+        files.update(unit_files)
+    request = sim_common.deck_request(
+        units,
+        backend,
+        timeout_s=args.timeout,
+        pdk_variant=pdk.variant,
+        capacity_wait_s=args.wait_for_capacity if backend == "batch" else 0,
+        max_workers=args.max_workers,
+    )
+    return request, files
+
+
+MISSING_UNIT_NOTE = (
+    "*** this point has no unit in the klt deck report: the fleet returned no tree for "
+    "it (a lost shard or a failed job). No measurement was made; the point's own "
+    "ngspice_ok[...] check fails rather than the point being silently dropped."
+)
+
+
+def result_from_unit(point: Point, deck: str, report: dict, unit: dict | None) -> dict:
+    """Map one returned deck unit back into the shape `evaluate()` consumes -- the same
+    `{point, deck, raw, rc, timed_out}` the local `ngspice -b` path used to build."""
+    if unit is None:
+        return {"point": point, "deck": deck, "raw": MISSING_UNIT_NOTE, "rc": -1, "timed_out": False}
+    exit_code = unit.get("exit_code")
+    return {
+        "point": point,
+        "deck": deck,
+        "raw": sim_common.deck_streams(report, unit),
+        "rc": -1 if exit_code is None else int(exit_code),
+        "timed_out": bool(unit.get("timed_out")),
+    }
 
 
 VALUE_RE = re.compile(r"^(-?[a-z0-9_.()]+)\s*=\s*(-?[0-9.]+(?:[eE][-+]?[0-9]+)?)\s*$")
@@ -372,32 +460,6 @@ def parse_values(raw: str) -> dict[str, float]:
         if m:
             out[m.group(1)] = float(m.group(2))
     return out
-
-
-def run_point(pdk, point: Point, body: list[str], record_id: str, timeout: int) -> dict:
-    run_dir = BUILD_DIR / record_id / point.point_id
-    run_dir.mkdir(parents=True, exist_ok=True)
-    deck = build_deck(pdk, point, body)
-    (run_dir / "deck.spice").write_text(deck)
-    (run_dir / ".spiceinit").write_text(spiceinit_text(VARIANTS[point.variant]))
-    try:
-        proc = subprocess.run(
-            ["ngspice", "-b", "deck.spice"],
-            cwd=run_dir,
-            capture_output=True,
-            text=True,
-            stdin=subprocess.DEVNULL,
-            timeout=timeout,
-        )
-        raw, rc, timed_out = proc.stdout + proc.stderr, proc.returncode, False
-    except subprocess.TimeoutExpired as exc:
-        out, err = exc.stdout or "", exc.stderr or ""
-        if isinstance(out, bytes):
-            out = out.decode(errors="replace")
-        if isinstance(err, bytes):
-            err = err.decode(errors="replace")
-        raw, rc, timed_out = out + err, -1, True
-    return {"point": point, "deck": deck, "raw": raw, "rc": rc, "timed_out": timed_out}
 
 
 # --------------------------------------------------------------------------
@@ -525,6 +587,8 @@ def evaluate(res: dict) -> dict:
         "rail_violations": [{"node": n, "value": v} for n, v in violations],
         "rail_window_v": [-RAIL_MARGIN_V, point.supply_v + RAIL_MARGIN_V],
         "values": values,
+        "ngspice": sim_common.fleet_ngspice(res["raw"]),
+        "solver": sim_common.log_solver(res["raw"]),
         "checks": checks,
         "pass": all(c["pass"] for c in checks),
     }
@@ -564,6 +628,31 @@ def cross_checks(results: list[dict]) -> list[dict]:
             f"tolerance {SMOKE_MATCH_TOL_V:g} V). This is the control that must fail if the "
             "mechanism under test is no longer active -- without it, an all-good sweep "
             "would be indistinguishable from a script that stopped exercising the artifact",
+        )
+
+    # -- the numerical variant each point was SUPPOSED to run under is the one that
+    #    actually reached the engine. The fleet runner ignores options.ngspice_init, so
+    #    the `sparse` variant's disabled `option klu` travels only as the unit's own
+    #    shipped `.spiceinit`; re-deriving the solver from each run's own log is what
+    #    makes a silently-dropped setting fail the record instead of being recorded as a
+    #    numerical path nobody ran (issue #319). Without this check `klu` and `sparse`
+    #    would be indistinguishable in evidence terms whenever the setting was lost --
+    #    and `solver_dependence` below, which compares the two, would be meaningless.
+    for variant in ("klu", "sparse", "srcstep", "nodeset"):
+        pts = [r for r in results if r["variant"] == variant]
+        want_klu = VARIANTS[variant].klu
+        seen = sorted({r.get("solver") or "(none announced)" for r in pts})
+        agree = [
+            r for r in pts
+            if r.get("solver") and (("KLU" in r["solver"].upper()) == want_klu)
+        ]
+        add(
+            f"solver_variant_reached[{variant}]",
+            bool(pts) and len(agree) == len(pts),
+            f"{len(agree)}/{len(pts)} point(s) ran under the linear solver this variant "
+            f"declares (`klu={want_klu}`); solvers ngspice announced in the run logs: "
+            f"{seen}. The setting travels in the unit's own shipped `.spiceinit`, which "
+            "is the only path that survives the fleet dropping `options.ngspice_init`",
         )
 
     # -- control: ngspice is deterministic, so variant-to-variant differences mean something.
@@ -685,6 +774,23 @@ def render_record(r: dict) -> str:
         f"(`{r['experiment']['provenance_source']}`)"
     )
     L.extend(render_pdk_tools_repo_state(r))
+    b = r["batch"]
+    add(
+        f"- **Backend**: `klt sim --backend batch` deck-list request (fleet job "
+        f"`{b['job_id']}`, {b['instance_type']} in {b['region']}, report status "
+        f"`{b['report_status']}`: {b['passed']}/{b['unit_count']} unit(s) passed, "
+        f"{b['errored']} errored, {b['timed_out']} timed out); fleet runner klt "
+        f"`{b['runner_klt_version']}`, client `{b['klt_client']}`, "
+        f"`--wait-for-capacity {b['capacity_wait_s']:g}`"
+        + (
+            ""
+            if not b["failed_earlier_attempts"]
+            else f"; {len(b['failed_earlier_attempts'])} earlier submit attempt(s) refused: "
+            + "; ".join(b["failed_earlier_attempts"])
+        )
+    )
+    add(f"- **Fleet engine**: {r['tools']['fleet_ngspice']} (per-point, from each unit's own log banner)")
+    add(f"- **Transport**: {r['tools']['fleet_note']}")
 
     m = r["matrix"]
     add("- **Corner matrix run**:")
@@ -770,6 +876,7 @@ def render_record(r: dict) -> str:
 
     add("- **Links**:")
     add(f"  - Testbench: `{r['links']['testbench']}`")
+    add(f"  - klt deck report: `{r['links']['klt_report']}`")
     add(f"  - Runner: `{r['links']['runner']}`")
     add(f"  - Netlist snapshot: `{r['links']['netlist_snapshot']}`")
     add(f"  - Raw per-point logs: `{r['links']['points_dir']}`")
@@ -837,6 +944,39 @@ def verdict_text(results: list[dict], checks: list[dict]) -> str:
 # --------------------------------------------------------------------------
 
 
+def run_probe(args, pdk, points: list[Point]) -> int:
+    """ONE point, local backend, nothing recorded -- the debugging escape hatch every
+    fleet runner keeps (`sim_common.run_local_probe`). Never a grid: a grid goes to the
+    fleet, which is the whole point of this script's execution model."""
+    match = [pt for pt in points if pt.point_id == args.probe]
+    if not match:
+        raise cr.HarnessError(
+            f"no point named {args.probe!r}; run with --dry-run to list the point ids"
+        )
+    point = match[0]
+    run_dir = BUILD_DIR / "probe"
+    run_dir.mkdir(parents=True, exist_ok=True)
+    netlist = cr.netlist_with_klt(TESTBENCH, run_dir, pdk)
+    body = cr.netlist_body(netlist)
+    request, files = build_request([point], body, pdk, "local", args)
+    d = run_dir / point.point_id
+    d.mkdir(parents=True, exist_ok=True)
+    for rel, text in files.items():
+        (d / rel).parent.mkdir(parents=True, exist_ok=True)
+        (d / rel).write_text(text)
+    (d / "request.json").write_text(json.dumps(request, indent=2) + "\n")
+    print(f"[probe] local single point {point.point_id} (variant {point.variant})")
+    proc = sim_common.run_local_probe(d)
+    report = json.loads((d / "report.json").read_text() or "{}")
+    unit = sim_common.deck_units(report).get(point.point_id)
+    print(f"[probe] klt exit {proc.returncode}, report status {report.get('status', '?')}")
+    if unit:
+        raw = sim_common.deck_streams(report, unit)
+        print(f"[probe] solver announced: {sim_common.log_solver(raw)}")
+        print(raw[-4000:])
+    return 0 if proc.returncode == 0 else 1
+
+
 def parse_args(argv: list[str]) -> argparse.Namespace:
     p = argparse.ArgumentParser(
         description="cold-.op branch-selection diagnostic for bias_core (issue #19)"
@@ -846,7 +986,24 @@ def parse_args(argv: list[str]) -> argparse.Namespace:
         action="store_true",
         help="coarse supply axis (100 mV) and 3 temperatures — smoke run, not evidence",
     )
-    p.add_argument("--jobs", type=int, default=4, help="parallel ngspice processes")
+    p.add_argument(
+        "--max-workers",
+        type=int,
+        default=8,
+        help="fleet-worker pool size for the deck list (klt `options.max_workers`)",
+    )
+    p.add_argument(
+        "--wait-for-capacity",
+        type=float,
+        default=600,
+        help="seconds the batch submit waits out a fleet capacity refusal before failing",
+    )
+    p.add_argument(
+        "--probe",
+        metavar="POINT_ID",
+        help="run ONE point on the local backend and print its log -- a debug check, "
+        "never evidence; writes nothing under sim/<experiment>/",
+    )
     add_common_args(p, timeout_default=600)
     return p.parse_args(argv)
 
@@ -864,6 +1021,9 @@ def main(argv: list[str]) -> int:
         )
 
     points = build_points(args.quick)
+    if args.probe:
+        return run_probe(args, pdk, points)
+
     git_info = cr.git_state()
     now = datetime.now(timezone.utc)
     record_id = f"{now:%Y%m%d}-{now:%H%M%S}-{git_info['sha']}"
@@ -885,57 +1045,86 @@ def main(argv: list[str]) -> int:
     netlist = cr.netlist_with_klt(TESTBENCH, run_dir, pdk)
     body = cr.netlist_body(netlist)
 
+    request, files = build_request(points, body, pdk, "batch", args)
+
     print(f"experiment      : {SLUG}")
     print(f"record id       : {record_id}")
     print(f"PDK             : {pdk.dir} (open_pdks {pdk.installed_commit})")
     print(f"testbench       : {TESTBENCH.relative_to(REPO_ROOT)}")
-    print(f"points          : {len(points)} cold .op solves")
+    print(f"points          : {len(points)} cold .op solves (one `klt sim` deck-list "
+          f"request -> batch fleet)")
     print(f"scratch run dir : {run_dir}")
 
     if args.dry_run:
         print("\n-- point list --")
-        for p in points:
-            print(f"  {p.point_id:<44} role={p.role:<10} variant={p.variant}")
+        for pt in points:
+            print(f"  {pt.point_id:<44} role={pt.role:<10} variant={pt.variant}")
+        print(f"\n-- request.json ({len(request['decks'])} units) --")
+        print(json.dumps({**request, "decks": request["decks"][:2] + ["... (truncated)"]}, indent=2))
         print(f"\n-- deck for {points[0].point_id} --")
-        print(build_deck(pdk, points[0], body))
-        print("\n(dry run: nothing written under sim/<experiment>/)")
+        print(files[f"units/{points[0].point_id}/deck.spice"])
+        print(f"-- .spiceinit for {points[0].point_id} --")
+        print(files[f"units/{points[0].point_id}/spiceinit"])
+        print("\n(dry run: nothing written under sim/<experiment>/, nothing submitted)")
         return 0
+
+    submit_dir = run_dir / "batch"
+    outcome = sim_common.submit_prepared(
+        submit_dir,
+        None,
+        request,
+        f"{SLUG}: {len(points)} cold .op decks -> batch fleet",
+        SLUG,
+        retry=sim_common.cap_retry(submit_dir, SLUG, 180, max_retries=19),
+        files=files,
+    )
+    report = json.loads((submit_dir / "report.json").read_text() or "{}")
+    units = sim_common.deck_units(report)
+    if not units:
+        # No local-grid fallback, ever (host rules): a refusal is reported verbatim and
+        # the run ends without a record, so nothing claims evidence the fleet never made.
+        raise cr.HarnessError(
+            f"batch submit produced no usable deck report (klt exit {outcome['exit']}, "
+            f"report status {outcome['status']}); NOT falling back to a local grid.\n"
+            f"  klt stderr: {(submit_dir / 'klt.stderr').read_text().strip()[:1200]}\n"
+            f"  request:    {submit_dir / 'request.json'}"
+        )
 
     results: list[dict] = []
     stamp = datetime.now(timezone.utc)
-    with cf.ThreadPoolExecutor(max_workers=max(1, args.jobs)) as ex:
-        futures = [
-            ex.submit(run_point, pdk, p, body, record_id, args.timeout) for p in points
+    points_dir.mkdir(parents=True, exist_ok=True)
+    for i, point in enumerate(points, start=1):
+        deck = files[f"units/{point.point_id}/deck.spice"]
+        init = files[f"units/{point.point_id}/spiceinit"]
+        res = result_from_unit(point, deck, report, units.get(point.point_id))
+        evaluated = evaluate(res)
+        log_path = points_dir / f"{point.point_id}.log"
+        header = [
+            f"# point: {point.point_id}",
+            f"# record: {record_id}",
+            f"# role: {point.role} -- {point.purpose}",
+            f"# variant: {point.variant} -- {VARIANTS[point.variant].description}",
+            f"# process={PROCESS} temp={point.temp_c:g}C supply={point.supply_v:.2f}V",
+            f"# branch: {evaluated['branch']}",
+            f"# solver announced by ngspice: {evaluated['solver']}",
+            f"# result: {'PASS' if evaluated['pass'] else 'FAIL'}",
         ]
-        for i, fut in enumerate(futures, start=1):
-            res = fut.result()
-            point: Point = res["point"]
-            evaluated = evaluate(res)
-            log_path = points_dir / f"{point.point_id}.log"
-            points_dir.mkdir(parents=True, exist_ok=True)
-            header = [
-                f"# point: {point.point_id}",
-                f"# record: {record_id}",
-                f"# role: {point.role} -- {point.purpose}",
-                f"# variant: {point.variant} -- {VARIANTS[point.variant].description}",
-                f"# process={PROCESS} temp={point.temp_c:g}C supply={point.supply_v:.2f}V",
-                f"# branch: {evaluated['branch']}",
-                f"# result: {'PASS' if evaluated['pass'] else 'FAIL'}",
-            ]
-            sections = [
-                (".spiceinit (exact)", spiceinit_text(VARIANTS[point.variant])),
-                ("deck (exact input given to ngspice)", res["deck"]),
-            ]
-            log_path.write_text(
-                render_log(header, pdk, res["rc"], res["timed_out"], stamp, sections, res["raw"])
-            )
-            evaluated["log"] = str(log_path.relative_to(REPO_ROOT))
-            results.append(evaluated)
-            print(
-                f"[{i:>3}/{len(points)}] {point.point_id:<46} "
-                f"{'PASS' if evaluated['pass'] else 'FAIL'}  branch={evaluated['branch']:<5} "
-                f"vref={'n/a' if evaluated['vref'] is None else format(evaluated['vref'], '.6g')}"
-            )
+        sections = [
+            (".spiceinit (exact, shipped as the unit's decks[].inputs[] entry)", init),
+            ("deck (exact input given to ngspice)", deck),
+        ]
+        log_path.write_text(
+            render_log(header, pdk, res["rc"], res["timed_out"], stamp, sections, res["raw"])
+        )
+        evaluated["log"] = str(log_path.relative_to(REPO_ROOT))
+        results.append(evaluated)
+        print(
+            f"[{i:>3}/{len(points)}] {point.point_id:<46} "
+            f"{'PASS' if evaluated['pass'] else 'FAIL'}  branch={evaluated['branch']:<5} "
+            f"vref={'n/a' if evaluated['vref'] is None else format(evaluated['vref'], '.6g')}"
+        )
+
+    sim_common.snapshot_deck_request(submit_dir, points_dir, run_dir, REPO_ROOT)
 
     checks = cross_checks(results)
     overall = all(p["pass"] for p in results) and all(
@@ -944,6 +1133,38 @@ def main(argv: list[str]) -> int:
 
     snapshot.parent.mkdir(parents=True, exist_ok=True)
     snapshot.write_text("\n".join(body) + "\n.end\n")
+
+    # Provenance is OBSERVED, never a literal (issue #297): the engine from each unit's
+    # own `ngspice-NN done` banner, the runner's klt from the job's report.
+    remote = (report.get("environment") or {}).get("remote") or {}
+    pdk_block, tools_block = sim_common.record_pdk_tools(
+        pdk,
+        pin,
+        {"klt_client": sim_common.klt_version()},
+        points=results,
+        requests=[remote],
+        lib_file=sim_common.runner_lib_ref(pdk.variant),
+        root=sim_common.HOST_PDK_ROOT,
+        xschem_note=None,
+        fleet_note=sim_common.DECK_NOTE,
+    )
+    batch_block = {
+        "job_id": remote.get("job_id"),
+        "region": remote.get("region"),
+        "instance_type": remote.get("instance_type"),
+        "state": remote.get("state"),
+        "runner_klt_version": remote.get("runner_klt_version"),
+        "runner_request_features": remote.get("runner_request_features"),
+        "klt_client": sim_common.klt_version(),
+        "klt_sim_backend_env": os.environ.get("KLT_SIM_BACKEND"),
+        "capacity_wait_s": args.wait_for_capacity,
+        "report_status": report.get("status"),
+        "unit_count": report.get("unit_count"),
+        "passed": report.get("passed"),
+        "errored": report.get("errored"),
+        "timed_out": report.get("timed_out"),
+        "failed_earlier_attempts": sim_common.attempt_messages(submit_dir, run_dir, REPO_ROOT),
+    }
 
     record = {
         "record_id": record_id,
@@ -961,15 +1182,10 @@ def main(argv: list[str]) -> int:
                 "determinism rather than assuming it)"
             ),
         },
-        "pdk": {
-            "root": str(pdk.root),
-            "variant": pdk.variant,
-            "installed_commit": pdk.installed_commit,
-            "pinned_commit": pin["open_pdks_commit"],
-            "matches_pin": pdk.matches_pin,
-            "lib_file": str(pdk.lib_file),
-        },
-        "tools": cr.tool_versions(),
+        "pdk": pdk_block,
+        "tools": tools_block,
+        "backend": "batch",
+        "batch": batch_block,
         "git": git_info,
         "matrix": {
             "process": [PROCESS],
@@ -997,6 +1213,7 @@ def main(argv: list[str]) -> int:
         "verdict": verdict_text(results, checks),
         "links": {
             "testbench": str(TESTBENCH.relative_to(REPO_ROOT)),
+            "klt_report": str((points_dir / "batch" / "report.json").relative_to(REPO_ROOT)),
             "runner": str(Path(__file__).resolve().relative_to(REPO_ROOT)),
             "netlist_snapshot": str(snapshot.relative_to(REPO_ROOT)),
             "points_dir": str(points_dir.relative_to(REPO_ROOT)) + "/",

@@ -36,8 +36,9 @@ python3 sim/bin/corner-run.py --print-env
 # 3. run the harness smoke test over the full PVT matrix (45 points, ~2 min)
 python3 sim/bin/corner-run.py sim/bias-core-smoke
 
-# 4. run the PNP mismatch Monte Carlo (local + global-process, ~2 min)
-python3 sim/pnp-mismatch/run_pnp_mismatch.py
+# 4. run the PNP mismatch Monte Carlo (local + global-process; submitted to the
+#    batch fleet as one klt sim deck-list request, ~2 min)
+python3 sim/pnp-mismatch/run_pnp_mismatch.py --wait-for-capacity 600
 ```
 
 Prerequisites, all machine-level (not vendored here): `ngspice`, `xschem`,
@@ -259,6 +260,21 @@ is *numerical settings*, not samples: the same deck re-solved under a different
 linear solver / continuation method, which a PVT manifest has no way to
 express). Such a script still has to behave like the harness:
 
+- **submit its grid, never launch one.** Every grid is one `klt sim` request to
+  the Spot batch fleet (`--backend batch`, `--wait-for-capacity 600`); a bespoke
+  runner never launches `ngspice -b` over a grid itself and never falls back to
+  a local grid when the fleet refuses — a refusal is recorded and the run ends
+  without a record. Both bespoke runners submit a **deck-list (`decks[]`)**
+  request rather than a corner request, because a script that renders its own
+  decks and mints its own evidence from the raw logs needs klt as *transport*,
+  not as corner engine: `decks[]` ships each deck byte-for-byte and returns its
+  raw stdout/stderr, so the artifact stays the one the harness mints (issue
+  #319; klayout-tools #2804). A point's `.spiceinit` rides along as a
+  `decks[].inputs[]` entry — the fleet runner ignores `options.ngspice_init`, so
+  that is how a solver choice or a Monte Carlo seed reaches the engine, and each
+  runner re-derives the setting from the run's own log so a dropped one fails
+  the record instead of being recorded as a setting nobody ran. A **single**
+  point may still run locally, as a `--probe` debug check that writes no record;
 - reuse `sim/bin/corner-run.py`'s PDK resolution and **pin enforcement**
   (import it via `sim_common.load_corner_run()`; don't re-implement it), so a
   record is reproducible the same way;

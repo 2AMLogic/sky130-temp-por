@@ -1,0 +1,190 @@
+{
+  "schema_version": 3,
+  "mode": "decks",
+  "backend": "batch",
+  "engine": "ngspice",
+  "status": "pass",
+  "unit_count": 6,
+  "passed": 6,
+  "errored": 0,
+  "timed_out": 0,
+  "units": [
+    {
+      "id": "tt_mm_-40c_nosupply",
+      "status": "pass",
+      "exit_code": 0,
+      "timed_out": false,
+      "duration_s": 5.205,
+      "engine_version": "47",
+      "deck": "tb_pnp_mismatch.spice",
+      "deck_sha256": "a87f01de536e674808931fcf3ee808d65dd8585e3fd1fd0e9d2a77597cd531fb",
+      "stdout": "tt_mm_-40c_nosupply/stdout.bin",
+      "stderr": "tt_mm_-40c_nosupply/stderr.bin",
+      "outputs": [],
+      "missing_outputs": [],
+      "host_resolved": [
+        "$PDK_ROOT/sky130A/libs.tech/combined/sky130.lib.spice"
+      ],
+      "diagnostics": []
+    },
+    {
+      "id": "tt_mm_27c_nosupply",
+      "status": "pass",
+      "exit_code": 0,
+      "timed_out": false,
+      "duration_s": 5.174,
+      "engine_version": "47",
+      "deck": "tb_pnp_mismatch.spice",
+      "deck_sha256": "a87f01de536e674808931fcf3ee808d65dd8585e3fd1fd0e9d2a77597cd531fb",
+      "stdout": "tt_mm_27c_nosupply/stdout.bin",
+      "stderr": "tt_mm_27c_nosupply/stderr.bin",
+      "outputs": [],
+      "missing_outputs": [],
+      "host_resolved": [
+        "$PDK_ROOT/sky130A/libs.tech/combined/sky130.lib.spice"
+      ],
+      "diagnostics": []
+    },
+    {
+      "id": "tt_mm_125c_nosupply",
+      "status": "pass",
+      "exit_code": 0,
+      "timed_out": false,
+      "duration_s": 4.659,
+      "engine_version": "47",
+      "deck": "tb_pnp_mismatch.spice",
+      "deck_sha256": "a87f01de536e674808931fcf3ee808d65dd8585e3fd1fd0e9d2a77597cd531fb",
+      "stdout": "tt_mm_125c_nosupply/stdout.bin",
+      "stderr": "tt_mm_125c_nosupply/stderr.bin",
+      "outputs": [],
+      "missing_outputs": [],
+      "host_resolved": [
+        "$PDK_ROOT/sky130A/libs.tech/combined/sky130.lib.spice"
+      ],
+      "diagnostics": []
+    },
+    {
+      "id": "tt_27c_nosupply_mm-off",
+      "status": "pass",
+      "exit_code": 0,
+      "timed_out": false,
+      "duration_s": 2.855,
+      "engine_version": "47",
+      "deck": "tb_pnp_mismatch.spice",
+      "deck_sha256": "a87f01de536e674808931fcf3ee808d65dd8585e3fd1fd0e9d2a77597cd531fb",
+      "stdout": "tt_27c_nosupply_mm-off/stdout.bin",
+      "stderr": "tt_27c_nosupply_mm-off/stderr.bin",
+      "outputs": [],
+      "missing_outputs": [],
+      "host_resolved": [
+        "$PDK_ROOT/sky130A/libs.tech/combined/sky130.lib.spice"
+      ],
+      "diagnostics": []
+    },
+    {
+      "id": "tt_mm_27c_nosupply_seed-b",
+      "status": "pass",
+      "exit_code": 0,
+      "timed_out": false,
+      "duration_s": 4.654,
+      "engine_version": "47",
+      "deck": "tb_pnp_mismatch.spice",
+      "deck_sha256": "a87f01de536e674808931fcf3ee808d65dd8585e3fd1fd0e9d2a77597cd531fb",
+      "stdout": "tt_mm_27c_nosupply_seed-b/stdout.bin",
+      "stderr": "tt_mm_27c_nosupply_seed-b/stderr.bin",
+      "outputs": [],
+      "missing_outputs": [],
+      "host_resolved": [
+        "$PDK_ROOT/sky130A/libs.tech/combined/sky130.lib.spice"
+      ],
+      "diagnostics": []
+    },
+    {
+      "id": "mc_27c_nosupply",
+      "status": "pass",
+      "exit_code": 0,
+      "timed_out": false,
+      "duration_s": 2.898,
+      "engine_version": "47",
+      "deck": "tb_pnp_mismatch.spice",
+      "deck_sha256": "a87f01de536e674808931fcf3ee808d65dd8585e3fd1fd0e9d2a77597cd531fb",
+      "stdout": "mc_27c_nosupply/stdout.bin",
+      "stderr": "mc_27c_nosupply/stderr.bin",
+      "outputs": [],
+      "missing_outputs": [],
+      "host_resolved": [
+        "$PDK_ROOT/sky130A/libs.tech/combined/sky130.lib.spice"
+      ],
+      "diagnostics": []
+    }
+  ],
+  "outdir": "<build>/batch/out",
+  "environment": {
+    "engine": "ngspice",
+    "engine_version": "47",
+    "ngspice_binary": "/usr/local/bin/ngspice",
+    "klt_version": "0.9.0",
+    "max_workers": 2,
+    "engine_host": "worker",
+    "remote": {
+      "provider": "aws-batch-fleet",
+      "job_id": "klt-sim-24f5caeb77f1",
+      "region": "us-east-1",
+      "instance_id": "i-080a54da437676328",
+      "instance_type": "m7i.4xlarge",
+      "availability_zone": "us-east-1d",
+      "ami_id": "ami-0f6bb304291339ed0",
+      "lifecycle": "spot",
+      "spot": true,
+      "state": "done",
+      "exit_code": "0",
+      "concurrency": "1",
+      "physical_cores": "8",
+      "elapsed_seconds": 41,
+      "runner_klt_version": "0.9.0",
+      "client_klt_version": "0.9.2.dev887+gec7400b7d8e5",
+      "runner_compatibility": "match",
+      "runner_request_features": {
+        "required": [
+          "decks"
+        ],
+        "missing": [],
+        "status": "supported"
+      },
+      "worker_environment": {
+        "capture": "ok",
+        "simulator": {
+          "requested_binary": "ngspice",
+          "binary_source": "PATH",
+          "selected_path": "/usr/local/bin/ngspice",
+          "version_banner": "******\n** ngspice-47 : Circuit level simulation program\n** Compiled with KLU Direct Linear Solver\n** The U. C. Berkeley CAD Group\n** Copyright 1985-1994, Regents of the University of California.\n** Copyright 2001-2026, The ngspice team.\n** Please get your ngspice manual from https://ngspice.sourceforge.io/docs.html\n** Please file your bug-reports at http://ngspice.sourceforge.net/bugrep.html\n** Creation Date: Thu Nov 12 22:47:40 UTC 2026\n******\n",
+          "version_probe": "ok"
+        },
+        "pdk": {
+          "variant": "sky130A",
+          "root": "/opt/pdk",
+          "stamp_scheme": "sources-sha256",
+          "stamp_sha256": "4ca10280ae9f293aa1ff69f0060a52e0026929111bda881503717469b429ce67",
+          "stamp_text": "open_pdks f6eeac7dad085ffcc829ccfd721f7b4ce39edcf7",
+          "models_staged": false,
+          "stamp_scope": "executed"
+        },
+        "cpu_model": "Intel(R) Xeon(R) Platinum 8488C",
+        "omp_num_threads": null,
+        "image_manifest": null,
+        "model_inputs": null,
+        "diagnostics": [],
+        "pdk_stamp_comparison": {
+          "status": "not_comparable",
+          "reason": "client_stamp_unavailable"
+        }
+      },
+      "runner_model_inputs": null,
+      "models_lib_comparison": {
+        "status": "not_comparable",
+        "reason": "runner_hash_unavailable"
+      }
+    },
+    "client_ngspice_binary": "<home>/.local/bin/ngspice"
+  }
+}

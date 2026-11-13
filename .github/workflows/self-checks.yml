@@ -64,6 +64,9 @@ jobs:
       - name: Corner-run batch-backend tests (stub klt, no SPICE, no PDK)
         run: python3 -I sim/bin/test_corner_run_batch.py
 
+      - name: Deck-transport tests for the bespoke fleet runners (stub klt, no SPICE, no PDK)
+        run: python3 -I sim/bin/test_deck_transport.py
+
       - name: sim_common waveform tests
         run: python3 -I sim/bin/test_sim_common_waveform.py
 

@@ -906,7 +906,8 @@ def attempt_messages(d: Path, run_dir: Path, repo_root: Path, cap: int = 400) ->
     return [scrub(attempt_message(ad), run_dir, repo_root)[:cap] for ad in sorted(d.glob("attempt*"), key=order)]
 
 
-def submit_prepared(d: Path, netlist: str, request: dict, submit_msg: str, done_label: str, retry=None) -> dict:
+def submit_prepared(d: Path, netlist: str | None, request: dict, submit_msg: str, done_label: str,
+                    retry=None, files: dict[str, str] | None = None) -> dict:
     """Archive d's earlier attempt, write netlist.spice + request.json, run `klt sim --backend batch`.
 
     An earlier attempt's report.json/klt.stderr is archived to attemptN/, never
@@ -915,6 +916,11 @@ def submit_prepared(d: Path, netlist: str, request: dict, submit_msg: str, done_
     each klt run (n = 1, 2, ...) and returns True to run klt again on the same
     request (e.g. a bounded launch-refusal wait); only the last run's output is
     written to report.json/klt.stderr.
+
+    `netlist` is None for a `decks[]` request, which carries no `netlist` field; its
+    per-unit decks and inputs are passed as `files`, a map of d-relative paths to their
+    text, written before the submit so each `decks[].deck`/`inputs[].path` resolves
+    against the request file's own directory (see `deck_request()`).
     """
     d.mkdir(parents=True, exist_ok=True)
     if (d / "report.json").is_file():  # archive an earlier attempt, never overwrite
@@ -925,7 +931,12 @@ def submit_prepared(d: Path, netlist: str, request: dict, submit_msg: str, done_
         for name in ("report.json", "klt.stderr"):
             if (d / name).is_file():
                 shutil.move(str(d / name), str(d / f"attempt{n}" / name))
-    (d / "netlist.spice").write_text(netlist)
+    if netlist is not None:
+        (d / "netlist.spice").write_text(netlist)
+    for rel, text in (files or {}).items():
+        unit_file = d / rel
+        unit_file.parent.mkdir(parents=True, exist_ok=True)
+        unit_file.write_text(text)
     (d / "request.json").write_text(json.dumps(request, indent=2) + "\n")
     cmd = ["klt", "sim", str(d / "request.json"), "--backend", "batch", "-o", str(d / "out"), "--format", "json"]
     say(f"[submit] {submit_msg}")
@@ -965,6 +976,140 @@ def submit_request(
         f"{variant_name} {tag}{label}: {points} points -> batch fleet", f"{variant_name} {tag}",
     )
     return {"variant": variant_name, "rate": rate, "tag": tag, **res}
+
+
+# --------------------------------------------------------------------------
+# deck-list (`decks[]`) requests: the fleet as transport, not as corner engine
+# --------------------------------------------------------------------------
+
+DECK_NOTE = (
+    "submitted as a `klt sim` deck-list (`decks[]`) request, the transport klt documents "
+    "for a harness that renders its own decks and mints its own evidence from the raw logs "
+    "(klayout-tools #2804): each point's deck is shipped byte-for-byte and run as "
+    "`ngspice -b <deck>` in its own directory on the fleet worker, so the artifact is the "
+    "one this harness mints rather than one klt re-composed from a corner axis. The "
+    "per-point `.spiceinit` rides as a `decks[].inputs[]` entry, which is how a setting the "
+    "fleet drops from `options.ngspice_init` still reaches the run"
+)
+
+
+def runner_lib_ref(variant: str = "sky130A", lib: str = MODEL_LIB) -> str:
+    """The model library as a *shipped deck* must spell it: `$PDK_ROOT/<variant>/<lib>`.
+
+    A deck-list request never rewrites the deck, so an absolute path under the SUBMITTING
+    host's `$PDK_ROOT` is refused by name rather than retargeted at the runner's PDK. The
+    `$PDK_ROOT` spelling is the one each executing host -- this one for a local probe, the
+    fleet worker for the real run -- expands for itself.
+    """
+    return f"$PDK_ROOT/{variant}/{lib}"
+
+
+def deck_request(
+    units: list[dict],
+    backend: str,
+    *,
+    timeout_s: int,
+    pdk_variant: str = "sky130A",
+    capacity_wait_s: float = 0,
+    max_workers: int | None = None,
+) -> dict:
+    """`decks[]` request skeleton shared by the deck-transport campaign drivers.
+
+    `units` is the `decks[]` list (each: `id`, `deck`, optional `inputs`, `timeout_s`).
+    A deck request must NOT also declare `netlist`, `corners`, `analysis`, `measurements`
+    or `monte_carlo` -- klt rejects a document carrying both by name -- so this skeleton
+    deliberately has no overlap with `base_request()`. Key order is part of the contract
+    (request.json is recorded evidence).
+    """
+    req = {
+        "backend": backend,
+        "models": {"pdk": pdk_variant},
+        "decks": units,
+        "options": {"timeout_s": timeout_s, **({"max_workers": max_workers} if max_workers else {})},
+    }
+    if backend == "batch":
+        req["batch"] = {"runner_version_check": "warn"}
+        if capacity_wait_s:
+            req["batch"]["capacity_wait_s"] = capacity_wait_s
+    return req
+
+
+def snapshot_deck_request(src: Path, corners_dir: Path, run_dir: Path, repo_root: Path) -> None:
+    """Copy a deck-list submit's own artifacts into the record's committed evidence.
+
+    The same convention `corner-run.py` uses for a batch corner run (`corners/<record>/
+    batch/`): the request as submitted, klt's report, and klt's stderr, each scrubbed of
+    build-tree and home paths. There is no `netlist.spice` for a deck request, and the
+    per-unit decks are not duplicated here because each point's own `.log` already
+    embeds the exact deck ngspice was given.
+    """
+    for name in ("request.json", "report.json", "klt.stderr"):
+        f = src / name
+        if f.is_file():
+            dst = corners_dir / "batch" / name
+            dst.parent.mkdir(parents=True, exist_ok=True)
+            dst.write_text(scrub(f.read_text(), run_dir, repo_root))
+
+
+def deck_units(report: dict | None) -> dict[str, dict]:
+    """`{unit id: unit}` of a `decks[]` report; empty for anything that is not one."""
+    return {u["id"]: u for u in (report or {}).get("units", []) if isinstance(u, dict) and u.get("id")}
+
+
+def deck_streams(report: dict, unit: dict) -> str:
+    """One unit's captured `stdout.bin` + `stderr.bin`, concatenated the way a local
+    `ngspice -b` harness read `proc.stdout + proc.stderr`.
+
+    klt ships the streams back as bytes and never normalizes them, so they are decoded
+    here with `errors="replace"` rather than assumed to be clean UTF-8. Stream paths in
+    the report are relative to its own absolute `outdir`.
+    """
+    out_dir = Path(report.get("outdir", ""))
+    text = ""
+    for key in ("stdout", "stderr"):
+        rel = unit.get(key)
+        if not rel:
+            continue
+        path = out_dir / rel
+        if path.is_file():
+            text += path.read_bytes().decode(errors="replace")
+    return text
+
+
+_SOLVER_RE = re.compile(r"Using (.+?) as Direct Linear Solver")
+
+
+def log_solver(log_text: str) -> str | None:
+    """The linear solver ngspice announced in a run log (`KLU`, `SPARSE 1.3`), or None.
+
+    This is the observable that proves a `.spiceinit` solver setting actually reached the
+    engine. It matters because the fleet runner ignores `options.ngspice_init`: a variant
+    whose setting was silently dropped would otherwise be indistinguishable from one that
+    took effect, and the record would name a numerical path nobody ran (issue #319).
+    """
+    m = _SOLVER_RE.search(log_text)
+    return m.group(1).strip() if m else None
+
+
+def spiceinit_text(sim_dir: Path, *, disable: tuple[str, ...] = (), extra: tuple[str, ...] = (), by: str = "") -> str:
+    """`<sim_dir>/spiceinit` rendered as the `.spiceinit` one point actually runs under.
+
+    `disable` comments out every init line starting with one of its entries (e.g.
+    `"option klu"`), naming `by` as the script that disabled it; `extra` appends lines
+    (e.g. a Monte Carlo point's `set mc_seed=`). Both edits stay visible in the returned
+    text, because this is the exact file shipped into the run directory as `.spiceinit`
+    and embedded verbatim in the point's log.
+    """
+    lines = []
+    for line in (sim_dir / "spiceinit").read_text().splitlines():
+        if any(line.strip().startswith(d) for d in disable):
+            lines.append(f"* {line}")
+            lines.append(f"*   ^ DISABLED by {by}")
+        else:
+            lines.append(line)
+    if extra:
+        lines += ["", f"* injected by {by}", *extra]
+    return "\n".join(lines) + "\n"
 
 
 def klt_version() -> str:

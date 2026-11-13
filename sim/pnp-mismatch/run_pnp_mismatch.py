@@ -36,11 +36,22 @@ own header note for the full topology justification):
    instead -- the correct way to falsify "MC_PR_SWITCH is silently inert on
    this deck" without mistaking common-mode cancellation for a broken switch.
 
+Execution model
+---------------
+The six Monte Carlo points are a grid, so they are ONE `klt sim` request
+submitted to the Spot batch fleet -- this script never launches ngspice over a
+grid itself and never falls back to a local grid when the fleet refuses (host
+rules, issue #319). It is a deck-list (`decks[]`) request, which carries the
+testbench's own in-deck `.control` sampling loop to the fleet byte-for-byte
+instead of re-expressing it as a klt `monte_carlo` block that would draw the
+samples differently; see the "fleet transport" section below.
+
 Usage
 -----
-    sim/pnp-mismatch/run_pnp_mismatch.py                  # the full run
+    sim/pnp-mismatch/run_pnp_mismatch.py --wait-for-capacity 600  # the full run
     sim/pnp-mismatch/run_pnp_mismatch.py --samples 20     # quick smoke run
-    sim/pnp-mismatch/run_pnp_mismatch.py --dry-run        # print the plan
+    sim/pnp-mismatch/run_pnp_mismatch.py --dry-run        # print the plan + request
+    sim/pnp-mismatch/run_pnp_mismatch.py --probe <corner-id>   # ONE point, local
 
 Exit status: 0 every check passed, 2 a record was written but a check failed,
 1 harness/setup error (no record written) -- same convention as corner-run.py.
@@ -51,8 +62,8 @@ from __future__ import annotations
 import argparse
 import json
 import math
+import os
 import shutil
-import subprocess
 import sys
 from dataclasses import dataclass
 from datetime import datetime, timezone
@@ -63,9 +74,9 @@ SIM_DIR = HERE.parent
 REPO_ROOT = SIM_DIR.parent
 DECK = HERE / "testbench" / "tb_pnp_mismatch.spice"
 BUILD_DIR = SIM_DIR / "build" / "pnp-mismatch"
-SPICEINIT_FILE = SIM_DIR / "spiceinit"
 
 sys.path.insert(0, str(SIM_DIR / "bin"))
+import sim_common  # noqa: E402
 from sim_common import (  # noqa: E402
     MismatchPoint,
     add_common_args,
@@ -204,72 +215,121 @@ def analytic_sigma(pair: Pair, temp_c: float) -> float:
 
 
 # --------------------------------------------------------------------------
-# ngspice
+# fleet transport
 # --------------------------------------------------------------------------
+#
+# Execution model (host rules, issue #319): the six Monte Carlo points are a grid, so
+# they are ONE `klt sim` request submitted to the Spot batch fleet -- this script never
+# launches ngspice over a grid itself and never falls back to a local grid when the
+# fleet refuses. `--probe` runs a SINGLE point locally (a debug check, not evidence).
+#
+# The request is a deck-list (`decks[]`) request rather than a corner request with a
+# `monte_carlo` block, and that choice is METHOD-PRESERVING by design. This deck draws
+# its samples in its own `.control` `dowhile`/`reset` loop inside ONE ngspice process,
+# seeded by `setseed $mc_seed`; klt's `monte_carlo` block draws them a different way
+# (one engine invocation per sample, seed derived from the corner index). Re-expressing
+# the campaign as a corner request would therefore mint a different artifact from the
+# one sim/pnp-mismatch/records/20260825-220116-a9cac4b was minted by, and the new record
+# would be a successor to compare against rather than a re-run of the same experiment.
+# `decks[]` ships the testbench byte-for-byte and runs it as `ngspice -b` in its own
+# directory, so the in-deck loop -- and the sampling method the existing record cites --
+# crosses to the fleet unchanged (see sim_common.DECK_NOTE).
 
 
-def corner_shim(pdk, point: Point) -> str:
+def corner_shim(point: Point) -> str:
+    """The `corner.spice` the testbench `.include`s: the `.lib` section (which IS the
+    MC_MM_SWITCH / MC_PR_SWITCH selector, see the deck header) plus `.temp`.
+
+    The library is spelled `$PDK_ROOT/...` because a shipped deck is never rewritten:
+    klt refuses an absolute path under the submitting host's own PDK root rather than
+    retargeting it at the runner's (`sim_common.runner_lib_ref`).
+    """
     return (
         "* Generated per point by sim/pnp-mismatch/run_pnp_mismatch.py from the\n"
         "* resolved PDK -- scratch only, not committed.\n"
-        f'.lib "{pdk.lib_file}" {point.section}\n'
+        f'.lib "{sim_common.runner_lib_ref()}" {point.section}\n'
         f".temp {point.temp_c:g}\n"
     )
 
 
 def spiceinit_text(point: Point) -> str:
-    return (
-        SPICEINIT_FILE.read_text()
-        + "\n* Monte Carlo controls injected by sim/pnp-mismatch/run_pnp_mismatch.py\n"
-        f"set mc_seed={point.seed}\n"
-        f"set mc_runs={point.samples}\n"
+    """The `.spiceinit` a point runs under: sim/spiceinit plus this point's `mc_seed`
+    and `mc_runs`, which the deck's own `.control` loop reads via `$?mc_seed`.
+
+    Shipping it as the unit's `decks[].inputs[]` entry is load-bearing, not incidental:
+    the fleet runner ignores `options.ngspice_init`, so an input file read from the
+    unit's own cwd is the only path by which the seed and sample count reach the engine.
+    `parsed_samples` and `seed_stability` then re-derive both from the run's own output,
+    so a dropped setting fails the record instead of silently changing N or the draw.
+    """
+    return sim_common.spiceinit_text(
+        SIM_DIR,
+        extra=(f"set mc_seed={point.seed}", f"set mc_runs={point.samples}"),
+        by="sim/pnp-mismatch/run_pnp_mismatch.py (Monte Carlo controls read by the "
+        "testbench's own .control loop)",
     )
 
 
-def run_point(pdk, point: Point, run_dir: Path, timeout: int) -> tuple[str, int, bool]:
-    run_dir.mkdir(parents=True, exist_ok=True)
-    shutil.copyfile(DECK, run_dir / DECK.name)
-    (run_dir / "corner.spice").write_text(corner_shim(pdk, point))
-    (run_dir / ".spiceinit").write_text(spiceinit_text(point))
-    try:
-        proc = subprocess.run(
-            ["ngspice", "-b", DECK.name],
-            cwd=run_dir,
-            capture_output=True,
-            text=True,
-            stdin=subprocess.DEVNULL,
-            timeout=timeout,
-        )
-        return proc.stdout + proc.stderr, proc.returncode, False
-    except subprocess.TimeoutExpired as exc:
-        out = exc.stdout or ""
-        err = exc.stderr or ""
-        if isinstance(out, bytes):
-            out = out.decode(errors="replace")
-        if isinstance(err, bytes):
-            err = err.decode(errors="replace")
-        return out + err, -1, True
+def deck_unit(point: Point, timeout: int) -> tuple[dict, dict[str, str]]:
+    """One point as a `decks[]` entry plus the files it needs, keyed by their path
+    relative to the request file's own directory.
+
+    The testbench is copied verbatim; its `.include corner.spice` resolves against the
+    deck's own directory, so klt stages the generated shim alongside it.
+    """
+    base = f"units/{point.corner_id}"
+    unit = {
+        "id": point.corner_id,
+        "deck": f"{base}/{DECK.name}",
+        "inputs": [{"path": f"{base}/spiceinit", "name": ".spiceinit"}],
+        "timeout_s": timeout,
+    }
+    files = {
+        f"{base}/{DECK.name}": DECK.read_text(),
+        f"{base}/corner.spice": corner_shim(point),
+        f"{base}/spiceinit": spiceinit_text(point),
+    }
+    return unit, files
+
+
+def build_request(points: list[Point], pdk, backend: str, args) -> tuple[dict, dict[str, str]]:
+    units, files = [], {}
+    for point in points:
+        unit, unit_files = deck_unit(point, args.timeout)
+        units.append(unit)
+        files.update(unit_files)
+    return (
+        sim_common.deck_request(
+            units,
+            backend,
+            timeout_s=args.timeout,
+            pdk_variant=pdk.variant,
+            capacity_wait_s=args.wait_for_capacity if backend == "batch" else 0,
+            max_workers=args.max_workers,
+        ),
+        files,
+    )
 
 
 def write_log(
-    corners_dir: Path, point: Point, pdk, record_id: str, stamp: datetime, run_dir: Path, raw: str, rc: int, timed_out: bool
+    corners_dir: Path, point: Point, pdk, record_id: str, stamp: datetime,
+    files: dict[str, str], raw: str, rc: int, timed_out: bool
 ) -> Path:
     corners_dir.mkdir(parents=True, exist_ok=True)
     path = corners_dir / f"{point.corner_id}.log"
-    deck_text = (run_dir / DECK.name).read_text()
-    shim_text = (run_dir / "corner.spice").read_text()
-    init_text = (run_dir / ".spiceinit").read_text()
+    base = f"units/{point.corner_id}"
     header = [
         f"# point: {point.corner_id}",
         f"# record: {record_id}",
         f"# role: {point.role} -- {point.purpose}",
         f"# section={point.section} temp={point.temp_c:g}C supply=n/a "
         f"seed={point.seed} samples={point.samples}",
+        f"# solver announced by ngspice: {sim_common.log_solver(raw)}",
     ]
     sections = [
-        (".spiceinit (exact)", init_text),
-        ("corner.spice (exact)", shim_text),
-        ("testbench deck (exact input given to ngspice)", deck_text),
+        (".spiceinit (exact, shipped as the unit's decks[].inputs[] entry)", files[f"{base}/spiceinit"]),
+        ("corner.spice (exact)", files[f"{base}/corner.spice"]),
+        ("testbench deck (exact input given to ngspice)", files[f"{base}/{DECK.name}"]),
     ]
     path.write_text(render_log(header, pdk, rc, timed_out, stamp, sections, raw))
     return path
@@ -458,6 +518,24 @@ def render_record(r: dict) -> str:
         f"(`{r['experiment']['provenance_source']}`)"
     )
     L.extend(render_pdk_tools_repo_state(r))
+    b = r["batch"]
+    add(
+        f"- **Backend**: `klt sim --backend batch` deck-list request (fleet job "
+        f"`{b['job_id']}`, {b['instance_type']} in {b['region']}, report status "
+        f"`{b['report_status']}`: {b['passed']}/{b['unit_count']} unit(s) passed, "
+        f"{b['errored']} errored, {b['timed_out']} timed out); fleet runner klt "
+        f"`{b['runner_klt_version']}`, client `{b['klt_client']}`, "
+        f"`--wait-for-capacity {b['capacity_wait_s']:g}`"
+        + (
+            ""
+            if not b["failed_earlier_attempts"]
+            else f"; {len(b['failed_earlier_attempts'])} earlier submit attempt(s) refused: "
+            + "; ".join(b["failed_earlier_attempts"])
+        )
+    )
+    add(f"- **Fleet engine**: {r['tools']['fleet_ngspice']} (per-point, from each unit's own log banner)")
+    add(f"- **Sampling method**: {b['sampling_method']}")
+    add(f"- **Transport**: {r['tools']['fleet_note']}")
 
     add("- **Corner matrix run**:")
     add(
@@ -683,8 +761,55 @@ CLAIM = (
 
 def parse_args(argv: list[str]) -> argparse.Namespace:
     p = argparse.ArgumentParser(description=__doc__.splitlines()[0])
+    p.add_argument(
+        "--max-workers",
+        type=int,
+        default=6,
+        help="fleet-worker pool size for the deck list (klt `options.max_workers`)",
+    )
+    p.add_argument(
+        "--wait-for-capacity",
+        type=float,
+        default=600,
+        help="seconds the batch submit waits out a fleet capacity refusal before failing",
+    )
+    p.add_argument(
+        "--probe",
+        metavar="CORNER_ID",
+        help="run ONE point on the local backend and print its log -- a debug check, "
+        "never evidence; writes nothing under sim/pnp-mismatch/",
+    )
     add_common_args(p, timeout_default=3600, samples_default=N_SAMPLES)
     return p.parse_args(argv)
+
+
+def run_probe(args, pdk, points: list[Point]) -> int:
+    """ONE point, local backend, nothing recorded -- the debugging escape hatch every
+    fleet runner keeps (`sim_common.run_local_probe`). Never a grid."""
+    match = [pt for pt in points if pt.corner_id == args.probe]
+    if not match:
+        raise cr.HarnessError(
+            f"no point named {args.probe!r}; run with --dry-run to list the corner ids"
+        )
+    point = match[0]
+    request, files = build_request([point], pdk, "local", args)
+    d = BUILD_DIR / "probe" / point.corner_id
+    d.mkdir(parents=True, exist_ok=True)
+    for rel, text in files.items():
+        (d / rel).parent.mkdir(parents=True, exist_ok=True)
+        (d / rel).write_text(text)
+    (d / "request.json").write_text(json.dumps(request, indent=2) + "\n")
+    print(f"[probe] local single point {point.corner_id} (N={point.samples}, seed={point.seed})")
+    proc = sim_common.run_local_probe(d)
+    report = json.loads((d / "report.json").read_text() or "{}")
+    unit = sim_common.deck_units(report).get(point.corner_id)
+    print(f"[probe] klt exit {proc.returncode}, report status {report.get('status', '?')}")
+    if unit:
+        raw = sim_common.deck_streams(report, unit)
+        print(f"[probe] solver announced: {sim_common.log_solver(raw)}")
+        print(f"[probe] samples parsed: {len(parse_samples(raw, ALL_VECTORS))}")
+        print(raw[-3000:])
+    return 0 if proc.returncode == 0 else 1
 
 
 def main(argv: list[str]) -> int:
@@ -703,10 +828,10 @@ def main(argv: list[str]) -> int:
             f"  install the pin: {pin['install_command']}\n"
             f"  or re-run with --allow-pdk-mismatch (the record will say so)"
         )
-    if not shutil.which("ngspice"):
-        raise cr.HarnessError("ngspice not found on PATH")
-
     points = build_points(args.samples)
+    if args.probe:
+        return run_probe(args, pdk, points)
+
     git_info = cr.git_state()
     now = datetime.now(timezone.utc)
     record_id = f"{now:%Y%m%d}-{now:%H%M%S}-{git_info['sha']}"
@@ -723,29 +848,69 @@ def main(argv: list[str]) -> int:
                 f"{path} already exists — sim/ is append-only, refusing to overwrite"
             )
 
+    request, files = build_request(points, pdk, "batch", args)
+    run_dir = BUILD_DIR / record_id
+
     print(f"experiment      : {SLUG}")
     print(f"record id       : {record_id}")
     print(f"PDK             : {pdk.dir} (open_pdks {pdk.installed_commit})")
     print(f"testbench       : {DECK.relative_to(REPO_ROOT)}")
-    print(f"points          : {len(points)} ({args.samples} samples per MC point)")
-    for p in points:
-        print(f"  {p.corner_id:<38} section={p.section:<6} T={p.temp_c:>5g}C seed={p.seed} N={p.samples}")
+    print(f"points          : {len(points)} ({args.samples} samples per MC point); one "
+          f"`klt sim` deck-list request -> batch fleet")
+    for pt in points:
+        print(f"  {pt.corner_id:<38} section={pt.section:<6} T={pt.temp_c:>5g}C seed={pt.seed} N={pt.samples}")
     if args.dry_run:
-        print("\n-- corner shim for the first point --")
-        print(corner_shim(pdk, points[0]))
-        print("(dry run: nothing written under sim/pnp-mismatch/)")
+        print(f"\n-- request.json ({len(request['decks'])} units) --")
+        print(json.dumps(request, indent=2))
+        print("-- corner shim for the first point --")
+        print(files[f"units/{points[0].corner_id}/corner.spice"])
+        print("-- .spiceinit for the first point --")
+        print(files[f"units/{points[0].corner_id}/spiceinit"])
+        print("(dry run: nothing written under sim/pnp-mismatch/, nothing submitted)")
         return 0
+
+    submit_dir = run_dir / "batch"
+    outcome = sim_common.submit_prepared(
+        submit_dir,
+        None,
+        request,
+        f"{SLUG}: {len(points)} Monte Carlo decks -> batch fleet",
+        SLUG,
+        retry=sim_common.cap_retry(submit_dir, SLUG, 180, max_retries=19),
+        files=files,
+    )
+    report = json.loads((submit_dir / "report.json").read_text() or "{}")
+    units = sim_common.deck_units(report)
+    if not units:
+        # No local-grid fallback, ever (host rules): a refusal is reported verbatim and
+        # the run ends without a record, so nothing claims evidence the fleet never made.
+        raise cr.HarnessError(
+            f"batch submit produced no usable deck report (klt exit {outcome['exit']}, "
+            f"report status {outcome['status']}); NOT falling back to a local grid.\n"
+            f"  klt stderr: {(submit_dir / 'klt.stderr').read_text().strip()[:1200]}\n"
+            f"  request:    {submit_dir / 'request.json'}"
+        )
 
     results: dict[str, dict] = {}
     ordered: list[dict] = []
     for i, point in enumerate(points, start=1):
-        run_dir = BUILD_DIR / record_id / point.corner_id
-        raw, rc, timed_out = run_point(pdk, point, run_dir, args.timeout)
-        write_log(corners_dir, point, pdk, record_id, now, run_dir, raw, rc, timed_out)
+        unit = units.get(point.corner_id)
+        if unit is None:
+            raise cr.HarnessError(
+                f"the fleet returned no unit for {point.corner_id} (a lost shard or a "
+                f"failed job); report status {report.get('status')}, "
+                f"{report.get('errored')} errored / {report.get('timed_out')} timed out"
+            )
+        raw = sim_common.deck_streams(report, unit)
+        exit_code = unit.get("exit_code")
+        rc = -1 if exit_code is None else int(exit_code)
+        timed_out = bool(unit.get("timed_out"))
+        write_log(corners_dir, point, pdk, record_id, now, files, raw, rc, timed_out)
         if rc != 0 or timed_out:
             raise cr.HarnessError(
-                f"ngspice exit {rc}{' (timeout)' if timed_out else ''} for {point.corner_id}; "
-                f"see {(corners_dir / (point.corner_id + '.log')).relative_to(REPO_ROOT)}"
+                f"ngspice exit {rc}{' (timeout)' if timed_out else ''} for {point.corner_id} "
+                f"on the fleet; diagnostics {unit.get('diagnostics')}; see "
+                f"{(corners_dir / (point.corner_id + '.log')).relative_to(REPO_ROOT)}"
             )
         samples = parse_samples(raw, ALL_VECTORS)
         if not samples:
@@ -753,21 +918,64 @@ def main(argv: list[str]) -> int:
                 f"no Monte Carlo samples parsed for {point.corner_id} — see the log"
             )
         res = evaluate(point, samples)
+        res["ngspice"] = sim_common.fleet_ngspice(raw)
+        res["solver"] = sim_common.log_solver(raw)
         results[point.corner_id] = res
         ordered.append(res)
         head = ", ".join(
-            f"sigma({p.vector})={res['stats'][p.vector]['sigma'] * 1e3:.4f}mV" for p in PAIRS
+            f"sigma({pr.vector})={res['stats'][pr.vector]['sigma'] * 1e3:.4f}mV" for pr in PAIRS
         )
         print(
             f"[{i}/{len(points)}] {point.corner_id:<38} "
             f"{'PASS' if res['pass'] else 'FAIL'}  n={res['parsed_samples']}  {head}"
         )
 
+    sim_common.snapshot_deck_request(submit_dir, corners_dir, run_dir, REPO_ROOT)
+
     cross = seed_stability(results)
     overall = all(r["pass"] for r in ordered) and all(c["pass"] for c in cross)
 
     snapshots_dir.mkdir(parents=True, exist_ok=True)
     shutil.copyfile(DECK, snapshot)
+
+    # Provenance is OBSERVED, never a literal (issue #297): the engine from each unit's
+    # own `ngspice-NN done` banner, the runner's klt from the job's report.
+    remote = (report.get("environment") or {}).get("remote") or {}
+    pdk_block, tools_block = sim_common.record_pdk_tools(
+        pdk,
+        pin,
+        {"klt_client": sim_common.klt_version()},
+        points=ordered,
+        requests=[remote],
+        lib_file=sim_common.runner_lib_ref(pdk.variant),
+        root=sim_common.HOST_PDK_ROOT,
+        xschem_note=None,
+        fleet_note=sim_common.DECK_NOTE,
+    )
+    batch_block = {
+        "job_id": remote.get("job_id"),
+        "region": remote.get("region"),
+        "instance_type": remote.get("instance_type"),
+        "state": remote.get("state"),
+        "runner_klt_version": remote.get("runner_klt_version"),
+        "runner_request_features": remote.get("runner_request_features"),
+        "klt_client": sim_common.klt_version(),
+        "klt_sim_backend_env": os.environ.get("KLT_SIM_BACKEND"),
+        "capacity_wait_s": args.wait_for_capacity,
+        "report_status": report.get("status"),
+        "unit_count": report.get("unit_count"),
+        "passed": report.get("passed"),
+        "errored": report.get("errored"),
+        "timed_out": report.get("timed_out"),
+        "failed_earlier_attempts": sim_common.attempt_messages(submit_dir, run_dir, REPO_ROOT),
+        "sampling_method": (
+            "in-deck `.control` dowhile/reset loop inside ONE ngspice process, seeded by "
+            "`setseed $mc_seed` from the shipped `.spiceinit` -- the SAME method this "
+            "experiment's earlier records were minted by, carried to the fleet unchanged "
+            "by the `decks[]` transport rather than re-expressed as a klt `monte_carlo` "
+            "block (which would draw the samples differently; issue #319 risk item 2)"
+        ),
+    }
 
     record = {
         "record_id": record_id,
@@ -817,15 +1025,10 @@ def main(argv: list[str]) -> int:
             for p in PAIRS
         ],
         "statistics": {"n_samples": args.samples, "seed_a": SEED_A, "seed_b": SEED_B},
-        "pdk": {
-            "root": str(pdk.root),
-            "variant": pdk.variant,
-            "installed_commit": pdk.installed_commit,
-            "pinned_commit": pin["open_pdks_commit"],
-            "matches_pin": pdk.matches_pin,
-            "lib_file": str(pdk.lib_file),
-        },
-        "tools": cr.tool_versions(),
+        "pdk": pdk_block,
+        "tools": tools_block,
+        "backend": "batch",
+        "batch": batch_block,
         "git": git_info,
         "points": ordered,
         "cross_point_checks": cross,
@@ -835,6 +1038,7 @@ def main(argv: list[str]) -> int:
             "run_script": str((HERE / "run_pnp_mismatch.py").relative_to(REPO_ROOT)),
             "netlist_snapshot": str(snapshot.relative_to(REPO_ROOT)),
             "raw_logs": str(corners_dir.relative_to(REPO_ROOT)) + "/",
+            "klt_report": str((corners_dir / "batch" / "report.json").relative_to(REPO_ROOT)),
             "json_record": str(record_json.relative_to(REPO_ROOT)),
             "record": str(record_md.relative_to(REPO_ROOT)),
         },
