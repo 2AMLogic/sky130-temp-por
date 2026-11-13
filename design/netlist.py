@@ -27,19 +27,23 @@ infrastructure:
 
 * **The xschem run is delegated to** ``klt netlist`` (headless flags forced,
   bounded by ``--timeout-s``). The PDK pin stays enforced *here*, before
-  ``klt`` is called: :func:`find_pdk` resolves ``$PDK_ROOT``/``$PDK`` (else
-  ``~/.ciel``), refuses a tree whose revision is not ``sim/pdk.json``'s pin
-  (``sim/bin/test_pdk_pin.py`` asserts this), and hands the resolved PDK to
-  ``klt netlist --pdk-root/--pdk``.
+  ``klt`` is called: :func:`find_pdk` refuses a tree whose revision is not
+  ``sim/pdk.json``'s pin (``sim/bin/test_pdk_pin.py`` asserts this) and hands
+  the resolved PDK to ``klt netlist --pdk-root/--pdk``. The resolution itself
+  is **not** reimplemented here -- :func:`find_pdk` is a thin wrapper over
+  ``sim/bin/corner-run.py``'s ``load_pin``/``resolve_pdk``/
+  ``pdk_mismatch_message``, the same resolver every recorded run under
+  ``sim/`` goes through, so ``sim/pdk.json``'s ``default_pdk_root`` and
+  ``variant`` govern the netlist export too (issue #292).
 * **The ratified-port-list assertion** uses a small inlined SPICE
   ``.subckt`` port-list parser (:func:`subckt_ports`) instead of importing
   ``layout/lvs_reference.py``, which also does not exist yet in this repo
   (layout/DRC/LVS is explicitly out of scope for issue #6). The parser
   itself is a straight port of ``lvs_reference.py``'s own
   ``logical_lines``/``subckt_ports`` (gf180-temp-por, stdlib-only, no PDK
-  dependency) -- when a real ``layout/lvs_reference.py`` lands in this repo,
-  this copy should be deleted in favour of importing it, exactly as gf180's
-  own module docstring intends.
+  dependency). It stays inlined: this repo's layout/LVS flow landed through
+  ``klt`` (per-cell ``layout/<cell>/lvs.json`` records) rather than through a
+  standalone LVS-reference module, so there is no such module here to import.
 
 ``temp_por_top.sch`` is always present in this repo, so the top-level and
 cross-cell invariants in :func:`check_invariants` run unconditionally on
@@ -52,7 +56,6 @@ from __future__ import annotations
 
 import argparse
 import difflib
-import json
 import os
 import re
 import subprocess
@@ -83,7 +86,6 @@ SCH_PIN_RE = re.compile(r"^C\s+\{devices/(i|o|io)pin\.sym\}\s+.*?\{(.*)\}\s*$")
 # gf180-temp-por/layout/lvs_reference.py's logical_lines/subckt_ports,
 # stdlib-only, no PDK dependency) --------------------------------------
 SUBCKT_RE = re.compile(r"^\.subckt\s+(\S+)\s+(.*)$", re.IGNORECASE)
-ENDS_RE = re.compile(r"^\.ends\b", re.IGNORECASE)
 
 
 class ExportError(RuntimeError):
@@ -94,57 +96,59 @@ class PdkNotFound(RuntimeError):
     pass
 
 
-class Pdk:
-    """Resolved PDK location: ``path`` is the variant dir (contains libs.tech/)."""
+def corner_run():
+    """``sim/bin/corner-run.py`` -- this repo's one PDK-pin resolver -- loaded lazily.
 
-    def __init__(self, path: Path, variant: str):
-        self.path = path
-        self.variant = variant
+    Loaded on the first :func:`find_pdk` call rather than imported at module
+    scope so ``design/check_committed_netlists.py``, the CI-runnable PDK-free
+    importer of this module, keeps working without pulling the sim harness in
+    just to run the pinout invariants over the committed netlists.
 
-
-def load_pdk_pin() -> dict:
-    """The reproducibility pin in sim/pdk.json (the single source of the revision)."""
-    pin_file = REPO_ROOT / "sim" / "pdk.json"
-    try:
-        return json.loads(pin_file.read_text())
-    except (OSError, ValueError) as exc:
-        raise PdkNotFound(f"cannot read PDK pin {pin_file}: {exc}")
-
-
-def installed_revision(path: Path) -> str:
-    """open_pdks revision of a PDK variant dir: the ``versions/<hash>`` component
-    its symlink resolves to, or ``unknown`` (which never matches the pin)."""
-    parts = path.resolve().parts
-    if "versions" in parts:
-        idx = parts.index("versions")
-        if idx + 1 < len(parts):
-            return parts[idx + 1]
-    return "unknown"
-
-
-def find_pdk() -> Pdk:
-    """Resolve the sky130 PDK: PDK_ROOT/PDK env vars, else ``~/.ciel``, and
-    require it to be the revision pinned in sim/pdk.json.
-
-    Mirrors design/xschemrc's own resolution order (PDK_ROOT falls back to
-    ``~/.ciel``, PDK to ``sky130A``). No other install location is searched.
+    An already-registered ``corner_run`` is reused rather than re-executed --
+    the same ``sys.modules.get("corner_run") or load_corner_run()`` form
+    ``sim_common.netlist_tb_head`` uses. ``load_corner_run()`` execs a *fresh*
+    module every call, so a second copy would give a second ``Pdk`` class that
+    is not the one the rest of the harness resolves against.
     """
-    pin = load_pdk_pin()
-    root = os.environ.get("PDK_ROOT") or str(Path.home() / ".ciel")
-    variant = os.environ.get("PDK") or "sky130A"
-    path = Path(root) / variant
-    if not (path / "libs.tech").is_dir():
+    module = sys.modules.get("corner_run")
+    if module is not None:
+        return module
+    sim_bin = str(REPO_ROOT / "sim" / "bin")
+    if sim_bin not in sys.path:
+        sys.path.insert(0, sim_bin)
+    try:
+        import sim_common  # noqa: E402  (deliberately lazy -- see above)
+
+        return sim_common.load_corner_run()
+    except (ImportError, OSError, RuntimeError) as exc:
         raise PdkNotFound(
-            f"no sky130 PDK at {path} (expected {path}/libs.tech/...). "
-            f"Install the pinned PDK: {pin['install_command']} (or set PDK_ROOT/PDK)."
-        )
-    found = installed_revision(path)
-    if found != pin["open_pdks_commit"]:
-        raise PdkNotFound(
-            f"PDK at {path} is open_pdks {found}, but sim/pdk.json pins "
-            f"{pin['open_pdks_commit']}. Install the pinned PDK: {pin['install_command']}"
-        )
-    return Pdk(path=path, variant=variant)
+            f"cannot load the shared PDK resolver {sim_bin}/corner-run.py: {exc}"
+        ) from exc
+
+
+def find_pdk():
+    """Resolve the sky130 PDK and require it to be sim/pdk.json's pinned revision.
+
+    A thin wrapper over the shared resolver (``corner-run.py``'s
+    ``load_pin``/``resolve_pdk``/``pdk_mismatch_message``) so the netlist
+    export and every recorded run under ``sim/`` resolve the *same* tree:
+    ``$PDK_ROOT``/``$PDK``, else ``sim/pdk.json``'s own ``default_pdk_root``/
+    ``variant``. No other install location is searched.
+
+    Returns ``corner-run.py``'s ``Pdk`` (``.root``, ``.variant``, ``.dir``,
+    ``.installed_commit``, ``.lib_file``). Raises :class:`PdkNotFound` -- here,
+    before ``klt netlist`` is ever invoked -- when the tree is missing,
+    incomplete, or not the pin.
+    """
+    cr = corner_run()
+    try:
+        pin = cr.load_pin()
+        pdk = cr.resolve_pdk(pin)
+    except (cr.HarnessError, OSError, ValueError) as exc:
+        raise PdkNotFound(str(exc)) from exc
+    if not pdk.matches_pin:
+        raise PdkNotFound(cr.pdk_mismatch_message(pdk, pin))
+    return pdk
 
 
 def logical_lines(text: str) -> list[str]:
@@ -193,8 +197,11 @@ def normalize(text: str) -> str:
     return text.rstrip("\n") + "\n"
 
 
-def export_cell(cell: str, outdir: Path, pdk: Pdk) -> str:
-    """Netlist one cell with ``klt netlist`` and return its normalized text."""
+def export_cell(cell: str, outdir: Path, pdk) -> str:
+    """Netlist one cell with ``klt netlist`` and return its normalized text.
+
+    ``pdk`` is a :func:`find_pdk` result (``corner-run.py``'s ``Pdk``).
+    """
     sch = DESIGN_DIR / f"{cell}.sch"
     if not sch.is_file():
         raise ExportError(f"no such cell: {sch}")
@@ -203,7 +210,7 @@ def export_cell(cell: str, outdir: Path, pdk: Pdk) -> str:
         "klt", "netlist", str(sch),
         "-o", str(produced),
         "--rcfile", str(XSCHEMRC),
-        "--pdk-root", str(pdk.path.parent),
+        "--pdk-root", str(pdk.root),
         "--pdk", pdk.variant,
     ]
     try:

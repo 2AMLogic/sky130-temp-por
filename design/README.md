@@ -100,7 +100,12 @@ plus the sky130A PDK installed — `design/xschemrc` resolves it via
 rcfile declares against `$PDK_ROOT`/`$PDK`. `netlist.py` still resolves the PDK
 itself and refuses any tree whose revision is not the `sim/pdk.json` pin
 (asserted by `sim/bin/test_pdk_pin.py`), then passes it to `klt netlist
---pdk-root/--pdk`. No PDK path is ever baked into a netlist or
+--pdk-root/--pdk`. That resolution is **not** a second implementation:
+`netlist.py`'s `find_pdk()` is a thin wrapper over `sim/bin/corner-run.py`'s
+`load_pin()`/`resolve_pdk()`, the one resolver every recorded run under `sim/`
+goes through, so `sim/pdk.json`'s own `default_pdk_root` and `variant` supply
+the fallbacks (`~/.ciel`, `sky130A`) rather than a hardcoded pair that could
+drift from the pin. No PDK path is ever baked into a netlist or
 into this directory.
 
 > **sky130 device-parameter unit convention.** `sky130_fd_pr__*` primitive
