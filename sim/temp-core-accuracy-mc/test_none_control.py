@@ -16,6 +16,11 @@ These tests pin the properties that close that hole:
   * any corner not compared     -> NOT VERIFIED even when every compared corner is flat,
                                    and the uncompared corners are named in the record;
   * a nominal point that failed a guard counts as "not compared" too;
+  * a corner with **no report at all** -- absent from the analysis, not present-with-None,
+                                   which is how a lost process section arrives (issue #318) --
+                                   counts as not compared as well: grading is against the
+                                   expected `PROCS x SUPPLIES` grid, so the corner count
+                                   cannot shrink to the corners that happened to report;
   * every corner compared       -> PASS below the flatness threshold, FAIL above it;
   * the control dict carries no hardcoded literal (the retired `none_max_sd_V`);
   * **re-grading the committed runs' `none` evidence still reads 0.0 V / PASS** --
@@ -65,6 +70,31 @@ def graded(corners, nominals=None):
     return m.analyse_term(ent, nom)
 
 
+GRID = [(p, v) for p in m.PROCS for v in m.SUPPLIES]
+# The 15 corner names the control must grade, written out rather than derived from PROCS x
+# SUPPLIES, so these tests state the expected grid independently of the grader enforcing it.
+GRID_NAMES = ["ff_2.97V", "ff_3.30V", "ff_3.63V", "fs_2.97V", "fs_3.30V", "fs_3.63V",
+              "sf_2.97V", "sf_3.30V", "sf_3.63V", "ss_2.97V", "ss_3.30V", "ss_3.63V",
+              "tt_2.97V", "tt_3.30V", "tt_3.63V"]
+
+
+def full_grid(overrides=None, drop=()):
+    """{corner: samples} over the whole PROCS x SUPPLIES grid: two flat samples per corner.
+
+    `overrides` replaces individual corners' sample dicts (to make one corner invalid, or
+    non-flat); `drop` removes corners from the mapping entirely, which is what a corner with
+    no report at all looks like by the time `analyse_term` runs -- `load_term` contributes no
+    key for it.  An entry of `drop` is either a corner key or a bare process name, meaning
+    that whole process section's three supplies (issue #318).
+    """
+    corners = {k: {0: curve(), 1: curve()} for k in GRID}
+    for d in drop:
+        for k in ([(d, v) for v in m.SUPPLIES] if isinstance(d, str) else [d]):
+            del corners[k]
+    corners.update(overrides or {})
+    return corners
+
+
 class SelfCheckTest(unittest.TestCase):
     """The synthetic fixtures must actually exercise the guards they claim to."""
 
@@ -74,17 +104,21 @@ class SelfCheckTest(unittest.TestCase):
     def test_an_invalid_sample_is_rejected(self):
         self.assertTrue(m.guard_check(BAD))
 
+    def test_the_fixture_grid_is_the_modules_expected_corner_set(self):
+        self.assertEqual(len(GRID), 15)
+        self.assertEqual(sorted(f"{p}_{v:.2f}V" for p, v in GRID), GRID_NAMES)
+        self.assertEqual(sorted(GRID), sorted(m.GRID))
+
 
 class VacuousPassTest(unittest.TestCase):
     """The reproduction from issue #310: every `none` sample failed, yet the control read PASS."""
 
     def setUp(self):
-        self.an = graded({("tt", 3.3): {1: BAD, 2: BAD}, ("ss", 3.0): {1: BAD}},
-                         nominals={("tt", 3.3): curve(), ("ss", 3.0): curve()})
+        self.an = graded(full_grid({k: {1: BAD, 2: BAD} for k in GRID}))
 
     def test_nothing_was_compared(self):
-        self.assertEqual([cs["n_valid"] for cs in self.an.values()], [0, 0])
-        self.assertEqual([cs["max_dev_from_nominal_V"] for cs in self.an.values()], [None, None])
+        self.assertEqual([cs["n_valid"] for cs in self.an.values()], [0] * 15)
+        self.assertEqual([cs["max_dev_from_nominal_V"] for cs in self.an.values()], [None] * 15)
 
     def test_the_old_fold_would_have_produced_a_passing_zero(self):
         # The exact expression this issue removed -- kept here so the hole stays visible.
@@ -94,7 +128,7 @@ class VacuousPassTest(unittest.TestCase):
         c = m.none_control(self.an)
         self.assertEqual(c["verdict"], "NOT VERIFIED")
         self.assertEqual(c["n_corners_compared"], 0)
-        self.assertEqual(c["corners_not_compared"], ["ss_3.00V", "tt_3.30V"])
+        self.assertEqual(c["corners_not_compared"], GRID_NAMES)
 
     def test_no_zero_volt_measurement_is_claimed(self):
         self.assertIsNone(m.none_control(self.an)["max_dev_from_nominal_V"])
@@ -110,9 +144,7 @@ class PartiallyFailedRunTest(unittest.TestCase):
     """A corner with no valid sample must not silently drop out of the max."""
 
     def setUp(self):
-        self.an = graded({("tt", 3.3): {0: curve(), 1: curve()},
-                          ("ss", 2.97): {0: curve(), 1: curve()},
-                          ("ff", 3.63): {0: BAD, 1: BAD}})
+        self.an = graded(full_grid({("ff", 3.63): {0: BAD, 1: BAD}}))
 
     def test_the_compared_corners_are_flat(self):
         self.assertEqual(self.an[("tt", 3.3)]["max_dev_from_nominal_V"], 0.0)
@@ -121,8 +153,8 @@ class PartiallyFailedRunTest(unittest.TestCase):
     def test_control_is_not_verified_despite_flat_compared_corners(self):
         c = m.none_control(self.an)
         self.assertEqual(c["verdict"], "NOT VERIFIED")
-        self.assertEqual(c["n_corners"], 3)
-        self.assertEqual(c["n_corners_compared"], 2)
+        self.assertEqual(c["n_corners"], 15)
+        self.assertEqual(c["n_corners_compared"], 14)
         self.assertEqual(c["corners_not_compared"], ["ff_3.63V"])
 
     def test_the_uncompared_corner_is_named_in_the_rendered_line(self):
@@ -130,20 +162,21 @@ class PartiallyFailedRunTest(unittest.TestCase):
         self.assertIn("NOT VERIFIED", line)
         self.assertNotIn("PASS", line)
         self.assertIn("ff_3.63V", line)
-        self.assertIn("1 of 3 corners compared nothing", line)
+        self.assertIn("1 of 15 corners compared nothing", line)
 
     def test_the_subset_max_is_still_disclosed(self):
         c = m.none_control(self.an)
         self.assertEqual(c["max_dev_from_nominal_V"], 0.0)
-        self.assertIn("over the 2 corners that were compared", m.control_line(c).lower())
+        self.assertIn("over the 14 corners that were compared", m.control_line(c).lower())
 
 
 class UnusableNominalTest(unittest.TestCase):
     """A corner whose NOMINAL reference failed a guard compared nothing either."""
 
     def setUp(self):
-        self.an = graded({("tt", 3.3): {0: curve(), 1: curve()}, ("ss", 3.3): {0: curve()}},
-                         nominals={("tt", 3.3): curve(), ("ss", 3.3): BAD})
+        noms = {k: curve() for k in GRID}
+        noms[("ss", 3.3)] = BAD
+        self.an = graded(full_grid(), nominals=noms)
 
     def test_corner_with_a_bad_nominal_is_counted_as_not_compared(self):
         self.assertTrue(self.an[("ss", 3.3)]["nominal_invalid"])
@@ -153,20 +186,88 @@ class UnusableNominalTest(unittest.TestCase):
         self.assertEqual(c["corners_not_compared"], ["ss_3.30V"])
 
 
+class MissingCornerTest(unittest.TestCase):
+    """A corner with no report at all must be graded, not skipped (issue #318).
+
+    `load_term` appends a process section whose request produced no usable report to
+    `missing_procs` and contributes **no key** for its corners, so `analyse_term` never
+    sees them -- they are absent rather than present-with-nothing-compared.  Grading over
+    whatever keys happen to be in `an` let a `none` term that lost a whole process section
+    render **PASS** "over all 12 corners": a max over 12 of the 15 corners, certifying the
+    switching wrappers on three corners that were never simulated.  The control therefore
+    grades against the expected `PROCS x SUPPLIES` grid.
+    """
+
+    def test_a_missing_process_section_is_not_verified(self):
+        c = m.none_control(graded(full_grid(drop=["fs"])))
+        self.assertEqual(c["verdict"], "NOT VERIFIED")
+        self.assertEqual(c["n_corners"], 15)
+        self.assertEqual(c["n_corners_compared"], 12)
+        self.assertEqual(c["corners_not_compared"], ["fs_2.97V", "fs_3.30V", "fs_3.63V"])
+
+    def test_the_missing_process_corners_are_named_in_the_rendered_line(self):
+        line = m.control_line(m.none_control(graded(full_grid(drop=["fs"]))))
+        self.assertIn("NOT VERIFIED", line)
+        self.assertNotIn("PASS", line)
+        self.assertIn("3 of 15 corners compared nothing", line)
+        for name in ("fs_2.97V", "fs_3.30V", "fs_3.63V"):
+            self.assertIn(name, line)
+
+    def test_a_single_missing_corner_is_not_verified(self):
+        c = m.none_control(graded(full_grid(drop=[("ss", 3.63)])))
+        self.assertEqual(c["verdict"], "NOT VERIFIED")
+        self.assertEqual(c["n_corners"], 15)
+        self.assertEqual(c["n_corners_compared"], 14)
+        self.assertEqual(c["corners_not_compared"], ["ss_3.63V"])
+
+    def test_a_missing_corner_alongside_a_non_flat_one_reports_the_subset_max(self):
+        c = m.none_control(graded(full_grid({("tt", 3.3): {0: curve(), 1: curve(dptat=1e-3)}},
+                                            drop=["fs"])))
+        self.assertEqual(c["verdict"], "NOT VERIFIED")
+        self.assertAlmostEqual(c["max_dev_from_nominal_V"], 1e-3)
+        self.assertEqual(c["corners_not_compared"], ["fs_2.97V", "fs_3.30V", "fs_3.63V"])
+
+    def test_an_absent_corner_grades_exactly_like_one_that_compared_nothing(self):
+        absent = m.none_control(graded(full_grid(drop=["fs"])))
+        invalid = m.none_control(graded(full_grid({("fs", v): {0: BAD} for v in m.SUPPLIES})))
+        self.assertEqual(absent, invalid)
+
+    def test_an_empty_analysis_names_the_whole_grid(self):
+        c = m.none_control({})
+        self.assertEqual(c["verdict"], "NOT VERIFIED")
+        self.assertEqual(c["corners_not_compared"], GRID_NAMES)
+        self.assertIsNone(c["max_dev_from_nominal_V"])
+
+    def test_a_corner_outside_the_grid_is_still_graded(self):
+        # The grid is a floor, not a filter: a key the function was handed is never dropped.
+        c = m.none_control(graded(full_grid({("tt", 3.0): {0: curve(dptat=1e-3)}})))
+        self.assertEqual(c["n_corners"], 16)
+        self.assertEqual(c["n_corners_compared"], 16)
+        self.assertEqual(c["verdict"], "FAIL")
+
+    def test_the_compare_renderer_also_sees_the_missing_process(self):
+        line = m.compare_control_line("baseline", m.none_control(graded(full_grid(drop=["fs"]))))
+        self.assertIn("NOT VERIFIED", line)
+        self.assertNotIn("PASS", line)
+        self.assertIn("3 of 15 corners compared nothing", line)
+        self.assertIn("fs_3.30V", line)
+
+
 class PassAndFailTest(unittest.TestCase):
     """With every corner compared, the control grades on the measurement alone."""
 
     def test_flat_control_passes(self):
-        an = graded({("tt", 3.3): {0: curve(), 1: curve()}, ("ss", 2.97): {0: curve()}})
+        an = graded(full_grid())
         c = m.none_control(an)
         self.assertEqual(c["verdict"], "PASS")
         self.assertEqual(c["max_dev_from_nominal_V"], 0.0)
         self.assertEqual(c["corners_not_compared"], [])
         self.assertEqual(c["n_corners_compared"], c["n_corners"])
+        self.assertEqual(c["n_corners"], 15)
         self.assertIn("PASS", m.control_line(c))
 
     def test_a_control_above_the_flatness_threshold_fails(self):
-        an = graded({("tt", 3.3): {0: curve(), 1: curve(dptat=1e-3)}})
+        an = graded(full_grid({("tt", 3.3): {0: curve(), 1: curve(dptat=1e-3)}}))
         c = m.none_control(an)
         self.assertEqual(c["verdict"], "FAIL")
         self.assertAlmostEqual(c["max_dev_from_nominal_V"], 1e-3)
@@ -175,7 +276,7 @@ class PassAndFailTest(unittest.TestCase):
         self.assertNotIn("PASS", line)
 
     def test_the_flatness_threshold_is_the_module_constant(self):
-        an = graded({("tt", 3.3): {0: curve(), 1: curve()}})
+        an = graded(full_grid())
         self.assertEqual(m.none_control(an)["flat_threshold_V"], m.CONTROL_FLAT_V)
 
 
@@ -183,13 +284,13 @@ class ControlShapeTest(unittest.TestCase):
     """The control block is all measurement: no literal is written into a record."""
 
     def test_keys_are_exactly_the_graded_fields(self):
-        c = m.none_control(graded({("tt", 3.3): {0: curve()}}))
+        c = m.none_control(graded(full_grid()))
         self.assertEqual(set(c), {"max_dev_from_nominal_V", "n_corners", "n_corners_compared",
                                   "corners_not_compared", "flat_threshold_V", "verdict"})
 
     def test_the_retired_hardcoded_control_value_is_gone(self):
         # `controls.none_max_sd_V` was written as the literal 0.0 with no reader (issue #310).
-        self.assertNotIn("none_max_sd_V", m.none_control(graded({("tt", 3.3): {0: curve()}})))
+        self.assertNotIn("none_max_sd_V", m.none_control(graded(full_grid())))
         self.assertNotIn("none_max_sd_V", (HERE / "run_accuracy_mc.py").read_text())
 
 
@@ -202,14 +303,14 @@ class CompareRendererTest(unittest.TestCase):
         self.assertNotIn("PASS", line)
 
     def test_partially_compared_deck_is_not_verified(self):
-        c = m.none_control(graded({("tt", 3.3): {0: curve()}, ("ff", 2.97): {0: BAD}}))
+        c = m.none_control(graded(full_grid({("ff", 2.97): {0: BAD}})))
         line = m.compare_control_line("mirror-degen", c)
         self.assertIn("NOT VERIFIED", line)
         self.assertNotIn("PASS", line)
         self.assertIn("ff_2.97V", line)
 
     def test_fully_compared_flat_deck_passes(self):
-        c = m.none_control(graded({("tt", 3.3): {0: curve()}}))
+        c = m.none_control(graded(full_grid()))
         self.assertIn("PASS", m.compare_control_line("baseline", c))
 
 
@@ -255,6 +356,8 @@ class CommittedRunsStillPassTest(unittest.TestCase):
                     c = m.none_control(an)
                     self.assertEqual(c["corners_not_compared"], [])
                     self.assertEqual(c["n_corners_compared"], c["n_corners"])
+                    # the whole expected grid, not just the corners this record happened to carry
+                    self.assertEqual(c["n_corners"], 15)
                     self.assertEqual(c["max_dev_from_nominal_V"], 0.0)
                     self.assertEqual(c["verdict"], "PASS")
                     # every corner really had samples to compare, so the PASS is not vacuous
