@@ -9,6 +9,14 @@ Chronological record of recently merged pull requests and closed issues. This fi
 
 ### 2026-11-13
 
+- **PR #317**: fix(sim): grade the accuracy-MC `none` control three-state so an empty one cannot PASS
+- **Issue #310** (closed): temp-core-accuracy-mc: negative control can PASS with zero compared samples; drop hardcoded none_max_sd_V and dead local
+- **PR #316**: fix(sim): make load_corner_run() return the one registered corner_run module
+- **Issue #304** (closed): Make load_corner_run() reuse the loaded module: drop three guards that still let corner-run.py load twice
+- **PR #313**: fix(sim): derive the solver sweep's record PDK/Tools lines from the run
+- **Issue #306** (closed): run_solver_sweep.py writes a hardcoded 'fleet runner klt 0.5.0' into record Tools lines
+- **PR #311**: fix(manifests): walk list-valued evidence entries and object `file` refs in check-citations.py
+- **Issue #302** (closed): check-citations.py silently skips list-valued manifest evidence entries (item 11)
 - **PR #300**: refactor(sim): derive each record's fleet/host tool versions instead of hardcoding them
 - **Issue #297** (closed): Share the record pdk/tools provenance block across fleet runners (7 copies; 4 hardcode stale tool versions)
 - **PR #305**: feat(manifests): gate items 1 and 9 with klt's own local_only attest check
