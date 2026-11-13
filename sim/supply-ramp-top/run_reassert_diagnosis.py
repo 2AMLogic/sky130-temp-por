@@ -353,14 +353,7 @@ def load_case(case, run_dir, man, corners_dir, write):
     rec = dict(case)
     rec.update({"tstop_s": camp.tstop_for(case["rate"])})
     rp = d / "report.json"
-    attempts = []
-    for ad in sorted(d.glob("attempt*")):
-        try:
-            body = json.loads((ad / "report.json").read_text()) if (ad / "report.json").is_file() else {}
-            msg = (body.get("error") or {}).get("message") or ("report status " + str(body.get("status")))
-        except json.JSONDecodeError:
-            msg = "unparseable report"
-        attempts.append(camp.scrub(msg, run_dir)[:400])
+    attempts = sim_common.attempt_messages(d, run_dir, camp.REPO_ROOT)
     if attempts:
         rec["failed_earlier_attempts"] = attempts
     if not rp.is_file():
