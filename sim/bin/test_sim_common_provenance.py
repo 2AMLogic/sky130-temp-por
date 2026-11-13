@@ -19,12 +19,15 @@ Run: python3 -I sim/bin/test_sim_common_provenance.py
 """
 from __future__ import annotations
 
+import re
 import sys
 import unittest
 from pathlib import Path
 from unittest import mock
 
-sys.path.insert(0, str(Path(__file__).resolve().parent))
+HERE = Path(__file__).resolve().parent
+REPO_ROOT = HERE.parent.parent
+sys.path.insert(0, str(HERE))
 import sim_common as sc  # noqa: E402
 
 HOST = {
@@ -159,6 +162,136 @@ class RecordPdkToolsTest(unittest.TestCase):
         self.assertIn("sky130A", lines[0])
         self.assertIn("ngspice-47", lines[1])
         self.assertIn("XSCHEM V3.4.7", lines[1])
+
+
+# --------------------------------------------------------------------------
+# Source-level regression guard: no campaign runner may STATE a tool version
+# --------------------------------------------------------------------------
+#
+# The builder above makes deriving a version easy; this guard makes stating one
+# detectable.  It is the second half of issue #306: `run_solver_sweep.py` kept a
+# `fleet runner klt 0.5.0` literal for two months after #297 removed the same shape
+# from the seven campaign runners, because the only check was a grep in a merged PR
+# body (`0\.5\.0 runner`, which does not match `runner klt 0.5.0`).  A grep that lives
+# in a PR body guards nothing; this one runs in CI on every push.
+
+RUNNER_GLOB = "sim/*/run_*.py"
+
+VERSION_LITERAL_PATTERNS = (
+    ("fleet/host ngspice version", re.compile(r"ngspice[- ]\d{2,}")),
+    ("klt version", re.compile(r"\bklt\b[^\n]{0,16}?\d+\.\d+\.\d+")),
+    ("xschem version", re.compile(r"(?i)\bxschem\b[^\n]{0,16}?\d+\.\d+\.\d+")),
+    ("open_pdks commit", re.compile(r"\b[0-9a-f]{40}\b")),
+)
+
+# A runner may be waived ONLY with an open issue that removes it.  `test_waivers_are_not
+# _stale` fails once a waived file is clean, so a waiver cannot outlive its fix.
+WAIVED_RUNNERS = {
+    "sim/temp-core-accuracy-mc/run_accuracy_mc.py":
+        "issue #312 -- hardcoded open_pdks commit (and a `'?'` ngspice fallback) in "
+        "render_md(); out of scope for #306, which fixes run_solver_sweep.py only",
+}
+
+
+def scan_version_literals(text: str) -> list[tuple[int, str, str]]:
+    """`(line number, what it is, the offending line)` for every stated tool version.
+
+    Matches the *source*, not a rendered record: an f-string placeholder
+    (`f"ngspice-{v}"`, `` f"klt `{runner_klt}`" ``) carries no digits and is therefore
+    invisible here, which is exactly the distinction the guard is drawing -- derived is
+    fine, stated is not.
+    """
+    hits = []
+    for n, line in enumerate(text.splitlines(), start=1):
+        for label, rx in VERSION_LITERAL_PATTERNS:
+            if rx.search(line):
+                hits.append((n, label, line.strip()))
+    return hits
+
+
+# The two lines `run_solver_sweep.py` carried before #306, verbatim from
+# `git show fd299ead:sim/temp-core-startup-solver/run_solver_sweep.py`.  Keeping them as
+# a fixture means "the guard would have caught this" stays asserted forever, not just on
+# the commit that added the guard.  Note that even on this version the *ngspice* half was
+# already derived (`ngspice-{next(...)}`) -- what was stated were the open_pdks commit and
+# the runner's klt, which is precisely what the guard reports.
+PRE_306_SOLVER_LINES = (
+    '         "- **PDK**: sky130A @ open_pdks `c6d73a35f524070e85faff4a6a9eef49553ebc2b` (matches sim/pdk.json pin), models `libs.tech/combined/sky130.lib.spice` (sha256 48de7c67...)",'
+    "\n"
+    '         f"- **Tools**: {klt_client} (client); fleet ngspice-{next((s.get(\'ngspice_engine_version\') for s in summary.values() if s.get(\'ngspice_engine_version\')), \'?\')} on Spot `c7i/m7i.4xlarge`, fleet runner klt 0.5.0 (version mismatch warning from the client, reported per job below); backend `{meta[\'klt_sim_backend_env\']}`",'
+    "\n"
+)
+
+# The shapes #297 removed from the seven campaign runners, kept so the ngspice and xschem
+# patterns stay exercised after the last in-tree example of each is gone.
+RETIRED_CAMPAIGN_LITERALS = (
+    '    "ngspice": "ngspice-46 (per fleet log)",\n'
+    '    "xschem_note": "host xschem is 3.4.4",\n'
+)
+
+
+class RunnerVersionLiteralTest(unittest.TestCase):
+    """No `sim/*/run_*.py` may state a tool version as a literal (issue #306)."""
+
+    def runners(self) -> list[Path]:
+        found = sorted(REPO_ROOT.glob(RUNNER_GLOB))
+        self.assertTrue(found, f"no runner matched {RUNNER_GLOB} under {REPO_ROOT}")
+        return found
+
+    def test_no_runner_states_a_tool_version_literal(self):
+        offenders = []
+        for path in self.runners():
+            rel = path.relative_to(REPO_ROOT).as_posix()
+            if rel in WAIVED_RUNNERS:
+                continue
+            for n, label, line in scan_version_literals(path.read_text()):
+                offenders.append(f"{rel}:{n}: {label}: {line}")
+        self.assertEqual(
+            offenders, [],
+            "a runner states a tool version instead of deriving it from the run:\n  "
+            + "\n  ".join(offenders)
+            + "\n\nDerive it (sim_common.joined_versions / record_pdk_tools / "
+              "cr.resolve_pdk), or add an entry to WAIVED_RUNNERS naming the issue "
+              "that removes it.",
+        )
+
+    def test_waivers_are_not_stale(self):
+        """A waived runner that is now clean must lose its waiver, or the next literal
+        it grows goes unreported."""
+        for rel, why in WAIVED_RUNNERS.items():
+            path = REPO_ROOT / rel
+            self.assertTrue(path.is_file(), f"WAIVED_RUNNERS names a missing file: {rel}")
+            self.assertIn("#", why, f"waiver for {rel} names no tracking issue")
+            self.assertTrue(
+                scan_version_literals(path.read_text()),
+                f"{rel} no longer states a tool version -- drop its WAIVED_RUNNERS entry ({why})",
+            )
+
+    def test_the_guard_flags_the_shape_that_regressed(self):
+        """All four patterns fire, on the lines that actually carried them."""
+        hits = scan_version_literals(PRE_306_SOLVER_LINES)
+        self.assertEqual(
+            {(n, label) for n, label, _ in hits},
+            {(1, "open_pdks commit"), (2, "klt version")},
+            f"guard missed a pre-#306 literal: {hits}",
+        )
+        retired = scan_version_literals(RETIRED_CAMPAIGN_LITERALS)
+        self.assertEqual(
+            {(n, label) for n, label, _ in retired},
+            {(1, "fleet/host ngspice version"), (2, "xschem version")},
+            f"guard missed a retired campaign-runner literal: {retired}",
+        )
+
+    def test_the_guard_ignores_a_derived_version(self):
+        """An f-string placeholder is not a literal; the guard must not fire on the
+        post-#306 shape, or the only way to pass it would be to say nothing at all."""
+        derived = (
+            'f"- **Tools**: {klt_client} (client); fleet `{prov[\'fleet_ngspice\']}` on '
+            'Spot `{prov[\'fleet_instance_type\']}`, fleet runner klt '
+            '`{prov[\'fleet_runner_klt\']}`; backend `{backend}`"\n'
+            'f"- **PDK**: {pdk.variant} @ open_pdks `{pdk.installed_commit}` ({pin_state})"\n'
+        )
+        self.assertEqual(scan_version_literals(derived), [])
 
 
 class HostNgspiceTagTest(unittest.TestCase):
