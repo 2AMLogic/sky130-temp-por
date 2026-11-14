@@ -174,6 +174,72 @@ class WriteGzRowsTest(unittest.TestCase):
                 self.assertEqual(fh.read(), "# h\n0,1.23457\n0.001,2\n")
 
 
+def _ref_write_wave_fixture_gz(path, doc):
+    """Frozen copy of write_wave_fixture() as it stood before the suffix dispatch
+    (ea999aa7..f8c1f3ca): gzip-only.  The brown-out and glitch fixtures committed
+    under sim/*/selftest/ were written by this, so the gzip branch must keep
+    reproducing its bytes exactly or those fixtures move."""
+    with open(path, "wb") as raw, gzip.GzipFile(fileobj=raw, mode="wb", compresslevel=9, mtime=0) as gz:
+        gz.write(json.dumps(doc, separators=(",", ":")).encode())
+
+
+DOC = {"plotname": "Synthetic (controlled) -- test", "stimulus": {"vf": 3.3},
+       "variables": [{"index": 0, "name": "time"}, {"index": 1, "name": "V(VDD)"}],
+       "points": [[0.0, 0.0], [1e-06, 1.5], [2e-06, 3.3]]}
+COMPACT = json.dumps(DOC, separators=(",", ":")).encode()
+
+
+class WriteWaveFixtureTest(unittest.TestCase):
+    """write_wave_fixture() dispatches on the `.gz` suffix exactly as load_wave() does."""
+
+    def test_plain_suffix_is_compact_json_with_no_trailing_newline(self):
+        with tempfile.TemporaryDirectory() as d:
+            p = Path(d) / "x.wave.json"
+            sc.write_wave_fixture(p, DOC)
+            self.assertEqual(p.read_bytes(), COMPACT)
+            self.assertFalse(p.read_bytes().endswith(b"\n"))
+
+    def test_gz_suffix_is_gzip(self):
+        with tempfile.TemporaryDirectory() as d:
+            p = Path(d) / "x.wave.json.gz"
+            sc.write_wave_fixture(p, DOC)
+            self.assertEqual(p.read_bytes()[:2], b"\x1f\x8b")
+            with gzip.open(p, "rb") as fh:
+                self.assertEqual(fh.read(), COMPACT)
+
+    def test_gz_branch_is_byte_identical_to_the_frozen_gzip_only_writer(self):
+        # Locks the committed brown-out / glitch fixtures in place.  Both writers
+        # get the SAME basename: GzipFile(fileobj=...) stores fileobj.name in the
+        # gzip header, so a fixture's bytes are a function of its name as well as
+        # its content.
+        with tempfile.TemporaryDirectory() as d:
+            now, ref = Path(d) / "now" / "x.wave.json.gz", Path(d) / "ref" / "x.wave.json.gz"
+            for q in (now, ref):
+                q.parent.mkdir()
+            sc.write_wave_fixture(now, DOC)
+            _ref_write_wave_fixture_gz(ref, DOC)
+            self.assertEqual(now.read_bytes(), ref.read_bytes())
+
+    def test_both_branches_are_deterministic_across_runs(self):
+        # mtime=0 in the gzip header; no clock or dict reordering in either branch.
+        # Same basename in two directories, for the header reason above.
+        with tempfile.TemporaryDirectory() as d:
+            for suffix in (".wave.json", ".wave.json.gz"):
+                a, b = Path(d) / "a" / f"x{suffix}", Path(d) / "b" / f"x{suffix}"
+                for q in (a, b):
+                    q.parent.mkdir(exist_ok=True)
+                sc.write_wave_fixture(a, DOC)
+                sc.write_wave_fixture(b, DOC)
+                self.assertEqual(a.read_bytes(), b.read_bytes(), suffix)
+
+    def test_both_branches_round_trip_through_load_wave(self):
+        with tempfile.TemporaryDirectory() as d:
+            for suffix in (".wave.json", ".wave.json.gz"):
+                p = Path(d) / f"x{suffix}"
+                sc.write_wave_fixture(p, DOC)
+                self.assertEqual(sc.load_wave(p), {"time": [0.0, 1e-06, 2e-06], "v(vdd)": [0.0, 1.5, 3.3]}, suffix)
+
+
 CAP = json.dumps({"error": {"message": "8 instance(s) already running + 1 requested exceeds BATCH_MAX_CONCURRENT_INSTANCES=8"}})
 OK = json.dumps({"status": "pass", "corners": []})
 

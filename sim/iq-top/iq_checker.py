@@ -15,14 +15,13 @@ can never be graded ``ok``.
 
 from __future__ import annotations
 
-import gzip
 import json
 import math
 import sys
 from pathlib import Path
 
 sys.path.insert(0, str(Path(__file__).resolve().parents[1] / "bin"))
-from sim_common import load_wave  # noqa: E402,F401  (shared hardened loader)
+from sim_common import load_wave, write_wave_fixture  # noqa: E402,F401  (shared hardened loader + fixture writer)
 
 SUBCELLS = {
     "bias_core": "i(v.xdut.vsbias)",
@@ -274,7 +273,7 @@ def run_selftest(cfg: dict, fixture_dir: Path | None = None):
         if fixture_dir is not None and name in ("settled_constant_total", "drifting_total"):
             names = list(wave)
             doc = {"variables": [{"name": n} for n in names], "points": [[wave[n][i] for n in names] for i in range(0, len(wave["time"]), 10)]}
-            (fixture_dir / f"{name}.wave.json").write_text(json.dumps(doc) + "\n")
+            write_wave_fixture(fixture_dir / f"{name}.wave.json", doc)
     return rows
 
 

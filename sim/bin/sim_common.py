@@ -333,10 +333,19 @@ def write_selftest_record(rec_dir: Path, record_id: str, doc: dict, md_lines: li
 
 
 def write_wave_fixture(path: Path, doc: dict) -> None:
-    """Write a synthetic-waveform fixture as compact gzipped JSON.  mtime=0 keeps it byte-identical on every
-    run, so a self-test never dirties the committed fixtures."""
-    with open(path, "wb") as raw, gzip.GzipFile(fileobj=raw, mode="wb", compresslevel=9, mtime=0) as gz:
-        gz.write(json.dumps(doc, separators=(",", ":")).encode())
+    """Write a synthetic-waveform fixture as compact JSON, gzipped when `path` ends `.gz`.
+
+    The suffix dispatch mirrors `load_wave()`'s, so writer and reader agree on which
+    form a given path carries.  In the gzip branch mtime=0 keeps the file byte-identical
+    on every run, so a self-test never dirties the committed fixtures; the plain branch
+    is deterministic for the same reason (no newline, compact separators).
+    """
+    payload = json.dumps(doc, separators=(",", ":")).encode()
+    if str(path).endswith(".gz"):
+        with open(path, "wb") as raw, gzip.GzipFile(fileobj=raw, mode="wb", compresslevel=9, mtime=0) as gz:
+            gz.write(payload)
+    else:
+        path.write_bytes(payload)
 
 
 def render_record_id_experiment(record_id: str, slug: str, title: str) -> list[str]:
