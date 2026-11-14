@@ -26,6 +26,7 @@ HERE = Path(__file__).resolve().parent
 SIM_DIR = HERE.parent
 REPO_ROOT = SIM_DIR.parent
 sys.path.insert(0, str(SIM_DIR / "bin"))
+import evidence_store  # noqa: E402
 import sim_common  # noqa: E402
 
 cr = sim_common.load_corner_run()
@@ -120,6 +121,7 @@ def build_request(backend, corners=None, timeout=3000, capacity_wait_s=0):
 
 
 def cmd_run(args):
+    evidence_store.preflight_or_exit()  # fail closed before anything is submitted
     git = cr.git_state()
     sim_common.refuse_unsubmittable(git, args.allow_dirty)
     run_id, run_dir, now = sim_common.open_run(
@@ -427,6 +429,7 @@ def render_provenance_lines(prov, pdk, klt_client, backend):
 
 
 def cmd_record(args):
+    evidence_store.preflight_or_exit()
     run_dir = BUILD / args.run_id
     meta = json.loads((run_dir / "run.json").read_text())
     # Resolved before anything is written: a record whose PDK line cannot be derived is a
@@ -443,14 +446,16 @@ def cmd_record(args):
     now = datetime.now(timezone.utc)
     rid = f"{now:%Y%m%d-%H%M%S}-{git['sha']}"
     rec_dir = SIM_DIR / SLUG
-    for d in ("records", "netlist-snapshots", "corners"):
+    for d in ("records", "netlist-snapshots"):
         (rec_dir / d).mkdir(exist_ok=True)
-    if (rec_dir / "records" / f"{rid}.md").exists():
-        sys.exit(f"refusing to overwrite record {rid}")
     snap = rec_dir / "netlist-snapshots" / rid
+    # Raw per-point logs stage in git-ignored scratch and are stored below; only the
+    # manifest and its summary are committed (sim/README.md, sim/bin/evidence_store.py).
+    cdir = evidence_store.stage_dir_for(SLUG, rid)
+    sim_common.refuse_existing((rec_dir / "records" / f"{rid}.md", rec_dir / "records" / f"{rid}.json",
+                                snap, cdir, evidence_store.manifest_path(SLUG, rid)))
     snap.mkdir()
-    cdir = rec_dir / "corners" / rid
-    cdir.mkdir()
+    cdir.mkdir(parents=True)
     for combo, ent in res.items():
         nl = run_dir / combo / "netlist.spice"
         if nl.is_file():
@@ -524,6 +529,11 @@ def cmd_record(args):
                          and res[f"{ent['scenario']}__{v}"]["points"].get(cid, {}).get("status") == "pass"]
                 all_fail.append({"combo": combo, "corner": cid, "status": g["status"], "nonphysical": nonphysical(g.get("m")), "passes_in": other})
     sig_all = all(f["nonphysical"] for f in all_fail if f["status"] == "fail")
+    # A run whose every unit was refused stages no bytes: record it with null artifact
+    # links rather than tripping the store's fail-closed empty-manifest refusal (the
+    # convention run_glitch_campaign.py uses for a class with nothing graded).
+    staged = any(p.is_file() for p in cdir.rglob("*"))
+    art_manifest, art_summary = evidence_store.store_or_exit(SLUG, rid, cdir) if staged else (None, None)
     rec = {
         "record_id": rid, "experiment": SLUG, "issue": 86, "timestamp": now.strftime("%Y-%m-%dT%H:%M:%SZ"),
         "git": git, "klt": klt_client, "backend": meta["klt_sim_backend_env"], "run_id": args.run_id,
@@ -536,6 +546,11 @@ def cmd_record(args):
         "caveats": [base_caveat(res)], "resumes": meta.get("resumes", []),
         "supersedes": args.supersedes or "(none)",
         "author": cr.default_author(),
+        "links": {"record": f"sim/{SLUG}/records/{rid}.md", "json": f"sim/{SLUG}/records/{rid}.json",
+                  "driver": f"sim/{SLUG}/run_solver_sweep.py",
+                  "netlist_snapshots": f"sim/{SLUG}/netlist-snapshots/{rid}/",
+                  "artifact_manifest": str(art_manifest.relative_to(REPO_ROOT)) if art_manifest else None,
+                  "artifact_summary": str(art_summary.relative_to(REPO_ROOT)) if art_summary else None},
     }
     (rec_dir / "records" / f"{rid}.json").write_text(json.dumps(rec, indent=2, default=str) + "\n")
 
@@ -614,7 +629,9 @@ def cmd_record(args):
             else:
                 L.append(f"| {var} | {cid} | {g['status']}: {g.get('reason')} | | | | |")
         L.append("")
-    L += ["## Links", "", f"- driver: `sim/{SLUG}/run_solver_sweep.py`; json twin `records/{rid}.json`; netlists `netlist-snapshots/{rid}/`; per-point logs `corners/{rid}/<scenario>__<variant>/<corner>.log`",
+    L += ["## Links", "", f"- driver: `sim/{SLUG}/run_solver_sweep.py`; json twin `records/{rid}.json`; netlists `netlist-snapshots/{rid}/`",
+          (f"- per-point logs are in the fleet artifact store as `<scenario>__<variant>/<corner>.log`: manifest `{rec['links']['artifact_manifest']}`, summary `{rec['links']['artifact_summary']}` (check with `klt artifact verify {rec['links']['artifact_manifest']}`)"
+           if rec["links"]["artifact_manifest"] else "- no per-point logs were produced (every combo was refused), so this record has no artifact manifest"),
           "- windows are copied unchanged from the two `experiment.json` files (no relaxation)", "",
           f"- **Timestamp**: {rec['timestamp']}", f"- **Author**: {rec['author']}",
           f"- **Supersedes**: {rec['supersedes']}"
