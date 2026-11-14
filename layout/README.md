@@ -51,11 +51,15 @@ recognize the key.
 [`2AMLogic/sky130-trng`](https://github.com/2AMLogic/sky130-trng)'s own
 `layout/bin/` (a shared, design-agnostic driver for the
 `klt gen` → `klt gen-compose` → `klt drc` → `klt extract` → `klt lvs` chain —
-see that script's own module docstring for the full contract). Their
-docstrings still cite `sky130-trng`'s own issue numbers (`#22`, `#27`, `#49`,
-`#1492`, ...) — those refer to *that* repo's history, not this one; nothing
-in this repo's own numbering corresponds to them. `layout/bias_core_pnp8_leg/`
-and `layout/bias_core_xq1_xqr/` are new to this repo.
+see that script's own module docstring for the full contract).
+`compose-cell.py`'s docstrings still cite `sky130-trng`'s own issue numbers
+(`#22`, `#27`, `#49`, `#1492`, ...) — those refer to *that* repo's history,
+not this one; nothing in this repo's own numbering corresponds to them.
+`_klt_common.py`'s no longer do: after #44 and #47 the only issue number it
+cites is this repo's own #51. Re-check per file with `grep -nE
+'#(22|27|49|1492)\b' layout/bin/*.py` rather than assuming the two scripts
+still match. `layout/bias_core_pnp8_leg/` and `layout/bias_core_xq1_xqr/` are
+new to this repo.
 
 ## `bias_core_pnp8_leg`: the first real sub-block
 
