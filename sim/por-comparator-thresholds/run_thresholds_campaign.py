@@ -219,13 +219,7 @@ def cmd_probe(args) -> int:
 def write_trace(path: Path, wave: dict, dv: float = 0.002, anchor_s: float = 0.2e-3) -> int:
     """Change-triggered trace (VDD, POR_RAW, VREF, IBIAS): a row whenever a column moved >= dv, or an anchor."""
     cols = [c for c in ("time", "v(vdd)", "v(por_raw)", "v(vref)", "v(ibias)") if c in wave]
-    t = wave["time"]
-    rows, last = [], None
-    for i in range(len(t)):
-        cur = [wave[c][i] for c in cols[1:]]
-        if last is None or i == len(t) - 1 or any(abs(a - b) >= dv for a, b in zip(cur, last[1])) or t[i] - last[0] >= anchor_s:
-            rows.append([t[i]] + cur)
-            last = (t[i], cur)
+    rows = sim_common.decimate([wave[c] for c in cols], anchor_s, [None] + [dv] * (len(cols) - 1))
     path.parent.mkdir(parents=True, exist_ok=True)
     with gzip.open(path, "wt") as fh:
         fh.write(",".join(cols) + "\n")

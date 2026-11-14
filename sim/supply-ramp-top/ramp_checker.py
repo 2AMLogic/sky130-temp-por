@@ -44,7 +44,6 @@ Definitions (``vf`` = final supply of the point, ``rate`` = constant dVDD/dt)
 
 from __future__ import annotations
 
-import gzip
 import json
 import math
 import sys
@@ -355,11 +354,6 @@ def transitions_from_stored(rows: list[list[float]], vf: float) -> dict:
 
 def write_trace(path: Path, rows: list[list[float]]) -> None:
     write_gz_rows(path, "# t_s,vdd_v,resetn_v,por_raw_v,ibias_v  (change-triggered, dV>=2mV or dt>=1ms)", rows)
-
-
-def read_trace(path: Path) -> list[list[float]]:
-    with gzip.open(path, "rt") as fh:
-        return [[float(x) for x in ln.split(",")] for ln in fh if ln.strip() and not ln.startswith("#")]
 
 
 # --------------------------------------------------------------------------
