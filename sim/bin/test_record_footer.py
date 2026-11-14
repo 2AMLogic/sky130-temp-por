@@ -92,16 +92,21 @@ WRITTEN_BY = re.compile(r"^Written by `([^` ]+)(?: (\w+))?`\. ", re.M)
 LINKS_HEAD = re.compile(r"^(## Links|- \*\*Links\*\*:)$", re.M)
 LINK_BULLET = re.compile(r"^ {0,2}- [^*]")
 
-# A record whose `links` carry no artifact-store entries at all.  The seven committed
-# `corner-run.py` records predate that store, and `corner-run.py`'s footer resolves
-# `artifact_manifest` / `artifact_summary` by hard key, so it cannot re-render any of
-# them -- true before this consolidation and after it, since the lookups are unchanged.
-# It is therefore the one renderer the corpus cannot drive, and these two keys are
-# supplied (paths only, no measurement invented) so its trailer is covered at all.
-CORNER_RUN_LINK_BACKFILL = {
+# Records whose `links` carry no artifact-store entries at all.  Three renderers resolve
+# `artifact_manifest` / `artifact_summary` by hard key -- `corner-run.py` above the
+# trailer, `run_op_branch.py` / `run_pnp_mismatch.py` in the trailer's artifact-store
+# prose -- so none of them can re-render a pre-store record, before or after this
+# consolidation (the lookups are unchanged here).  These two keys are supplied (paths
+# only, no measurement invented) so those trailers stay covered at all.
+ARTIFACT_LINK_BACKFILL = {
     "artifact_manifest": "sim/bias-core-smoke/artifacts/manifest.json",
     "artifact_summary": "sim/bias-core-smoke/artifacts/summary.md",
 }
+HARD_ARTIFACT_KEY = (
+    "sim/bin/corner-run.py",
+    "sim/bias-core-op-branch/run_op_branch.py",
+    "sim/pnp-mismatch/run_pnp_mismatch.py",
+)
 
 # The only bullets a call site may add to the trailer, both genuinely per-record:
 # `sim/glitch-top`'s "no bytes were stored because nothing was graded", and
@@ -151,9 +156,9 @@ def committed_records() -> list[tuple[str, Path, dict]]:
         if name not in RENDERERS:
             continue
         doc = json.loads(js.read_text())
-        if name == "sim/bin/corner-run.py":
+        if name in HARD_ARTIFACT_KEY:
             doc = copy.deepcopy(doc)
-            doc["links"] = {**doc["links"], **CORNER_RUN_LINK_BACKFILL}
+            doc["links"] = {**doc["links"], **ARTIFACT_LINK_BACKFILL}
         out.append((name, md, doc))
     return out
 
@@ -211,6 +216,20 @@ class CanonicalTrailerTest(unittest.TestCase):
             links=[("Testbench", "sim/x/testbench/tb.sch"), ("Machine-readable record", "r.json")])
         self.assertIn("  - Testbench: `sim/x/testbench/tb.sch`", got)
         self.assertIn("  - Machine-readable record: `r.json`", got)
+        self.assertEqual(unlinked(got),
+                         unlinked(sim_common.record_footer_lines(STUB, "s.py", nested=True)))
+
+    def test_a_bare_string_link_is_one_pre_written_bullet_at_its_position(self):
+        """`run_op_branch.py`'s artifact-store link is a sentence covering several
+        stored objects, not a `label: value` pair; it passes through with the same
+        bullet the pairs get and holds its place in the list order."""
+        got = sim_common.record_footer_lines(
+            STUB, "s.py", nested=True,
+            links=[("Testbench", "tb.sch"),
+                   "the raw logs and the deck report are stored objects",
+                   ("Machine-readable record", "r.json")])
+        self.assertEqual(got[2], "  - the raw logs and the deck report are stored objects")
+        self.assertEqual(got[3], "  - Machine-readable record: `r.json`")
         self.assertEqual(unlinked(got),
                          unlinked(sim_common.record_footer_lines(STUB, "s.py", nested=True)))
 

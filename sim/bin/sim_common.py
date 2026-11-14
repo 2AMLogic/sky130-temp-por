@@ -353,9 +353,12 @@ def record_footer_lines(rec: dict, script: str, *, links=None, nested: bool = Fa
 
     What is genuinely per-record stays at the call site:
 
-    * `links` replaces the default `rec["links"].items()` walk for the two
-      renderers whose link lines carry prose labels (`Testbench:`, `Netlist
-      snapshot:`) instead of the JSON keys -- pass `(label, value)` pairs.
+    * `links` replaces the default `rec["links"].items()` walk for the renderers
+      whose link lines carry prose labels (`Testbench:`, `Netlist snapshot:`)
+      instead of the JSON keys -- entries are `(label, value)` pairs, or a bare
+      string for a link that is a sentence covering several stored objects
+      (`run_op_branch.py`'s artifact-store line); the same bullet is prepended
+      either way.
     * `nested=True` renders a `- **Links**:` sub-list instead of a `## Links`
       section, for the three renderers that nest the block inside the bullet
       list above it.  That is layout, not policy, so it is preserved rather
@@ -373,8 +376,13 @@ def record_footer_lines(rec: dict, script: str, *, links=None, nested: bool = Fa
     """
     bullet = "  - " if nested else "- "
     out = ["- **Links**:" if nested else "## Links"]
-    out += [f"{bullet}{k}: `{v}`" if v else f"{bullet}{k}: none"
-            for k, v in (rec["links"].items() if links is None else links)]
+    for entry in (rec["links"].items() if links is None else links):
+        if isinstance(entry, str):
+            out.append(f"{bullet}{entry}")
+        elif entry[1]:
+            out.append(f"{bullet}{entry[0]}: `{entry[1]}`")
+        else:
+            out.append(f"{bullet}{entry[0]}: none")
     out += list(after_links)
     out += [f"- **Timestamp / author**: {rec['timestamp']}, {rec['author']}",
             f"- **Supersedes**: {rec['supersedes'] or '(none)'}"]
