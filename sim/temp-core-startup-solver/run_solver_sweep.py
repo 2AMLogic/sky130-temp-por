@@ -634,8 +634,7 @@ def main():
     r.add_argument("--variant", action="append", choices=list(VARIANTS))
     r.add_argument("--jobs", type=int, default=2)
     r.add_argument("--allow-dirty", action="store_true", help="submit from a dirty tree (debugging only; such a run's source revision does not resolve)")
-    r.add_argument("--wait-for-capacity", type=float, default=0, metavar="S",
-                   help="batch.capacity_wait_s: seconds klt waits out a Spot/fleet capacity refusal instead of failing the submit")
+    sim_common.add_capacity_wait_arg(r)
     r.set_defaults(fn=cmd_run)
     p = sub.add_parser("probe")
     p.add_argument("--run-id", required=True)

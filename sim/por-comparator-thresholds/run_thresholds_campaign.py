@@ -169,7 +169,7 @@ def cmd_run(args) -> int:
     }
     say(f"run id {run_id}: {len(work)} request(s)")
     results = sim_common.fan_out(
-        lambda vr: submit(vr[0], vr[1], heads[vr[0]], man, run_dir, args.capacity_wait, axis), work, args.jobs)
+        lambda vr: submit(vr[0], vr[1], heads[vr[0]], man, run_dir, args.wait_for_capacity, axis), work, args.jobs)
     meta["submit_results"] = results
     path = run_dir / ("run.retry.json" if args.retry_failed else "run.json")
     path.write_text(json.dumps(meta, indent=2) + "\n")
@@ -529,7 +529,7 @@ def main(argv: list[str]) -> int:
     r.add_argument("--jobs", type=int, default=2, help="concurrent fleet submissions (max 2)")
     r.add_argument("--run-id")
     r.add_argument("--retry-failed", action="store_true")
-    r.add_argument("--capacity-wait", type=float, default=0)
+    sim_common.add_capacity_wait_arg(r)
     r.add_argument("--allow-dirty", action="store_true", help="debugging only; such a run must not be recorded")
     p = sub.add_parser("probe")
     p.add_argument("--variant", choices=variants, default="ideal-bias")

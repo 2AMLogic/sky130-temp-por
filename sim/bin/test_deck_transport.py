@@ -6,6 +6,12 @@ answers `--version` and `sim` the way the real verb's outputs are shaped, so req
 construction, the shipped-`.spiceinit` path, report-to-result mapping and the
 no-local-fallback failure path are all exercised without a batch job.
 
+The last two classes widen that scope from the request to the CLI that feeds it, across
+every `sim/*/run_*.py` rather than only the two bespoke ones: `batch.capacity_wait_s` is
+one field with one declaration now, and the source guards plus per-runner subprocess
+probes there are what keep a twelfth hand-rolled copy of its flag from being written
+(issue #339).
+
 Modelled on sim/bin/test_corner_run_batch.py.
 
 Run: python3 -I sim/bin/test_deck_transport.py
@@ -17,7 +23,9 @@ import argparse
 import importlib.util
 import json
 import os
+import re
 import stat
+import subprocess
 import sys
 import tempfile
 import unittest
@@ -369,6 +377,182 @@ class SubmitWithStubbedKlt(unittest.TestCase):
         self.assertEqual(len(self.log.read_text().splitlines()), 1)
         report = json.loads((d / "report.json").read_text())
         self.assertEqual(len(sim_common.deck_units(report)), 6)
+
+
+# ---------------------------------------------------------------------------
+# the capacity-wait flag: one declaration, every runner (issue #339)
+# ---------------------------------------------------------------------------
+
+# `batch.capacity_wait_s` is written in exactly two places -- `sim_common.base_request()`
+# and `sim_common.deck_request()` -- so it is ONE knob.  It was declared eleven times, by
+# hand, under two flag names (`--wait-for-capacity` on five runners, `--capacity-wait` on
+# six) with two defaults (600 on two, 0 on nine) and two types (float on ten, int on one).
+# An operator who typed the spelling the fleet host rule mandates got `unrecognized
+# arguments` on six of the eleven; the nine that defaulted it to 0 failed a submit on a
+# Spot capacity refusal instead of waiting it out, which is how
+# `sim/temp-core-startup-solver/records/20261010-100955-292949a.md:32` came to record
+# `NOT-RUN: fleet refused (batch_no_capacity)`.
+#
+# Issue #339 replaced all eleven with `sim_common.add_capacity_wait_arg()`.  This section
+# is the cross-runner contract that keeps a TWELFTH copy from being written: the source
+# guards below fail on any local re-declaration, and the subprocess probes assert the one
+# name actually reaches every runner's own parser rather than only sim_common's.
+
+# runner (relative to sim/) -> the argv prefix that parses a submit.  The two bespoke
+# runners parse at top level and reach the flag through `add_common_args()`; the nine
+# campaign runners parse their submit on a `run` subparser and call the helper on it.
+CAPACITY_WAIT_RUNNERS = {
+    "bias-core-op-branch/run_op_branch.py": [],
+    "pnp-mismatch/run_pnp_mismatch.py": [],
+    "brownout-top/run_brownout_campaign.py": ["run"],
+    "glitch-top/run_glitch_campaign.py": ["run"],
+    "iq-top/run_iq_campaign.py": ["run"],
+    "iq-top/run_iq_sensitivity.py": ["run"],
+    "por-comparator-thresholds/run_thresholds_campaign.py": ["run"],
+    "supply-ramp-top/run_ramp_campaign.py": ["run"],
+    "supply-ramp-top/run_reassert_diagnosis.py": ["run"],
+    "temp-core-accuracy-mc/run_accuracy_mc.py": ["run"],
+    "temp-core-startup-solver/run_solver_sweep.py": ["run"],
+}
+
+CANONICAL_FLAG = "--wait-for-capacity"
+DEPRECATED_ALIAS = "--capacity-wait"
+
+
+def runner_sources() -> dict[str, str]:
+    """`{path relative to sim/: source}` for every `sim/*/run_*.py`."""
+    found = {p.relative_to(REPO / "sim").as_posix(): p.read_text()
+             for p in sorted((REPO / "sim").glob("*/run_*.py"))}
+    assert found, "no runner sources found"
+    return found
+
+
+class CapacityWaitFlagIsDeclaredOnce(unittest.TestCase):
+    """The declaration lives in sim_common and nowhere else."""
+
+    def test_the_helper_defaults_to_the_host_rule_value(self):
+        p = argparse.ArgumentParser()
+        sim_common.add_capacity_wait_arg(p)
+        self.assertEqual(p.parse_args([]).wait_for_capacity, 600.0)
+        self.assertEqual(sim_common.CAPACITY_WAIT_DEFAULT, 600.0)
+
+    def test_both_spellings_land_on_the_same_field(self):
+        p = argparse.ArgumentParser()
+        sim_common.add_capacity_wait_arg(p)
+        for argv in ([CANONICAL_FLAG, "120"], [DEPRECATED_ALIAS, "120"]):
+            with self.subTest(argv[0]):
+                self.assertEqual(p.parse_args(argv).wait_for_capacity, 120.0)
+
+    def test_the_alias_does_not_win_the_default_from_the_canonical_flag(self):
+        """argparse seeds a shared `dest` from the FIRST action declaring it, so the
+        alias carries `default=SUPPRESS`.  A second action with a real default would
+        silently decide what every runner submits."""
+        p = argparse.ArgumentParser()
+        sim_common.add_capacity_wait_arg(p, default=42)
+        self.assertEqual(p.parse_args([]).wait_for_capacity, 42.0)
+
+    def test_help_teaches_exactly_one_name(self):
+        p = argparse.ArgumentParser(prog="x")
+        sim_common.add_capacity_wait_arg(p)
+        text = p.format_help()
+        self.assertIn(CANONICAL_FLAG, text)
+        self.assertNotIn(DEPRECATED_ALIAS, text)
+
+    def test_zero_still_omits_the_field_from_the_request(self):
+        """The pre-#339 fail-fast behaviour stays reachable, and stays spelled `0`."""
+        p = argparse.ArgumentParser()
+        sim_common.add_capacity_wait_arg(p)
+        self.assertEqual(p.parse_args([CANONICAL_FLAG, "0"]).wait_for_capacity, 0.0)
+        req = sim_common.deck_request([{"id": "u", "deck": "u/deck.spice"}], "batch",
+                                      timeout_s=42, capacity_wait_s=0, max_workers=8)
+        self.assertNotIn("capacity_wait_s", req["batch"])
+
+    def test_the_default_reaches_the_request_as_the_host_rule_value(self):
+        req = sim_common.deck_request(
+            [{"id": "u", "deck": "u/deck.spice"}], "batch", timeout_s=42,
+            capacity_wait_s=sim_common.CAPACITY_WAIT_DEFAULT, max_workers=8)
+        self.assertEqual(req["batch"]["capacity_wait_s"], 600.0)
+
+    def test_no_runner_declares_the_flag_itself(self):
+        """The guard against a twelfth copy: eleven runners each owned a declaration of
+        one field, and two of them disagreed with the other nine about its default."""
+        offenders = [f"{rel}:{n}: {line.strip()}"
+                     for rel, src in runner_sources().items()
+                     for n, line in enumerate(src.splitlines(), start=1)
+                     if f'"{CANONICAL_FLAG}"' in line or f'"{DEPRECATED_ALIAS}"' in line]
+        self.assertEqual(offenders, [],
+                         "a runner declares the capacity-wait flag locally instead of "
+                         "calling sim_common.add_capacity_wait_arg():\n  " + "\n  ".join(offenders))
+
+    def test_every_runner_that_plumbs_the_field_is_in_this_file_s_table(self):
+        """A new fleet runner joins the table above or fails here -- otherwise the
+        contract silently stops covering the repo."""
+        plumbing = {rel for rel, src in runner_sources().items() if "capacity_wait_s" in src}
+        self.assertEqual(plumbing - set(CAPACITY_WAIT_RUNNERS), set(),
+                         "a runner plumbs batch.capacity_wait_s but is not covered here")
+        self.assertEqual(set(CAPACITY_WAIT_RUNNERS) - plumbing, set(),
+                         "the table names a runner that no longer plumbs batch.capacity_wait_s")
+
+    def test_each_covered_runner_reaches_the_flag_through_the_shared_helper(self):
+        for rel, src in runner_sources().items():
+            if rel not in CAPACITY_WAIT_RUNNERS:
+                continue
+            with self.subTest(rel):
+                self.assertTrue(
+                    "add_capacity_wait_arg(" in src or "add_common_args(" in src,
+                    f"{rel} plumbs batch.capacity_wait_s without declaring the flag at all")
+
+    def test_no_runner_reads_the_old_dest(self):
+        """Six runners read `args.capacity_wait`; the consolidated flag's `dest` is
+        `wait_for_capacity`, so a surviving read would raise AttributeError mid-submit."""
+        offenders = [f"{rel}:{n}" for rel, src in runner_sources().items()
+                     for n, line in enumerate(src.splitlines(), start=1)
+                     if re.search(r"\bargs\.capacity_wait\b", line)]
+        self.assertEqual(offenders, [], "a runner still reads the pre-#339 dest: "
+                         + ", ".join(offenders))
+
+
+class CapacityWaitFlagReachesEveryRunnersParser(unittest.TestCase):
+    """Source guards cannot see a parser built inside `main()`, so drive each runner's
+    real CLI in a subprocess.  `--help` and an argparse type error both exit before any
+    PDK, netlist or fleet submit, so this needs none of them."""
+
+    def cli(self, rel: str, *argv: str):
+        return subprocess.run([sys.executable, "-I", str(REPO / "sim" / rel),
+                               *CAPACITY_WAIT_RUNNERS[rel], *argv],
+                              cwd=REPO, capture_output=True, text=True)
+
+    def test_every_runner_names_the_canonical_flag_in_its_own_help(self):
+        for rel in CAPACITY_WAIT_RUNNERS:
+            with self.subTest(rel):
+                p = self.cli(rel, "--help")
+                self.assertEqual(p.returncode, 0, p.stderr)
+                self.assertIn(CANONICAL_FLAG, p.stdout)
+
+    def test_no_runner_advertises_the_deprecated_alias(self):
+        """One name in `--help`, so an operator learns the spelling the host rule uses."""
+        for rel in CAPACITY_WAIT_RUNNERS:
+            with self.subTest(rel):
+                self.assertNotIn(DEPRECATED_ALIAS, self.cli(rel, "--help").stdout)
+
+    def test_every_runner_still_accepts_the_deprecated_alias(self):
+        """Six runners shipped under `--capacity-wait` and READMEs, operator notes and
+        earlier records cite it, so it must keep parsing -- `invalid float value` (the
+        flag was accepted, the value was not) and never `unrecognized arguments`."""
+        for rel in CAPACITY_WAIT_RUNNERS:
+            for flag in (CANONICAL_FLAG, DEPRECATED_ALIAS):
+                with self.subTest(f"{rel} {flag}"):
+                    err = self.cli(rel, flag, "not-a-number").stderr
+                    self.assertIn("invalid float value", err)
+                    self.assertNotIn("unrecognized arguments", err)
+
+    def test_the_old_int_typed_runner_now_takes_a_fractional_wait(self):
+        """`run_accuracy_mc.py` alone typed the flag `int`; the field is seconds and
+        `sim_common` types it `float`, so the odd one out is now normalised."""
+        rel = "temp-core-accuracy-mc/run_accuracy_mc.py"
+        err = self.cli(rel, CANONICAL_FLAG, "0.5").stderr
+        self.assertNotIn("invalid int value", err)
+        self.assertNotIn("invalid float value", err)
 
 
 if __name__ == "__main__":

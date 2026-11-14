@@ -59,7 +59,7 @@ attribution-sum discrepancy is reported (it checks the instrumentation, KCL).
 ```
 python3 sim/iq-top/run_iq_campaign.py selftest
 python3 sim/iq-top/run_iq_campaign.py run                     # 2 klt sim requests x 45 corners, --backend batch
-python3 sim/iq-top/run_iq_campaign.py run --run-id ID --retry-failed --capacity-wait 1800
+python3 sim/iq-top/run_iq_campaign.py run --run-id ID --retry-failed --wait-for-capacity 1800
 python3 sim/iq-top/run_iq_campaign.py crosscheck --run-id ID  # single local corner tt/27C/3.30V
 python3 sim/iq-top/run_iq_campaign.py record --run-id ID
 ```
@@ -84,7 +84,7 @@ unknowns and nothing is ever run locally.
 
 ```
 python3 -I sim/iq-top/test_solver_sensitivity.py
-python3 sim/iq-top/run_iq_sensitivity.py run --run-id ID [--capacity-wait 1800]
+python3 sim/iq-top/run_iq_sensitivity.py run --run-id ID [--wait-for-capacity 1800]
 python3 sim/iq-top/run_iq_sensitivity.py run --run-id ID --retry-failed --variant trtol7 --split-process
 python3 sim/iq-top/run_iq_sensitivity.py record --run-id ID
 ```

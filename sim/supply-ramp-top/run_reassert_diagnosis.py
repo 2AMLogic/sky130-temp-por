@@ -532,8 +532,7 @@ def main(argv):
     r.add_argument("--retry-failed", action="store_true")
     r.add_argument("--only", action="append")
     r.add_argument("--allow-dirty", action="store_true")
-    r.add_argument("--wait-for-capacity", type=float, default=0, metavar="S",
-                   help="batch.capacity_wait_s: seconds klt waits out a Spot/fleet capacity refusal instead of failing the submit")
+    sim_common.add_capacity_wait_arg(r)
     c = sub.add_parser("record")
     c.add_argument("--run-id", required=True)
     c.add_argument("--author")

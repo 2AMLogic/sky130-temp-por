@@ -993,12 +993,6 @@ def parse_args(argv: list[str]) -> argparse.Namespace:
         help="fleet-worker pool size for the deck list (klt `options.max_workers`)",
     )
     p.add_argument(
-        "--wait-for-capacity",
-        type=float,
-        default=600,
-        help="seconds the batch submit waits out a fleet capacity refusal before failing",
-    )
-    p.add_argument(
         "--probe",
         metavar="POINT_ID",
         help="run ONE point on the local backend and print its log -- a debug check, "

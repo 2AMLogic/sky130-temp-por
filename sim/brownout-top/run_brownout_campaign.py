@@ -298,20 +298,20 @@ def cmd_run(args) -> int:
         run_dir.mkdir(parents=True)
     if args.retry_failed:
         reqs = [r for r in reqs if not sim_common.report_usable(run_dir / r["tag"] / "report.json")]
-        say(f"retrying {len(reqs)} request(s) without a usable report (variant {variant_key}), capacity_wait_s={args.capacity_wait}")
+        say(f"retrying {len(reqs)} request(s) without a usable report (variant {variant_key}), capacity_wait_s={args.wait_for_capacity}")
     head = tb_netlist_head(run_dir / ("retry" if args.retry_failed else "."), pdk)
     if meta is None:
         meta = {"run_id": run_id, "started_utc": now.strftime("%Y-%m-%dT%H:%M:%SZ"), "source": gi, "klt_client": sim_common.klt_version(),
-                "klt_sim_backend_env": os.environ.get("KLT_SIM_BACKEND"), "declared": declared_counts(man), "solver_variant": variant_key, "capacity_wait_s": args.capacity_wait, "slot_wait_s": args.slot_wait,
+                "klt_sim_backend_env": os.environ.get("KLT_SIM_BACKEND"), "declared": declared_counts(man), "solver_variant": variant_key, "capacity_wait_s": args.wait_for_capacity, "slot_wait_s": args.slot_wait,
                 "submitted_tags": [r["tag"] for r in reqs]}
         (run_dir / "run.json").write_text(json.dumps(meta, indent=2) + "\n")
     say(f"run id {run_id}: {len(reqs)} request(s), solver variant {variant_key}")
     results = sim_common.fan_out(
-        lambda r: submit_one(r, head, man, run_dir, args.capacity_wait, variant_key, args.slot_wait, args.slot_poll),
+        lambda r: submit_one(r, head, man, run_dir, args.wait_for_capacity, variant_key, args.slot_wait, args.slot_poll),
         reqs, args.jobs)
     old = json.loads((run_dir / "run.json").read_text()) if args.retry_failed else meta
     if args.retry_failed:
-        old.setdefault("retries", []).append({"at_utc": datetime.now(timezone.utc).strftime("%Y-%m-%dT%H:%M:%SZ"), "capacity_wait_s": args.capacity_wait,
+        old.setdefault("retries", []).append({"at_utc": datetime.now(timezone.utc).strftime("%Y-%m-%dT%H:%M:%SZ"), "capacity_wait_s": args.wait_for_capacity,
                                              "slot_wait_s": args.slot_wait,
                                              "source": gi, "klt_client": sim_common.klt_version(), "klt_sim_backend_env": os.environ.get("KLT_SIM_BACKEND"),
                                              "submitted_tags": [r["tag"] for r in reqs], "results": results})
@@ -951,7 +951,7 @@ def main(argv: list[str]) -> int:
     r.add_argument("--variant", help="declared solver variant key (experiment.json solver_variants); default deck if omitted")
     r.add_argument("--only", action="append", help="submit only this declared request tag (repeatable); the rest stay NOT_COVERED")
     r.add_argument("--retry-failed", action="store_true")
-    r.add_argument("--capacity-wait", type=float, default=0)
+    sim_common.add_capacity_wait_arg(r)
     r.add_argument("--slot-wait", type=float, default=0, help="seconds to keep resubmitting a request the fleet refused at its concurrent-instance cap (klayout-tools#2917); each refusal is archived")
     r.add_argument("--slot-poll", type=float, default=300, help="seconds between concurrency-cap resubmissions")
     r.add_argument("--allow-dirty", action="store_true")

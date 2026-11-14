@@ -51,6 +51,12 @@ and/or `corner-run.py` itself):
                           `--allow-pdk-mismatch`/`--dry-run` flags (and
                           `--samples` when requested) a bespoke script's
                           `parse_args()` needs
+    add_capacity_wait_arg()/CAPACITY_WAIT_DEFAULT
+                          the ONE declaration of `--wait-for-capacity`, the
+                          CLI surface of `batch.capacity_wait_s`, callable on
+                          a top-level parser or a `run` subparser; eleven
+                          runners declared it by hand under two names with
+                          two defaults before issue #339
     build_mismatch_points() the N-point mismatch-sweep-plus-controls list
                           builder `pnp-mismatch/run_pnp_mismatch.py` uses
     mean()/stdev()/mv()     small numeric/formatting helpers
@@ -139,19 +145,72 @@ class MismatchPoint:
     purpose: str
 
 
+# The host rule ("pass `--wait-for-capacity 600` on every batch `klt sim`") expressed as
+# the default, not as help text a runner may or may not carry.  Nine of the eleven
+# hand-rolled declarations this replaces defaulted the wait to 0, i.e. a Spot capacity
+# refusal failed the submit instead of being waited out -- which is exactly how
+# `sim/temp-core-startup-solver/records/20261010-100955-292949a.md` came to record four
+# `NOT-RUN: fleet refused (batch_no_capacity)` rows (issue #339).
+CAPACITY_WAIT_DEFAULT = 600.0
+
+
+def add_capacity_wait_arg(
+    parser: argparse.ArgumentParser,
+    *,
+    default: float = CAPACITY_WAIT_DEFAULT,
+) -> None:
+    """Declare `--wait-for-capacity` -- the one CLI surface of `batch.capacity_wait_s`.
+
+    `base_request()` and `deck_request()` are the only writers of that field, so this is
+    the only flag any runner needs for it.  Call this on whichever parser actually parses
+    a submit: the top-level parser for a bespoke runner (`add_common_args()` does it for
+    you), or the `run` subparser for a campaign runner.
+
+    `--capacity-wait` survives as a hidden alias on the same `dest`, because six
+    campaign runners shipped under that spelling and operator notes, READMEs and earlier
+    records cite it (e.g. `sim/por-comparator-thresholds/README.md`).  It is
+    `help=argparse.SUPPRESS` so `--help` teaches exactly one name, and
+    `default=argparse.SUPPRESS` so it cannot win the default from the canonical flag
+    (argparse seeds a shared `dest` from the FIRST action declaring it).
+
+    `0` leaves the field out of the request entirely -- the fail-fast behaviour that was
+    the default before issue #339, still reachable as `--wait-for-capacity 0`.
+    """
+    parser.add_argument(
+        "--wait-for-capacity",
+        dest="wait_for_capacity",
+        type=float,
+        default=default,
+        metavar="S",
+        help="batch.capacity_wait_s: seconds klt waits out a Spot/fleet capacity refusal "
+        f"instead of failing the submit (host rule: {default:g}; 0 omits the field)",
+    )
+    parser.add_argument(
+        "--capacity-wait",
+        dest="wait_for_capacity",
+        type=float,
+        default=argparse.SUPPRESS,
+        metavar="S",
+        help=argparse.SUPPRESS,
+    )
+
+
 def add_common_args(
     parser: argparse.ArgumentParser,
     *,
     timeout_default: int,
     samples_default: int | None = None,
 ) -> None:
-    """Add the `--author`/`--supersedes`/`--timeout`/`--allow-pdk-mismatch`/
-    `--dry-run` flags a bespoke `run_*.py` script's `parse_args()` needs (and,
-    when `samples_default` is given, `--samples`).
+    """Add the `--author`/`--supersedes`/`--timeout`/`--wait-for-capacity`/
+    `--allow-pdk-mismatch`/`--dry-run` flags a bespoke `run_*.py` script's
+    `parse_args()` needs (and, when `samples_default` is given, `--samples`).
 
     Callers add any script-specific flags to `parser` first, then call this
     to append the shared set -- `--samples` (when requested) is added first
     within this call, matching sky130-bandgap's own convention.
+
+    A campaign runner parses its submit on a `run` subparser rather than here, so it
+    calls `add_capacity_wait_arg()` on that subparser directly (issue #339).
     """
     if samples_default is not None:
         parser.add_argument(
@@ -162,6 +221,7 @@ def add_common_args(
     parser.add_argument(
         "--timeout", type=int, default=timeout_default, help="per-point ngspice timeout (s)"
     )
+    add_capacity_wait_arg(parser)
     parser.add_argument(
         "--allow-pdk-mismatch",
         action="store_true",

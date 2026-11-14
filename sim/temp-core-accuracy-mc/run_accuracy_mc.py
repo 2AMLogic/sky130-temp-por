@@ -1220,8 +1220,7 @@ def main():
     r.add_argument("--allow-dirty", action="store_true")
     r.add_argument("--variant", choices=VARIANTS, default="baseline",
                    help="deck variant (issue #284); 'mirror-degen' needs --run-id of the baseline run and writes under <run dir>/mirror-degen/")
-    r.add_argument("--wait-for-capacity", type=int, default=0, metavar="S",
-                   help="request batch.capacity_wait_s (host rule: 600 on every batch submit); 0 = leave out (default)")
+    sim_common.add_capacity_wait_arg(r)
     r.set_defaults(fn=cmd_run)
     p = sub.add_parser("probe")
     p.add_argument("--run-id", required=True)
