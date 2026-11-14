@@ -41,6 +41,7 @@ from pathlib import Path
 HERE = Path(__file__).resolve().parent
 sys.path.insert(0, str(HERE))
 import run_accuracy_mc as ram  # noqa: E402
+sim_common = ram.sim_common  # the shared pin-state vocabulary, through the module under test
 
 PIN = {"open_pdks_commit": "f" * 40, "ngspice_lib": "libs.tech/combined/sky130.lib.spice"}
 
@@ -107,9 +108,9 @@ def not_run():
     return {"report": None, "jobs": {}, "engines": {}, "missing_procs": []}
 
 
-def lines(ents, pdk=None, klt="klayout-tools 0.9.0", backend="batch"):
+def lines(ents, pdk=None, klt="klayout-tools 0.9.0", backend="batch", pin=PIN):
     """`(pdk_line, tools_line)` for a stubbed set of term entries."""
-    prov = ram.observed_provenance(ents)
+    prov = ram.observed_provenance(ents, pin)
     fleet = {t: {"jobs": e["jobs"]} for t, e in ents.items() if e["report"] is not None}
     rec = {"klt": klt, "backend": backend}
     return prov, ram.render_pdk_tools_lines(rec, pdk or _Pdk(), prov, fleet)
@@ -182,7 +183,7 @@ class WithinTermJobsTest(unittest.TestCase):
         `tt`'s stamp and engine."""
         ent = ran(procs=self.FIVE)
         self.assertEqual(ent["report"]["environment"]["engine_version"], "46")   # first section
-        prov = ram.observed_provenance({"pnp": ent})
+        prov = ram.observed_provenance({"pnp": ent}, PIN)
         self.assertNotEqual(prov["fleet_engine"], "ngspice-46")
         self.assertNotEqual(prov["fleet_pdk"], "open_pdks " + "a" * 40)
 
@@ -255,7 +256,7 @@ class LoadTermContractTest(unittest.TestCase):
         ent = ram.load_term(d, "pnp")
         self.assertEqual(sorted(ent["jobs"]), sorted(WithinTermJobsTest.FIVE))
         self.assertEqual(sorted(set(ent["engines"].values())), ["46", "47"])
-        prov = ram.observed_provenance({"pnp": ent})
+        prov = ram.observed_provenance({"pnp": ent}, PIN)
         self.assertEqual(prov["fleet_engine"], "ngspice-46, ngspice-47")
         self.assertEqual(prov["fleet_pdk"], "open_pdks " + "a" * 40 + ", open_pdks " + "b" * 40)
         self.assertEqual(prov["fleet_pdk_jobs"], 5)
@@ -266,7 +267,7 @@ class LoadTermContractTest(unittest.TestCase):
         d = self._run_dir("pnp", {k: v for k, v in WithinTermJobsTest.FIVE.items() if k != "fs"})
         ent = ram.load_term(d, "pnp")
         self.assertIn("fs", ent["missing_procs"])
-        self.assertEqual(ram.observed_provenance({"pnp": ent})["fleet_pdk_jobs"], 4)
+        self.assertEqual(ram.observed_provenance({"pnp": ent}, PIN)["fleet_pdk_jobs"], 4)
 
 
 class PdkLineTest(unittest.TestCase):
@@ -323,6 +324,67 @@ class PdkLineTest(unittest.TestCase):
         host, fleet_half = pdk_line.split("; the fleet runners", 1)
         self.assertIn("e" * 40, host)
         self.assertNotIn("e" * 40, fleet_half)
+
+
+class FleetPinVerdictLineTest(unittest.TestCase):
+    """Issue #333: the PDK line states how the runners' stamp compares with the pin.
+
+    These fixtures were already shaped for it: `RUNNER_PDK` is `a`*40 while
+    `PIN["open_pdks_commit"]` and `CLIENT_PDK` are both `f`*40, so the default stub is a
+    runner OFF the pin whose client is ON it.  A verdict taken from the client -- the
+    #312/#328 defect -- would read `match` on every one of these.
+    """
+
+    ON_PIN = "open_pdks " + PIN["open_pdks_commit"]
+
+    def test_a_runner_off_the_pin_is_a_mismatch_even_though_the_client_matches(self):
+        prov, (pdk_line, _) = lines({"nominal": ran()})
+        self.assertEqual(prov["fleet_matches_pin"], "mismatch")
+        _, fleet_half = pdk_line.split("; the fleet runners", 1)
+        self.assertIn("MISMATCH", fleet_half)
+
+    def test_a_runner_on_the_pin_is_a_match(self):
+        prov, (pdk_line, _) = lines({"nominal": ran(runner_pdk=self.ON_PIN)})
+        self.assertEqual(prov["fleet_matches_pin"], "match")
+        _, fleet_half = pdk_line.split("; the fleet runners", 1)
+        self.assertIn(sim_common.pin_state(True), fleet_half)
+        self.assertNotIn("MISMATCH", fleet_half)
+
+    def test_a_runner_that_stamped_nothing_is_not_reported_not_a_mismatch(self):
+        """36 fleet jobs, none of which said what they ran: unverifiable, not wrong."""
+        prov, (pdk_line, _) = lines({"nominal": ran(runner_pdk=None, client_pdk=self.ON_PIN)})
+        self.assertEqual(prov["fleet_matches_pin"], "not-reported")
+        _, fleet_half = pdk_line.split("; the fleet runners", 1)
+        self.assertIn(sim_common.fleet_pin_state("not-reported"), fleet_half)
+        self.assertNotIn("MISMATCH", fleet_half)
+
+    def test_a_mixed_set_across_terms_is_a_mismatch(self):
+        prov, (pdk_line, _) = lines({"nominal": ran(runner_pdk=self.ON_PIN), "pnp": ran()})
+        self.assertEqual(prov["fleet_matches_pin"], "mismatch")
+        self.assertIn("MISMATCH", pdk_line.split("; the fleet runners", 1)[1])
+
+    def test_the_verdict_sits_beside_the_coverage_note_not_instead_of_it(self):
+        """Partial coverage and the verdict answer different questions: how many jobs
+        spoke, and whether what they said is the pin."""
+        prov, (pdk_line, _) = lines({"nominal": ran(runner_pdk=self.ON_PIN),
+                                     "pnp": ran(runner_pdk=None)})
+        self.assertEqual(prov["fleet_matches_pin"], "match")
+        self.assertEqual((prov["fleet_pdk_jobs"], prov["fleet_pdk_reporting"]), (2, 1))
+        self.assertIn("from 1 of 2 fleet jobs", pdk_line)
+        self.assertIn(sim_common.pin_state(True), pdk_line.split("; the fleet runners", 1)[1])
+
+    def test_the_line_states_what_an_equal_commit_does_not_establish(self):
+        _, (pdk_line, _) = lines({"nominal": ran(runner_pdk=self.ON_PIN)})
+        self.assertIn(sim_common.PIN_COMMIT_LIMIT, pdk_line)
+
+    def test_the_two_halves_keep_their_own_verdicts(self):
+        """The host's bool and the fleet's three-state are about different machines."""
+        _, (pdk_line, _) = lines({"nominal": ran(runner_pdk=self.ON_PIN)},
+                                 pdk=_Pdk(matches_pin=False, installed_commit="b" * 40))
+        host, fleet_half = pdk_line.split("; the fleet runners", 1)
+        self.assertIn("MISMATCH", host)                         # the HOST is off the pin
+        self.assertIn(sim_common.pin_state(True), fleet_half)   # the FLEET is on it
+        self.assertNotIn("MISMATCH", fleet_half)
 
 
 class ToolsLineTest(unittest.TestCase):
