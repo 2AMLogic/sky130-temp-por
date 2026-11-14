@@ -581,7 +581,14 @@ def batch_axes(matrix: list[Corner]) -> tuple[list[str], list[float], list[float
 
 
 def build_batch_netlist(exp: Experiment, body: list[str], matrix: list[Corner]) -> str:
-    """Netlist for the fleet: klt supplies .lib, .temp and the supply alter."""
+    """Netlist for the fleet: klt supplies .lib, .temp and the supply alter.
+
+    The netlist carries `set ng_nomodcheck` in its own .control block (the same
+    line sim/spiceinit gives the local path): the runner ignores
+    options.ngspice_init (sim_common.FLEET_NOTE), and without it ngspice's BSIM
+    parameter check aborts the deck before simulating on this repo's native
+    nfet_05v0_nvt device (`pdits negative`, XMASSIST) -- the mechanism every
+    bespoke campaign already ships (glitch-top, iq-top, ...)."""
     deck = exp.raw.get("deck", {})
     supplies = sorted({c.supply_v for c in matrix})
     nominal = supplies[len(supplies) // 2]
@@ -595,10 +602,12 @@ def build_batch_netlist(exp: Experiment, body: list[str], matrix: list[Corner]) 
         head.append(f".param {name}={value}")
     for opt in deck.get("options") or []:
         head.append(f".option {opt}")
-    return "\n".join(head + body + [".end", ""])
+    return "\n".join(head + body + [sim_common.NOMODCHECK_CONTROL, ".end", ""])
 
 
-def build_batch_request(exp: Experiment, pdk: Pdk, matrix: list[Corner], timeout: int) -> dict:
+def build_batch_request(
+    exp: Experiment, pdk: Pdk, matrix: list[Corner], timeout: int, capacity_wait_s: float = 0
+) -> dict:
     deck = exp.raw.get("deck", {})
     analyses = list(deck.get("analyses") or ["op"])
     if len(analyses) != 1:
@@ -609,6 +618,9 @@ def build_batch_request(exp: Experiment, pdk: Pdk, matrix: list[Corner], timeout
     analysis = {"kind": kind.lower(), "args": args.strip()}
     process, temps, supplies = batch_axes(matrix)
     supply_source = deck.get("supply_source", "v1")
+    batch: dict = {"runner_version_check": "warn"}
+    if capacity_wait_s:
+        batch["capacity_wait_s"] = capacity_wait_s
     return {
         "netlist": "netlist.spice",
         "backend": "batch",
@@ -624,7 +636,7 @@ def build_batch_request(exp: Experiment, pdk: Pdk, matrix: list[Corner], timeout
             for m in exp.measurements
         ],
         "options": {"timeout_s": timeout, "keep_artifacts": True},
-        "batch": {"runner_version_check": "warn"},
+        "batch": batch,
     }
 
 
@@ -736,17 +748,33 @@ def write_batch_corner_log(res: dict, log_path: Path) -> None:
 
 
 def submit_batch(
-    exp: Experiment, matrix: list[Corner], netlist: str, request: dict, run_dir: Path
+    exp: Experiment,
+    matrix: list[Corner],
+    netlist: str,
+    request: dict,
+    run_dir: Path,
+    capacity_wait_s: float = 0,
 ) -> tuple[dict, dict]:
     """Submit the grid as one `klt sim --backend batch` request.
 
     Returns (report, fleet) where `fleet` carries what the fleet reported about
     itself. A submit that yields no usable report is a HarnessError quoting klt
     verbatim: there is no local fallback.
+
+    `capacity_wait_s` (request batch.capacity_wait_s) makes klt itself wait out a
+    Spot capacity refusal; `sim_common.cap_retry` is the separate, bounded
+    resubmit for the shared fleet's BATCH_MAX_CONCURRENT_INSTANCES cap, which
+    capacity_wait_s does not cover (sim_common.py) -- so both are armed.
     """
     d = run_dir / "batch"
+    retry = (
+        sim_common.cap_retry(d, exp.slug, min(180, capacity_wait_s), max_retries=40)
+        if capacity_wait_s
+        else None
+    )
     outcome = sim_common.submit_prepared(
-        d, netlist, request, f"{exp.slug}: {len(matrix)} points -> batch fleet", exp.slug
+        d, netlist, request, f"{exp.slug}: {len(matrix)} points -> batch fleet", exp.slug,
+        retry=retry,
     )
     report_path = d / "report.json"
     if not sim_common.report_usable(report_path):
@@ -987,6 +1015,15 @@ def parse_args(argv: list[str]) -> argparse.Namespace:
         "batch: submit the whole grid as one `klt sim --backend batch` request to the "
         "fleet; a failed submit is an error, never a local fallback",
     )
+    p.add_argument(
+        "--wait-for-capacity",
+        type=float,
+        default=600.0,
+        help="batch backend: seconds the submit may wait out fleet capacity and "
+        "concurrency-cap refusals -- sets request batch.capacity_wait_s and arms a "
+        "bounded launch-refusal retry (sim_common.cap_retry); 0 disables both. "
+        "Default 600 (host batch-submit rules)",
+    )
     return p.parse_args(argv)
 
 
@@ -1071,7 +1108,7 @@ def main(argv: list[str]) -> int:
 
     fleet = None
     if backend == "batch":
-        request = build_batch_request(exp, pdk, matrix, args.timeout)
+        request = build_batch_request(exp, pdk, matrix, args.timeout, args.wait_for_capacity)
         batch_netlist = build_batch_netlist(exp, body, matrix)
         if args.dry_run:
             print(f"\n-- klt sim request ({len(matrix)} corners, one grid) --")
@@ -1081,7 +1118,9 @@ def main(argv: list[str]) -> int:
                 print(f"  {corner.id}")
             print("\n(dry run: nothing submitted, nothing written under sim/<experiment>/)")
             return 0
-        report, fleet = submit_batch(exp, matrix, batch_netlist, request, run_dir)
+        report, fleet = submit_batch(
+            exp, matrix, batch_netlist, request, run_dir, args.wait_for_capacity
+        )
         results = results_from_report(exp, matrix, report, corners_dir, args.timeout)
         for i, res in enumerate(results, start=1):
             write_batch_corner_log(res, corners_dir / f"{res['corner_id']}.log")
