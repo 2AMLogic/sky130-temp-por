@@ -214,7 +214,6 @@ def cmd_crosscheck(args) -> int:
 
 def analyze_variant(variant: str, run_dir: Path, man: dict, corners_dir: Path, write: bool) -> dict:
     points, requests = [], []
-    pdk_info = {}
     for rate, primary in all_rates(man):
         tag = rate_tag(rate)
         d = run_dir / variant / tag
@@ -228,7 +227,14 @@ def analyze_variant(variant: str, run_dir: Path, man: dict, corners_dir: Path, w
             requests.append(req_rec)
             continue
         req_rec.update(sim_common.fleet_job_fields(rep))
-        pdk_info = (rep.get("provenance") or {}).get("pdk", pdk_info)
+        # Both PDK values this job's report carries, each under a key that says whose it
+        # is: the stamp of the machine that RAN the corners (`sim_common.runner_pdk()`,
+        # the repo's one reader of it) and, separately, the PDK the submitting CLIENT
+        # resolved for itself.  This runner used to collect only the client's value, as
+        # `fleet_pdk_report` (issue #328).  Only a request that reached the fleet carries
+        # either key, so one that never ran is not counted as a job reporting no stamp.
+        req_rec["runner_pdk"] = sim_common.runner_pdk(rep)
+        req_rec["client_pdk_report"] = (rep.get("provenance") or {}).get("pdk") or {}
         requests.append(req_rec)
         for c in rep.get("corners", []):
             proc = c["process"]
@@ -292,7 +298,7 @@ def analyze_variant(variant: str, run_dir: Path, man: dict, corners_dir: Path, w
                 (corners_dir / tag).mkdir(parents=True, exist_ok=True)
                 (corners_dir / tag / f"{cid}.log").write_text(sim_common.point_log(c, header, run_dir, REPO_ROOT))
             points.append(pt)
-    return {"points": points, "requests": requests, "fleet_pdk_report": pdk_info}
+    return {"points": points, "requests": requests}
 
 
 def grade_pairs(points: list[dict], man: dict) -> list[dict]:
@@ -484,6 +490,12 @@ def cmd_record(args) -> int:
         res = analyze_variant(variant, run_dir, man, corners_dir, write=True)
         pts = res["points"]
         pairs = grade_pairs(pts, man)
+        # What the machines that ran this variant reported about their own PDK install,
+        # observed from their reports (`sim_common.runner_pdk()`), never the client's
+        # resolution: the cross-check sentence below and the record's `pdk` block both
+        # state this instead of the blanket literal they used to carry about the runner
+        # never reporting one, which the runners have since made false (issue #328).
+        fleet_pdk = sim_common.fleet_pdk_fields(q.get("runner_pdk") for q in res["requests"])
         snap_dir.mkdir(parents=True, exist_ok=True)
         for rate, _ in all_rates(man):
             src = run_dir / variant / rate_tag(rate) / "netlist.spice"
@@ -511,11 +523,14 @@ def cmd_record(args) -> int:
                         f"tt / 27 C / 3.30 V / 10 kV/s, variant {variant}: local {xc['local']['ngspice']} released at {xc['local']['t_release_s'] * 1e3:.5g} ms "
                         f"(RESETn end {xc['local']['end_v']:.5g} V, POR_RAW rose at VDD={xc['local']['por_raw_vdd_v']:.4g} V); fleet {xc['fleet']['ngspice']} released at "
                         f"{xc['fleet']['t_release_s'] * 1e3:.5g} ms (end {xc['fleet']['end_v']:.5g} V, VDD={xc['fleet']['por_raw_vdd_v']:.4g} V). "
-                        "The fleet PDK commit is not reported by the runner; agreement of the two engines here is the only evidence that the fleet model library matches the pin."
+                        f"{sim_common.fleet_pdk_clause(fleet_pdk['fleet_pdk'])} (recorded in this record's `pdk` block, "
+                        "not compared with the sim/pdk.json pin here); agreement of the two engines above is this record's "
+                        "only evidence that the fleet model library matches the pin."
                     )
         n_wave = sum(1 for p in pts if p["check"] and "resetn" in p["check"])
         v = man["variants"][variant]
         pdk_d, tools_d = sim_common.record_pdk_tools(pdk, pin, meta, pts, res["requests"])
+        pdk_d.update(fleet_pdk)
         art_manifest, art_summary = evidence_store.store_or_exit(SLUG, record_id, corners_dir)
         record = {
             "record_id": record_id,

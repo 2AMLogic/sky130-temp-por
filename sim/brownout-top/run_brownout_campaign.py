@@ -445,11 +445,19 @@ def analyze_request(req: dict, run_dir: Path, man: dict, corners_dir: Path, writ
         info["outcome"] = why
         for p, t, v in declared:
             pts.append({"id": corner_id(p, t, v), "tag": req["tag"], "process": p, "temperature_c": t, "supply_v": v, "outcome": "NOT_COVERED", "reason": why})
-        return {"info": info, "points": pts, "pdk_report": {}}
+        return {"info": info, "points": pts}
     info["netlist_sha256_submitted"] = file_sha256(d / "netlist.spice")
     info["netlist_sha256_reported"] = (rep.get("environment") or {}).get("netlist_sha256")
     info["netlist_matches_report"] = info["netlist_sha256_submitted"] is not None and info["netlist_sha256_submitted"] == info["netlist_sha256_reported"]
     info.update(sim_common.fleet_job_fields(rep))
+    # Both PDK values this job's report carries, each under a key that says whose it is:
+    # the stamp of the machine that RAN the corners (`sim_common.runner_pdk()`, the repo's
+    # one reader of it) and, separately, the PDK the submitting CLIENT resolved for
+    # itself.  This record used to store the client's value as `pdk.fleet_pdk_report`
+    # (issue #328); only a request that reached the fleet carries either key at all, so a
+    # request that never ran is not counted as a job that reported no stamp.
+    info["runner_pdk"] = sim_common.runner_pdk(rep)
+    info["client_pdk_report"] = (rep.get("provenance") or {}).get("pdk") or {}
     seen = set()
     for c in rep.get("corners", []):
         proc, vf, temp = c["process"], c["supply_v"]["vset"], c["temperature_c"]
@@ -492,7 +500,7 @@ def analyze_request(req: dict, run_dir: Path, man: dict, corners_dir: Path, writ
         cid = corner_id(p, t, v)
         if cid not in seen:
             pts.append({"id": cid, "tag": req["tag"], "process": p, "temperature_c": t, "supply_v": v, "outcome": "NOT_COVERED", "reason": "corner absent from an otherwise returned report"})
-    return {"info": info, "points": pts, "pdk_report": (rep.get("provenance") or {}).get("pdk", {})}
+    return {"info": info, "points": pts}
 
 
 OUTCOMES = ("PASS", "FAIL", "ERROR", "NONPHYSICAL", "UNRESOLVED", "NOT_COVERED")
@@ -840,12 +848,11 @@ def cmd_record(args) -> int:
     snap_dir = HERE / "netlist-snapshots" / record_id
     sim_common.refuse_existing((rec_dir / f"{record_id}.md", rec_dir / f"{record_id}.json", corners_dir, snap_dir, evidence_store.manifest_path(HERE.name, record_id)))
     reqs = plan_requests(man)
-    points, requests, fleet_pdk = [], [], {}
+    points, requests = [], []
     for r in reqs:
         res = analyze_request(r, run_dir, man, corners_dir, write=True)
         points += res["points"]
         requests.append(res["info"])
-        fleet_pdk = res["pdk_report"] or fleet_pdk
         src = run_dir / r["tag"]
         sim_common.snapshot_request_artifacts(src, r["tag"], snap_dir, corners_dir, run_dir, REPO_ROOT)
     snap_dir.mkdir(parents=True, exist_ok=True)
@@ -857,7 +864,10 @@ def cmd_record(args) -> int:
     cost_projections = [json.loads(cf.read_text()) for cf in cost_files]
     fails = sim_common.submit_failures(requests)
     pdk_d, tools_d = sim_common.record_pdk_tools(pdk, pin, meta, points, requests)
-    pdk_d["fleet_pdk_report"] = fleet_pdk
+    # The fleet half of the PDK block: the SET of stamps the runners that executed this
+    # record's requests reported, with its coverage.  Each request's own stamp and the
+    # client-resolved PDK it was submitted with stay beside that request under `requests`.
+    pdk_d.update(sim_common.fleet_pdk_fields(q.get("runner_pdk") for q in requests))
     tools_d["fleet_klu_points"] = sum(1 for p in points if p.get("netlist_klu_announced"))
     cnt = declared_counts(man)
     n_graded = sum(1 for p in points if p["outcome"] != "NOT_COVERED")

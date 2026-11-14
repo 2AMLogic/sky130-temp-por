@@ -374,12 +374,20 @@ def analyze_request(req: dict, run_dir: Path, man: dict, corners_dir: Path, writ
         info["outcome"] = why
         for p, t, v in declared:
             pts.append({"id": corner_id(p, t, v), "tag": req["tag"], "class": cls, "process": p, "temperature_c": t, "supply_v": v, "outcome": "NOT_COVERED", "reason": why})
-        return {"info": info, "points": pts, "pdk_report": {}}
+        return {"info": info, "points": pts}
     info["netlist_sha256_submitted"] = file_sha256(d / "netlist.spice")
     info["netlist_sha256_reported"] = (rep.get("environment") or {}).get("netlist_sha256")
     info["netlist_matches_report"] = info["netlist_sha256_submitted"] is not None and info["netlist_sha256_submitted"] == info["netlist_sha256_reported"]
     info.update(sim_common.fleet_job_fields(rep))
     info["request_id"] = (rep.get("environment") or {}).get("request_id") or rep.get("request_id")
+    # Both PDK values this job's report carries, each under a key that says whose it is:
+    # the stamp of the machine that RAN the corners (`sim_common.runner_pdk()`, the repo's
+    # one reader of it) and, separately, the PDK the submitting CLIENT resolved for
+    # itself.  This record used to store the client's value as `pdk.fleet_pdk_report`
+    # (issue #328); only a request that reached the fleet carries either key at all, so a
+    # request that never ran is not counted as a job that reported no stamp.
+    info["runner_pdk"] = sim_common.runner_pdk(rep)
+    info["client_pdk_report"] = (rep.get("provenance") or {}).get("pdk") or {}
     seen = set()
     for c in rep.get("corners", []):
         proc, vf, temp = c["process"], c["supply_v"]["vset"], c["temperature_c"]
@@ -432,7 +440,7 @@ def analyze_request(req: dict, run_dir: Path, man: dict, corners_dir: Path, writ
         if cid not in seen:
             pts.append({"id": cid, "tag": req["tag"], "class": cls, "process": p, "temperature_c": t, "supply_v": v, "outcome": "NOT_COVERED",
                         "reason": "corner absent from an otherwise returned report"})
-    return {"info": info, "points": pts, "pdk_report": (rep.get("provenance") or {}).get("pdk", {})}
+    return {"info": info, "points": pts}
 
 
 def summarize(points: list[dict]) -> dict:
@@ -632,12 +640,11 @@ def cmd_record(args) -> int:
         corners_dir = evidence_store.stage_dir_for(SLUG, record_id)  # git-ignored scratch; stored below
         snap_dir = HERE / "netlist-snapshots" / record_id
         sim_common.refuse_existing((rec_dir / f"{record_id}.md", rec_dir / f"{record_id}.json", corners_dir, snap_dir, evidence_store.manifest_path(SLUG, record_id)))
-        points, requests, fleet_pdk = [], [], {}
+        points, requests = [], []
         for r in plan_requests(man, cls):
             res = analyze_request(r, run_dir, man, corners_dir, write=True)
             points += res["points"]
             requests.append(res["info"])
-            fleet_pdk = res["pdk_report"] or fleet_pdk
             src = run_dir / r["tag"]
             sim_common.snapshot_request_artifacts(src, r["tag"], snap_dir, corners_dir, run_dir, REPO_ROOT)
         # A class with nothing submitted/graded (a --only subset run) stages no bytes: record it as NOT_COVERED
@@ -649,7 +656,10 @@ def cmd_record(args) -> int:
                 shutil.copyfile(run_dir / "run.json", snap_dir / "run.json")
         fails = sim_common.submit_failures(requests)
         pdk_d, tools_d = sim_common.record_pdk_tools(pdk, pin, meta, points, requests)
-        pdk_d["fleet_pdk_report"] = fleet_pdk
+        # The fleet half of the PDK block: the SET of stamps the runners that executed
+        # this class's requests reported, with its coverage.  Each request's own stamp and
+        # the client-resolved PDK it was submitted with stay beside it under `requests`.
+        pdk_d.update(sim_common.fleet_pdk_fields(q.get("runner_pdk") for q in requests))
         cnt = declared_counts(man, cls)
         n_graded = sum(1 for p in points if p["outcome"] != "NOT_COVERED")
         art_manifest, art_summary = evidence_store.store_or_exit(SLUG, record_id, corners_dir) if staged else (None, None)

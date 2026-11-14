@@ -300,6 +300,22 @@ def analyze_variant(n: str, run_dir: Path, man: dict, traces: dict) -> dict:
     return {"requests": req, "points": full}
 
 
+def runner_pdks(req: dict) -> list:
+    """Every fleet job's runner-PDK stamp in ONE variant's request record.
+
+    A variant resubmitted split by MOS corner is one fleet job per split (plus the earlier
+    whole-grid attempt, which ran on its own machine), so a single stamp per variant would
+    hide a split whose runners disagreed -- the shape issue #315 found in accuracy-MC.  The
+    stamps themselves are read by `run_iq_campaign.analyze_state()` through
+    `sim_common.runner_pdk()`; `None` here means that job never reached the fleet and is
+    therefore not one of the jobs `sim_common.fleet_pdk_fields()` counts (issue #328).
+    """
+    if "split_by_process" in req:
+        return [r.get("runner_pdk") for r in req["split_by_process"].values()] + \
+               [(req.get("first_whole_grid_attempt") or {}).get("runner_pdk")]
+    return [req.get("runner_pdk")]
+
+
 def f_ua(x):
     return "-" if x is None else f"{x * 1e6:.3f}"
 
@@ -407,6 +423,11 @@ def cmd_record(args) -> int:
         pdk, pin, meta, allp, [per[n]["requests"] for n in names],
         fleet_note=None, xschem_note=None,
     )
+    # What the machines that ran these variants reported about their own PDK install,
+    # observed from their reports -- never the client's resolution.  The two texts below
+    # state this instead of the literals they used to carry (issue #328).
+    pdk_d.update(sim_common.fleet_pdk_fields(p for n in names for p in runner_pdks(per[n]["requests"])))
+    pdk_clause = sim_common.fleet_pdk_clause(pdk_d["fleet_pdk"])
     bo = [r["baseline_vs_original_rel"] for r in cmp_["rows"] if "baseline_vs_original_rel" in r]
     both_ok = [r["id"] for r in cmp_["rows"] if "baseline_vs_original_rel" in r]
     flips = [r["id"] for r in cmp_["rows"] if r["original_status"] and r["runs"]["baseline"]["status"] != r["original_status"]]
@@ -418,7 +439,8 @@ def cmd_record(args) -> int:
         "Natural-release iq-total only; forced-low por-iq contention and the definition of incremental temp-iq (DR-006 blockers) are not addressed.",
         "Three solver settings are a bounded sample, not an exhaustive sweep; a point that is non-physical in all three is `reproduced-non-physical` for THESE settings only.",
         "A passing variant shows that a physical settled landing exists under that setting; it does not by itself prove the cause of the original artifact.",
-        "The fleet runner does not report the PDK commit; the host pin is recorded, and the fleet library is assumed to match it (disclosed, not verified here).",
+        f"{pdk_clause} (recorded in this record's `pdk` block); it is not compared with the sim/pdk.json pin"
+        " here, so the fleet model library is still assumed, not verified, to match the pin.",
         "Constant-VDD settled current only (supply-ramp behavior is out of scope); no mismatch Monte Carlo; no ll/hh axis; no ceiling is proposed.",
         f"{n_total - n_res} of {n_total} point-runs produced no settled-window value (see the table; these are explicit unknowns).",
     ]
@@ -435,7 +457,9 @@ def cmd_record(args) -> int:
         "tools": tools_d,
         "git": gi, "run_git": meta["git"],
         "provenance": {"dut_sha256": meta["dut_sha256"], "testbench_sha256": meta["testbench_sha256"], "manifest_sha256": meta["manifest_sha256"], "hashes": meta.get("hashes", {})},
-        "fleet_pdk_note": "the fleet runner does not report its PDK commit; the host pin is " + pin["open_pdks_commit"] + " and the runner resolves the library under /opt/pdk/sky130A (commit unavailable, not verified)",
+        "fleet_pdk_note": f"{pdk_clause} ({pdk_d['fleet_pdk_reporting']} of {pdk_d['fleet_pdk_jobs']} fleet jobs reported one);"
+                          " the host pin is " + pin["open_pdks_commit"] + " and the runner resolves the library under"
+                          " /opt/pdk/sky130A; the two are recorded here, not compared",
         "fleet_note": f"jobs { {n: reqs[n].get('job_id') for n in names} }; runner klt {tools_d['fleet_runner_klt']}; fleet ngspice {tools_d['fleet_ngspice']}; client {meta['klt_client']}; batch.runner_version_check=warn",
         "requests": reqs, "points": {n: per[n]["points"] for n in names}, "comparison": cmp_, "baseline_vs_original_text": bvo, "limitations": limits,
         "original_record": "sim/iq-top/records/20261009-191705-df85523.json",

@@ -227,6 +227,12 @@ class Accounting(unittest.TestCase):
                 self.assertEqual(rec["matrix"]["n_points_graded"], 0)
                 self.assertEqual(rec["matrix"]["n_points_not_covered"], 945)
                 self.assertEqual(rec["summary"]["total"]["PASS"], 0)
+                # Fleet PDK: no request reached the fleet, so no job reported a stamp and
+                # the record says `unknown` -- never the client-resolved value the old
+                # `fleet_pdk_report` key carried (issue #328).
+                self.assertEqual(rec["pdk"]["fleet_pdk"], "unknown")
+                self.assertEqual((rec["pdk"]["fleet_pdk_jobs"], rec["pdk"]["fleet_pdk_reporting"]), (0, 0))
+                self.assertNotIn("fleet_pdk_report", rec["pdk"])
                 before = {p: p.read_text() for p in (here / "records").glob("*")}
                 with self.assertRaises(SystemExit):
                     rb.cmd_record(ns)

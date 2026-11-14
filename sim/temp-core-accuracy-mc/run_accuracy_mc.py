@@ -798,26 +798,6 @@ def cmd_record(args):
     return 0
 
 
-def runner_pdks(ent):
-    """The PDK install of EVERY fleet machine that ran a process section of this term.
-
-    NOT the client-resolved `provenance.pdk`: the runner executes against its own
-    `/opt/pdk`, stamped under `environment.remote.worker_environment.pdk`, and the two
-    genuinely diverge -- `sim/bias-core-smoke/records/20261023-171642-e69f5b2e.json`
-    recorded a grid executed under open_pdks `c6d73a35...` while the client had merely
-    resolved `f6eeac7d...`.  That runner stamp is exactly the value this runner used to
-    state as a literal labelled "(sim/pdk.json pin)" (issue #312), which it never was.
-
-    One entry per process job, off `ent['jobs']` rather than the merged
-    `report['environment']` -- that merged section is the first usable process only, so a
-    term's other four runners (and any different install among them) were invisible.
-    Yields `{}` for a job with no stamp, so an unreported one becomes `unknown` via
-    `sim_common.joined_versions()` rather than borrowing the client's or another job's.
-    """
-    return [((j or {}).get("worker_environment") or {}).get("pdk") or {}
-            for j in (ent.get("jobs") or {}).values()]
-
-
 def observed_provenance(ents):
     """The fleet-side halves of the record header, derived from the run's own reports.
 
@@ -832,13 +812,18 @@ def observed_provenance(ents):
     `*_jobs` / `*_reporting` are the coverage of each value: how many jobs reported one at
     all, out of how many ran.  Rendering uses them to keep a PARTIAL answer from reading
     like a unanimous one; see `render_pdk_tools_lines()`.
+
+    The PDK of each job is read by `sim_common.runner_pdk()` -- the repo's one reader of
+    the runner's own stamp, never the client-resolved `provenance.pdk` (issue #328) -- and
+    deliberately off `ent['jobs']` rather than the merged `report['environment']`, which
+    is the FIRST usable process section only: a term's other four runners (and any
+    different install among them) were invisible that way (issue #315).
     """
     jv = sim_common.joined_versions
-    pdks = [p for e in ents.values() for p in runner_pdks(e)]
     engines = [{"tag": f"ngspice-{v}"} if v else {}
                for e in ents.values() for v in (e.get("engines") or {}).values()]
-    return {"fleet_pdk": jv(pdks, "stamp_text"),
-            "fleet_pdk_jobs": len(pdks), "fleet_pdk_reporting": sum(1 for p in pdks if p.get("stamp_text")),
+    return {**sim_common.fleet_pdk_fields(sim_common.runner_pdk(j) for e in ents.values()
+                                          for j in (e.get("jobs") or {}).values()),
             "fleet_engine": jv(engines, "tag"),
             "fleet_engine_jobs": len(engines), "fleet_engine_reporting": sum(1 for e in engines if e.get("tag"))}
 
@@ -861,16 +846,15 @@ def render_pdk_tools_lines(rec, pdk, prov, fleet):
 
     The grid ran on the fleet but the record is written here, so the PDK line names both
     halves explicitly and lets neither stand in for the other: the recording host's
-    resolved install (with the same pin-state ternary
+    resolved install (with the same `sim_common.pin_state()` ternary
     `sim_common.render_pdk_tools_repo_state()` uses) and the stamp the fleet runners
     reported.  Before issue #312 this line stated one literal commit labelled
     "(sim/pdk.json pin)" that was in fact neither the pin nor this host's install, but the
     October fleet runners' stamp -- so the claim was wrong in both halves at once.
     """
-    pin_state = "matches sim/pdk.json pin" if pdk.matches_pin else "**MISMATCH vs sim/pdk.json pin**"
     jobs = ", ".join(f"{t}[{k}]={j['job_id']}" for t, f in fleet.items() for k, j in f["jobs"].items())
     return [
-        f"- **PDK**: {pdk.variant} @ open_pdks `{pdk.installed_commit}` ({pin_state}) on the host"
+        f"- **PDK**: {pdk.variant} @ open_pdks `{pdk.installed_commit}` ({sim_common.pin_state(pdk.matches_pin)}) on the host"
         f" that wrote this record, models `{pdk.pin['ngspice_lib']}` (`_mm` sections for"
         f" mismatch); the fleet runners that executed the grid reported `{prov['fleet_pdk']}`"
         + coverage_note(prov, "fleet_pdk"),

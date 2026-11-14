@@ -13,6 +13,13 @@ These tests pin the two properties that made that drift possible:
   * an input that carries nothing yields the explicit string `unknown`, never a default
     version and never a silently-omitted key.
 
+They also pin the shared fleet-PDK vocabulary issue #328 collapsed five answers into:
+`runner_pdk()` (the one reader of the stamp the fleet runner reported, never the
+client-resolved `provenance.pdk`), `fleet_pdk_fields()` (the `pdk.fleet_pdk*` record
+fields and their coverage), `fleet_pdk_clause()` (the one prose sentence) and
+`pin_state()` (the pin-state ternary).  Per-runner wiring is asserted in
+`sim/bin/test_runner_fleet_pdk.py`.
+
 Stdlib only, no SPICE, no PDK: the host half is stubbed so the test is hermetic.
 
 Run: python3 -I sim/bin/test_sim_common_provenance.py
@@ -79,6 +86,137 @@ class JoinedVersionsTest(unittest.TestCase):
     def test_empty_and_missing_and_none_entries_are_unknown(self):
         self.assertEqual(sc.joined_versions([], "v"), "unknown")
         self.assertEqual(sc.joined_versions([{}, {"v": None}, {"v": ""}, None], "v"), "unknown")
+
+
+RUNNER_PDK = {"variant": "sky130A", "stamp_text": "open_pdks " + "c" * 40}
+CLIENT_PDK = {"name": "sky130A", "version": "open_pdks " + "9" * 40,
+              "source": "search root: ~/.ciel", "ambiguous_sources": ["search root: ~/.volare"]}
+
+
+def report(runner=RUNNER_PDK, client=CLIENT_PDK, job="klt-sim-dead"):
+    """A klt batch `report.json` carrying BOTH PDK values, as a real one does.
+
+    The runner's own install stamp hangs off `environment.remote.worker_environment.pdk`;
+    the PDK the *client* resolved is `provenance.pdk`.  They differ on purpose: a reader
+    that takes the client's value must fail these tests, not quietly report the wrong
+    half under a fleet label (the real divergence is recorded in
+    `sim/bias-core-smoke/records/20261023-171642-e69f5b2e.json`, and the mislabel in
+    `sim/glitch-top/records/20261113-082829-da28d31-vdd_level-rerun181.json`).
+    """
+    env = {"engine": "ngspice", "engine_version": "47",
+           "remote": {"job_id": job, "runner_klt_version": "0.9.1",
+                      **({"worker_environment": {"pdk": dict(runner)}} if runner else {})}}
+    return {"status": "ok", "corners": [], "environment": env,
+            **({"provenance": {"pdk": dict(client)}} if client else {})}
+
+
+class RunnerPdkTest(unittest.TestCase):
+    """The one reader of the fleet runner's PDK stamp (issue #328).
+
+    Three runners used to store `provenance.pdk` -- the *client's* resolution -- under
+    the key `fleet_pdk_report`, and two more carried their own private copy of this
+    walk.  These cases pin what the single reader answers, so there is one place where
+    "which field is the fleet's PDK?" is decided.
+    """
+
+    def test_the_runner_stamp_is_read_off_a_whole_report(self):
+        self.assertEqual(sc.runner_pdk(report()), RUNNER_PDK)
+
+    def test_the_client_resolved_pdk_is_never_returned(self):
+        """`provenance.pdk` would make an unverified fleet read as pinned."""
+        got = sc.runner_pdk(report())
+        self.assertNotIn(CLIENT_PDK["version"], str(got))
+        self.assertEqual(sc.runner_pdk(report(runner=None)), {})  # NOT the client's value
+
+    def test_the_environment_and_remote_sections_are_accepted_too(self):
+        """corner-run holds the `remote` section; accuracy-MC holds one per process job."""
+        rep = report()
+        self.assertEqual(sc.runner_pdk(rep["environment"]), RUNNER_PDK)
+        self.assertEqual(sc.runner_pdk(rep["environment"]["remote"]), RUNNER_PDK)
+
+    def test_an_absent_link_anywhere_in_the_chain_is_empty_not_a_guess(self):
+        for src in (None, {}, {"environment": None}, {"environment": {}}, {"environment": {"remote": None}},
+                    {"environment": {"remote": {}}}, {"environment": {"remote": {"worker_environment": {}}}},
+                    {"environment": {"remote": {"worker_environment": {"pdk": None}}}}):
+            self.assertEqual(sc.runner_pdk(src), {}, src)
+
+    def test_a_local_report_with_no_remote_section_is_empty(self):
+        self.assertEqual(sc.runner_pdk({"status": "ok", "environment": {"engine": "ngspice"}}), {})
+
+
+class FleetPdkFieldsTest(unittest.TestCase):
+    """The `pdk` block's fleet half: the observed SET plus its coverage (issue #328)."""
+
+    def test_one_stamp_observed_by_every_job(self):
+        pdks = [sc.runner_pdk(report()), sc.runner_pdk(report())]
+        self.assertEqual(sc.fleet_pdk_fields(pdks), {
+            "fleet_pdk": RUNNER_PDK["stamp_text"], "fleet_pdk_jobs": 2, "fleet_pdk_reporting": 2})
+
+    def test_disagreeing_runners_are_both_reported_never_first_found(self):
+        a, b = "open_pdks " + "a" * 40, "open_pdks " + "b" * 40
+        got = sc.fleet_pdk_fields([{"stamp_text": a}, {"stamp_text": b}, {"stamp_text": a}])
+        self.assertEqual(got["fleet_pdk"], f"{a}, {b}")
+
+    def test_nothing_reported_is_unknown_not_the_client_s_value(self):
+        got = sc.fleet_pdk_fields([{}, {}])
+        self.assertEqual(got["fleet_pdk"], "unknown")
+        self.assertEqual((got["fleet_pdk_jobs"], got["fleet_pdk_reporting"]), (2, 0))
+
+    def test_partial_coverage_is_countable(self):
+        """A value joined over the jobs that answered must not read as one they all
+        agreed on; the counts are what a caller renders that caveat from."""
+        got = sc.fleet_pdk_fields([{"stamp_text": "open_pdks " + "a" * 40}, {}, {}])
+        self.assertEqual((got["fleet_pdk_jobs"], got["fleet_pdk_reporting"]), (3, 1))
+
+    def test_a_request_that_never_reached_the_fleet_is_not_a_job(self):
+        """`None` means no job ran -- it must not inflate the denominator the way a job
+        that ran and reported no stamp does."""
+        got = sc.fleet_pdk_fields([sc.runner_pdk(report()), None, None])
+        self.assertEqual((got["fleet_pdk_jobs"], got["fleet_pdk_reporting"]), (1, 1))
+
+    def test_no_jobs_at_all(self):
+        self.assertEqual(sc.fleet_pdk_fields([]),
+                         {"fleet_pdk": "unknown", "fleet_pdk_jobs": 0, "fleet_pdk_reporting": 0})
+
+    def test_it_accepts_a_generator(self):
+        got = sc.fleet_pdk_fields(sc.runner_pdk(r) for r in (report(), report(runner=None)))
+        self.assertEqual((got["fleet_pdk_jobs"], got["fleet_pdk_reporting"]), (2, 1))
+
+
+class FleetPdkClauseTest(unittest.TestCase):
+    """The sentence four records used to hardcode as "not reported by the runner"."""
+
+    def test_an_observed_stamp_is_named(self):
+        stamp = "open_pdks " + "c" * 40
+        clause = sc.fleet_pdk_clause(stamp)
+        self.assertIn(stamp, clause)
+        self.assertNotIn("no PDK stamp", clause)
+
+    def test_an_unobserved_stamp_says_so_without_claiming_the_runner_cannot(self):
+        """The old literal claimed the runner never reports one, which is false; the
+        honest statement is that none was reported by the jobs in THIS record."""
+        clause = sc.fleet_pdk_clause("unknown")
+        self.assertIn("no PDK stamp", clause)
+        self.assertNotIn("unknown`", clause)
+
+    def test_the_clause_is_sentence_initial(self):
+        for value in ("unknown", "open_pdks " + "c" * 40):
+            self.assertTrue(sc.fleet_pdk_clause(value)[0].isupper(), value)
+
+
+class PinStateTest(unittest.TestCase):
+    """One ternary, not three copies: the `sim/pdk.json` pin state of a record's PDK line."""
+
+    def test_both_branches(self):
+        self.assertEqual(sc.pin_state(True), "matches sim/pdk.json pin")
+        self.assertEqual(sc.pin_state(False), "**MISMATCH vs sim/pdk.json pin**")
+
+    def test_the_shared_renderer_uses_it(self):
+        pdk, tools = build()
+        git = {"sha": "deadbee", "branch": "main", "dirty": False}
+        line = sc.render_pdk_tools_repo_state({"pdk": {**pdk, "matches_pin": False}, "tools": tools, "git": git})[0]
+        self.assertIn(sc.pin_state(False), line)
+        self.assertNotIn(sc.pin_state(True), line)
 
 
 class RecordPdkToolsTest(unittest.TestCase):
