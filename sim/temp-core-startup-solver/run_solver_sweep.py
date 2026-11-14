@@ -357,24 +357,6 @@ def verdict_for_point(cid, scen, res, ctx=None):
                          for k, g in rows.items()}}
 
 
-def runner_pdk(entry):
-    """The PDK install of the machine that actually ran the job, off its `report.json`.
-
-    NOT `provenance.pdk`: that is the PDK the *client* resolved, while the runner executes
-    against its own `/opt/pdk`, stamped under `environment.remote.worker_environment.pdk`.
-    `sim/bin/corner-run.py` cites the same field for the same reason, and the two really do
-    diverge -- in `sim/bias-core-smoke/records/20261023-171642-e69f5b2e.json` the grid ran
-    under open_pdks `c6d73a35...` while the client had merely resolved `f6eeac7d...`.
-    Citing the client's value would make an unverified fleet read as pinned, which is the
-    stated-not-observed claim this whole module exists to remove (issue #306).
-
-    Returns `{}` when any link in the chain is absent, so an unreported stamp becomes
-    `unknown` via `sim_common.joined_versions()` rather than falling back to the client.
-    """
-    env = (entry.get("report") or {}).get("environment") or {}
-    return ((env.get("remote") or {}).get("worker_environment") or {}).get("pdk") or {}
-
-
 def observed_provenance(summary, res):
     """Everything the record's `PDK` / `Tools` lines say about tools, derived from what
     this run observed -- never a literal (issue #306).
@@ -385,6 +367,11 @@ def observed_provenance(summary, res):
     `sim_common.joined_versions()` enforces -- rather than to a default version, so a tool
     nobody observed reads as unobserved instead of as whatever was current when this code
     was written.
+
+    The fleet PDK comes from `sim_common.runner_pdk()`, the repo's one reader of the
+    runner's own stamp (never the client-resolved `provenance.pdk`); a combo with no
+    usable report is passed as `None`, because the fleet refused it and it is therefore
+    not one of the jobs `fleet_pdk_jobs` counts (issue #328).
     """
     fleets = [s.get("fleet") for s in summary.values()]
     jv = sim_common.joined_versions
@@ -400,7 +387,10 @@ def observed_provenance(summary, res):
         "fleet_ngspice": jv(engines, "tag"),
         "fleet_runner_klt": jv(fleets, "runner_klt_version"),
         "fleet_instance_type": jv(fleets, "instance_type"),
-        "fleet_pdk": jv((runner_pdk(e) for e in res.values()), "stamp_text"),
+        **sim_common.fleet_pdk_fields(
+            sim_common.runner_pdk(e["report"]) if (e or {}).get("report") else None
+            for e in res.values()
+        ),
         "klt_skew": skew,
     }
 
@@ -410,18 +400,17 @@ def render_provenance_lines(prov, pdk, klt_client, backend):
     PDK `corner-run` resolved on the host writing the record.
 
     The grid itself ran on the fleet, so the PDK line names both halves explicitly: the
-    recording host's resolved install (with the same pin-state ternary
+    recording host's resolved install (with the same `sim_common.pin_state()` ternary
     `sim_common.render_pdk_tools_repo_state()` uses) and the stamp of the fleet runners
-    that executed the grid (`runner_pdk()`, never the client-side `provenance.pdk`).
-    Neither is invented when absent.
+    that executed the grid (`sim_common.runner_pdk()`, never the client-side
+    `provenance.pdk`).  Neither is invented when absent.
     """
-    pin_state = "matches sim/pdk.json pin" if pdk.matches_pin else "**MISMATCH vs sim/pdk.json pin**"
     skew_note = ""
     if prov["klt_skew"]:
         pairs = "; ".join(f"runner {r} vs client {c}" for r, c in prov["klt_skew"])
         skew_note = f" (client/runner klt mismatch warning observed on at least one job: {pairs}; reported per job below)"
     return [
-        f"- **PDK**: {pdk.variant} @ open_pdks `{pdk.installed_commit}` ({pin_state}) on the host that wrote this"
+        f"- **PDK**: {pdk.variant} @ open_pdks `{pdk.installed_commit}` ({sim_common.pin_state(pdk.matches_pin)}) on the host that wrote this"
         f" record, models `{pdk.pin['ngspice_lib']}`; the fleet runners that executed the grid"
         f" reported `{prov['fleet_pdk']}`",
         f"- **Tools**: {klt_client} (client); fleet `{prov['fleet_ngspice']}` on Spot `{prov['fleet_instance_type']}`,"

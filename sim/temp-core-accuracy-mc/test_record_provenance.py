@@ -17,7 +17,10 @@ that keep them honest:
 
 The sibling file `sim/temp-core-startup-solver/test_record_provenance.py` asserts the
 same contract for `run_solver_sweep.py` (issue #306); the source-level counterpart is
-`RunnerVersionLiteralTest` in `sim/bin/test_sim_common_provenance.py`.
+`RunnerVersionLiteralTest` in `sim/bin/test_sim_common_provenance.py`.  Which FIELD is the
+fleet's PDK is decided once, by `sim_common.runner_pdk()`, and asserted across every
+runner in `sim/bin/test_runner_fleet_pdk.py` (issue #328); what stays here is this
+runner's per-process-job wiring and the lines it renders.
 
 Stdlib only: no SPICE, no PDK, no fleet, no record written.  `LoadTermContractTest`
 builds a run directory of stub `report.json` files under a temp dir so the real
@@ -313,10 +316,6 @@ class PdkLineTest(unittest.TestCase):
         _, (pdk_line, _) = lines({"nominal": ran(runner_pdk="open_pdks " + "c" * 40),
                                   "pnp": ran(runner_pdk="open_pdks " + "d" * 40)})
         self.assertIn("open_pdks " + "c" * 40 + ", open_pdks " + "d" * 40, pdk_line)
-
-    def test_a_report_without_a_runner_environment_is_unknown(self):
-        ents = {"nominal": {"report": {"corners": []}, "jobs": {}, "missing_procs": []}}
-        self.assertEqual(ram.observed_provenance(ents)["fleet_pdk"], "unknown")
 
     def test_the_host_half_is_never_presented_as_the_fleet_s(self):
         """Both halves are named, and the host's commit is not offered as the grid's."""

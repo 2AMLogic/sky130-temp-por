@@ -82,6 +82,9 @@ jobs:
       - name: sim_common record provenance builder tests (fleet/host tool versions are derived, never literals)
         run: python3 -I sim/bin/test_sim_common_provenance.py
 
+      - name: Every fleet runner records the PDK its runners reported, never the client's (one contract, all seven runners)
+        run: python3 -I sim/bin/test_runner_fleet_pdk.py
+
       - name: Solver-sweep record provenance lines (PDK/Tools derived from the run, no literals)
         run: python3 -I sim/temp-core-startup-solver/test_record_provenance.py
 
