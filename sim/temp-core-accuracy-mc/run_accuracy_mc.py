@@ -47,6 +47,7 @@ HERE = Path(__file__).resolve().parent
 SIM_DIR = HERE.parent
 REPO_ROOT = SIM_DIR.parent
 sys.path.insert(0, str(SIM_DIR / "bin"))
+import evidence_store  # noqa: E402
 import sim_common  # noqa: E402
 
 cr = sim_common.load_corner_run()
@@ -272,6 +273,7 @@ def variant_dir(base, variant):
 
 
 def cmd_run(args):
+    evidence_store.preflight_or_exit()  # fail closed before anything is submitted
     git = cr.git_state()
     sim_common.refuse_unsubmittable(git, args.allow_dirty)
     variant = args.variant
@@ -605,8 +607,26 @@ def term_summary(an, sig="ptat"):
 
 
 def transient_crosscheck(nominal_ent):
-    """Compare the nominal DC-sweep PTAT/CTAT against the #86 EN-high `base` transient values (same PVT points)."""
+    """Compare the nominal DC-sweep PTAT/CTAT against the #86 EN-high `base` transient values (same PVT points).
+
+    `SOLVER_RECORD` is pinned to a record whose per-point logs are COMMITTED under
+    `sim/temp-core-startup-solver/corners/<record-id>/`, so they are read straight from
+    the tree.  New solver-sweep runs stage their logs in the fleet artifact store
+    instead (`sim/bin/evidence_store.py`), so a later `SOLVER_RECORD` bump needs the
+    bytes fetched with `klt artifact get` from that record's
+    `manifests/artifacts/temp-core-startup-solver-<record-id>.manifest.json` first.
+    This refuses loudly rather than silently reporting `n_compared = 0`: a cross-check
+    that compared nothing must never read as a cross-check that agreed.
+    """
     logs = REPO_ROOT / SOLVER_RECORD.replace("records", "corners") / "en-high__base"
+    if not logs.is_dir():
+        raise SystemExit(
+            f"the pinned cross-check record {SOLVER_RECORD} has no committed per-corner logs at "
+            f"{logs.relative_to(REPO_ROOT)}: it is a store-era record, so fetch its objects with "
+            f"`klt artifact get` (manifest manifests/artifacts/temp-core-startup-solver-"
+            f"{Path(SOLVER_RECORD).name}.manifest.json) into that path, or pin SOLVER_RECORD to a "
+            f"record whose logs are committed. Refusing to render a cross-check that compared nothing."
+        )
     rows, worst = [], {"d_ptat": (0.0, None), "d_ctat": (0.0, None)}
     for (proc, supply), smp in sorted(nominal_ent["corners"].items()):
         v = smp.get(None)
@@ -648,6 +668,7 @@ def f3(x, nd=3):
 
 
 def cmd_record(args):
+    evidence_store.preflight_or_exit()
     run_dir = BUILD / args.run_id
     meta = json.loads((run_dir / "run.json").read_text())
     last = meta.get("resumes", [None])[-1] or meta
@@ -656,8 +677,9 @@ def cmd_record(args):
     now = datetime.now(timezone.utc)
     rid = f"{now:%Y%m%d-%H%M%S}-{git['sha']}"
     rec_dir = SIM_DIR / SLUG
-    if (rec_dir / "records" / f"{rid}.md").exists():
-        sys.exit(f"refusing to overwrite record {rid}")
+    sim_common.refuse_existing((rec_dir / "records" / f"{rid}.md", rec_dir / "records" / f"{rid}.json",
+                                rec_dir / "netlist-snapshots" / rid,
+                                evidence_store.stage_dir_for(SLUG, rid), evidence_store.manifest_path(SLUG, rid)))
     if git["dirty"] and not args.allow_dirty:
         sys.exit("the run was made from a DIRTY tree: this record would not be provenance-clean (re-run from a clean commit)")
     grade_git = cr.git_state()  # the analysis code that graded the run (may be later than the run SHA on a re-grade)
@@ -671,11 +693,13 @@ def cmd_record(args):
     pdk = cr.resolve_pdk(cr.load_pin())
     ents ={t: load_term(run_dir, t) for t in ["nominal", *RUN_TERMS]}
     nominal = ents["nominal"]
-    for d in ("records", "netlist-snapshots", "corners"):
+    for d in ("records", "netlist-snapshots"):
         (rec_dir / d).mkdir(exist_ok=True)
-    snap, cdir = rec_dir / "netlist-snapshots" / rid, rec_dir / "corners" / rid
+    # Raw per-sample CSVs and nominal logs stage in git-ignored scratch and are stored
+    # below; only the manifest and its summary are committed (sim/README.md).
+    snap, cdir = rec_dir / "netlist-snapshots" / rid, evidence_store.stage_dir_for(SLUG, rid)
     snap.mkdir()
-    cdir.mkdir()
+    cdir.mkdir(parents=True)
     anal, summ, summ_ctat, fleet = {}, {}, {}, {}
     summ_legacy, branch_suspects = {}, {}
     for t, ent in ents.items():
@@ -745,7 +769,17 @@ def cmd_record(args):
             rss[mode] = {"worst_corner_RSS_of_terms": math.sqrt(sum(summ[t][mode]["worst_corner"]["k3sd"] ** 2 for t in TERMS)),
                          "pooled_RSS_of_terms": math.sqrt(sum(summ[t][mode]["pooled_worst"] ** 2 for t in TERMS)),
                          "all_worst_corner": summ["all"][mode]["worst_corner"]["k3sd"], "all_pooled": summ["all"][mode]["pooled_worst"]}
+    # A run whose every unit was refused stages no bytes: record it with null artifact
+    # links rather than tripping the store's fail-closed empty-manifest refusal (the
+    # convention run_glitch_campaign.py uses for a class with nothing graded).
+    staged = any(p.is_file() for p in cdir.rglob("*"))
+    art_manifest, art_summary = evidence_store.store_or_exit(SLUG, rid, cdir) if staged else (None, None)
     rec = {"record_id": rid, "experiment": SLUG, "issue": 105, "timestamp": now.strftime("%Y-%m-%dT%H:%M:%SZ"),
+           "links": {"record": f"sim/{SLUG}/records/{rid}.md", "json": f"sim/{SLUG}/records/{rid}.json",
+                     "driver": f"sim/{SLUG}/run_accuracy_mc.py",
+                     "netlist_snapshots": f"sim/{SLUG}/netlist-snapshots/{rid}/",
+                     "artifact_manifest": str(art_manifest.relative_to(REPO_ROOT)) if art_manifest else None,
+                     "artifact_summary": str(art_summary.relative_to(REPO_ROOT)) if art_summary else None},
            "git": git, "klt": klt_client, "backend": meta["klt_sim_backend_env"], "run_id": args.run_id,
            "n_per_corner": meta["n"], "seed": meta["seed"], "guards": GUARDS, "groups": GROUPS, "fleet": fleet,
            "not_run_terms": not_run, "partial_terms_missing_process_sections": partial, "summary_ptat": summ, "summary_ctat": summ_ctat, "rss_check": rss, "controls": ctrl,
@@ -977,7 +1011,7 @@ def render_md(rec, anal, summ, summ_ctat, rss, ctrl, xcheck, not_run, fleet, met
         aff = ", ".join(f"{p}_{v:.2f}V ({len(cs['invalid'])})" for (p, v), cs in sorted(anal[t].items()) if cs["invalid"]) or "none"
         L.append(f"| {t} | {inv} / {tot} | {aff} |")
     bad_nom = [f"{p}_{v:.2f}V" for t_ in [*RUN_TERMS] if t_ in anal and anal[t_] for (p, v), cs in anal[t_].items() if cs["nominal_invalid"]]
-    L += ["", "Reasons per invalid sample are in the json twin (`per_corner.<term>.<corner>.invalid`, first 50 per corner) and in the `valid`/`reason` columns of `corners/" + rid + "/samples-<term>.csv`.",
+    L += ["", "Reasons per invalid sample are in the json twin (`per_corner.<term>.<corner>.invalid`, first 50 per corner) and in the `valid`/`reason` columns of the stored `samples-<term>.csv` objects (see Links).",
           "Corners whose NOMINAL reference failed a guard (all their samples are excluded): " + (", ".join(sorted(set(bad_nom))) or "none") + ".", ""]
     # controls
     L += ["## Controls and cross-checks", ""]
@@ -1002,7 +1036,9 @@ def render_md(rec, anal, summ, summ_ctat, rss, ctrl, xcheck, not_run, fleet, met
           ("- **NOT-RUN terms**: " + ", ".join(not_run) + " -- unmeasured; the `all` row still includes their physics but their individual share is unknown."
            if not_run else "- **Statistical resolution**: N = " + str(N) + " samples per corner gives a coarse sigma estimate (chi-square 95 % interval on a per-corner sigma at n = 30: about -20 % / +34 %); every term, the `none` control and the `nominal` reference ran on all 15 corners (none NOT-RUN)."),
           "- **Branch detection resolution**: the branch-consistency guard sees only the three evaluation temperatures stored per sample; a branch excursion confined strictly between -40, 27 and 125 C would not be seen (the dense -40..125 C sweep is evaluated by `.meas` only at those points).", ""]
-    L += ["## Links", "", f"- driver `sim/{SLUG}/run_accuracy_mc.py`; json twin `records/{rid}.json`; netlists and requests `netlist-snapshots/{rid}/`; raw per-sample values `corners/{rid}/samples-<term>.csv`; nominal points `corners/{rid}/nominal_*.log`",
+    L += ["## Links", "", f"- driver `sim/{SLUG}/run_accuracy_mc.py`; json twin `records/{rid}.json`; netlists and requests `netlist-snapshots/{rid}/`",
+          (f"- raw per-sample values (`samples-<term>.csv`) and nominal points (`nominal_*.log`) are in the fleet artifact store: manifest `{rec['links']['artifact_manifest']}`, summary `{rec['links']['artifact_summary']}` (check with `klt artifact verify {rec['links']['artifact_manifest']}`)"
+           if rec["links"]["artifact_manifest"] else "- no per-sample values were produced (every term was refused), so this record has no artifact manifest"),
           f"- **Timestamp**: {rec['timestamp']}", f"- **Author**: {rec['author']}", f"- **Supersedes**: {rec['supersedes']}"]
     return "\n".join(L)
 
@@ -1040,6 +1076,7 @@ def _guard_counts(ent, an):
 
 
 def cmd_compare(args):
+    evidence_store.preflight_or_exit()
     variant = args.variant
     base_dir, var_dir = BUILD / args.run_id, variant_dir(BUILD / args.run_id, variant)
     metas = {}
@@ -1064,7 +1101,10 @@ def cmd_compare(args):
     graded = {}
     for name, d in (("baseline", base_dir), (variant, var_dir)):
         graded[name] = _grade_variant(d)
-    snap, cdir = rec_dir / "netlist-snapshots" / rid, rec_dir / "corners" / rid
+    # Raw per-sample CSVs and nominal logs stage in git-ignored scratch and are stored
+    # below; only the manifest and its summary are committed (sim/README.md).
+    snap, cdir = rec_dir / "netlist-snapshots" / rid, evidence_store.stage_dir_for(SLUG, rid)
+    sim_common.refuse_existing((snap, cdir, evidence_store.manifest_path(SLUG, rid)))
     for d in (rec_dir / "records", snap, cdir):
         d.mkdir(parents=True, exist_ok=True)
     fleet = {}
@@ -1128,7 +1168,17 @@ def cmd_compare(args):
     for name in graded:
         a = graded[name][1]["none"]
         ctrl[name] = none_control(a) if a else None
+    # A run whose every unit was refused stages no bytes: record it with null artifact
+    # links rather than tripping the store's fail-closed empty-manifest refusal (the
+    # convention run_glitch_campaign.py uses for a class with nothing graded).
+    staged = any(p.is_file() for p in cdir.rglob("*"))
+    art_manifest, art_summary = evidence_store.store_or_exit(SLUG, rid, cdir) if staged else (None, None)
     rec = {"record_id": rid, "experiment": SLUG, "issue": 284, "kind": "variant-compare", "variant": variant,
+           "links": {"record": f"sim/{SLUG}/records/{rid}.md", "json": f"sim/{SLUG}/records/{rid}.json",
+                     "driver": f"sim/{SLUG}/run_accuracy_mc.py",
+                     "netlist_snapshots": f"sim/{SLUG}/netlist-snapshots/{rid}/",
+                     "artifact_manifest": str(art_manifest.relative_to(REPO_ROOT)) if art_manifest else None,
+                     "artifact_summary": str(art_summary.relative_to(REPO_ROOT)) if art_summary else None},
            "variant_description": VARIANT_DESC[variant], "timestamp": now.strftime("%Y-%m-%dT%H:%M:%SZ"), "run_id": args.run_id,
            "runs_git": gits, "graded_at_git": grade_git, "pdk_pin": pdk["open_pdks_commit"], "klt": metas["baseline"].get("klt_client"),
            "backend": metas["baseline"].get("klt_sim_backend_env"), "n_per_corner": metas["baseline"]["n"], "seed": metas["baseline"]["seed"],
@@ -1212,7 +1262,9 @@ def render_compare_md(rec, graded, variant, guards, cmp_rows, head):
           "- Variant deck is a rewrite of the generated testbench, not a schematic change; layout parasitics, resistor self-heating and systematic mismatch are not modelled. Local mismatch only (global process MC not sampled); DC sweep, not a cold-start transient.",
           "- The degeneration resistor value is one sizing (about 0.3 V at 27 C, per DR-007 item 2); no optimisation across values was done. DR-007 is not edited; its update belongs to the ratification lane.",
           f"- Statistical resolution: N = {N} per corner (chi-square 95 % interval on a per-corner sigma: about -13 % / +17 % at n = 100); a ratio of two such estimates carries both.", ""]
-    L += ["## Links", "", f"- driver `sim/{SLUG}/run_accuracy_mc.py` (`run --variant`, `compare`); json twin `records/{rid}.json`; decks and requests `netlist-snapshots/{rid}/<variant>/`; samples `corners/{rid}/<variant>/`",
+    L += ["## Links", "", f"- driver `sim/{SLUG}/run_accuracy_mc.py` (`run --variant`, `compare`); json twin `records/{rid}.json`; decks and requests `netlist-snapshots/{rid}/<variant>/`",
+          (f"- per-variant samples (`<variant>/samples-<term>.csv`) and nominal points are in the fleet artifact store: manifest `{rec['links']['artifact_manifest']}`, summary `{rec['links']['artifact_summary']}` (check with `klt artifact verify {rec['links']['artifact_manifest']}`)"
+           if rec["links"]["artifact_manifest"] else "- no per-variant samples were produced (every term was refused), so this record has no artifact manifest"),
           f"- **Timestamp**: {rec['timestamp']}", f"- **Author**: {rec['author']}", "- **Supersedes**: (none)"]
     return "\n".join(L)
 

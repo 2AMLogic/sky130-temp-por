@@ -40,13 +40,13 @@ jobs:
               echo "::warning::could not fetch baseline ${GITHUB_EVENT_BEFORE}; the append-only check will report it as unresolvable"
           fi
 
-      - name: Append-only evidence checker selftest (records, snapshots, corners; add, modify, delete, move, baseline fixtures)
+      - name: Append-only evidence checker selftest (records, snapshots, corners; add, modify, delete, move, closed-corners additions, baseline fixtures)
         run: python3 -I .github/scripts/check_records_append_only.py --selftest
 
-      - name: Simulation records, netlist snapshots and corner evidence are append-only against the Git baseline
+      - name: Simulation records, netlist snapshots and corner evidence are append-only, and no new raw bytes are added under sim/*/corners/
         run: python3 -I .github/scripts/check_records_append_only.py
 
-      - name: Evidence-store helper selftest (fake klt; fail-closed preflight and put, artifact-only manifests)
+      - name: Evidence-store helper selftest (fake klt; fail-closed preflight and put for all eleven sim runners, artifact-only manifests)
         run: python3 -I sim/bin/evidence_store.py --selftest
 
       - name: Artifact manifest checker selftest (schema, artifact-only URIs, tracked-bytes fixtures)
@@ -90,6 +90,9 @@ jobs:
 
       - name: Accuracy-MC `none` negative control is three-state (a corner that compared nothing can never render PASS)
         run: python3 -I sim/temp-core-accuracy-mc/test_none_control.py
+
+      - name: Accuracy-MC operating-point cross-check refuses an unreadable pinned record (never renders a 0-comparison cross-check as agreement)
+        run: python3 -I sim/temp-core-accuracy-mc/test_transient_crosscheck.py
 
       - name: Pad-island census unit tests
         run: python3 -m unittest layout/bin/test_pad_island_census.py
