@@ -659,7 +659,7 @@ def cmd_record(args) -> int:
         # The fleet half of the PDK block: the SET of stamps the runners that executed
         # this class's requests reported, with its coverage.  Each request's own stamp and
         # the client-resolved PDK it was submitted with stay beside it under `requests`.
-        pdk_d.update(sim_common.fleet_pdk_fields(q.get("runner_pdk") for q in requests))
+        pdk_d.update(sim_common.fleet_pdk_fields((q.get("runner_pdk") for q in requests), pin))
         cnt = declared_counts(man, cls)
         n_graded = sum(1 for p in points if p["outcome"] != "NOT_COVERED")
         art_manifest, art_summary = evidence_store.store_or_exit(SLUG, record_id, corners_dir) if staged else (None, None)

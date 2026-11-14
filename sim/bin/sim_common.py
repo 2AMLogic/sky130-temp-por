@@ -83,6 +83,14 @@ and/or `corner-run.py` itself):
                           `provenance.pdk`), the `pdk.fleet_pdk*` fields a
                           record states it in, and the one sentence that
                           states it in prose (issue #328)
+    fleet_pdk_commit()/fleet_pin_verdict()/fleet_pin_state()/PIN_COMMIT_LIMIT
+                          the fleet half of the pin check (issue #333): the
+                          one open_pdks-commit parser (moved here from
+                          `corner-run.py`), the THREE-state
+                          `match`/`mismatch`/`not-reported` verdict over a
+                          set of runner stamps, its rendered phrase, and the
+                          one sentence stating what an equal commit does not
+                          establish
     pin_state()             the `sim/pdk.json` pin-state ternary every
                           record's `PDK` line carries
 """
@@ -355,14 +363,46 @@ def pin_state(matches_pin: bool) -> str:
     return "matches sim/pdk.json pin" if matches_pin else "**MISMATCH vs sim/pdk.json pin**"
 
 
+def fleet_pin_state(verdict: str) -> str:
+    """`pin_state()`'s three-state sibling, for the FLEET runners' stamp (issue #333).
+
+    `pin_state()` takes a bool because the host's own install always has a commit to
+    compare.  A fleet runner may report no commit at all, and "unverifiable" is not
+    "wrong": collapsing it onto the mismatch branch is the conflation #306/#312/#328
+    exist to prevent, and was live in `corner-run.py`'s batch path, which rendered an
+    unreported stamp as `**MISMATCH vs sim/pdk.json pin**`.
+
+    Shares `pin_state()`'s match/mismatch wording on purpose -- `**MISMATCH vs
+    sim/pdk.json pin**` is the string a reader greps a record for -- and the
+    not-reported branch deliberately contains neither "matches" nor "MISMATCH".
+    """
+    if verdict == "match":
+        return "matches sim/pdk.json pin"
+    if verdict == "mismatch":
+        return "**MISMATCH vs sim/pdk.json pin**"
+    if verdict == "not-reported":
+        return "no open_pdks commit reported, so not compared with sim/pdk.json pin"
+    raise ValueError(f"not a fleet pin verdict: {verdict!r}")
+
+
 def render_pdk_tools_repo_state(r: dict) -> list[str]:
     """`PDK` (pin-state ternary) + `Tools` + `Repo state` (dirty-tree
     ternary) lines shared verbatim across every experiment's
     `render_record()`."""
     pdk = r["pdk"]
     tools = r["tools"]
+    # `local_installed_commit` exists for exactly one reason: on a batch record
+    # `corner-run.py` substitutes the FLEET runner's commit into `installed_commit` and
+    # parks this host's under that key.  So when it is present this line's pin state is
+    # the fleet verdict, which is three-state -- an unreported runner stamp must not
+    # render as a mismatch (issue #333).  Campaign-runner records carry
+    # `fleet_matches_pin` too, but their `installed_commit` is the host's, so they
+    # keep the host's bool here and state the fleet verdict in their own prose.
+    verdict = pdk.get("fleet_matches_pin")
+    state = (fleet_pin_state(verdict) if verdict and "local_installed_commit" in pdk
+             else pin_state(pdk["matches_pin"]))
     return [
-        f"- **PDK**: {pdk['variant']} @ open_pdks `{pdk['installed_commit']}` ({pin_state(pdk['matches_pin'])}); "
+        f"- **PDK**: {pdk['variant']} @ open_pdks `{pdk['installed_commit']}` ({state}); "
         f"models `{pdk['lib_file']}`",
         f"- **Tools**: {tools['ngspice']}; {tools['xschem']}; {tools['platform']}",
         f"- **Repo state**: `{r['git']['sha']}` on `{r['git']['branch']}`"
@@ -662,8 +702,56 @@ def runner_pdk(src) -> dict:
     return (d.get("worker_environment") or {}).get("pdk") or {}
 
 
-def fleet_pdk_fields(pdks) -> dict:
-    """The fleet half of a record's `pdk` block: what the runners reported, and how many.
+def fleet_pdk_commit(version: str) -> str:
+    """The open_pdks commit out of a PDK stamp string, or `"unknown"` when it carries none.
+
+    One parser for the whole repo.  It lived in `corner-run.py`, the only runner that
+    compared a runner stamp with the pin at all; issue #333 moved it here so the other
+    seven runners inherit the comparison instead of each re-deriving it, which is the
+    move issue #328 made for the *reader* (`runner_pdk()`).  `corner-run.py` imports
+    `sim_common`, and `load_corner_run()` is a lazy importlib shim, so this is the one
+    direction that creates no import cycle.
+    """
+    m = re.search(r"\b[0-9a-f]{40}\b", version or "")
+    return m.group(0) if m else "unknown"
+
+
+def fleet_pin_verdict(commits, pin: dict) -> str:
+    """The THREE-state verdict of a set of fleet-runner commits against the pin:
+    `"match"` / `"mismatch"` / `"not-reported"` (issue #333).
+
+    `commits` is one `fleet_pdk_commit()` result per fleet job (any iterable; `None` and
+    `"unknown"` both mean that job named no commit).
+
+      * `"not-reported"` -- no job named a commit.  An absent stamp and a stamp that
+        carries no 40-hex commit are the SAME answer: nothing to compare.  This is the
+        branch that must never collapse into `"mismatch"`, and the reason this is a
+        string and not a bool -- `corner-run.py` used a bool and so reported an
+        unstamped fleet run as `**MISMATCH vs sim/pdk.json pin**` and exited 3.
+      * `"match"` -- at least one job named a commit and every named commit equals
+        `pin["open_pdks_commit"]`.
+      * `"mismatch"` -- otherwise, which includes the MIXED case (some jobs on the pin,
+        some not).  A grid is not on the pin because part of it was.
+
+    Partial coverage is deliberately not a fourth state: `fleet_pdk_jobs` /
+    `fleet_pdk_reporting` already carry it, so this is a verdict over the jobs that
+    ANSWERED, never over the whole grid.  `"match"` from 2 of 5 reporting jobs says "the
+    jobs that reported ran the pin", not "the grid ran the pin"; render the coverage
+    beside it.  Note the denominators differ on purpose: `fleet_pdk_reporting` counts
+    jobs with a *stamp*, this counts jobs with a parseable *commit*, so a malformed
+    stamp is reported-but-not-comparable rather than silently wrong.
+
+    See `PIN_COMMIT_LIMIT` for what a `"match"` does not establish.
+    """
+    named = [c for c in commits if c and c != "unknown"]
+    if not named:
+        return "not-reported"
+    return "match" if all(c == pin["open_pdks_commit"] for c in named) else "mismatch"
+
+
+def fleet_pdk_fields(pdks, pin: dict) -> dict:
+    """The fleet half of a record's `pdk` block: what the runners reported, how many, and
+    how that compares with the `sim/pdk.json` pin.
 
     `pdks` is one `runner_pdk()` result per fleet job the record covers (any iterable;
     `None` for a request that never reached the fleet, which is NOT counted as a job --
@@ -675,25 +763,77 @@ def fleet_pdk_fields(pdks) -> dict:
     `pdk.fleet_pdk*` keys `run_accuracy_mc.py` already writes -- deliberately NOT the old
     `fleet_pdk_report`, whose recorded contents are the client's resolution, so a reader
     comparing an old record with a new one sees the key change with the meaning.
+
+    `fleet_matches_pin` is `fleet_pin_verdict()`'s three-state string (issue #333): until
+    then every record *stated* the runners' stamp and no record *compared* it, so "the
+    fleet ran under the pinned PDK" was an assumption disclosed in prose with
+    local-vs-fleet engine agreement as its only indirect evidence.  `pin` is required,
+    not optional, so a runner cannot keep writing the uncompared shape by omission.
     """
     observed = [p for p in pdks if p is not None]
     return {"fleet_pdk": joined_versions(observed, "stamp_text"),
             "fleet_pdk_jobs": len(observed),
-            "fleet_pdk_reporting": sum(1 for p in observed if p.get("stamp_text"))}
+            "fleet_pdk_reporting": sum(1 for p in observed if p.get("stamp_text")),
+            "fleet_matches_pin": fleet_pin_verdict(
+                (fleet_pdk_commit(p.get("stamp_text")) for p in observed), pin)}
 
 
-def fleet_pdk_clause(fleet_pdk: str) -> str:
-    """One sentence-initial clause stating what the fleet runners reported about their PDK.
+def fleet_pdk_clause(fleet_pdk: str, verdict: str) -> str:
+    """One sentence-initial clause stating what the fleet runners reported about their PDK
+    **and how it compares with the pin**.
 
     Four record texts used to state "the fleet PDK commit is not reported by the runner"
     as a literal.  The runners do report it, so the claim went stale into append-only
-    records that can no longer be corrected (issue #328).  Derived from
-    `fleet_pdk_fields()['fleet_pdk']`: the stamp when any job reported one, and otherwise
-    a statement about THIS record's jobs rather than about what the fleet can do.
+    records that can no longer be corrected (issue #328).  Those four then said, still
+    weakly, that the stamp is recorded and *not compared* with the pin -- also a literal,
+    and also false once the comparison exists (issue #333).  Both halves are derived
+    here: `fleet_pdk_fields()`'s `fleet_pdk` and its `fleet_matches_pin`.
+
+    `verdict` is required for the same reason `pin` is required above: a caller that
+    renders only the stamp is a caller that silently keeps the uncompared claim.
     """
     if fleet_pdk == "unknown":
-        return "The fleet runners that executed the grid reported no PDK stamp"
-    return f"The fleet runners that executed the grid reported PDK `{fleet_pdk}`"
+        got = "The fleet runners that executed the grid reported no PDK stamp"
+    else:
+        got = f"The fleet runners that executed the grid reported PDK `{fleet_pdk}`"
+    # One parenthetical form for all three states.  `pin_state()`'s wording is a noun
+    # fragment ("**MISMATCH vs sim/pdk.json pin**"), not a predicate, so splicing it in
+    # after "which" is ungrammatical -- and a parenthetical is what every record's PDK
+    # header line already uses.  `not-reported` is reached two ways (no stamp at all, and
+    # a stamp carrying no 40-hex commit); both name whatever was reported and then decline
+    # to compare it, which is NOT the mismatch branch.
+    return f"{got} (verdict: {fleet_pin_state(verdict)})"
+
+
+PIN_COMMIT_LIMIT = (
+    "an equal open_pdks commit is not proof that the runner's model library is "
+    "byte-identical to this host's -- it identifies the open_pdks build, not a hash of "
+    "the `sky130.lib.spice` the runner loaded, and the only model-library hash a klt "
+    "report carries (`environment.models_lib_sha256`) is client-scope "
+    "(`models_lib_sha256_scope: \"client\"`), taken on the submitting host, so it is not "
+    "fleet-side evidence about the runner's library"
+)
+"""What a `"match"` from `fleet_pin_verdict()` does NOT establish (issue #333).
+
+Issue #333 asked whether `environment.models_lib_sha256` is the stronger check.  It is
+not: every klt report in this tree carries `models_lib_sha256_scope: "client"`, and
+`sim/bias-core-smoke/records/20261023-171642-e69f5b2e.json` shows a client-scope hash
+sitting beside a *runner* that ran a different open_pdks commit than the client resolved.
+
+klt does have the comparison -- `environment.remote.models_lib_comparison`, from
+klayout-tools #5321 -- and on every batch report in this tree it answers
+`{"status": "not_comparable", "reason": "runner_hash_unavailable"}`, because its input
+(the runner inner report's own `models_lib_sha256`) is absent.  Most of this repo's
+requests declare no `models.lib` at all (they select corners per section), which is the
+structural case already filed and open as **klayout-tools #5457**; that issue is the
+friction-protocol record for this gap, so do not file it again.  The commit comparison
+above is the strongest fleet-side PDK claim available until it closes.
+
+The runner does report a runner-scope hash -- `worker_environment.pdk.stamp_sha256` with
+`stamp_scope: "executed"` -- but `stamp_scheme: "sources-sha256"` makes it a hash of the
+open_pdks sources, not of the `sky130.lib.spice` the simulator loaded, so it answers the
+same question as the commit rather than a stronger one.
+"""
 
 
 @functools.lru_cache(maxsize=1)

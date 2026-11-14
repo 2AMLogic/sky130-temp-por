@@ -495,7 +495,9 @@ def cmd_record(args) -> int:
         # resolution: the cross-check sentence below and the record's `pdk` block both
         # state this instead of the blanket literal they used to carry about the runner
         # never reporting one, which the runners have since made false (issue #328).
-        fleet_pdk = sim_common.fleet_pdk_fields(q.get("runner_pdk") for q in res["requests"])
+        # The pin goes in too, so `fleet_matches_pin` carries the three-state verdict and
+        # the sentence states a comparison rather than declining to make one (#333).
+        fleet_pdk = sim_common.fleet_pdk_fields((q.get("runner_pdk") for q in res["requests"]), pin)
         snap_dir.mkdir(parents=True, exist_ok=True)
         for rate, _ in all_rates(man):
             src = run_dir / variant / rate_tag(rate) / "netlist.spice"
@@ -523,9 +525,11 @@ def cmd_record(args) -> int:
                         f"tt / 27 C / 3.30 V / 10 kV/s, variant {variant}: local {xc['local']['ngspice']} released at {xc['local']['t_release_s'] * 1e3:.5g} ms "
                         f"(RESETn end {xc['local']['end_v']:.5g} V, POR_RAW rose at VDD={xc['local']['por_raw_vdd_v']:.4g} V); fleet {xc['fleet']['ngspice']} released at "
                         f"{xc['fleet']['t_release_s'] * 1e3:.5g} ms (end {xc['fleet']['end_v']:.5g} V, VDD={xc['fleet']['por_raw_vdd_v']:.4g} V). "
-                        f"{sim_common.fleet_pdk_clause(fleet_pdk['fleet_pdk'])} (recorded in this record's `pdk` block, "
-                        "not compared with the sim/pdk.json pin here); agreement of the two engines above is this record's "
-                        "only evidence that the fleet model library matches the pin."
+                        f"{sim_common.fleet_pdk_clause(fleet_pdk['fleet_pdk'], fleet_pdk['fleet_matches_pin'])} -- "
+                        f"{fleet_pdk['fleet_pdk_reporting']} of {fleet_pdk['fleet_pdk_jobs']} fleet jobs reported a stamp, "
+                        f"and the verdict is recorded as `pdk.fleet_matches_pin`. That comparison is of commits only, so "
+                        f"{sim_common.PIN_COMMIT_LIMIT}; agreement of the two engines above is this record's only "
+                        "evidence on the library itself."
                     )
         n_wave = sum(1 for p in pts if p["check"] and "resetn" in p["check"])
         v = man["variants"][variant]

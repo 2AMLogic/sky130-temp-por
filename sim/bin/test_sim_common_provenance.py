@@ -20,6 +20,11 @@ fields and their coverage), `fleet_pdk_clause()` (the one prose sentence) and
 `pin_state()` (the pin-state ternary).  Per-runner wiring is asserted in
 `sim/bin/test_runner_fleet_pdk.py`.
 
+Issue #333 added the pin COMPARISON to that vocabulary -- `fleet_pdk_commit()`,
+`fleet_pin_verdict()`, `fleet_pin_state()` and the `fleet_matches_pin` field -- and the
+property under test there is that it is THREE-state: a runner that reported no commit is
+unverifiable, not mismatched, and the two must never render as each other.
+
 Stdlib only, no SPICE, no PDK: the host half is stubbed so the test is hermetic.
 
 Run: python3 -I sim/bin/test_sim_common_provenance.py
@@ -149,38 +154,173 @@ class FleetPdkFieldsTest(unittest.TestCase):
 
     def test_one_stamp_observed_by_every_job(self):
         pdks = [sc.runner_pdk(report()), sc.runner_pdk(report())]
-        self.assertEqual(sc.fleet_pdk_fields(pdks), {
-            "fleet_pdk": RUNNER_PDK["stamp_text"], "fleet_pdk_jobs": 2, "fleet_pdk_reporting": 2})
+        self.assertEqual(sc.fleet_pdk_fields(pdks, PIN), {
+            "fleet_pdk": RUNNER_PDK["stamp_text"], "fleet_pdk_jobs": 2, "fleet_pdk_reporting": 2,
+            "fleet_matches_pin": "mismatch"})
 
     def test_disagreeing_runners_are_both_reported_never_first_found(self):
         a, b = "open_pdks " + "a" * 40, "open_pdks " + "b" * 40
-        got = sc.fleet_pdk_fields([{"stamp_text": a}, {"stamp_text": b}, {"stamp_text": a}])
+        got = sc.fleet_pdk_fields([{"stamp_text": a}, {"stamp_text": b}, {"stamp_text": a}], PIN)
         self.assertEqual(got["fleet_pdk"], f"{a}, {b}")
 
     def test_nothing_reported_is_unknown_not_the_client_s_value(self):
-        got = sc.fleet_pdk_fields([{}, {}])
+        got = sc.fleet_pdk_fields([{}, {}], PIN)
         self.assertEqual(got["fleet_pdk"], "unknown")
         self.assertEqual((got["fleet_pdk_jobs"], got["fleet_pdk_reporting"]), (2, 0))
 
     def test_partial_coverage_is_countable(self):
         """A value joined over the jobs that answered must not read as one they all
         agreed on; the counts are what a caller renders that caveat from."""
-        got = sc.fleet_pdk_fields([{"stamp_text": "open_pdks " + "a" * 40}, {}, {}])
+        got = sc.fleet_pdk_fields([{"stamp_text": "open_pdks " + "a" * 40}, {}, {}], PIN)
         self.assertEqual((got["fleet_pdk_jobs"], got["fleet_pdk_reporting"]), (3, 1))
 
     def test_a_request_that_never_reached_the_fleet_is_not_a_job(self):
         """`None` means no job ran -- it must not inflate the denominator the way a job
         that ran and reported no stamp does."""
-        got = sc.fleet_pdk_fields([sc.runner_pdk(report()), None, None])
+        got = sc.fleet_pdk_fields([sc.runner_pdk(report()), None, None], PIN)
         self.assertEqual((got["fleet_pdk_jobs"], got["fleet_pdk_reporting"]), (1, 1))
 
     def test_no_jobs_at_all(self):
-        self.assertEqual(sc.fleet_pdk_fields([]),
-                         {"fleet_pdk": "unknown", "fleet_pdk_jobs": 0, "fleet_pdk_reporting": 0})
+        self.assertEqual(sc.fleet_pdk_fields([], PIN),
+                         {"fleet_pdk": "unknown", "fleet_pdk_jobs": 0, "fleet_pdk_reporting": 0,
+                          "fleet_matches_pin": "not-reported"})
 
     def test_it_accepts_a_generator(self):
-        got = sc.fleet_pdk_fields(sc.runner_pdk(r) for r in (report(), report(runner=None)))
+        got = sc.fleet_pdk_fields((sc.runner_pdk(r) for r in (report(), report(runner=None))), PIN)
         self.assertEqual((got["fleet_pdk_jobs"], got["fleet_pdk_reporting"]), (2, 1))
+
+    def test_the_verdict_is_produced_here_so_no_runner_re_derives_it(self):
+        """Every runner inherits the comparison from this one producer (issue #333); the
+        pin is a required argument so none can keep the uncompared shape by omission."""
+        on_pin = sc.fleet_pdk_fields([{"stamp_text": "open_pdks " + PIN["open_pdks_commit"]}], PIN)
+        self.assertEqual(on_pin["fleet_matches_pin"], "match")
+        with self.assertRaises(TypeError):
+            sc.fleet_pdk_fields([{}])
+
+
+class FleetPdkCommitTest(unittest.TestCase):
+    """The one open_pdks-commit parser, moved out of `corner-run.py` (issue #333)."""
+
+    def test_a_stamp_with_a_commit(self):
+        self.assertEqual(sc.fleet_pdk_commit("open_pdks " + "c" * 40), "c" * 40)
+
+    def test_a_stamp_with_no_commit_is_unknown(self):
+        for text in ("", None, "open_pdks", "sky130A (no commit here)", "open_pdks " + "c" * 39,
+                     "open_pdks " + "C" * 40, "open_pdks " + "g" * 40):
+            self.assertEqual(sc.fleet_pdk_commit(text), "unknown", repr(text))
+
+    def test_corner_run_delegates_rather_than_keeping_a_copy(self):
+        """`corner-run.py` was the only runner that compared a stamp with the pin; the
+        work of issue #333 was lifting that here, not adding a second parser."""
+        cr = sc.load_corner_run()
+        self.assertIs(cr.fleet_pdk_commit, sc.fleet_pdk_commit)
+
+
+class FleetPinVerdictTest(unittest.TestCase):
+    """THREE states, never a bool (issue #333).
+
+    `corner-run.py` used `commit != pin` on a `fleet_pdk_commit()` result, which is the
+    string `"unknown"` when the runner reported no commit -- so an unstamped fleet run
+    compared unequal and was recorded and printed as a MISMATCH.  "Unverifiable" and
+    "wrong" are different findings; these tests are the ones that separate them.
+    """
+
+    MATCH = "open_pdks " + PIN["open_pdks_commit"]
+    OTHER = "open_pdks " + "b" * 40
+
+    def verdict(self, *stamps):
+        return sc.fleet_pin_verdict([sc.fleet_pdk_commit(t) for t in stamps], PIN)
+
+    def test_every_reporting_job_on_the_pin_is_a_match(self):
+        self.assertEqual(self.verdict(self.MATCH), "match")
+        self.assertEqual(self.verdict(self.MATCH, self.MATCH), "match")
+
+    def test_a_differing_commit_is_a_mismatch(self):
+        self.assertEqual(self.verdict(self.OTHER), "mismatch")
+
+    def test_a_mixed_set_is_a_mismatch_not_a_match(self):
+        """Negative control: a grid is not on the pin because PART of it was."""
+        self.assertEqual(self.verdict(self.MATCH, self.OTHER), "mismatch")
+        self.assertEqual(self.verdict(self.OTHER, self.MATCH), "mismatch")
+
+    def test_no_job_named_a_commit_is_not_reported_not_a_mismatch(self):
+        """Negative control, and the live defect this issue fixes: absent and malformed
+        are the SAME answer -- nothing to compare -- and neither is `"mismatch"`."""
+        for stamps in ((), ("",), ("open_pdks",), ("sky130A, no commit",),
+                        ("open_pdks " + "c" * 39,), ("", "open_pdks")):
+            self.assertEqual(self.verdict(*stamps), "not-reported", stamps)
+        self.assertEqual(sc.fleet_pin_verdict([None, "unknown"], PIN), "not-reported")
+
+    def test_a_malformed_stamp_beside_a_matching_one_does_not_poison_the_verdict(self):
+        """The denominators differ on purpose: `fleet_pdk_reporting` counts jobs with a
+        STAMP, the verdict counts jobs with a parseable COMMIT.  A job that named no
+        commit abstains; it does not vote mismatch."""
+        self.assertEqual(self.verdict(self.MATCH, "open_pdks"), "match")
+
+    def test_the_verdict_is_a_string_never_a_bool(self):
+        for stamps in ((self.MATCH,), (self.OTHER,), ()):
+            v = self.verdict(*stamps)
+            self.assertIsInstance(v, str)
+            self.assertNotIsInstance(v, bool)
+            self.assertIn(v, ("match", "mismatch", "not-reported"))
+
+
+class FleetPinStateTest(unittest.TestCase):
+    """`pin_state()`'s three-state sibling: the rendered phrase (issue #333)."""
+
+    def test_match_and_mismatch_share_the_host_wording(self):
+        self.assertEqual(sc.fleet_pin_state("match"), sc.pin_state(True))
+        self.assertEqual(sc.fleet_pin_state("mismatch"), sc.pin_state(False))
+
+    def test_not_reported_renders_as_neither(self):
+        """The whole point: the unverifiable state must not contain the string a reader
+        greps a record for, nor claim a match."""
+        text = sc.fleet_pin_state("not-reported")
+        self.assertNotIn("MISMATCH", text)
+        self.assertNotIn("matches", text)
+        self.assertIn("not compared", text)
+
+    def test_the_three_renderings_are_mutually_distinguishable(self):
+        rendered = [sc.fleet_pin_state(v) for v in ("match", "mismatch", "not-reported")]
+        self.assertEqual(len(set(rendered)), 3)
+        for a in rendered:
+            self.assertEqual([b for b in rendered if b != a and a in b], [])
+
+    def test_an_unknown_verdict_is_refused_not_rendered_as_a_match(self):
+        for bad in (True, False, None, "yes", "unknown", ""):
+            with self.assertRaises((ValueError, TypeError)):
+                sc.fleet_pin_state(bad)
+
+
+class PinCommitLimitTest(unittest.TestCase):
+    """What a `"match"` does NOT establish, stated once (issue #333 decision 4)."""
+
+    def test_it_names_the_limit_without_citing_the_client_hash_as_evidence(self):
+        text = sc.PIN_COMMIT_LIMIT
+        self.assertIn("not proof", text)
+        self.assertIn("models_lib_sha256", text)
+        self.assertIn("client", text)
+
+    def test_it_is_spliceable_mid_sentence(self):
+        """Every call site splices it in after a clause of its own ("...is of commits
+        only, so ..."), so it must not open with a capital or a colon clause."""
+        self.assertFalse(sc.PIN_COMMIT_LIMIT[0].isupper(), sc.PIN_COMMIT_LIMIT[:40])
+        self.assertNotIn(":", sc.PIN_COMMIT_LIMIT.split("--")[0])
+
+    def test_no_runner_cites_models_lib_sha256_as_fleet_side_evidence(self):
+        """Issue #333 item 4, evaluated: every klt report in this tree is
+        `models_lib_sha256_scope: "client"`, so the hash is the SUBMITTING host's.  A
+        runner may record it, but not as evidence about the fleet."""
+        offenders = []
+        for src in sorted((REPO_ROOT / "sim").glob("*/run_*.py")):
+            for n, line in enumerate(src.read_text().splitlines(), start=1):
+                if "models_lib_sha256" not in line:
+                    continue
+                if re.search(r"(?i)fleet[- ]side evidence|evidence (that|the) (the )?fleet"
+                             r"|independent check of the (library|fleet)", line) \
+                        and "NOT" not in line and "not " not in line:
+                    offenders.append(f"{src.name}:{n}: {line.strip()}")
+        self.assertEqual(offenders, [])
 
 
 class FleetPdkClauseTest(unittest.TestCase):
@@ -188,20 +328,66 @@ class FleetPdkClauseTest(unittest.TestCase):
 
     def test_an_observed_stamp_is_named(self):
         stamp = "open_pdks " + "c" * 40
-        clause = sc.fleet_pdk_clause(stamp)
+        clause = sc.fleet_pdk_clause(stamp, "mismatch")
         self.assertIn(stamp, clause)
         self.assertNotIn("no PDK stamp", clause)
 
     def test_an_unobserved_stamp_says_so_without_claiming_the_runner_cannot(self):
         """The old literal claimed the runner never reports one, which is false; the
         honest statement is that none was reported by the jobs in THIS record."""
-        clause = sc.fleet_pdk_clause("unknown")
+        clause = sc.fleet_pdk_clause("unknown", "not-reported")
         self.assertIn("no PDK stamp", clause)
         self.assertNotIn("unknown`", clause)
 
     def test_the_clause_is_sentence_initial(self):
-        for value in ("unknown", "open_pdks " + "c" * 40):
-            self.assertTrue(sc.fleet_pdk_clause(value)[0].isupper(), value)
+        for value, verdict in (("unknown", "not-reported"),
+                               ("open_pdks " + "c" * 40, "match")):
+            self.assertTrue(sc.fleet_pdk_clause(value, verdict)[0].isupper(), value)
+
+    def test_the_clause_carries_the_verdict_for_all_three_states(self):
+        """Issue #333: the clause used to end "...not compared with the sim/pdk.json pin
+        here", a literal that is false once the comparison exists.  It states the verdict
+        now, derived -- and the three states do not render as each other."""
+        stamp = "open_pdks " + "c" * 40
+        match = sc.fleet_pdk_clause(stamp, "match")
+        mism = sc.fleet_pdk_clause(stamp, "mismatch")
+        notrep = sc.fleet_pdk_clause("unknown", "not-reported")
+        self.assertIn(sc.pin_state(True), match)
+        self.assertIn("MISMATCH", mism)
+        self.assertNotIn("MISMATCH", match)
+        self.assertNotIn("MISMATCH", notrep)
+        self.assertNotIn(sc.pin_state(True), notrep)
+        self.assertEqual(len({match, mism, notrep}), 3)
+
+    def test_every_state_renders_the_verdict_through_fleet_pin_state(self):
+        """Derived, never a literal: whatever the state, the wording in the clause is the
+        shared one, so field and text cannot drift apart."""
+        for verdict in ("match", "mismatch", "not-reported"):
+            with self.subTest(verdict):
+                self.assertIn(sc.fleet_pin_state(verdict),
+                              sc.fleet_pdk_clause("open_pdks " + "c" * 40, verdict))
+
+    def test_the_clause_is_grammatical_not_a_spliced_noun_fragment(self):
+        """`pin_state()`'s mismatch wording is a noun fragment, so it reads only inside a
+        parenthetical; an earlier draft spliced it in after "which", which produced
+        "...reported PDK `X`, which **MISMATCH vs sim/pdk.json pin**"."""
+        for verdict in ("match", "mismatch", "not-reported"):
+            clause = sc.fleet_pdk_clause("open_pdks " + "c" * 40, verdict)
+            self.assertIn(f"(verdict: {sc.fleet_pin_state(verdict)})", clause)
+            self.assertNotIn("which **MISMATCH", clause)
+
+    def test_a_stamp_with_no_commit_in_it_reads_as_nothing_to_compare(self):
+        """`not-reported` is reachable WITH a stamp: the runner named a PDK but no
+        40-hex commit.  That clause must name the stamp and still decline to compare."""
+        stamp = "open_pdks (no commit)"
+        clause = sc.fleet_pdk_clause(stamp, "not-reported")
+        self.assertIn(stamp, clause)
+        self.assertIn(sc.fleet_pin_state("not-reported"), clause)
+        self.assertNotIn("MISMATCH", clause)
+
+    def test_the_verdict_is_required_so_a_caller_cannot_omit_the_comparison(self):
+        with self.assertRaises(TypeError):
+            sc.fleet_pdk_clause("unknown")
 
 
 class PinStateTest(unittest.TestCase):
@@ -217,6 +403,32 @@ class PinStateTest(unittest.TestCase):
         line = sc.render_pdk_tools_repo_state({"pdk": {**pdk, "matches_pin": False}, "tools": tools, "git": git})[0]
         self.assertIn(sc.pin_state(False), line)
         self.assertNotIn(sc.pin_state(True), line)
+
+    def _line(self, **pdk_extra):
+        pdk, tools = build()
+        return sc.render_pdk_tools_repo_state(
+            {"pdk": {**pdk, **pdk_extra}, "tools": tools,
+             "git": {"sha": "deadbee", "branch": "main", "dirty": False}})[0]
+
+    def test_a_batch_record_renders_the_three_state_fleet_verdict(self):
+        """On a batch record `corner-run.py` substitutes the FLEET commit into
+        `installed_commit` and parks the host's under `local_installed_commit`, so this
+        line's pin state is the fleet's and must be three-state (issue #333)."""
+        notrep = self._line(matches_pin=False, fleet_matches_pin="not-reported",
+                            local_installed_commit="f" * 40)
+        self.assertIn(sc.fleet_pin_state("not-reported"), notrep)
+        self.assertNotIn("MISMATCH", notrep)
+        mism = self._line(matches_pin=False, fleet_matches_pin="mismatch",
+                          local_installed_commit="f" * 40)
+        self.assertIn("MISMATCH", mism)
+
+    def test_a_campaign_record_keeps_the_host_bool_on_its_own_pdk_line(self):
+        """A campaign runner's `pdk` block carries `fleet_matches_pin` too, but its
+        `installed_commit` is the HOST's -- so this line must stay the host's verdict and
+        leave the fleet verdict to the record's own prose."""
+        line = self._line(matches_pin=True, fleet_matches_pin="mismatch")
+        self.assertIn(sc.pin_state(True), line)
+        self.assertNotIn("MISMATCH", line)
 
 
 class RecordPdkToolsTest(unittest.TestCase):

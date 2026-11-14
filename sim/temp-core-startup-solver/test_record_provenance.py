@@ -33,6 +33,7 @@ from pathlib import Path
 HERE = Path(__file__).resolve().parent
 sys.path.insert(0, str(HERE))
 import run_solver_sweep as rss  # noqa: E402
+sim_common = rss.sim_common  # the shared pin-state vocabulary, through the module under test
 
 PIN = {"open_pdks_commit": "f" * 40, "ngspice_lib": "libs.tech/combined/sky130.lib.spice"}
 
@@ -90,10 +91,10 @@ def not_run():
     return {"status": "NOT-RUN", "refusal": {"code": "batch_no_capacity"}}, {"report": None}
 
 
-def build(combos, pdk=None, klt_client="klayout-tools 0.9.0", backend="batch"):
+def build(combos, pdk=None, klt_client="klayout-tools 0.9.0", backend="batch", pin=PIN):
     summary = {f"c{i}": s for i, (s, _) in enumerate(combos)}
     res = {f"c{i}": r for i, (_, r) in enumerate(combos)}
-    prov = rss.observed_provenance(summary, res)
+    prov = rss.observed_provenance(summary, res, pin)
     return prov, rss.render_provenance_lines(prov, pdk or _Pdk(), klt_client, backend)
 
 
@@ -193,6 +194,51 @@ class PdkLineTest(unittest.TestCase):
     def test_disagreeing_fleet_pdks_are_both_reported(self):
         _, (pdk_line, _) = build([ran(runner_pdk="open_pdks " + "c" * 40), ran(runner_pdk="open_pdks " + "d" * 40)])
         self.assertIn("open_pdks " + "c" * 40 + ", open_pdks " + "d" * 40, pdk_line)
+
+
+class FleetPinVerdictLineTest(unittest.TestCase):
+    """Issue #333: the PDK line states how the runners' stamp compares with the pin.
+
+    The fixtures above were already built for this: `RUNNER_PDK` is `a`*40 while
+    `PIN["open_pdks_commit"]` and `CLIENT_PDK` are both `f`*40 -- so the default stub is a
+    runner OFF the pin whose client is ON it, and a verdict that followed the client would
+    read `match` here.
+    """
+
+    ON_PIN = "open_pdks " + PIN["open_pdks_commit"]
+
+    def test_a_runner_off_the_pin_is_a_mismatch_even_though_the_client_matches(self):
+        prov, (pdk_line, _) = build([ran()])
+        self.assertEqual(prov["fleet_matches_pin"], "mismatch")
+        self.assertIn("MISMATCH", pdk_line)
+
+    def test_a_runner_on_the_pin_is_a_match(self):
+        prov, (pdk_line, _) = build([ran(runner_pdk=self.ON_PIN)])
+        self.assertEqual(prov["fleet_matches_pin"], "match")
+        self.assertIn(sim_common.pin_state(True), pdk_line)
+
+    def test_a_runner_that_stamped_nothing_is_not_reported_not_a_mismatch(self):
+        prov, (pdk_line, _) = build([ran(runner_pdk=None, client_pdk=self.ON_PIN)])
+        self.assertEqual(prov["fleet_matches_pin"], "not-reported")
+        self.assertIn(sim_common.fleet_pin_state("not-reported"), pdk_line)
+        self.assertNotIn("MISMATCH", pdk_line)
+
+    def test_a_mixed_set_is_a_mismatch(self):
+        prov, (pdk_line, _) = build([ran(runner_pdk=self.ON_PIN), ran()])
+        self.assertEqual(prov["fleet_matches_pin"], "mismatch")
+        self.assertIn("MISMATCH", pdk_line)
+
+    def test_the_line_states_what_an_equal_commit_does_not_establish(self):
+        _, (pdk_line, _) = build([ran(runner_pdk=self.ON_PIN)])
+        self.assertIn(sim_common.PIN_COMMIT_LIMIT, pdk_line)
+
+    def test_the_host_half_of_the_line_keeps_its_own_two_state_verdict(self):
+        """Two verdicts on one line, and they are about different machines: the host's
+        resolved install and the runners' stamp must not borrow each other's."""
+        _, (pdk_line, _) = build([ran(runner_pdk=self.ON_PIN)], pdk=_Pdk(matches_pin=False))
+        self.assertIn("MISMATCH", pdk_line)                    # the HOST is off the pin
+        self.assertIn(sim_common.pin_state(True), pdk_line)    # the FLEET is on it
+        self.assertIn("on the host that wrote this", pdk_line)
 
 
 class RenderedLinesCarryNoLiteralTest(unittest.TestCase):

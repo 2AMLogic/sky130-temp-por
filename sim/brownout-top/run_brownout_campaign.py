@@ -867,7 +867,7 @@ def cmd_record(args) -> int:
     # The fleet half of the PDK block: the SET of stamps the runners that executed this
     # record's requests reported, with its coverage.  Each request's own stamp and the
     # client-resolved PDK it was submitted with stay beside that request under `requests`.
-    pdk_d.update(sim_common.fleet_pdk_fields(q.get("runner_pdk") for q in requests))
+    pdk_d.update(sim_common.fleet_pdk_fields((q.get("runner_pdk") for q in requests), pin))
     tools_d["fleet_klu_points"] = sum(1 for p in points if p.get("netlist_klu_announced"))
     cnt = declared_counts(man)
     n_graded = sum(1 for p in points if p["outcome"] != "NOT_COVERED")
