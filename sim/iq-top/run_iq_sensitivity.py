@@ -374,9 +374,7 @@ def render_md(rec: dict) -> str:
         L.append("| " + " | ".join(cells) + " |")
     L += ["", "## Baseline replicate vs original record", f"- {rec['baseline_vs_original_text']}", "", "## Limitations (stated, not hidden)"]
     L += [f"- {a}" for a in rec["limitations"]]
-    L += ["", "## Links"] + [f"- {k}: `{v}`" for k, v in rec["links"].items()]
-    L += [f"- **Timestamp / author**: {rec['timestamp']}, {rec['author']}", f"- **Supersedes**: {rec['supersedes'] or '(none; the original records are untouched)'}", "",
-          "Written by `sim/iq-top/run_iq_sensitivity.py record`. Append-only: never edit this file.", ""]
+    L += [""] + sim_common.record_footer_lines(rec, "sim/iq-top/run_iq_sensitivity.py record")
     return "\n".join(L)
 
 

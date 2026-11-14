@@ -322,6 +322,67 @@ def selftest_footer_lines(doc: dict, ok: bool, script: str) -> list[str]:
             f"- **Supersedes**: {doc['supersedes'] or '(none)'}", "", f"Written by `{script}`. Append-only.", ""]
 
 
+RECORD_APPEND_ONLY = (
+    "Append-only: never edit this file -- a correction is a new record with a "
+    "`Supersedes` field (see `sim/README.md`)."
+)
+
+
+def record_footer_lines(rec: dict, script: str, *, links=None, nested: bool = False,
+                        after_links=(), after_supersedes=()) -> list[str]:
+    """Closing lines shared by every EVIDENCE record's markdown: the `Links`
+    block, `Timestamp / author`, `Supersedes`, and the one canonical
+    append-only sentence.
+
+    `selftest_footer_lines()` above is this helper's sibling for the self-test
+    record.  The evidence record's trailer was the half that never got the same
+    treatment: ten renderers each re-emitted it by hand, and the sentence
+    restating `sim/README.md`'s own append-only rule had drifted into four
+    texts -- three with an em dash, one that dropped the `(see sim/README.md)`
+    pointer, one truncated to `Append-only: never edit this file.` -- so two of
+    ten record classes no longer pointed a reader at the policy they were
+    asserting (issue #337).  A committed record can never be corrected in
+    place, only superseded, which is precisely why the sentence that states
+    that rule must not be maintained in ten places.
+
+    `rec` supplies `links` / `timestamp` / `author` / `supersedes`.  The
+    `(none)` fallback is fixed rather than a parameter: `sim/README.md`'s field
+    table defines it ("prior `<record-id>` this corrects or re-runs; `(none)`
+    otherwise"), and the three callers that had their own wording had drifted
+    away from the ratified text, not extended it.
+
+    What is genuinely per-record stays at the call site:
+
+    * `links` replaces the default `rec["links"].items()` walk for the two
+      renderers whose link lines carry prose labels (`Testbench:`, `Netlist
+      snapshot:`) instead of the JSON keys -- pass `(label, value)` pairs.
+    * `nested=True` renders a `- **Links**:` sub-list instead of a `## Links`
+      section, for the three renderers that nest the block inside the bullet
+      list above it.  That is layout, not policy, so it is preserved rather
+      than converged.
+    * `after_links` / `after_supersedes` carry extra bullets at the two points
+      callers actually insert them -- `sim/glitch-top`'s `Evidence bytes: none
+      stored` belongs with the links it qualifies, `sim/brownout-top`'s
+      `Companion of` after the `Supersedes` it distinguishes itself from.  A
+      record's field ORDER is part of its format, so the two hooks are not
+      collapsed into one.
+
+    An empty link value renders as `none` rather than an empty pair of
+    backticks: a link the run could not produce (nothing graded, so no
+    artifacts stored) is stated outright instead of rendered blank.
+    """
+    bullet = "  - " if nested else "- "
+    out = ["- **Links**:" if nested else "## Links"]
+    out += [f"{bullet}{k}: `{v}`" if v else f"{bullet}{k}: none"
+            for k, v in (rec["links"].items() if links is None else links)]
+    out += list(after_links)
+    out += [f"- **Timestamp / author**: {rec['timestamp']}, {rec['author']}",
+            f"- **Supersedes**: {rec['supersedes'] or '(none)'}"]
+    out += list(after_supersedes)
+    out += ["", f"Written by `{script}`. {RECORD_APPEND_ONLY}", ""]
+    return out
+
+
 def write_selftest_record(rec_dir: Path, record_id: str, doc: dict, md_lines: list[str]) -> None:
     """Write a self-test record's `.json` + `.md`, refusing to touch an existing record (records/ is append-only)."""
     rec_dir.mkdir(exist_ok=True)

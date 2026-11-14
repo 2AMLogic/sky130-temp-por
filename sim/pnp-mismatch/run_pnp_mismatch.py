@@ -726,18 +726,8 @@ def render_record(r: dict) -> str:
     )
     add("")
 
-    add("- **Links**:")
-    for key, value in r["links"].items():
-        add(f"  - {key}: `{value}`")
-    add(f"- **Timestamp / author**: {r['timestamp']}, {r['author']}")
-    add(f"- **Supersedes**: {r['supersedes'] or '(none — first record for this claim)'}")
-    add("")
-    add(
-        "Written by `sim/pnp-mismatch/run_pnp_mismatch.py`. Append-only: never edit this "
-        "file — a correction is a new record with a `Supersedes` field (see "
-        "`sim/README.md`)."
-    )
-    add("")
+    L += sim_common.record_footer_lines(
+        r, "sim/pnp-mismatch/run_pnp_mismatch.py", nested=True)
     return "\n".join(L)
 
 
