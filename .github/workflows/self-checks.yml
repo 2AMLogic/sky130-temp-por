@@ -82,6 +82,9 @@ jobs:
       - name: sim_common record provenance builder tests (fleet/host tool versions are derived, never literals)
         run: python3 -I sim/bin/test_sim_common_provenance.py
 
+      - name: sim_common deck-list record batch-block tests (committed records are the oracle for its keys and prose)
+        run: python3 -I sim/bin/test_sim_common_deck_batch.py
+
       - name: Every fleet runner records the PDK its runners reported, never the client's (one contract, all seven runners)
         run: python3 -I sim/bin/test_runner_fleet_pdk.py
 

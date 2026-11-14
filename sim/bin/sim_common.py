@@ -93,6 +93,13 @@ and/or `corner-run.py` itself):
                           establish
     pin_state()             the `sim/pdk.json` pin-state ternary every
                           record's `PDK` line carries
+    deck_list_record_blocks()/deck_list_batch_fields()/deck_list_batch_clause()
+                          the same one-builder rule applied to a deck-list
+                          (`decks[]`) run's record provenance (issue #350):
+                          the `pdk`/`tools`/`batch` blocks in one call, the
+                          `batch` dict's own 15-key shape (a unit tally, not
+                          `fleet_job_fields()`' corner one), and the
+                          `Backend`/`Fleet engine` sentences that render it
 """
 
 from __future__ import annotations
@@ -1270,6 +1277,113 @@ def snapshot_deck_request(src: Path, corners_dir: Path, run_dir: Path, repo_root
             dst = corners_dir / "batch" / name
             dst.parent.mkdir(parents=True, exist_ok=True)
             dst.write_text(scrub(f.read_text(), run_dir, repo_root))
+
+
+# The record `batch` block's key order.  Named for the same reason `FLEET_JOB_KEYS` is:
+# the block is committed evidence under `sim/*/records`, append-only, so a key that
+# changes name or disappears cannot be corrected in an already-minted record, only
+# superseded.  `DECK_LIST_REMOTE_KEYS` is the half read straight off the job's
+# `environment.remote`; the rest come from the report, the client and the CLI.
+DECK_LIST_REMOTE_KEYS = ("job_id", "region", "instance_type", "state",
+                         "runner_klt_version", "runner_request_features")
+
+DECK_LIST_BATCH_KEYS = (*DECK_LIST_REMOTE_KEYS, "klt_client", "klt_sim_backend_env",
+                        "capacity_wait_s", "report_status", "unit_count", "passed",
+                        "errored", "timed_out", "failed_earlier_attempts")
+
+
+def deck_list_batch_fields(report: dict, *, capacity_wait_s, attempts: list[str],
+                           klt_client: str | None = None) -> dict:
+    """The record `batch` block a deck-list (`decks[]`) fleet run carries.
+
+    A deck-list job reports UNITS, not corners, so this is a different shape from the
+    per-corner `fleet_job_fields()` above and not a narrower view of it: the unit tally
+    (`unit_count`/`passed`/`errored`/`timed_out`) stands where that one has
+    `corner_count`, and it additionally records what the transport itself was asked for
+    (`runner_request_features`, `klt_sim_backend_env`, `capacity_wait_s`) because a
+    deck-list run's result depends on the request's features being honoured.
+
+    Keys absent from the report are recorded as None rather than dropped, so a record
+    always has the same shape whatever the fleet reported -- the same contract
+    `fleet_job_fields()` keeps.  `attempts` is `attempt_messages()`' list of earlier
+    submit refusals (empty when the first submit landed).  `klt_client` defaults to
+    observing the client now; pass it when the caller already observed it for the same
+    record, so one record reports one client version.
+
+    Experiment-specific claims do NOT belong here -- `run_pnp_mismatch.py` adds its
+    `sampling_method` key at the call site, because that is a statement about how that
+    experiment drew its samples, not about the fleet job that carried them.
+    """
+    remote = (report.get("environment") or {}).get("remote") or {}
+    fields = {k: remote.get(k) for k in DECK_LIST_REMOTE_KEYS}
+    fields["klt_client"] = klt_version() if klt_client is None else klt_client
+    fields["klt_sim_backend_env"] = os.environ.get("KLT_SIM_BACKEND")
+    fields["capacity_wait_s"] = capacity_wait_s
+    fields["report_status"] = report.get("status")
+    fields["unit_count"] = report.get("unit_count")
+    fields["passed"] = report.get("passed")
+    fields["errored"] = report.get("errored")
+    fields["timed_out"] = report.get("timed_out")
+    fields["failed_earlier_attempts"] = attempts
+    return fields
+
+
+def deck_list_record_blocks(pdk, pin: dict, report: dict, *, points, capacity_wait_s,
+                            attempts: list[str]) -> tuple[dict, dict, dict]:
+    """A deck-list fleet run's `pdk`, `tools` and `batch` record blocks, in one call.
+
+    Provenance is OBSERVED, never a literal (issue #297): the engine from each unit's
+    own `ngspice-NN done` banner, the runner's klt from the job's report.
+
+    This is `record_pdk_tools()` wired for the deck-list profile -- the model library
+    spelled as a shipped deck must spell it (`runner_lib_ref()`), the host's `$PDK_ROOT`
+    parked under `root`, no xschem note (a deck-list runner nets nothing), and
+    `DECK_NOTE` as the fleet note -- plus the `batch` block that always accompanies it.
+    `points` stays a keyword argument on purpose: a reader of either call site must be
+    able to see WHICH of that runner's result lists the per-point banners are read from.
+    """
+    remote = (report.get("environment") or {}).get("remote") or {}
+    client = klt_version()
+    pdk_block, tools_block = record_pdk_tools(
+        pdk,
+        pin,
+        {"klt_client": client},
+        points=points,
+        requests=[remote],
+        lib_file=runner_lib_ref(pdk.variant),
+        root=HOST_PDK_ROOT,
+        xschem_note=None,
+        fleet_note=DECK_NOTE,
+    )
+    batch_block = deck_list_batch_fields(
+        report, capacity_wait_s=capacity_wait_s, attempts=attempts, klt_client=client
+    )
+    return pdk_block, tools_block, batch_block
+
+
+def deck_list_batch_clause(b: dict, fleet_ngspice: str) -> list[str]:
+    """The `Backend` + `Fleet engine` record lines a deck-list fleet run renders.
+
+    Mirrors `render_pdk_tools_repo_state()`: returns the lines so the caller `L.extend`s
+    them and keeps its own trailing lines local (`run_pnp_mismatch.py` adds
+    `**Sampling method**`, both add `**Transport**`).  These two lines are record text
+    under an append-only tree, so the wording is as much a contract as the dict's keys.
+    """
+    return [
+        f"- **Backend**: `klt sim --backend batch` deck-list request (fleet job "
+        f"`{b['job_id']}`, {b['instance_type']} in {b['region']}, report status "
+        f"`{b['report_status']}`: {b['passed']}/{b['unit_count']} unit(s) passed, "
+        f"{b['errored']} errored, {b['timed_out']} timed out); fleet runner klt "
+        f"`{b['runner_klt_version']}`, client `{b['klt_client']}`, "
+        f"`--wait-for-capacity {b['capacity_wait_s']:g}`"
+        + (
+            ""
+            if not b["failed_earlier_attempts"]
+            else f"; {len(b['failed_earlier_attempts'])} earlier submit attempt(s) refused: "
+            + "; ".join(b["failed_earlier_attempts"])
+        ),
+        f"- **Fleet engine**: {fleet_ngspice} (per-point, from each unit's own log banner)",
+    ]
 
 
 def deck_units(report: dict | None) -> dict[str, dict]:

@@ -78,7 +78,6 @@ from __future__ import annotations
 
 import argparse
 import json
-import os
 import re
 import sys
 from dataclasses import dataclass, field
@@ -95,6 +94,7 @@ sys.path.insert(0, str(SIM_DIR / "bin"))
 import sim_common  # noqa: E402
 from sim_common import (  # noqa: E402
     add_common_args,
+    deck_list_batch_clause,
     load_corner_run,
     render_log,
     render_pdk_tools_repo_state,
@@ -774,22 +774,7 @@ def render_record(r: dict) -> str:
         f"(`{r['experiment']['provenance_source']}`)"
     )
     L.extend(render_pdk_tools_repo_state(r))
-    b = r["batch"]
-    add(
-        f"- **Backend**: `klt sim --backend batch` deck-list request (fleet job "
-        f"`{b['job_id']}`, {b['instance_type']} in {b['region']}, report status "
-        f"`{b['report_status']}`: {b['passed']}/{b['unit_count']} unit(s) passed, "
-        f"{b['errored']} errored, {b['timed_out']} timed out); fleet runner klt "
-        f"`{b['runner_klt_version']}`, client `{b['klt_client']}`, "
-        f"`--wait-for-capacity {b['capacity_wait_s']:g}`"
-        + (
-            ""
-            if not b["failed_earlier_attempts"]
-            else f"; {len(b['failed_earlier_attempts'])} earlier submit attempt(s) refused: "
-            + "; ".join(b["failed_earlier_attempts"])
-        )
-    )
-    add(f"- **Fleet engine**: {r['tools']['fleet_ngspice']} (per-point, from each unit's own log banner)")
+    L.extend(deck_list_batch_clause(r["batch"], r["tools"]["fleet_ngspice"]))
     add(f"- **Transport**: {r['tools']['fleet_note']}")
 
     m = r["matrix"]
@@ -1134,37 +1119,14 @@ def main(argv: list[str]) -> int:
     snapshot.parent.mkdir(parents=True, exist_ok=True)
     snapshot.write_text("\n".join(body) + "\n.end\n")
 
-    # Provenance is OBSERVED, never a literal (issue #297): the engine from each unit's
-    # own `ngspice-NN done` banner, the runner's klt from the job's report.
-    remote = (report.get("environment") or {}).get("remote") or {}
-    pdk_block, tools_block = sim_common.record_pdk_tools(
+    pdk_block, tools_block, batch_block = sim_common.deck_list_record_blocks(
         pdk,
         pin,
-        {"klt_client": sim_common.klt_version()},
+        report,
         points=results,
-        requests=[remote],
-        lib_file=sim_common.runner_lib_ref(pdk.variant),
-        root=sim_common.HOST_PDK_ROOT,
-        xschem_note=None,
-        fleet_note=sim_common.DECK_NOTE,
+        capacity_wait_s=args.wait_for_capacity,
+        attempts=sim_common.attempt_messages(submit_dir, run_dir, REPO_ROOT),
     )
-    batch_block = {
-        "job_id": remote.get("job_id"),
-        "region": remote.get("region"),
-        "instance_type": remote.get("instance_type"),
-        "state": remote.get("state"),
-        "runner_klt_version": remote.get("runner_klt_version"),
-        "runner_request_features": remote.get("runner_request_features"),
-        "klt_client": sim_common.klt_version(),
-        "klt_sim_backend_env": os.environ.get("KLT_SIM_BACKEND"),
-        "capacity_wait_s": args.wait_for_capacity,
-        "report_status": report.get("status"),
-        "unit_count": report.get("unit_count"),
-        "passed": report.get("passed"),
-        "errored": report.get("errored"),
-        "timed_out": report.get("timed_out"),
-        "failed_earlier_attempts": sim_common.attempt_messages(submit_dir, run_dir, REPO_ROOT),
-    }
 
     record = {
         "record_id": record_id,
