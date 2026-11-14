@@ -308,7 +308,7 @@ def cmd_run(args) -> int:
             raise SystemExit("--only matched no declared request")
     if args.retry_failed:
         reqs = [r for r in reqs if not sim_common.report_usable(run_dir / r["tag"] / "report.json")]
-        say(f"retrying {len(reqs)} request(s) without a usable report, capacity_wait_s={args.capacity_wait}")
+        say(f"retrying {len(reqs)} request(s) without a usable report, capacity_wait_s={args.wait_for_capacity}")
     head = tb_netlist_head(run_dir / ("retry" if args.retry_failed else "."), pdk)
     meta = {"run_id": run_id, "started_utc": now.strftime("%Y-%m-%dT%H:%M:%SZ"), "source": gi, "klt_client": sim_common.klt_version(),
             "klt_sim_backend_env": os.environ.get("KLT_SIM_BACKEND"), "request_timeout_s": args.timeout_s, "declared": declared_counts(man), "submitted_tags": [r["tag"] for r in reqs]}
@@ -316,10 +316,10 @@ def cmd_run(args) -> int:
         (run_dir / "run.json").write_text(json.dumps(meta, indent=2) + "\n")
     say(f"run id {run_id}: {len(reqs)} request(s)")
     results = sim_common.fan_out(
-        lambda r: submit_one(r, head, man, run_dir, args.capacity_wait, args.timeout_s), reqs, args.jobs)
+        lambda r: submit_one(r, head, man, run_dir, args.wait_for_capacity, args.timeout_s), reqs, args.jobs)
     old = json.loads((run_dir / "run.json").read_text()) if args.retry_failed else meta
     if args.retry_failed:
-        old.setdefault("retries", []).append({"at_utc": datetime.now(timezone.utc).strftime("%Y-%m-%dT%H:%M:%SZ"), "capacity_wait_s": args.capacity_wait, "results": results})
+        old.setdefault("retries", []).append({"at_utc": datetime.now(timezone.utc).strftime("%Y-%m-%dT%H:%M:%SZ"), "capacity_wait_s": args.wait_for_capacity, "results": results})
     else:
         old["submit_results"] = results
     (run_dir / "run.json").write_text(json.dumps(old, indent=2) + "\n")
@@ -731,7 +731,7 @@ def main(argv: list[str]) -> int:
     r.add_argument("--only", action="append", help="submit only this declared request tag (repeatable); the rest stay NOT_COVERED")
     r.add_argument("--only-class", choices=CLASSES)
     r.add_argument("--retry-failed", action="store_true")
-    r.add_argument("--capacity-wait", type=float, default=0)
+    sim_common.add_capacity_wait_arg(r)
     r.add_argument("--timeout-s", type=int, default=DEFAULT_TIMEOUT_S, help="per-unit options.timeout_s; the fleet whole-job ceiling is 3600 s, so a re-run of a timed-out request needs <= 3480")
     r.add_argument("--allow-dirty", action="store_true")
     x = sub.add_parser("probe")

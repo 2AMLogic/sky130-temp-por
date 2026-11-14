@@ -261,7 +261,11 @@ linear solver / continuation method, which a PVT manifest has no way to
 express). Such a script still has to behave like the harness:
 
 - **submit its grid, never launch one.** Every grid is one `klt sim` request to
-  the Spot batch fleet (`--backend batch`, `--wait-for-capacity 600`); a bespoke
+  the Spot batch fleet (`--backend batch`, `--wait-for-capacity 600` — one flag
+  name on every runner, declared once in `sim_common.add_capacity_wait_arg()`
+  and defaulting to the host rule's 600 s, so a Spot capacity refusal is waited
+  out rather than failing the submit; `--wait-for-capacity 0` opts back into
+  failing fast, and `--capacity-wait` survives as a hidden alias); a bespoke
   runner never launches `ngspice -b` over a grid itself and never falls back to
   a local grid when the fleet refuses — a refusal is recorded and the run ends
   without a record. Both bespoke runners submit a **deck-list (`decks[]`)**

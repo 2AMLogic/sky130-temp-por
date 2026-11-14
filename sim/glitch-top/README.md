@@ -105,7 +105,7 @@ python3 sim/glitch-top/run_glitch_campaign.py plan
 python3 sim/glitch-top/run_glitch_campaign.py probe --tag vdd_control --tstop 9e-3   # ONE local corner, validation only
 # commit + push first (run refuses a dirty/unpushed tree), then
 KLT_SIM_BACKEND=batch python3 sim/glitch-top/run_glitch_campaign.py run --run-id <id>
-python3 sim/glitch-top/run_glitch_campaign.py run --run-id <id> --retry-failed --capacity-wait 600
+python3 sim/glitch-top/run_glitch_campaign.py run --run-id <id> --retry-failed --wait-for-capacity 600
 python3 sim/glitch-top/run_glitch_campaign.py record --run-id <id>    # writes both class records
 python3 sim/glitch-top/run_glitch_campaign.py selftest
 ```

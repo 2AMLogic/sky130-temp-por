@@ -219,7 +219,7 @@ def cmd_run(args) -> int:
     if args.retry_failed:
         work = [n for n in names if args.split_process or not sim_common.report_usable(run_dir / n / STATE / sim_common.rate_tag(man["measurement"]["rate_v_per_s"]) / "report.json")]
         say = sim_common.say
-        say(f"retrying {len(work)} variant request(s) without a usable report, capacity_wait_s={args.capacity_wait}")
+        say(f"retrying {len(work)} variant request(s) without a usable report, capacity_wait_s={args.wait_for_capacity}")
     else:
         work = list(names)
     head = head_for_run(run_dir if not args.retry_failed else run_dir / "retry", pdk)
@@ -229,7 +229,7 @@ def cmd_run(args) -> int:
     procs = (list(args.process or man["corners"]["process"])) if args.split_process else [None]
     for n in work:
         for pr in procs:
-            req = build_variant_request(man, args.capacity_wait, pr)
+            req = build_variant_request(man, args.wait_for_capacity, pr)
             hashes[n if pr is None else f"{n}/split-{pr}"] = {"deck_sha256": sha256(decks[n]), "request_sha256": sha256(json.dumps(req, indent=2, sort_keys=True))}
     meta_path = run_dir / "run.json"
     meta = json.loads(meta_path.read_text()) if args.retry_failed else {
@@ -246,16 +246,16 @@ def cmd_run(args) -> int:
     def one(item):
         n, pr = item
         if pr is None:
-            return sim_common.submit_request(f"{n}/{STATE}", rate, run_dir, decks[n], build_variant_request(man, args.capacity_wait), f" [{n}]", len(rc.grid(man)))
+            return sim_common.submit_request(f"{n}/{STATE}", rate, run_dir, decks[n], build_variant_request(man, args.wait_for_capacity), f" [{n}]", len(rc.grid(man)))
         npts = len(man["corners"]["temperature_c"]) * len(man["corners"]["supply_v"])
-        return sim_common.submit_request(f"{n}/split-{pr}/{STATE}", rate, run_dir, decks[n], build_variant_request(man, args.capacity_wait, pr), f" [{n} process {pr}]", npts)
+        return sim_common.submit_request(f"{n}/split-{pr}/{STATE}", rate, run_dir, decks[n], build_variant_request(man, args.wait_for_capacity, pr), f" [{n} process {pr}]", npts)
 
     results = sim_common.fan_out(one, [(n, pr) for n in work for pr in procs], args.jobs,
                                  label=label, tag="variant")
     meta = json.loads(meta_path.read_text())
     key = "retries" if args.retry_failed else "submit_results"
     if args.retry_failed:
-        meta.setdefault(key, []).append({"at_utc": datetime.now(timezone.utc).strftime("%Y-%m-%dT%H:%M:%SZ"), "capacity_wait_s": args.capacity_wait, "results": results})
+        meta.setdefault(key, []).append({"at_utc": datetime.now(timezone.utc).strftime("%Y-%m-%dT%H:%M:%SZ"), "capacity_wait_s": args.wait_for_capacity, "results": results})
     else:
         meta[key] = results
     meta_path.write_text(json.dumps(meta, indent=2) + "\n")
@@ -474,7 +474,7 @@ def main(argv: list[str]) -> int:
     r.add_argument("--jobs", type=int, default=2)
     r.add_argument("--run-id")
     r.add_argument("--retry-failed", action="store_true")
-    r.add_argument("--capacity-wait", type=float, default=0)
+    sim_common.add_capacity_wait_arg(r)
     r.add_argument("--allow-dirty", action="store_true")
     r.add_argument("--process", action="append", help="with --split-process: resubmit only these MOS corners (e.g. after a fleet capacity refusal)")
     r.add_argument("--split-process", action="store_true", help="one fleet request per MOS corner (9 points each) for a variant whose single 45-corner job exceeds the fleet wall-clock ceiling")
