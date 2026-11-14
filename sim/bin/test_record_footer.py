@@ -288,7 +288,16 @@ class EveryRendererGoesThroughTheHelperTest(unittest.TestCase):
     def test_no_renderer_hand_writes_the_timestamp_or_supersedes_bullet(self):
         """`Supersedes`' fallback drifted three ways precisely because each renderer
         emitted the bullet itself.  A renderer may still PASS extra bullets through
-        `after_links` / `after_supersedes`; it may not re-emit these two."""
+        `after_links` / `after_supersedes`; it may not re-emit these two.
+
+        Scoped to the ten renderers in the table, NOT to every `sim/*/run_*.py`:
+        `run_accuracy_mc.py` and `run_solver_sweep.py` write a differently shaped
+        record with no append-only trailer, and their own `supersedes` handling --
+        including a hardcoded `- **Supersedes**: (none)` markdown line and a `"(none)"`
+        sentinel stored in the MACHINE field -- is issue #353's subject, which is parked
+        on an operator decision.  Widening this grep would pull that decision into this
+        contract rather than enforce this one.
+        """
         offenders = [f"{name}:{n}: {line.strip()}"
                      for name, src in self.renderer_sources().items()
                      for n, line in enumerate(src.splitlines(), start=1)
