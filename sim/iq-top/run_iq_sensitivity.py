@@ -35,6 +35,7 @@ sys.path.insert(0, str(HERE))
 import run_iq_campaign as rc  # noqa: E402
 
 sim_common, cr, qc = rc.sim_common, rc.cr, rc.qc
+evidence_store = rc.evidence_store
 STATE = "iq-total"
 ORIGINAL_RECORD = HERE / "records" / "20261009-191705-df85523.json"
 SLUG_SUFFIX = "solver-sensitivity"
@@ -207,6 +208,7 @@ def head_for_run(run_dir: Path, pdk) -> str:
 
 
 def cmd_run(args) -> int:
+    evidence_store.preflight_or_exit()  # fail closed before anything is submitted
     man = sim_common.load_manifest(rc.MANIFEST)
     pdk = cr.resolve_pdk(cr.load_pin())
     gi = cr.git_state()
@@ -381,6 +383,7 @@ def render_md(rec: dict) -> str:
 
 
 def cmd_record(args) -> int:
+    evidence_store.preflight_or_exit()
     man = sim_common.load_manifest(rc.MANIFEST)
     run_dir = BUILD / args.run_id
     meta = json.loads((run_dir / "run.json").read_text())
@@ -389,8 +392,10 @@ def cmd_record(args) -> int:
     gi = cr.git_state()
     now = datetime.now(timezone.utc)
     record_id = f"{now:%Y%m%d}-{now:%H%M%S}-{meta['git']['sha']}-{SLUG_SUFFIX}"
-    rec_dir, cdir, sdir = HERE / "records", HERE / "corners" / record_id, HERE / "netlist-snapshots" / record_id
-    sim_common.refuse_existing((rec_dir / f"{record_id}.md", rec_dir / f"{record_id}.json", cdir, sdir))
+    rec_dir, sdir = HERE / "records", HERE / "netlist-snapshots" / record_id
+    cdir = evidence_store.stage_dir_for(rc.SLUG, record_id)  # git-ignored scratch; stored below
+    sim_common.refuse_existing((rec_dir / f"{record_id}.md", rec_dir / f"{record_id}.json", cdir, sdir,
+                                evidence_store.manifest_path(rc.SLUG, record_id)))
     names = variant_names(man)
     traces: dict = {}
     per = {n: analyze_variant(n, run_dir, man, traces) for n in names}
@@ -442,6 +447,11 @@ def cmd_record(args) -> int:
         f"{n_total - n_res} of {n_total} point-runs produced no settled-window value (see the table; these are explicit unknowns).",
     ]
     reqs = {n: per[n]["requests"] for n in names}
+    # A run whose every unit was refused stages no bytes: record it with null artifact
+    # links rather than tripping the store's fail-closed empty-manifest refusal (the
+    # convention run_glitch_campaign.py uses for a class with nothing graded).
+    staged = any(p.is_file() for p in cdir.rglob("*"))
+    art_manifest, art_summary = evidence_store.store_or_exit(rc.SLUG, record_id, cdir) if staged else (None, None)
     record = {
         "record_id": record_id, "kind": "solver-sensitivity replicate (issue #160)", "timestamp": now.strftime("%Y-%m-%dT%H:%M:%SZ"), "author": args.author or cr.default_author(), "supersedes": args.supersedes,
         "variants": names, "variant_options": {n: sens(man)["variants"][n]["options"] for n in names}, "manifest_sensitivity": sens(man),
@@ -456,7 +466,10 @@ def cmd_record(args) -> int:
         "fleet_note": f"jobs { {n: reqs[n].get('job_id') for n in names} }; runner klt {tools_d['fleet_runner_klt']}; fleet ngspice {tools_d['fleet_ngspice']}; client {meta['klt_client']}; batch.runner_version_check=warn",
         "requests": reqs, "points": {n: per[n]["points"] for n in names}, "comparison": cmp_, "baseline_vs_original_text": bvo, "limitations": limits,
         "original_record": "sim/iq-top/records/20261009-191705-df85523.json",
-        "links": {"record": f"sim/iq-top/records/{record_id}.md", "json": f"sim/iq-top/records/{record_id}.json", "corners_dir": f"sim/iq-top/corners/{record_id}/", "netlist_snapshots": f"sim/iq-top/netlist-snapshots/{record_id}/",
+        "links": {"record": f"sim/iq-top/records/{record_id}.md", "json": f"sim/iq-top/records/{record_id}.json",
+                  "artifact_manifest": str(art_manifest.relative_to(rc.REPO_ROOT)) if art_manifest else None,
+                  "artifact_summary": str(art_summary.relative_to(rc.REPO_ROOT)) if art_summary else None,
+                  "netlist_snapshots": f"sim/iq-top/netlist-snapshots/{record_id}/",
                   "driver": "sim/iq-top/run_iq_sensitivity.py", "manifest": "sim/iq-top/experiment.json", "original_record": "sim/iq-top/records/20261009-191705-df85523.md"},
     }
     rec_dir.mkdir(parents=True, exist_ok=True)
