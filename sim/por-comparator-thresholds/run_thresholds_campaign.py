@@ -269,13 +269,10 @@ def analyze_variant(variant: str, run_dir: Path, man: dict, corners_dir: Path) -
                 pt["vref_end_v"] = wave.get("v(vref)", [None])[-1]
             else:
                 pt["extract"] = None
-                pt["error_class"] = "model_not_found" if "could not find a valid modelname" in log_text else "no waveform retrieved"
-            deck = Path(art["deck"]).read_text() if art.get("deck") and Path(art["deck"]).is_file() else "(no deck retrieved)"
+                pt["error_class"] = sim_common.classify_error(c, log_text)
             header = [f"# point: {SLUG} {variant} {tag} {cid}", f"# process={proc} temp={cr.fmt_temp(temp)}C rate={rate:g} V/s tstop={tstop_for(rate, man):.6g}s klt status: {c.get('status')}"]
-            body = header + ["", "# ==== klt sim deck ====", *[f"| {ln}" for ln in deck.splitlines()], "", "# ==== klt diagnostics ====",
-                             *[f"| {g['severity']}/{g['code']}: {g['message']}" for g in pt["diagnostics"]], "", "# ==== ngspice stdout+stderr ====", log_text.rstrip(), ""]
             (corners_dir / tag).mkdir(parents=True, exist_ok=True)
-            (corners_dir / tag / f"{cid}.log").write_text(scrub("\n".join(body), run_dir))
+            (corners_dir / tag / f"{cid}.log").write_text(sim_common.point_log(c, header, run_dir, REPO_ROOT))
             points.append(pt)
     return {"points": points, "requests": requests}
 
