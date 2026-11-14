@@ -113,7 +113,18 @@ measurements/  silicon characterization (empty until tape-out)
 
 ## CI
 
-`signoff-manifest.yml` gates signoff-report freshness; `self-checks.yml` runs fast stdlib-only self-checks (census unit test, ramp-checker selftest, committed-netlist invariants, sim JSON well-formedness). No SPICE, layout composition, or xschem netlist-vs-schematic check runs in CI -- see [manifests/README.md](manifests/README.md#what-ci-covers-and-does-not).
+`signoff-manifest.yml` guards the tier verdict: it re-renders the graded report
+with the pinned `klt` build and requires a byte match against the committed one,
+re-hashes every cited artifact against its envelope, and re-attests items 1, 9
+and 10. `self-checks.yml` runs the stdlib-only self-checks (no SPICE, no `klt`,
+no xschem) — append-only enforcement for records, netlist snapshots and corner
+evidence against the Git baseline; artifact-manifest well-formedness
+(artifact-only URIs, no committed bytes) and citation freshness; the
+`sim/pdk.json` pin enforcement; per-checker selftests (brown-out, glitch,
+supply-ramp, Iq, POR thresholds, pad-island census); the `sim_common` runner
+contracts; committed-netlist pinout invariants; sim JSON well-formedness; and
+characterization-report coverage. No SPICE, layout composition, or xschem
+netlist-vs-schematic check runs in CI -- see [manifests/README.md](manifests/README.md#what-ci-covers-and-does-not).
 
 ## License
 
