@@ -425,20 +425,24 @@ ABSENT = [
 ]
 
 
-def absent(fleet_pdk: str) -> list[str]:
+def absent(pdk_d: dict) -> list[str]:
     """`ABSENT` plus the one limitation that depends on what this run observed.
 
     The PDK entry used to be a literal claiming the runner never reports its PDK commit.
     It does report one -- so the claim was stated, not observed, and went stale into
-    append-only records that can no longer be corrected (issue #328).  Derived here from
-    the stamps the jobs actually reported (`sim_common.fleet_pdk_clause()`), which keeps
-    the real limitation -- the stamp is recorded but never compared with the pin -- and
-    drops the part that was false.
+    append-only records that can no longer be corrected (issue #328).  Its replacement
+    then declined to make the pin comparison, which issue #333 made available.  Both
+    halves are derived from this record's own `pdk` block now
+    (`sim_common.fleet_pdk_clause()` over `fleet_pdk` and `fleet_matches_pin`), so what
+    remains is the limitation that is still true: the comparison is of open_pdks commits,
+    not of the model library.
     """
     return ABSENT + [
-        f"{sim_common.fleet_pdk_clause(fleet_pdk)} (recorded in this record's `pdk` block); this record does"
-        " not compare that stamp with the sim/pdk.json pin, so agreement with the local cross-check is its"
-        " only evidence that the fleet model library matches the pin.",
+        f"{sim_common.fleet_pdk_clause(pdk_d['fleet_pdk'], pdk_d['fleet_matches_pin'])}"
+        f" -- {pdk_d['fleet_pdk_reporting']} of {pdk_d['fleet_pdk_jobs']} fleet jobs reported a"
+        " stamp, and the verdict is recorded as `pdk.fleet_matches_pin`. That comparison is of"
+        f" commits only, so {sim_common.PIN_COMMIT_LIMIT}; agreement with the local cross-check"
+        " is this record's only evidence on the library itself.",
     ]
 
 
@@ -526,7 +530,8 @@ def cmd_record(args) -> int:
         pdk, pin, meta, all_pts, [per[s]["requests"] for s in STATES],
         fleet_note=None, xschem_note=None,
     )
-    pdk_d.update(sim_common.fleet_pdk_fields(per[s]["requests"].get("runner_pdk") for s in STATES))
+    pdk_d.update(sim_common.fleet_pdk_fields(
+        (per[s]["requests"].get("runner_pdk") for s in STATES), pin))
     jobs = [per[s]["requests"].get("job_id") for s in STATES]
     fleet_note = (f"batch jobs {jobs}; runner klt {tools_d['fleet_runner_klt']}; fleet ngspice {tools_d['fleet_ngspice']}; client {meta['klt_client']}; "
                   "client/runner version skew accepted with batch.runner_version_check=warn")
@@ -539,7 +544,7 @@ def cmd_record(args) -> int:
         "git": git_info, "fleet_note": fleet_note,
         "matrix": {**man["corners"], "n_points_per_state": 45, "n_with_value": sum(1 for p in all_pts if p.get("i_total_a") is not None), "n_ok": sum(1 for p in all_pts if p["status"] == "ok")},
         "definitions": DEFS, "requests": {s: per[s]["requests"] for s in STATES},
-        "points": {s: per[s]["points"] for s in STATES}, "temp_iq": temp, "summary": summary, "crosscheck": xc, "absent_coverage": absent(pdk_d["fleet_pdk"]),
+        "points": {s: per[s]["points"] for s in STATES}, "temp_iq": temp, "summary": summary, "crosscheck": xc, "absent_coverage": absent(pdk_d),
         "links": {"testbench_por": "sim/iq-top/testbench/tb_temp_por_iq_por.sch", "testbench_total": "sim/iq-top/testbench/tb_temp_por_iq_total.sch", "manifest": "sim/iq-top/experiment.json",
                   "driver": "sim/iq-top/run_iq_campaign.py", "checker": "sim/iq-top/iq_checker.py", "netlist_snapshots": f"sim/iq-top/netlist-snapshots/{record_id}/",
                   "artifact_manifest": str(art_manifest.relative_to(REPO_ROOT)), "artifact_summary": str(art_summary.relative_to(REPO_ROOT)), "json": f"sim/iq-top/records/{record_id}.json", "record": f"sim/iq-top/records/{record_id}.md"},

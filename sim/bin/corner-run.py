@@ -628,10 +628,36 @@ def build_batch_request(exp: Experiment, pdk: Pdk, matrix: list[Corner], timeout
     }
 
 
-def fleet_pdk_commit(version: str) -> str:
-    """open_pdks commit out of the fleet's `provenance.pdk.version` string."""
-    m = re.search(r"\b[0-9a-f]{40}\b", version or "")
-    return m.group(0) if m else "unknown"
+# One parser for the repo, and it lives in `sim_common` so the other seven runners can
+# compare their runners' stamp with the pin too (issue #333).  This name stays as the
+# module's own alias: `fleet_pdk_commit` is what this file's callers and tests use, and a
+# re-export is a delegation, not the second copy issue #333 exists to remove.
+fleet_pdk_commit = sim_common.fleet_pdk_commit
+
+
+def fleet_pdk_block(fleet_commit: str, local_commit: str, pin: dict) -> dict:
+    """The fleet overlay of a BATCH record's `pdk` block: whose install
+    `installed_commit` describes, and how it compares with the `sim/pdk.json` pin.
+
+    On a batch record the fleet ran the simulator, so `installed_commit` is the runner's
+    and this host's is parked under `local_installed_commit` -- which is also what tells
+    `sim_common.render_pdk_tools_repo_state()` that this line's pin state is the fleet's.
+
+    The verdict is three-state (`sim_common.fleet_pin_verdict()`), not the bool this path
+    used to compute as `installed_commit != pin["open_pdks_commit"]`: `fleet_pdk_commit()`
+    returns the string `"unknown"` for a runner that reported no 40-hex commit, which
+    compares unequal to any pin -- so an *unstamped* fleet run was recorded and printed as
+    `**MISMATCH vs sim/pdk.json pin**` and exited 3.  Unverifiable is not wrong
+    (issue #333).  `matches_pin` stays beside it as the two-state form older readers and
+    already-written records use, derived from the verdict so they cannot disagree.
+    """
+    verdict = sim_common.fleet_pin_verdict([fleet_commit], pin)
+    return {
+        "local_installed_commit": local_commit,
+        "fleet_matches_pin": verdict,
+        "matches_pin": verdict == "match",
+        "fleet_pin_limit": sim_common.PIN_COMMIT_LIMIT,
+    }
 
 
 def _report_corner_key(c: dict) -> tuple:
@@ -1122,8 +1148,8 @@ def main(argv: list[str]) -> int:
         # The fleet, not this host, ran the simulator: the record must cite the
         # PDK and engine the fleet reports (the pin is checked against that).
         pdk_record.update(fleet["pdk"])
-        pdk_record["local_installed_commit"] = pdk.installed_commit
-        pdk_record["matches_pin"] = pdk_record["installed_commit"] == pin["open_pdks_commit"]
+        pdk_record.update(
+            fleet_pdk_block(pdk_record["installed_commit"], pdk.installed_commit, pin))
         tools["ngspice"] = fleet["ngspice"]
 
     record = {
@@ -1180,12 +1206,23 @@ def main(argv: list[str]) -> int:
     print(f"json    : {record_json.relative_to(REPO_ROOT)}")
     print(f"logs    : {art_manifest.relative_to(REPO_ROOT)} (artifact store)")
     print(f"overall : {'PASS' if overall else 'FAIL'}")
-    if fleet is not None and not pdk_record["matches_pin"]:
-        print(
-            f"corner-run: WARNING: the fleet runner's PDK is {pdk_record['installed_commit']}, "
-            f"but sim/pdk.json pins {pin['open_pdks_commit']}; the record says MISMATCH.",
-            file=sys.stderr,
-        )
+    if fleet is not None and pdk_record["fleet_matches_pin"] != "match":
+        # Both non-match states keep the nonzero exit -- an unstamped fleet run is
+        # unverifiable, and honest wording must not quietly weaken the gate -- but they
+        # are different findings and the warning says which one happened (issue #333).
+        if pdk_record["fleet_matches_pin"] == "not-reported":
+            print(
+                "corner-run: WARNING: the fleet runner reported no open_pdks commit, so its "
+                f"PDK cannot be compared with the sim/pdk.json pin {pin['open_pdks_commit']}; "
+                "the record says NOT COMPARED, not MISMATCH.",
+                file=sys.stderr,
+            )
+        else:
+            print(
+                f"corner-run: WARNING: the fleet runner's PDK is {pdk_record['installed_commit']}, "
+                f"but sim/pdk.json pins {pin['open_pdks_commit']}; the record says MISMATCH.",
+                file=sys.stderr,
+            )
         if not args.allow_pdk_mismatch:
             print("  re-run with --allow-pdk-mismatch to accept this as exit 0", file=sys.stderr)
             return 3
