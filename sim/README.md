@@ -149,7 +149,7 @@ number, limit and verdict, for tooling):
 | Experiment | slug + title from the manifest |
 | Claim | which spec parameter/line this substantiates — `spec/target-spec.md` does not exist yet in this repo (`spec/porting-plan.md` §4 item 4), so every current record is harness bring-up / pre-spec evidence, stated as such in its own claim text |
 | Netlist provenance | `schematic` (`design/…`, `sim/…/testbench/…`) — `extracted` (post-layout) is not used yet, no layout exists in this repo |
-| PDK | variant + open_pdks commit actually used, whether it matches `sim/pdk.json`, and the model library path |
+| PDK | variant + open_pdks commit actually used, whether it matches `sim/pdk.json`, and the model library path. On a fleet record the `pdk` block also carries `fleet_pdk` (the SET of open_pdks stamps the *runners* reported), `fleet_pdk_jobs`/`fleet_pdk_reporting` (its coverage) and `fleet_matches_pin` — a three-state `match`/`mismatch`/`not-reported` verdict of those stamps against the pin. `not-reported` is **not** a mismatch: it means no runner named a commit, so there was nothing to compare. An equal commit identifies the open_pdks build only; it is not proof the runner's model library is byte-identical to the host's, and `environment.models_lib_sha256` is client-scope, so it is not fleet-side evidence. |
 | Tools | ngspice / xschem / OS / python versions used |
 | Repo state | short sha, branch, and whether the working tree was dirty at run time |
 | Corner matrix run | the (process, temperature, supply) points actually executed; must be the full PVT matrix unless a subset reason is recorded |

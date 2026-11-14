@@ -30,6 +30,7 @@ cr = sim_common.load_corner_run()
 
 PIN = cr.load_pin()
 PINNED = PIN["open_pdks_commit"]
+LOCAL_COMMIT = "e" * 40          # this host's own install, parked on a batch record
 EXPERIMENT = REPO / "sim" / "bias-core-smoke"
 
 STUB_KLT = """#!/usr/bin/env python3
@@ -257,12 +258,73 @@ class SubmitWithStubbedKlt(unittest.TestCase):
         record_ok = self.minimal_record(fleet, fleet_commit=PINNED)
         self.assertIn("matches sim/pdk.json pin", cr.render_record(record_ok))
 
+    # ------------------------------------------------------------------
+    # issue #333: an UNSTAMPED fleet run is not a mismatch
+    # ------------------------------------------------------------------
+    #
+    # `fleet_pdk_commit()` returns the string `"unknown"` when the runner's stamp carries
+    # no 40-hex commit, and this path used to compare that against the pin with `!=`.  So
+    # a fleet run that simply never said what it ran was recorded as
+    # `**MISMATCH vs sim/pdk.json pin**` and reported as one on stderr.  These assert the
+    # three states are distinguishable in BOTH the JSON field and the rendered text.
+
+    def test_an_unreported_runner_commit_is_not_reported_not_a_mismatch(self):
+        _, fleet = cr.submit_batch(
+            self.exp, self.matrix, "* netlist\n.end\n", self.request(), self.tmp / "run"
+        )
+        record = self.minimal_record(fleet, fleet_commit="unknown")
+        self.assertEqual(record["pdk"]["fleet_matches_pin"], "not-reported")
+        self.assertIs(record["pdk"]["matches_pin"], False)  # still not a pass
+        text = cr.render_record(record)
+        self.assertNotIn("MISMATCH", text)
+        self.assertNotIn("matches sim/pdk.json pin", text)
+        self.assertIn(sim_common.fleet_pin_state("not-reported"), text)
+
+    def test_the_three_batch_pin_states_are_distinct_in_field_and_text(self):
+        _, fleet = cr.submit_batch(
+            self.exp, self.matrix, "* netlist\n.end\n", self.request(), self.tmp / "run"
+        )
+        want = {PINNED: "match", "0" * 40: "mismatch", "unknown": "not-reported"}
+        rendered = {}
+        for commit, verdict in want.items():
+            rec = self.minimal_record(fleet, fleet_commit=commit)
+            self.assertEqual(rec["pdk"]["fleet_matches_pin"], verdict, commit)
+            # the host's own install is kept, never overwritten by the fleet's
+            self.assertEqual(rec["pdk"]["local_installed_commit"], LOCAL_COMMIT)
+            rendered[verdict] = cr.render_record(rec).splitlines()
+        pdk_lines = {v: next(l for l in ls if l.startswith("- **PDK**")) for v, ls in rendered.items()}
+        self.assertEqual(len(set(pdk_lines.values())), 3, pdk_lines)
+        self.assertIn("MISMATCH", pdk_lines["mismatch"])
+        for v in ("match", "not-reported"):
+            self.assertNotIn("MISMATCH", pdk_lines[v], v)
+
+    def test_a_batch_record_states_what_an_equal_commit_does_not_establish(self):
+        _, fleet = cr.submit_batch(
+            self.exp, self.matrix, "* netlist\n.end\n", self.request(), self.tmp / "run"
+        )
+        limit = self.minimal_record(fleet, fleet_commit=PINNED)["pdk"]["fleet_pin_limit"]
+        self.assertEqual(limit, sim_common.PIN_COMMIT_LIMIT)
+        self.assertIn("not proof", limit)
+
+    def test_an_unstamped_report_flows_into_the_not_reported_verdict(self):
+        """Not a hand-set `"unknown"`: the whole path from a report with no
+        `worker_environment` through to the verdict."""
+        report = fake_report(self.matrix)
+        del report["environment"]["remote"]["worker_environment"]
+        Path(os.environ["STUB_KLT_REPORT"]).write_text(json.dumps(report))
+        _, fleet = cr.submit_batch(
+            self.exp, self.matrix, "* netlist\n.end\n", self.request(), self.tmp / "run"
+        )
+        self.assertEqual(fleet["pdk"]["installed_commit"], "unknown")
+        block = cr.fleet_pdk_block(fleet["pdk"]["installed_commit"], LOCAL_COMMIT, PIN)
+        self.assertEqual(block["fleet_matches_pin"], "not-reported")
+
     def minimal_record(self, fleet, fleet_commit):
         results = cr.results_from_report(
             self.exp, self.matrix, fake_report(self.matrix), EXPERIMENT / "corners" / "TEST", 300
         )
         pdk = {"variant": "sky130A", **fleet["pdk"], "installed_commit": fleet_commit}
-        pdk["matches_pin"] = fleet_commit == PINNED
+        pdk.update(cr.fleet_pdk_block(fleet_commit, LOCAL_COMMIT, PIN))
         return {
             "record_id": "TEST",
             "timestamp": "2026-10-23T00:00:00Z",

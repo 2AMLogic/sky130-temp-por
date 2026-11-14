@@ -756,7 +756,7 @@ def cmd_record(args):
                 + "\n".join(f"{k} = {v}" for k, v in vals.items()) + "\n")
     # Fleet-side provenance off the reports themselves, so the header states what ran
     # rather than what was current when this code was written (issue #312).
-    prov = observed_provenance(ents)
+    prov = observed_provenance(ents, pdk.pin)
     not_run = [t for t in RUN_TERMS if ents[t]["report"] is None] + (["nominal"] if nominal["report"] is None else [])
     partial = {t: ents[t]["missing_procs"] for t in RUN_TERMS if ents[t]["report"] is not None and ents[t]["missing_procs"]}
     xcheck = transient_crosscheck(nominal) if nominal["report"] else None
@@ -798,7 +798,7 @@ def cmd_record(args):
     return 0
 
 
-def observed_provenance(ents):
+def observed_provenance(ents, pin):
     """The fleet-side halves of the record header, derived from the run's own reports.
 
     Joined over every PROCESS JOB of every term -- a full run is 7 mismatch terms x 5
@@ -818,12 +818,16 @@ def observed_provenance(ents):
     deliberately off `ent['jobs']` rather than the merged `report['environment']`, which
     is the FIRST usable process section only: a term's other four runners (and any
     different install among them) were invisible that way (issue #315).
+
+    `pin` is the `sim/pdk.json` pin those stamps are compared against, yielding the
+    three-state `fleet_matches_pin` verdict the header line renders; before issue #333
+    this block stated the stamp alone, with no verdict beside it.
     """
     jv = sim_common.joined_versions
     engines = [{"tag": f"ngspice-{v}"} if v else {}
                for e in ents.values() for v in (e.get("engines") or {}).values()]
-    return {**sim_common.fleet_pdk_fields(sim_common.runner_pdk(j) for e in ents.values()
-                                          for j in (e.get("jobs") or {}).values()),
+    return {**sim_common.fleet_pdk_fields((sim_common.runner_pdk(j) for e in ents.values()
+                                           for j in (e.get("jobs") or {}).values()), pin),
             "fleet_engine": jv(engines, "tag"),
             "fleet_engine_jobs": len(engines), "fleet_engine_reporting": sum(1 for e in engines if e.get("tag"))}
 
@@ -857,7 +861,9 @@ def render_pdk_tools_lines(rec, pdk, prov, fleet):
         f"- **PDK**: {pdk.variant} @ open_pdks `{pdk.installed_commit}` ({sim_common.pin_state(pdk.matches_pin)}) on the host"
         f" that wrote this record, models `{pdk.pin['ngspice_lib']}` (`_mm` sections for"
         f" mismatch); the fleet runners that executed the grid reported `{prov['fleet_pdk']}`"
-        + coverage_note(prov, "fleet_pdk"),
+        + coverage_note(prov, "fleet_pdk")
+        + f" (verdict: {sim_common.fleet_pin_state(prov['fleet_matches_pin'])});"
+        f" that comparison is of commits only, so {sim_common.PIN_COMMIT_LIMIT}",
         f"- **Tools**: {rec['klt']} (client); backend `{rec['backend']}`; fleet engine"
         f" {prov['fleet_engine']}{coverage_note(prov, 'fleet_engine')}; fleet jobs: {jobs}",
     ]

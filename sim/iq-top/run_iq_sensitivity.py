@@ -426,8 +426,9 @@ def cmd_record(args) -> int:
     # What the machines that ran these variants reported about their own PDK install,
     # observed from their reports -- never the client's resolution.  The two texts below
     # state this instead of the literals they used to carry (issue #328).
-    pdk_d.update(sim_common.fleet_pdk_fields(p for n in names for p in runner_pdks(per[n]["requests"])))
-    pdk_clause = sim_common.fleet_pdk_clause(pdk_d["fleet_pdk"])
+    pdk_d.update(sim_common.fleet_pdk_fields(
+        (p for n in names for p in runner_pdks(per[n]["requests"])), pin))
+    pdk_clause = sim_common.fleet_pdk_clause(pdk_d["fleet_pdk"], pdk_d["fleet_matches_pin"])
     bo = [r["baseline_vs_original_rel"] for r in cmp_["rows"] if "baseline_vs_original_rel" in r]
     both_ok = [r["id"] for r in cmp_["rows"] if "baseline_vs_original_rel" in r]
     flips = [r["id"] for r in cmp_["rows"] if r["original_status"] and r["runs"]["baseline"]["status"] != r["original_status"]]
@@ -439,8 +440,9 @@ def cmd_record(args) -> int:
         "Natural-release iq-total only; forced-low por-iq contention and the definition of incremental temp-iq (DR-006 blockers) are not addressed.",
         "Three solver settings are a bounded sample, not an exhaustive sweep; a point that is non-physical in all three is `reproduced-non-physical` for THESE settings only.",
         "A passing variant shows that a physical settled landing exists under that setting; it does not by itself prove the cause of the original artifact.",
-        f"{pdk_clause} (recorded in this record's `pdk` block); it is not compared with the sim/pdk.json pin"
-        " here, so the fleet model library is still assumed, not verified, to match the pin.",
+        f"{pdk_clause}, recorded as `pdk.fleet_matches_pin`. That comparison is of open_pdks"
+        f" commits only, so {sim_common.PIN_COMMIT_LIMIT}; the fleet model library itself is"
+        " therefore still assumed, not verified, to match this host's.",
         "Constant-VDD settled current only (supply-ramp behavior is out of scope); no mismatch Monte Carlo; no ll/hh axis; no ceiling is proposed.",
         f"{n_total - n_res} of {n_total} point-runs produced no settled-window value (see the table; these are explicit unknowns).",
     ]
@@ -459,7 +461,8 @@ def cmd_record(args) -> int:
         "provenance": {"dut_sha256": meta["dut_sha256"], "testbench_sha256": meta["testbench_sha256"], "manifest_sha256": meta["manifest_sha256"], "hashes": meta.get("hashes", {})},
         "fleet_pdk_note": f"{pdk_clause} ({pdk_d['fleet_pdk_reporting']} of {pdk_d['fleet_pdk_jobs']} fleet jobs reported one);"
                           " the host pin is " + pin["open_pdks_commit"] + " and the runner resolves the library under"
-                          " /opt/pdk/sky130A; the two are recorded here, not compared",
+                          " /opt/pdk/sky130A; the verdict above is that commit comparison, recorded"
+                          f" as `pdk.fleet_matches_pin` -- but {sim_common.PIN_COMMIT_LIMIT}",
         "fleet_note": f"jobs { {n: reqs[n].get('job_id') for n in names} }; runner klt {tools_d['fleet_runner_klt']}; fleet ngspice {tools_d['fleet_ngspice']}; client {meta['klt_client']}; batch.runner_version_check=warn",
         "requests": reqs, "points": {n: per[n]["points"] for n in names}, "comparison": cmp_, "baseline_vs_original_text": bvo, "limitations": limits,
         "original_record": "sim/iq-top/records/20261009-191705-df85523.json",

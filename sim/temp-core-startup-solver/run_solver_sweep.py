@@ -359,7 +359,7 @@ def verdict_for_point(cid, scen, res, ctx=None):
                          for k, g in rows.items()}}
 
 
-def observed_provenance(summary, res):
+def observed_provenance(summary, res, pin):
     """Everything the record's `PDK` / `Tools` lines say about tools, derived from what
     this run observed -- never a literal (issue #306).
 
@@ -374,6 +374,10 @@ def observed_provenance(summary, res):
     runner's own stamp (never the client-resolved `provenance.pdk`); a combo with no
     usable report is passed as `None`, because the fleet refused it and it is therefore
     not one of the jobs `fleet_pdk_jobs` counts (issue #328).
+
+    `pin` is the `sim/pdk.json` pin the stamps are compared against, so the record states
+    a three-state `fleet_matches_pin` verdict instead of leaving "the fleet ran under the
+    pinned PDK" as an assumption disclosed in prose (issue #333).
     """
     fleets = [s.get("fleet") for s in summary.values()]
     jv = sim_common.joined_versions
@@ -390,8 +394,9 @@ def observed_provenance(summary, res):
         "fleet_runner_klt": jv(fleets, "runner_klt_version"),
         "fleet_instance_type": jv(fleets, "instance_type"),
         **sim_common.fleet_pdk_fields(
-            sim_common.runner_pdk(e["report"]) if (e or {}).get("report") else None
-            for e in res.values()
+            (sim_common.runner_pdk(e["report"]) if (e or {}).get("report") else None
+             for e in res.values()),
+            pin,
         ),
         "klt_skew": skew,
     }
@@ -414,7 +419,10 @@ def render_provenance_lines(prov, pdk, klt_client, backend):
     return [
         f"- **PDK**: {pdk.variant} @ open_pdks `{pdk.installed_commit}` ({sim_common.pin_state(pdk.matches_pin)}) on the host that wrote this"
         f" record, models `{pdk.pin['ngspice_lib']}`; the fleet runners that executed the grid"
-        f" reported `{prov['fleet_pdk']}`",
+        f" reported `{prov['fleet_pdk']}` ({prov['fleet_pdk_reporting']} of"
+        f" {prov['fleet_pdk_jobs']} jobs reported one; verdict:"
+        f" {sim_common.fleet_pin_state(prov['fleet_matches_pin'])}); that comparison is of"
+        f" commits only, so {sim_common.PIN_COMMIT_LIMIT}",
         f"- **Tools**: {klt_client} (client); fleet `{prov['fleet_ngspice']}` on Spot `{prov['fleet_instance_type']}`,"
         f" fleet runner klt `{prov['fleet_runner_klt']}`{skew_note}; backend `{backend}`",
     ]
@@ -547,7 +555,7 @@ def cmd_record(args):
     (rec_dir / "records" / f"{rid}.json").write_text(json.dumps(rec, indent=2, default=str) + "\n")
 
     prov_lines = render_provenance_lines(
-        observed_provenance(summary, res), pdk, klt_client, meta["klt_sim_backend_env"])
+        observed_provenance(summary, res, pdk.pin), pdk, klt_client, meta["klt_sim_backend_env"])
 
     L = [f"# Record {rid}", "",
          f"- **Record ID**: {rid}",
