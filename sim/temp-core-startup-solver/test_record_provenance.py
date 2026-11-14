@@ -13,6 +13,12 @@ the three properties that keep them honest:
   * the fleet half of the PDK line is the *runner's* stamp, never the client-resolved
     `provenance.pdk` -- those two genuinely differ on real runs.
 
+Which FIELD is the fleet's PDK is no longer decided here: `sim_common.runner_pdk()` is
+the one reader, pinned by `sim/bin/test_sim_common_provenance.py`, and
+`sim/bin/test_runner_fleet_pdk.py` holds the cross-runner contract that every runner
+records the runner's stamp and never the client's (issue #328).  What stays here is this
+runner's own wiring and the lines it renders from it.
+
 Stdlib only: no SPICE, no PDK, no run directory, no record written.
 
 Run: python3 -I sim/temp-core-startup-solver/test_record_provenance.py
@@ -187,12 +193,6 @@ class PdkLineTest(unittest.TestCase):
     def test_disagreeing_fleet_pdks_are_both_reported(self):
         _, (pdk_line, _) = build([ran(runner_pdk="open_pdks " + "c" * 40), ran(runner_pdk="open_pdks " + "d" * 40)])
         self.assertIn("open_pdks " + "c" * 40 + ", open_pdks " + "d" * 40, pdk_line)
-
-    def test_a_report_without_a_runner_environment_is_unknown(self):
-        summary = {"c0": ran()[0]}
-        res = {"c0": {"report": {"corners": []}}}
-        prov = rss.observed_provenance(summary, res)
-        self.assertEqual(prov["fleet_pdk"], "unknown")
 
 
 class RenderedLinesCarryNoLiteralTest(unittest.TestCase):

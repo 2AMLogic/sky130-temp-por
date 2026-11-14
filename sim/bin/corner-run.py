@@ -739,8 +739,9 @@ def submit_batch(
     # the runner executes against its own /opt/pdk, whose stamp is reported under
     # remote.worker_environment.pdk. Cite the runner's stamp; only when the fleet
     # reports none is the commit "unknown" (never the client's, which would
-    # make an unverified fleet look pinned).
-    runner_pdk = (remote.get("worker_environment") or {}).get("pdk") or {}
+    # make an unverified fleet look pinned). `sim_common.runner_pdk()` is the one
+    # reader of that field for every runner in the repo (issue #328).
+    runner_pdk = sim_common.runner_pdk(remote)
     runner_stamp = runner_pdk.get("stamp_text") or ""
     return report, {
         "pdk": {

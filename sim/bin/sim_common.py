@@ -76,6 +76,15 @@ and/or `corner-run.py` itself):
                           built from -- fleet_ngspice() (the one klt-log
                           banner regex), joined_versions(),
                           host_tool_versions()/host_ngspice_tag()
+    runner_pdk()/fleet_pdk_fields()/fleet_pdk_clause()
+                          the one reader of the PDK the fleet runner
+                          actually ran under (`environment.remote.
+                          worker_environment.pdk`, never the client-resolved
+                          `provenance.pdk`), the `pdk.fleet_pdk*` fields a
+                          record states it in, and the one sentence that
+                          states it in prose (issue #328)
+    pin_state()             the `sim/pdk.json` pin-state ternary every
+                          record's `PDK` line carries
 """
 
 from __future__ import annotations
@@ -336,15 +345,24 @@ def render_record_id_experiment(record_id: str, slug: str, title: str) -> list[s
     ]
 
 
+def pin_state(matches_pin: bool) -> str:
+    """The `sim/pdk.json` pin-state ternary a record's `PDK` line carries.
+
+    One definition: the renderer below, `run_solver_sweep.py` and `run_accuracy_mc.py`
+    each wrote this conditional out in full, so the wording a reader greps for
+    (`**MISMATCH vs sim/pdk.json pin**`) lived in three places at once (issue #328).
+    """
+    return "matches sim/pdk.json pin" if matches_pin else "**MISMATCH vs sim/pdk.json pin**"
+
+
 def render_pdk_tools_repo_state(r: dict) -> list[str]:
     """`PDK` (pin-state ternary) + `Tools` + `Repo state` (dirty-tree
     ternary) lines shared verbatim across every experiment's
     `render_record()`."""
     pdk = r["pdk"]
-    pin_state = "matches sim/pdk.json pin" if pdk["matches_pin"] else "**MISMATCH vs sim/pdk.json pin**"
     tools = r["tools"]
     return [
-        f"- **PDK**: {pdk['variant']} @ open_pdks `{pdk['installed_commit']}` ({pin_state}); "
+        f"- **PDK**: {pdk['variant']} @ open_pdks `{pdk['installed_commit']}` ({pin_state(pdk['matches_pin'])}); "
         f"models `{pdk['lib_file']}`",
         f"- **Tools**: {tools['ngspice']}; {tools['xschem']}; {tools['platform']}",
         f"- **Repo state**: `{r['git']['sha']}` on `{r['git']['branch']}`"
@@ -616,6 +634,68 @@ def joined_versions(items, key: str) -> str:
     return ", ".join(sorted({v for it in items if (v := (it or {}).get(key))})) or "unknown"
 
 
+def runner_pdk(src) -> dict:
+    """The PDK install of the fleet machine that actually RAN a job, off its klt report.
+
+    NOT `provenance.pdk`: that is the PDK the *client* resolved, while the runner executes
+    against its own `/opt/pdk`, stamped under `environment.remote.worker_environment.pdk`.
+    The two genuinely diverge -- `sim/bias-core-smoke/records/20261023-171642-e69f5b2e.json`
+    recorded a grid executed under open_pdks `c6d73a35...` while the client had merely
+    resolved `f6eeac7d...` -- so citing the client's value makes an unverified fleet read
+    as pinned, which is the stated-not-observed claim it exists to remove.
+
+    `sim/bin/corner-run.py` settled which field is correct; issues #306 and #312 then
+    repeated the walk as a private helper in two more runners, and three campaign runners
+    stored the client's value under the key `fleet_pdk_report` anyway (visible in
+    `sim/glitch-top/records/20261113-082829-da28d31-vdd_level-rerun181.json`, whose
+    "fleet" PDK report names search roots on the SUBMITTING host).  This is the one
+    reader, so "which field is the fleet's PDK?" is answered in one place (issue #328).
+
+    Accepts a whole report, its `environment` section, or one `remote`-shaped section --
+    which is also the shape of a per-process job in accuracy-MC's `ent['jobs']`.  Returns
+    `{}` when any link in the chain is absent, so an unreported stamp becomes `unknown`
+    via `joined_versions()` rather than falling back to the client's value.
+    """
+    d = src or {}
+    d = d.get("environment") or d   # a whole klt report -> its environment section
+    d = d.get("remote") or d        # an environment section -> its remote section
+    return (d.get("worker_environment") or {}).get("pdk") or {}
+
+
+def fleet_pdk_fields(pdks) -> dict:
+    """The fleet half of a record's `pdk` block: what the runners reported, and how many.
+
+    `pdks` is one `runner_pdk()` result per fleet job the record covers (any iterable;
+    `None` for a request that never reached the fleet, which is NOT counted as a job --
+    only a job that ran and reported no stamp belongs in the denominator).
+
+    `fleet_pdk` is the sorted SET of observed stamps, `unknown` when no job reported one;
+    `fleet_pdk_jobs` / `fleet_pdk_reporting` are its coverage, so a value joined over the
+    jobs that answered cannot be rendered as one they all agreed on.  Named for the
+    `pdk.fleet_pdk*` keys `run_accuracy_mc.py` already writes -- deliberately NOT the old
+    `fleet_pdk_report`, whose recorded contents are the client's resolution, so a reader
+    comparing an old record with a new one sees the key change with the meaning.
+    """
+    observed = [p for p in pdks if p is not None]
+    return {"fleet_pdk": joined_versions(observed, "stamp_text"),
+            "fleet_pdk_jobs": len(observed),
+            "fleet_pdk_reporting": sum(1 for p in observed if p.get("stamp_text"))}
+
+
+def fleet_pdk_clause(fleet_pdk: str) -> str:
+    """One sentence-initial clause stating what the fleet runners reported about their PDK.
+
+    Four record texts used to state "the fleet PDK commit is not reported by the runner"
+    as a literal.  The runners do report it, so the claim went stale into append-only
+    records that can no longer be corrected (issue #328).  Derived from
+    `fleet_pdk_fields()['fleet_pdk']`: the stamp when any job reported one, and otherwise
+    a statement about THIS record's jobs rather than about what the fleet can do.
+    """
+    if fleet_pdk == "unknown":
+        return "The fleet runners that executed the grid reported no PDK stamp"
+    return f"The fleet runners that executed the grid reported PDK `{fleet_pdk}`"
+
+
 @functools.lru_cache(maxsize=1)
 def host_tool_versions() -> dict:
     """`corner-run.tool_versions()` read once per process -- each call shells out to
@@ -657,9 +737,10 @@ def record_pdk_tools(
     entries tolerated); pass `ngspice_key` / `runner_key` when a runner names those
     fields differently.  Pass `None` for `lib_file`, `root`, `fleet_note` or
     `xschem_note` to leave that key out, and `host_tools=False` for a runner that never
-    invokes ngspice or xschem itself.  Runner-specific extras (`fleet_pdk_report`,
-    `fleet_klu_points`, `klt_sim_backend_env`, ...) are added by the caller on top of the
-    returned dicts.
+    invokes ngspice or xschem itself.  Runner-specific extras (`fleet_klu_points`,
+    `klt_sim_backend_env`, ...) are added by the caller on top of the returned dicts --
+    including the fleet half of the `pdk` block, which every caller adds from the one
+    shared `fleet_pdk_fields()` below rather than reading a report itself (issue #328).
     """
     pdk_d = {
         "variant": pdk.variant,
