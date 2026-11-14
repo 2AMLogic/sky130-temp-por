@@ -7,6 +7,11 @@ Chronological record of recently merged pull requests and closed issues. This fi
 - [2026-09](work_log/WORK_LOG_2026-09.md)
 - [2026-08](work_log/WORK_LOG_2026-08.md)
 
+### 2026-11-14
+
+- **PR #332**: refactor(sim): read the fleet's PDK through one sim_common helper, not five
+- **Issue #328** (closed): Share one fleet-PDK reader in sim_common: 3 private copies, and 3 runners record the client's PDK as fleet_pdk_report
+
 ### 2026-11-13
 
 - **PR #330**: refactor(sim): submit the last two local ngspice grids through klt sim as deck-list requests
