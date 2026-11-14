@@ -36,6 +36,7 @@ import ramp_checker as rc  # noqa: E402
 import run_ramp_campaign as camp  # noqa: E402
 
 sim_common = camp.sim_common
+evidence_store = camp.evidence_store
 cr = camp.cr
 SLUG = camp.SLUG
 MANIFEST = camp.MANIFEST
@@ -137,6 +138,7 @@ def submit_case(case, head, man, run_dir, capacity_wait_s=0):
 
 
 def cmd_run(args) -> int:
+    evidence_store.preflight_or_exit()  # fail closed before anything is submitted
     man = sim_common.load_manifest(MANIFEST)
     pdk = cr.resolve_pdk(cr.load_pin())
     git_info = cr.git_state()
@@ -460,6 +462,7 @@ def render_md(rec):
 
 
 def cmd_record(args) -> int:
+    evidence_store.preflight_or_exit()
     man = sim_common.load_manifest(MANIFEST)
     run_dir = BUILD / args.run_id
     meta = json.loads((run_dir / "run.json").read_text())
@@ -471,11 +474,10 @@ def cmd_record(args) -> int:
     now = datetime.now(timezone.utc)
     record_id = f"{now:%Y%m%d-%H%M%S}-{git_info['sha']}-reassert-diagnosis"
     rec_dir = HERE / "records"
-    corners_dir = HERE / "corners" / record_id
+    corners_dir = evidence_store.stage_dir_for(SLUG, record_id)  # git-ignored scratch; stored below
     snap_dir = HERE / "netlist-snapshots" / record_id
-    for p in (rec_dir / f"{record_id}.md", rec_dir / f"{record_id}.json", corners_dir, snap_dir):
-        if p.exists():
-            raise SystemExit(f"{p} exists -- append-only")
+    sim_common.refuse_existing((rec_dir / f"{record_id}.md", rec_dir / f"{record_id}.json", corners_dir, snap_dir,
+                                evidence_store.manifest_path(SLUG, record_id)))
     cases = [load_case(c, run_dir, man, corners_dir, True) for c in build_matrix(man)]
     snap_dir.mkdir(parents=True, exist_ok=True)
     corners_dir.mkdir(parents=True, exist_ok=True)
@@ -499,6 +501,11 @@ def cmd_record(args) -> int:
     )
     tools_d["klt_sim_backend_env"] = meta.get("klt_sim_backend_env")
     d = man["reassert_diagnosis"]
+    # A run whose every unit was refused stages no bytes: record it with null artifact
+    # links rather than tripping the store's fail-closed empty-manifest refusal (the
+    # convention run_glitch_campaign.py uses for a class with nothing graded).
+    staged = corners_dir.is_dir() and any(p.is_file() for p in corners_dir.rglob("*"))
+    art_manifest, art_summary = evidence_store.store_or_exit(SLUG, record_id, corners_dir) if staged else (None, None)
     record = {
         "record_id": record_id, "run_id": args.run_id, "timestamp": now.strftime("%Y-%m-%dT%H:%M:%SZ"),
         "author": args.author or cr.default_author(), "supersedes": args.supersedes, "cites": SOURCE_RECORD,
@@ -511,7 +518,9 @@ def cmd_record(args) -> int:
         "absent_coverage": d["absent_coverage"],
         "links": {"manifest": "sim/supply-ramp-top/experiment.json", "driver": "sim/supply-ramp-top/run_reassert_diagnosis.py",
                   "source_record": f"sim/supply-ramp-top/records/{SOURCE_RECORD}.md",
-                  "netlist_snapshots": f"sim/supply-ramp-top/netlist-snapshots/{record_id}/", "corners_dir": f"sim/supply-ramp-top/corners/{record_id}/",
+                  "netlist_snapshots": f"sim/supply-ramp-top/netlist-snapshots/{record_id}/",
+                  "artifact_manifest": str(art_manifest.relative_to(camp.REPO_ROOT)) if art_manifest else None,
+                  "artifact_summary": str(art_summary.relative_to(camp.REPO_ROOT)) if art_summary else None,
                   "json": f"sim/supply-ramp-top/records/{record_id}.json", "record": f"sim/supply-ramp-top/records/{record_id}.md"},
     }
     (rec_dir / f"{record_id}.json").write_text(json.dumps(record, indent=1, sort_keys=True, default=float) + "\n")
