@@ -409,10 +409,7 @@ def render_md(rec: dict) -> str:
         L.append(f"| {t['id']} | {t['status']} | {ua(t.get('temp_iq_a'))} | {ua(t.get('temp_core_attrib_delta_a'))} | {t.get('reason', '')} |")
     L += ["", "## Absent coverage (stated, not hidden)"]
     L += [f"- {a}" for a in ABSENT]
-    L += ["", "## Links"]
-    L += [f"- {k}: `{v}`" for k, v in rec["links"].items()]
-    L += [f"- **Timestamp / author**: {rec['timestamp']}, {rec['author']}", f"- **Supersedes**: {rec['supersedes'] or '(none)'}", "",
-          "Written by `sim/iq-top/run_iq_campaign.py`. Append-only: never edit this file -- a correction is a new record with a `Supersedes` field (see `sim/README.md`).", ""]
+    L += [""] + sim_common.record_footer_lines(rec, "sim/iq-top/run_iq_campaign.py")
     return "\n".join(L)
 
 

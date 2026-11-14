@@ -874,22 +874,15 @@ def render_record(r: dict) -> str:
     add(f"  - **Overall: {'PASS' if r['overall_pass'] else 'FAIL'}**")
     add(f"- **Verdict**: {r['verdict']}")
 
-    add("- **Links**:")
-    add(f"  - Testbench: `{r['links']['testbench']}`")
-    add(f"  - klt deck report: `{r['links']['klt_report']}`")
-    add(f"  - Runner: `{r['links']['runner']}`")
-    add(f"  - Netlist snapshot: `{r['links']['netlist_snapshot']}`")
-    add(f"  - Raw per-point logs: `{r['links']['points_dir']}`")
-    add(f"  - Machine-readable record: `{r['links']['json']}`")
-    add(f"- **Timestamp / author**: {r['timestamp']}, {r['author']}")
-    add(f"- **Supersedes**: {r['supersedes'] or '(none)'}")
-    add("")
-    add(
-        "Written by `sim/bias-core-op-branch/run_op_branch.py`. Append-only: never edit "
-        "this file — a correction is a new record with a `Supersedes` field (see "
-        "`sim/README.md`)."
-    )
-    add("")
+    L += sim_common.record_footer_lines(
+        r, "sim/bias-core-op-branch/run_op_branch.py", nested=True, links=[
+            ("Testbench", r["links"]["testbench"]),
+            ("klt deck report", r["links"]["klt_report"]),
+            ("Runner", r["links"]["runner"]),
+            ("Netlist snapshot", r["links"]["netlist_snapshot"]),
+            ("Raw per-point logs", r["links"]["points_dir"]),
+            ("Machine-readable record", r["links"]["json"]),
+        ])
     return "\n".join(L)
 
 

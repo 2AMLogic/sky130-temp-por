@@ -451,11 +451,8 @@ def render_md(rec):
     L += ["## Absent coverage (stated, not hidden)"]
     for a in rec["absent_coverage"]:
         L.append(f"- {a}")
-    L += ["", "## Links", ""]
-    for k, v in rec["links"].items():
-        L.append(f"- {k}: `{v}`")
-    L += [f"- **Timestamp / author**: {rec['timestamp']}, {rec['author']}", f"- **Supersedes**: {rec['supersedes'] or '(none; cites ' + SOURCE_RECORD + ', which is unchanged)'}", "",
-          "Written by `sim/supply-ramp-top/run_reassert_diagnosis.py`. Append-only: never edit this file -- a correction is a new record with a `Supersedes` field.", ""]
+    L += [""] + sim_common.record_footer_lines(
+        rec, "sim/supply-ramp-top/run_reassert_diagnosis.py")
     return "\n".join(L)
 
 

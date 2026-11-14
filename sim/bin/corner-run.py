@@ -917,23 +917,15 @@ def render_record(record: dict) -> str:
         )
     lines.append(f"  - **Overall: {'PASS' if r['overall_pass'] else 'FAIL'}**")
 
-    lines.append("- **Links**:")
-    lines.append(f"  - Testbench: `{r['links']['testbench']}`")
-    lines.append(f"  - Netlist snapshot: `{r['links']['netlist_snapshot']}`")
-    lines.append(f"  - Raw per-corner logs (artifact store manifest): `{r['links']['artifact_manifest']}`")
-    lines.append(f"  - Stored-object summary: `{r['links']['artifact_summary']}`")
-    lines.append(f"  - Machine-readable record: `{r['links']['json']}`")
-    lines.append(f"  - Experiment manifest: `{r['links']['manifest']}`")
-    lines.append(
-        f"- **Timestamp / author**: {r['timestamp']}, {r['author']}"
-    )
-    lines.append(f"- **Supersedes**: {r['supersedes'] or '(none)'}")
-    lines.append("")
-    lines.append(
-        "Written by `sim/bin/corner-run.py`. Append-only: never edit this file — "
-        "a correction is a new record with a `Supersedes` field (see `sim/README.md`)."
-    )
-    lines.append("")
+    lines += sim_common.record_footer_lines(
+        r, "sim/bin/corner-run.py", nested=True, links=[
+            ("Testbench", r["links"]["testbench"]),
+            ("Netlist snapshot", r["links"]["netlist_snapshot"]),
+            ("Raw per-corner logs (artifact store manifest)", r["links"]["artifact_manifest"]),
+            ("Stored-object summary", r["links"]["artifact_summary"]),
+            ("Machine-readable record", r["links"]["json"]),
+            ("Experiment manifest", r["links"]["manifest"]),
+        ])
     return "\n".join(lines)
 
 

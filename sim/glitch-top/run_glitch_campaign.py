@@ -595,16 +595,10 @@ def render_md(rec: dict) -> str:
     L.append("")
     if rec.get("follow_on"):
         L += ["## Notes", rec["follow_on"], ""]
-    L.append("## Links")
-    for k, v in rec["links"].items():
-        L.append(f"- {k}: `{v}`" if v else f"- {k}: none")
-    if not rec["links"].get("artifact_manifest"):
-        L.append("- **Evidence bytes**: none stored -- no point of this class was graded and no request was submitted (all points NOT_COVERED).")
-    L.append(f"- **Timestamp / author**: {rec['timestamp']}, {rec['author']}")
-    L.append(f"- **Supersedes**: {rec['supersedes'] or '(none)'}")
-    L.append("")
-    L.append("Written by `sim/glitch-top/run_glitch_campaign.py`. Append-only: never edit this file -- a correction is a new record with a `Supersedes` field (see `sim/README.md`).")
-    L.append("")
+    L += sim_common.record_footer_lines(
+        rec, "sim/glitch-top/run_glitch_campaign.py",
+        after_links=["- **Evidence bytes**: none stored -- no point of this class was graded and no request was submitted (all points NOT_COVERED)."]
+        if not rec["links"].get("artifact_manifest") else ())
     return "\n".join(L)
 
 
