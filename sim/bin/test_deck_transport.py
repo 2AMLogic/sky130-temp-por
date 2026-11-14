@@ -1,10 +1,17 @@
 #!/usr/bin/env python3
 """Deck-transport tests for the two fleet-submitting bespoke runners (issue #319).
 
-Stdlib only, no SPICE, no PDK, no fleet: `klt` is a stub executable on PATH that
-answers `--version` and `sim` the way the real verb's outputs are shaped, so request
-construction, the shipped-`.spiceinit` path, report-to-result mapping and the
-no-local-fallback failure path are all exercised without a batch job.
+Stdlib only, no SPICE, no PDK, no fleet -- but by two different mechanisms, and the
+difference matters.  The request-construction classes get a `klt` stub, prepended to
+`PATH` by their own `setUp`, answering `--version` and `sim` the way the real verb's
+outputs are shaped, so request construction, the shipped-`.spiceinit` path,
+report-to-result mapping and the no-local-fallback failure path are all exercised without
+a batch job.  The per-runner CLI probes in the last class get **no** stub: they spawn real
+runners against the real `klt`, and stay fleet-free only because every argv they pass is
+one argparse rejects before the runner reaches `cmd_run` -- `cli()` enforces that rather
+than leaving it to each test.  So do not read this line as a blanket guarantee for the
+whole file: an argv a runner *accepts* submits a real campaign (see that class's
+docstring, and PR #359).
 
 The last two classes widen that scope from the request to the CLI that feeds it, across
 every `sim/*/run_*.py` rather than only the two bespoke ones: `batch.capacity_wait_s` is
@@ -418,6 +425,13 @@ CAPACITY_WAIT_RUNNERS = {
 CANONICAL_FLAG = "--wait-for-capacity"
 DEPRECATED_ALIAS = "--capacity-wait"
 
+# Argv tokens that argparse is guaranteed to reject, so a subprocess probe below can
+# never reach a runner's `cmd_run` and submit to the fleet.  `--help` exits 0 inside
+# argparse; each of the other two makes `parse_args()` exit 2 there.
+NOT_A_NUMBER = "not-a-number"              # rejected by `type=float`
+UNRECOGNISED_PROBE = "--loom-339-unrecognised-probe"   # rejected as a leftover option
+SUBMIT_FREE_TOKENS = frozenset({"--help", NOT_A_NUMBER, UNRECOGNISED_PROBE})
+
 
 def runner_sources() -> dict[str, str]:
     """`{path relative to sim/: source}` for every `sim/*/run_*.py`."""
@@ -443,13 +457,25 @@ class CapacityWaitFlagIsDeclaredOnce(unittest.TestCase):
             with self.subTest(argv[0]):
                 self.assertEqual(p.parse_args(argv).wait_for_capacity, 120.0)
 
-    def test_the_alias_does_not_win_the_default_from_the_canonical_flag(self):
-        """argparse seeds a shared `dest` from the FIRST action declaring it, so the
-        alias carries `default=SUPPRESS`.  A second action with a real default would
-        silently decide what every runner submits."""
+    def test_the_canonical_flag_owns_the_default_whatever_the_alias_carries(self):
+        """What this proves: the default an operator gets is the one the CALLER passed,
+        not something the alias contributes -- argparse seeds a shared `dest` from the
+        FIRST action declaring it.
+
+        What it deliberately does not claim: this is not a guard on the alias's
+        `default=SUPPRESS`.  Measured on PR #359 (Python 3.12), the alias's default is
+        unobservable in every configuration `add_capacity_wait_arg` can produce -- a real
+        `default=0.0` there changes nothing, both on one parser (the canonical action is
+        first and wins) and across a parent parser plus a subparser (the subparser's own
+        canonical default wins the copy-back).  `SUPPRESS` is kept because it states the
+        intent and cannot be the thing that decides a submit, but it is defence in depth,
+        not behaviour under test; the two live guards on this flag's default are
+        `test_the_helper_defaults_to_the_host_rule_value` and
+        `test_the_default_reaches_the_request_as_the_host_rule_value`."""
         p = argparse.ArgumentParser()
         sim_common.add_capacity_wait_arg(p, default=42)
         self.assertEqual(p.parse_args([]).wait_for_capacity, 42.0)
+        self.assertEqual(p.parse_args([DEPRECATED_ALIAS, "5"]).wait_for_capacity, 5.0)
 
     def test_help_teaches_exactly_one_name(self):
         p = argparse.ArgumentParser(prog="x")
@@ -514,10 +540,27 @@ class CapacityWaitFlagIsDeclaredOnce(unittest.TestCase):
 
 class CapacityWaitFlagReachesEveryRunnersParser(unittest.TestCase):
     """Source guards cannot see a parser built inside `main()`, so drive each runner's
-    real CLI in a subprocess.  `--help` and an argparse type error both exit before any
-    PDK, netlist or fleet submit, so this needs none of them."""
+    real CLI in a subprocess.
+
+    Every probe here must be stopped *by argparse itself*, before the chosen subcommand's
+    `fn` is called.  These runners submit to the Spot batch fleet, and a dispatch worker
+    exports `KLT_SIM_BACKEND=batch`, so any argv a runner ACCEPTS launches a real campaign
+    from the test suite -- `.github/workflows/self-checks.yml` drives this file, so that
+    would be once per self-check run on every credentialed host.  `cli()` enforces the
+    invariant for every current and future probe rather than trusting each test to pick a
+    safe argv, because trusting each test is exactly what failed: the first version of
+    this class asserted only the *absence* of an `invalid value` message and so probed
+    `--wait-for-capacity 0.5`, which is a valid float.  It parsed, reached `cmd_run`, and
+    submitted a live Monte Carlo campaign (job `klt-sim-aa1c808dee03`) on every run of
+    this file, while still reporting OK -- caught in review on PR #359."""
 
     def cli(self, rel: str, *argv: str):
+        """Drive one runner's real CLI on an argv argparse is guaranteed to reject."""
+        self.assertTrue(
+            SUBMIT_FREE_TOKENS.intersection(argv),
+            f"refusing to run {rel} with {list(argv)}: every probe in this class must "
+            f"carry one of {sorted(SUBMIT_FREE_TOKENS)} so argparse stops it before the "
+            "runner can submit to the fleet")
         return subprocess.run([sys.executable, "-I", str(REPO / "sim" / rel),
                                *CAPACITY_WAIT_RUNNERS[rel], *argv],
                               cwd=REPO, capture_output=True, text=True)
@@ -542,17 +585,30 @@ class CapacityWaitFlagReachesEveryRunnersParser(unittest.TestCase):
         for rel in CAPACITY_WAIT_RUNNERS:
             for flag in (CANONICAL_FLAG, DEPRECATED_ALIAS):
                 with self.subTest(f"{rel} {flag}"):
-                    err = self.cli(rel, flag, "not-a-number").stderr
+                    err = self.cli(rel, flag, NOT_A_NUMBER).stderr
                     self.assertIn("invalid float value", err)
                     self.assertNotIn("unrecognized arguments", err)
 
     def test_the_old_int_typed_runner_now_takes_a_fractional_wait(self):
         """`run_accuracy_mc.py` alone typed the flag `int`; the field is seconds and
-        `sim_common` types it `float`, so the odd one out is now normalised."""
+        `sim_common` types it `float`, so the odd one out is now normalised.
+
+        `0.5` cannot be probed the way the alias is, because it is a *valid* float: on its
+        own the parser accepts it and `cmd_run` submits.  So pair it with an unrecognised
+        option.  argparse converts each option's value as it consumes it and only reports
+        leftovers once the whole argv is walked, so the two outcomes separate cleanly:
+        `type=int` fails first and names the value (`invalid int value: '0.5'`), while
+        `type=float` gets past conversion and dies on the leftover instead.  Requiring
+        that leftover error is what makes this a test rather than a tautology -- the
+        absence of an `invalid value` message is also satisfied by a crash, a capacity
+        refusal or a completed fleet job."""
         rel = "temp-core-accuracy-mc/run_accuracy_mc.py"
-        err = self.cli(rel, CANONICAL_FLAG, "0.5").stderr
-        self.assertNotIn("invalid int value", err)
-        self.assertNotIn("invalid float value", err)
+        p = self.cli(rel, CANONICAL_FLAG, "0.5", UNRECOGNISED_PROBE)
+        self.assertEqual(p.returncode, 2, p.stderr)
+        self.assertNotIn("invalid int value", p.stderr)
+        self.assertNotIn("invalid float value", p.stderr)
+        self.assertIn("unrecognized arguments", p.stderr)
+        self.assertIn(UNRECOGNISED_PROBE, p.stderr)
 
 
 if __name__ == "__main__":
