@@ -19,6 +19,19 @@ still well-formed; the affected paths are listed. Added paths are allowed.
 Live testbenches, campaign drivers, experiment manifests and READMEs are not
 protected and stay editable.
 
+Closed directory (added paths also fail):
+  sim/*/corners/*            historical raw bytes only
+
+sim/README.md's "New evidence goes to the artifact store" says new runs do not
+commit raw bytes -- every runner stages them in git-ignored scratch and stores
+them with `klt artifact put`, committing only
+manifests/artifacts/<slug>-<record-id>.{manifest.json,summary.md}. That rule was
+documented but unenforceable: a runner that never writes a manifest is invisible
+to check_artifact_manifests.py, and commit cf3404f added 1 MB of raw corner bytes
+fifteen days after the store path landed. So an *added* file under
+sim/*/corners/ fails here (issue #325); the directory is closed, historical
+evidence, and nothing in it is edited, deleted, moved -- or added to.
+
 Baseline resolution (first match wins):
   --baseline REV        use REV verbatim (must resolve to a commit)
   pull_request(_target) merge-base of HEAD and origin/$GITHUB_BASE_REF
@@ -37,11 +50,12 @@ Usage:
                                             (add, modify, delete, rename,
                                             twin edit, correction), flat and
                                             nested snapshot/corner evidence
-                                            (modify, delete, move), fresh
-                                            run, live-file edits, and
-                                            baseline resolution (missing,
-                                            initial push, push before-commit,
-                                            PR merge base)
+                                            (modify, delete, move), additions
+                                            under the closed corners/ (flat
+                                            and nested), fresh store-era run,
+                                            live-file edits, and baseline
+                                            resolution (missing, initial push,
+                                            push before-commit, PR merge base)
 
 Exit codes: 0 pass, 1 append-only violation (paths listed), 2 unusable
 invocation or unresolvable baseline.
@@ -58,6 +72,10 @@ PROTECTED = (
     "sim/*/corners/*",
     "manifests/artifacts/*",
 )
+
+# Closed to additions as well: raw bytes of a new run belong in the artifact
+# store, never in the tree (sim/README.md, sim/bin/evidence_store.py).
+CLOSED_TO_ADDITIONS = ("sim/*/corners/*",)
 
 
 class BaselineError(Exception):
@@ -144,10 +162,10 @@ def resolve_baseline(repo, env, explicit):
     )
 
 
-def record_changes(repo, baseline, head="HEAD"):
-    """[(status, path)] for protected paths diffed baseline..head, renames off."""
+def record_changes(repo, baseline, head="HEAD", pathspecs=PROTECTED):
+    """[(status, path)] for `pathspecs` diffed baseline..head, renames off."""
     proc = git(
-        repo, "diff", "--no-renames", "--name-status", "-z", baseline, head, "--", *PROTECTED
+        repo, "diff", "--no-renames", "--name-status", "-z", baseline, head, "--", *pathspecs
     )
     # With -z the fields themselves are NUL-separated: STATUS\0PATH\0... per entry.
     tokens = proc.stdout.split("\0")
@@ -183,8 +201,24 @@ def main(argv):
     changes = record_changes(repo, baseline)
     bad = [(s, p) for s, p in changes if s != "A"]
     added = sum(1 for s, _ in changes if s == "A")
+    # The closed directory: additions are violations too, not "new evidence".
+    closed_added = [
+        p for s, p in record_changes(repo, baseline, pathspecs=CLOSED_TO_ADDITIONS) if s == "A"
+    ]
 
-    if bad:
+    for path in closed_added:
+        print(
+            f"::error file={path}::new raw evidence bytes committed in-tree: "
+            f"sim/*/corners/ is closed, historical evidence only. New runs stage their "
+            f"bytes in sim/.work/.stage/ and store them with `klt artifact put` via "
+            f"sim/bin/evidence_store.py, committing only "
+            f"manifests/artifacts/<slug>-<record-id>.manifest.json and its .summary.md "
+            f'twin (sim/README.md "New evidence goes to the artifact store"). There is '
+            f"no flag that commits bytes instead.",
+            file=sys.stderr,
+        )
+
+    if bad or closed_added:
         verbs = {"D": "deleted", "M": "modified", "T": "type-changed"}
         for status, path in bad:
             verb = verbs.get(status, f"changed ({status})")
@@ -197,14 +231,17 @@ def main(argv):
             )
         print(
             f"append-only check FAILED vs baseline {label}: {len(bad)} protected "
-            f"evidence path(s) edited, deleted or moved, {added} new path(s) allowed",
+            f"evidence path(s) edited, deleted or moved, {len(closed_added)} raw byte(s) "
+            f"added under the closed sim/*/corners/, "
+            f"{added - len(closed_added)} new path(s) allowed",
             file=sys.stderr,
         )
         return 1
 
     print(
         f"append-only ok vs baseline {label}: no protected evidence edited, "
-        f"deleted or moved; {added} new path(s) allowed"
+        f"deleted or moved and nothing added under the closed sim/*/corners/; "
+        f"{added} new path(s) allowed"
     )
     return 0
 
@@ -468,17 +505,61 @@ def selftest():
         commit_all("edit artifact manifest")
         expect_fail("modifying an artifact manifest fails", "manifests/artifacts/exp-r0.manifest.json")
 
-        # fresh run (records + flat/nested snapshots + corners) passes
+        # fresh store-era run: records + flat/nested snapshots + an artifact
+        # manifest pair, and NO new bytes under corners/
         (snap / "r9.spice").write_text("* new flat\n")
         (snap / "r9-x").mkdir()
         (snap / "r9-x" / "deck.spice").write_text("* new nested\n")
-        (cor / "r9").mkdir()
-        (cor / "r9" / "tt.log").write_text("new\n")
         (rec / "r9.md").write_text("# r9\n")
         (rec / "r9.json").write_text("{}\n")
+        (art / "exp-r9.manifest.json").write_text("{}\n")
+        (art / "exp-r9.summary.md").write_text("# stored\n")
         commit_all("fresh run")
         p = ev()
-        check("adding a fresh run's evidence passes", p.returncode == 0, p.stderr)
+        check("adding a fresh store-era run's evidence passes", p.returncode == 0, p.stderr)
+        git(repo, "reset", "-q", "--hard", ev_base)
+
+        # corners/ is closed to ADDITIONS too: new raw bytes in-tree fail (issue #325)
+        (cor / "r9").mkdir()
+        (cor / "r9" / "tt.log").write_text("new raw bytes\n")
+        commit_all("new run commits a raw corner log in-tree")
+        p = ev()
+        check(
+            "adding a new corner log under corners/ fails",
+            p.returncode == 1 and "sim/exp/corners/r9/tt.log" in p.stderr,
+            f"rc={p.returncode} {p.stderr}",
+        )
+        check(
+            "the closed-directory error names the artifact store",
+            "klt artifact put" in p.stderr and "sim/.work/.stage/" in p.stderr,
+            p.stderr,
+        )
+        git(repo, "reset", "-q", "--hard", ev_base)
+
+        # a nested addition (a non-.log object, e.g. a per-sample CSV) fails too
+        (cor / "r9" / "baseline").mkdir(parents=True)
+        (cor / "r9" / "baseline" / "samples-mirror.csv").write_text("a,b\n1,2\n")
+        commit_all("new run commits per-sample CSVs in-tree")
+        p = ev()
+        check(
+            "adding a nested non-log object under corners/ fails",
+            p.returncode == 1
+            and "sim/exp/corners/r9/baseline/samples-mirror.csv" in p.stderr,
+            f"rc={p.returncode} {p.stderr}",
+        )
+        git(repo, "reset", "-q", "--hard", ev_base)
+
+        # a records/ or netlist-snapshots/ addition is still allowed
+        (rec / "r10.md").write_text("# r10\n")
+        (snap / "r10.spice").write_text("* r10 deck\n")
+        commit_all("add a record and a snapshot only")
+        p = ev()
+        check(
+            "records/ and netlist-snapshots/ additions are still allowed",
+            p.returncode == 0,
+            p.stderr,
+        )
+        git(repo, "reset", "-q", "--hard", ev_base)
 
         # live files stay editable
         (exp / "testbench" / "tb.spice").write_text("* tb v2\n")

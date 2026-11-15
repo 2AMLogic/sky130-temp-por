@@ -117,8 +117,10 @@ sim/
     corners/
       <record-id>/
         <corner-id>.log              # deck + raw ngspice output per point
-                                      # (records before the artifact-store change only;
-                                      # new runs store these bytes off-repo, see below)
+                                      # CLOSED: records from before the artifact-store
+                                      # change only. No runner writes here any more and
+                                      # CI rejects additions -- new runs store these
+                                      # bytes off-repo (see below)
     records/
       <record-id>.md                 # append-only summary record (human)
       <record-id>.json               # same record, machine-readable
@@ -179,35 +181,56 @@ and remain editable.
 
 ### New evidence goes to the artifact store
 
-New runs do not commit raw bytes. `corner-run.py` and the five campaign drivers
-(`brownout-top`, `glitch-top`, `iq-top`, `supply-ramp-top`,
-`por-comparator-thresholds`) stage their per-corner logs, traces and fleet
-reports in the git-ignored `sim/.work/.stage/<slug>/<record-id>/`, store them
-with `klt artifact put` (via `sim/bin/evidence_store.py`), and commit only:
+New runs do not commit raw bytes — this holds for **every** runner in the repo,
+with no exception and no per-runner opt-out. `corner-run.py` and all eleven
+bespoke `run_*.py` drivers stage their per-corner logs, traces, per-sample CSVs
+and fleet reports in the git-ignored `sim/.work/.stage/<slug>/<record-id>/`,
+store them with `klt artifact put` (via `sim/bin/evidence_store.py`), and commit
+only:
 
 - `manifests/artifacts/<slug>-<record-id>.manifest.json` — every `uri` is
   `artifact:<key>`; and
 - `manifests/artifacts/<slug>-<record-id>.summary.md` — name, size and sha256
   per stored object.
 
-The record's `links` name those two files in place of the old `corners_dir`.
-Check the stored bytes with
+The record's `links` name those two files as `artifact_manifest` /
+`artifact_summary`, in place of the old `corners_dir` (a record written before a
+runner was routed through the store still carries `corners_dir`, so a reader of
+`links` must accept both shapes). Check the stored bytes with
 `klt artifact verify manifests/artifacts/<slug>-<record-id>.manifest.json`.
+
+A run whose every unit was refused by the fleet stages no bytes; its record is
+written with `artifact_manifest` / `artifact_summary` set to `null` rather than
+an empty manifest.
 
 **Fail closed, no fallback.** If `$KLT_ARTIFACT_BROKER` is unset, the worker's
 `klt` lacks `artifact put`/`verify`, or the broker is unreachable, the run exits
 nonzero and commits nothing. `corner-run.py` checks before simulating; each
-campaign driver checks in both `run` (before anything is submitted to the
-fleet) and `record` (before it writes anything). If the put fails after the
-grid ran, the staged bytes stay in `sim/.work/.stage/` for a retry and no
-manifest, summary or record is written. There is no flag that commits bytes
-instead. The broker URL is never written to the repo. The fleet workers set
-`$KLT_ARTIFACT_BROKER` and carry a recent enough `klt`; CI does not call it.
+`run`/`record` driver checks in both `run` (before anything is submitted to the
+fleet) and `record` (before it writes anything); the two single-command runners
+(`bias-core-op-branch/run_op_branch.py`, `pnp-mismatch/run_pnp_mismatch.py`)
+check first thing in `main()`, before the PDK is even resolved, and skip the
+check only for `--dry-run` / `--probe`, which submit nothing to the fleet and
+write no record. If the put fails after the grid ran, the staged bytes stay in
+`sim/.work/.stage/` for a retry and no manifest, summary or record is written.
+There is no flag that commits bytes instead. The broker URL is never written to
+the repo. The fleet workers set `$KLT_ARTIFACT_BROKER` and carry a recent enough
+`klt`; CI does not call it.
+
+`sim/bin/evidence_store.py --selftest` asserts the fail-closed property for
+every one of those runners by invoking each with `$KLT_ARTIFACT_BROKER` unset,
+so a new runner that forgets the check fails the self-checks workflow.
 
 CI (`.github/scripts/check_artifact_manifests.py`) validates the manifests'
 schema, accepts only `artifact:` URIs, fails if a stored object's bytes are also
 tracked, and rejects `s3://` / `arn:aws:` strings under `manifests/`. Evidence
 committed before this change stays where it is.
+
+**The rule is enforced, not only documented.**
+`.github/scripts/check_records_append_only.py` fails a change that *adds* any
+file under `sim/*/corners/` — that directory is closed, historical evidence
+only. A runner that quietly writes raw bytes in-tree is caught by CI rather
+than noticed later in a diff.
 
 CI enforces this rule in the self-checks workflow
 (`.github/scripts/check_records_append_only.py`): the protected
