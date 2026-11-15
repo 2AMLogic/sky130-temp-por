@@ -408,8 +408,6 @@ def synth(vf=3.3, st=None, t_obs=T_OBS_REF, behavior="ok", coarse=None, tstop=No
     t_raw_up = (t_up + 1.9e-3) if t_up is not None else None
     if behavior == "premature" and t_up is not None:
         t_raw_up = t_up + 2.5e-3
-    if behavior == "chatter" and t_release is not None:
-        pass
     cols = {c: [] for c in CORE}
     for x, v in zip(ts, vdd):
         rs = 0.0
@@ -417,7 +415,7 @@ def synth(vf=3.3, st=None, t_obs=T_OBS_REF, behavior="ok", coarse=None, tstop=No
             rs = 0.0  # never released
         elif x >= t_rel0:
             rs = v
-            if behavior != "missed" and not (behavior == "control_assert" and False):
+            if behavior != "missed":
                 if t_assert is not None and x >= t_assert and st["vlow"] < vf:
                     rs = 0.0
                     if t_release is not None and x >= t_release and behavior != "no_recovery":
