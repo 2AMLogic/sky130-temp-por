@@ -34,7 +34,12 @@ infrastructure:
   ``sim/bin/corner-run.py``'s ``load_pin``/``resolve_pdk``/
   ``pdk_mismatch_message``, the same resolver every recorded run under
   ``sim/`` goes through, so ``sim/pdk.json``'s ``default_pdk_root`` and
-  ``variant`` govern the netlist export too (issue #292).
+  ``variant`` govern the netlist export too (issue #292). That now holds
+  for the refusal *text* too: ``pdk_mismatch_message`` has exactly one
+  definition repo-wide (issue #338 routed the last two sim runners
+  through it), so every pin refusal names the resolved tree
+  (``pdk.dir``) rather than the ``variant``, which is ``sky130A`` on
+  every install.
 * **The ratified-port-list assertion** uses a small inlined SPICE
   ``.subckt`` port-list parser (:func:`subckt_ports`) instead of importing
   ``layout/lvs_reference.py``, which also does not exist yet in this repo
