@@ -408,9 +408,11 @@ def render_provenance_lines(prov, pdk, klt_client, backend):
 
     The grid itself ran on the fleet, so the PDK line names both halves explicitly: the
     recording host's resolved install (with the same `sim_common.pin_state()` ternary
-    `sim_common.render_pdk_tools_repo_state()` uses) and the stamp of the fleet runners
-    that executed the grid (`sim_common.runner_pdk()`, never the client-side
-    `provenance.pdk`).  Neither is invented when absent.
+    `sim_common.render_pdk_tools_repo_state()` uses) and the fleet half rendered by the
+    shared `sim_common.fleet_pdk_sentence()` (issue #368) over what `runner_pdk()`
+    observed -- never the client-side `provenance.pdk`.  Neither is
+    invented when absent, and the fleet half closes on what this record does NOT have:
+    no evidence on the runner's model library itself.
     """
     skew_note = ""
     if prov["klt_skew"]:
@@ -418,11 +420,10 @@ def render_provenance_lines(prov, pdk, klt_client, backend):
         skew_note = f" (client/runner klt mismatch warning observed on at least one job: {pairs}; reported per job below)"
     return [
         f"- **PDK**: {pdk.variant} @ open_pdks `{pdk.installed_commit}` ({sim_common.pin_state(pdk.matches_pin)}) on the host that wrote this"
-        f" record, models `{pdk.pin['ngspice_lib']}`; the fleet runners that executed the grid"
-        f" reported `{prov['fleet_pdk']}` ({prov['fleet_pdk_reporting']} of"
-        f" {prov['fleet_pdk_jobs']} jobs reported one; verdict:"
-        f" {sim_common.fleet_pin_state(prov['fleet_matches_pin'])}); that comparison is of"
-        f" commits only, so {sim_common.PIN_COMMIT_LIMIT}",
+        f" record, models `{pdk.pin['ngspice_lib']}`; "
+        + sim_common.fleet_pdk_sentence(
+            prov, "this record has no evidence on the runner's model library itself",
+            mid_sentence=True),
         f"- **Tools**: {klt_client} (client); fleet `{prov['fleet_ngspice']}` on Spot `{prov['fleet_instance_type']}`,"
         f" fleet runner klt `{prov['fleet_runner_klt']}`{skew_note}; backend `{backend}`",
     ]

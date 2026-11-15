@@ -17,10 +17,12 @@ Three campaign runners stored the client's value under the key `fleet_pdk_report
 This file is the cross-runner contract: ONE table of runners, each fed a stub report
 whose two PDK values disagree, so a seventh runner cannot quietly reintroduce the
 mislabel and so the fix cannot regress in one runner while the other six stay right.
-Three source-level guards back it up -- the record-side wiring must go through
-`sim_common.fleet_pdk_fields()`, no runner may state the fleet's PDK as unreported, and
+Source-level guards back it up -- the record-side wiring must go through
+`sim_common.fleet_pdk_fields()`, no runner may state the fleet's PDK as unreported,
 (issue #333) no runner may state that the stamp is recorded but not compared with the
-`sim/pdk.json` pin.
+`sim/pdk.json` pin, and (issue #368) no runner may hand-assemble the sentence between
+`fleet_pdk_clause()` and `PIN_COMMIT_LIMIT` -- that bridge is
+`sim_common.fleet_pdk_sentence()`'s, so all records carry one wording of one claim.
 
 Issue #333 extended the contract from "what did the runner report?" to "how does it
 compare with the pin?".  Each runner is driven through all THREE states of
@@ -355,6 +357,75 @@ class RenderedVerdictTest(unittest.TestCase):
                               self.clause(f))
 
 
+class RenderedSentenceTest(unittest.TestCase):
+    """Issue #368: the bridge between `fleet_pdk_clause()` and `PIN_COMMIT_LIMIT` is one
+    shared renderer (`sim_common.fleet_pdk_sentence()`), not six hand-assembled wordings.
+
+    Two layers, like the clause tests above.  Every runner's own `fleet_pdk_fields()`
+    result must render a sentence that names the machine-readable field and runs from
+    the clause through the commit limitation before it may close (driven here through
+    the same runner table), and the renderer's own shape is pinned directly -- the
+    coverage rule absorbed from `run_accuracy_mc.py`'s `coverage_note()`, the
+    sentence-initial vs mid-sentence capitalisation, and the required residual-evidence
+    tail.  `SourceGuardTest` keeps every RENDERED sentence on the shared renderer, so a
+    seventh hand-assembly cannot be added silently.
+    """
+
+    def sentence(self, driver, tail="tail", **kw) -> str:
+        with tempfile.TemporaryDirectory() as td:
+            fields = driver(Path(td), PIN, **kw)
+        return sim_common.fleet_pdk_sentence(fields, tail)
+
+    @staticmethod
+    def fleet(**kw) -> dict:
+        base = {"fleet_pdk": RUNNER_STAMP, "fleet_pdk_jobs": 3, "fleet_pdk_reporting": 3,
+                "fleet_matches_pin": "match"}
+        return {**base, **kw}
+
+    def test_every_runners_rendered_sentence_names_the_field_and_runs_to_the_limit(self):
+        for name, driver in RUNNERS.items():
+            with self.subTest(name):
+                s = self.sentence(driver)
+                self.assertIn("`pdk.fleet_matches_pin`", s)
+                # The sentence cannot stop short of the limitation: it runs from the
+                # clause through "so" into PIN_COMMIT_LIMIT, then closes on the tail.
+                self.assertTrue(s.endswith(f"so {sim_common.PIN_COMMIT_LIMIT}; tail."), s)
+
+    def test_every_verdict_state_renders_the_pointer_and_the_limit(self):
+        for verdict in ("match", "mismatch", "not-reported"):
+            s = sim_common.fleet_pdk_sentence(self.fleet(fleet_matches_pin=verdict), "t")
+            self.assertIn("`pdk.fleet_matches_pin`", s)
+            self.assertIn(sim_common.fleet_pin_state(verdict), s)
+            self.assertTrue(s.endswith(f"so {sim_common.PIN_COMMIT_LIMIT}; t."), s)
+
+    def test_partial_coverage_is_stated_and_unambiguous_coverage_is_not(self):
+        """The absorbed `coverage_note()` rule: the count is rendered only when it says
+        something -- `0 < reporting < jobs`.  Every job reporting (the value speaks for
+        itself), none reporting (the clause already reads "reported no PDK stamp"), and
+        no job at all are the unambiguous cases."""
+        partial = sim_common.fleet_pdk_sentence(self.fleet(fleet_pdk_reporting=1), "tail")
+        self.assertIn(" -- 1 of 3 fleet jobs reported a stamp", partial)
+        for f in (self.fleet(),                                                 # all reported
+                  self.fleet(fleet_pdk_reporting=0),                            # none did
+                  self.fleet(fleet_pdk_jobs=0, fleet_pdk_reporting=0)):         # no job ran
+            s = sim_common.fleet_pdk_sentence(f, "tail")
+            self.assertNotIn("fleet jobs reported a stamp", s)
+
+    def test_mid_sentence_lowercases_only_the_leading_the(self):
+        f = self.fleet()
+        self.assertTrue(sim_common.fleet_pdk_sentence(f, "t").startswith("The fleet runners"))
+        mid = sim_common.fleet_pdk_sentence(f, "t", mid_sentence=True)
+        self.assertTrue(mid.startswith("the fleet runners"))
+        self.assertIn("the fleet runners that executed the grid reported PDK", mid)
+
+    def test_the_evidence_tail_is_required_not_optional(self):
+        """Required for the same reason `verdict` is in `fleet_pdk_clause()`: a caller
+        that omits it is a record that stops short of saying what evidence it does
+        have on the library itself."""
+        with self.assertRaises(TypeError):
+            sim_common.fleet_pdk_sentence(self.fleet())
+
+
 class SourceGuardTest(unittest.TestCase):
     """Mechanism, not documentation: the two greps that keep the shape from returning."""
 
@@ -396,6 +467,39 @@ class SourceGuardTest(unittest.TestCase):
                 continue
             with self.subTest(rel):
                 self.assertIn("sim_common.fleet_pdk_fields(", src)
+
+    # Issue #368's sibling of the two guards above.  The sentence between
+    # `fleet_pdk_clause()` and `PIN_COMMIT_LIMIT` -- coverage count, the pointer to
+    # `pdk.fleet_matches_pin`, the commits-only hand-off -- used to be re-written at six
+    # sites in five runners and had already drifted four ways: two coverage nouns, two
+    # comparison scopes, two records with no field pointer, and one copy asserting a
+    # host-path literal about a machine the recording host never inspected.  All of
+    # that lands in append-only records, so the bridge is code now
+    # (`sim_common.fleet_pdk_sentence()`), and a runner that names the limitation
+    # constant, the coverage count or the field pointer directly is a seventh
+    # hand-assembly.
+    BRIDGE = re.compile(r"PIN_COMMIT_LIMIT"
+                        r"|fleet jobs reported"
+                        r"|recorded as `pdk\.fleet_matches_pin`")
+
+    RENDERERS = ("supply-ramp-top/run_ramp_campaign.py", "iq-top/run_iq_campaign.py",
+                 "iq-top/run_iq_sensitivity.py",
+                 "temp-core-startup-solver/run_solver_sweep.py",
+                 "temp-core-accuracy-mc/run_accuracy_mc.py")
+
+    def test_no_runner_hand_assembles_the_fleet_pdk_bridge(self):
+        offenders = [f"{rel}:{n}: {line.strip()}"
+                     for rel, src in self.runners().items()
+                     for n, line in enumerate(src.splitlines(), start=1)
+                     if self.BRIDGE.search(line)]
+        self.assertEqual(offenders, [], "a runner hand-assembles the fleet-PDK bridge:\n  "
+                         + "\n  ".join(offenders))
+
+    def test_every_runner_that_renders_the_sentence_uses_the_shared_renderer(self):
+        for rel, src in self.runners().items():
+            if rel in self.RENDERERS:
+                with self.subTest(rel):
+                    self.assertIn("sim_common.fleet_pdk_sentence(", src)
 
     def test_no_runner_states_the_fleet_pdk_as_unreported(self):
         """Four records carried "the fleet PDK commit is not reported by the runner" as a

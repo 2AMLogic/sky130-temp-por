@@ -832,40 +832,35 @@ def observed_provenance(ents, pin):
             "fleet_engine_jobs": len(engines), "fleet_engine_reporting": sum(1 for e in engines if e.get("tag"))}
 
 
-def coverage_note(prov, which):
-    """A ` (from N of M fleet jobs; ...)` suffix when only SOME jobs reported `which`, else `""`.
-
-    A set joined over 36 jobs of which 3 answered is not the same claim as one all 36
-    agreed on, and the header sentence ("the fleet runners that executed the grid
-    reported ...") reads as the latter.  The note is deliberately absent in the two
-    unambiguous cases: every job reported (the value speaks for itself), and none did
-    (the value is already `unknown`, which says exactly that).
-    """
-    n, m = prov[f"{which}_reporting"], prov[f"{which}_jobs"]
-    return f" (from {n} of {m} fleet jobs; the rest reported none)" if 0 < n < m else ""
-
-
 def render_pdk_tools_lines(rec, pdk, prov, fleet):
     """The record's `PDK` and `Tools` header lines.
 
     The grid ran on the fleet but the record is written here, so the PDK line names both
     halves explicitly and lets neither stand in for the other: the recording host's
     resolved install (with the same `sim_common.pin_state()` ternary
-    `sim_common.render_pdk_tools_repo_state()` uses) and the stamp the fleet runners
-    reported.  Before issue #312 this line stated one literal commit labelled
-    "(sim/pdk.json pin)" that was in fact neither the pin nor this host's install, but the
-    October fleet runners' stamp -- so the claim was wrong in both halves at once.
+    `sim_common.render_pdk_tools_repo_state()` uses) and the fleet half rendered by the
+    shared `sim_common.fleet_pdk_sentence()` (issue #368).  Before issue #312 this line
+    stated one literal commit labelled "(sim/pdk.json pin)" that was in fact neither the
+    pin nor this host's install, but the October fleet runners' stamp -- so the claim was
+    wrong in both halves at once.
     """
     jobs = ", ".join(f"{t}[{k}]={j['job_id']}" for t, f in fleet.items() for k, j in f["jobs"].items())
+    # The engine set keeps the coverage-note rule that `sim_common.fleet_pdk_sentence()`
+    # absorbed from this file's old `coverage_note()` (issue #368); the rule still has
+    # one non-PDK use here: state the count only when it says something -- every job
+    # reporting, or none, is already carried by the value itself.
+    engine_note = (f" (from {prov['fleet_engine_reporting']} of {prov['fleet_engine_jobs']}"
+                   " fleet jobs; the rest reported none)"
+                   if 0 < prov["fleet_engine_reporting"] < prov["fleet_engine_jobs"] else "")
     return [
         f"- **PDK**: {pdk.variant} @ open_pdks `{pdk.installed_commit}` ({sim_common.pin_state(pdk.matches_pin)}) on the host"
         f" that wrote this record, models `{pdk.pin['ngspice_lib']}` (`_mm` sections for"
-        f" mismatch); the fleet runners that executed the grid reported `{prov['fleet_pdk']}`"
-        + coverage_note(prov, "fleet_pdk")
-        + f" (verdict: {sim_common.fleet_pin_state(prov['fleet_matches_pin'])});"
-        f" that comparison is of commits only, so {sim_common.PIN_COMMIT_LIMIT}",
+        " mismatch); "
+        + sim_common.fleet_pdk_sentence(
+            prov, "this record has no evidence on the runner's model library itself",
+            mid_sentence=True),
         f"- **Tools**: {rec['klt']} (client); backend `{rec['backend']}`; fleet engine"
-        f" {prov['fleet_engine']}{coverage_note(prov, 'fleet_engine')}; fleet jobs: {jobs}",
+        f" {prov['fleet_engine']}{engine_note}; fleet jobs: {jobs}",
     ]
 
 

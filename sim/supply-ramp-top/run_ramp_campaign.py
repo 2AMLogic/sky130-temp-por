@@ -518,11 +518,10 @@ def cmd_record(args) -> int:
                         f"tt / 27 C / 3.30 V / 10 kV/s, variant {variant}: local {xc['local']['ngspice']} released at {xc['local']['t_release_s'] * 1e3:.5g} ms "
                         f"(RESETn end {xc['local']['end_v']:.5g} V, POR_RAW rose at VDD={xc['local']['por_raw_vdd_v']:.4g} V); fleet {xc['fleet']['ngspice']} released at "
                         f"{xc['fleet']['t_release_s'] * 1e3:.5g} ms (end {xc['fleet']['end_v']:.5g} V, VDD={xc['fleet']['por_raw_vdd_v']:.4g} V). "
-                        f"{sim_common.fleet_pdk_clause(fleet_pdk['fleet_pdk'], fleet_pdk['fleet_matches_pin'])} -- "
-                        f"{fleet_pdk['fleet_pdk_reporting']} of {fleet_pdk['fleet_pdk_jobs']} fleet jobs reported a stamp, "
-                        f"and the verdict is recorded as `pdk.fleet_matches_pin`. That comparison is of commits only, so "
-                        f"{sim_common.PIN_COMMIT_LIMIT}; agreement of the two engines above is this record's only "
-                        "evidence on the library itself."
+                        + sim_common.fleet_pdk_sentence(
+                            fleet_pdk,
+                            "agreement of the two engines above is this record's only evidence"
+                            " on the library itself")
                     )
         n_wave = sum(1 for p in pts if p["check"] and "resetn" in p["check"])
         v = man["variants"][variant]

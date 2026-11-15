@@ -76,13 +76,16 @@ and/or `corner-run.py` itself):
                           built from -- fleet_ngspice() (the one klt-log
                           banner regex), joined_versions(),
                           host_tool_versions()/host_ngspice_tag()
-    runner_pdk()/fleet_pdk_fields()/fleet_pdk_clause()
+    runner_pdk()/fleet_pdk_fields()/fleet_pdk_clause()/fleet_pdk_sentence()
                           the one reader of the PDK the fleet runner
                           actually ran under (`environment.remote.
                           worker_environment.pdk`, never the client-resolved
                           `provenance.pdk`), the `pdk.fleet_pdk*` fields a
                           record states it in, and the one sentence that
-                          states it in prose (issue #328)
+                          states it in prose -- clause and full sentence
+                          (clause + coverage + `pdk.fleet_matches_pin`
+                          pointer + hand-off to `PIN_COMMIT_LIMIT`)
+                          (issues #328, #368)
     fleet_pdk_commit()/fleet_pin_verdict()/fleet_pin_state()/PIN_COMMIT_LIMIT
                           the fleet half of the pin check (issue #333): the
                           one open_pdks-commit parser (moved here from
@@ -872,6 +875,50 @@ def fleet_pdk_clause(fleet_pdk: str, verdict: str) -> str:
     # a stamp carrying no 40-hex commit); both name whatever was reported and then decline
     # to compare it, which is NOT the mismatch branch.
     return f"{got} (verdict: {fleet_pin_state(verdict)})"
+
+
+def fleet_pdk_sentence(fleet: dict, evidence_tail: str, *, mid_sentence: bool = False) -> str:
+    """The whole fleet-PDK record sentence: `fleet_pdk_clause()`, the coverage count,
+    the pointer to `pdk.fleet_matches_pin`, and the commits-only hand-off to
+    `PIN_COMMIT_LIMIT`, closed by the caller's own `evidence_tail`.
+
+    One wording for one claim about one mechanism (issue #368).  The bridge between
+    `fleet_pdk_clause()` and `PIN_COMMIT_LIMIT` used to be hand-assembled at six sites
+    across five runners, and the copies had already drifted four ways: two coverage
+    nouns ("reported a stamp" / "reported one"), two comparison scopes ("of commits
+    only" / "of open_pdks commits only"), two records with no pointer to the
+    machine-readable field at all, and one copy asserting a host-path literal about a
+    machine the recording host never inspected.  Every one of those landed in
+    append-only records that cannot be corrected, so the bridge is code now: `fleet`
+    is a `fleet_pdk_fields()` result and its four keys are read unconditionally, so a
+    caller cannot state the clause without the verdict, the coverage and the pointer.
+
+    `evidence_tail` is required for the same reason `verdict` is required in
+    `fleet_pdk_clause()`: once `PIN_COMMIT_LIMIT` has said what the commit comparison
+    does not establish, a record that stops there says neither what evidence it does
+    have on the library itself nor that it has none.  Campaign runners pass their
+    agreement statement ("agreement with the local cross-check is this record's only
+    evidence on the library itself"); the fleet-only grids pass the honest negative
+    ("this record has no evidence on the runner's model library itself").  The tail is
+    a clause without its final period -- the renderer punctuates the sentence.
+
+    The coverage count follows the rule `run_accuracy_mc.py`'s absorbed
+    `coverage_note()` stated: it is rendered only when it says something --
+    `0 < reporting < jobs`.  Every job reporting (the value speaks for itself), none
+    reporting (the clause already reads "reported no PDK stamp"), and no job at all
+    are the unambiguous cases.  `mid_sentence` lowercases the leading "The" for the
+    two bespoke runners whose PDK header line embeds the fleet half after the
+    recording host's install ("...; the fleet runners that executed the grid ...").
+    """
+    clause = fleet_pdk_clause(fleet["fleet_pdk"], fleet["fleet_matches_pin"])
+    if mid_sentence:
+        clause = clause[0].lower() + clause[1:]
+    coverage = (f" -- {fleet['fleet_pdk_reporting']} of {fleet['fleet_pdk_jobs']} fleet jobs"
+                " reported a stamp"
+                if 0 < fleet["fleet_pdk_reporting"] < fleet["fleet_pdk_jobs"] else "")
+    return (f"{clause}{coverage}{', and ' if coverage else '; '}the verdict is recorded"
+            f" as `pdk.fleet_matches_pin`. That comparison is of commits only, so "
+            f"{PIN_COMMIT_LIMIT}; {evidence_tail}.")
 
 
 PIN_COMMIT_LIMIT = (
