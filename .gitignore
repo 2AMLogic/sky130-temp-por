@@ -99,5 +99,8 @@ flow/build/
 
 # Staged evidence scratch: raw outputs of new runs go to the fleet artifact
 # store (sim/bin/evidence_store.py); only manifests/artifacts/ is committed.
-# The corners/**/*.log exception above covers already-committed history only.
+# The corners/**/*.log exception above covers already-committed history only:
+# every runner stages into sim/.work/.stage/, and CI
+# (.github/scripts/check_records_append_only.py) fails a change that ADDS any
+# file under sim/*/corners/, so nothing new can land through that exception.
 sim/.work/

@@ -28,7 +28,10 @@ bucket, account or broker URL, and no storage-scheme URI; CI greps for them). Th
 closed: with no `$KLT_ARTIFACT_BROKER`, no `klt artifact put`/`verify`, or an
 unreachable broker, the run exits nonzero and nothing is committed. They are
 append-only like the rest of the evidence, and
-`.github/scripts/check_artifact_manifests.py` checks them in CI. Verify one from
+`.github/scripts/check_artifact_manifests.py` checks them in CI. The other half
+of the rule is enforced too: `.github/scripts/check_records_append_only.py`
+fails a change that *adds* any file under `sim/*/corners/`, so a runner cannot
+quietly commit raw bytes instead of storing them. Verify one from
 a fleet worker with `klt artifact verify <manifest>`. They are separate from
 the signoff report and attestations below. Flow and rationale: `sim/README.md`,
 "New evidence goes to the artifact store".
