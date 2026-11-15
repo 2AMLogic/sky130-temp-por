@@ -401,9 +401,7 @@ def record_footer_lines(rec: dict, script: str, *, links=None, nested: bool = Fa
 def write_selftest_record(rec_dir: Path, record_id: str, doc: dict, md_lines: list[str]) -> None:
     """Write a self-test record's `.json` + `.md`, refusing to touch an existing record (records/ is append-only)."""
     rec_dir.mkdir(exist_ok=True)
-    for ext in (".md", ".json"):
-        if (rec_dir / f"{record_id}{ext}").exists():
-            raise SystemExit("record exists -- append-only")
+    refuse_existing((rec_dir / f"{record_id}.md", rec_dir / f"{record_id}.json"))
     (rec_dir / f"{record_id}.json").write_text(json.dumps(doc, indent=1, sort_keys=True) + "\n")
     (rec_dir / f"{record_id}.md").write_text("\n".join(md_lines))
 
