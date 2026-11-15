@@ -7,8 +7,13 @@ schema_version 1):
               version,loom.repo,commit}, uri, optional name/media_type)
   uri         must start with 'artifact:'; any '://' or 'arn:aws:' anywhere in
               the manifest (s3:// URIs, broker URLs, account ARNs) fails
-  bytes       fails if a git-tracked file outside manifests/artifacts/ has the
-              sha256 of a stored object (the bytes were committed as well)
+  bytes       fails if a git-tracked file outside manifests/artifacts/ is the
+              bytes of a stored object. Identity is by sha256 AND declared
+              path: a same-hash tracked file only counts when the object's
+              entry names that exact path (or carries no name at all —
+              unknown path, fail safe). Distinct files that merely share
+              bytes — e.g. two experiments' 4-line clean-pass corner stubs,
+              which differ only in the corner name — are not duplication.
 Each manifest needs its '.summary.md' twin. Stdlib only; no klt, no broker
 (`klt artifact verify` needs the broker and runs from fleet workers).
 
@@ -61,7 +66,7 @@ def check_manifest(path, text):
         if not (isinstance(e["sha256"], str) and SHA.match(e["sha256"])):
             errs.append(f"{where}: sha256 must be 64 lowercase hex")
         else:
-            shas.append((e["sha256"], e["size"]))
+            shas.append((e["sha256"], e["size"], e.get("name")))
         if not (isinstance(e["size"], int) and not isinstance(e["size"], bool) and e["size"] >= 0):
             errs.append(f"{where}: size must be a non-negative integer")
         if e["kind"] != "evidence":
@@ -82,21 +87,30 @@ def run(repo):
     manifests = sorted(p for p in tracked if re.fullmatch(re.escape(ART_DIR) + r"/[^/]+\.manifest\.json", p))
     problems = []
     stored = {}
+    named = {}
     for m in manifests:
         errs, shas = check_manifest(m, (repo / m).read_text())
         problems += [f"{m}: {e}" for e in errs]
         if not m.endswith(".manifest.json") or (m[: -len(".manifest.json")] + ".summary.md") not in tracked:
             problems.append(f"{m}: missing .summary.md twin")
-        for sha, size in shas:
+        for sha, size, name in shas:
             stored[sha] = (size, m)
+            if name is not None:
+                named.setdefault(sha, set()).add(name)
     sizes = {s for s, _ in stored.values()}
     if stored:
         for p in tracked:
             if p.startswith(ART_DIR + "/") or not (repo / p).is_file():
                 continue
             f = repo / p
-            if f.stat().st_size in sizes and hashlib.sha256(f.read_bytes()).hexdigest() in stored:
-                problems.append(f"{p}: bytes of a stored object are also committed ({stored[hashlib.sha256(f.read_bytes()).hexdigest()][1]})")
+            if f.stat().st_size in sizes and (h := hashlib.sha256(f.read_bytes()).hexdigest()) in stored:
+                # path-aware: a same-hash object with a declared name at a
+                # DIFFERENT path is a distinct file sharing bytes (clean-pass
+                # corner stubs across experiments); only a path match — or an
+                # unnamed object, whose path we cannot check — is duplication.
+                if h not in named or p in named[h]:
+                    why = "unnamed stored object" if h not in named else "same path"
+                    problems.append(f"{p}: bytes of a stored object are also committed ({why}, {stored[h][1]})")
     # any other tracked file under manifests/ must not name storage either
     for p in tracked:
         if p.startswith("manifests/") and not p.startswith(ART_DIR + "/") and p.endswith((".json", ".md", ".yml")):
@@ -140,7 +154,11 @@ def selftest():
     case("empty entries fails", lambda d: d.update(entries=[]), False)
     case("absolute name fails", lambda d: d["entries"][0].update(name="/etc/x"), False)
     case("arn in manifest fails", lambda d: d["entries"][0].update(name="arn:aws:x"), False)
-    case("tracked bytes of stored object fail", lambda d: None, False,
+    case("tracked bytes at declared path fail", lambda d: d["entries"][0].update(name="sim/tt.log"), False,
+         lambda r: (r / "sim").mkdir() or (r / "sim" / "tt.log").write_bytes(b"payload\n"))
+    case("same bytes at a different path pass", lambda d: d["entries"][0].update(name="sim/tt.log"), True,
+         lambda r: (r / "sim").mkdir() or (r / "sim" / "o.log").write_bytes(b"payload\n"))
+    case("tracked bytes of unnamed object fail", lambda d: d["entries"][0].pop("name"), False,
          lambda r: (r / "sim").mkdir() or (r / "sim" / "tt.log").write_bytes(b"payload\n"))
     case("unrelated tracked file passes", lambda d: None, True,
          lambda r: (r / "sim").mkdir() or (r / "sim" / "o.log").write_bytes(b"other!!\n"))
