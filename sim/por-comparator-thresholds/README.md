@@ -231,6 +231,46 @@ corners or the margin of the main grid.
 replaced by the klt-extracted lumped-RC netlist (`layout/por_comparator/pex/`). New record ids; the schematic records above are
 untouched. Delta table, extraction model, and the `klt pex` blocker (pin order, MOS flavour) are in
 [`layout/por_comparator/pex/README.md`](../../layout/por_comparator/pex/README.md). Run with `run --variant <name>-postlayout`
+
+### Mismatch Monte Carlo supplement (issue #348): real-bias-core, tt/ss x -40/27/125 C, N = 20 per corner
+
+Record: `records/20261115-002854-ad5bbeda-real-bias-core-mismatch-mc.md` (+
+`.json`); fleet jobs `klt-sim-75437447430e`, `klt-sim-fcad8d4af43e`,
+`klt-sim-f0072776735a`, `klt-sim-d71889c27127`, `klt-sim-2e35a2e1c04a`,
+`klt-sim-c4092f427b38` (one per (process, temperature), 20 mismatch samples
+each, seeds 20261115-20261120, primary 100 V/s only, no half-rate guard).
+Per corner, over the **valid** samples (Bessel (n-1) sigmas; hysteresis per
+sample):
+
+| corner | N valid/N run | VPOR-up mean ± sigma (V) | VPOR-down mean ± sigma (V) | hysteresis mean ± sigma (mV) | sigma resolution | excluded |
+|---|---|---|---|---|---|---|
+| tt/-40C | 13/20 | 2.7789 ± 0.1520 | 2.6195 ± 0.1444 | 159.4 ± 7.6 | 20.4% | 7 |
+| tt/27C | 10/20 | 2.7023 ± 0.1157 | 2.5521 ± 0.1127 | 150.2 ± 14.4 | 23.6% | 10 |
+| tt/125C | 15/20 | 2.7396 ± 0.1478 | 2.5874 ± 0.1405 | 152.2 ± 7.4 | 18.9% | 5 |
+| ss/-40C | 11/20 | 2.7675 ± 0.1033 | 2.6082 ± 0.0979 | 159.3 ± 5.5 | 22.4% | 9 |
+| ss/27C | 13/20 | 2.7344 ± 0.1006 | 2.5776 ± 0.0957 | 156.9 ± 5.0 | 20.4% | 7 |
+| ss/125C | 19/20 | 2.7283 ± 0.1405 | 2.5749 ± 0.1335 | 153.3 ± 7.1 | 16.7% | 1 |
+
+Two findings the corner tables could not show:
+
+- **The mismatch spread of the thresholds is an order of magnitude larger
+  than the corner envelope.** VPOR-up spans 18 mV across the whole 5x3
+  corner grid of the nominal circuit; under mismatch its sigma is
+  100-152 mV at every simulated corner. The record states the resolution of
+  each sigma (17-24% at these N) alongside.
+- **38 of 120 samples never release reset at all**: POR_RAW held low through
+  the entire 0 -> 3.63 V -> 0 sweep (up AND down `no_transition`), with
+  `bias_core`'s VREF healthy (1.14-1.38 V at the intended branch), i.e. the
+  failure is downstream of the reference. One further sample shows
+  `multiple_transitions` on the DOWN segment. The per-corner distributions
+  therefore describe the **releasing subset** only; the failed-release
+  fraction (5-50% per corner) is part of the mismatch behaviour, and neither
+  DR-004's +257 mV corner margin nor a release-subset sigma describes those
+  samples.
+
+Evidence only, as everywhere in this campaign: no threshold is proposed,
+`spec/` and DR-004 are untouched. Temperatures draw independent realisation
+sets, so no per-sample temperature-drift claim is made.
 (post-layout variants are never part of the default `run`).
 
 ### Fleet friction (reported, not worked around locally)
