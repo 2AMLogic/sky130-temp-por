@@ -12,7 +12,7 @@ Stages (each a subcommand):
   run         build the two generated decks + requests and submit them to the fleet.
   crosscheck  one single-corner (tt / 27 C / 3.30 V) LOCAL probe per state (``--backend local``).
   record      grade every retrieved waveform with iq_checker.py and write the append-only
-              evidence (snapshots, scrubbed klt reports, decimated traces, md + json twins).
+              evidence (snapshots, scrubbed klt reports, uniform-stride thinned traces, md + json twins).
   selftest    run the settling/physicality checker on synthetic settled / drifting currents.
 
 States: por-iq (RESETn forced low by a testbench source), iq-total (natural released
@@ -179,7 +179,8 @@ def cmd_crosscheck(args) -> int:
 # --------------------------------------------------------------------------
 
 
-def decimate(wave: dict, keep: list[str], n: int = 400) -> dict:
+def thin_uniform(wave: dict, keep: list[str], n: int = 400) -> dict:
+    """Uniform-stride thinning to ~n samples (last point kept); NOT sim_common.decimate, which is change-triggered."""
     t = wave["time"]
     step = max(1, len(t) // n)
     idx = list(range(0, len(t), step))
@@ -252,7 +253,7 @@ def analyze_state(state: str, run_dir: Path, man: dict, traces: dict) -> dict:
         if g.get("invalid_input"):  # NaN/inf/ragged samples: no trace, so no NaN/Infinity tokens reach the trace JSON
             continue
         keep = ["v(vdd)", "v(resetn)", "i(bvdd)", *qc.SUBCELLS.values(), "i(vrst)", "v(ptat)", "v(ctat)"]
-        traces.setdefault(state, {})[cid] = decimate(wave, keep)
+        traces.setdefault(state, {})[cid] = thin_uniform(wave, keep)
     return {"requests": req, "points": pts}
 
 
