@@ -7,8 +7,20 @@ Chronological record of recently merged pull requests and closed issues. This fi
 - [2026-09](work_log/WORK_LOG_2026-09.md)
 - [2026-08](work_log/WORK_LOG_2026-08.md)
 
+### 2026-11-15
+
+- **PR #370**: docs(report): index the mirror-degeneration record and retire #86 as an open owner
+- **Issue #347** (closed): Characterization report: cite the mirror-degeneration record and correct the #86 wording
+
 ### 2026-11-14
 
+- **PR #345**: docs: roadmap as of 2026-11-13
+- **PR #343**: feat(sim): derive a three-state fleet-PDK-vs-pin verdict in every runner's record
+- **Issue #333** (closed): Compare the recorded fleet-runner PDK stamp with the sim/pdk.json pin (today it is recorded, never checked)
+- **PR #336**: refactor(sim): route the last six runners through evidence_store and close corners/ to additions
+- **Issue #325** (closed): Route the six remaining sim runners through evidence_store: they still commit raw corner bytes in-tree (1 MB added since adoption)
+- **Issue #360** (closed): por-comparator-thresholds: adopt sim_common.decimate + write_gz_rows in run_thresholds_campaign.write_trace (the fifth, un-migrated trace writer)
+- **Issue #358** (closed): run_glitch_campaign.py rides one flag for two retry mechanisms: the capacity wait is also the concurrency-cap poll
 - **PR #332**: refactor(sim): read the fleet's PDK through one sim_common helper, not five
 - **Issue #328** (closed): Share one fleet-PDK reader in sim_common: 3 private copies, and 3 runners record the client's PDK as fleet_pdk_report
 
