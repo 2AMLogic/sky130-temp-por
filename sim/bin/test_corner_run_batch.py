@@ -15,16 +15,20 @@ import argparse
 import json
 import os
 import stat
+import subprocess
 import sys
 import tempfile
 import unittest
+from datetime import datetime, timezone
 from pathlib import Path
+from unittest import mock
 
 BIN = Path(__file__).resolve().parent
 REPO = BIN.parent.parent
 sys.path.insert(0, str(BIN))
 
 import sim_common  # noqa: E402
+import evidence_store  # noqa: E402
 
 cr = sim_common.load_corner_run()
 
@@ -58,6 +62,46 @@ def make_pdk() -> "cr.Pdk":
         installed_commit=PINNED,
         lib_file=root / "sky130A" / PIN["ngspice_lib"],
     )
+
+
+class FixedDatetime(datetime):
+    """`datetime` whose `now()` is frozen, so `main()`'s record id is deterministic."""
+
+    @classmethod
+    def now(cls, tz=None):
+        return cls(2026, 1, 1, 12, 0, 0, tzinfo=timezone.utc)
+
+
+# Child interpreter for the end-to-end collision check: fakes the PDK away,
+# freezes the clock and the git state, then lets `main()` hit the guard with
+# SystemExit uncaught so the process exit status is the real one.
+COLLISION_CHILD = """\
+import sys
+from datetime import datetime, timezone
+from pathlib import Path
+
+BIN = Path(sys.argv[1])
+sys.path.insert(0, str(BIN))
+import sim_common
+
+cr = sim_common.load_corner_run()
+pin = cr.load_pin()
+fake_root = Path("/nonexistent/pdk-root")
+cr.resolve_pdk = lambda p: cr.Pdk(
+    pin=p, root=fake_root, variant=pin["variant"], dir=fake_root / pin["variant"],
+    installed_commit=pin["open_pdks_commit"],
+    lib_file=fake_root / pin["variant"] / pin["ngspice_lib"],
+)
+
+class FixedDatetime(datetime):
+    @classmethod
+    def now(cls, tz=None):
+        return cls(2026, 1, 1, 12, 0, 0, tzinfo=timezone.utc)
+
+cr.datetime = FixedDatetime
+cr.git_state = lambda: {"sha": "deadbee", "branch": "test", "dirty": False}
+cr.main([sys.argv[2]])
+"""
 
 
 def full_matrix(exp):
@@ -349,6 +393,148 @@ class SubmitWithStubbedKlt(unittest.TestCase):
             "backend": "batch",
             "batch": fleet["batch"],
         }
+
+
+class RefuseExistingHelper(unittest.TestCase):
+    """Net-new coverage for `sim_common.refuse_existing` (issue #369): the helper
+    is the append-only refusal for sim/ evidence at 13 call sites and had none."""
+
+    def test_a_collision_aborts_naming_that_path(self):
+        with tempfile.TemporaryDirectory() as tmp:
+            existing = Path(tmp) / "rec.md"
+            existing.write_text("prior evidence\n")
+            with self.assertRaises(SystemExit) as ctx:
+                sim_common.refuse_existing((existing, Path(tmp) / "rec.json"))
+            self.assertEqual(str(ctx.exception), f"{existing} exists -- sim/ is append-only")
+
+    def test_no_collision_returns_silently(self):
+        with tempfile.TemporaryDirectory() as tmp:
+            paths = (Path(tmp) / "rec.md", Path(tmp) / "rec.json")
+            self.assertIsNone(sim_common.refuse_existing(paths))
+
+
+class WriteSelftestRecordCollision(unittest.TestCase):
+    """`write_selftest_record` used to raise a pathless `record exists --
+    append-only`, so an operator could not tell whether the `.md` or the `.json`
+    was in the way (issue #369). The refusal must name the colliding path and
+    write nothing."""
+
+    def setUp(self):
+        self.tmp = tempfile.TemporaryDirectory(prefix="selftest-record-")
+        self.addCleanup(self.tmp.cleanup)
+        self.rec_dir = Path(self.tmp.name) / "records"
+        self.rec_dir.mkdir()
+
+    def test_existing_md_names_the_md_and_writes_nothing(self):
+        existing = self.rec_dir / "REC.md"
+        existing.write_text("prior record\n")
+        with self.assertRaises(SystemExit) as ctx:
+            sim_common.write_selftest_record(self.rec_dir, "REC", {"record_id": "REC"}, ["- line"])
+        self.assertEqual(str(ctx.exception), f"{existing} exists -- sim/ is append-only")
+        self.assertFalse((self.rec_dir / "REC.json").exists())
+
+    def test_json_only_collision_names_the_json_the_old_message_could_not(self):
+        existing = self.rec_dir / "REC.json"
+        existing.write_text("{}\n")
+        with self.assertRaises(SystemExit) as ctx:
+            sim_common.write_selftest_record(self.rec_dir, "REC", {"record_id": "REC"}, ["- line"])
+        self.assertEqual(str(ctx.exception), f"{existing} exists -- sim/ is append-only")
+        self.assertFalse((self.rec_dir / "REC.md").exists())
+
+    def test_a_clean_record_still_writes_both_files(self):
+        sim_common.write_selftest_record(
+            self.rec_dir, "REC", {"record_id": "REC"}, ["# REC", "- line"]
+        )
+        self.assertEqual(json.loads((self.rec_dir / "REC.json").read_text()), {"record_id": "REC"})
+        self.assertEqual((self.rec_dir / "REC.md").read_text(), "# REC\n- line")
+
+
+class MainRecordCollision(unittest.TestCase):
+    """`main()`'s five-path append-only guard now routes through
+    `sim_common.refuse_existing` (issue #369): a collision aborts with
+    SystemExit naming the path -- not a HarnessError with the old wording --
+    before anything is written under sim/.
+
+    The experiment lives in a tmp dir (a copy of bias-core-smoke's manifest with
+    an absolute schematic path), and the evidence-store roots are repointed
+    there too, so no repo path is ever created.
+    """
+
+    REC_ID = "20260101-120000-deadbee"
+
+    def setUp(self):
+        self.tmp = tempfile.TemporaryDirectory(prefix="corner-run-collision-")
+        self.addCleanup(self.tmp.cleanup)
+        self.exp_dir = Path(self.tmp.name) / "experiment"
+        self.exp_dir.mkdir()
+        manifest = json.loads((EXPERIMENT / "experiment.json").read_text())
+        manifest["schematic"] = str(EXPERIMENT / manifest["schematic"])
+        (self.exp_dir / "experiment.json").write_text(json.dumps(manifest))
+        # Deterministic record id: frozen clock, frozen git sha, fake PDK pinned
+        # to the pin (matches_pin -> True, no --allow-pdk-mismatch needed).
+        for patch in (
+            mock.patch.object(cr, "datetime", FixedDatetime),
+            mock.patch.object(cr, "git_state",
+                              lambda: {"sha": "deadbee", "branch": "test", "dirty": False}),
+            mock.patch.object(cr, "resolve_pdk", lambda pin: make_pdk()),
+            mock.patch.object(evidence_store, "STAGE_ROOT", self.exp_dir / ".stage"),
+            mock.patch.object(evidence_store, "MANIFEST_DIR", self.exp_dir / ".manifests"),
+        ):
+            patch.start()
+            self.addCleanup(patch.stop)
+
+    def guarded_paths(self):
+        exp = cr.load_experiment(self.exp_dir)
+        return {
+            "record_md": exp.dir / "records" / f"{self.REC_ID}.md",
+            "record_json": exp.dir / "records" / f"{self.REC_ID}.json",
+            "snapshot": exp.dir / "netlist-snapshots" / f"{self.REC_ID}.spice",
+            "stage_dir": evidence_store.stage_dir_for(exp.slug, self.REC_ID),
+            "artifact_manifest": evidence_store.manifest_path(exp.slug, self.REC_ID),
+        }
+
+    def place(self, colliding, as_dir=False):
+        colliding.parent.mkdir(parents=True, exist_ok=True)
+        if as_dir:
+            colliding.mkdir()
+            (colliding / "staged-bytes").write_text("raw log\n")
+        else:
+            colliding.write_text("prior evidence\n")
+
+    def assert_refusal(self, colliding):
+        self.place(colliding)
+        with self.assertRaises(SystemExit) as ctx:
+            cr.main([str(self.exp_dir)])
+        self.assertEqual(str(ctx.exception), f"{colliding} exists -- sim/ is append-only")
+
+    def test_existing_record_md_refuses_and_names_the_md(self):
+        self.assert_refusal(self.guarded_paths()["record_md"])
+
+    def test_existing_record_json_without_md_refuses_and_names_the_json(self):
+        self.assert_refusal(self.guarded_paths()["record_json"])
+
+    def test_existing_netlist_snapshot_refuses_and_names_the_snapshot(self):
+        self.assert_refusal(self.guarded_paths()["snapshot"])
+
+    def test_existing_stage_dir_refuses_and_names_the_dir(self):
+        self.assert_refusal(self.guarded_paths()["stage_dir"])
+
+    def test_existing_artifact_manifest_refuses_and_names_the_manifest(self):
+        self.assert_refusal(self.guarded_paths()["artifact_manifest"])
+
+    def test_collision_exits_status_1_from_a_real_process(self):
+        # End-to-end: the guard's SystemExit carries a string code, which the
+        # interpreter turns into exit status 1 with the message on stderr.
+        # Assert that real exit status from a child interpreter rather than
+        # assuming it from the exception type.
+        existing = self.guarded_paths()["record_md"]
+        self.place(existing)
+        proc = subprocess.run(
+            [sys.executable, "-I", "-c", COLLISION_CHILD, str(BIN), str(self.exp_dir)],
+            capture_output=True, text=True, timeout=120,
+        )
+        self.assertEqual(proc.returncode, 1, proc.stderr)
+        self.assertIn(f"{existing} exists -- sim/ is append-only", proc.stderr)
 
 
 if __name__ == "__main__":
