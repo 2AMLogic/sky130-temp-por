@@ -269,11 +269,11 @@ def _probe_points(
     """
     origins = spec.get("placement", {}).get("origins_um", {})
     blocks = {block["id"]: block for block in spec.get("blocks", [])}
+    _sibling_cache: dict[str, list[dict] | None] = {}
 
     def sibling_response_ports(block_id):
-        cache = getattr(sibling_response_ports, "_cache", {})
-        if block_id in cache:
-            return cache[block_id]
+        if block_id in _sibling_cache:
+            return _sibling_cache[block_id]
         cell = blocks[block_id].get("cell", {}) if block_id in blocks else {}
         gds_path = cell.get("gds_path")
         result = None
@@ -292,7 +292,7 @@ def _probe_points(
                     except (ValueError, KeyError):
                         _fail(f"unparseable sibling response: {response}")
                         raise SystemExit(1)
-        getattr(sibling_response_ports, "_cache", {})[block_id] = result
+        _sibling_cache[block_id] = result
         return result
 
     seen: set[tuple[str, str, str]] = set()
@@ -387,10 +387,10 @@ def _probe_points(
 def run_census(
     kdb,
     *,
-    cell_dir: Path,
     cell_name: str,
     gds_path: Path,
     spec_path: Path,
+    spec: dict,
     erc_spec_path: Path,
     erc_spec: dict,
     window_um: float,
@@ -462,7 +462,7 @@ def run_census(
             net_regions[(net, register_index)] = l2n.polygons_of_net(net, register_index)
 
     allowed = _load_policy(policy_path)
-    probes = _probe_points(json.loads(spec_path.read_text()), spec_path.parent, allowed)
+    probes = _probe_points(spec, spec_path.parent, allowed)
     probe_reports: list[dict] = []
     half_dbu = window_um / 2.0
     for probe in probes:
@@ -636,10 +636,10 @@ def main(argv=None) -> int:
     kdb = _ensure_klayout()
     report, ok = run_census(
         kdb,
-        cell_dir=cell_dir,
         cell_name=cell_name,
         gds_path=gds_path,
         spec_path=spec_path,
+        spec=spec,
         erc_spec_path=Path(erc_spec_path).resolve(),
         erc_spec=json.loads(Path(erc_spec_path).resolve().read_text()),
         window_um=args.window_um,

@@ -17,7 +17,9 @@ import tempfile
 import unittest
 from pathlib import Path
 
-sys.path.insert(0, str(Path(__file__).resolve().parent))
+HERE = Path(__file__).resolve().parent
+REPO_ROOT = HERE.parent.parent
+sys.path.insert(0, str(HERE))
 import sim_common as sc  # noqa: E402
 
 CAP_MSG = "8 instance(s) already running + 1 requested exceeds BATCH_MAX_CONCURRENT_INSTANCES=8"
@@ -166,6 +168,60 @@ class PointLogTest(unittest.TestCase):
             out = sc.point_log({}, ["# h"], Path(td), Path(td))
             self.assertIn("(no deck retrieved)", out)
             self.assertIn("(no ngspice log retrieved)", out)
+
+
+class NoRunnerOpenCodesTheseHelpersTest(unittest.TestCase):
+    """Source-level guard: the copies #293 hoisted must not grow back open-coded.
+
+    #293 enumerated its duplicates as named ``def``s, so the sweep could not see the two
+    copies that were open-coded in the middle of ``run_thresholds_campaign.py``'s record
+    loop -- they survived the very commit that consolidated everything else and then
+    drifted (that ``error_class`` could only ever answer ``no waveform retrieved``, never
+    ``timeout``; issue #365).  Name-based detection cannot catch that shape, so these two
+    assertions are positional instead: they look for the *text* of the open-coded bodies
+    anywhere under ``sim/``, which is what a reintroduced inline copy would look like.
+    """
+
+    #: Runners that turn a fleet corner into graded points; each writes per-point `.log`s.
+    RUNNERS = sorted((REPO_ROOT / "sim").glob("*/run_*.py"))
+
+    def test_runners_exist(self):
+        """Guard the guard: a glob that silently matched nothing would assert nothing."""
+        self.assertGreaterEqual(len(self.RUNNERS), 7, "campaign-runner glob matched too few files")
+
+    def test_point_log_body_is_assembled_in_exactly_one_place(self):
+        """The `.log` deck section is written by `sim_common.point_log` and nowhere else.
+
+        `run_thresholds_campaign.py` used to hand-assemble the same sections, in the same
+        order, with the same `| ` prefix and the same final `scrub`, under the pre-unified
+        header `# ==== klt sim deck ====`.
+        """
+        offenders = [str(f.relative_to(REPO_ROOT)) for f in self.RUNNERS
+                     if "==== klt sim deck" in f.read_text()]
+        self.assertEqual(offenders, [], "a campaign runner open-codes the per-point `.log` "
+                                        "deck section; call sim_common.point_log instead")
+        # ...and the one legitimate home still has it, so this guard cannot pass vacuously.
+        self.assertIn("==== klt sim deck", (REPO_ROOT / "sim/bin/sim_common.py").read_text())
+
+    def test_no_runner_derives_error_class_from_the_log_itself(self):
+        """An `error_class` read off the log text must come from `sim_common.classify_error`.
+
+        A runner may still assign a bare literal for a distinct named case it alone knows
+        about (glitch's `deck_attribution`); what it may not do is re-derive the shared
+        classification by inspecting `log_text` inline, which is how the thresholds copy
+        lost `timeout` and `error:<codes>`.  Deliberately NOT implicated:
+        `run_iq_campaign.classify_failure`, a different helper with a `timestep_too_small`
+        branch and a `klt:` prefix that never assigns `error_class`.
+        """
+        offenders = []
+        for f in self.RUNNERS:
+            for n, line in enumerate(f.read_text().splitlines(), 1):
+                if "error_class" not in line or "classify_error" in line:
+                    continue
+                if "log_text" in line or "could not find a valid modelname" in line:
+                    offenders.append(f"{f.relative_to(REPO_ROOT)}:{n}")
+        self.assertEqual(offenders, [], "a campaign runner derives `error_class` from the "
+                                        "log inline; call sim_common.classify_error instead")
 
 
 if __name__ == "__main__":
