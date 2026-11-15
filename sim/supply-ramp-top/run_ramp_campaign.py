@@ -445,14 +445,7 @@ def render_md(rec: dict) -> str:
         L.append("## Measured follow-on recommendation")
         L.append(rec["follow_on"])
         L.append("")
-    L.append("## Links")
-    for k, v in rec["links"].items():
-        L.append(f"- {k}: `{v}`")
-    L.append(f"- **Timestamp / author**: {rec['timestamp']}, {rec['author']}")
-    L.append(f"- **Supersedes**: {rec['supersedes'] or '(none)'}")
-    L.append("")
-    L.append("Written by `sim/supply-ramp-top/run_ramp_campaign.py`. Append-only: never edit this file -- a correction is a new record with a `Supersedes` field (see `sim/README.md`).")
-    L.append("")
+    L += sim_common.record_footer_lines(rec, "sim/supply-ramp-top/run_ramp_campaign.py")
     return "\n".join(L)
 
 

@@ -803,16 +803,10 @@ def render_md(rec: dict) -> str:
     L.append("")
     if rec.get("follow_on"):
         L += ["## Notes", rec["follow_on"], ""]
-    L.append("## Links")
-    for k, v in rec["links"].items():
-        L.append(f"- {k}: `{v}`")
-    L.append(f"- **Timestamp / author**: {rec['timestamp']}, {rec['author']}")
-    L.append(f"- **Supersedes**: {rec['supersedes'] or '(none)'}")
-    if rec.get("companion_of"):
-        L.append(f"- **Companion of**: `{rec['companion_of']}` -- the default-deck record stays as evidence; this solver-variant record is reported beside it and does not replace it.")
-    L.append("")
-    L.append("Written by `sim/brownout-top/run_brownout_campaign.py`. Append-only: never edit this file -- a correction is a new record with a `Supersedes` field (see `sim/README.md`).")
-    L.append("")
+    L += sim_common.record_footer_lines(
+        rec, "sim/brownout-top/run_brownout_campaign.py",
+        after_supersedes=[f"- **Companion of**: `{rec['companion_of']}` -- the default-deck record stays as evidence; this solver-variant record is reported beside it and does not replace it."]
+        if rec.get("companion_of") else ())
     return "\n".join(L)
 
 
