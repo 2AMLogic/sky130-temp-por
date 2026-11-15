@@ -62,7 +62,6 @@ from __future__ import annotations
 import argparse
 import json
 import math
-import os
 import shutil
 import sys
 from dataclasses import dataclass
@@ -76,11 +75,13 @@ DECK = HERE / "testbench" / "tb_pnp_mismatch.spice"
 BUILD_DIR = SIM_DIR / "build" / "pnp-mismatch"
 
 sys.path.insert(0, str(SIM_DIR / "bin"))
+import evidence_store  # noqa: E402
 import sim_common  # noqa: E402
 from sim_common import (  # noqa: E402
     MismatchPoint,
     add_common_args,
     build_mismatch_points,
+    deck_list_batch_clause,
     load_corner_run,
     mean,
     mv,
@@ -519,21 +520,7 @@ def render_record(r: dict) -> str:
     )
     L.extend(render_pdk_tools_repo_state(r))
     b = r["batch"]
-    add(
-        f"- **Backend**: `klt sim --backend batch` deck-list request (fleet job "
-        f"`{b['job_id']}`, {b['instance_type']} in {b['region']}, report status "
-        f"`{b['report_status']}`: {b['passed']}/{b['unit_count']} unit(s) passed, "
-        f"{b['errored']} errored, {b['timed_out']} timed out); fleet runner klt "
-        f"`{b['runner_klt_version']}`, client `{b['klt_client']}`, "
-        f"`--wait-for-capacity {b['capacity_wait_s']:g}`"
-        + (
-            ""
-            if not b["failed_earlier_attempts"]
-            else f"; {len(b['failed_earlier_attempts'])} earlier submit attempt(s) refused: "
-            + "; ".join(b["failed_earlier_attempts"])
-        )
-    )
-    add(f"- **Fleet engine**: {r['tools']['fleet_ngspice']} (per-point, from each unit's own log banner)")
+    L.extend(deck_list_batch_clause(b, r["tools"]["fleet_ngspice"]))
     add(f"- **Sampling method**: {b['sampling_method']}")
     add(f"- **Transport**: {r['tools']['fleet_note']}")
 
@@ -726,18 +713,12 @@ def render_record(r: dict) -> str:
     )
     add("")
 
-    add("- **Links**:")
-    for key, value in r["links"].items():
-        add(f"  - {key}: `{value}`")
-    add(f"- **Timestamp / author**: {r['timestamp']}, {r['author']}")
-    add(f"- **Supersedes**: {r['supersedes'] or '(none — first record for this claim)'}")
-    add("")
-    add(
-        "Written by `sim/pnp-mismatch/run_pnp_mismatch.py`. Append-only: never edit this "
-        "file — a correction is a new record with a `Supersedes` field (see "
-        "`sim/README.md`)."
-    )
-    add("")
+    L += sim_common.record_footer_lines(
+        r, "sim/pnp-mismatch/run_pnp_mismatch.py", nested=True, after_links=[
+            "  - the raw per-point ngspice logs (`<corner-id>.log`) and the klt deck report "
+            "(`batch/report.json`) are stored objects of `artifact_manifest`, not tracked "
+            f"files; check the bytes with `klt artifact verify {r['links']['artifact_manifest']}`"
+        ])
     return "\n".join(L)
 
 
@@ -766,12 +747,6 @@ def parse_args(argv: list[str]) -> argparse.Namespace:
         type=int,
         default=6,
         help="fleet-worker pool size for the deck list (klt `options.max_workers`)",
-    )
-    p.add_argument(
-        "--wait-for-capacity",
-        type=float,
-        default=600,
-        help="seconds the batch submit waits out a fleet capacity refusal before failing",
     )
     p.add_argument(
         "--probe",
@@ -814,6 +789,10 @@ def run_probe(args, pdk, points: list[Point]) -> int:
 
 def main(argv: list[str]) -> int:
     args = parse_args(argv)
+    if not (args.dry_run or args.probe):
+        # Fail closed before anything is submitted: new evidence goes to the artifact
+        # store and there is no fallback that commits raw bytes (sim/README.md).
+        evidence_store.preflight_or_exit()
     if not DECK.is_file():
         raise cr.HarnessError(f"missing testbench: {DECK}")
     if args.samples < 2:
@@ -823,10 +802,8 @@ def main(argv: list[str]) -> int:
     pdk = cr.resolve_pdk(pin)
     if not pdk.matches_pin and not args.allow_pdk_mismatch:
         raise cr.HarnessError(
-            f"installed PDK {pdk.variant} is open_pdks {pdk.installed_commit}, but "
-            f"sim/pdk.json pins {pin['open_pdks_commit']}\n"
-            f"  install the pin: {pin['install_command']}\n"
-            f"  or re-run with --allow-pdk-mismatch (the record will say so)"
+            cr.pdk_mismatch_message(pdk, pin)
+            + "\n  or re-run with --allow-pdk-mismatch (the record will say so)"
         )
     points = build_points(args.samples)
     if args.probe:
@@ -838,15 +815,16 @@ def main(argv: list[str]) -> int:
 
     records_dir = HERE / "records"
     snapshots_dir = HERE / "netlist-snapshots"
-    corners_dir = HERE / "corners" / record_id
+    # Raw per-point logs stage in git-ignored scratch and are stored in the fleet
+    # artifact store below; only the manifest and its summary are committed.
+    corners_dir = evidence_store.stage_dir_for(SLUG, record_id)
+    art_manifest_path = evidence_store.manifest_path(SLUG, record_id)
     record_md = records_dir / f"{record_id}.md"
     record_json = records_dir / f"{record_id}.json"
     snapshot = snapshots_dir / f"{record_id}.spice"
-    for path in (record_md, record_json, snapshot, corners_dir):
-        if path.exists():
-            raise cr.HarnessError(
-                f"{path} already exists — sim/ is append-only, refusing to overwrite"
-            )
+    sim_common.refuse_existing(
+        (record_md, record_json, snapshot, corners_dir, art_manifest_path)
+    )
 
     request, files = build_request(points, pdk, "batch", args)
     run_dir = BUILD_DIR / record_id
@@ -932,50 +910,33 @@ def main(argv: list[str]) -> int:
 
     sim_common.snapshot_deck_request(submit_dir, corners_dir, run_dir, REPO_ROOT)
 
+    # Store the staged bytes first: on failure nothing is written under
+    # sim/pnp-mismatch/ or manifests/ and the bytes stay for a retry.
+    art_manifest, art_summary = evidence_store.store_or_exit(SLUG, record_id, corners_dir)
+
     cross = seed_stability(results)
     overall = all(r["pass"] for r in ordered) and all(c["pass"] for c in cross)
 
     snapshots_dir.mkdir(parents=True, exist_ok=True)
     shutil.copyfile(DECK, snapshot)
 
-    # Provenance is OBSERVED, never a literal (issue #297): the engine from each unit's
-    # own `ngspice-NN done` banner, the runner's klt from the job's report.
-    remote = (report.get("environment") or {}).get("remote") or {}
-    pdk_block, tools_block = sim_common.record_pdk_tools(
+    pdk_block, tools_block, batch_block = sim_common.deck_list_record_blocks(
         pdk,
         pin,
-        {"klt_client": sim_common.klt_version()},
+        report,
         points=ordered,
-        requests=[remote],
-        lib_file=sim_common.runner_lib_ref(pdk.variant),
-        root=sim_common.HOST_PDK_ROOT,
-        xschem_note=None,
-        fleet_note=sim_common.DECK_NOTE,
+        capacity_wait_s=args.wait_for_capacity,
+        attempts=sim_common.attempt_messages(submit_dir, run_dir, REPO_ROOT),
     )
-    batch_block = {
-        "job_id": remote.get("job_id"),
-        "region": remote.get("region"),
-        "instance_type": remote.get("instance_type"),
-        "state": remote.get("state"),
-        "runner_klt_version": remote.get("runner_klt_version"),
-        "runner_request_features": remote.get("runner_request_features"),
-        "klt_client": sim_common.klt_version(),
-        "klt_sim_backend_env": os.environ.get("KLT_SIM_BACKEND"),
-        "capacity_wait_s": args.wait_for_capacity,
-        "report_status": report.get("status"),
-        "unit_count": report.get("unit_count"),
-        "passed": report.get("passed"),
-        "errored": report.get("errored"),
-        "timed_out": report.get("timed_out"),
-        "failed_earlier_attempts": sim_common.attempt_messages(submit_dir, run_dir, REPO_ROOT),
-        "sampling_method": (
-            "in-deck `.control` dowhile/reset loop inside ONE ngspice process, seeded by "
-            "`setseed $mc_seed` from the shipped `.spiceinit` -- the SAME method this "
-            "experiment's earlier records were minted by, carried to the fleet unchanged "
-            "by the `decks[]` transport rather than re-expressed as a klt `monte_carlo` "
-            "block (which would draw the samples differently; issue #319 risk item 2)"
-        ),
-    }
+    # This experiment's own claim about HOW the samples were drawn -- not fleet
+    # provenance, so it stays here rather than in the shared `batch` builder.
+    batch_block["sampling_method"] = (
+        "in-deck `.control` dowhile/reset loop inside ONE ngspice process, seeded by "
+        "`setseed $mc_seed` from the shipped `.spiceinit` -- the SAME method this "
+        "experiment's earlier records were minted by, carried to the fleet unchanged "
+        "by the `decks[]` transport rather than re-expressed as a klt `monte_carlo` "
+        "block (which would draw the samples differently; issue #319 risk item 2)"
+    )
 
     record = {
         "record_id": record_id,
@@ -1037,8 +998,8 @@ def main(argv: list[str]) -> int:
             "testbench": str(DECK.relative_to(REPO_ROOT)),
             "run_script": str((HERE / "run_pnp_mismatch.py").relative_to(REPO_ROOT)),
             "netlist_snapshot": str(snapshot.relative_to(REPO_ROOT)),
-            "raw_logs": str(corners_dir.relative_to(REPO_ROOT)) + "/",
-            "klt_report": str((corners_dir / "batch" / "report.json").relative_to(REPO_ROOT)),
+            "artifact_manifest": str(art_manifest.relative_to(REPO_ROOT)),
+            "artifact_summary": str(art_summary.relative_to(REPO_ROOT)),
             "json_record": str(record_json.relative_to(REPO_ROOT)),
             "record": str(record_md.relative_to(REPO_ROOT)),
         },
@@ -1051,7 +1012,7 @@ def main(argv: list[str]) -> int:
     print()
     print(f"record  : {record_md.relative_to(REPO_ROOT)}")
     print(f"json    : {record_json.relative_to(REPO_ROOT)}")
-    print(f"logs    : {corners_dir.relative_to(REPO_ROOT)}/")
+    print(f"logs    : stored; {art_manifest.relative_to(REPO_ROOT)}")
     print(f"overall : {'PASS' if overall else 'FAIL'}")
     return 0 if overall else 2
 

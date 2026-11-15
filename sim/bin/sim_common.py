@@ -51,6 +51,12 @@ and/or `corner-run.py` itself):
                           `--allow-pdk-mismatch`/`--dry-run` flags (and
                           `--samples` when requested) a bespoke script's
                           `parse_args()` needs
+    add_capacity_wait_arg()/CAPACITY_WAIT_DEFAULT
+                          the ONE declaration of `--wait-for-capacity`, the
+                          CLI surface of `batch.capacity_wait_s`, callable on
+                          a top-level parser or a `run` subparser; eleven
+                          runners declared it by hand under two names with
+                          two defaults before issue #339
     build_mismatch_points() the N-point mismatch-sweep-plus-controls list
                           builder `pnp-mismatch/run_pnp_mismatch.py` uses
     mean()/stdev()/mv()     small numeric/formatting helpers
@@ -93,6 +99,13 @@ and/or `corner-run.py` itself):
                           establish
     pin_state()             the `sim/pdk.json` pin-state ternary every
                           record's `PDK` line carries
+    deck_list_record_blocks()/deck_list_batch_fields()/deck_list_batch_clause()
+                          the same one-builder rule applied to a deck-list
+                          (`decks[]`) run's record provenance (issue #350):
+                          the `pdk`/`tools`/`batch` blocks in one call, the
+                          `batch` dict's own 15-key shape (a unit tally, not
+                          `fleet_job_fields()`' corner one), and the
+                          `Backend`/`Fleet engine` sentences that render it
 """
 
 from __future__ import annotations
@@ -139,19 +152,72 @@ class MismatchPoint:
     purpose: str
 
 
+# The host rule ("pass `--wait-for-capacity 600` on every batch `klt sim`") expressed as
+# the default, not as help text a runner may or may not carry.  Nine of the eleven
+# hand-rolled declarations this replaces defaulted the wait to 0, i.e. a Spot capacity
+# refusal failed the submit instead of being waited out -- which is exactly how
+# `sim/temp-core-startup-solver/records/20261010-100955-292949a.md` came to record four
+# `NOT-RUN: fleet refused (batch_no_capacity)` rows (issue #339).
+CAPACITY_WAIT_DEFAULT = 600.0
+
+
+def add_capacity_wait_arg(
+    parser: argparse.ArgumentParser,
+    *,
+    default: float = CAPACITY_WAIT_DEFAULT,
+) -> None:
+    """Declare `--wait-for-capacity` -- the one CLI surface of `batch.capacity_wait_s`.
+
+    `base_request()` and `deck_request()` are the only writers of that field, so this is
+    the only flag any runner needs for it.  Call this on whichever parser actually parses
+    a submit: the top-level parser for a bespoke runner (`add_common_args()` does it for
+    you), or the `run` subparser for a campaign runner.
+
+    `--capacity-wait` survives as a hidden alias on the same `dest`, because six
+    campaign runners shipped under that spelling and operator notes, READMEs and earlier
+    records cite it (e.g. `sim/por-comparator-thresholds/README.md`).  It is
+    `help=argparse.SUPPRESS` so `--help` teaches exactly one name, and
+    `default=argparse.SUPPRESS` so it cannot win the default from the canonical flag
+    (argparse seeds a shared `dest` from the FIRST action declaring it).
+
+    `0` leaves the field out of the request entirely -- the fail-fast behaviour that was
+    the default before issue #339, still reachable as `--wait-for-capacity 0`.
+    """
+    parser.add_argument(
+        "--wait-for-capacity",
+        dest="wait_for_capacity",
+        type=float,
+        default=default,
+        metavar="S",
+        help="batch.capacity_wait_s: seconds klt waits out a Spot/fleet capacity refusal "
+        f"instead of failing the submit (host rule: {default:g}; 0 omits the field)",
+    )
+    parser.add_argument(
+        "--capacity-wait",
+        dest="wait_for_capacity",
+        type=float,
+        default=argparse.SUPPRESS,
+        metavar="S",
+        help=argparse.SUPPRESS,
+    )
+
+
 def add_common_args(
     parser: argparse.ArgumentParser,
     *,
     timeout_default: int,
     samples_default: int | None = None,
 ) -> None:
-    """Add the `--author`/`--supersedes`/`--timeout`/`--allow-pdk-mismatch`/
-    `--dry-run` flags a bespoke `run_*.py` script's `parse_args()` needs (and,
-    when `samples_default` is given, `--samples`).
+    """Add the `--author`/`--supersedes`/`--timeout`/`--wait-for-capacity`/
+    `--allow-pdk-mismatch`/`--dry-run` flags a bespoke `run_*.py` script's
+    `parse_args()` needs (and, when `samples_default` is given, `--samples`).
 
     Callers add any script-specific flags to `parser` first, then call this
     to append the shared set -- `--samples` (when requested) is added first
     within this call, matching sky130-bandgap's own convention.
+
+    A campaign runner parses its submit on a `run` subparser rather than here, so it
+    calls `add_capacity_wait_arg()` on that subparser directly (issue #339).
     """
     if samples_default is not None:
         parser.add_argument(
@@ -162,6 +228,7 @@ def add_common_args(
     parser.add_argument(
         "--timeout", type=int, default=timeout_default, help="per-point ngspice timeout (s)"
     )
+    add_capacity_wait_arg(parser)
     parser.add_argument(
         "--allow-pdk-mismatch",
         action="store_true",
@@ -320,6 +387,75 @@ def selftest_footer_lines(doc: dict, ok: bool, script: str) -> list[str]:
     """Closing lines shared by every self-test record's markdown: verdict, timestamp/author, supersedes."""
     return ["", f"**Overall: {'PASS' if ok else 'FAIL'}**", "", f"- **Timestamp / author**: {doc['timestamp']}, {doc['author']}",
             f"- **Supersedes**: {doc['supersedes'] or '(none)'}", "", f"Written by `{script}`. Append-only.", ""]
+
+
+RECORD_APPEND_ONLY = (
+    "Append-only: never edit this file -- a correction is a new record with a "
+    "`Supersedes` field (see `sim/README.md`)."
+)
+
+
+def record_footer_lines(rec: dict, script: str, *, links=None, nested: bool = False,
+                        after_links=(), after_supersedes=()) -> list[str]:
+    """Closing lines shared by every EVIDENCE record's markdown: the `Links`
+    block, `Timestamp / author`, `Supersedes`, and the one canonical
+    append-only sentence.
+
+    `selftest_footer_lines()` above is this helper's sibling for the self-test
+    record.  The evidence record's trailer was the half that never got the same
+    treatment: ten renderers each re-emitted it by hand, and the sentence
+    restating `sim/README.md`'s own append-only rule had drifted into four
+    texts -- three with an em dash, one that dropped the `(see sim/README.md)`
+    pointer, one truncated to `Append-only: never edit this file.` -- so two of
+    ten record classes no longer pointed a reader at the policy they were
+    asserting (issue #337).  A committed record can never be corrected in
+    place, only superseded, which is precisely why the sentence that states
+    that rule must not be maintained in ten places.
+
+    `rec` supplies `links` / `timestamp` / `author` / `supersedes`.  The
+    `(none)` fallback is fixed rather than a parameter: `sim/README.md`'s field
+    table defines it ("prior `<record-id>` this corrects or re-runs; `(none)`
+    otherwise"), and the three callers that had their own wording had drifted
+    away from the ratified text, not extended it.
+
+    What is genuinely per-record stays at the call site:
+
+    * `links` replaces the default `rec["links"].items()` walk for the renderers
+      whose link lines carry prose labels (`Testbench:`, `Netlist snapshot:`)
+      instead of the JSON keys -- entries are `(label, value)` pairs, or a bare
+      string for a link that is a sentence covering several stored objects
+      (`run_op_branch.py`'s artifact-store line); the same bullet is prepended
+      either way.
+    * `nested=True` renders a `- **Links**:` sub-list instead of a `## Links`
+      section, for the three renderers that nest the block inside the bullet
+      list above it.  That is layout, not policy, so it is preserved rather
+      than converged.
+    * `after_links` / `after_supersedes` carry extra bullets at the two points
+      callers actually insert them -- `sim/glitch-top`'s `Evidence bytes: none
+      stored` belongs with the links it qualifies, `sim/brownout-top`'s
+      `Companion of` after the `Supersedes` it distinguishes itself from.  A
+      record's field ORDER is part of its format, so the two hooks are not
+      collapsed into one.
+
+    An empty link value renders as `none` rather than an empty pair of
+    backticks: a link the run could not produce (nothing graded, so no
+    artifacts stored) is stated outright instead of rendered blank.
+    """
+    bullet = "  - " if nested else "- "
+    out = ["- **Links**:" if nested else "## Links"]
+    for entry in (rec["links"].items() if links is None else links):
+        if isinstance(entry, str):
+            out.append(f"{bullet}{entry}")
+        elif entry[1]:
+            out.append(f"{bullet}{entry[0]}: `{entry[1]}`")
+        else:
+            out.append(f"{bullet}{entry[0]}: none")
+    out += list(after_links)
+    out += [f"- **Timestamp / author**: {rec['timestamp']}, {rec['author']}",
+            f"- **Supersedes**: {rec['supersedes'] or '(none)'}"]
+    out += list(after_supersedes)
+    out += ["", f"Written by `{script}`. {RECORD_APPEND_ONLY}", ""]
+    return out
 
 
 def write_selftest_record(rec_dir: Path, record_id: str, doc: dict, md_lines: list[str]) -> None:
@@ -1270,6 +1406,113 @@ def snapshot_deck_request(src: Path, corners_dir: Path, run_dir: Path, repo_root
             dst = corners_dir / "batch" / name
             dst.parent.mkdir(parents=True, exist_ok=True)
             dst.write_text(scrub(f.read_text(), run_dir, repo_root))
+
+
+# The record `batch` block's key order.  Named for the same reason `FLEET_JOB_KEYS` is:
+# the block is committed evidence under `sim/*/records`, append-only, so a key that
+# changes name or disappears cannot be corrected in an already-minted record, only
+# superseded.  `DECK_LIST_REMOTE_KEYS` is the half read straight off the job's
+# `environment.remote`; the rest come from the report, the client and the CLI.
+DECK_LIST_REMOTE_KEYS = ("job_id", "region", "instance_type", "state",
+                         "runner_klt_version", "runner_request_features")
+
+DECK_LIST_BATCH_KEYS = (*DECK_LIST_REMOTE_KEYS, "klt_client", "klt_sim_backend_env",
+                        "capacity_wait_s", "report_status", "unit_count", "passed",
+                        "errored", "timed_out", "failed_earlier_attempts")
+
+
+def deck_list_batch_fields(report: dict, *, capacity_wait_s, attempts: list[str],
+                           klt_client: str | None = None) -> dict:
+    """The record `batch` block a deck-list (`decks[]`) fleet run carries.
+
+    A deck-list job reports UNITS, not corners, so this is a different shape from the
+    per-corner `fleet_job_fields()` above and not a narrower view of it: the unit tally
+    (`unit_count`/`passed`/`errored`/`timed_out`) stands where that one has
+    `corner_count`, and it additionally records what the transport itself was asked for
+    (`runner_request_features`, `klt_sim_backend_env`, `capacity_wait_s`) because a
+    deck-list run's result depends on the request's features being honoured.
+
+    Keys absent from the report are recorded as None rather than dropped, so a record
+    always has the same shape whatever the fleet reported -- the same contract
+    `fleet_job_fields()` keeps.  `attempts` is `attempt_messages()`' list of earlier
+    submit refusals (empty when the first submit landed).  `klt_client` defaults to
+    observing the client now; pass it when the caller already observed it for the same
+    record, so one record reports one client version.
+
+    Experiment-specific claims do NOT belong here -- `run_pnp_mismatch.py` adds its
+    `sampling_method` key at the call site, because that is a statement about how that
+    experiment drew its samples, not about the fleet job that carried them.
+    """
+    remote = (report.get("environment") or {}).get("remote") or {}
+    fields = {k: remote.get(k) for k in DECK_LIST_REMOTE_KEYS}
+    fields["klt_client"] = klt_version() if klt_client is None else klt_client
+    fields["klt_sim_backend_env"] = os.environ.get("KLT_SIM_BACKEND")
+    fields["capacity_wait_s"] = capacity_wait_s
+    fields["report_status"] = report.get("status")
+    fields["unit_count"] = report.get("unit_count")
+    fields["passed"] = report.get("passed")
+    fields["errored"] = report.get("errored")
+    fields["timed_out"] = report.get("timed_out")
+    fields["failed_earlier_attempts"] = attempts
+    return fields
+
+
+def deck_list_record_blocks(pdk, pin: dict, report: dict, *, points, capacity_wait_s,
+                            attempts: list[str]) -> tuple[dict, dict, dict]:
+    """A deck-list fleet run's `pdk`, `tools` and `batch` record blocks, in one call.
+
+    Provenance is OBSERVED, never a literal (issue #297): the engine from each unit's
+    own `ngspice-NN done` banner, the runner's klt from the job's report.
+
+    This is `record_pdk_tools()` wired for the deck-list profile -- the model library
+    spelled as a shipped deck must spell it (`runner_lib_ref()`), the host's `$PDK_ROOT`
+    parked under `root`, no xschem note (a deck-list runner nets nothing), and
+    `DECK_NOTE` as the fleet note -- plus the `batch` block that always accompanies it.
+    `points` stays a keyword argument on purpose: a reader of either call site must be
+    able to see WHICH of that runner's result lists the per-point banners are read from.
+    """
+    remote = (report.get("environment") or {}).get("remote") or {}
+    client = klt_version()
+    pdk_block, tools_block = record_pdk_tools(
+        pdk,
+        pin,
+        {"klt_client": client},
+        points=points,
+        requests=[remote],
+        lib_file=runner_lib_ref(pdk.variant),
+        root=HOST_PDK_ROOT,
+        xschem_note=None,
+        fleet_note=DECK_NOTE,
+    )
+    batch_block = deck_list_batch_fields(
+        report, capacity_wait_s=capacity_wait_s, attempts=attempts, klt_client=client
+    )
+    return pdk_block, tools_block, batch_block
+
+
+def deck_list_batch_clause(b: dict, fleet_ngspice: str) -> list[str]:
+    """The `Backend` + `Fleet engine` record lines a deck-list fleet run renders.
+
+    Mirrors `render_pdk_tools_repo_state()`: returns the lines so the caller `L.extend`s
+    them and keeps its own trailing lines local (`run_pnp_mismatch.py` adds
+    `**Sampling method**`, both add `**Transport**`).  These two lines are record text
+    under an append-only tree, so the wording is as much a contract as the dict's keys.
+    """
+    return [
+        f"- **Backend**: `klt sim --backend batch` deck-list request (fleet job "
+        f"`{b['job_id']}`, {b['instance_type']} in {b['region']}, report status "
+        f"`{b['report_status']}`: {b['passed']}/{b['unit_count']} unit(s) passed, "
+        f"{b['errored']} errored, {b['timed_out']} timed out); fleet runner klt "
+        f"`{b['runner_klt_version']}`, client `{b['klt_client']}`, "
+        f"`--wait-for-capacity {b['capacity_wait_s']:g}`"
+        + (
+            ""
+            if not b["failed_earlier_attempts"]
+            else f"; {len(b['failed_earlier_attempts'])} earlier submit attempt(s) refused: "
+            + "; ".join(b["failed_earlier_attempts"])
+        ),
+        f"- **Fleet engine**: {fleet_ngspice} (per-point, from each unit's own log banner)",
+    ]
 
 
 def deck_units(report: dict | None) -> dict[str, dict]:

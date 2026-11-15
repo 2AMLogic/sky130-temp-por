@@ -436,7 +436,7 @@ def synth_a(vf=3.3, st=None, t_obs=T_OBS_REF, behavior="ok", coarse=None, tstop=
     t_on = st["t0"] + st["te"] * 0.5  # POR_RAW crosses V_MID half way up the injection edge
     t_off = tl["t_fall_start"] + st["te"] * 0.5 + 30e-6  # POR_RAW recovers a little after the injection ends
     dwell = (t_off - t_on) if (not tl["control"] and behavior != "no_effect") else 0.0
-    assert_ = behavior in ("force_assert", "premature", "chatter", "no_recovery") or (dwell >= D_REQ and behavior != "missed") or (behavior == "ok" and dwell >= D_REQ)
+    assert_ = behavior in ("force_assert", "premature", "chatter", "no_recovery") or (dwell >= D_REQ and behavior != "missed")
     if behavior == "ok" and D_REJ <= dwell < D_REQ:
         assert_ = False
     t_a = t_on + 5e-6

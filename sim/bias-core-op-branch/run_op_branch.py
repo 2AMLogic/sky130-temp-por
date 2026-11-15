@@ -78,7 +78,6 @@ from __future__ import annotations
 
 import argparse
 import json
-import os
 import re
 import sys
 from dataclasses import dataclass, field
@@ -92,9 +91,11 @@ BUILD_DIR = SIM_DIR / "build" / "bias-core-op-branch"
 TESTBENCH = SIM_DIR / "bias-core-smoke" / "testbench" / "tb_bias_core_smoke.sch"
 
 sys.path.insert(0, str(SIM_DIR / "bin"))
+import evidence_store  # noqa: E402
 import sim_common  # noqa: E402
 from sim_common import (  # noqa: E402
     add_common_args,
+    deck_list_batch_clause,
     load_corner_run,
     render_log,
     render_pdk_tools_repo_state,
@@ -774,22 +775,7 @@ def render_record(r: dict) -> str:
         f"(`{r['experiment']['provenance_source']}`)"
     )
     L.extend(render_pdk_tools_repo_state(r))
-    b = r["batch"]
-    add(
-        f"- **Backend**: `klt sim --backend batch` deck-list request (fleet job "
-        f"`{b['job_id']}`, {b['instance_type']} in {b['region']}, report status "
-        f"`{b['report_status']}`: {b['passed']}/{b['unit_count']} unit(s) passed, "
-        f"{b['errored']} errored, {b['timed_out']} timed out); fleet runner klt "
-        f"`{b['runner_klt_version']}`, client `{b['klt_client']}`, "
-        f"`--wait-for-capacity {b['capacity_wait_s']:g}`"
-        + (
-            ""
-            if not b["failed_earlier_attempts"]
-            else f"; {len(b['failed_earlier_attempts'])} earlier submit attempt(s) refused: "
-            + "; ".join(b["failed_earlier_attempts"])
-        )
-    )
-    add(f"- **Fleet engine**: {r['tools']['fleet_ngspice']} (per-point, from each unit's own log banner)")
+    L.extend(deck_list_batch_clause(r["batch"], r["tools"]["fleet_ngspice"]))
     add(f"- **Transport**: {r['tools']['fleet_note']}")
 
     m = r["matrix"]
@@ -874,22 +860,17 @@ def render_record(r: dict) -> str:
     add(f"  - **Overall: {'PASS' if r['overall_pass'] else 'FAIL'}**")
     add(f"- **Verdict**: {r['verdict']}")
 
-    add("- **Links**:")
-    add(f"  - Testbench: `{r['links']['testbench']}`")
-    add(f"  - klt deck report: `{r['links']['klt_report']}`")
-    add(f"  - Runner: `{r['links']['runner']}`")
-    add(f"  - Netlist snapshot: `{r['links']['netlist_snapshot']}`")
-    add(f"  - Raw per-point logs: `{r['links']['points_dir']}`")
-    add(f"  - Machine-readable record: `{r['links']['json']}`")
-    add(f"- **Timestamp / author**: {r['timestamp']}, {r['author']}")
-    add(f"- **Supersedes**: {r['supersedes'] or '(none)'}")
-    add("")
-    add(
-        "Written by `sim/bias-core-op-branch/run_op_branch.py`. Append-only: never edit "
-        "this file — a correction is a new record with a `Supersedes` field (see "
-        "`sim/README.md`)."
-    )
-    add("")
+    L += sim_common.record_footer_lines(
+        r, "sim/bias-core-op-branch/run_op_branch.py", nested=True, links=[
+            ("Testbench", r["links"]["testbench"]),
+            ("Runner", r["links"]["runner"]),
+            ("Netlist snapshot", r["links"]["netlist_snapshot"]),
+            "Raw per-point logs and the klt deck report (`batch/report.json`) are in "
+            f"the fleet artifact store: manifest `{r['links']['artifact_manifest']}`, "
+            f"summary `{r['links']['artifact_summary']}` (check the bytes with "
+            f"`klt artifact verify {r['links']['artifact_manifest']}`)",
+            ("Machine-readable record", r["links"]["json"]),
+        ])
     return "\n".join(L)
 
 
@@ -993,12 +974,6 @@ def parse_args(argv: list[str]) -> argparse.Namespace:
         help="fleet-worker pool size for the deck list (klt `options.max_workers`)",
     )
     p.add_argument(
-        "--wait-for-capacity",
-        type=float,
-        default=600,
-        help="seconds the batch submit waits out a fleet capacity refusal before failing",
-    )
-    p.add_argument(
         "--probe",
         metavar="POINT_ID",
         help="run ONE point on the local backend and print its log -- a debug check, "
@@ -1010,14 +985,16 @@ def parse_args(argv: list[str]) -> argparse.Namespace:
 
 def main(argv: list[str]) -> int:
     args = parse_args(argv)
+    if not (args.dry_run or args.probe):
+        # Fail closed before anything is submitted: new evidence goes to the artifact
+        # store and there is no fallback that commits raw bytes (sim/README.md).
+        evidence_store.preflight_or_exit()
     pin = cr.load_pin()
     pdk = cr.resolve_pdk(pin)
     if not pdk.matches_pin and not args.allow_pdk_mismatch:
         raise cr.HarnessError(
-            f"installed PDK {pdk.variant} is open_pdks {pdk.installed_commit}, but "
-            f"sim/pdk.json pins {pin['open_pdks_commit']}\n"
-            f"  install the pin: {pin['install_command']}\n"
-            f"  or re-run with --allow-pdk-mismatch (the record will say so)"
+            cr.pdk_mismatch_message(pdk, pin)
+            + "\n  or re-run with --allow-pdk-mismatch (the record will say so)"
         )
 
     points = build_points(args.quick)
@@ -1030,15 +1007,16 @@ def main(argv: list[str]) -> int:
 
     records_dir = HERE / "records"
     snapshots_dir = HERE / "netlist-snapshots"
-    points_dir = HERE / "corners" / record_id
+    # Raw per-point logs stage in git-ignored scratch and are stored in the fleet
+    # artifact store below; only the manifest and its summary are committed.
+    points_dir = evidence_store.stage_dir_for(SLUG, record_id)
+    art_manifest_path = evidence_store.manifest_path(SLUG, record_id)
     record_md = records_dir / f"{record_id}.md"
     record_json = records_dir / f"{record_id}.json"
     snapshot = snapshots_dir / f"{record_id}.spice"
-    for path in (record_md, record_json, snapshot, points_dir):
-        if path.exists():
-            raise cr.HarnessError(
-                f"{path} already exists — sim/ is append-only, refusing to overwrite"
-            )
+    sim_common.refuse_existing(
+        (record_md, record_json, snapshot, points_dir, art_manifest_path)
+    )
 
     run_dir = BUILD_DIR / record_id
     run_dir.mkdir(parents=True, exist_ok=True)
@@ -1116,7 +1094,9 @@ def main(argv: list[str]) -> int:
         log_path.write_text(
             render_log(header, pdk, res["rc"], res["timed_out"], stamp, sections, res["raw"])
         )
-        evaluated["log"] = str(log_path.relative_to(REPO_ROOT))
+        # the stored object's name in the artifact manifest (entry names are staged-dir
+        # relative), not a tracked path: the bytes live in the artifact store
+        evaluated["log"] = str(log_path.relative_to(points_dir))
         results.append(evaluated)
         print(
             f"[{i:>3}/{len(points)}] {point.point_id:<46} "
@@ -1126,6 +1106,10 @@ def main(argv: list[str]) -> int:
 
     sim_common.snapshot_deck_request(submit_dir, points_dir, run_dir, REPO_ROOT)
 
+    # Store the staged bytes first: on failure nothing is written under
+    # sim/bias-core-op-branch/ or manifests/ and the bytes stay for a retry.
+    art_manifest, art_summary = evidence_store.store_or_exit(SLUG, record_id, points_dir)
+
     checks = cross_checks(results)
     overall = all(p["pass"] for p in results) and all(
         c["pass"] for c in checks if not c.get("descriptive")
@@ -1134,37 +1118,14 @@ def main(argv: list[str]) -> int:
     snapshot.parent.mkdir(parents=True, exist_ok=True)
     snapshot.write_text("\n".join(body) + "\n.end\n")
 
-    # Provenance is OBSERVED, never a literal (issue #297): the engine from each unit's
-    # own `ngspice-NN done` banner, the runner's klt from the job's report.
-    remote = (report.get("environment") or {}).get("remote") or {}
-    pdk_block, tools_block = sim_common.record_pdk_tools(
+    pdk_block, tools_block, batch_block = sim_common.deck_list_record_blocks(
         pdk,
         pin,
-        {"klt_client": sim_common.klt_version()},
+        report,
         points=results,
-        requests=[remote],
-        lib_file=sim_common.runner_lib_ref(pdk.variant),
-        root=sim_common.HOST_PDK_ROOT,
-        xschem_note=None,
-        fleet_note=sim_common.DECK_NOTE,
+        capacity_wait_s=args.wait_for_capacity,
+        attempts=sim_common.attempt_messages(submit_dir, run_dir, REPO_ROOT),
     )
-    batch_block = {
-        "job_id": remote.get("job_id"),
-        "region": remote.get("region"),
-        "instance_type": remote.get("instance_type"),
-        "state": remote.get("state"),
-        "runner_klt_version": remote.get("runner_klt_version"),
-        "runner_request_features": remote.get("runner_request_features"),
-        "klt_client": sim_common.klt_version(),
-        "klt_sim_backend_env": os.environ.get("KLT_SIM_BACKEND"),
-        "capacity_wait_s": args.wait_for_capacity,
-        "report_status": report.get("status"),
-        "unit_count": report.get("unit_count"),
-        "passed": report.get("passed"),
-        "errored": report.get("errored"),
-        "timed_out": report.get("timed_out"),
-        "failed_earlier_attempts": sim_common.attempt_messages(submit_dir, run_dir, REPO_ROOT),
-    }
 
     record = {
         "record_id": record_id,
@@ -1213,10 +1174,10 @@ def main(argv: list[str]) -> int:
         "verdict": verdict_text(results, checks),
         "links": {
             "testbench": str(TESTBENCH.relative_to(REPO_ROOT)),
-            "klt_report": str((points_dir / "batch" / "report.json").relative_to(REPO_ROOT)),
             "runner": str(Path(__file__).resolve().relative_to(REPO_ROOT)),
             "netlist_snapshot": str(snapshot.relative_to(REPO_ROOT)),
-            "points_dir": str(points_dir.relative_to(REPO_ROOT)) + "/",
+            "artifact_manifest": str(art_manifest.relative_to(REPO_ROOT)),
+            "artifact_summary": str(art_summary.relative_to(REPO_ROOT)),
             "json": str(record_json.relative_to(REPO_ROOT)),
             "record": str(record_md.relative_to(REPO_ROOT)),
         },
@@ -1229,7 +1190,7 @@ def main(argv: list[str]) -> int:
     print()
     print(f"record  : {record_md.relative_to(REPO_ROOT)}")
     print(f"json    : {record_json.relative_to(REPO_ROOT)}")
-    print(f"logs    : {points_dir.relative_to(REPO_ROOT)}/")
+    print(f"logs    : stored; {art_manifest.relative_to(REPO_ROOT)}")
     print(f"verdict : {record['verdict']}")
     print(f"overall : {'PASS' if overall else 'FAIL'}")
     return 0 if overall else 2

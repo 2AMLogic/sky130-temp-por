@@ -84,7 +84,7 @@ python3 sim/brownout-top/run_brownout_campaign.py probe --tag cube_v1.2_h0.0001_
 # 2. commit + push the source first (run refuses a dirty or unpushed tree), then submit the grid
 KLT_SIM_BACKEND=batch python3 sim/brownout-top/run_brownout_campaign.py run --run-id <id>
 #    capacity refusals: re-run only the missing requests (earlier attempts are archived)
-python3 sim/brownout-top/run_brownout_campaign.py run --run-id <id> --retry-failed --capacity-wait 600
+python3 sim/brownout-top/run_brownout_campaign.py run --run-id <id> --retry-failed --wait-for-capacity 600
 
 # 3. grade + write the append-only record (refuses to overwrite)
 python3 sim/brownout-top/run_brownout_campaign.py record --run-id <id>

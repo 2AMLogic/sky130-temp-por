@@ -35,6 +35,7 @@ sys.path.insert(0, str(HERE))
 import run_iq_campaign as rc  # noqa: E402
 
 sim_common, cr, qc = rc.sim_common, rc.cr, rc.qc
+evidence_store = rc.evidence_store
 STATE = "iq-total"
 ORIGINAL_RECORD = HERE / "records" / "20261009-191705-df85523.json"
 SLUG_SUFFIX = "solver-sensitivity"
@@ -207,6 +208,7 @@ def head_for_run(run_dir: Path, pdk) -> str:
 
 
 def cmd_run(args) -> int:
+    evidence_store.preflight_or_exit()  # fail closed before anything is submitted
     man = sim_common.load_manifest(rc.MANIFEST)
     pdk = cr.resolve_pdk(cr.load_pin())
     gi = cr.git_state()
@@ -219,7 +221,7 @@ def cmd_run(args) -> int:
     if args.retry_failed:
         work = [n for n in names if args.split_process or not sim_common.report_usable(run_dir / n / STATE / sim_common.rate_tag(man["measurement"]["rate_v_per_s"]) / "report.json")]
         say = sim_common.say
-        say(f"retrying {len(work)} variant request(s) without a usable report, capacity_wait_s={args.capacity_wait}")
+        say(f"retrying {len(work)} variant request(s) without a usable report, capacity_wait_s={args.wait_for_capacity}")
     else:
         work = list(names)
     head = head_for_run(run_dir if not args.retry_failed else run_dir / "retry", pdk)
@@ -229,7 +231,7 @@ def cmd_run(args) -> int:
     procs = (list(args.process or man["corners"]["process"])) if args.split_process else [None]
     for n in work:
         for pr in procs:
-            req = build_variant_request(man, args.capacity_wait, pr)
+            req = build_variant_request(man, args.wait_for_capacity, pr)
             hashes[n if pr is None else f"{n}/split-{pr}"] = {"deck_sha256": sha256(decks[n]), "request_sha256": sha256(json.dumps(req, indent=2, sort_keys=True))}
     meta_path = run_dir / "run.json"
     meta = json.loads(meta_path.read_text()) if args.retry_failed else {
@@ -246,16 +248,16 @@ def cmd_run(args) -> int:
     def one(item):
         n, pr = item
         if pr is None:
-            return sim_common.submit_request(f"{n}/{STATE}", rate, run_dir, decks[n], build_variant_request(man, args.capacity_wait), f" [{n}]", len(rc.grid(man)))
+            return sim_common.submit_request(f"{n}/{STATE}", rate, run_dir, decks[n], build_variant_request(man, args.wait_for_capacity), f" [{n}]", len(rc.grid(man)))
         npts = len(man["corners"]["temperature_c"]) * len(man["corners"]["supply_v"])
-        return sim_common.submit_request(f"{n}/split-{pr}/{STATE}", rate, run_dir, decks[n], build_variant_request(man, args.capacity_wait, pr), f" [{n} process {pr}]", npts)
+        return sim_common.submit_request(f"{n}/split-{pr}/{STATE}", rate, run_dir, decks[n], build_variant_request(man, args.wait_for_capacity, pr), f" [{n} process {pr}]", npts)
 
     results = sim_common.fan_out(one, [(n, pr) for n in work for pr in procs], args.jobs,
                                  label=label, tag="variant")
     meta = json.loads(meta_path.read_text())
     key = "retries" if args.retry_failed else "submit_results"
     if args.retry_failed:
-        meta.setdefault(key, []).append({"at_utc": datetime.now(timezone.utc).strftime("%Y-%m-%dT%H:%M:%SZ"), "capacity_wait_s": args.capacity_wait, "results": results})
+        meta.setdefault(key, []).append({"at_utc": datetime.now(timezone.utc).strftime("%Y-%m-%dT%H:%M:%SZ"), "capacity_wait_s": args.wait_for_capacity, "results": results})
     else:
         meta[key] = results
     meta_path.write_text(json.dumps(meta, indent=2) + "\n")
@@ -374,13 +376,12 @@ def render_md(rec: dict) -> str:
         L.append("| " + " | ".join(cells) + " |")
     L += ["", "## Baseline replicate vs original record", f"- {rec['baseline_vs_original_text']}", "", "## Limitations (stated, not hidden)"]
     L += [f"- {a}" for a in rec["limitations"]]
-    L += ["", "## Links"] + [f"- {k}: `{v}`" for k, v in rec["links"].items()]
-    L += [f"- **Timestamp / author**: {rec['timestamp']}, {rec['author']}", f"- **Supersedes**: {rec['supersedes'] or '(none; the original records are untouched)'}", "",
-          "Written by `sim/iq-top/run_iq_sensitivity.py record`. Append-only: never edit this file.", ""]
+    L += [""] + sim_common.record_footer_lines(rec, "sim/iq-top/run_iq_sensitivity.py record")
     return "\n".join(L)
 
 
 def cmd_record(args) -> int:
+    evidence_store.preflight_or_exit()
     man = sim_common.load_manifest(rc.MANIFEST)
     run_dir = BUILD / args.run_id
     meta = json.loads((run_dir / "run.json").read_text())
@@ -389,8 +390,10 @@ def cmd_record(args) -> int:
     gi = cr.git_state()
     now = datetime.now(timezone.utc)
     record_id = f"{now:%Y%m%d}-{now:%H%M%S}-{meta['git']['sha']}-{SLUG_SUFFIX}"
-    rec_dir, cdir, sdir = HERE / "records", HERE / "corners" / record_id, HERE / "netlist-snapshots" / record_id
-    sim_common.refuse_existing((rec_dir / f"{record_id}.md", rec_dir / f"{record_id}.json", cdir, sdir))
+    rec_dir, sdir = HERE / "records", HERE / "netlist-snapshots" / record_id
+    cdir = evidence_store.stage_dir_for(rc.SLUG, record_id)  # git-ignored scratch; stored below
+    sim_common.refuse_existing((rec_dir / f"{record_id}.md", rec_dir / f"{record_id}.json", cdir, sdir,
+                                evidence_store.manifest_path(rc.SLUG, record_id)))
     names = variant_names(man)
     traces: dict = {}
     per = {n: analyze_variant(n, run_dir, man, traces) for n in names}
@@ -442,6 +445,11 @@ def cmd_record(args) -> int:
         f"{n_total - n_res} of {n_total} point-runs produced no settled-window value (see the table; these are explicit unknowns).",
     ]
     reqs = {n: per[n]["requests"] for n in names}
+    # A run whose every unit was refused stages no bytes: record it with null artifact
+    # links rather than tripping the store's fail-closed empty-manifest refusal (the
+    # convention run_glitch_campaign.py uses for a class with nothing graded).
+    staged = any(p.is_file() for p in cdir.rglob("*"))
+    art_manifest, art_summary = evidence_store.store_or_exit(rc.SLUG, record_id, cdir) if staged else (None, None)
     record = {
         "record_id": record_id, "kind": "solver-sensitivity replicate (issue #160)", "timestamp": now.strftime("%Y-%m-%dT%H:%M:%SZ"), "author": args.author or cr.default_author(), "supersedes": args.supersedes,
         "variants": names, "variant_options": {n: sens(man)["variants"][n]["options"] for n in names}, "manifest_sensitivity": sens(man),
@@ -456,7 +464,10 @@ def cmd_record(args) -> int:
         "fleet_note": f"jobs { {n: reqs[n].get('job_id') for n in names} }; runner klt {tools_d['fleet_runner_klt']}; fleet ngspice {tools_d['fleet_ngspice']}; client {meta['klt_client']}; batch.runner_version_check=warn",
         "requests": reqs, "points": {n: per[n]["points"] for n in names}, "comparison": cmp_, "baseline_vs_original_text": bvo, "limitations": limits,
         "original_record": "sim/iq-top/records/20261009-191705-df85523.json",
-        "links": {"record": f"sim/iq-top/records/{record_id}.md", "json": f"sim/iq-top/records/{record_id}.json", "corners_dir": f"sim/iq-top/corners/{record_id}/", "netlist_snapshots": f"sim/iq-top/netlist-snapshots/{record_id}/",
+        "links": {"record": f"sim/iq-top/records/{record_id}.md", "json": f"sim/iq-top/records/{record_id}.json",
+                  "artifact_manifest": str(art_manifest.relative_to(rc.REPO_ROOT)) if art_manifest else None,
+                  "artifact_summary": str(art_summary.relative_to(rc.REPO_ROOT)) if art_summary else None,
+                  "netlist_snapshots": f"sim/iq-top/netlist-snapshots/{record_id}/",
                   "driver": "sim/iq-top/run_iq_sensitivity.py", "manifest": "sim/iq-top/experiment.json", "original_record": "sim/iq-top/records/20261009-191705-df85523.md"},
     }
     rec_dir.mkdir(parents=True, exist_ok=True)
@@ -474,7 +485,7 @@ def main(argv: list[str]) -> int:
     r.add_argument("--jobs", type=int, default=2)
     r.add_argument("--run-id")
     r.add_argument("--retry-failed", action="store_true")
-    r.add_argument("--capacity-wait", type=float, default=0)
+    sim_common.add_capacity_wait_arg(r)
     r.add_argument("--allow-dirty", action="store_true")
     r.add_argument("--process", action="append", help="with --split-process: resubmit only these MOS corners (e.g. after a fleet capacity refusal)")
     r.add_argument("--split-process", action="store_true", help="one fleet request per MOS corner (9 points each) for a variant whose single 45-corner job exceeds the fleet wall-clock ceiling")

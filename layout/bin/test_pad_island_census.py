@@ -15,6 +15,7 @@ import json
 import tempfile
 import unittest
 from pathlib import Path
+from unittest import mock
 
 _HERE = Path(__file__).resolve().parent
 _SPEC = importlib.util.spec_from_file_location("pad_island_census", _HERE / "pad-island-census.py")
@@ -60,6 +61,30 @@ class ProbePointsTest(unittest.TestCase):
         self.assertEqual(probe["probe_source"], "sibling_compose_response")
         self.assertIs(probe["declared_matches_source"], True)
         self.assertEqual((probe["x_um"], probe["y_um"]), (11.0, -3.0))
+
+    def test_sibling_response_read_once_per_block(self):
+        # Two distinct pins on one block with an existing sibling response:
+        # the response must be read and parsed exactly once. Pinned
+        # mechanically (call count), not by inspection: the original code
+        # stored into a fresh temporary dict on every call, so the memo
+        # never memoized and a dead cache was indistinguishable from a
+        # live one in single-pin fixtures.
+        with tempfile.TemporaryDirectory() as d:
+            spec, top = self._assembly(Path(d), [_port("p", 1.0, 2.0)], [_port("p", 1.0, 2.0)])
+            spec["connectivity"].append({"net": "m", "pins": [{"block": "b", "port": "p"}]})
+            with mock.patch.object(
+                Path, "read_text", autospec=True, wraps=Path.read_text
+            ) as spy:
+                probes = census._probe_points(spec, top)
+        sibling_reads = [
+            call for call in spy.call_args_list if call.args[0].name == "compose.response.json"
+        ]
+        self.assertEqual(len(probes), 2)
+        self.assertEqual(len(sibling_reads), 1)
+        for probe in probes:
+            self.assertEqual(probe["probe_source"], "sibling_compose_response")
+            self.assertIs(probe["declared_matches_source"], True)
+            self.assertEqual((probe["x_um"], probe["y_um"]), (11.0, -3.0))
 
     def test_unpromoted_sibling_port_falls_back_to_declaration(self):
         # The sibling reports ports, but not `p` (an internal net it cannot
