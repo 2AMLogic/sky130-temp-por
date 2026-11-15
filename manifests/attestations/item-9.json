@@ -3,14 +3,14 @@
   "kind": "generic",
   "status": "pass",
   "t1_item": 9,
-  "summary": "T1 item 9 (Testbenches shipped): 43/43 attestation checks passed (klt signoff --attest)",
+  "summary": "T1 item 9 (Testbenches shipped): 45/45 attestation checks passed (klt signoff --attest)",
   "source": "manifests/inventories/item-9.json",
   "attestation": {
     "producer": "klt signoff --attest",
     "inventory_schema_version": 1,
     "hash_algorithm": "sha256-raw-bytes",
-    "check_count": 43,
-    "passed_count": 43,
+    "check_count": 45,
+    "passed_count": 45,
     "checks": [
       {
         "check": "present",
@@ -52,7 +52,7 @@
         "role": "testbench",
         "path": "sim/bin/corner-run.py",
         "passed": true,
-        "content_hash": "sha256:5100f3282d2a27afe4e6179059e089c7bf73ea0baa3366e14c75ea40993d79dc"
+        "content_hash": "sha256:012d7505ac96e89c55cee8d3a68ce1f3b1f8e20cc6dea3f7ddbb80bb8d668b34"
       },
       {
         "check": "present",
@@ -204,6 +204,20 @@
       {
         "check": "present",
         "role": "testbench",
+        "path": "sim/por-output-chain-deglitch/experiment.json",
+        "passed": true,
+        "content_hash": "sha256:45afba61b070786b8d1233ef29701efa32908936423110883ce22c622f1b3afb"
+      },
+      {
+        "check": "present",
+        "role": "testbench",
+        "path": "sim/por-output-chain-deglitch/testbench/tb_por_output_chain_deglitch.sch",
+        "passed": true,
+        "content_hash": "sha256:a1b39fa13ac94b577703b1458377a663d0282ddc0e8f18c9de42086cd08c40bc"
+      },
+      {
+        "check": "present",
+        "role": "testbench",
         "path": "sim/spiceinit",
         "passed": true,
         "content_hash": "sha256:7b5350d05d41130e5473ca284e89fbb2cac330e7ac023ab0226190acd961d917"
@@ -337,7 +351,7 @@
         "path": "manifests/inventories/item-9.json",
         "scope": "repo"
       },
-      "content_hash": "sha256:efae26afd0cb4623556d6bcda77990337a433d7d94a5e3c6fa2a5c3735910d1c"
+      "content_hash": "sha256:4e09863f4632c2dfd3d619340037312f7dd32268c64578bb3f0ed1fc59ab51d3"
     }
   }
 }

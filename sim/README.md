@@ -223,7 +223,13 @@ so a new runner that forgets the check fails the self-checks workflow.
 
 CI (`.github/scripts/check_artifact_manifests.py`) validates the manifests'
 schema, accepts only `artifact:` URIs, fails if a stored object's bytes are also
-tracked, and rejects `s3://` / `arn:aws:` strings under `manifests/`. Evidence
+tracked within the same experiment, and rejects `s3://` / `arn:aws:` strings
+under `manifests/`. Object names are klt staging paths
+(`sim/.work/.stage/<experiment>/…`, gitignored), so byte identity is scoped by
+experiment slug: a runner committing its own raw bytes still fails, while
+byte-identical files across different experiments (e.g. the 4-line clean-pass
+corner stubs, which differ only in the corner name) are distinct evidence, not
+duplication. Unnamed or unattributable object names fail safe. Evidence
 committed before this change stays where it is.
 
 **The rule is enforced, not only documented.**
@@ -264,6 +270,7 @@ fetch needed to fix it.
 | `sim/iq-top/` | bespoke `run_iq_campaign.py` (`klt sim` batch fleet) | Issue #107: settled supply current (Iq) of the assembled `temp_por_top` in por-iq (RESETn forced low), iq-total (natural released state, measured directly) and the derived incremental temp-iq over the 45-point PVT grid, with per-sub-cell attribution (attribution only), settling checked per point, and an explicit status for all 45 points per state. Evidence only: no numeric ceiling is proposed (DR-003 TBD-4/5/6). See `sim/iq-top/README.md`. |
 | `sim/brownout-top/` | bespoke `run_brownout_campaign.py` (`klt sim` batch fleet) | Issue #116 (child of #106): as-drawn brown-out of the assembled `temp_por_top` over independent dip floor x hold x falling-slew axes (+ recovery slew, + no-dip control) x the 45-point PVT grid, graded from full-resolution RESETn/POR_RAW/VDD/IBIAS waveforms with an explicit delivered-bias branch current. Exploratory, bounded grid with a declared expansion policy; PASS/FAIL/ERROR/NONPHYSICAL/UNRESOLVED/NOT_COVERED per point. Not a spec claim. Issue #153 adds a declared solver variant (`reltol2e-4`) and a companion re-run of all 21 requests (all 673 default-deck NONPHYSICAL points, plus 272 physical controls), with a per-point default-vs-tightened comparison. The default-deck record stays. The first tightened record (`records/20261011-214916-183a3fc.md`) is a pilot only. Both pilot jobs hit the fleet's 3600 s job limit, so no tightened point is graded yet. See `sim/brownout-top/README.md`. |
 | `sim/glitch-top/` | bespoke `run_glitch_campaign.py` (`klt sim` batch fleet) | Issue #117 (child of #106): two SEPARATELY reported glitch classes on the assembled `temp_por_top` -- POR_RAW-domain finite-impedance pulse injection (instrumented assembly, disclosed instrument lines, no-injection control) and VDD-level supply glitches (unmodified assembly, no-glitch control) -- over the 45-point PVT grid, graded from full-resolution RESETn/POR_RAW/VDD/IBIAS waveforms with an explicit delivered-bias branch current. Exploratory, bounded grid with a declared expansion policy; PASS/FAIL/ERROR/NONPHYSICAL/UNRESOLVED/NOT_COVERED per point, one record per class. Not a spec claim. See `sim/glitch-top/README.md`. |
+| `sim/por-output-chain-deglitch/` | `sim/bin/corner-run.py` + `experiment.json` (`klt sim` batch fleet) | Issue #349: the first cell-level record for `por_output_chain` (gap 3's second clause). The unchanged `design/por_output_chain.sym` driven from ideal comparator and bias inputs (1 uA into IBIAS, one POR_RAW PWL: 100 us sub-deglitch pulse, settle, real trip at 2 ms) over the full 45-point PVT matrix, one fleet request. Overall PASS 45/45: release delay 0.624-2.234 ms across corners (tt/27 C/3.3 V 1.204 ms), every release after the trip so the pulse was rejected by stimulus ordering; released/asserted RESETn levels and rail-band physicality guards on TIM/NDG/TRIP/RSTB. Harness-liveness windows only -- **not a spec claim** (no deglitch/pulse-width target exists in `spec/`). Also adds `--wait-for-capacity` (default 600 s) to the corner runner's batch submit path and the netlist-carried `set ng_nomodcheck` the fleet path needs for this cell's native device. See `sim/por-output-chain-deglitch/README.md`. |
 
 These are the first, concrete increment of `spec/porting-plan.md` §4 item 1
 (sim-harness port) — infrastructure and harness-liveness evidence, not the
