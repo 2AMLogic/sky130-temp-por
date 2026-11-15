@@ -62,7 +62,6 @@ from __future__ import annotations
 import argparse
 import json
 import math
-import os
 import shutil
 import sys
 from dataclasses import dataclass
@@ -82,6 +81,7 @@ from sim_common import (  # noqa: E402
     MismatchPoint,
     add_common_args,
     build_mismatch_points,
+    deck_list_batch_clause,
     load_corner_run,
     mean,
     mv,
@@ -520,21 +520,7 @@ def render_record(r: dict) -> str:
     )
     L.extend(render_pdk_tools_repo_state(r))
     b = r["batch"]
-    add(
-        f"- **Backend**: `klt sim --backend batch` deck-list request (fleet job "
-        f"`{b['job_id']}`, {b['instance_type']} in {b['region']}, report status "
-        f"`{b['report_status']}`: {b['passed']}/{b['unit_count']} unit(s) passed, "
-        f"{b['errored']} errored, {b['timed_out']} timed out); fleet runner klt "
-        f"`{b['runner_klt_version']}`, client `{b['klt_client']}`, "
-        f"`--wait-for-capacity {b['capacity_wait_s']:g}`"
-        + (
-            ""
-            if not b["failed_earlier_attempts"]
-            else f"; {len(b['failed_earlier_attempts'])} earlier submit attempt(s) refused: "
-            + "; ".join(b["failed_earlier_attempts"])
-        )
-    )
-    add(f"- **Fleet engine**: {r['tools']['fleet_ngspice']} (per-point, from each unit's own log banner)")
+    L.extend(deck_list_batch_clause(b, r["tools"]["fleet_ngspice"]))
     add(f"- **Sampling method**: {b['sampling_method']}")
     add(f"- **Transport**: {r['tools']['fleet_note']}")
 
@@ -727,23 +713,12 @@ def render_record(r: dict) -> str:
     )
     add("")
 
-    add("- **Links**:")
-    for key, value in r["links"].items():
-        add(f"  - {key}: `{value}`")
-    add(
-        "  - the raw per-point ngspice logs (`<corner-id>.log`) and the klt deck report "
-        "(`batch/report.json`) are stored objects of `artifact_manifest`, not tracked "
-        f"files; check the bytes with `klt artifact verify {r['links']['artifact_manifest']}`"
-    )
-    add(f"- **Timestamp / author**: {r['timestamp']}, {r['author']}")
-    add(f"- **Supersedes**: {r['supersedes'] or '(none — first record for this claim)'}")
-    add("")
-    add(
-        "Written by `sim/pnp-mismatch/run_pnp_mismatch.py`. Append-only: never edit this "
-        "file — a correction is a new record with a `Supersedes` field (see "
-        "`sim/README.md`)."
-    )
-    add("")
+    L += sim_common.record_footer_lines(
+        r, "sim/pnp-mismatch/run_pnp_mismatch.py", nested=True, after_links=[
+            "  - the raw per-point ngspice logs (`<corner-id>.log`) and the klt deck report "
+            "(`batch/report.json`) are stored objects of `artifact_manifest`, not tracked "
+            f"files; check the bytes with `klt artifact verify {r['links']['artifact_manifest']}`"
+        ])
     return "\n".join(L)
 
 
@@ -953,44 +928,23 @@ def main(argv: list[str]) -> int:
     snapshots_dir.mkdir(parents=True, exist_ok=True)
     shutil.copyfile(DECK, snapshot)
 
-    # Provenance is OBSERVED, never a literal (issue #297): the engine from each unit's
-    # own `ngspice-NN done` banner, the runner's klt from the job's report.
-    remote = (report.get("environment") or {}).get("remote") or {}
-    pdk_block, tools_block = sim_common.record_pdk_tools(
+    pdk_block, tools_block, batch_block = sim_common.deck_list_record_blocks(
         pdk,
         pin,
-        {"klt_client": sim_common.klt_version()},
+        report,
         points=ordered,
-        requests=[remote],
-        lib_file=sim_common.runner_lib_ref(pdk.variant),
-        root=sim_common.HOST_PDK_ROOT,
-        xschem_note=None,
-        fleet_note=sim_common.DECK_NOTE,
+        capacity_wait_s=args.wait_for_capacity,
+        attempts=sim_common.attempt_messages(submit_dir, run_dir, REPO_ROOT),
     )
-    batch_block = {
-        "job_id": remote.get("job_id"),
-        "region": remote.get("region"),
-        "instance_type": remote.get("instance_type"),
-        "state": remote.get("state"),
-        "runner_klt_version": remote.get("runner_klt_version"),
-        "runner_request_features": remote.get("runner_request_features"),
-        "klt_client": sim_common.klt_version(),
-        "klt_sim_backend_env": os.environ.get("KLT_SIM_BACKEND"),
-        "capacity_wait_s": args.wait_for_capacity,
-        "report_status": report.get("status"),
-        "unit_count": report.get("unit_count"),
-        "passed": report.get("passed"),
-        "errored": report.get("errored"),
-        "timed_out": report.get("timed_out"),
-        "failed_earlier_attempts": sim_common.attempt_messages(submit_dir, run_dir, REPO_ROOT),
-        "sampling_method": (
-            "in-deck `.control` dowhile/reset loop inside ONE ngspice process, seeded by "
-            "`setseed $mc_seed` from the shipped `.spiceinit` -- the SAME method this "
-            "experiment's earlier records were minted by, carried to the fleet unchanged "
-            "by the `decks[]` transport rather than re-expressed as a klt `monte_carlo` "
-            "block (which would draw the samples differently; issue #319 risk item 2)"
-        ),
-    }
+    # This experiment's own claim about HOW the samples were drawn -- not fleet
+    # provenance, so it stays here rather than in the shared `batch` builder.
+    batch_block["sampling_method"] = (
+        "in-deck `.control` dowhile/reset loop inside ONE ngspice process, seeded by "
+        "`setseed $mc_seed` from the shipped `.spiceinit` -- the SAME method this "
+        "experiment's earlier records were minted by, carried to the fleet unchanged "
+        "by the `decks[]` transport rather than re-expressed as a klt `monte_carlo` "
+        "block (which would draw the samples differently; issue #319 risk item 2)"
+    )
 
     record = {
         "record_id": record_id,
