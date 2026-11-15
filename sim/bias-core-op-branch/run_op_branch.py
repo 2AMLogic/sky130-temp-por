@@ -860,26 +860,17 @@ def render_record(r: dict) -> str:
     add(f"  - **Overall: {'PASS' if r['overall_pass'] else 'FAIL'}**")
     add(f"- **Verdict**: {r['verdict']}")
 
-    add("- **Links**:")
-    add(f"  - Testbench: `{r['links']['testbench']}`")
-    add(f"  - Runner: `{r['links']['runner']}`")
-    add(f"  - Netlist snapshot: `{r['links']['netlist_snapshot']}`")
-    add(
-        f"  - Raw per-point logs and the klt deck report (`batch/report.json`) are in "
-        f"the fleet artifact store: manifest `{r['links']['artifact_manifest']}`, "
-        f"summary `{r['links']['artifact_summary']}` (check the bytes with "
-        f"`klt artifact verify {r['links']['artifact_manifest']}`)"
-    )
-    add(f"  - Machine-readable record: `{r['links']['json']}`")
-    add(f"- **Timestamp / author**: {r['timestamp']}, {r['author']}")
-    add(f"- **Supersedes**: {r['supersedes'] or '(none)'}")
-    add("")
-    add(
-        "Written by `sim/bias-core-op-branch/run_op_branch.py`. Append-only: never edit "
-        "this file — a correction is a new record with a `Supersedes` field (see "
-        "`sim/README.md`)."
-    )
-    add("")
+    L += sim_common.record_footer_lines(
+        r, "sim/bias-core-op-branch/run_op_branch.py", nested=True, links=[
+            ("Testbench", r["links"]["testbench"]),
+            ("Runner", r["links"]["runner"]),
+            ("Netlist snapshot", r["links"]["netlist_snapshot"]),
+            "Raw per-point logs and the klt deck report (`batch/report.json`) are in "
+            f"the fleet artifact store: manifest `{r['links']['artifact_manifest']}`, "
+            f"summary `{r['links']['artifact_summary']}` (check the bytes with "
+            f"`klt artifact verify {r['links']['artifact_manifest']}`)",
+            ("Machine-readable record", r["links"]["json"]),
+        ])
     return "\n".join(L)
 
 
