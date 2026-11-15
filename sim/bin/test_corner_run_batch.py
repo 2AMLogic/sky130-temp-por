@@ -48,6 +48,13 @@ open(os.environ["STUB_KLT_LOG"], "a").write(json.dumps(args) + "\\n")
 if os.environ.get("STUB_KLT_FAIL"):
     sys.stderr.write("batch_no_capacity: fleet refused the job\\n")
     sys.exit(2)
+capfail = os.environ.get("STUB_KLT_CAPFAIL")
+if capfail:
+    n = int(open(capfail).read().strip() or "0")
+    if n < int(os.environ.get("STUB_KLT_CAPFAIL_TIMES", "1")):
+        open(capfail, "w").write(str(n + 1))
+        sys.stderr.write(json.dumps({"error": {"message": "launch refused: BATCH_MAX_CONCURRENT_INSTANCES cap reached"}}) + "\\n")
+        sys.exit(2)
 sys.stdout.write(open(os.environ["STUB_KLT_REPORT"]).read())
 """
 
@@ -189,6 +196,10 @@ class RequestConstruction(unittest.TestCase):
         self.assertNotIn(".lib", cards)
         self.assertNotIn(".temp", cards)
         self.assertTrue(text.rstrip().endswith(".end"))
+        # the local path gets `set ng_nomodcheck` from sim/spiceinit; the runner
+        # ignores ngspice_init, so the batch netlist must carry its own control
+        # block or native-device decks abort on the BSIM parameter check
+        self.assertIn("set ng_nomodcheck", text)
 
 
 class ReportMapping(unittest.TestCase):
@@ -271,6 +282,42 @@ class SubmitWithStubbedKlt(unittest.TestCase):
         self.assertIn("batch_no_capacity: fleet refused the job", str(ctx.exception))
         self.assertIn("not falling back to a local grid", str(ctx.exception))
         self.assertEqual(len(self.log.read_text().splitlines()), 1)  # no retry via another path
+
+    def test_request_carries_capacity_wait_and_zero_disables_it(self):
+        req = cr.build_batch_request(self.exp, make_pdk(), self.matrix, 300, capacity_wait_s=600)
+        self.assertEqual(req["batch"]["capacity_wait_s"], 600)
+        req0 = cr.build_batch_request(self.exp, make_pdk(), self.matrix, 300)
+        self.assertNotIn("capacity_wait_s", req0["batch"])
+
+    def test_default_wait_for_capacity_is_600(self):
+        self.assertEqual(cr.parse_args([]).wait_for_capacity, 600.0)
+
+    def test_concurrency_cap_refusal_is_retried_under_capacity_wait(self):
+        # BATCH_MAX_CONCURRENT_INSTANCES is a refusal capacity_wait_s does not
+        # cover: submit_batch must arm cap_retry and get a clean report on the
+        # second attempt, keeping the refusal as evidence (never a local grid).
+        counter = self.tmp / "capfail.count"
+        counter.write_text("0")
+        os.environ["STUB_KLT_CAPFAIL"] = str(counter)
+        run = self.tmp / "run-retry"
+        report, fleet = cr.submit_batch(
+            self.exp, self.matrix, "* netlist\n.end\n", self.request(), run, capacity_wait_s=0.01
+        )
+        self.assertEqual(len(report["corners"]), 45)
+        self.assertEqual(fleet["batch"]["job_id"], "job-123")
+        self.assertEqual(len(self.log.read_text().splitlines()), 2)  # refusal + retry
+        self.assertTrue((run / "batch" / "launch-refused-1.txt").is_file())
+
+    def test_zero_capacity_wait_does_not_retry_a_concurrency_cap_refusal(self):
+        counter = self.tmp / "capfail-noretry.count"
+        counter.write_text("0")
+        os.environ["STUB_KLT_CAPFAIL"] = str(counter)
+        with self.assertRaises(cr.HarnessError):
+            cr.submit_batch(
+                self.exp, self.matrix, "* netlist\n.end\n",
+                self.request(), self.tmp / "run-noretry", capacity_wait_s=0,
+            )
+        self.assertEqual(len(self.log.read_text().splitlines()), 1)  # one refusal, no retry
 
     def test_runner_pdk_stamp_wins_over_client_side_provenance(self):
         report = fake_report(self.matrix, fleet_commit="c" * 40)
