@@ -8,12 +8,17 @@ schema_version 1):
   uri         must start with 'artifact:'; any '://' or 'arn:aws:' anywhere in
               the manifest (s3:// URIs, broker URLs, account ARNs) fails
   bytes       fails if a git-tracked file outside manifests/artifacts/ is the
-              bytes of a stored object. Identity is by sha256 AND declared
-              path: a same-hash tracked file only counts when the object's
-              entry names that exact path (or carries no name at all —
-              unknown path, fail safe). Distinct files that merely share
-              bytes — e.g. two experiments' 4-line clean-pass corner stubs,
-              which differ only in the corner name — are not duplication.
+              bytes of a stored object that belongs to the same experiment.
+              Identity is by sha256, scoped by the experiment slug of the
+              object's declared name: klt names every object under its
+              gitignored staging path (sim/.work/.stage/<slug>/...), so exact
+              path matching can never fire against a tracked path, and what
+              separates real duplication from two experiments' byte-identical
+              small files (e.g. clean-pass corner stubs, which differ only in
+              the corner name) is the experiment slug. Same slug — or an
+              unnamed / unattributable name, which cannot be checked (fail
+              safe) — is duplication; different slugs are distinct files
+              sharing bytes, not duplication.
 Each manifest needs its '.summary.md' twin. Stdlib only; no klt, no broker
 (`klt artifact verify` needs the broker and runs from fleet workers).
 
@@ -82,12 +87,29 @@ def check_manifest(path, text):
     return errs, shas
 
 
+def slug(path):
+    """Experiment slug of a repo path or declared object name, else None.
+
+    'sim/.work/.stage/<slug>/<record>/f.log' -> slug  (klt staging layout)
+    'sim/<slug>/...'                         -> slug  (committed evidence layout)
+    Anything else (including other sim/.work/ shapes) is unattributable.
+    """
+    parts = path.split("/")
+    if parts[:3] == ["sim", ".work", ".stage"] and len(parts) > 3:
+        return parts[3]
+    if parts[:2] == [".work", ".stage"] and len(parts) > 2:
+        return parts[2]
+    if parts[0] == "sim" and len(parts) > 1 and parts[1] != ".work":
+        return parts[1]
+    return None
+
+
 def run(repo):
     tracked = [p for p in git(repo, "ls-files", "-z").decode().split("\0") if p]
     manifests = sorted(p for p in tracked if re.fullmatch(re.escape(ART_DIR) + r"/[^/]+\.manifest\.json", p))
     problems = []
     stored = {}
-    named = {}
+    names = {}
     for m in manifests:
         errs, shas = check_manifest(m, (repo / m).read_text())
         problems += [f"{m}: {e}" for e in errs]
@@ -95,8 +117,7 @@ def run(repo):
             problems.append(f"{m}: missing .summary.md twin")
         for sha, size, name in shas:
             stored[sha] = (size, m)
-            if name is not None:
-                named.setdefault(sha, set()).add(name)
+            names.setdefault(sha, []).append(name)
     sizes = {s for s, _ in stored.values()}
     if stored:
         for p in tracked:
@@ -104,12 +125,27 @@ def run(repo):
                 continue
             f = repo / p
             if f.stat().st_size in sizes and (h := hashlib.sha256(f.read_bytes()).hexdigest()) in stored:
-                # path-aware: a same-hash object with a declared name at a
-                # DIFFERENT path is a distinct file sharing bytes (clean-pass
-                # corner stubs across experiments); only a path match — or an
-                # unnamed object, whose path we cannot check — is duplication.
-                if h not in named or p in named[h]:
-                    why = "unnamed stored object" if h not in named else "same path"
+                # experiment-scoped: a tracked file duplicates a stored object
+                # only within the object's own experiment. Names are judged per
+                # entry: an unnamed object or an unattributable path cannot be
+                # scoped, so it fails safe; a same-slug name is duplication;
+                # a different-slug name is a distinct experiment sharing bytes
+                # (clean-pass corner stubs across experiments).
+                ps = slug(p)
+                why = None
+                for n in names[h]:
+                    if n is None:
+                        why = "unnamed stored object"
+                    elif n == p:
+                        why = "same path"
+                    elif slug(n) is None or ps is None:
+                        why = f"unattributable name ({n})"
+                    elif slug(n) == ps:
+                        why = f"same experiment ({ps})"
+                    else:
+                        continue
+                    break
+                if why:
                     problems.append(f"{p}: bytes of a stored object are also committed ({why}, {stored[h][1]})")
     # any other tracked file under manifests/ must not name storage either
     for p in tracked:
@@ -154,12 +190,24 @@ def selftest():
     case("empty entries fails", lambda d: d.update(entries=[]), False)
     case("absolute name fails", lambda d: d["entries"][0].update(name="/etc/x"), False)
     case("arn in manifest fails", lambda d: d["entries"][0].update(name="arn:aws:x"), False)
+    case("same-experiment staging bytes fail",
+         lambda d: d["entries"][0].update(name="sim/.work/.stage/exp/20260101-000000-abc/tt.log"), False,
+         lambda r: (r / "sim" / "exp" / "corners" / "20260101-000000-abc").mkdir(parents=True)
+         or (r / "sim" / "exp" / "corners" / "20260101-000000-abc" / "tt.log").write_bytes(b"payload\n"))
+    case("cross-experiment staging bytes pass",
+         lambda d: d["entries"][0].update(name="sim/.work/.stage/other/20260101-000000-abc/tt.log"), True,
+         lambda r: (r / "sim" / "exp" / "corners" / "20260101-000000-abc").mkdir(parents=True)
+         or (r / "sim" / "exp" / "corners" / "20260101-000000-abc" / "tt.log").write_bytes(b"payload\n"))
     case("tracked bytes at declared path fail", lambda d: d["entries"][0].update(name="sim/tt.log"), False,
          lambda r: (r / "sim").mkdir() or (r / "sim" / "tt.log").write_bytes(b"payload\n"))
     case("same bytes at a different path pass", lambda d: d["entries"][0].update(name="sim/tt.log"), True,
          lambda r: (r / "sim").mkdir() or (r / "sim" / "o.log").write_bytes(b"payload\n"))
     case("tracked bytes of unnamed object fail", lambda d: d["entries"][0].pop("name"), False,
          lambda r: (r / "sim").mkdir() or (r / "sim" / "tt.log").write_bytes(b"payload\n"))
+    case("unattributable name fails safe",
+         lambda d: d["entries"][0].update(name="sim/.work/scratch/x/tt.log"), False,
+         lambda r: (r / "sim" / "exp" / "corners" / "20260101-000000-abc").mkdir(parents=True)
+         or (r / "sim" / "exp" / "corners" / "20260101-000000-abc" / "tt.log").write_bytes(b"payload\n"))
     case("unrelated tracked file passes", lambda d: None, True,
          lambda r: (r / "sim").mkdir() or (r / "sim" / "o.log").write_bytes(b"other!!\n"))
 

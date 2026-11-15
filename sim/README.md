@@ -223,7 +223,13 @@ so a new runner that forgets the check fails the self-checks workflow.
 
 CI (`.github/scripts/check_artifact_manifests.py`) validates the manifests'
 schema, accepts only `artifact:` URIs, fails if a stored object's bytes are also
-tracked, and rejects `s3://` / `arn:aws:` strings under `manifests/`. Evidence
+tracked within the same experiment, and rejects `s3://` / `arn:aws:` strings
+under `manifests/`. Object names are klt staging paths
+(`sim/.work/.stage/<experiment>/…`, gitignored), so byte identity is scoped by
+experiment slug: a runner committing its own raw bytes still fails, while
+byte-identical files across different experiments (e.g. the 4-line clean-pass
+corner stubs, which differ only in the corner name) are distinct evidence, not
+duplication. Unnamed or unattributable object names fail safe. Evidence
 committed before this change stays where it is.
 
 **The rule is enforced, not only documented.**
