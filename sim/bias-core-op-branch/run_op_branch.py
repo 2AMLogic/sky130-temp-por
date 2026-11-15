@@ -974,12 +974,6 @@ def parse_args(argv: list[str]) -> argparse.Namespace:
         help="fleet-worker pool size for the deck list (klt `options.max_workers`)",
     )
     p.add_argument(
-        "--wait-for-capacity",
-        type=float,
-        default=600,
-        help="seconds the batch submit waits out a fleet capacity refusal before failing",
-    )
-    p.add_argument(
         "--probe",
         metavar="POINT_ID",
         help="run ONE point on the local backend and print its log -- a debug check, "
@@ -999,10 +993,8 @@ def main(argv: list[str]) -> int:
     pdk = cr.resolve_pdk(pin)
     if not pdk.matches_pin and not args.allow_pdk_mismatch:
         raise cr.HarnessError(
-            f"installed PDK {pdk.variant} is open_pdks {pdk.installed_commit}, but "
-            f"sim/pdk.json pins {pin['open_pdks_commit']}\n"
-            f"  install the pin: {pin['install_command']}\n"
-            f"  or re-run with --allow-pdk-mismatch (the record will say so)"
+            cr.pdk_mismatch_message(pdk, pin)
+            + "\n  or re-run with --allow-pdk-mismatch (the record will say so)"
         )
 
     points = build_points(args.quick)

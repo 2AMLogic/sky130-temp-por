@@ -152,3 +152,9 @@ jobs:
 
       - name: Characterization report cites every sim experiment with records
         run: python3 -I .github/scripts/check_characterization_coverage.py
+
+      - name: Decision-record index checker selftest (unindexed record, prose-only mention, status mismatch, orphan row, missing Status bullet, out-of-vocabulary status, malformed row, empty dir)
+        run: python3 -I .github/scripts/check_decision_record_index.py --selftest
+
+      - name: Every decision record is indexed in spec/README.md with its own status
+        run: python3 -I .github/scripts/check_decision_record_index.py

@@ -1,0 +1,6655 @@
+{
+  "author": "313063438+loom-fleet-dispatch[bot]@users.noreply.github.com",
+  "backend": "batch",
+  "batch": {
+    "client_pdk_version": "open_pdks f6eeac7dad085ffcc829ccfd721f7b4ce39edcf7",
+    "fleet_pdk_name": "sky130A",
+    "fleet_pdk_version": "open_pdks f6eeac7dad085ffcc829ccfd721f7b4ce39edcf7",
+    "job_id": "klt-sim-69b194bf2091",
+    "klt_client": "klt 0.9.2.dev1029+g76f47afa48f1",
+    "models_lib_sha256": "48de7c677e2c6e7d09b2559279de9f818be71010a4aa933d728eb4db3b133c84",
+    "remote": {
+      "ami_id": "ami-09c14f55df4958cbd",
+      "availability_zone": "us-east-1a",
+      "client_collected_at": "2026-11-14T19:36:20.488026Z",
+      "client_klt_version": "0.9.2.dev1029+g76f47afa48f1",
+      "client_launched_at": "2026-11-14T19:35:16.781548Z",
+      "client_status_terminal_at": "2026-11-14T19:36:19.105814Z",
+      "client_submitted_at": "2026-11-14T19:33:13.585959Z",
+      "concurrency": "1",
+      "elapsed_seconds": 25,
+      "exit_code": "0",
+      "instance_id": "i-08d99aebff4f3917e",
+      "instance_type": "m7i.4xlarge",
+      "job_ceiling": {
+        "basis": "conservative_serial_bound",
+        "check": "warn",
+        "exceeds_ceiling": true,
+        "job_bound_s": 13620.0,
+        "max_job_seconds": 3600.0,
+        "max_job_seconds_source": "fleet_config",
+        "max_units_per_job": 11,
+        "overhead_s": 120.0,
+        "per_unit_timeout_s": 300,
+        "recommended_hosts": 5,
+        "unit_count": 45,
+        "warning": "batch job bound 13620s (options.timeout_s 300s x 45 units + 120s; a conservative fully-serial upper bound, not a runtime estimate) exceeds the fleet's whole-job ceiling of 3600s (max_job_seconds from fleet_config); a job still running at the ceiling is killed and every unit is reported batch_job_timeout. Set request.remote.hosts to at least 5 to run one job per shard of at most 11 units, each within the ceiling"
+      },
+      "job_id": "klt-sim-69b194bf2091",
+      "lifecycle": "spot",
+      "models_lib_comparison": {
+        "status": "match"
+      },
+      "physical_cores": "8",
+      "provider": "aws-batch-fleet",
+      "region": "us-east-1",
+      "runner_compatibility": "match",
+      "runner_klt_version": "0.9.0",
+      "runner_model_inputs": null,
+      "runner_models_lib_sha256": "48de7c677e2c6e7d09b2559279de9f818be71010a4aa933d728eb4db3b133c84",
+      "runner_request_features": {
+        "missing": [],
+        "required": [
+          "measurements[].expr"
+        ],
+        "status": "supported"
+      },
+      "spot": true,
+      "state": "done",
+      "worker_environment": {
+        "capture": "ok",
+        "cpu_model": "Intel(R) Xeon(R) Platinum 8488C",
+        "diagnostics": [],
+        "engine_build_comparison": {
+          "status": "match"
+        },
+        "image_manifest": null,
+        "model_inputs": null,
+        "omp_num_threads": null,
+        "pdk": {
+          "models_staged": false,
+          "root": "/opt/pdk",
+          "stamp_scheme": "sources-sha256",
+          "stamp_scope": "executed",
+          "stamp_sha256": "4ca10280ae9f293aa1ff69f0060a52e0026929111bda881503717469b429ce67",
+          "stamp_text": "open_pdks f6eeac7dad085ffcc829ccfd721f7b4ce39edcf7",
+          "variant": "sky130A"
+        },
+        "pdk_stamp_comparison": {
+          "status": "match"
+        },
+        "simulator": {
+          "binary_source": "PATH",
+          "requested_binary": "ngspice",
+          "selected_path": "/usr/local/bin/ngspice",
+          "version_banner": "******\n** ngspice-47 : Circuit level simulation program\n** Compiled with KLU Direct Linear Solver\n** The U. C. Berkeley CAD Group\n** Copyright 1985-1994, Regents of the University of California.\n** Copyright 2001-2026, The ngspice team.\n** Please get your ngspice manual from https://ngspice.sourceforge.io/docs.html\n** Please file your bug-reports at http://ngspice.sourceforge.net/bugrep.html\n** Creation Date: Fri Nov 13 23:19:32 UTC 2026\n******\n",
+          "version_probe": "ok"
+        }
+      }
+    },
+    "runner_klt": "0.9.0",
+    "status": "pass"
+  },
+  "corners": [
+    {
+      "batch_status": "pass",
+      "corner_id": "tt_-40c_2.97v",
+      "diagnostics": [],
+      "elapsed_s": 3.075,
+      "killed_by_signal": null,
+      "killed_by_signal_name": null,
+      "log": "sim/.work/.stage/por-output-chain-deglitch/20261114-193311-94b18bbe/tt_-40c_2.97v.log",
+      "measurements": [
+        {
+          "expr": "1e-2 - 2e-3 - integ(v(resetn) gt 1.65)[length(v(resetn))-1]",
+          "max": 0.004,
+          "min": 0.0005,
+          "name": "release_delay",
+          "pass": true,
+          "reason": "",
+          "unit": "s",
+          "value": 0.0008972209
+        },
+        {
+          "expr": "1e-2 - integ(v(resetn) gt 1.65)[length(v(resetn))-1]",
+          "max": 0.006,
+          "min": 0.0022,
+          "name": "t_release",
+          "pass": true,
+          "reason": "",
+          "unit": "s",
+          "value": 0.002897221
+        },
+        {
+          "expr": "maximum(v(resetn))",
+          "max": 3.8,
+          "min": 1.8,
+          "name": "rstn_released",
+          "pass": true,
+          "reason": "",
+          "unit": "V",
+          "value": 2.672116
+        },
+        {
+          "expr": "minimum(v(resetn))",
+          "max": 0.01,
+          "min": -0.05,
+          "name": "rstn_asserted",
+          "pass": true,
+          "reason": "",
+          "unit": "V",
+          "value": -3.0053e-06
+        },
+        {
+          "expr": "maximum(v(xdut.tim))",
+          "max": 4.7,
+          "min": -1.0,
+          "name": "tim_max",
+          "pass": true,
+          "reason": "",
+          "unit": "V",
+          "value": 2.969988
+        },
+        {
+          "expr": "minimum(v(xdut.tim))",
+          "max": 4.7,
+          "min": -1.0,
+          "name": "tim_min",
+          "pass": true,
+          "reason": "",
+          "unit": "V",
+          "value": -0.00161135
+        },
+        {
+          "expr": "maximum(v(xdut.ndg))",
+          "max": 4.7,
+          "min": -1.0,
+          "name": "ndg_max",
+          "pass": true,
+          "reason": "",
+          "unit": "V",
+          "value": 2.975849
+        },
+        {
+          "expr": "minimum(v(xdut.ndg))",
+          "max": 4.7,
+          "min": -1.0,
+          "name": "ndg_min",
+          "pass": true,
+          "reason": "",
+          "unit": "V",
+          "value": -4.98554e-05
+        },
+        {
+          "expr": "maximum(v(xdut.trip))",
+          "max": 4.7,
+          "min": -1.0,
+          "name": "trip_max",
+          "pass": true,
+          "reason": "",
+          "unit": "V",
+          "value": 2.994974
+        },
+        {
+          "expr": "minimum(v(xdut.trip))",
+          "max": 4.7,
+          "min": -1.0,
+          "name": "trip_min",
+          "pass": true,
+          "reason": "",
+          "unit": "V",
+          "value": -1.82595e-05
+        },
+        {
+          "expr": "maximum(v(xdut.rstb))",
+          "max": 4.7,
+          "min": -1.0,
+          "name": "rstb_max",
+          "pass": true,
+          "reason": "",
+          "unit": "V",
+          "value": 2.97003
+        },
+        {
+          "expr": "minimum(v(xdut.rstb))",
+          "max": 4.7,
+          "min": -1.0,
+          "name": "rstb_min",
+          "pass": true,
+          "reason": "",
+          "unit": "V",
+          "value": -8.18306e-05
+        }
+      ],
+      "ngspice_exit": 0,
+      "pass": true,
+      "process": "tt",
+      "supply_v": 2.97,
+      "temperature_c": -40.0,
+      "timed_out": false,
+      "timeout_s": 300
+    },
+    {
+      "batch_status": "pass",
+      "corner_id": "tt_-40c_3.30v",
+      "diagnostics": [],
+      "elapsed_s": 3.072,
+      "killed_by_signal": null,
+      "killed_by_signal_name": null,
+      "log": "sim/.work/.stage/por-output-chain-deglitch/20261114-193311-94b18bbe/tt_-40c_3.30v.log",
+      "measurements": [
+        {
+          "expr": "1e-2 - 2e-3 - integ(v(resetn) gt 1.65)[length(v(resetn))-1]",
+          "max": 0.004,
+          "min": 0.0005,
+          "name": "release_delay",
+          "pass": true,
+          "reason": "",
+          "unit": "s",
+          "value": 0.001037086
+        },
+        {
+          "expr": "1e-2 - integ(v(resetn) gt 1.65)[length(v(resetn))-1]",
+          "max": 0.006,
+          "min": 0.0022,
+          "name": "t_release",
+          "pass": true,
+          "reason": "",
+          "unit": "s",
+          "value": 0.003037086
+        },
+        {
+          "expr": "maximum(v(resetn))",
+          "max": 3.8,
+          "min": 1.8,
+          "name": "rstn_released",
+          "pass": true,
+          "reason": "",
+          "unit": "V",
+          "value": 2.970198
+        },
+        {
+          "expr": "minimum(v(resetn))",
+          "max": 0.01,
+          "min": -0.05,
+          "name": "rstn_asserted",
+          "pass": true,
+          "reason": "",
+          "unit": "V",
+          "value": -3.03973e-06
+        },
+        {
+          "expr": "maximum(v(xdut.tim))",
+          "max": 4.7,
+          "min": -1.0,
+          "name": "tim_max",
+          "pass": true,
+          "reason": "",
+          "unit": "V",
+          "value": 3.299987
+        },
+        {
+          "expr": "minimum(v(xdut.tim))",
+          "max": 4.7,
+          "min": -1.0,
+          "name": "tim_min",
+          "pass": true,
+          "reason": "",
+          "unit": "V",
+          "value": -0.00144776
+        },
+        {
+          "expr": "maximum(v(xdut.ndg))",
+          "max": 4.7,
+          "min": -1.0,
+          "name": "ndg_max",
+          "pass": true,
+          "reason": "",
+          "unit": "V",
+          "value": 3.302132
+        },
+        {
+          "expr": "minimum(v(xdut.ndg))",
+          "max": 4.7,
+          "min": -1.0,
+          "name": "ndg_min",
+          "pass": true,
+          "reason": "",
+          "unit": "V",
+          "value": -0.000192437
+        },
+        {
+          "expr": "maximum(v(xdut.trip))",
+          "max": 4.7,
+          "min": -1.0,
+          "name": "trip_max",
+          "pass": true,
+          "reason": "",
+          "unit": "V",
+          "value": 3.32543
+        },
+        {
+          "expr": "minimum(v(xdut.trip))",
+          "max": 4.7,
+          "min": -1.0,
+          "name": "trip_min",
+          "pass": true,
+          "reason": "",
+          "unit": "V",
+          "value": -1.72177e-05
+        },
+        {
+          "expr": "maximum(v(xdut.rstb))",
+          "max": 4.7,
+          "min": -1.0,
+          "name": "rstb_max",
+          "pass": true,
+          "reason": "",
+          "unit": "V",
+          "value": 3.300025
+        },
+        {
+          "expr": "minimum(v(xdut.rstb))",
+          "max": 4.7,
+          "min": -1.0,
+          "name": "rstb_min",
+          "pass": true,
+          "reason": "",
+          "unit": "V",
+          "value": -4.5863e-05
+        }
+      ],
+      "ngspice_exit": 0,
+      "pass": true,
+      "process": "tt",
+      "supply_v": 3.3,
+      "temperature_c": -40.0,
+      "timed_out": false,
+      "timeout_s": 300
+    },
+    {
+      "batch_status": "pass",
+      "corner_id": "tt_-40c_3.63v",
+      "diagnostics": [],
+      "elapsed_s": 3.019,
+      "killed_by_signal": null,
+      "killed_by_signal_name": null,
+      "log": "sim/.work/.stage/por-output-chain-deglitch/20261114-193311-94b18bbe/tt_-40c_3.63v.log",
+      "measurements": [
+        {
+          "expr": "1e-2 - 2e-3 - integ(v(resetn) gt 1.65)[length(v(resetn))-1]",
+          "max": 0.004,
+          "min": 0.0005,
+          "name": "release_delay",
+          "pass": true,
+          "reason": "",
+          "unit": "s",
+          "value": 0.001167405
+        },
+        {
+          "expr": "1e-2 - integ(v(resetn) gt 1.65)[length(v(resetn))-1]",
+          "max": 0.006,
+          "min": 0.0022,
+          "name": "t_release",
+          "pass": true,
+          "reason": "",
+          "unit": "s",
+          "value": 0.003167405
+        },
+        {
+          "expr": "maximum(v(resetn))",
+          "max": 3.8,
+          "min": 1.8,
+          "name": "rstn_released",
+          "pass": true,
+          "reason": "",
+          "unit": "V",
+          "value": 3.264299
+        },
+        {
+          "expr": "minimum(v(resetn))",
+          "max": 0.01,
+          "min": -0.05,
+          "name": "rstn_asserted",
+          "pass": true,
+          "reason": "",
+          "unit": "V",
+          "value": -3.10864e-06
+        },
+        {
+          "expr": "maximum(v(xdut.tim))",
+          "max": 4.7,
+          "min": -1.0,
+          "name": "tim_max",
+          "pass": true,
+          "reason": "",
+          "unit": "V",
+          "value": 3.629985
+        },
+        {
+          "expr": "minimum(v(xdut.tim))",
+          "max": 4.7,
+          "min": -1.0,
+          "name": "tim_min",
+          "pass": true,
+          "reason": "",
+          "unit": "V",
+          "value": -0.0237126
+        },
+        {
+          "expr": "maximum(v(xdut.ndg))",
+          "max": 4.7,
+          "min": -1.0,
+          "name": "ndg_max",
+          "pass": true,
+          "reason": "",
+          "unit": "V",
+          "value": 3.631858
+        },
+        {
+          "expr": "minimum(v(xdut.ndg))",
+          "max": 4.7,
+          "min": -1.0,
+          "name": "ndg_min",
+          "pass": true,
+          "reason": "",
+          "unit": "V",
+          "value": -0.00125292
+        },
+        {
+          "expr": "maximum(v(xdut.trip))",
+          "max": 4.7,
+          "min": -1.0,
+          "name": "trip_max",
+          "pass": true,
+          "reason": "",
+          "unit": "V",
+          "value": 3.639237
+        },
+        {
+          "expr": "minimum(v(xdut.trip))",
+          "max": 4.7,
+          "min": -1.0,
+          "name": "trip_min",
+          "pass": true,
+          "reason": "",
+          "unit": "V",
+          "value": -1.64509e-05
+        },
+        {
+          "expr": "maximum(v(xdut.rstb))",
+          "max": 4.7,
+          "min": -1.0,
+          "name": "rstb_max",
+          "pass": true,
+          "reason": "",
+          "unit": "V",
+          "value": 3.630024
+        },
+        {
+          "expr": "minimum(v(xdut.rstb))",
+          "max": 4.7,
+          "min": -1.0,
+          "name": "rstb_min",
+          "pass": true,
+          "reason": "",
+          "unit": "V",
+          "value": -1.04246e-05
+        }
+      ],
+      "ngspice_exit": 0,
+      "pass": true,
+      "process": "tt",
+      "supply_v": 3.63,
+      "temperature_c": -40.0,
+      "timed_out": false,
+      "timeout_s": 300
+    },
+    {
+      "batch_status": "pass",
+      "corner_id": "tt_27c_2.97v",
+      "diagnostics": [],
+      "elapsed_s": 3.022,
+      "killed_by_signal": null,
+      "killed_by_signal_name": null,
+      "log": "sim/.work/.stage/por-output-chain-deglitch/20261114-193311-94b18bbe/tt_27c_2.97v.log",
+      "measurements": [
+        {
+          "expr": "1e-2 - 2e-3 - integ(v(resetn) gt 1.65)[length(v(resetn))-1]",
+          "max": 0.004,
+          "min": 0.0005,
+          "name": "release_delay",
+          "pass": true,
+          "reason": "",
+          "unit": "s",
+          "value": 0.00105926
+        },
+        {
+          "expr": "1e-2 - integ(v(resetn) gt 1.65)[length(v(resetn))-1]",
+          "max": 0.006,
+          "min": 0.0022,
+          "name": "t_release",
+          "pass": true,
+          "reason": "",
+          "unit": "s",
+          "value": 0.00305926
+        },
+        {
+          "expr": "maximum(v(resetn))",
+          "max": 3.8,
+          "min": 1.8,
+          "name": "rstn_released",
+          "pass": true,
+          "reason": "",
+          "unit": "V",
+          "value": 2.710558
+        },
+        {
+          "expr": "minimum(v(resetn))",
+          "max": 0.01,
+          "min": -0.05,
+          "name": "rstn_asserted",
+          "pass": true,
+          "reason": "",
+          "unit": "V",
+          "value": -4.4108e-06
+        },
+        {
+          "expr": "maximum(v(xdut.tim))",
+          "max": 4.7,
+          "min": -1.0,
+          "name": "tim_max",
+          "pass": true,
+          "reason": "",
+          "unit": "V",
+          "value": 2.969984
+        },
+        {
+          "expr": "minimum(v(xdut.tim))",
+          "max": 4.7,
+          "min": -1.0,
+          "name": "tim_min",
+          "pass": true,
+          "reason": "",
+          "unit": "V",
+          "value": -0.00186648
+        },
+        {
+          "expr": "maximum(v(xdut.ndg))",
+          "max": 4.7,
+          "min": -1.0,
+          "name": "ndg_max",
+          "pass": true,
+          "reason": "",
+          "unit": "V",
+          "value": 2.984968
+        },
+        {
+          "expr": "minimum(v(xdut.ndg))",
+          "max": 4.7,
+          "min": -1.0,
+          "name": "ndg_min",
+          "pass": true,
+          "reason": "",
+          "unit": "V",
+          "value": -0.000606801
+        },
+        {
+          "expr": "maximum(v(xdut.trip))",
+          "max": 4.7,
+          "min": -1.0,
+          "name": "trip_max",
+          "pass": true,
+          "reason": "",
+          "unit": "V",
+          "value": 2.998692
+        },
+        {
+          "expr": "minimum(v(xdut.trip))",
+          "max": 4.7,
+          "min": -1.0,
+          "name": "trip_min",
+          "pass": true,
+          "reason": "",
+          "unit": "V",
+          "value": -3.0348e-05
+        },
+        {
+          "expr": "maximum(v(xdut.rstb))",
+          "max": 4.7,
+          "min": -1.0,
+          "name": "rstb_max",
+          "pass": true,
+          "reason": "",
+          "unit": "V",
+          "value": 2.970042
+        },
+        {
+          "expr": "minimum(v(xdut.rstb))",
+          "max": 4.7,
+          "min": -1.0,
+          "name": "rstb_min",
+          "pass": true,
+          "reason": "",
+          "unit": "V",
+          "value": -3.04683e-05
+        }
+      ],
+      "ngspice_exit": 0,
+      "pass": true,
+      "process": "tt",
+      "supply_v": 2.97,
+      "temperature_c": 27.0,
+      "timed_out": false,
+      "timeout_s": 300
+    },
+    {
+      "batch_status": "pass",
+      "corner_id": "tt_27c_3.30v",
+      "diagnostics": [],
+      "elapsed_s": 3.019,
+      "killed_by_signal": null,
+      "killed_by_signal_name": null,
+      "log": "sim/.work/.stage/por-output-chain-deglitch/20261114-193311-94b18bbe/tt_27c_3.30v.log",
+      "measurements": [
+        {
+          "expr": "1e-2 - 2e-3 - integ(v(resetn) gt 1.65)[length(v(resetn))-1]",
+          "max": 0.004,
+          "min": 0.0005,
+          "name": "release_delay",
+          "pass": true,
+          "reason": "",
+          "unit": "s",
+          "value": 0.001203774
+        },
+        {
+          "expr": "1e-2 - integ(v(resetn) gt 1.65)[length(v(resetn))-1]",
+          "max": 0.006,
+          "min": 0.0022,
+          "name": "t_release",
+          "pass": true,
+          "reason": "",
+          "unit": "s",
+          "value": 0.003203774
+        },
+        {
+          "expr": "maximum(v(resetn))",
+          "max": 3.8,
+          "min": 1.8,
+          "name": "rstn_released",
+          "pass": true,
+          "reason": "",
+          "unit": "V",
+          "value": 3.014364
+        },
+        {
+          "expr": "minimum(v(resetn))",
+          "max": 0.01,
+          "min": -0.05,
+          "name": "rstn_asserted",
+          "pass": true,
+          "reason": "",
+          "unit": "V",
+          "value": -4.40007e-06
+        },
+        {
+          "expr": "maximum(v(xdut.tim))",
+          "max": 4.7,
+          "min": -1.0,
+          "name": "tim_max",
+          "pass": true,
+          "reason": "",
+          "unit": "V",
+          "value": 3.299982
+        },
+        {
+          "expr": "minimum(v(xdut.tim))",
+          "max": 4.7,
+          "min": -1.0,
+          "name": "tim_min",
+          "pass": true,
+          "reason": "",
+          "unit": "V",
+          "value": -0.00174458
+        },
+        {
+          "expr": "maximum(v(xdut.ndg))",
+          "max": 4.7,
+          "min": -1.0,
+          "name": "ndg_max",
+          "pass": true,
+          "reason": "",
+          "unit": "V",
+          "value": 3.320569
+        },
+        {
+          "expr": "minimum(v(xdut.ndg))",
+          "max": 4.7,
+          "min": -1.0,
+          "name": "ndg_min",
+          "pass": true,
+          "reason": "",
+          "unit": "V",
+          "value": -0.000339582
+        },
+        {
+          "expr": "maximum(v(xdut.trip))",
+          "max": 4.7,
+          "min": -1.0,
+          "name": "trip_max",
+          "pass": true,
+          "reason": "",
+          "unit": "V",
+          "value": 3.332089
+        },
+        {
+          "expr": "minimum(v(xdut.trip))",
+          "max": 4.7,
+          "min": -1.0,
+          "name": "trip_min",
+          "pass": true,
+          "reason": "",
+          "unit": "V",
+          "value": -2.84615e-05
+        },
+        {
+          "expr": "maximum(v(xdut.rstb))",
+          "max": 4.7,
+          "min": -1.0,
+          "name": "rstb_max",
+          "pass": true,
+          "reason": "",
+          "unit": "V",
+          "value": 3.300036
+        },
+        {
+          "expr": "minimum(v(xdut.rstb))",
+          "max": 4.7,
+          "min": -1.0,
+          "name": "rstb_min",
+          "pass": true,
+          "reason": "",
+          "unit": "V",
+          "value": -9.85962e-05
+        }
+      ],
+      "ngspice_exit": 0,
+      "pass": true,
+      "process": "tt",
+      "supply_v": 3.3,
+      "temperature_c": 27.0,
+      "timed_out": false,
+      "timeout_s": 300
+    },
+    {
+      "batch_status": "pass",
+      "corner_id": "tt_27c_3.63v",
+      "diagnostics": [],
+      "elapsed_s": 3.02,
+      "killed_by_signal": null,
+      "killed_by_signal_name": null,
+      "log": "sim/.work/.stage/por-output-chain-deglitch/20261114-193311-94b18bbe/tt_27c_3.63v.log",
+      "measurements": [
+        {
+          "expr": "1e-2 - 2e-3 - integ(v(resetn) gt 1.65)[length(v(resetn))-1]",
+          "max": 0.004,
+          "min": 0.0005,
+          "name": "release_delay",
+          "pass": true,
+          "reason": "",
+          "unit": "s",
+          "value": 0.001350659
+        },
+        {
+          "expr": "1e-2 - integ(v(resetn) gt 1.65)[length(v(resetn))-1]",
+          "max": 0.006,
+          "min": 0.0022,
+          "name": "t_release",
+          "pass": true,
+          "reason": "",
+          "unit": "s",
+          "value": 0.003350659
+        },
+        {
+          "expr": "maximum(v(resetn))",
+          "max": 3.8,
+          "min": 1.8,
+          "name": "rstn_released",
+          "pass": true,
+          "reason": "",
+          "unit": "V",
+          "value": 3.316022
+        },
+        {
+          "expr": "minimum(v(resetn))",
+          "max": 0.01,
+          "min": -0.05,
+          "name": "rstn_asserted",
+          "pass": true,
+          "reason": "",
+          "unit": "V",
+          "value": -4.44396e-06
+        },
+        {
+          "expr": "maximum(v(xdut.tim))",
+          "max": 4.7,
+          "min": -1.0,
+          "name": "tim_max",
+          "pass": true,
+          "reason": "",
+          "unit": "V",
+          "value": 3.629979
+        },
+        {
+          "expr": "minimum(v(xdut.tim))",
+          "max": 4.7,
+          "min": -1.0,
+          "name": "tim_min",
+          "pass": true,
+          "reason": "",
+          "unit": "V",
+          "value": -0.00170148
+        },
+        {
+          "expr": "maximum(v(xdut.ndg))",
+          "max": 4.7,
+          "min": -1.0,
+          "name": "ndg_max",
+          "pass": true,
+          "reason": "",
+          "unit": "V",
+          "value": 3.633987
+        },
+        {
+          "expr": "minimum(v(xdut.ndg))",
+          "max": 4.7,
+          "min": -1.0,
+          "name": "ndg_min",
+          "pass": true,
+          "reason": "",
+          "unit": "V",
+          "value": -2.65085e-05
+        },
+        {
+          "expr": "maximum(v(xdut.trip))",
+          "max": 4.7,
+          "min": -1.0,
+          "name": "trip_max",
+          "pass": true,
+          "reason": "",
+          "unit": "V",
+          "value": 3.662902
+        },
+        {
+          "expr": "minimum(v(xdut.trip))",
+          "max": 4.7,
+          "min": -1.0,
+          "name": "trip_min",
+          "pass": true,
+          "reason": "",
+          "unit": "V",
+          "value": -2.72128e-05
+        },
+        {
+          "expr": "maximum(v(xdut.rstb))",
+          "max": 4.7,
+          "min": -1.0,
+          "name": "rstb_max",
+          "pass": true,
+          "reason": "",
+          "unit": "V",
+          "value": 3.630035
+        },
+        {
+          "expr": "minimum(v(xdut.rstb))",
+          "max": 4.7,
+          "min": -1.0,
+          "name": "rstb_min",
+          "pass": true,
+          "reason": "",
+          "unit": "V",
+          "value": -0.000111352
+        }
+      ],
+      "ngspice_exit": 0,
+      "pass": true,
+      "process": "tt",
+      "supply_v": 3.63,
+      "temperature_c": 27.0,
+      "timed_out": false,
+      "timeout_s": 300
+    },
+    {
+      "batch_status": "pass",
+      "corner_id": "tt_125c_2.97v",
+      "diagnostics": [],
+      "elapsed_s": 3.021,
+      "killed_by_signal": null,
+      "killed_by_signal_name": null,
+      "log": "sim/.work/.stage/por-output-chain-deglitch/20261114-193311-94b18bbe/tt_125c_2.97v.log",
+      "measurements": [
+        {
+          "expr": "1e-2 - 2e-3 - integ(v(resetn) gt 1.65)[length(v(resetn))-1]",
+          "max": 0.004,
+          "min": 0.0005,
+          "name": "release_delay",
+          "pass": true,
+          "reason": "",
+          "unit": "s",
+          "value": 0.001333947
+        },
+        {
+          "expr": "1e-2 - integ(v(resetn) gt 1.65)[length(v(resetn))-1]",
+          "max": 0.006,
+          "min": 0.0022,
+          "name": "t_release",
+          "pass": true,
+          "reason": "",
+          "unit": "s",
+          "value": 0.003333947
+        },
+        {
+          "expr": "maximum(v(resetn))",
+          "max": 3.8,
+          "min": 1.8,
+          "name": "rstn_released",
+          "pass": true,
+          "reason": "",
+          "unit": "V",
+          "value": 2.748276
+        },
+        {
+          "expr": "minimum(v(resetn))",
+          "max": 0.01,
+          "min": -0.05,
+          "name": "rstn_asserted",
+          "pass": true,
+          "reason": "",
+          "unit": "V",
+          "value": -7.30196e-06
+        },
+        {
+          "expr": "maximum(v(xdut.tim))",
+          "max": 4.7,
+          "min": -1.0,
+          "name": "tim_max",
+          "pass": true,
+          "reason": "",
+          "unit": "V",
+          "value": 2.969665
+        },
+        {
+          "expr": "minimum(v(xdut.tim))",
+          "max": 4.7,
+          "min": -1.0,
+          "name": "tim_min",
+          "pass": true,
+          "reason": "",
+          "unit": "V",
+          "value": -0.00320276
+        },
+        {
+          "expr": "maximum(v(xdut.ndg))",
+          "max": 4.7,
+          "min": -1.0,
+          "name": "ndg_max",
+          "pass": true,
+          "reason": "",
+          "unit": "V",
+          "value": 2.982256
+        },
+        {
+          "expr": "minimum(v(xdut.ndg))",
+          "max": 4.7,
+          "min": -1.0,
+          "name": "ndg_min",
+          "pass": true,
+          "reason": "",
+          "unit": "V",
+          "value": -0.00148586
+        },
+        {
+          "expr": "maximum(v(xdut.trip))",
+          "max": 4.7,
+          "min": -1.0,
+          "name": "trip_max",
+          "pass": true,
+          "reason": "",
+          "unit": "V",
+          "value": 3.006261
+        },
+        {
+          "expr": "minimum(v(xdut.trip))",
+          "max": 4.7,
+          "min": -1.0,
+          "name": "trip_min",
+          "pass": true,
+          "reason": "",
+          "unit": "V",
+          "value": -5.64477e-05
+        },
+        {
+          "expr": "maximum(v(xdut.rstb))",
+          "max": 4.7,
+          "min": -1.0,
+          "name": "rstb_max",
+          "pass": true,
+          "reason": "",
+          "unit": "V",
+          "value": 2.970057
+        },
+        {
+          "expr": "minimum(v(xdut.rstb))",
+          "max": 4.7,
+          "min": -1.0,
+          "name": "rstb_min",
+          "pass": true,
+          "reason": "",
+          "unit": "V",
+          "value": -0.000126994
+        }
+      ],
+      "ngspice_exit": 0,
+      "pass": true,
+      "process": "tt",
+      "supply_v": 2.97,
+      "temperature_c": 125.0,
+      "timed_out": false,
+      "timeout_s": 300
+    },
+    {
+      "batch_status": "pass",
+      "corner_id": "tt_125c_3.30v",
+      "diagnostics": [],
+      "elapsed_s": 3.071,
+      "killed_by_signal": null,
+      "killed_by_signal_name": null,
+      "log": "sim/.work/.stage/por-output-chain-deglitch/20261114-193311-94b18bbe/tt_125c_3.30v.log",
+      "measurements": [
+        {
+          "expr": "1e-2 - 2e-3 - integ(v(resetn) gt 1.65)[length(v(resetn))-1]",
+          "max": 0.004,
+          "min": 0.0005,
+          "name": "release_delay",
+          "pass": true,
+          "reason": "",
+          "unit": "s",
+          "value": 0.001503552
+        },
+        {
+          "expr": "1e-2 - integ(v(resetn) gt 1.65)[length(v(resetn))-1]",
+          "max": 0.006,
+          "min": 0.0022,
+          "name": "t_release",
+          "pass": true,
+          "reason": "",
+          "unit": "s",
+          "value": 0.003503552
+        },
+        {
+          "expr": "maximum(v(resetn))",
+          "max": 3.8,
+          "min": 1.8,
+          "name": "rstn_released",
+          "pass": true,
+          "reason": "",
+          "unit": "V",
+          "value": 3.058173
+        },
+        {
+          "expr": "minimum(v(resetn))",
+          "max": 0.01,
+          "min": -0.05,
+          "name": "rstn_asserted",
+          "pass": true,
+          "reason": "",
+          "unit": "V",
+          "value": -7.19272e-06
+        },
+        {
+          "expr": "maximum(v(xdut.tim))",
+          "max": 4.7,
+          "min": -1.0,
+          "name": "tim_max",
+          "pass": true,
+          "reason": "",
+          "unit": "V",
+          "value": 3.299659
+        },
+        {
+          "expr": "minimum(v(xdut.tim))",
+          "max": 4.7,
+          "min": -1.0,
+          "name": "tim_min",
+          "pass": true,
+          "reason": "",
+          "unit": "V",
+          "value": -0.00222991
+        },
+        {
+          "expr": "maximum(v(xdut.ndg))",
+          "max": 4.7,
+          "min": -1.0,
+          "name": "ndg_max",
+          "pass": true,
+          "reason": "",
+          "unit": "V",
+          "value": 3.310247
+        },
+        {
+          "expr": "minimum(v(xdut.ndg))",
+          "max": 4.7,
+          "min": -1.0,
+          "name": "ndg_min",
+          "pass": true,
+          "reason": "",
+          "unit": "V",
+          "value": -0.00136102
+        },
+        {
+          "expr": "maximum(v(xdut.trip))",
+          "max": 4.7,
+          "min": -1.0,
+          "name": "trip_max",
+          "pass": true,
+          "reason": "",
+          "unit": "V",
+          "value": 3.338958
+        },
+        {
+          "expr": "minimum(v(xdut.trip))",
+          "max": 4.7,
+          "min": -1.0,
+          "name": "trip_min",
+          "pass": true,
+          "reason": "",
+          "unit": "V",
+          "value": -5.29441e-05
+        },
+        {
+          "expr": "maximum(v(xdut.rstb))",
+          "max": 4.7,
+          "min": -1.0,
+          "name": "rstb_max",
+          "pass": true,
+          "reason": "",
+          "unit": "V",
+          "value": 3.300054
+        },
+        {
+          "expr": "minimum(v(xdut.rstb))",
+          "max": 4.7,
+          "min": -1.0,
+          "name": "rstb_min",
+          "pass": true,
+          "reason": "",
+          "unit": "V",
+          "value": -0.000119226
+        }
+      ],
+      "ngspice_exit": 0,
+      "pass": true,
+      "process": "tt",
+      "supply_v": 3.3,
+      "temperature_c": 125.0,
+      "timed_out": false,
+      "timeout_s": 300
+    },
+    {
+      "batch_status": "pass",
+      "corner_id": "tt_125c_3.63v",
+      "diagnostics": [],
+      "elapsed_s": 2.871,
+      "killed_by_signal": null,
+      "killed_by_signal_name": null,
+      "log": "sim/.work/.stage/por-output-chain-deglitch/20261114-193311-94b18bbe/tt_125c_3.63v.log",
+      "measurements": [
+        {
+          "expr": "1e-2 - 2e-3 - integ(v(resetn) gt 1.65)[length(v(resetn))-1]",
+          "max": 0.004,
+          "min": 0.0005,
+          "name": "release_delay",
+          "pass": true,
+          "reason": "",
+          "unit": "s",
+          "value": 0.001666415
+        },
+        {
+          "expr": "1e-2 - integ(v(resetn) gt 1.65)[length(v(resetn))-1]",
+          "max": 0.006,
+          "min": 0.0022,
+          "name": "t_release",
+          "pass": true,
+          "reason": "",
+          "unit": "s",
+          "value": 0.003666415
+        },
+        {
+          "expr": "maximum(v(resetn))",
+          "max": 3.8,
+          "min": 1.8,
+          "name": "rstn_released",
+          "pass": true,
+          "reason": "",
+          "unit": "V",
+          "value": 3.366662
+        },
+        {
+          "expr": "minimum(v(resetn))",
+          "max": 0.01,
+          "min": -0.05,
+          "name": "rstn_asserted",
+          "pass": true,
+          "reason": "",
+          "unit": "V",
+          "value": -7.17913e-06
+        },
+        {
+          "expr": "maximum(v(xdut.tim))",
+          "max": 4.7,
+          "min": -1.0,
+          "name": "tim_max",
+          "pass": true,
+          "reason": "",
+          "unit": "V",
+          "value": 3.629652
+        },
+        {
+          "expr": "minimum(v(xdut.tim))",
+          "max": 4.7,
+          "min": -1.0,
+          "name": "tim_min",
+          "pass": true,
+          "reason": "",
+          "unit": "V",
+          "value": -0.00297113
+        },
+        {
+          "expr": "maximum(v(xdut.ndg))",
+          "max": 4.7,
+          "min": -1.0,
+          "name": "ndg_max",
+          "pass": true,
+          "reason": "",
+          "unit": "V",
+          "value": 3.62963
+        },
+        {
+          "expr": "minimum(v(xdut.ndg))",
+          "max": 4.7,
+          "min": -1.0,
+          "name": "ndg_min",
+          "pass": true,
+          "reason": "",
+          "unit": "V",
+          "value": -0.000912709
+        },
+        {
+          "expr": "maximum(v(xdut.trip))",
+          "max": 4.7,
+          "min": -1.0,
+          "name": "trip_max",
+          "pass": true,
+          "reason": "",
+          "unit": "V",
+          "value": 3.671885
+        },
+        {
+          "expr": "minimum(v(xdut.trip))",
+          "max": 4.7,
+          "min": -1.0,
+          "name": "trip_min",
+          "pass": true,
+          "reason": "",
+          "unit": "V",
+          "value": -5.04392e-05
+        },
+        {
+          "expr": "maximum(v(xdut.rstb))",
+          "max": 4.7,
+          "min": -1.0,
+          "name": "rstb_max",
+          "pass": true,
+          "reason": "",
+          "unit": "V",
+          "value": 3.630053
+        },
+        {
+          "expr": "minimum(v(xdut.rstb))",
+          "max": 4.7,
+          "min": -1.0,
+          "name": "rstb_min",
+          "pass": true,
+          "reason": "",
+          "unit": "V",
+          "value": -3.15099e-05
+        }
+      ],
+      "ngspice_exit": 0,
+      "pass": true,
+      "process": "tt",
+      "supply_v": 3.63,
+      "temperature_c": 125.0,
+      "timed_out": false,
+      "timeout_s": 300
+    },
+    {
+      "batch_status": "pass",
+      "corner_id": "ss_-40c_2.97v",
+      "diagnostics": [],
+      "elapsed_s": 2.871,
+      "killed_by_signal": null,
+      "killed_by_signal_name": null,
+      "log": "sim/.work/.stage/por-output-chain-deglitch/20261114-193311-94b18bbe/ss_-40c_2.97v.log",
+      "measurements": [
+        {
+          "expr": "1e-2 - 2e-3 - integ(v(resetn) gt 1.65)[length(v(resetn))-1]",
+          "max": 0.004,
+          "min": 0.0005,
+          "name": "release_delay",
+          "pass": true,
+          "reason": "",
+          "unit": "s",
+          "value": 0.00102252
+        },
+        {
+          "expr": "1e-2 - integ(v(resetn) gt 1.65)[length(v(resetn))-1]",
+          "max": 0.006,
+          "min": 0.0022,
+          "name": "t_release",
+          "pass": true,
+          "reason": "",
+          "unit": "s",
+          "value": 0.00302252
+        },
+        {
+          "expr": "maximum(v(resetn))",
+          "max": 3.8,
+          "min": 1.8,
+          "name": "rstn_released",
+          "pass": true,
+          "reason": "",
+          "unit": "V",
+          "value": 2.667906
+        },
+        {
+          "expr": "minimum(v(resetn))",
+          "max": 0.01,
+          "min": -0.05,
+          "name": "rstn_asserted",
+          "pass": true,
+          "reason": "",
+          "unit": "V",
+          "value": -3.18799e-06
+        },
+        {
+          "expr": "maximum(v(xdut.tim))",
+          "max": 4.7,
+          "min": -1.0,
+          "name": "tim_max",
+          "pass": true,
+          "reason": "",
+          "unit": "V",
+          "value": 2.969986
+        },
+        {
+          "expr": "minimum(v(xdut.tim))",
+          "max": 4.7,
+          "min": -1.0,
+          "name": "tim_min",
+          "pass": true,
+          "reason": "",
+          "unit": "V",
+          "value": -0.00169682
+        },
+        {
+          "expr": "maximum(v(xdut.ndg))",
+          "max": 4.7,
+          "min": -1.0,
+          "name": "ndg_max",
+          "pass": true,
+          "reason": "",
+          "unit": "V",
+          "value": 2.972877
+        },
+        {
+          "expr": "minimum(v(xdut.ndg))",
+          "max": 4.7,
+          "min": -1.0,
+          "name": "ndg_min",
+          "pass": true,
+          "reason": "",
+          "unit": "V",
+          "value": -9.92082e-05
+        },
+        {
+          "expr": "maximum(v(xdut.trip))",
+          "max": 4.7,
+          "min": -1.0,
+          "name": "trip_max",
+          "pass": true,
+          "reason": "",
+          "unit": "V",
+          "value": 2.995033
+        },
+        {
+          "expr": "minimum(v(xdut.trip))",
+          "max": 4.7,
+          "min": -1.0,
+          "name": "trip_min",
+          "pass": true,
+          "reason": "",
+          "unit": "V",
+          "value": -1.98128e-05
+        },
+        {
+          "expr": "maximum(v(xdut.rstb))",
+          "max": 4.7,
+          "min": -1.0,
+          "name": "rstb_max",
+          "pass": true,
+          "reason": "",
+          "unit": "V",
+          "value": 2.970028
+        },
+        {
+          "expr": "minimum(v(xdut.rstb))",
+          "max": 4.7,
+          "min": -1.0,
+          "name": "rstb_min",
+          "pass": true,
+          "reason": "",
+          "unit": "V",
+          "value": -5.77496e-05
+        }
+      ],
+      "ngspice_exit": 0,
+      "pass": true,
+      "process": "ss",
+      "supply_v": 2.97,
+      "temperature_c": -40.0,
+      "timed_out": false,
+      "timeout_s": 300
+    },
+    {
+      "batch_status": "pass",
+      "corner_id": "ss_-40c_3.30v",
+      "diagnostics": [],
+      "elapsed_s": 2.869,
+      "killed_by_signal": null,
+      "killed_by_signal_name": null,
+      "log": "sim/.work/.stage/por-output-chain-deglitch/20261114-193311-94b18bbe/ss_-40c_3.30v.log",
+      "measurements": [
+        {
+          "expr": "1e-2 - 2e-3 - integ(v(resetn) gt 1.65)[length(v(resetn))-1]",
+          "max": 0.004,
+          "min": 0.0005,
+          "name": "release_delay",
+          "pass": true,
+          "reason": "",
+          "unit": "s",
+          "value": 0.001162776
+        },
+        {
+          "expr": "1e-2 - integ(v(resetn) gt 1.65)[length(v(resetn))-1]",
+          "max": 0.006,
+          "min": 0.0022,
+          "name": "t_release",
+          "pass": true,
+          "reason": "",
+          "unit": "s",
+          "value": 0.003162776
+        },
+        {
+          "expr": "maximum(v(resetn))",
+          "max": 3.8,
+          "min": 1.8,
+          "name": "rstn_released",
+          "pass": true,
+          "reason": "",
+          "unit": "V",
+          "value": 2.966904
+        },
+        {
+          "expr": "minimum(v(resetn))",
+          "max": 0.01,
+          "min": -0.05,
+          "name": "rstn_asserted",
+          "pass": true,
+          "reason": "",
+          "unit": "V",
+          "value": -3.20258e-06
+        },
+        {
+          "expr": "maximum(v(xdut.tim))",
+          "max": 4.7,
+          "min": -1.0,
+          "name": "tim_max",
+          "pass": true,
+          "reason": "",
+          "unit": "V",
+          "value": 3.299985
+        },
+        {
+          "expr": "minimum(v(xdut.tim))",
+          "max": 4.7,
+          "min": -1.0,
+          "name": "tim_min",
+          "pass": true,
+          "reason": "",
+          "unit": "V",
+          "value": -0.0100035
+        },
+        {
+          "expr": "maximum(v(xdut.ndg))",
+          "max": 4.7,
+          "min": -1.0,
+          "name": "ndg_max",
+          "pass": true,
+          "reason": "",
+          "unit": "V",
+          "value": 3.30153
+        },
+        {
+          "expr": "minimum(v(xdut.ndg))",
+          "max": 4.7,
+          "min": -1.0,
+          "name": "ndg_min",
+          "pass": true,
+          "reason": "",
+          "unit": "V",
+          "value": -0.000577129
+        },
+        {
+          "expr": "maximum(v(xdut.trip))",
+          "max": 4.7,
+          "min": -1.0,
+          "name": "trip_max",
+          "pass": true,
+          "reason": "",
+          "unit": "V",
+          "value": 3.328499
+        },
+        {
+          "expr": "minimum(v(xdut.trip))",
+          "max": 4.7,
+          "min": -1.0,
+          "name": "trip_min",
+          "pass": true,
+          "reason": "",
+          "unit": "V",
+          "value": -1.85769e-05
+        },
+        {
+          "expr": "maximum(v(xdut.rstb))",
+          "max": 4.7,
+          "min": -1.0,
+          "name": "rstb_max",
+          "pass": true,
+          "reason": "",
+          "unit": "V",
+          "value": 3.300027
+        },
+        {
+          "expr": "minimum(v(xdut.rstb))",
+          "max": 4.7,
+          "min": -1.0,
+          "name": "rstb_min",
+          "pass": true,
+          "reason": "",
+          "unit": "V",
+          "value": -1.48181e-05
+        }
+      ],
+      "ngspice_exit": 0,
+      "pass": true,
+      "process": "ss",
+      "supply_v": 3.3,
+      "temperature_c": -40.0,
+      "timed_out": false,
+      "timeout_s": 300
+    },
+    {
+      "batch_status": "pass",
+      "corner_id": "ss_-40c_3.63v",
+      "diagnostics": [],
+      "elapsed_s": 2.87,
+      "killed_by_signal": null,
+      "killed_by_signal_name": null,
+      "log": "sim/.work/.stage/por-output-chain-deglitch/20261114-193311-94b18bbe/ss_-40c_3.63v.log",
+      "measurements": [
+        {
+          "expr": "1e-2 - 2e-3 - integ(v(resetn) gt 1.65)[length(v(resetn))-1]",
+          "max": 0.004,
+          "min": 0.0005,
+          "name": "release_delay",
+          "pass": true,
+          "reason": "",
+          "unit": "s",
+          "value": 0.001303011
+        },
+        {
+          "expr": "1e-2 - integ(v(resetn) gt 1.65)[length(v(resetn))-1]",
+          "max": 0.006,
+          "min": 0.0022,
+          "name": "t_release",
+          "pass": true,
+          "reason": "",
+          "unit": "s",
+          "value": 0.003303011
+        },
+        {
+          "expr": "maximum(v(resetn))",
+          "max": 3.8,
+          "min": 1.8,
+          "name": "rstn_released",
+          "pass": true,
+          "reason": "",
+          "unit": "V",
+          "value": 3.261826
+        },
+        {
+          "expr": "minimum(v(resetn))",
+          "max": 0.01,
+          "min": -0.05,
+          "name": "rstn_asserted",
+          "pass": true,
+          "reason": "",
+          "unit": "V",
+          "value": -3.25848e-06
+        },
+        {
+          "expr": "maximum(v(xdut.tim))",
+          "max": 4.7,
+          "min": -1.0,
+          "name": "tim_max",
+          "pass": true,
+          "reason": "",
+          "unit": "V",
+          "value": 3.629983
+        },
+        {
+          "expr": "minimum(v(xdut.tim))",
+          "max": 4.7,
+          "min": -1.0,
+          "name": "tim_min",
+          "pass": true,
+          "reason": "",
+          "unit": "V",
+          "value": -0.00128425
+        },
+        {
+          "expr": "maximum(v(xdut.ndg))",
+          "max": 4.7,
+          "min": -1.0,
+          "name": "ndg_max",
+          "pass": true,
+          "reason": "",
+          "unit": "V",
+          "value": 3.631532
+        },
+        {
+          "expr": "minimum(v(xdut.ndg))",
+          "max": 4.7,
+          "min": -1.0,
+          "name": "ndg_min",
+          "pass": true,
+          "reason": "",
+          "unit": "V",
+          "value": -0.000130086
+        },
+        {
+          "expr": "maximum(v(xdut.trip))",
+          "max": 4.7,
+          "min": -1.0,
+          "name": "trip_max",
+          "pass": true,
+          "reason": "",
+          "unit": "V",
+          "value": 3.660321
+        },
+        {
+          "expr": "minimum(v(xdut.trip))",
+          "max": 4.7,
+          "min": -1.0,
+          "name": "trip_min",
+          "pass": true,
+          "reason": "",
+          "unit": "V",
+          "value": -1.78249e-05
+        },
+        {
+          "expr": "maximum(v(xdut.rstb))",
+          "max": 4.7,
+          "min": -1.0,
+          "name": "rstb_max",
+          "pass": true,
+          "reason": "",
+          "unit": "V",
+          "value": 3.630026
+        },
+        {
+          "expr": "minimum(v(xdut.rstb))",
+          "max": 4.7,
+          "min": -1.0,
+          "name": "rstb_min",
+          "pass": true,
+          "reason": "",
+          "unit": "V",
+          "value": -1.92936e-05
+        }
+      ],
+      "ngspice_exit": 0,
+      "pass": true,
+      "process": "ss",
+      "supply_v": 3.63,
+      "temperature_c": -40.0,
+      "timed_out": false,
+      "timeout_s": 300
+    },
+    {
+      "batch_status": "pass",
+      "corner_id": "ss_27c_2.97v",
+      "diagnostics": [],
+      "elapsed_s": 2.87,
+      "killed_by_signal": null,
+      "killed_by_signal_name": null,
+      "log": "sim/.work/.stage/por-output-chain-deglitch/20261114-193311-94b18bbe/ss_27c_2.97v.log",
+      "measurements": [
+        {
+          "expr": "1e-2 - 2e-3 - integ(v(resetn) gt 1.65)[length(v(resetn))-1]",
+          "max": 0.004,
+          "min": 0.0005,
+          "name": "release_delay",
+          "pass": true,
+          "reason": "",
+          "unit": "s",
+          "value": 0.001174961
+        },
+        {
+          "expr": "1e-2 - integ(v(resetn) gt 1.65)[length(v(resetn))-1]",
+          "max": 0.006,
+          "min": 0.0022,
+          "name": "t_release",
+          "pass": true,
+          "reason": "",
+          "unit": "s",
+          "value": 0.003174961
+        },
+        {
+          "expr": "maximum(v(resetn))",
+          "max": 3.8,
+          "min": 1.8,
+          "name": "rstn_released",
+          "pass": true,
+          "reason": "",
+          "unit": "V",
+          "value": 2.707059
+        },
+        {
+          "expr": "minimum(v(resetn))",
+          "max": 0.01,
+          "min": -0.05,
+          "name": "rstn_asserted",
+          "pass": true,
+          "reason": "",
+          "unit": "V",
+          "value": -4.71999e-06
+        },
+        {
+          "expr": "maximum(v(xdut.tim))",
+          "max": 4.7,
+          "min": -1.0,
+          "name": "tim_max",
+          "pass": true,
+          "reason": "",
+          "unit": "V",
+          "value": 2.969983
+        },
+        {
+          "expr": "minimum(v(xdut.tim))",
+          "max": 4.7,
+          "min": -1.0,
+          "name": "tim_min",
+          "pass": true,
+          "reason": "",
+          "unit": "V",
+          "value": -0.00249868
+        },
+        {
+          "expr": "maximum(v(xdut.ndg))",
+          "max": 4.7,
+          "min": -1.0,
+          "name": "ndg_max",
+          "pass": true,
+          "reason": "",
+          "unit": "V",
+          "value": 2.978023
+        },
+        {
+          "expr": "minimum(v(xdut.ndg))",
+          "max": 4.7,
+          "min": -1.0,
+          "name": "ndg_min",
+          "pass": true,
+          "reason": "",
+          "unit": "V",
+          "value": -0.000272553
+        },
+        {
+          "expr": "maximum(v(xdut.trip))",
+          "max": 4.7,
+          "min": -1.0,
+          "name": "trip_max",
+          "pass": true,
+          "reason": "",
+          "unit": "V",
+          "value": 3.001001
+        },
+        {
+          "expr": "minimum(v(xdut.trip))",
+          "max": 4.7,
+          "min": -1.0,
+          "name": "trip_min",
+          "pass": true,
+          "reason": "",
+          "unit": "V",
+          "value": -3.34283e-05
+        },
+        {
+          "expr": "maximum(v(xdut.rstb))",
+          "max": 4.7,
+          "min": -1.0,
+          "name": "rstb_max",
+          "pass": true,
+          "reason": "",
+          "unit": "V",
+          "value": 2.970042
+        },
+        {
+          "expr": "minimum(v(xdut.rstb))",
+          "max": 4.7,
+          "min": -1.0,
+          "name": "rstb_min",
+          "pass": true,
+          "reason": "",
+          "unit": "V",
+          "value": -7.97714e-06
+        }
+      ],
+      "ngspice_exit": 0,
+      "pass": true,
+      "process": "ss",
+      "supply_v": 2.97,
+      "temperature_c": 27.0,
+      "timed_out": false,
+      "timeout_s": 300
+    },
+    {
+      "batch_status": "pass",
+      "corner_id": "ss_27c_3.30v",
+      "diagnostics": [],
+      "elapsed_s": 2.872,
+      "killed_by_signal": null,
+      "killed_by_signal_name": null,
+      "log": "sim/.work/.stage/por-output-chain-deglitch/20261114-193311-94b18bbe/ss_27c_3.30v.log",
+      "measurements": [
+        {
+          "expr": "1e-2 - 2e-3 - integ(v(resetn) gt 1.65)[length(v(resetn))-1]",
+          "max": 0.004,
+          "min": 0.0005,
+          "name": "release_delay",
+          "pass": true,
+          "reason": "",
+          "unit": "s",
+          "value": 0.001335741
+        },
+        {
+          "expr": "1e-2 - integ(v(resetn) gt 1.65)[length(v(resetn))-1]",
+          "max": 0.006,
+          "min": 0.0022,
+          "name": "t_release",
+          "pass": true,
+          "reason": "",
+          "unit": "s",
+          "value": 0.003335741
+        },
+        {
+          "expr": "maximum(v(resetn))",
+          "max": 3.8,
+          "min": 1.8,
+          "name": "rstn_released",
+          "pass": true,
+          "reason": "",
+          "unit": "V",
+          "value": 3.011415
+        },
+        {
+          "expr": "minimum(v(resetn))",
+          "max": 0.01,
+          "min": -0.05,
+          "name": "rstn_asserted",
+          "pass": true,
+          "reason": "",
+          "unit": "V",
+          "value": -4.67634e-06
+        },
+        {
+          "expr": "maximum(v(xdut.tim))",
+          "max": 4.7,
+          "min": -1.0,
+          "name": "tim_max",
+          "pass": true,
+          "reason": "",
+          "unit": "V",
+          "value": 3.29998
+        },
+        {
+          "expr": "minimum(v(xdut.tim))",
+          "max": 4.7,
+          "min": -1.0,
+          "name": "tim_min",
+          "pass": true,
+          "reason": "",
+          "unit": "V",
+          "value": -0.0110082
+        },
+        {
+          "expr": "maximum(v(xdut.ndg))",
+          "max": 4.7,
+          "min": -1.0,
+          "name": "ndg_max",
+          "pass": true,
+          "reason": "",
+          "unit": "V",
+          "value": 3.301429
+        },
+        {
+          "expr": "minimum(v(xdut.ndg))",
+          "max": 4.7,
+          "min": -1.0,
+          "name": "ndg_min",
+          "pass": true,
+          "reason": "",
+          "unit": "V",
+          "value": -0.000223477
+        },
+        {
+          "expr": "maximum(v(xdut.trip))",
+          "max": 4.7,
+          "min": -1.0,
+          "name": "trip_max",
+          "pass": true,
+          "reason": "",
+          "unit": "V",
+          "value": 3.333257
+        },
+        {
+          "expr": "minimum(v(xdut.trip))",
+          "max": 4.7,
+          "min": -1.0,
+          "name": "trip_min",
+          "pass": true,
+          "reason": "",
+          "unit": "V",
+          "value": -3.1182e-05
+        },
+        {
+          "expr": "maximum(v(xdut.rstb))",
+          "max": 4.7,
+          "min": -1.0,
+          "name": "rstb_max",
+          "pass": true,
+          "reason": "",
+          "unit": "V",
+          "value": 3.300039
+        },
+        {
+          "expr": "minimum(v(xdut.rstb))",
+          "max": 4.7,
+          "min": -1.0,
+          "name": "rstb_min",
+          "pass": true,
+          "reason": "",
+          "unit": "V",
+          "value": -1.86025e-05
+        }
+      ],
+      "ngspice_exit": 0,
+      "pass": true,
+      "process": "ss",
+      "supply_v": 3.3,
+      "temperature_c": 27.0,
+      "timed_out": false,
+      "timeout_s": 300
+    },
+    {
+      "batch_status": "pass",
+      "corner_id": "ss_27c_3.63v",
+      "diagnostics": [],
+      "elapsed_s": 2.922,
+      "killed_by_signal": null,
+      "killed_by_signal_name": null,
+      "log": "sim/.work/.stage/por-output-chain-deglitch/20261114-193311-94b18bbe/ss_27c_3.63v.log",
+      "measurements": [
+        {
+          "expr": "1e-2 - 2e-3 - integ(v(resetn) gt 1.65)[length(v(resetn))-1]",
+          "max": 0.004,
+          "min": 0.0005,
+          "name": "release_delay",
+          "pass": true,
+          "reason": "",
+          "unit": "s",
+          "value": 0.001489243
+        },
+        {
+          "expr": "1e-2 - integ(v(resetn) gt 1.65)[length(v(resetn))-1]",
+          "max": 0.006,
+          "min": 0.0022,
+          "name": "t_release",
+          "pass": true,
+          "reason": "",
+          "unit": "s",
+          "value": 0.003489243
+        },
+        {
+          "expr": "maximum(v(resetn))",
+          "max": 3.8,
+          "min": 1.8,
+          "name": "rstn_released",
+          "pass": true,
+          "reason": "",
+          "unit": "V",
+          "value": 3.313056
+        },
+        {
+          "expr": "minimum(v(resetn))",
+          "max": 0.01,
+          "min": -0.05,
+          "name": "rstn_asserted",
+          "pass": true,
+          "reason": "",
+          "unit": "V",
+          "value": -4.69757e-06
+        },
+        {
+          "expr": "maximum(v(xdut.tim))",
+          "max": 4.7,
+          "min": -1.0,
+          "name": "tim_max",
+          "pass": true,
+          "reason": "",
+          "unit": "V",
+          "value": 3.629978
+        },
+        {
+          "expr": "minimum(v(xdut.tim))",
+          "max": 4.7,
+          "min": -1.0,
+          "name": "tim_min",
+          "pass": true,
+          "reason": "",
+          "unit": "V",
+          "value": -0.0143254
+        },
+        {
+          "expr": "maximum(v(xdut.ndg))",
+          "max": 4.7,
+          "min": -1.0,
+          "name": "ndg_max",
+          "pass": true,
+          "reason": "",
+          "unit": "V",
+          "value": 3.631424
+        },
+        {
+          "expr": "minimum(v(xdut.ndg))",
+          "max": 4.7,
+          "min": -1.0,
+          "name": "ndg_min",
+          "pass": true,
+          "reason": "",
+          "unit": "V",
+          "value": -8.16758e-05
+        },
+        {
+          "expr": "maximum(v(xdut.trip))",
+          "max": 4.7,
+          "min": -1.0,
+          "name": "trip_max",
+          "pass": true,
+          "reason": "",
+          "unit": "V",
+          "value": 3.6629
+        },
+        {
+          "expr": "minimum(v(xdut.trip))",
+          "max": 4.7,
+          "min": -1.0,
+          "name": "trip_min",
+          "pass": true,
+          "reason": "",
+          "unit": "V",
+          "value": -2.96865e-05
+        },
+        {
+          "expr": "maximum(v(xdut.rstb))",
+          "max": 4.7,
+          "min": -1.0,
+          "name": "rstb_max",
+          "pass": true,
+          "reason": "",
+          "unit": "V",
+          "value": 3.630038
+        },
+        {
+          "expr": "minimum(v(xdut.rstb))",
+          "max": 4.7,
+          "min": -1.0,
+          "name": "rstb_min",
+          "pass": true,
+          "reason": "",
+          "unit": "V",
+          "value": -9.34858e-05
+        }
+      ],
+      "ngspice_exit": 0,
+      "pass": true,
+      "process": "ss",
+      "supply_v": 3.63,
+      "temperature_c": 27.0,
+      "timed_out": false,
+      "timeout_s": 300
+    },
+    {
+      "batch_status": "pass",
+      "corner_id": "ss_125c_2.97v",
+      "diagnostics": [],
+      "elapsed_s": 2.869,
+      "killed_by_signal": null,
+      "killed_by_signal_name": null,
+      "log": "sim/.work/.stage/por-output-chain-deglitch/20261114-193311-94b18bbe/ss_125c_2.97v.log",
+      "measurements": [
+        {
+          "expr": "1e-2 - 2e-3 - integ(v(resetn) gt 1.65)[length(v(resetn))-1]",
+          "max": 0.004,
+          "min": 0.0005,
+          "name": "release_delay",
+          "pass": true,
+          "reason": "",
+          "unit": "s",
+          "value": 0.001464316
+        },
+        {
+          "expr": "1e-2 - integ(v(resetn) gt 1.65)[length(v(resetn))-1]",
+          "max": 0.006,
+          "min": 0.0022,
+          "name": "t_release",
+          "pass": true,
+          "reason": "",
+          "unit": "s",
+          "value": 0.003464316
+        },
+        {
+          "expr": "maximum(v(resetn))",
+          "max": 3.8,
+          "min": 1.8,
+          "name": "rstn_released",
+          "pass": true,
+          "reason": "",
+          "unit": "V",
+          "value": 2.745665
+        },
+        {
+          "expr": "minimum(v(resetn))",
+          "max": 0.01,
+          "min": -0.05,
+          "name": "rstn_asserted",
+          "pass": true,
+          "reason": "",
+          "unit": "V",
+          "value": -7.8678e-06
+        },
+        {
+          "expr": "maximum(v(xdut.tim))",
+          "max": 4.7,
+          "min": -1.0,
+          "name": "tim_max",
+          "pass": true,
+          "reason": "",
+          "unit": "V",
+          "value": 2.969758
+        },
+        {
+          "expr": "minimum(v(xdut.tim))",
+          "max": 4.7,
+          "min": -1.0,
+          "name": "tim_min",
+          "pass": true,
+          "reason": "",
+          "unit": "V",
+          "value": -0.00305947
+        },
+        {
+          "expr": "maximum(v(xdut.ndg))",
+          "max": 4.7,
+          "min": -1.0,
+          "name": "ndg_max",
+          "pass": true,
+          "reason": "",
+          "unit": "V",
+          "value": 2.979765
+        },
+        {
+          "expr": "minimum(v(xdut.ndg))",
+          "max": 4.7,
+          "min": -1.0,
+          "name": "ndg_min",
+          "pass": true,
+          "reason": "",
+          "unit": "V",
+          "value": -0.000352412
+        },
+        {
+          "expr": "maximum(v(xdut.trip))",
+          "max": 4.7,
+          "min": -1.0,
+          "name": "trip_max",
+          "pass": true,
+          "reason": "",
+          "unit": "V",
+          "value": 3.007304
+        },
+        {
+          "expr": "minimum(v(xdut.trip))",
+          "max": 4.7,
+          "min": -1.0,
+          "name": "trip_min",
+          "pass": true,
+          "reason": "",
+          "unit": "V",
+          "value": -6.30601e-05
+        },
+        {
+          "expr": "maximum(v(xdut.rstb))",
+          "max": 4.7,
+          "min": -1.0,
+          "name": "rstb_max",
+          "pass": true,
+          "reason": "",
+          "unit": "V",
+          "value": 2.970064
+        },
+        {
+          "expr": "minimum(v(xdut.rstb))",
+          "max": 4.7,
+          "min": -1.0,
+          "name": "rstb_min",
+          "pass": true,
+          "reason": "",
+          "unit": "V",
+          "value": -0.000109719
+        }
+      ],
+      "ngspice_exit": 0,
+      "pass": true,
+      "process": "ss",
+      "supply_v": 2.97,
+      "temperature_c": 125.0,
+      "timed_out": false,
+      "timeout_s": 300
+    },
+    {
+      "batch_status": "pass",
+      "corner_id": "ss_125c_3.30v",
+      "diagnostics": [],
+      "elapsed_s": 2.872,
+      "killed_by_signal": null,
+      "killed_by_signal_name": null,
+      "log": "sim/.work/.stage/por-output-chain-deglitch/20261114-193311-94b18bbe/ss_125c_3.30v.log",
+      "measurements": [
+        {
+          "expr": "1e-2 - 2e-3 - integ(v(resetn) gt 1.65)[length(v(resetn))-1]",
+          "max": 0.004,
+          "min": 0.0005,
+          "name": "release_delay",
+          "pass": true,
+          "reason": "",
+          "unit": "s",
+          "value": 0.00163709
+        },
+        {
+          "expr": "1e-2 - integ(v(resetn) gt 1.65)[length(v(resetn))-1]",
+          "max": 0.006,
+          "min": 0.0022,
+          "name": "t_release",
+          "pass": true,
+          "reason": "",
+          "unit": "s",
+          "value": 0.00363709
+        },
+        {
+          "expr": "maximum(v(resetn))",
+          "max": 3.8,
+          "min": 1.8,
+          "name": "rstn_released",
+          "pass": true,
+          "reason": "",
+          "unit": "V",
+          "value": 3.055857
+        },
+        {
+          "expr": "minimum(v(resetn))",
+          "max": 0.01,
+          "min": -0.05,
+          "name": "rstn_asserted",
+          "pass": true,
+          "reason": "",
+          "unit": "V",
+          "value": -7.70723e-06
+        },
+        {
+          "expr": "maximum(v(xdut.tim))",
+          "max": 4.7,
+          "min": -1.0,
+          "name": "tim_max",
+          "pass": true,
+          "reason": "",
+          "unit": "V",
+          "value": 3.299753
+        },
+        {
+          "expr": "minimum(v(xdut.tim))",
+          "max": 4.7,
+          "min": -1.0,
+          "name": "tim_min",
+          "pass": true,
+          "reason": "",
+          "unit": "V",
+          "value": -0.00220137
+        },
+        {
+          "expr": "maximum(v(xdut.ndg))",
+          "max": 4.7,
+          "min": -1.0,
+          "name": "ndg_max",
+          "pass": true,
+          "reason": "",
+          "unit": "V",
+          "value": 3.302265
+        },
+        {
+          "expr": "minimum(v(xdut.ndg))",
+          "max": 4.7,
+          "min": -1.0,
+          "name": "ndg_min",
+          "pass": true,
+          "reason": "",
+          "unit": "V",
+          "value": -0.000264282
+        },
+        {
+          "expr": "maximum(v(xdut.trip))",
+          "max": 4.7,
+          "min": -1.0,
+          "name": "trip_max",
+          "pass": true,
+          "reason": "",
+          "unit": "V",
+          "value": 3.341787
+        },
+        {
+          "expr": "minimum(v(xdut.trip))",
+          "max": 4.7,
+          "min": -1.0,
+          "name": "trip_min",
+          "pass": true,
+          "reason": "",
+          "unit": "V",
+          "value": -5.88769e-05
+        },
+        {
+          "expr": "maximum(v(xdut.rstb))",
+          "max": 4.7,
+          "min": -1.0,
+          "name": "rstb_max",
+          "pass": true,
+          "reason": "",
+          "unit": "V",
+          "value": 3.300061
+        },
+        {
+          "expr": "minimum(v(xdut.rstb))",
+          "max": 4.7,
+          "min": -1.0,
+          "name": "rstb_min",
+          "pass": true,
+          "reason": "",
+          "unit": "V",
+          "value": -2.33987e-05
+        }
+      ],
+      "ngspice_exit": 0,
+      "pass": true,
+      "process": "ss",
+      "supply_v": 3.3,
+      "temperature_c": 125.0,
+      "timed_out": false,
+      "timeout_s": 300
+    },
+    {
+      "batch_status": "pass",
+      "corner_id": "ss_125c_3.63v",
+      "diagnostics": [],
+      "elapsed_s": 2.921,
+      "killed_by_signal": null,
+      "killed_by_signal_name": null,
+      "log": "sim/.work/.stage/por-output-chain-deglitch/20261114-193311-94b18bbe/ss_125c_3.63v.log",
+      "measurements": [
+        {
+          "expr": "1e-2 - 2e-3 - integ(v(resetn) gt 1.65)[length(v(resetn))-1]",
+          "max": 0.004,
+          "min": 0.0005,
+          "name": "release_delay",
+          "pass": true,
+          "reason": "",
+          "unit": "s",
+          "value": 0.001801707
+        },
+        {
+          "expr": "1e-2 - integ(v(resetn) gt 1.65)[length(v(resetn))-1]",
+          "max": 0.006,
+          "min": 0.0022,
+          "name": "t_release",
+          "pass": true,
+          "reason": "",
+          "unit": "s",
+          "value": 0.003801707
+        },
+        {
+          "expr": "maximum(v(resetn))",
+          "max": 3.8,
+          "min": 1.8,
+          "name": "rstn_released",
+          "pass": true,
+          "reason": "",
+          "unit": "V",
+          "value": 3.364649
+        },
+        {
+          "expr": "minimum(v(resetn))",
+          "max": 0.01,
+          "min": -0.05,
+          "name": "rstn_asserted",
+          "pass": true,
+          "reason": "",
+          "unit": "V",
+          "value": -7.64704e-06
+        },
+        {
+          "expr": "maximum(v(xdut.tim))",
+          "max": 4.7,
+          "min": -1.0,
+          "name": "tim_max",
+          "pass": true,
+          "reason": "",
+          "unit": "V",
+          "value": 3.629747
+        },
+        {
+          "expr": "minimum(v(xdut.tim))",
+          "max": 4.7,
+          "min": -1.0,
+          "name": "tim_min",
+          "pass": true,
+          "reason": "",
+          "unit": "V",
+          "value": -0.00207215
+        },
+        {
+          "expr": "maximum(v(xdut.ndg))",
+          "max": 4.7,
+          "min": -1.0,
+          "name": "ndg_max",
+          "pass": true,
+          "reason": "",
+          "unit": "V",
+          "value": 3.63332
+        },
+        {
+          "expr": "minimum(v(xdut.ndg))",
+          "max": 4.7,
+          "min": -1.0,
+          "name": "ndg_min",
+          "pass": true,
+          "reason": "",
+          "unit": "V",
+          "value": 0.0004083598
+        },
+        {
+          "expr": "maximum(v(xdut.trip))",
+          "max": 4.7,
+          "min": -1.0,
+          "name": "trip_max",
+          "pass": true,
+          "reason": "",
+          "unit": "V",
+          "value": 3.675656
+        },
+        {
+          "expr": "minimum(v(xdut.trip))",
+          "max": 4.7,
+          "min": -1.0,
+          "name": "trip_min",
+          "pass": true,
+          "reason": "",
+          "unit": "V",
+          "value": -5.58555e-05
+        },
+        {
+          "expr": "maximum(v(xdut.rstb))",
+          "max": 4.7,
+          "min": -1.0,
+          "name": "rstb_max",
+          "pass": true,
+          "reason": "",
+          "unit": "V",
+          "value": 3.630058
+        },
+        {
+          "expr": "minimum(v(xdut.rstb))",
+          "max": 4.7,
+          "min": -1.0,
+          "name": "rstb_min",
+          "pass": true,
+          "reason": "",
+          "unit": "V",
+          "value": -0.000106742
+        }
+      ],
+      "ngspice_exit": 0,
+      "pass": true,
+      "process": "ss",
+      "supply_v": 3.63,
+      "temperature_c": 125.0,
+      "timed_out": false,
+      "timeout_s": 300
+    },
+    {
+      "batch_status": "pass",
+      "corner_id": "ff_-40c_2.97v",
+      "diagnostics": [],
+      "elapsed_s": 2.87,
+      "killed_by_signal": null,
+      "killed_by_signal_name": null,
+      "log": "sim/.work/.stage/por-output-chain-deglitch/20261114-193311-94b18bbe/ff_-40c_2.97v.log",
+      "measurements": [
+        {
+          "expr": "1e-2 - 2e-3 - integ(v(resetn) gt 1.65)[length(v(resetn))-1]",
+          "max": 0.004,
+          "min": 0.0005,
+          "name": "release_delay",
+          "pass": true,
+          "reason": "",
+          "unit": "s",
+          "value": 0.0007914768
+        },
+        {
+          "expr": "1e-2 - integ(v(resetn) gt 1.65)[length(v(resetn))-1]",
+          "max": 0.006,
+          "min": 0.0022,
+          "name": "t_release",
+          "pass": true,
+          "reason": "",
+          "unit": "s",
+          "value": 0.002791477
+        },
+        {
+          "expr": "maximum(v(resetn))",
+          "max": 3.8,
+          "min": 1.8,
+          "name": "rstn_released",
+          "pass": true,
+          "reason": "",
+          "unit": "V",
+          "value": 2.676026
+        },
+        {
+          "expr": "minimum(v(resetn))",
+          "max": 0.01,
+          "min": -0.05,
+          "name": "rstn_asserted",
+          "pass": true,
+          "reason": "",
+          "unit": "V",
+          "value": -2.8376e-06
+        },
+        {
+          "expr": "maximum(v(xdut.tim))",
+          "max": 4.7,
+          "min": -1.0,
+          "name": "tim_max",
+          "pass": true,
+          "reason": "",
+          "unit": "V",
+          "value": 2.96999
+        },
+        {
+          "expr": "minimum(v(xdut.tim))",
+          "max": 4.7,
+          "min": -1.0,
+          "name": "tim_min",
+          "pass": true,
+          "reason": "",
+          "unit": "V",
+          "value": -0.00170472
+        },
+        {
+          "expr": "maximum(v(xdut.ndg))",
+          "max": 4.7,
+          "min": -1.0,
+          "name": "ndg_max",
+          "pass": true,
+          "reason": "",
+          "unit": "V",
+          "value": 2.971555
+        },
+        {
+          "expr": "minimum(v(xdut.ndg))",
+          "max": 4.7,
+          "min": -1.0,
+          "name": "ndg_min",
+          "pass": true,
+          "reason": "",
+          "unit": "V",
+          "value": -0.00350039
+        },
+        {
+          "expr": "maximum(v(xdut.trip))",
+          "max": 4.7,
+          "min": -1.0,
+          "name": "trip_max",
+          "pass": true,
+          "reason": "",
+          "unit": "V",
+          "value": 2.992401
+        },
+        {
+          "expr": "minimum(v(xdut.trip))",
+          "max": 4.7,
+          "min": -1.0,
+          "name": "trip_min",
+          "pass": true,
+          "reason": "",
+          "unit": "V",
+          "value": -1.6912e-05
+        },
+        {
+          "expr": "maximum(v(xdut.rstb))",
+          "max": 4.7,
+          "min": -1.0,
+          "name": "rstb_max",
+          "pass": true,
+          "reason": "",
+          "unit": "V",
+          "value": 2.970029
+        },
+        {
+          "expr": "minimum(v(xdut.rstb))",
+          "max": 4.7,
+          "min": -1.0,
+          "name": "rstb_min",
+          "pass": true,
+          "reason": "",
+          "unit": "V",
+          "value": -6.12574e-06
+        }
+      ],
+      "ngspice_exit": 0,
+      "pass": true,
+      "process": "ff",
+      "supply_v": 2.97,
+      "temperature_c": -40.0,
+      "timed_out": false,
+      "timeout_s": 300
+    },
+    {
+      "batch_status": "pass",
+      "corner_id": "ff_-40c_3.30v",
+      "diagnostics": [],
+      "elapsed_s": 2.923,
+      "killed_by_signal": null,
+      "killed_by_signal_name": null,
+      "log": "sim/.work/.stage/por-output-chain-deglitch/20261114-193311-94b18bbe/ff_-40c_3.30v.log",
+      "measurements": [
+        {
+          "expr": "1e-2 - 2e-3 - integ(v(resetn) gt 1.65)[length(v(resetn))-1]",
+          "max": 0.004,
+          "min": 0.0005,
+          "name": "release_delay",
+          "pass": true,
+          "reason": "",
+          "unit": "s",
+          "value": 0.0009150584
+        },
+        {
+          "expr": "1e-2 - integ(v(resetn) gt 1.65)[length(v(resetn))-1]",
+          "max": 0.006,
+          "min": 0.0022,
+          "name": "t_release",
+          "pass": true,
+          "reason": "",
+          "unit": "s",
+          "value": 0.002915058
+        },
+        {
+          "expr": "maximum(v(resetn))",
+          "max": 3.8,
+          "min": 1.8,
+          "name": "rstn_released",
+          "pass": true,
+          "reason": "",
+          "unit": "V",
+          "value": 2.9733
+        },
+        {
+          "expr": "minimum(v(resetn))",
+          "max": 0.01,
+          "min": -0.05,
+          "name": "rstn_asserted",
+          "pass": true,
+          "reason": "",
+          "unit": "V",
+          "value": -2.88701e-06
+        },
+        {
+          "expr": "maximum(v(xdut.tim))",
+          "max": 4.7,
+          "min": -1.0,
+          "name": "tim_max",
+          "pass": true,
+          "reason": "",
+          "unit": "V",
+          "value": 3.299988
+        },
+        {
+          "expr": "minimum(v(xdut.tim))",
+          "max": 4.7,
+          "min": -1.0,
+          "name": "tim_min",
+          "pass": true,
+          "reason": "",
+          "unit": "V",
+          "value": -0.00160669
+        },
+        {
+          "expr": "maximum(v(xdut.ndg))",
+          "max": 4.7,
+          "min": -1.0,
+          "name": "ndg_max",
+          "pass": true,
+          "reason": "",
+          "unit": "V",
+          "value": 3.316845
+        },
+        {
+          "expr": "minimum(v(xdut.ndg))",
+          "max": 4.7,
+          "min": -1.0,
+          "name": "ndg_min",
+          "pass": true,
+          "reason": "",
+          "unit": "V",
+          "value": -0.00139163
+        },
+        {
+          "expr": "maximum(v(xdut.trip))",
+          "max": 4.7,
+          "min": -1.0,
+          "name": "trip_max",
+          "pass": true,
+          "reason": "",
+          "unit": "V",
+          "value": 3.322493
+        },
+        {
+          "expr": "minimum(v(xdut.trip))",
+          "max": 4.7,
+          "min": -1.0,
+          "name": "trip_min",
+          "pass": true,
+          "reason": "",
+          "unit": "V",
+          "value": -1.60266e-05
+        },
+        {
+          "expr": "maximum(v(xdut.rstb))",
+          "max": 4.7,
+          "min": -1.0,
+          "name": "rstb_max",
+          "pass": true,
+          "reason": "",
+          "unit": "V",
+          "value": 3.300027
+        },
+        {
+          "expr": "minimum(v(xdut.rstb))",
+          "max": 4.7,
+          "min": -1.0,
+          "name": "rstb_min",
+          "pass": true,
+          "reason": "",
+          "unit": "V",
+          "value": -2.12774e-06
+        }
+      ],
+      "ngspice_exit": 0,
+      "pass": true,
+      "process": "ff",
+      "supply_v": 3.3,
+      "temperature_c": -40.0,
+      "timed_out": false,
+      "timeout_s": 300
+    },
+    {
+      "batch_status": "pass",
+      "corner_id": "ff_-40c_3.63v",
+      "diagnostics": [],
+      "elapsed_s": 2.92,
+      "killed_by_signal": null,
+      "killed_by_signal_name": null,
+      "log": "sim/.work/.stage/por-output-chain-deglitch/20261114-193311-94b18bbe/ff_-40c_3.63v.log",
+      "measurements": [
+        {
+          "expr": "1e-2 - 2e-3 - integ(v(resetn) gt 1.65)[length(v(resetn))-1]",
+          "max": 0.004,
+          "min": 0.0005,
+          "name": "release_delay",
+          "pass": true,
+          "reason": "",
+          "unit": "s",
+          "value": 0.001027305
+        },
+        {
+          "expr": "1e-2 - integ(v(resetn) gt 1.65)[length(v(resetn))-1]",
+          "max": 0.006,
+          "min": 0.0022,
+          "name": "t_release",
+          "pass": true,
+          "reason": "",
+          "unit": "s",
+          "value": 0.003027305
+        },
+        {
+          "expr": "maximum(v(resetn))",
+          "max": 3.8,
+          "min": 1.8,
+          "name": "rstn_released",
+          "pass": true,
+          "reason": "",
+          "unit": "V",
+          "value": 3.266699
+        },
+        {
+          "expr": "minimum(v(resetn))",
+          "max": 0.01,
+          "min": -0.05,
+          "name": "rstn_asserted",
+          "pass": true,
+          "reason": "",
+          "unit": "V",
+          "value": -2.97166e-06
+        },
+        {
+          "expr": "maximum(v(xdut.tim))",
+          "max": 4.7,
+          "min": -1.0,
+          "name": "tim_max",
+          "pass": true,
+          "reason": "",
+          "unit": "V",
+          "value": 3.629987
+        },
+        {
+          "expr": "minimum(v(xdut.tim))",
+          "max": 4.7,
+          "min": -1.0,
+          "name": "tim_min",
+          "pass": true,
+          "reason": "",
+          "unit": "V",
+          "value": -0.00153595
+        },
+        {
+          "expr": "maximum(v(xdut.ndg))",
+          "max": 4.7,
+          "min": -1.0,
+          "name": "ndg_max",
+          "pass": true,
+          "reason": "",
+          "unit": "V",
+          "value": 3.631524
+        },
+        {
+          "expr": "minimum(v(xdut.ndg))",
+          "max": 4.7,
+          "min": -1.0,
+          "name": "ndg_min",
+          "pass": true,
+          "reason": "",
+          "unit": "V",
+          "value": -0.000199477
+        },
+        {
+          "expr": "maximum(v(xdut.trip))",
+          "max": 4.7,
+          "min": -1.0,
+          "name": "trip_max",
+          "pass": true,
+          "reason": "",
+          "unit": "V",
+          "value": 3.657006
+        },
+        {
+          "expr": "minimum(v(xdut.trip))",
+          "max": 4.7,
+          "min": -1.0,
+          "name": "trip_min",
+          "pass": true,
+          "reason": "",
+          "unit": "V",
+          "value": -1.55177e-05
+        },
+        {
+          "expr": "maximum(v(xdut.rstb))",
+          "max": 4.7,
+          "min": -1.0,
+          "name": "rstb_max",
+          "pass": true,
+          "reason": "",
+          "unit": "V",
+          "value": 3.630022
+        },
+        {
+          "expr": "minimum(v(xdut.rstb))",
+          "max": 4.7,
+          "min": -1.0,
+          "name": "rstb_min",
+          "pass": true,
+          "reason": "",
+          "unit": "V",
+          "value": -1.31156e-05
+        }
+      ],
+      "ngspice_exit": 0,
+      "pass": true,
+      "process": "ff",
+      "supply_v": 3.63,
+      "temperature_c": -40.0,
+      "timed_out": false,
+      "timeout_s": 300
+    },
+    {
+      "batch_status": "pass",
+      "corner_id": "ff_27c_2.97v",
+      "diagnostics": [],
+      "elapsed_s": 2.921,
+      "killed_by_signal": null,
+      "killed_by_signal_name": null,
+      "log": "sim/.work/.stage/por-output-chain-deglitch/20261114-193311-94b18bbe/ff_27c_2.97v.log",
+      "measurements": [
+        {
+          "expr": "1e-2 - 2e-3 - integ(v(resetn) gt 1.65)[length(v(resetn))-1]",
+          "max": 0.004,
+          "min": 0.0005,
+          "name": "release_delay",
+          "pass": true,
+          "reason": "",
+          "unit": "s",
+          "value": 0.0009520123
+        },
+        {
+          "expr": "1e-2 - integ(v(resetn) gt 1.65)[length(v(resetn))-1]",
+          "max": 0.006,
+          "min": 0.0022,
+          "name": "t_release",
+          "pass": true,
+          "reason": "",
+          "unit": "s",
+          "value": 0.002952012
+        },
+        {
+          "expr": "maximum(v(resetn))",
+          "max": 3.8,
+          "min": 1.8,
+          "name": "rstn_released",
+          "pass": true,
+          "reason": "",
+          "unit": "V",
+          "value": 2.71386
+        },
+        {
+          "expr": "minimum(v(resetn))",
+          "max": 0.01,
+          "min": -0.05,
+          "name": "rstn_asserted",
+          "pass": true,
+          "reason": "",
+          "unit": "V",
+          "value": -4.12819e-06
+        },
+        {
+          "expr": "maximum(v(xdut.tim))",
+          "max": 4.7,
+          "min": -1.0,
+          "name": "tim_max",
+          "pass": true,
+          "reason": "",
+          "unit": "V",
+          "value": 2.969984
+        },
+        {
+          "expr": "minimum(v(xdut.tim))",
+          "max": 4.7,
+          "min": -1.0,
+          "name": "tim_min",
+          "pass": true,
+          "reason": "",
+          "unit": "V",
+          "value": -0.00204464
+        },
+        {
+          "expr": "maximum(v(xdut.ndg))",
+          "max": 4.7,
+          "min": -1.0,
+          "name": "ndg_max",
+          "pass": true,
+          "reason": "",
+          "unit": "V",
+          "value": 2.971126
+        },
+        {
+          "expr": "minimum(v(xdut.ndg))",
+          "max": 4.7,
+          "min": -1.0,
+          "name": "ndg_min",
+          "pass": true,
+          "reason": "",
+          "unit": "V",
+          "value": -0.00014345
+        },
+        {
+          "expr": "maximum(v(xdut.trip))",
+          "max": 4.7,
+          "min": -1.0,
+          "name": "trip_max",
+          "pass": true,
+          "reason": "",
+          "unit": "V",
+          "value": 2.996079
+        },
+        {
+          "expr": "minimum(v(xdut.trip))",
+          "max": 4.7,
+          "min": -1.0,
+          "name": "trip_min",
+          "pass": true,
+          "reason": "",
+          "unit": "V",
+          "value": -2.77354e-05
+        },
+        {
+          "expr": "maximum(v(xdut.rstb))",
+          "max": 4.7,
+          "min": -1.0,
+          "name": "rstb_max",
+          "pass": true,
+          "reason": "",
+          "unit": "V",
+          "value": 2.970034
+        },
+        {
+          "expr": "minimum(v(xdut.rstb))",
+          "max": 4.7,
+          "min": -1.0,
+          "name": "rstb_min",
+          "pass": true,
+          "reason": "",
+          "unit": "V",
+          "value": -7.04147e-05
+        }
+      ],
+      "ngspice_exit": 0,
+      "pass": true,
+      "process": "ff",
+      "supply_v": 2.97,
+      "temperature_c": 27.0,
+      "timed_out": false,
+      "timeout_s": 300
+    },
+    {
+      "batch_status": "pass",
+      "corner_id": "ff_27c_3.30v",
+      "diagnostics": [],
+      "elapsed_s": 2.922,
+      "killed_by_signal": null,
+      "killed_by_signal_name": null,
+      "log": "sim/.work/.stage/por-output-chain-deglitch/20261114-193311-94b18bbe/ff_27c_3.30v.log",
+      "measurements": [
+        {
+          "expr": "1e-2 - 2e-3 - integ(v(resetn) gt 1.65)[length(v(resetn))-1]",
+          "max": 0.004,
+          "min": 0.0005,
+          "name": "release_delay",
+          "pass": true,
+          "reason": "",
+          "unit": "s",
+          "value": 0.001082867
+        },
+        {
+          "expr": "1e-2 - integ(v(resetn) gt 1.65)[length(v(resetn))-1]",
+          "max": 0.006,
+          "min": 0.0022,
+          "name": "t_release",
+          "pass": true,
+          "reason": "",
+          "unit": "s",
+          "value": 0.003082867
+        },
+        {
+          "expr": "maximum(v(resetn))",
+          "max": 3.8,
+          "min": 1.8,
+          "name": "rstn_released",
+          "pass": true,
+          "reason": "",
+          "unit": "V",
+          "value": 3.017163
+        },
+        {
+          "expr": "minimum(v(resetn))",
+          "max": 0.01,
+          "min": -0.05,
+          "name": "rstn_asserted",
+          "pass": true,
+          "reason": "",
+          "unit": "V",
+          "value": -4.1465e-06
+        },
+        {
+          "expr": "maximum(v(xdut.tim))",
+          "max": 4.7,
+          "min": -1.0,
+          "name": "tim_max",
+          "pass": true,
+          "reason": "",
+          "unit": "V",
+          "value": 3.299982
+        },
+        {
+          "expr": "minimum(v(xdut.tim))",
+          "max": 4.7,
+          "min": -1.0,
+          "name": "tim_min",
+          "pass": true,
+          "reason": "",
+          "unit": "V",
+          "value": -0.00187825
+        },
+        {
+          "expr": "maximum(v(xdut.ndg))",
+          "max": 4.7,
+          "min": -1.0,
+          "name": "ndg_max",
+          "pass": true,
+          "reason": "",
+          "unit": "V",
+          "value": 3.315073
+        },
+        {
+          "expr": "minimum(v(xdut.ndg))",
+          "max": 4.7,
+          "min": -1.0,
+          "name": "ndg_min",
+          "pass": true,
+          "reason": "",
+          "unit": "V",
+          "value": -0.000148967
+        },
+        {
+          "expr": "maximum(v(xdut.trip))",
+          "max": 4.7,
+          "min": -1.0,
+          "name": "trip_max",
+          "pass": true,
+          "reason": "",
+          "unit": "V",
+          "value": 3.329629
+        },
+        {
+          "expr": "minimum(v(xdut.trip))",
+          "max": 4.7,
+          "min": -1.0,
+          "name": "trip_min",
+          "pass": true,
+          "reason": "",
+          "unit": "V",
+          "value": -2.61488e-05
+        },
+        {
+          "expr": "maximum(v(xdut.rstb))",
+          "max": 4.7,
+          "min": -1.0,
+          "name": "rstb_max",
+          "pass": true,
+          "reason": "",
+          "unit": "V",
+          "value": 3.300033
+        },
+        {
+          "expr": "minimum(v(xdut.rstb))",
+          "max": 4.7,
+          "min": -1.0,
+          "name": "rstb_min",
+          "pass": true,
+          "reason": "",
+          "unit": "V",
+          "value": -8.85409e-05
+        }
+      ],
+      "ngspice_exit": 0,
+      "pass": true,
+      "process": "ff",
+      "supply_v": 3.3,
+      "temperature_c": 27.0,
+      "timed_out": false,
+      "timeout_s": 300
+    },
+    {
+      "batch_status": "pass",
+      "corner_id": "ff_27c_3.63v",
+      "diagnostics": [],
+      "elapsed_s": 2.922,
+      "killed_by_signal": null,
+      "killed_by_signal_name": null,
+      "log": "sim/.work/.stage/por-output-chain-deglitch/20261114-193311-94b18bbe/ff_27c_3.63v.log",
+      "measurements": [
+        {
+          "expr": "1e-2 - 2e-3 - integ(v(resetn) gt 1.65)[length(v(resetn))-1]",
+          "max": 0.004,
+          "min": 0.0005,
+          "name": "release_delay",
+          "pass": true,
+          "reason": "",
+          "unit": "s",
+          "value": 0.001212905
+        },
+        {
+          "expr": "1e-2 - integ(v(resetn) gt 1.65)[length(v(resetn))-1]",
+          "max": 0.006,
+          "min": 0.0022,
+          "name": "t_release",
+          "pass": true,
+          "reason": "",
+          "unit": "s",
+          "value": 0.003212905
+        },
+        {
+          "expr": "maximum(v(resetn))",
+          "max": 3.8,
+          "min": 1.8,
+          "name": "rstn_released",
+          "pass": true,
+          "reason": "",
+          "unit": "V",
+          "value": 3.317825
+        },
+        {
+          "expr": "minimum(v(resetn))",
+          "max": 0.01,
+          "min": -0.05,
+          "name": "rstn_asserted",
+          "pass": true,
+          "reason": "",
+          "unit": "V",
+          "value": -4.20968e-06
+        },
+        {
+          "expr": "maximum(v(xdut.tim))",
+          "max": 4.7,
+          "min": -1.0,
+          "name": "tim_max",
+          "pass": true,
+          "reason": "",
+          "unit": "V",
+          "value": 3.629981
+        },
+        {
+          "expr": "minimum(v(xdut.tim))",
+          "max": 4.7,
+          "min": -1.0,
+          "name": "tim_min",
+          "pass": true,
+          "reason": "",
+          "unit": "V",
+          "value": -0.00179062
+        },
+        {
+          "expr": "maximum(v(xdut.ndg))",
+          "max": 4.7,
+          "min": -1.0,
+          "name": "ndg_max",
+          "pass": true,
+          "reason": "",
+          "unit": "V",
+          "value": 3.648585
+        },
+        {
+          "expr": "minimum(v(xdut.ndg))",
+          "max": 4.7,
+          "min": -1.0,
+          "name": "ndg_min",
+          "pass": true,
+          "reason": "",
+          "unit": "V",
+          "value": 1.020553e-05
+        },
+        {
+          "expr": "maximum(v(xdut.trip))",
+          "max": 4.7,
+          "min": -1.0,
+          "name": "trip_max",
+          "pass": true,
+          "reason": "",
+          "unit": "V",
+          "value": 3.660931
+        },
+        {
+          "expr": "minimum(v(xdut.trip))",
+          "max": 4.7,
+          "min": -1.0,
+          "name": "trip_min",
+          "pass": true,
+          "reason": "",
+          "unit": "V",
+          "value": -2.5106e-05
+        },
+        {
+          "expr": "maximum(v(xdut.rstb))",
+          "max": 4.7,
+          "min": -1.0,
+          "name": "rstb_max",
+          "pass": true,
+          "reason": "",
+          "unit": "V",
+          "value": 3.630032
+        },
+        {
+          "expr": "minimum(v(xdut.rstb))",
+          "max": 4.7,
+          "min": -1.0,
+          "name": "rstb_min",
+          "pass": true,
+          "reason": "",
+          "unit": "V",
+          "value": -2.17488e-05
+        }
+      ],
+      "ngspice_exit": 0,
+      "pass": true,
+      "process": "ff",
+      "supply_v": 3.63,
+      "temperature_c": 27.0,
+      "timed_out": false,
+      "timeout_s": 300
+    },
+    {
+      "batch_status": "pass",
+      "corner_id": "ff_125c_2.97v",
+      "diagnostics": [],
+      "elapsed_s": 2.92,
+      "killed_by_signal": null,
+      "killed_by_signal_name": null,
+      "log": "sim/.work/.stage/por-output-chain-deglitch/20261114-193311-94b18bbe/ff_125c_2.97v.log",
+      "measurements": [
+        {
+          "expr": "1e-2 - 2e-3 - integ(v(resetn) gt 1.65)[length(v(resetn))-1]",
+          "max": 0.004,
+          "min": 0.0005,
+          "name": "release_delay",
+          "pass": true,
+          "reason": "",
+          "unit": "s",
+          "value": 0.001211972
+        },
+        {
+          "expr": "1e-2 - integ(v(resetn) gt 1.65)[length(v(resetn))-1]",
+          "max": 0.006,
+          "min": 0.0022,
+          "name": "t_release",
+          "pass": true,
+          "reason": "",
+          "unit": "s",
+          "value": 0.003211972
+        },
+        {
+          "expr": "maximum(v(resetn))",
+          "max": 3.8,
+          "min": 1.8,
+          "name": "rstn_released",
+          "pass": true,
+          "reason": "",
+          "unit": "V",
+          "value": 2.750738
+        },
+        {
+          "expr": "minimum(v(resetn))",
+          "max": 0.01,
+          "min": -0.05,
+          "name": "rstn_asserted",
+          "pass": true,
+          "reason": "",
+          "unit": "V",
+          "value": -6.78266e-06
+        },
+        {
+          "expr": "maximum(v(xdut.tim))",
+          "max": 4.7,
+          "min": -1.0,
+          "name": "tim_max",
+          "pass": true,
+          "reason": "",
+          "unit": "V",
+          "value": 2.969511
+        },
+        {
+          "expr": "minimum(v(xdut.tim))",
+          "max": 4.7,
+          "min": -1.0,
+          "name": "tim_min",
+          "pass": true,
+          "reason": "",
+          "unit": "V",
+          "value": -0.00296498
+        },
+        {
+          "expr": "maximum(v(xdut.ndg))",
+          "max": 4.7,
+          "min": -1.0,
+          "name": "ndg_max",
+          "pass": true,
+          "reason": "",
+          "unit": "V",
+          "value": 2.989969
+        },
+        {
+          "expr": "minimum(v(xdut.ndg))",
+          "max": 4.7,
+          "min": -1.0,
+          "name": "ndg_min",
+          "pass": true,
+          "reason": "",
+          "unit": "V",
+          "value": -0.000608221
+        },
+        {
+          "expr": "maximum(v(xdut.trip))",
+          "max": 4.7,
+          "min": -1.0,
+          "name": "trip_max",
+          "pass": true,
+          "reason": "",
+          "unit": "V",
+          "value": 3.004755
+        },
+        {
+          "expr": "minimum(v(xdut.trip))",
+          "max": 4.7,
+          "min": -1.0,
+          "name": "trip_min",
+          "pass": true,
+          "reason": "",
+          "unit": "V",
+          "value": -5.08894e-05
+        },
+        {
+          "expr": "maximum(v(xdut.rstb))",
+          "max": 4.7,
+          "min": -1.0,
+          "name": "rstb_max",
+          "pass": true,
+          "reason": "",
+          "unit": "V",
+          "value": 2.97005
+        },
+        {
+          "expr": "minimum(v(xdut.rstb))",
+          "max": 4.7,
+          "min": -1.0,
+          "name": "rstb_min",
+          "pass": true,
+          "reason": "",
+          "unit": "V",
+          "value": -0.000126459
+        }
+      ],
+      "ngspice_exit": 0,
+      "pass": true,
+      "process": "ff",
+      "supply_v": 2.97,
+      "temperature_c": 125.0,
+      "timed_out": false,
+      "timeout_s": 300
+    },
+    {
+      "batch_status": "pass",
+      "corner_id": "ff_125c_3.30v",
+      "diagnostics": [],
+      "elapsed_s": 2.921,
+      "killed_by_signal": null,
+      "killed_by_signal_name": null,
+      "log": "sim/.work/.stage/por-output-chain-deglitch/20261114-193311-94b18bbe/ff_125c_3.30v.log",
+      "measurements": [
+        {
+          "expr": "1e-2 - 2e-3 - integ(v(resetn) gt 1.65)[length(v(resetn))-1]",
+          "max": 0.004,
+          "min": 0.0005,
+          "name": "release_delay",
+          "pass": true,
+          "reason": "",
+          "unit": "s",
+          "value": 0.001371033
+        },
+        {
+          "expr": "1e-2 - integ(v(resetn) gt 1.65)[length(v(resetn))-1]",
+          "max": 0.006,
+          "min": 0.0022,
+          "name": "t_release",
+          "pass": true,
+          "reason": "",
+          "unit": "s",
+          "value": 0.003371033
+        },
+        {
+          "expr": "maximum(v(resetn))",
+          "max": 3.8,
+          "min": 1.8,
+          "name": "rstn_released",
+          "pass": true,
+          "reason": "",
+          "unit": "V",
+          "value": 3.060354
+        },
+        {
+          "expr": "minimum(v(resetn))",
+          "max": 0.01,
+          "min": -0.05,
+          "name": "rstn_asserted",
+          "pass": true,
+          "reason": "",
+          "unit": "V",
+          "value": -6.72537e-06
+        },
+        {
+          "expr": "maximum(v(xdut.tim))",
+          "max": 4.7,
+          "min": -1.0,
+          "name": "tim_max",
+          "pass": true,
+          "reason": "",
+          "unit": "V",
+          "value": 3.299501
+        },
+        {
+          "expr": "minimum(v(xdut.tim))",
+          "max": 4.7,
+          "min": -1.0,
+          "name": "tim_min",
+          "pass": true,
+          "reason": "",
+          "unit": "V",
+          "value": -0.00274361
+        },
+        {
+          "expr": "maximum(v(xdut.ndg))",
+          "max": 4.7,
+          "min": -1.0,
+          "name": "ndg_max",
+          "pass": true,
+          "reason": "",
+          "unit": "V",
+          "value": 3.301726
+        },
+        {
+          "expr": "minimum(v(xdut.ndg))",
+          "max": 4.7,
+          "min": -1.0,
+          "name": "ndg_min",
+          "pass": true,
+          "reason": "",
+          "unit": "V",
+          "value": -0.000396145
+        },
+        {
+          "expr": "maximum(v(xdut.trip))",
+          "max": 4.7,
+          "min": -1.0,
+          "name": "trip_max",
+          "pass": true,
+          "reason": "",
+          "unit": "V",
+          "value": 3.335431
+        },
+        {
+          "expr": "minimum(v(xdut.trip))",
+          "max": 4.7,
+          "min": -1.0,
+          "name": "trip_min",
+          "pass": true,
+          "reason": "",
+          "unit": "V",
+          "value": -4.79693e-05
+        },
+        {
+          "expr": "maximum(v(xdut.rstb))",
+          "max": 4.7,
+          "min": -1.0,
+          "name": "rstb_max",
+          "pass": true,
+          "reason": "",
+          "unit": "V",
+          "value": 3.300048
+        },
+        {
+          "expr": "minimum(v(xdut.rstb))",
+          "max": 4.7,
+          "min": -1.0,
+          "name": "rstb_min",
+          "pass": true,
+          "reason": "",
+          "unit": "V",
+          "value": -2.06301e-05
+        }
+      ],
+      "ngspice_exit": 0,
+      "pass": true,
+      "process": "ff",
+      "supply_v": 3.3,
+      "temperature_c": 125.0,
+      "timed_out": false,
+      "timeout_s": 300
+    },
+    {
+      "batch_status": "pass",
+      "corner_id": "ff_125c_3.63v",
+      "diagnostics": [],
+      "elapsed_s": 2.87,
+      "killed_by_signal": null,
+      "killed_by_signal_name": null,
+      "log": "sim/.work/.stage/por-output-chain-deglitch/20261114-193311-94b18bbe/ff_125c_3.63v.log",
+      "measurements": [
+        {
+          "expr": "1e-2 - 2e-3 - integ(v(resetn) gt 1.65)[length(v(resetn))-1]",
+          "max": 0.004,
+          "min": 0.0005,
+          "name": "release_delay",
+          "pass": true,
+          "reason": "",
+          "unit": "s",
+          "value": 0.001519741
+        },
+        {
+          "expr": "1e-2 - integ(v(resetn) gt 1.65)[length(v(resetn))-1]",
+          "max": 0.006,
+          "min": 0.0022,
+          "name": "t_release",
+          "pass": true,
+          "reason": "",
+          "unit": "s",
+          "value": 0.003519741
+        },
+        {
+          "expr": "maximum(v(resetn))",
+          "max": 3.8,
+          "min": 1.8,
+          "name": "rstn_released",
+          "pass": true,
+          "reason": "",
+          "unit": "V",
+          "value": 3.368578
+        },
+        {
+          "expr": "minimum(v(resetn))",
+          "max": 0.01,
+          "min": -0.05,
+          "name": "rstn_asserted",
+          "pass": true,
+          "reason": "",
+          "unit": "V",
+          "value": -6.7392e-06
+        },
+        {
+          "expr": "maximum(v(xdut.tim))",
+          "max": 4.7,
+          "min": -1.0,
+          "name": "tim_max",
+          "pass": true,
+          "reason": "",
+          "unit": "V",
+          "value": 3.629491
+        },
+        {
+          "expr": "minimum(v(xdut.tim))",
+          "max": 4.7,
+          "min": -1.0,
+          "name": "tim_min",
+          "pass": true,
+          "reason": "",
+          "unit": "V",
+          "value": -0.00314863
+        },
+        {
+          "expr": "maximum(v(xdut.ndg))",
+          "max": 4.7,
+          "min": -1.0,
+          "name": "ndg_max",
+          "pass": true,
+          "reason": "",
+          "unit": "V",
+          "value": 3.629204
+        },
+        {
+          "expr": "minimum(v(xdut.ndg))",
+          "max": 4.7,
+          "min": -1.0,
+          "name": "ndg_min",
+          "pass": true,
+          "reason": "",
+          "unit": "V",
+          "value": 0.003960781
+        },
+        {
+          "expr": "maximum(v(xdut.trip))",
+          "max": 4.7,
+          "min": -1.0,
+          "name": "trip_max",
+          "pass": true,
+          "reason": "",
+          "unit": "V",
+          "value": 3.668723
+        },
+        {
+          "expr": "minimum(v(xdut.trip))",
+          "max": 4.7,
+          "min": -1.0,
+          "name": "trip_min",
+          "pass": true,
+          "reason": "",
+          "unit": "V",
+          "value": -4.58756e-05
+        },
+        {
+          "expr": "maximum(v(xdut.rstb))",
+          "max": 4.7,
+          "min": -1.0,
+          "name": "rstb_max",
+          "pass": true,
+          "reason": "",
+          "unit": "V",
+          "value": 3.630047
+        },
+        {
+          "expr": "minimum(v(xdut.rstb))",
+          "max": 4.7,
+          "min": -1.0,
+          "name": "rstb_min",
+          "pass": true,
+          "reason": "",
+          "unit": "V",
+          "value": -4.47466e-05
+        }
+      ],
+      "ngspice_exit": 0,
+      "pass": true,
+      "process": "ff",
+      "supply_v": 3.63,
+      "temperature_c": 125.0,
+      "timed_out": false,
+      "timeout_s": 300
+    },
+    {
+      "batch_status": "pass",
+      "corner_id": "sf_-40c_2.97v",
+      "diagnostics": [],
+      "elapsed_s": 2.921,
+      "killed_by_signal": null,
+      "killed_by_signal_name": null,
+      "log": "sim/.work/.stage/por-output-chain-deglitch/20261114-193311-94b18bbe/sf_-40c_2.97v.log",
+      "measurements": [
+        {
+          "expr": "1e-2 - 2e-3 - integ(v(resetn) gt 1.65)[length(v(resetn))-1]",
+          "max": 0.004,
+          "min": 0.0005,
+          "name": "release_delay",
+          "pass": true,
+          "reason": "",
+          "unit": "s",
+          "value": 0.0006241419
+        },
+        {
+          "expr": "1e-2 - integ(v(resetn) gt 1.65)[length(v(resetn))-1]",
+          "max": 0.006,
+          "min": 0.0022,
+          "name": "t_release",
+          "pass": true,
+          "reason": "",
+          "unit": "s",
+          "value": 0.002624142
+        },
+        {
+          "expr": "maximum(v(resetn))",
+          "max": 3.8,
+          "min": 1.8,
+          "name": "rstn_released",
+          "pass": true,
+          "reason": "",
+          "unit": "V",
+          "value": 2.638733
+        },
+        {
+          "expr": "minimum(v(resetn))",
+          "max": 0.01,
+          "min": -0.05,
+          "name": "rstn_asserted",
+          "pass": true,
+          "reason": "",
+          "unit": "V",
+          "value": -2.90543e-06
+        },
+        {
+          "expr": "maximum(v(xdut.tim))",
+          "max": 4.7,
+          "min": -1.0,
+          "name": "tim_max",
+          "pass": true,
+          "reason": "",
+          "unit": "V",
+          "value": 2.96999
+        },
+        {
+          "expr": "minimum(v(xdut.tim))",
+          "max": 4.7,
+          "min": -1.0,
+          "name": "tim_min",
+          "pass": true,
+          "reason": "",
+          "unit": "V",
+          "value": -0.00206973
+        },
+        {
+          "expr": "maximum(v(xdut.ndg))",
+          "max": 4.7,
+          "min": -1.0,
+          "name": "ndg_max",
+          "pass": true,
+          "reason": "",
+          "unit": "V",
+          "value": 2.976016
+        },
+        {
+          "expr": "minimum(v(xdut.ndg))",
+          "max": 4.7,
+          "min": -1.0,
+          "name": "ndg_min",
+          "pass": true,
+          "reason": "",
+          "unit": "V",
+          "value": -0.000204277
+        },
+        {
+          "expr": "maximum(v(xdut.trip))",
+          "max": 4.7,
+          "min": -1.0,
+          "name": "trip_max",
+          "pass": true,
+          "reason": "",
+          "unit": "V",
+          "value": 2.990886
+        },
+        {
+          "expr": "minimum(v(xdut.trip))",
+          "max": 4.7,
+          "min": -1.0,
+          "name": "trip_min",
+          "pass": true,
+          "reason": "",
+          "unit": "V",
+          "value": -1.73074e-05
+        },
+        {
+          "expr": "maximum(v(xdut.rstb))",
+          "max": 4.7,
+          "min": -1.0,
+          "name": "rstb_max",
+          "pass": true,
+          "reason": "",
+          "unit": "V",
+          "value": 2.970028
+        },
+        {
+          "expr": "minimum(v(xdut.rstb))",
+          "max": 4.7,
+          "min": -1.0,
+          "name": "rstb_min",
+          "pass": true,
+          "reason": "",
+          "unit": "V",
+          "value": -5.08164e-06
+        }
+      ],
+      "ngspice_exit": 0,
+      "pass": true,
+      "process": "sf",
+      "supply_v": 2.97,
+      "temperature_c": -40.0,
+      "timed_out": false,
+      "timeout_s": 300
+    },
+    {
+      "batch_status": "pass",
+      "corner_id": "sf_-40c_3.30v",
+      "diagnostics": [],
+      "elapsed_s": 2.921,
+      "killed_by_signal": null,
+      "killed_by_signal_name": null,
+      "log": "sim/.work/.stage/por-output-chain-deglitch/20261114-193311-94b18bbe/sf_-40c_3.30v.log",
+      "measurements": [
+        {
+          "expr": "1e-2 - 2e-3 - integ(v(resetn) gt 1.65)[length(v(resetn))-1]",
+          "max": 0.004,
+          "min": 0.0005,
+          "name": "release_delay",
+          "pass": true,
+          "reason": "",
+          "unit": "s",
+          "value": 0.0007247724
+        },
+        {
+          "expr": "1e-2 - integ(v(resetn) gt 1.65)[length(v(resetn))-1]",
+          "max": 0.006,
+          "min": 0.0022,
+          "name": "t_release",
+          "pass": true,
+          "reason": "",
+          "unit": "s",
+          "value": 0.002724772
+        },
+        {
+          "expr": "maximum(v(resetn))",
+          "max": 3.8,
+          "min": 1.8,
+          "name": "rstn_released",
+          "pass": true,
+          "reason": "",
+          "unit": "V",
+          "value": 2.938364
+        },
+        {
+          "expr": "minimum(v(resetn))",
+          "max": 0.01,
+          "min": -0.05,
+          "name": "rstn_asserted",
+          "pass": true,
+          "reason": "",
+          "unit": "V",
+          "value": -2.94608e-06
+        },
+        {
+          "expr": "maximum(v(xdut.tim))",
+          "max": 4.7,
+          "min": -1.0,
+          "name": "tim_max",
+          "pass": true,
+          "reason": "",
+          "unit": "V",
+          "value": 3.299989
+        },
+        {
+          "expr": "minimum(v(xdut.tim))",
+          "max": 4.7,
+          "min": -1.0,
+          "name": "tim_min",
+          "pass": true,
+          "reason": "",
+          "unit": "V",
+          "value": -0.00192683
+        },
+        {
+          "expr": "maximum(v(xdut.ndg))",
+          "max": 4.7,
+          "min": -1.0,
+          "name": "ndg_max",
+          "pass": true,
+          "reason": "",
+          "unit": "V",
+          "value": 3.317334
+        },
+        {
+          "expr": "minimum(v(xdut.ndg))",
+          "max": 4.7,
+          "min": -1.0,
+          "name": "ndg_min",
+          "pass": true,
+          "reason": "",
+          "unit": "V",
+          "value": -3.12957e-05
+        },
+        {
+          "expr": "maximum(v(xdut.trip))",
+          "max": 4.7,
+          "min": -1.0,
+          "name": "trip_max",
+          "pass": true,
+          "reason": "",
+          "unit": "V",
+          "value": 3.322652
+        },
+        {
+          "expr": "minimum(v(xdut.trip))",
+          "max": 4.7,
+          "min": -1.0,
+          "name": "trip_min",
+          "pass": true,
+          "reason": "",
+          "unit": "V",
+          "value": -1.64051e-05
+        },
+        {
+          "expr": "maximum(v(xdut.rstb))",
+          "max": 4.7,
+          "min": -1.0,
+          "name": "rstb_max",
+          "pass": true,
+          "reason": "",
+          "unit": "V",
+          "value": 3.300027
+        },
+        {
+          "expr": "minimum(v(xdut.rstb))",
+          "max": 4.7,
+          "min": -1.0,
+          "name": "rstb_min",
+          "pass": true,
+          "reason": "",
+          "unit": "V",
+          "value": -6.85461e-06
+        }
+      ],
+      "ngspice_exit": 0,
+      "pass": true,
+      "process": "sf",
+      "supply_v": 3.3,
+      "temperature_c": -40.0,
+      "timed_out": false,
+      "timeout_s": 300
+    },
+    {
+      "batch_status": "pass",
+      "corner_id": "sf_-40c_3.63v",
+      "diagnostics": [],
+      "elapsed_s": 2.92,
+      "killed_by_signal": null,
+      "killed_by_signal_name": null,
+      "log": "sim/.work/.stage/por-output-chain-deglitch/20261114-193311-94b18bbe/sf_-40c_3.63v.log",
+      "measurements": [
+        {
+          "expr": "1e-2 - 2e-3 - integ(v(resetn) gt 1.65)[length(v(resetn))-1]",
+          "max": 0.004,
+          "min": 0.0005,
+          "name": "release_delay",
+          "pass": true,
+          "reason": "",
+          "unit": "s",
+          "value": 0.0008222272
+        },
+        {
+          "expr": "1e-2 - integ(v(resetn) gt 1.65)[length(v(resetn))-1]",
+          "max": 0.006,
+          "min": 0.0022,
+          "name": "t_release",
+          "pass": true,
+          "reason": "",
+          "unit": "s",
+          "value": 0.002822227
+        },
+        {
+          "expr": "maximum(v(resetn))",
+          "max": 3.8,
+          "min": 1.8,
+          "name": "rstn_released",
+          "pass": true,
+          "reason": "",
+          "unit": "V",
+          "value": 3.233127
+        },
+        {
+          "expr": "minimum(v(resetn))",
+          "max": 0.01,
+          "min": -0.05,
+          "name": "rstn_asserted",
+          "pass": true,
+          "reason": "",
+          "unit": "V",
+          "value": -3.01956e-06
+        },
+        {
+          "expr": "maximum(v(xdut.tim))",
+          "max": 4.7,
+          "min": -1.0,
+          "name": "tim_max",
+          "pass": true,
+          "reason": "",
+          "unit": "V",
+          "value": 3.629988
+        },
+        {
+          "expr": "minimum(v(xdut.tim))",
+          "max": 4.7,
+          "min": -1.0,
+          "name": "tim_min",
+          "pass": true,
+          "reason": "",
+          "unit": "V",
+          "value": -0.00182408
+        },
+        {
+          "expr": "maximum(v(xdut.ndg))",
+          "max": 4.7,
+          "min": -1.0,
+          "name": "ndg_max",
+          "pass": true,
+          "reason": "",
+          "unit": "V",
+          "value": 3.643022
+        },
+        {
+          "expr": "minimum(v(xdut.ndg))",
+          "max": 4.7,
+          "min": -1.0,
+          "name": "ndg_min",
+          "pass": true,
+          "reason": "",
+          "unit": "V",
+          "value": -0.00100295
+        },
+        {
+          "expr": "maximum(v(xdut.trip))",
+          "max": 4.7,
+          "min": -1.0,
+          "name": "trip_max",
+          "pass": true,
+          "reason": "",
+          "unit": "V",
+          "value": 3.655727
+        },
+        {
+          "expr": "minimum(v(xdut.trip))",
+          "max": 4.7,
+          "min": -1.0,
+          "name": "trip_min",
+          "pass": true,
+          "reason": "",
+          "unit": "V",
+          "value": -1.58688e-05
+        },
+        {
+          "expr": "maximum(v(xdut.rstb))",
+          "max": 4.7,
+          "min": -1.0,
+          "name": "rstb_max",
+          "pass": true,
+          "reason": "",
+          "unit": "V",
+          "value": 3.630026
+        },
+        {
+          "expr": "minimum(v(xdut.rstb))",
+          "max": 4.7,
+          "min": -1.0,
+          "name": "rstb_min",
+          "pass": true,
+          "reason": "",
+          "unit": "V",
+          "value": -7.55688e-05
+        }
+      ],
+      "ngspice_exit": 0,
+      "pass": true,
+      "process": "sf",
+      "supply_v": 3.63,
+      "temperature_c": -40.0,
+      "timed_out": false,
+      "timeout_s": 300
+    },
+    {
+      "batch_status": "pass",
+      "corner_id": "sf_27c_2.97v",
+      "diagnostics": [],
+      "elapsed_s": 2.92,
+      "killed_by_signal": null,
+      "killed_by_signal_name": null,
+      "log": "sim/.work/.stage/por-output-chain-deglitch/20261114-193311-94b18bbe/sf_27c_2.97v.log",
+      "measurements": [
+        {
+          "expr": "1e-2 - 2e-3 - integ(v(resetn) gt 1.65)[length(v(resetn))-1]",
+          "max": 0.004,
+          "min": 0.0005,
+          "name": "release_delay",
+          "pass": true,
+          "reason": "",
+          "unit": "s",
+          "value": 0.0007719197
+        },
+        {
+          "expr": "1e-2 - integ(v(resetn) gt 1.65)[length(v(resetn))-1]",
+          "max": 0.006,
+          "min": 0.0022,
+          "name": "t_release",
+          "pass": true,
+          "reason": "",
+          "unit": "s",
+          "value": 0.00277192
+        },
+        {
+          "expr": "maximum(v(resetn))",
+          "max": 3.8,
+          "min": 1.8,
+          "name": "rstn_released",
+          "pass": true,
+          "reason": "",
+          "unit": "V",
+          "value": 2.684054
+        },
+        {
+          "expr": "minimum(v(resetn))",
+          "max": 0.01,
+          "min": -0.05,
+          "name": "rstn_asserted",
+          "pass": true,
+          "reason": "",
+          "unit": "V",
+          "value": -4.23147e-06
+        },
+        {
+          "expr": "maximum(v(xdut.tim))",
+          "max": 4.7,
+          "min": -1.0,
+          "name": "tim_max",
+          "pass": true,
+          "reason": "",
+          "unit": "V",
+          "value": 2.969982
+        },
+        {
+          "expr": "minimum(v(xdut.tim))",
+          "max": 4.7,
+          "min": -1.0,
+          "name": "tim_min",
+          "pass": true,
+          "reason": "",
+          "unit": "V",
+          "value": -0.0024452
+        },
+        {
+          "expr": "maximum(v(xdut.ndg))",
+          "max": 4.7,
+          "min": -1.0,
+          "name": "ndg_max",
+          "pass": true,
+          "reason": "",
+          "unit": "V",
+          "value": 2.988871
+        },
+        {
+          "expr": "minimum(v(xdut.ndg))",
+          "max": 4.7,
+          "min": -1.0,
+          "name": "ndg_min",
+          "pass": true,
+          "reason": "",
+          "unit": "V",
+          "value": -0.000327607
+        },
+        {
+          "expr": "maximum(v(xdut.trip))",
+          "max": 4.7,
+          "min": -1.0,
+          "name": "trip_max",
+          "pass": true,
+          "reason": "",
+          "unit": "V",
+          "value": 2.993018
+        },
+        {
+          "expr": "minimum(v(xdut.trip))",
+          "max": 4.7,
+          "min": -1.0,
+          "name": "trip_min",
+          "pass": true,
+          "reason": "",
+          "unit": "V",
+          "value": -2.86318e-05
+        },
+        {
+          "expr": "maximum(v(xdut.rstb))",
+          "max": 4.7,
+          "min": -1.0,
+          "name": "rstb_max",
+          "pass": true,
+          "reason": "",
+          "unit": "V",
+          "value": 2.970041
+        },
+        {
+          "expr": "minimum(v(xdut.rstb))",
+          "max": 4.7,
+          "min": -1.0,
+          "name": "rstb_min",
+          "pass": true,
+          "reason": "",
+          "unit": "V",
+          "value": -9.41057e-05
+        }
+      ],
+      "ngspice_exit": 0,
+      "pass": true,
+      "process": "sf",
+      "supply_v": 2.97,
+      "temperature_c": 27.0,
+      "timed_out": false,
+      "timeout_s": 300
+    },
+    {
+      "batch_status": "pass",
+      "corner_id": "sf_27c_3.30v",
+      "diagnostics": [],
+      "elapsed_s": 2.871,
+      "killed_by_signal": null,
+      "killed_by_signal_name": null,
+      "log": "sim/.work/.stage/por-output-chain-deglitch/20261114-193311-94b18bbe/sf_27c_3.30v.log",
+      "measurements": [
+        {
+          "expr": "1e-2 - 2e-3 - integ(v(resetn) gt 1.65)[length(v(resetn))-1]",
+          "max": 0.004,
+          "min": 0.0005,
+          "name": "release_delay",
+          "pass": true,
+          "reason": "",
+          "unit": "s",
+          "value": 0.0008826126
+        },
+        {
+          "expr": "1e-2 - integ(v(resetn) gt 1.65)[length(v(resetn))-1]",
+          "max": 0.006,
+          "min": 0.0022,
+          "name": "t_release",
+          "pass": true,
+          "reason": "",
+          "unit": "s",
+          "value": 0.002882613
+        },
+        {
+          "expr": "maximum(v(resetn))",
+          "max": 3.8,
+          "min": 1.8,
+          "name": "rstn_released",
+          "pass": true,
+          "reason": "",
+          "unit": "V",
+          "value": 2.98889
+        },
+        {
+          "expr": "minimum(v(resetn))",
+          "max": 0.01,
+          "min": -0.05,
+          "name": "rstn_asserted",
+          "pass": true,
+          "reason": "",
+          "unit": "V",
+          "value": -4.23608e-06
+        },
+        {
+          "expr": "maximum(v(xdut.tim))",
+          "max": 4.7,
+          "min": -1.0,
+          "name": "tim_max",
+          "pass": true,
+          "reason": "",
+          "unit": "V",
+          "value": 3.29998
+        },
+        {
+          "expr": "minimum(v(xdut.tim))",
+          "max": 4.7,
+          "min": -1.0,
+          "name": "tim_min",
+          "pass": true,
+          "reason": "",
+          "unit": "V",
+          "value": -0.00314974
+        },
+        {
+          "expr": "maximum(v(xdut.ndg))",
+          "max": 4.7,
+          "min": -1.0,
+          "name": "ndg_max",
+          "pass": true,
+          "reason": "",
+          "unit": "V",
+          "value": 3.308611
+        },
+        {
+          "expr": "minimum(v(xdut.ndg))",
+          "max": 4.7,
+          "min": -1.0,
+          "name": "ndg_min",
+          "pass": true,
+          "reason": "",
+          "unit": "V",
+          "value": -0.000134308
+        },
+        {
+          "expr": "maximum(v(xdut.trip))",
+          "max": 4.7,
+          "min": -1.0,
+          "name": "trip_max",
+          "pass": true,
+          "reason": "",
+          "unit": "V",
+          "value": 3.327319
+        },
+        {
+          "expr": "minimum(v(xdut.trip))",
+          "max": 4.7,
+          "min": -1.0,
+          "name": "trip_min",
+          "pass": true,
+          "reason": "",
+          "unit": "V",
+          "value": -2.70105e-05
+        },
+        {
+          "expr": "maximum(v(xdut.rstb))",
+          "max": 4.7,
+          "min": -1.0,
+          "name": "rstb_max",
+          "pass": true,
+          "reason": "",
+          "unit": "V",
+          "value": 3.300039
+        },
+        {
+          "expr": "minimum(v(xdut.rstb))",
+          "max": 4.7,
+          "min": -1.0,
+          "name": "rstb_min",
+          "pass": true,
+          "reason": "",
+          "unit": "V",
+          "value": -8.9458e-05
+        }
+      ],
+      "ngspice_exit": 0,
+      "pass": true,
+      "process": "sf",
+      "supply_v": 3.3,
+      "temperature_c": 27.0,
+      "timed_out": false,
+      "timeout_s": 300
+    },
+    {
+      "batch_status": "pass",
+      "corner_id": "sf_27c_3.63v",
+      "diagnostics": [],
+      "elapsed_s": 2.923,
+      "killed_by_signal": null,
+      "killed_by_signal_name": null,
+      "log": "sim/.work/.stage/por-output-chain-deglitch/20261114-193311-94b18bbe/sf_27c_3.63v.log",
+      "measurements": [
+        {
+          "expr": "1e-2 - 2e-3 - integ(v(resetn) gt 1.65)[length(v(resetn))-1]",
+          "max": 0.004,
+          "min": 0.0005,
+          "name": "release_delay",
+          "pass": true,
+          "reason": "",
+          "unit": "s",
+          "value": 0.0009901659
+        },
+        {
+          "expr": "1e-2 - integ(v(resetn) gt 1.65)[length(v(resetn))-1]",
+          "max": 0.006,
+          "min": 0.0022,
+          "name": "t_release",
+          "pass": true,
+          "reason": "",
+          "unit": "s",
+          "value": 0.002990166
+        },
+        {
+          "expr": "maximum(v(resetn))",
+          "max": 3.8,
+          "min": 1.8,
+          "name": "rstn_released",
+          "pass": true,
+          "reason": "",
+          "unit": "V",
+          "value": 3.290493
+        },
+        {
+          "expr": "minimum(v(resetn))",
+          "max": 0.01,
+          "min": -0.05,
+          "name": "rstn_asserted",
+          "pass": true,
+          "reason": "",
+          "unit": "V",
+          "value": -4.28901e-06
+        },
+        {
+          "expr": "maximum(v(xdut.tim))",
+          "max": 4.7,
+          "min": -1.0,
+          "name": "tim_max",
+          "pass": true,
+          "reason": "",
+          "unit": "V",
+          "value": 3.629978
+        },
+        {
+          "expr": "minimum(v(xdut.tim))",
+          "max": 4.7,
+          "min": -1.0,
+          "name": "tim_min",
+          "pass": true,
+          "reason": "",
+          "unit": "V",
+          "value": -0.00235402
+        },
+        {
+          "expr": "maximum(v(xdut.ndg))",
+          "max": 4.7,
+          "min": -1.0,
+          "name": "ndg_max",
+          "pass": true,
+          "reason": "",
+          "unit": "V",
+          "value": 3.631267
+        },
+        {
+          "expr": "minimum(v(xdut.ndg))",
+          "max": 4.7,
+          "min": -1.0,
+          "name": "ndg_min",
+          "pass": true,
+          "reason": "",
+          "unit": "V",
+          "value": -8.85928e-05
+        },
+        {
+          "expr": "maximum(v(xdut.trip))",
+          "max": 4.7,
+          "min": -1.0,
+          "name": "trip_max",
+          "pass": true,
+          "reason": "",
+          "unit": "V",
+          "value": 3.660517
+        },
+        {
+          "expr": "minimum(v(xdut.trip))",
+          "max": 4.7,
+          "min": -1.0,
+          "name": "trip_min",
+          "pass": true,
+          "reason": "",
+          "unit": "V",
+          "value": -2.59398e-05
+        },
+        {
+          "expr": "maximum(v(xdut.rstb))",
+          "max": 4.7,
+          "min": -1.0,
+          "name": "rstb_max",
+          "pass": true,
+          "reason": "",
+          "unit": "V",
+          "value": 3.630037
+        },
+        {
+          "expr": "minimum(v(xdut.rstb))",
+          "max": 4.7,
+          "min": -1.0,
+          "name": "rstb_min",
+          "pass": true,
+          "reason": "",
+          "unit": "V",
+          "value": -1.79449e-05
+        }
+      ],
+      "ngspice_exit": 0,
+      "pass": true,
+      "process": "sf",
+      "supply_v": 3.63,
+      "temperature_c": 27.0,
+      "timed_out": false,
+      "timeout_s": 300
+    },
+    {
+      "batch_status": "pass",
+      "corner_id": "sf_125c_2.97v",
+      "diagnostics": [],
+      "elapsed_s": 2.921,
+      "killed_by_signal": null,
+      "killed_by_signal_name": null,
+      "log": "sim/.work/.stage/por-output-chain-deglitch/20261114-193311-94b18bbe/sf_125c_2.97v.log",
+      "measurements": [
+        {
+          "expr": "1e-2 - 2e-3 - integ(v(resetn) gt 1.65)[length(v(resetn))-1]",
+          "max": 0.004,
+          "min": 0.0005,
+          "name": "release_delay",
+          "pass": true,
+          "reason": "",
+          "unit": "s",
+          "value": 0.001002332
+        },
+        {
+          "expr": "1e-2 - integ(v(resetn) gt 1.65)[length(v(resetn))-1]",
+          "max": 0.006,
+          "min": 0.0022,
+          "name": "t_release",
+          "pass": true,
+          "reason": "",
+          "unit": "s",
+          "value": 0.003002332
+        },
+        {
+          "expr": "maximum(v(resetn))",
+          "max": 3.8,
+          "min": 1.8,
+          "name": "rstn_released",
+          "pass": true,
+          "reason": "",
+          "unit": "V",
+          "value": 2.728087
+        },
+        {
+          "expr": "minimum(v(resetn))",
+          "max": 0.01,
+          "min": -0.05,
+          "name": "rstn_asserted",
+          "pass": true,
+          "reason": "",
+          "unit": "V",
+          "value": -6.92151e-06
+        },
+        {
+          "expr": "maximum(v(xdut.tim))",
+          "max": 4.7,
+          "min": -1.0,
+          "name": "tim_max",
+          "pass": true,
+          "reason": "",
+          "unit": "V",
+          "value": 2.969183
+        },
+        {
+          "expr": "minimum(v(xdut.tim))",
+          "max": 4.7,
+          "min": -1.0,
+          "name": "tim_min",
+          "pass": true,
+          "reason": "",
+          "unit": "V",
+          "value": -0.00386188
+        },
+        {
+          "expr": "maximum(v(xdut.ndg))",
+          "max": 4.7,
+          "min": -1.0,
+          "name": "ndg_max",
+          "pass": true,
+          "reason": "",
+          "unit": "V",
+          "value": 2.968611
+        },
+        {
+          "expr": "minimum(v(xdut.ndg))",
+          "max": 4.7,
+          "min": -1.0,
+          "name": "ndg_min",
+          "pass": true,
+          "reason": "",
+          "unit": "V",
+          "value": -0.000311331
+        },
+        {
+          "expr": "maximum(v(xdut.trip))",
+          "max": 4.7,
+          "min": -1.0,
+          "name": "trip_max",
+          "pass": true,
+          "reason": "",
+          "unit": "V",
+          "value": 3.001976
+        },
+        {
+          "expr": "minimum(v(xdut.trip))",
+          "max": 4.7,
+          "min": -1.0,
+          "name": "trip_min",
+          "pass": true,
+          "reason": "",
+          "unit": "V",
+          "value": -5.2937e-05
+        },
+        {
+          "expr": "maximum(v(xdut.rstb))",
+          "max": 4.7,
+          "min": -1.0,
+          "name": "rstb_max",
+          "pass": true,
+          "reason": "",
+          "unit": "V",
+          "value": 2.970057
+        },
+        {
+          "expr": "minimum(v(xdut.rstb))",
+          "max": 4.7,
+          "min": -1.0,
+          "name": "rstb_min",
+          "pass": true,
+          "reason": "",
+          "unit": "V",
+          "value": -0.000104225
+        }
+      ],
+      "ngspice_exit": 0,
+      "pass": true,
+      "process": "sf",
+      "supply_v": 2.97,
+      "temperature_c": 125.0,
+      "timed_out": false,
+      "timeout_s": 300
+    },
+    {
+      "batch_status": "pass",
+      "corner_id": "sf_125c_3.30v",
+      "diagnostics": [],
+      "elapsed_s": 2.92,
+      "killed_by_signal": null,
+      "killed_by_signal_name": null,
+      "log": "sim/.work/.stage/por-output-chain-deglitch/20261114-193311-94b18bbe/sf_125c_3.30v.log",
+      "measurements": [
+        {
+          "expr": "1e-2 - 2e-3 - integ(v(resetn) gt 1.65)[length(v(resetn))-1]",
+          "max": 0.004,
+          "min": 0.0005,
+          "name": "release_delay",
+          "pass": true,
+          "reason": "",
+          "unit": "s",
+          "value": 0.001145724
+        },
+        {
+          "expr": "1e-2 - integ(v(resetn) gt 1.65)[length(v(resetn))-1]",
+          "max": 0.006,
+          "min": 0.0022,
+          "name": "t_release",
+          "pass": true,
+          "reason": "",
+          "unit": "s",
+          "value": 0.003145724
+        },
+        {
+          "expr": "maximum(v(resetn))",
+          "max": 3.8,
+          "min": 1.8,
+          "name": "rstn_released",
+          "pass": true,
+          "reason": "",
+          "unit": "V",
+          "value": 3.038748
+        },
+        {
+          "expr": "minimum(v(resetn))",
+          "max": 0.01,
+          "min": -0.05,
+          "name": "rstn_asserted",
+          "pass": true,
+          "reason": "",
+          "unit": "V",
+          "value": -6.85769e-06
+        },
+        {
+          "expr": "maximum(v(xdut.tim))",
+          "max": 4.7,
+          "min": -1.0,
+          "name": "tim_max",
+          "pass": true,
+          "reason": "",
+          "unit": "V",
+          "value": 3.299168
+        },
+        {
+          "expr": "minimum(v(xdut.tim))",
+          "max": 4.7,
+          "min": -1.0,
+          "name": "tim_min",
+          "pass": true,
+          "reason": "",
+          "unit": "V",
+          "value": -0.00283308
+        },
+        {
+          "expr": "maximum(v(xdut.ndg))",
+          "max": 4.7,
+          "min": -1.0,
+          "name": "ndg_max",
+          "pass": true,
+          "reason": "",
+          "unit": "V",
+          "value": 3.298482
+        },
+        {
+          "expr": "minimum(v(xdut.ndg))",
+          "max": 4.7,
+          "min": -1.0,
+          "name": "ndg_min",
+          "pass": true,
+          "reason": "",
+          "unit": "V",
+          "value": -0.000391698
+        },
+        {
+          "expr": "maximum(v(xdut.trip))",
+          "max": 4.7,
+          "min": -1.0,
+          "name": "trip_max",
+          "pass": true,
+          "reason": "",
+          "unit": "V",
+          "value": 3.331189
+        },
+        {
+          "expr": "minimum(v(xdut.trip))",
+          "max": 4.7,
+          "min": -1.0,
+          "name": "trip_min",
+          "pass": true,
+          "reason": "",
+          "unit": "V",
+          "value": -5.00089e-05
+        },
+        {
+          "expr": "maximum(v(xdut.rstb))",
+          "max": 4.7,
+          "min": -1.0,
+          "name": "rstb_max",
+          "pass": true,
+          "reason": "",
+          "unit": "V",
+          "value": 3.300054
+        },
+        {
+          "expr": "minimum(v(xdut.rstb))",
+          "max": 4.7,
+          "min": -1.0,
+          "name": "rstb_min",
+          "pass": true,
+          "reason": "",
+          "unit": "V",
+          "value": -0.00011317
+        }
+      ],
+      "ngspice_exit": 0,
+      "pass": true,
+      "process": "sf",
+      "supply_v": 3.3,
+      "temperature_c": 125.0,
+      "timed_out": false,
+      "timeout_s": 300
+    },
+    {
+      "batch_status": "pass",
+      "corner_id": "sf_125c_3.63v",
+      "diagnostics": [],
+      "elapsed_s": 2.922,
+      "killed_by_signal": null,
+      "killed_by_signal_name": null,
+      "log": "sim/.work/.stage/por-output-chain-deglitch/20261114-193311-94b18bbe/sf_125c_3.63v.log",
+      "measurements": [
+        {
+          "expr": "1e-2 - 2e-3 - integ(v(resetn) gt 1.65)[length(v(resetn))-1]",
+          "max": 0.004,
+          "min": 0.0005,
+          "name": "release_delay",
+          "pass": true,
+          "reason": "",
+          "unit": "s",
+          "value": 0.001270267
+        },
+        {
+          "expr": "1e-2 - integ(v(resetn) gt 1.65)[length(v(resetn))-1]",
+          "max": 0.006,
+          "min": 0.0022,
+          "name": "t_release",
+          "pass": true,
+          "reason": "",
+          "unit": "s",
+          "value": 0.003270267
+        },
+        {
+          "expr": "maximum(v(resetn))",
+          "max": 3.8,
+          "min": 1.8,
+          "name": "rstn_released",
+          "pass": true,
+          "reason": "",
+          "unit": "V",
+          "value": 3.347714
+        },
+        {
+          "expr": "minimum(v(resetn))",
+          "max": 0.01,
+          "min": -0.05,
+          "name": "rstn_asserted",
+          "pass": true,
+          "reason": "",
+          "unit": "V",
+          "value": -6.86518e-06
+        },
+        {
+          "expr": "maximum(v(xdut.tim))",
+          "max": 4.7,
+          "min": -1.0,
+          "name": "tim_max",
+          "pass": true,
+          "reason": "",
+          "unit": "V",
+          "value": 3.629153
+        },
+        {
+          "expr": "minimum(v(xdut.tim))",
+          "max": 4.7,
+          "min": -1.0,
+          "name": "tim_min",
+          "pass": true,
+          "reason": "",
+          "unit": "V",
+          "value": -0.00260874
+        },
+        {
+          "expr": "maximum(v(xdut.ndg))",
+          "max": 4.7,
+          "min": -1.0,
+          "name": "ndg_max",
+          "pass": true,
+          "reason": "",
+          "unit": "V",
+          "value": 3.631469
+        },
+        {
+          "expr": "minimum(v(xdut.ndg))",
+          "max": 4.7,
+          "min": -1.0,
+          "name": "ndg_min",
+          "pass": true,
+          "reason": "",
+          "unit": "V",
+          "value": -0.00285115
+        },
+        {
+          "expr": "maximum(v(xdut.trip))",
+          "max": 4.7,
+          "min": -1.0,
+          "name": "trip_max",
+          "pass": true,
+          "reason": "",
+          "unit": "V",
+          "value": 3.670091
+        },
+        {
+          "expr": "minimum(v(xdut.trip))",
+          "max": 4.7,
+          "min": -1.0,
+          "name": "trip_min",
+          "pass": true,
+          "reason": "",
+          "unit": "V",
+          "value": -4.78898e-05
+        },
+        {
+          "expr": "maximum(v(xdut.rstb))",
+          "max": 4.7,
+          "min": -1.0,
+          "name": "rstb_max",
+          "pass": true,
+          "reason": "",
+          "unit": "V",
+          "value": 3.630051
+        },
+        {
+          "expr": "minimum(v(xdut.rstb))",
+          "max": 4.7,
+          "min": -1.0,
+          "name": "rstb_min",
+          "pass": true,
+          "reason": "",
+          "unit": "V",
+          "value": -0.000121302
+        }
+      ],
+      "ngspice_exit": 0,
+      "pass": true,
+      "process": "sf",
+      "supply_v": 3.63,
+      "temperature_c": 125.0,
+      "timed_out": false,
+      "timeout_s": 300
+    },
+    {
+      "batch_status": "pass",
+      "corner_id": "fs_-40c_2.97v",
+      "diagnostics": [],
+      "elapsed_s": 2.92,
+      "killed_by_signal": null,
+      "killed_by_signal_name": null,
+      "log": "sim/.work/.stage/por-output-chain-deglitch/20261114-193311-94b18bbe/fs_-40c_2.97v.log",
+      "measurements": [
+        {
+          "expr": "1e-2 - 2e-3 - integ(v(resetn) gt 1.65)[length(v(resetn))-1]",
+          "max": 0.004,
+          "min": 0.0005,
+          "name": "release_delay",
+          "pass": true,
+          "reason": "",
+          "unit": "s",
+          "value": 0.001344404
+        },
+        {
+          "expr": "1e-2 - integ(v(resetn) gt 1.65)[length(v(resetn))-1]",
+          "max": 0.006,
+          "min": 0.0022,
+          "name": "t_release",
+          "pass": true,
+          "reason": "",
+          "unit": "s",
+          "value": 0.003344404
+        },
+        {
+          "expr": "maximum(v(resetn))",
+          "max": 3.8,
+          "min": 1.8,
+          "name": "rstn_released",
+          "pass": true,
+          "reason": "",
+          "unit": "V",
+          "value": 2.700712
+        },
+        {
+          "expr": "minimum(v(resetn))",
+          "max": 0.01,
+          "min": -0.05,
+          "name": "rstn_asserted",
+          "pass": true,
+          "reason": "",
+          "unit": "V",
+          "value": -3.12529e-06
+        },
+        {
+          "expr": "maximum(v(xdut.tim))",
+          "max": 4.7,
+          "min": -1.0,
+          "name": "tim_max",
+          "pass": true,
+          "reason": "",
+          "unit": "V",
+          "value": 2.969985
+        },
+        {
+          "expr": "minimum(v(xdut.tim))",
+          "max": 4.7,
+          "min": -1.0,
+          "name": "tim_min",
+          "pass": true,
+          "reason": "",
+          "unit": "V",
+          "value": -0.00130981
+        },
+        {
+          "expr": "maximum(v(xdut.ndg))",
+          "max": 4.7,
+          "min": -1.0,
+          "name": "ndg_max",
+          "pass": true,
+          "reason": "",
+          "unit": "V",
+          "value": 2.982548
+        },
+        {
+          "expr": "minimum(v(xdut.ndg))",
+          "max": 4.7,
+          "min": -1.0,
+          "name": "ndg_min",
+          "pass": true,
+          "reason": "",
+          "unit": "V",
+          "value": -0.00010989
+        },
+        {
+          "expr": "maximum(v(xdut.trip))",
+          "max": 4.7,
+          "min": -1.0,
+          "name": "trip_max",
+          "pass": true,
+          "reason": "",
+          "unit": "V",
+          "value": 2.99933
+        },
+        {
+          "expr": "minimum(v(xdut.trip))",
+          "max": 4.7,
+          "min": -1.0,
+          "name": "trip_min",
+          "pass": true,
+          "reason": "",
+          "unit": "V",
+          "value": -1.93951e-05
+        },
+        {
+          "expr": "maximum(v(xdut.rstb))",
+          "max": 4.7,
+          "min": -1.0,
+          "name": "rstb_max",
+          "pass": true,
+          "reason": "",
+          "unit": "V",
+          "value": 2.970024
+        },
+        {
+          "expr": "minimum(v(xdut.rstb))",
+          "max": 4.7,
+          "min": -1.0,
+          "name": "rstb_min",
+          "pass": true,
+          "reason": "",
+          "unit": "V",
+          "value": -7.39324e-05
+        }
+      ],
+      "ngspice_exit": 0,
+      "pass": true,
+      "process": "fs",
+      "supply_v": 2.97,
+      "temperature_c": -40.0,
+      "timed_out": false,
+      "timeout_s": 300
+    },
+    {
+      "batch_status": "pass",
+      "corner_id": "fs_-40c_3.30v",
+      "diagnostics": [],
+      "elapsed_s": 2.922,
+      "killed_by_signal": null,
+      "killed_by_signal_name": null,
+      "log": "sim/.work/.stage/por-output-chain-deglitch/20261114-193311-94b18bbe/fs_-40c_3.30v.log",
+      "measurements": [
+        {
+          "expr": "1e-2 - 2e-3 - integ(v(resetn) gt 1.65)[length(v(resetn))-1]",
+          "max": 0.004,
+          "min": 0.0005,
+          "name": "release_delay",
+          "pass": true,
+          "reason": "",
+          "unit": "s",
+          "value": 0.001529152
+        },
+        {
+          "expr": "1e-2 - integ(v(resetn) gt 1.65)[length(v(resetn))-1]",
+          "max": 0.006,
+          "min": 0.0022,
+          "name": "t_release",
+          "pass": true,
+          "reason": "",
+          "unit": "s",
+          "value": 0.003529152
+        },
+        {
+          "expr": "maximum(v(resetn))",
+          "max": 3.8,
+          "min": 1.8,
+          "name": "rstn_released",
+          "pass": true,
+          "reason": "",
+          "unit": "V",
+          "value": 2.998135
+        },
+        {
+          "expr": "minimum(v(resetn))",
+          "max": 0.01,
+          "min": -0.05,
+          "name": "rstn_asserted",
+          "pass": true,
+          "reason": "",
+          "unit": "V",
+          "value": -3.1485e-06
+        },
+        {
+          "expr": "maximum(v(xdut.tim))",
+          "max": 4.7,
+          "min": -1.0,
+          "name": "tim_max",
+          "pass": true,
+          "reason": "",
+          "unit": "V",
+          "value": 3.299983
+        },
+        {
+          "expr": "minimum(v(xdut.tim))",
+          "max": 4.7,
+          "min": -1.0,
+          "name": "tim_min",
+          "pass": true,
+          "reason": "",
+          "unit": "V",
+          "value": -0.00158971
+        },
+        {
+          "expr": "maximum(v(xdut.ndg))",
+          "max": 4.7,
+          "min": -1.0,
+          "name": "ndg_max",
+          "pass": true,
+          "reason": "",
+          "unit": "V",
+          "value": 3.301669
+        },
+        {
+          "expr": "minimum(v(xdut.ndg))",
+          "max": 4.7,
+          "min": -1.0,
+          "name": "ndg_min",
+          "pass": true,
+          "reason": "",
+          "unit": "V",
+          "value": -0.00180542
+        },
+        {
+          "expr": "maximum(v(xdut.trip))",
+          "max": 4.7,
+          "min": -1.0,
+          "name": "trip_max",
+          "pass": true,
+          "reason": "",
+          "unit": "V",
+          "value": 3.330953
+        },
+        {
+          "expr": "minimum(v(xdut.trip))",
+          "max": 4.7,
+          "min": -1.0,
+          "name": "trip_min",
+          "pass": true,
+          "reason": "",
+          "unit": "V",
+          "value": -1.81656e-05
+        },
+        {
+          "expr": "maximum(v(xdut.rstb))",
+          "max": 4.7,
+          "min": -1.0,
+          "name": "rstb_max",
+          "pass": true,
+          "reason": "",
+          "unit": "V",
+          "value": 3.300023
+        },
+        {
+          "expr": "minimum(v(xdut.rstb))",
+          "max": 4.7,
+          "min": -1.0,
+          "name": "rstb_min",
+          "pass": true,
+          "reason": "",
+          "unit": "V",
+          "value": -7.92659e-05
+        }
+      ],
+      "ngspice_exit": 0,
+      "pass": true,
+      "process": "fs",
+      "supply_v": 3.3,
+      "temperature_c": -40.0,
+      "timed_out": false,
+      "timeout_s": 300
+    },
+    {
+      "batch_status": "pass",
+      "corner_id": "fs_-40c_3.63v",
+      "diagnostics": [],
+      "elapsed_s": 2.873,
+      "killed_by_signal": null,
+      "killed_by_signal_name": null,
+      "log": "sim/.work/.stage/por-output-chain-deglitch/20261114-193311-94b18bbe/fs_-40c_3.63v.log",
+      "measurements": [
+        {
+          "expr": "1e-2 - 2e-3 - integ(v(resetn) gt 1.65)[length(v(resetn))-1]",
+          "max": 0.004,
+          "min": 0.0005,
+          "name": "release_delay",
+          "pass": true,
+          "reason": "",
+          "unit": "s",
+          "value": 0.001710003
+        },
+        {
+          "expr": "1e-2 - integ(v(resetn) gt 1.65)[length(v(resetn))-1]",
+          "max": 0.006,
+          "min": 0.0022,
+          "name": "t_release",
+          "pass": true,
+          "reason": "",
+          "unit": "s",
+          "value": 0.003710003
+        },
+        {
+          "expr": "maximum(v(resetn))",
+          "max": 3.8,
+          "min": 1.8,
+          "name": "rstn_released",
+          "pass": true,
+          "reason": "",
+          "unit": "V",
+          "value": 3.292166
+        },
+        {
+          "expr": "minimum(v(resetn))",
+          "max": 0.01,
+          "min": -0.05,
+          "name": "rstn_asserted",
+          "pass": true,
+          "reason": "",
+          "unit": "V",
+          "value": -3.21239e-06
+        },
+        {
+          "expr": "maximum(v(xdut.tim))",
+          "max": 4.7,
+          "min": -1.0,
+          "name": "tim_max",
+          "pass": true,
+          "reason": "",
+          "unit": "V",
+          "value": 3.629981
+        },
+        {
+          "expr": "minimum(v(xdut.tim))",
+          "max": 4.7,
+          "min": -1.0,
+          "name": "tim_min",
+          "pass": true,
+          "reason": "",
+          "unit": "V",
+          "value": -0.0156631
+        },
+        {
+          "expr": "maximum(v(xdut.ndg))",
+          "max": 4.7,
+          "min": -1.0,
+          "name": "ndg_max",
+          "pass": true,
+          "reason": "",
+          "unit": "V",
+          "value": 3.631561
+        },
+        {
+          "expr": "minimum(v(xdut.ndg))",
+          "max": 4.7,
+          "min": -1.0,
+          "name": "ndg_min",
+          "pass": true,
+          "reason": "",
+          "unit": "V",
+          "value": -0.000262302
+        },
+        {
+          "expr": "maximum(v(xdut.trip))",
+          "max": 4.7,
+          "min": -1.0,
+          "name": "trip_max",
+          "pass": true,
+          "reason": "",
+          "unit": "V",
+          "value": 3.663036
+        },
+        {
+          "expr": "minimum(v(xdut.trip))",
+          "max": 4.7,
+          "min": -1.0,
+          "name": "trip_min",
+          "pass": true,
+          "reason": "",
+          "unit": "V",
+          "value": -1.74191e-05
+        },
+        {
+          "expr": "maximum(v(xdut.rstb))",
+          "max": 4.7,
+          "min": -1.0,
+          "name": "rstb_max",
+          "pass": true,
+          "reason": "",
+          "unit": "V",
+          "value": 3.630023
+        },
+        {
+          "expr": "minimum(v(xdut.rstb))",
+          "max": 4.7,
+          "min": -1.0,
+          "name": "rstb_min",
+          "pass": true,
+          "reason": "",
+          "unit": "V",
+          "value": -8.02462e-05
+        }
+      ],
+      "ngspice_exit": 0,
+      "pass": true,
+      "process": "fs",
+      "supply_v": 3.63,
+      "temperature_c": -40.0,
+      "timed_out": false,
+      "timeout_s": 300
+    },
+    {
+      "batch_status": "pass",
+      "corner_id": "fs_27c_2.97v",
+      "diagnostics": [],
+      "elapsed_s": 2.92,
+      "killed_by_signal": null,
+      "killed_by_signal_name": null,
+      "log": "sim/.work/.stage/por-output-chain-deglitch/20261114-193311-94b18bbe/fs_27c_2.97v.log",
+      "measurements": [
+        {
+          "expr": "1e-2 - 2e-3 - integ(v(resetn) gt 1.65)[length(v(resetn))-1]",
+          "max": 0.004,
+          "min": 0.0005,
+          "name": "release_delay",
+          "pass": true,
+          "reason": "",
+          "unit": "s",
+          "value": 0.001505919
+        },
+        {
+          "expr": "1e-2 - integ(v(resetn) gt 1.65)[length(v(resetn))-1]",
+          "max": 0.006,
+          "min": 0.0022,
+          "name": "t_release",
+          "pass": true,
+          "reason": "",
+          "unit": "s",
+          "value": 0.003505919
+        },
+        {
+          "expr": "maximum(v(resetn))",
+          "max": 3.8,
+          "min": 1.8,
+          "name": "rstn_released",
+          "pass": true,
+          "reason": "",
+          "unit": "V",
+          "value": 2.73375
+        },
+        {
+          "expr": "minimum(v(resetn))",
+          "max": 0.01,
+          "min": -0.05,
+          "name": "rstn_asserted",
+          "pass": true,
+          "reason": "",
+          "unit": "V",
+          "value": -4.6282e-06
+        },
+        {
+          "expr": "maximum(v(xdut.tim))",
+          "max": 4.7,
+          "min": -1.0,
+          "name": "tim_max",
+          "pass": true,
+          "reason": "",
+          "unit": "V",
+          "value": 2.969981
+        },
+        {
+          "expr": "minimum(v(xdut.tim))",
+          "max": 4.7,
+          "min": -1.0,
+          "name": "tim_min",
+          "pass": true,
+          "reason": "",
+          "unit": "V",
+          "value": -0.00145551
+        },
+        {
+          "expr": "maximum(v(xdut.ndg))",
+          "max": 4.7,
+          "min": -1.0,
+          "name": "ndg_max",
+          "pass": true,
+          "reason": "",
+          "unit": "V",
+          "value": 2.987362
+        },
+        {
+          "expr": "minimum(v(xdut.ndg))",
+          "max": 4.7,
+          "min": -1.0,
+          "name": "ndg_min",
+          "pass": true,
+          "reason": "",
+          "unit": "V",
+          "value": -0.000188484
+        },
+        {
+          "expr": "maximum(v(xdut.trip))",
+          "max": 4.7,
+          "min": -1.0,
+          "name": "trip_max",
+          "pass": true,
+          "reason": "",
+          "unit": "V",
+          "value": 3.003222
+        },
+        {
+          "expr": "minimum(v(xdut.trip))",
+          "max": 4.7,
+          "min": -1.0,
+          "name": "trip_min",
+          "pass": true,
+          "reason": "",
+          "unit": "V",
+          "value": -3.24215e-05
+        },
+        {
+          "expr": "maximum(v(xdut.rstb))",
+          "max": 4.7,
+          "min": -1.0,
+          "name": "rstb_max",
+          "pass": true,
+          "reason": "",
+          "unit": "V",
+          "value": 2.970035
+        },
+        {
+          "expr": "minimum(v(xdut.rstb))",
+          "max": 4.7,
+          "min": -1.0,
+          "name": "rstb_min",
+          "pass": true,
+          "reason": "",
+          "unit": "V",
+          "value": -8.50497e-05
+        }
+      ],
+      "ngspice_exit": 0,
+      "pass": true,
+      "process": "fs",
+      "supply_v": 2.97,
+      "temperature_c": 27.0,
+      "timed_out": false,
+      "timeout_s": 300
+    },
+    {
+      "batch_status": "pass",
+      "corner_id": "fs_27c_3.30v",
+      "diagnostics": [],
+      "elapsed_s": 2.871,
+      "killed_by_signal": null,
+      "killed_by_signal_name": null,
+      "log": "sim/.work/.stage/por-output-chain-deglitch/20261114-193311-94b18bbe/fs_27c_3.30v.log",
+      "measurements": [
+        {
+          "expr": "1e-2 - 2e-3 - integ(v(resetn) gt 1.65)[length(v(resetn))-1]",
+          "max": 0.004,
+          "min": 0.0005,
+          "name": "release_delay",
+          "pass": true,
+          "reason": "",
+          "unit": "s",
+          "value": 0.001703246
+        },
+        {
+          "expr": "1e-2 - integ(v(resetn) gt 1.65)[length(v(resetn))-1]",
+          "max": 0.006,
+          "min": 0.0022,
+          "name": "t_release",
+          "pass": true,
+          "reason": "",
+          "unit": "s",
+          "value": 0.003703246
+        },
+        {
+          "expr": "maximum(v(resetn))",
+          "max": 3.8,
+          "min": 1.8,
+          "name": "rstn_released",
+          "pass": true,
+          "reason": "",
+          "unit": "V",
+          "value": 3.037064
+        },
+        {
+          "expr": "minimum(v(resetn))",
+          "max": 0.01,
+          "min": -0.05,
+          "name": "rstn_asserted",
+          "pass": true,
+          "reason": "",
+          "unit": "V",
+          "value": -4.59237e-06
+        },
+        {
+          "expr": "maximum(v(xdut.tim))",
+          "max": 4.7,
+          "min": -1.0,
+          "name": "tim_max",
+          "pass": true,
+          "reason": "",
+          "unit": "V",
+          "value": 3.299979
+        },
+        {
+          "expr": "minimum(v(xdut.tim))",
+          "max": 4.7,
+          "min": -1.0,
+          "name": "tim_min",
+          "pass": true,
+          "reason": "",
+          "unit": "V",
+          "value": -0.0146591
+        },
+        {
+          "expr": "maximum(v(xdut.ndg))",
+          "max": 4.7,
+          "min": -1.0,
+          "name": "ndg_max",
+          "pass": true,
+          "reason": "",
+          "unit": "V",
+          "value": 3.301497
+        },
+        {
+          "expr": "minimum(v(xdut.ndg))",
+          "max": 4.7,
+          "min": -1.0,
+          "name": "ndg_min",
+          "pass": true,
+          "reason": "",
+          "unit": "V",
+          "value": -5.00816e-05
+        },
+        {
+          "expr": "maximum(v(xdut.trip))",
+          "max": 4.7,
+          "min": -1.0,
+          "name": "trip_max",
+          "pass": true,
+          "reason": "",
+          "unit": "V",
+          "value": 3.334567
+        },
+        {
+          "expr": "minimum(v(xdut.trip))",
+          "max": 4.7,
+          "min": -1.0,
+          "name": "trip_min",
+          "pass": true,
+          "reason": "",
+          "unit": "V",
+          "value": -3.01788e-05
+        },
+        {
+          "expr": "maximum(v(xdut.rstb))",
+          "max": 4.7,
+          "min": -1.0,
+          "name": "rstb_max",
+          "pass": true,
+          "reason": "",
+          "unit": "V",
+          "value": 3.300033
+        },
+        {
+          "expr": "minimum(v(xdut.rstb))",
+          "max": 4.7,
+          "min": -1.0,
+          "name": "rstb_min",
+          "pass": true,
+          "reason": "",
+          "unit": "V",
+          "value": -1.70592e-05
+        }
+      ],
+      "ngspice_exit": 0,
+      "pass": true,
+      "process": "fs",
+      "supply_v": 3.3,
+      "temperature_c": 27.0,
+      "timed_out": false,
+      "timeout_s": 300
+    },
+    {
+      "batch_status": "pass",
+      "corner_id": "fs_27c_3.63v",
+      "diagnostics": [],
+      "elapsed_s": 2.872,
+      "killed_by_signal": null,
+      "killed_by_signal_name": null,
+      "log": "sim/.work/.stage/por-output-chain-deglitch/20261114-193311-94b18bbe/fs_27c_3.63v.log",
+      "measurements": [
+        {
+          "expr": "1e-2 - 2e-3 - integ(v(resetn) gt 1.65)[length(v(resetn))-1]",
+          "max": 0.004,
+          "min": 0.0005,
+          "name": "release_delay",
+          "pass": true,
+          "reason": "",
+          "unit": "s",
+          "value": 0.001888146
+        },
+        {
+          "expr": "1e-2 - integ(v(resetn) gt 1.65)[length(v(resetn))-1]",
+          "max": 0.006,
+          "min": 0.0022,
+          "name": "t_release",
+          "pass": true,
+          "reason": "",
+          "unit": "s",
+          "value": 0.003888146
+        },
+        {
+          "expr": "maximum(v(resetn))",
+          "max": 3.8,
+          "min": 1.8,
+          "name": "rstn_released",
+          "pass": true,
+          "reason": "",
+          "unit": "V",
+          "value": 3.338078
+        },
+        {
+          "expr": "minimum(v(resetn))",
+          "max": 0.01,
+          "min": -0.05,
+          "name": "rstn_asserted",
+          "pass": true,
+          "reason": "",
+          "unit": "V",
+          "value": -4.62258e-06
+        },
+        {
+          "expr": "maximum(v(xdut.tim))",
+          "max": 4.7,
+          "min": -1.0,
+          "name": "tim_max",
+          "pass": true,
+          "reason": "",
+          "unit": "V",
+          "value": 3.629977
+        },
+        {
+          "expr": "minimum(v(xdut.tim))",
+          "max": 4.7,
+          "min": -1.0,
+          "name": "tim_min",
+          "pass": true,
+          "reason": "",
+          "unit": "V",
+          "value": -0.00160696
+        },
+        {
+          "expr": "maximum(v(xdut.ndg))",
+          "max": 4.7,
+          "min": -1.0,
+          "name": "ndg_max",
+          "pass": true,
+          "reason": "",
+          "unit": "V",
+          "value": 3.631496
+        },
+        {
+          "expr": "minimum(v(xdut.ndg))",
+          "max": 4.7,
+          "min": -1.0,
+          "name": "ndg_min",
+          "pass": true,
+          "reason": "",
+          "unit": "V",
+          "value": -0.00179549
+        },
+        {
+          "expr": "maximum(v(xdut.trip))",
+          "max": 4.7,
+          "min": -1.0,
+          "name": "trip_max",
+          "pass": true,
+          "reason": "",
+          "unit": "V",
+          "value": 3.66792
+        },
+        {
+          "expr": "minimum(v(xdut.trip))",
+          "max": 4.7,
+          "min": -1.0,
+          "name": "trip_min",
+          "pass": true,
+          "reason": "",
+          "unit": "V",
+          "value": -2.87029e-05
+        },
+        {
+          "expr": "maximum(v(xdut.rstb))",
+          "max": 4.7,
+          "min": -1.0,
+          "name": "rstb_max",
+          "pass": true,
+          "reason": "",
+          "unit": "V",
+          "value": 3.630033
+        },
+        {
+          "expr": "minimum(v(xdut.rstb))",
+          "max": 4.7,
+          "min": -1.0,
+          "name": "rstb_min",
+          "pass": true,
+          "reason": "",
+          "unit": "V",
+          "value": -2.57344e-05
+        }
+      ],
+      "ngspice_exit": 0,
+      "pass": true,
+      "process": "fs",
+      "supply_v": 3.63,
+      "temperature_c": 27.0,
+      "timed_out": false,
+      "timeout_s": 300
+    },
+    {
+      "batch_status": "pass",
+      "corner_id": "fs_125c_2.97v",
+      "diagnostics": [],
+      "elapsed_s": 2.922,
+      "killed_by_signal": null,
+      "killed_by_signal_name": null,
+      "log": "sim/.work/.stage/por-output-chain-deglitch/20261114-193311-94b18bbe/fs_125c_2.97v.log",
+      "measurements": [
+        {
+          "expr": "1e-2 - 2e-3 - integ(v(resetn) gt 1.65)[length(v(resetn))-1]",
+          "max": 0.004,
+          "min": 0.0005,
+          "name": "release_delay",
+          "pass": true,
+          "reason": "",
+          "unit": "s",
+          "value": 0.001806943
+        },
+        {
+          "expr": "1e-2 - integ(v(resetn) gt 1.65)[length(v(resetn))-1]",
+          "max": 0.006,
+          "min": 0.0022,
+          "name": "t_release",
+          "pass": true,
+          "reason": "",
+          "unit": "s",
+          "value": 0.003806943
+        },
+        {
+          "expr": "maximum(v(resetn))",
+          "max": 3.8,
+          "min": 1.8,
+          "name": "rstn_released",
+          "pass": true,
+          "reason": "",
+          "unit": "V",
+          "value": 2.76625
+        },
+        {
+          "expr": "minimum(v(resetn))",
+          "max": 0.01,
+          "min": -0.05,
+          "name": "rstn_asserted",
+          "pass": true,
+          "reason": "",
+          "unit": "V",
+          "value": -7.73061e-06
+        },
+        {
+          "expr": "maximum(v(xdut.tim))",
+          "max": 4.7,
+          "min": -1.0,
+          "name": "tim_max",
+          "pass": true,
+          "reason": "",
+          "unit": "V",
+          "value": 2.969826
+        },
+        {
+          "expr": "minimum(v(xdut.tim))",
+          "max": 4.7,
+          "min": -1.0,
+          "name": "tim_min",
+          "pass": true,
+          "reason": "",
+          "unit": "V",
+          "value": -0.00188317
+        },
+        {
+          "expr": "maximum(v(xdut.ndg))",
+          "max": 4.7,
+          "min": -1.0,
+          "name": "ndg_max",
+          "pass": true,
+          "reason": "",
+          "unit": "V",
+          "value": 2.988502
+        },
+        {
+          "expr": "minimum(v(xdut.ndg))",
+          "max": 4.7,
+          "min": -1.0,
+          "name": "ndg_min",
+          "pass": true,
+          "reason": "",
+          "unit": "V",
+          "value": -0.000341232
+        },
+        {
+          "expr": "maximum(v(xdut.trip))",
+          "max": 4.7,
+          "min": -1.0,
+          "name": "trip_max",
+          "pass": true,
+          "reason": "",
+          "unit": "V",
+          "value": 3.010027
+        },
+        {
+          "expr": "minimum(v(xdut.trip))",
+          "max": 4.7,
+          "min": -1.0,
+          "name": "trip_min",
+          "pass": true,
+          "reason": "",
+          "unit": "V",
+          "value": -6.04539e-05
+        },
+        {
+          "expr": "maximum(v(xdut.rstb))",
+          "max": 4.7,
+          "min": -1.0,
+          "name": "rstb_max",
+          "pass": true,
+          "reason": "",
+          "unit": "V",
+          "value": 2.970054
+        },
+        {
+          "expr": "minimum(v(xdut.rstb))",
+          "max": 4.7,
+          "min": -1.0,
+          "name": "rstb_min",
+          "pass": true,
+          "reason": "",
+          "unit": "V",
+          "value": -8.89746e-05
+        }
+      ],
+      "ngspice_exit": 0,
+      "pass": true,
+      "process": "fs",
+      "supply_v": 2.97,
+      "temperature_c": 125.0,
+      "timed_out": false,
+      "timeout_s": 300
+    },
+    {
+      "batch_status": "pass",
+      "corner_id": "fs_125c_3.30v",
+      "diagnostics": [],
+      "elapsed_s": 2.921,
+      "killed_by_signal": null,
+      "killed_by_signal_name": null,
+      "log": "sim/.work/.stage/por-output-chain-deglitch/20261114-193311-94b18bbe/fs_125c_3.30v.log",
+      "measurements": [
+        {
+          "expr": "1e-2 - 2e-3 - integ(v(resetn) gt 1.65)[length(v(resetn))-1]",
+          "max": 0.004,
+          "min": 0.0005,
+          "name": "release_delay",
+          "pass": true,
+          "reason": "",
+          "unit": "s",
+          "value": 0.00202496
+        },
+        {
+          "expr": "1e-2 - integ(v(resetn) gt 1.65)[length(v(resetn))-1]",
+          "max": 0.006,
+          "min": 0.0022,
+          "name": "t_release",
+          "pass": true,
+          "reason": "",
+          "unit": "s",
+          "value": 0.00402496
+        },
+        {
+          "expr": "maximum(v(resetn))",
+          "max": 3.8,
+          "min": 1.8,
+          "name": "rstn_released",
+          "pass": true,
+          "reason": "",
+          "unit": "V",
+          "value": 3.07572
+        },
+        {
+          "expr": "minimum(v(resetn))",
+          "max": 0.01,
+          "min": -0.05,
+          "name": "rstn_asserted",
+          "pass": true,
+          "reason": "",
+          "unit": "V",
+          "value": -7.57324e-06
+        },
+        {
+          "expr": "maximum(v(xdut.tim))",
+          "max": 4.7,
+          "min": -1.0,
+          "name": "tim_max",
+          "pass": true,
+          "reason": "",
+          "unit": "V",
+          "value": 3.299822
+        },
+        {
+          "expr": "minimum(v(xdut.tim))",
+          "max": 4.7,
+          "min": -1.0,
+          "name": "tim_min",
+          "pass": true,
+          "reason": "",
+          "unit": "V",
+          "value": -0.00178372
+        },
+        {
+          "expr": "maximum(v(xdut.ndg))",
+          "max": 4.7,
+          "min": -1.0,
+          "name": "ndg_max",
+          "pass": true,
+          "reason": "",
+          "unit": "V",
+          "value": 3.300842
+        },
+        {
+          "expr": "minimum(v(xdut.ndg))",
+          "max": 4.7,
+          "min": -1.0,
+          "name": "ndg_min",
+          "pass": true,
+          "reason": "",
+          "unit": "V",
+          "value": -0.000592691
+        },
+        {
+          "expr": "maximum(v(xdut.trip))",
+          "max": 4.7,
+          "min": -1.0,
+          "name": "trip_max",
+          "pass": true,
+          "reason": "",
+          "unit": "V",
+          "value": 3.343391
+        },
+        {
+          "expr": "minimum(v(xdut.trip))",
+          "max": 4.7,
+          "min": -1.0,
+          "name": "trip_min",
+          "pass": true,
+          "reason": "",
+          "unit": "V",
+          "value": -5.62846e-05
+        },
+        {
+          "expr": "maximum(v(xdut.rstb))",
+          "max": 4.7,
+          "min": -1.0,
+          "name": "rstb_max",
+          "pass": true,
+          "reason": "",
+          "unit": "V",
+          "value": 3.300052
+        },
+        {
+          "expr": "minimum(v(xdut.rstb))",
+          "max": 4.7,
+          "min": -1.0,
+          "name": "rstb_min",
+          "pass": true,
+          "reason": "",
+          "unit": "V",
+          "value": -0.000131475
+        }
+      ],
+      "ngspice_exit": 0,
+      "pass": true,
+      "process": "fs",
+      "supply_v": 3.3,
+      "temperature_c": 125.0,
+      "timed_out": false,
+      "timeout_s": 300
+    },
+    {
+      "batch_status": "pass",
+      "corner_id": "fs_125c_3.63v",
+      "diagnostics": [],
+      "elapsed_s": 2.872,
+      "killed_by_signal": null,
+      "killed_by_signal_name": null,
+      "log": "sim/.work/.stage/por-output-chain-deglitch/20261114-193311-94b18bbe/fs_125c_3.63v.log",
+      "measurements": [
+        {
+          "expr": "1e-2 - 2e-3 - integ(v(resetn) gt 1.65)[length(v(resetn))-1]",
+          "max": 0.004,
+          "min": 0.0005,
+          "name": "release_delay",
+          "pass": true,
+          "reason": "",
+          "unit": "s",
+          "value": 0.002233832
+        },
+        {
+          "expr": "1e-2 - integ(v(resetn) gt 1.65)[length(v(resetn))-1]",
+          "max": 0.006,
+          "min": 0.0022,
+          "name": "t_release",
+          "pass": true,
+          "reason": "",
+          "unit": "s",
+          "value": 0.004233832
+        },
+        {
+          "expr": "maximum(v(resetn))",
+          "max": 3.8,
+          "min": 1.8,
+          "name": "rstn_released",
+          "pass": true,
+          "reason": "",
+          "unit": "V",
+          "value": 3.383979
+        },
+        {
+          "expr": "minimum(v(resetn))",
+          "max": 0.01,
+          "min": -0.05,
+          "name": "rstn_asserted",
+          "pass": true,
+          "reason": "",
+          "unit": "V",
+          "value": -7.51854e-06
+        },
+        {
+          "expr": "maximum(v(xdut.tim))",
+          "max": 4.7,
+          "min": -1.0,
+          "name": "tim_max",
+          "pass": true,
+          "reason": "",
+          "unit": "V",
+          "value": 3.629817
+        },
+        {
+          "expr": "minimum(v(xdut.tim))",
+          "max": 4.7,
+          "min": -1.0,
+          "name": "tim_min",
+          "pass": true,
+          "reason": "",
+          "unit": "V",
+          "value": -0.00188003
+        },
+        {
+          "expr": "maximum(v(xdut.ndg))",
+          "max": 4.7,
+          "min": -1.0,
+          "name": "ndg_max",
+          "pass": true,
+          "reason": "",
+          "unit": "V",
+          "value": 3.645872
+        },
+        {
+          "expr": "minimum(v(xdut.ndg))",
+          "max": 4.7,
+          "min": -1.0,
+          "name": "ndg_min",
+          "pass": true,
+          "reason": "",
+          "unit": "V",
+          "value": 0.007228719
+        },
+        {
+          "expr": "maximum(v(xdut.trip))",
+          "max": 4.7,
+          "min": -1.0,
+          "name": "trip_max",
+          "pass": true,
+          "reason": "",
+          "unit": "V",
+          "value": 3.675846
+        },
+        {
+          "expr": "minimum(v(xdut.trip))",
+          "max": 4.7,
+          "min": -1.0,
+          "name": "trip_min",
+          "pass": true,
+          "reason": "",
+          "unit": "V",
+          "value": -5.33027e-05
+        },
+        {
+          "expr": "maximum(v(xdut.rstb))",
+          "max": 4.7,
+          "min": -1.0,
+          "name": "rstb_max",
+          "pass": true,
+          "reason": "",
+          "unit": "V",
+          "value": 3.63005
+        },
+        {
+          "expr": "minimum(v(xdut.rstb))",
+          "max": 4.7,
+          "min": -1.0,
+          "name": "rstb_min",
+          "pass": true,
+          "reason": "",
+          "unit": "V",
+          "value": -3.93467e-05
+        }
+      ],
+      "ngspice_exit": 0,
+      "pass": true,
+      "process": "fs",
+      "supply_v": 3.63,
+      "temperature_c": 125.0,
+      "timed_out": false,
+      "timeout_s": 300
+    }
+  ],
+  "experiment": {
+    "claim": "Issue #349 -- NOT a spec claim (no deglitch or reset-pulse-width target exists anywhere in spec/; design/por_output_chain.md and DR-003 Sec8 both defer any such number). Closes the second clause of the characterization report's gap 3: por_output_chain previously had NO cell-level record at all -- it was exercised only inside the whole-block campaigns (E9-E11, E14), where its behaviour is mixed with the non-physical solver branches those campaigns report, and its deglitch delay, RESETn asserted level and short-pulse behaviour were measured nowhere on their own. This experiment drives the UNCHANGED design/por_output_chain.sym from ideal comparator and bias inputs (a constant 1 uA into IBIAS, one POR_RAW PWL: a sub-deglitch pulse first, a settle gap, then the real trip) at every point of the full 45-point PVT matrix and records, per point: the delay from the POR_RAW trip to RESETn's release, the absolute release time, the released and asserted RESETn levels, and rail-band physicality guards on the four internal nodes (TIM, NDG, TRIP, RSTB) that carry the deglitch/one-shot mechanism. The sub-deglitch pulse is rejected BY CONSTRUCTION of the stimulus ordering -- the real trip is the last edge, so a release delayed by the normal deglitch time after the trip proves the earlier pulse contributed nothing -- and the release-delay window excludes a glitch-honoring reading outright (it would precede the trip and read negative). The 1 uA ideal bias is the same convention sim/iq-top's ideal-bias variant uses and is in the range bias_core actually delivers (0.78-1.2 uA across the matrix, sim/bias-core-startup and the glitch-top delivered-bias measurement); it is NOT the shared-bias assembly, and nothing here claims the cell behaves identically under real bias_core drive.",
+    "provenance": "schematic",
+    "provenance_source": "sim/por-output-chain-deglitch/testbench/tb_por_output_chain_deglitch.sch",
+    "slug": "por-output-chain-deglitch",
+    "statistical_convention": "N/A (corner-matrix check, not a distribution claim)",
+    "title": "por_output_chain cell-level deglitch/one-shot transient: sub-deglitch pulse rejection and RESETn release delay over the full PVT matrix, ideal bias and ideal POR_RAW stimulus"
+  },
+  "git": {
+    "branch": "feature/issue-349",
+    "dirty": true,
+    "sha": "94b18bbe"
+  },
+  "links": {
+    "artifact_manifest": "manifests/artifacts/por-output-chain-deglitch-20261114-193311-94b18bbe.manifest.json",
+    "artifact_summary": "manifests/artifacts/por-output-chain-deglitch-20261114-193311-94b18bbe.summary.md",
+    "json": "sim/por-output-chain-deglitch/records/20261114-193311-94b18bbe.json",
+    "manifest": "sim/por-output-chain-deglitch/experiment.json",
+    "netlist_snapshot": "sim/por-output-chain-deglitch/netlist-snapshots/20261114-193311-94b18bbe.spice",
+    "record": "sim/por-output-chain-deglitch/records/20261114-193311-94b18bbe.md",
+    "testbench": "sim/por-output-chain-deglitch/testbench/tb_por_output_chain_deglitch.sch"
+  },
+  "matrix": {
+    "is_subset": false,
+    "n_points": 45,
+    "point_ids": [
+      "tt_-40c_2.97v",
+      "tt_-40c_3.30v",
+      "tt_-40c_3.63v",
+      "tt_27c_2.97v",
+      "tt_27c_3.30v",
+      "tt_27c_3.63v",
+      "tt_125c_2.97v",
+      "tt_125c_3.30v",
+      "tt_125c_3.63v",
+      "ss_-40c_2.97v",
+      "ss_-40c_3.30v",
+      "ss_-40c_3.63v",
+      "ss_27c_2.97v",
+      "ss_27c_3.30v",
+      "ss_27c_3.63v",
+      "ss_125c_2.97v",
+      "ss_125c_3.30v",
+      "ss_125c_3.63v",
+      "ff_-40c_2.97v",
+      "ff_-40c_3.30v",
+      "ff_-40c_3.63v",
+      "ff_27c_2.97v",
+      "ff_27c_3.30v",
+      "ff_27c_3.63v",
+      "ff_125c_2.97v",
+      "ff_125c_3.30v",
+      "ff_125c_3.63v",
+      "sf_-40c_2.97v",
+      "sf_-40c_3.30v",
+      "sf_-40c_3.63v",
+      "sf_27c_2.97v",
+      "sf_27c_3.30v",
+      "sf_27c_3.63v",
+      "sf_125c_2.97v",
+      "sf_125c_3.30v",
+      "sf_125c_3.63v",
+      "fs_-40c_2.97v",
+      "fs_-40c_3.30v",
+      "fs_-40c_3.63v",
+      "fs_27c_2.97v",
+      "fs_27c_3.30v",
+      "fs_27c_3.63v",
+      "fs_125c_2.97v",
+      "fs_125c_3.30v",
+      "fs_125c_3.63v"
+    ],
+    "points": [
+      [
+        "tt",
+        -40.0,
+        2.97
+      ],
+      [
+        "tt",
+        -40.0,
+        3.3
+      ],
+      [
+        "tt",
+        -40.0,
+        3.63
+      ],
+      [
+        "tt",
+        27.0,
+        2.97
+      ],
+      [
+        "tt",
+        27.0,
+        3.3
+      ],
+      [
+        "tt",
+        27.0,
+        3.63
+      ],
+      [
+        "tt",
+        125.0,
+        2.97
+      ],
+      [
+        "tt",
+        125.0,
+        3.3
+      ],
+      [
+        "tt",
+        125.0,
+        3.63
+      ],
+      [
+        "ss",
+        -40.0,
+        2.97
+      ],
+      [
+        "ss",
+        -40.0,
+        3.3
+      ],
+      [
+        "ss",
+        -40.0,
+        3.63
+      ],
+      [
+        "ss",
+        27.0,
+        2.97
+      ],
+      [
+        "ss",
+        27.0,
+        3.3
+      ],
+      [
+        "ss",
+        27.0,
+        3.63
+      ],
+      [
+        "ss",
+        125.0,
+        2.97
+      ],
+      [
+        "ss",
+        125.0,
+        3.3
+      ],
+      [
+        "ss",
+        125.0,
+        3.63
+      ],
+      [
+        "ff",
+        -40.0,
+        2.97
+      ],
+      [
+        "ff",
+        -40.0,
+        3.3
+      ],
+      [
+        "ff",
+        -40.0,
+        3.63
+      ],
+      [
+        "ff",
+        27.0,
+        2.97
+      ],
+      [
+        "ff",
+        27.0,
+        3.3
+      ],
+      [
+        "ff",
+        27.0,
+        3.63
+      ],
+      [
+        "ff",
+        125.0,
+        2.97
+      ],
+      [
+        "ff",
+        125.0,
+        3.3
+      ],
+      [
+        "ff",
+        125.0,
+        3.63
+      ],
+      [
+        "sf",
+        -40.0,
+        2.97
+      ],
+      [
+        "sf",
+        -40.0,
+        3.3
+      ],
+      [
+        "sf",
+        -40.0,
+        3.63
+      ],
+      [
+        "sf",
+        27.0,
+        2.97
+      ],
+      [
+        "sf",
+        27.0,
+        3.3
+      ],
+      [
+        "sf",
+        27.0,
+        3.63
+      ],
+      [
+        "sf",
+        125.0,
+        2.97
+      ],
+      [
+        "sf",
+        125.0,
+        3.3
+      ],
+      [
+        "sf",
+        125.0,
+        3.63
+      ],
+      [
+        "fs",
+        -40.0,
+        2.97
+      ],
+      [
+        "fs",
+        -40.0,
+        3.3
+      ],
+      [
+        "fs",
+        -40.0,
+        3.63
+      ],
+      [
+        "fs",
+        27.0,
+        2.97
+      ],
+      [
+        "fs",
+        27.0,
+        3.3
+      ],
+      [
+        "fs",
+        27.0,
+        3.63
+      ],
+      [
+        "fs",
+        125.0,
+        2.97
+      ],
+      [
+        "fs",
+        125.0,
+        3.3
+      ],
+      [
+        "fs",
+        125.0,
+        3.63
+      ]
+    ],
+    "process": [
+      "tt",
+      "ss",
+      "ff",
+      "sf",
+      "fs"
+    ],
+    "subset_reason": "",
+    "supply_v": [
+      2.97,
+      3.3,
+      3.63
+    ],
+    "temperature_c": [
+      -40.0,
+      27.0,
+      125.0
+    ]
+  },
+  "overall_pass": true,
+  "pdk": {
+    "fleet_matches_pin": "match",
+    "fleet_pin_limit": "an equal open_pdks commit is not proof that the runner's model library is byte-identical to this host's -- it identifies the open_pdks build, not a hash of the `sky130.lib.spice` the runner loaded, and the only model-library hash a klt report carries (`environment.models_lib_sha256`) is client-scope (`models_lib_sha256_scope: \"client\"`), taken on the submitting host, so it is not fleet-side evidence about the runner's library",
+    "installed_commit": "f6eeac7dad085ffcc829ccfd721f7b4ce39edcf7",
+    "lib_file": "libs.tech/combined/sky130.lib.spice (resolved on the runner)",
+    "local_installed_commit": "f6eeac7dad085ffcc829ccfd721f7b4ce39edcf7",
+    "matches_pin": true,
+    "pinned_commit": "f6eeac7dad085ffcc829ccfd721f7b4ce39edcf7",
+    "root": "/home/ubuntu/.ciel",
+    "variant": "sky130A"
+  },
+  "record_id": "20261114-193311-94b18bbe",
+  "spread_checks": [
+    {
+      "measurement": "release_delay",
+      "min_spread": 0.0001,
+      "n": 45,
+      "note": "Corner-blindness guard, same convention as sim/bias-core-startup/'s own vref spread check: if every corner returns the same release delay, the .lib/.temp injection is not taking effect. The delay is set by current-starved charging of CDG/CTIM against corner- and temperature-dependent thresholds and a supply-dependent gate overdrive, so its spread across a 5x3x3 matrix should be far above this 100 us floor; 100 us is also 1/5 of the smallest release_delay window width, so a corner-blind harness fails the spread check before any window boundary artifact could mask it.",
+      "observed_spread": 0.0016096900999999998,
+      "pass": true,
+      "reason": ""
+    }
+  ],
+  "supersedes": "",
+  "timestamp": "2026-11-14T19:33:11Z",
+  "tools": {
+    "ngspice": "ngspice 47 (fleet)",
+    "platform": "Linux 7.0.0-1014-aws x86_64",
+    "python": "3.12.3",
+    "xschem": "XSCHEM V3.4.7"
+  }
+}

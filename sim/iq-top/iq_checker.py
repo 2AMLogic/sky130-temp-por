@@ -15,7 +15,6 @@ can never be graded ``ok``.
 
 from __future__ import annotations
 
-import gzip
 import json
 import math
 import sys
