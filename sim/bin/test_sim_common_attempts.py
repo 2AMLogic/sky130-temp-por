@@ -146,6 +146,19 @@ class ClassifyErrorTest(unittest.TestCase):
     def test_all_codes_none(self):
         self.assertEqual(sc.classify_error({"diagnostics": [{"code": None}]}, ""), "error:")
 
+    def test_timestep_too_small_from_log(self):
+        self.assertEqual(sc.classify_error({}, "TRAN: timestep too small; trouble with node vdd"),
+                         "timestep_too_small")
+
+    def test_timestep_branch_sits_between_model_and_codes(self):
+        # iq's own precedence, preserved on consolidation: model_not_found wins
+        # when the log carries both strings, and a diagnostic code cannot
+        # out-rank the timestep branch.
+        self.assertEqual(sc.classify_error({}, "could not find a valid modelname ... timestep too small"),
+                         "model_not_found")
+        corner = {"diagnostics": [{"code": "measurement,timeout"}]}
+        self.assertEqual(sc.classify_error(corner, "timestep too small"), "timestep_too_small")
+
 
 class PointLogTest(unittest.TestCase):
     def test_sections_and_missing_artifacts(self):

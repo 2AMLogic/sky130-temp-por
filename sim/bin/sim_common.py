@@ -513,6 +513,8 @@ def classify_error(corner: dict, log_text: str) -> str:
     """`error_class` for a corner that produced no usable result (display only, never a grade)."""
     if "could not find a valid modelname" in log_text:
         return "model_not_found"
+    if "timestep too small" in log_text.lower():
+        return "timestep_too_small"
     codes = [d.get("code") for d in corner.get("diagnostics", [])]
     if any(c and "timeout" in c for c in codes):
         return "timeout"
