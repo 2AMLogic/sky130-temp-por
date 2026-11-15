@@ -181,6 +181,27 @@ sys.exit(2)
 '''
 
 
+# Every `sim/*/run_*.py`, and the argv that must fail closed when the broker is unset.
+# `run`/`record` subcommand drivers check in both; the two single-command runners check
+# first thing in `main()`, so a bare invocation is the gate. `probe` / `--probe` /
+# `--dry-run` submit nothing and write no record, so they are deliberately not listed.
+_STAGES = [["run"], ["record", "--run-id", "selftest-none"]]
+DRIVER_ARGV: dict[str, list[list[str]]] = {
+    "run_brownout_campaign.py": _STAGES,
+    "run_glitch_campaign.py": _STAGES,
+    "run_iq_campaign.py": _STAGES,
+    "run_iq_sensitivity.py": _STAGES,
+    "run_thresholds_campaign.py": _STAGES,
+    "run_ramp_campaign.py": _STAGES,
+    "run_reassert_diagnosis.py": _STAGES,
+    "run_solver_sweep.py": _STAGES,
+    "run_accuracy_mc.py": _STAGES + [["compare", "--run-id", "selftest-none"]],
+    # single-command runners: one invocation does run + record
+    "run_op_branch.py": [[]],
+    "run_pnp_mismatch.py": [[]],
+}
+
+
 def selftest() -> int:
     global MANIFEST_DIR, STAGE_ROOT
     failures: list[str] = []
@@ -269,14 +290,19 @@ def selftest() -> int:
                   raises_exit(lambda: store_or_exit("b", "r4", stage4))
                   and not manifest_path("b", "r4").exists())
 
-            # Every campaign driver refuses to submit or record without the
-            # broker, before touching anything (no fleet job, no files).
+            # EVERY sim runner refuses to submit or record without the broker, before
+            # touching anything (no fleet job, no files). The table is checked against
+            # the tree below, so a new `sim/*/run_*.py` cannot skip this gate silently.
             env = {k: v for k, v in os.environ.items() if k != BROKER_ENV}
-            for drv in sorted(REPO_ROOT.glob("sim/*/run_*_campaign.py")):
-                for argv in (["run"], ["record", "--run-id", "selftest-none"]):
+            found = {p.name for p in REPO_ROOT.glob("sim/*/run_*.py")}
+            check("every sim/*/run_*.py is covered by the fail-closed matrix",
+                  found == set(DRIVER_ARGV),
+                  f"uncovered {sorted(found - set(DRIVER_ARGV))}, stale {sorted(set(DRIVER_ARGV) - found)}")
+            for drv in sorted(REPO_ROOT.glob("sim/*/run_*.py")):
+                for argv in DRIVER_ARGV.get(drv.name, ()):
                     proc = subprocess.run([sys.executable, "-I", str(drv), *argv],
                                           capture_output=True, text=True, env=env, timeout=120)
-                    check(f"{drv.parent.name} `{argv[0]}` fails closed without the broker",
+                    check(f"{drv.parent.name}/{drv.name} `{' '.join(argv) or '(no subcommand)'}` fails closed without the broker",
                           proc.returncode != 0 and BROKER_ENV in (proc.stderr + proc.stdout),
                           (proc.stderr or proc.stdout)[-200:])
 

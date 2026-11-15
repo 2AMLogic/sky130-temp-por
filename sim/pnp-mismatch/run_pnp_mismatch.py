@@ -76,6 +76,7 @@ DECK = HERE / "testbench" / "tb_pnp_mismatch.spice"
 BUILD_DIR = SIM_DIR / "build" / "pnp-mismatch"
 
 sys.path.insert(0, str(SIM_DIR / "bin"))
+import evidence_store  # noqa: E402
 import sim_common  # noqa: E402
 from sim_common import (  # noqa: E402
     MismatchPoint,
@@ -729,6 +730,11 @@ def render_record(r: dict) -> str:
     add("- **Links**:")
     for key, value in r["links"].items():
         add(f"  - {key}: `{value}`")
+    add(
+        "  - the raw per-point ngspice logs (`<corner-id>.log`) and the klt deck report "
+        "(`batch/report.json`) are stored objects of `artifact_manifest`, not tracked "
+        f"files; check the bytes with `klt artifact verify {r['links']['artifact_manifest']}`"
+    )
     add(f"- **Timestamp / author**: {r['timestamp']}, {r['author']}")
     add(f"- **Supersedes**: {r['supersedes'] or '(none — first record for this claim)'}")
     add("")
@@ -814,6 +820,10 @@ def run_probe(args, pdk, points: list[Point]) -> int:
 
 def main(argv: list[str]) -> int:
     args = parse_args(argv)
+    if not (args.dry_run or args.probe):
+        # Fail closed before anything is submitted: new evidence goes to the artifact
+        # store and there is no fallback that commits raw bytes (sim/README.md).
+        evidence_store.preflight_or_exit()
     if not DECK.is_file():
         raise cr.HarnessError(f"missing testbench: {DECK}")
     if args.samples < 2:
@@ -838,15 +848,16 @@ def main(argv: list[str]) -> int:
 
     records_dir = HERE / "records"
     snapshots_dir = HERE / "netlist-snapshots"
-    corners_dir = HERE / "corners" / record_id
+    # Raw per-point logs stage in git-ignored scratch and are stored in the fleet
+    # artifact store below; only the manifest and its summary are committed.
+    corners_dir = evidence_store.stage_dir_for(SLUG, record_id)
+    art_manifest_path = evidence_store.manifest_path(SLUG, record_id)
     record_md = records_dir / f"{record_id}.md"
     record_json = records_dir / f"{record_id}.json"
     snapshot = snapshots_dir / f"{record_id}.spice"
-    for path in (record_md, record_json, snapshot, corners_dir):
-        if path.exists():
-            raise cr.HarnessError(
-                f"{path} already exists — sim/ is append-only, refusing to overwrite"
-            )
+    sim_common.refuse_existing(
+        (record_md, record_json, snapshot, corners_dir, art_manifest_path)
+    )
 
     request, files = build_request(points, pdk, "batch", args)
     run_dir = BUILD_DIR / record_id
@@ -931,6 +942,10 @@ def main(argv: list[str]) -> int:
         )
 
     sim_common.snapshot_deck_request(submit_dir, corners_dir, run_dir, REPO_ROOT)
+
+    # Store the staged bytes first: on failure nothing is written under
+    # sim/pnp-mismatch/ or manifests/ and the bytes stay for a retry.
+    art_manifest, art_summary = evidence_store.store_or_exit(SLUG, record_id, corners_dir)
 
     cross = seed_stability(results)
     overall = all(r["pass"] for r in ordered) and all(c["pass"] for c in cross)
@@ -1037,8 +1052,8 @@ def main(argv: list[str]) -> int:
             "testbench": str(DECK.relative_to(REPO_ROOT)),
             "run_script": str((HERE / "run_pnp_mismatch.py").relative_to(REPO_ROOT)),
             "netlist_snapshot": str(snapshot.relative_to(REPO_ROOT)),
-            "raw_logs": str(corners_dir.relative_to(REPO_ROOT)) + "/",
-            "klt_report": str((corners_dir / "batch" / "report.json").relative_to(REPO_ROOT)),
+            "artifact_manifest": str(art_manifest.relative_to(REPO_ROOT)),
+            "artifact_summary": str(art_summary.relative_to(REPO_ROOT)),
             "json_record": str(record_json.relative_to(REPO_ROOT)),
             "record": str(record_md.relative_to(REPO_ROOT)),
         },
@@ -1051,7 +1066,7 @@ def main(argv: list[str]) -> int:
     print()
     print(f"record  : {record_md.relative_to(REPO_ROOT)}")
     print(f"json    : {record_json.relative_to(REPO_ROOT)}")
-    print(f"logs    : {corners_dir.relative_to(REPO_ROOT)}/")
+    print(f"logs    : stored; {art_manifest.relative_to(REPO_ROOT)}")
     print(f"overall : {'PASS' if overall else 'FAIL'}")
     return 0 if overall else 2
 
