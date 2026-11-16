@@ -30,7 +30,14 @@ may hand-write the `Timestamp / author` or `Supersedes` bullet.
 
 The committed records under `sim/*/records/` are the end-to-end corpus: each one that
 its renderer can still re-render is re-rendered from its own `.json` twin and its
-trailer checked against the helper.  Nothing is written, and no record is rewritten.
+trailer checked against the helper.  A record whose renderer resolves a later-added
+key by hard subscript cannot re-render at all; those stay valid committed evidence and
+are pinned -- missing key and reason -- in `RENDER_EXCLUSIONS` below, a registry
+guarded in both directions so the next retroactive breakage (a renderer gaining a
+hard subscript, which breaks records already committed) is named rather than absorbed.
+Renderers the registry strips of all their records keep trailer coverage through a
+synthetic fixture doc built in this file.  Nothing is written, and no record is
+rewritten.
 
 Stdlib only: no SPICE, no PDK, no fleet, no records written.
 
@@ -39,7 +46,6 @@ Run: python3 -I sim/bin/test_record_footer.py
 
 from __future__ import annotations
 
-import copy
 import json
 import re
 import sys
@@ -92,21 +98,107 @@ WRITTEN_BY = re.compile(r"^Written by `([^` ]+)(?: (\w+))?`\. ", re.M)
 LINKS_HEAD = re.compile(r"^(## Links|- \*\*Links\*\*:)$", re.M)
 LINK_BULLET = re.compile(r"^ {0,2}- [^*]")
 
-# Records whose `links` carry no artifact-store entries at all.  Three renderers resolve
-# `artifact_manifest` / `artifact_summary` by hard key -- `corner-run.py` above the
-# trailer, `run_op_branch.py` / `run_pnp_mismatch.py` in the trailer's artifact-store
-# prose -- so none of them can re-render a pre-store record, before or after this
-# consolidation (the lookups are unchanged here).  These two keys are supplied (paths
-# only, no measurement invented) so those trailers stay covered at all.
-ARTIFACT_LINK_BACKFILL = {
-    "artifact_manifest": "sim/bias-core-smoke/artifacts/manifest.json",
-    "artifact_summary": "sim/bias-core-smoke/artifacts/summary.md",
+# Records that cannot be re-rendered from their own raw `.json` twin: the renderer
+# that wrote them resolves a `links` or record key by hard subscript, and the record
+# predates that key.  Each one is still valid committed evidence -- append-only means
+# nothing here repairs it -- so it is excluded from the round-trip walk below, and the
+# exclusion is pinned with the missing key and the reason.  The registry is guarded in
+# both directions by `test_the_exclusion_registry_matches_the_corpus_exactly`, so it
+# can neither silently grow nor rot:
+#
+#   * a record that raises and is NOT listed fails the test, naming the record and
+#     the key (the old mechanism here was an absorbed `except KeyError: continue`);
+#   * an entry that no longer raises fails as a stale allowlist entry; and
+#   * the corpus floor is derived from this table's length, so a renderer change that
+#     breaks one record cannot net out against another that was fixed.
+#
+# The set is OPEN, and that is the point: growth comes from a RENDERER gaining a hard
+# subscript, which retroactively breaks records already committed -- exactly how the
+# two 20261113-160939 entries joined (commit 7023a693, PR #336, added the trailer's
+# artifact-store prose the day after those records were committed, and PR #366's
+# review absorbed the breakage by widening a backfill while its floor never moved).
+# Re-measure before editing: run this file and read the failure, never copy a count.
+RENDER_EXCLUSIONS: dict[str, tuple[str, str]] = {
+    # record path: (missing key, why the record lacks it)
+
+    # Predating the batch backend: the record body has no `batch` block, and the
+    # renderer resolves it by hard key while building the deck-list clause.
+    "sim/bias-core-op-branch/records/20260826-001526-f4f73a5.md": (
+        "batch", "predates the batch backend; run_op_branch.py resolves r['batch'] by hard key"),
+    "sim/pnp-mismatch/records/20260825-220116-a9cac4b.md": (
+        "batch", "predates the batch backend; run_pnp_mismatch.py resolves r['batch'] by hard key"),
+
+    # Committed 2026-11-13 by the pre-artifact-store renderer vintage (links carry
+    # klt_report / points_dir, not artifact_manifest / artifact_summary); 7023a693
+    # added the trailer's artifact-store prose -- with its hard subscript -- the next
+    # day, retroactively breaking them.
+    "sim/bias-core-op-branch/records/20261113-160939-9211b20a.md": (
+        "artifact_manifest",
+        "committed by the pre-artifact-store renderer vintage; 7023a693 (PR #336) added "
+        "the hard subscript in the trailer's artifact-store prose the day after"),
+    "sim/pnp-mismatch/records/20261113-160939-9211b20a.md": (
+        "artifact_manifest",
+        "committed by the pre-artifact-store renderer vintage; 7023a693 (PR #336) added "
+        "the hard subscript in the trailer's artifact-store prose the day after"),
+
+    # Pre-artifact-store `corner-run.py` records: `links` carry `corners_dir`/`manifest`
+    # instead, and corner-run.py resolves `links['artifact_manifest']` (and its summary
+    # twin) by hard key since the artifact store landed (1285ef82).  One of these was
+    # committed 38 minutes AFTER that commit by a worktree branched before it -- a
+    # record's schema vintage is not derivable from its own timestamp, which is why
+    # these are pinned by path rather than inferred by date.
+    "sim/bias-core-smoke/records/20260825-214036-a9cac4b.md": (
+        "artifact_manifest",
+        "links predate the artifact store; corner-run.py resolves links['artifact_manifest'] by hard key"),
+    "sim/bias-core-smoke/records/20261023-171642-e69f5b2e.md": (
+        "artifact_manifest",
+        "written by a pre-artifact-store renderer vintage; corner-run.py resolves links['artifact_manifest'] by hard key"),
+    "sim/bias-core-startup/records/20260825-235846-f4f73a5.md": (
+        "artifact_manifest",
+        "links predate the artifact store; corner-run.py resolves links['artifact_manifest'] by hard key"),
+    "sim/bias-core-startup/records/20260826-005156-f4f73a5.md": (
+        "artifact_manifest",
+        "links predate the artifact store; corner-run.py resolves links['artifact_manifest'] by hard key"),
+    "sim/native-device-characterization/records/20260909-232337-c7b9b94.md": (
+        "artifact_manifest",
+        "links predate the artifact store; corner-run.py resolves links['artifact_manifest'] by hard key"),
+    "sim/temp-core-startup/records/20260826-053032-ee63b45.md": (
+        "artifact_manifest",
+        "links predate the artifact store; corner-run.py resolves links['artifact_manifest'] by hard key"),
+    "sim/temp-core-startup-en-delayed/records/20260826-054047-ee63b45.md": (
+        "artifact_manifest",
+        "links predate the artifact store; corner-run.py resolves links['artifact_manifest'] by hard key"),
 }
-HARD_ARTIFACT_KEY = (
-    "sim/bin/corner-run.py",
-    "sim/bias-core-op-branch/run_op_branch.py",
-    "sim/pnp-mismatch/run_pnp_mismatch.py",
-)
+
+# Renderers whose committed records are ALL in RENDER_EXCLUSIONS, mapped to a record
+# whose raw `.json` twin seeds a synthetic fixture doc for them.  The fixture is
+# trailer-coverage tooling, not a repair: `fixture_doc()` adds ONLY the missing
+# hard-subscript keys, with paths derived from that record's own experiment directory
+# and merged so any real value wins.  The committed record on disk stays byte-for-byte
+# as committed and still cannot re-render from its raw twin.
+FIXTURE_SEEDS: dict[str, str] = {
+    "sim/bias-core-op-branch/run_op_branch.py":
+        "sim/bias-core-op-branch/records/20261113-160939-9211b20a.md",
+    "sim/pnp-mismatch/run_pnp_mismatch.py":
+        "sim/pnp-mismatch/records/20261113-160939-9211b20a.md",
+}
+
+
+def fixture_doc(seed: str) -> dict:
+    """The seeded record's raw `.json` twin with the artifact-store link keys added.
+
+    The added paths are clearly synthetic (no such bytes are committed) and name the
+    record's OWN experiment, so the no-foreign-path contract below holds; the merge
+    order means a real value in the record's own `links` always wins.
+    """
+    md = REPO_ROOT / seed
+    doc = json.loads(md.with_suffix(".json").read_text())
+    experiment, record_id = seed.split("/")[1], md.stem
+    fixture_links = {
+        "artifact_manifest": f"sim/{experiment}/corners/{record_id}/batch/manifest.json",
+        "artifact_summary": f"sim/{experiment}/corners/{record_id}/batch/summary.md",
+    }
+    return {**doc, "links": {**fixture_links, **doc["links"]}}
 
 # The only bullets a call site may add to the trailer, both genuinely per-record:
 # `sim/glitch-top`'s "no bytes were stored because nothing was graded", and
@@ -139,9 +231,10 @@ def unlinked(lines: list[str]) -> list[str]:
 def committed_records() -> list[tuple[str, Path, dict]]:
     """`(renderer, md path, record document)` for every committed evidence record.
 
-    Self-test records are excluded: their trailer is `selftest_footer_lines()`'s, and the
-    three hand-written records (a fleet timeout, a local probe, a fleet refusal) have no
-    `.json` twin and no renderer at all.
+    The document is the raw `.json` twin, exactly as committed -- no key is injected
+    into it anywhere downstream.  Self-test records are excluded: their trailer is
+    `selftest_footer_lines()`'s, and the three hand-written records (a fleet timeout, a
+    local probe, a fleet refusal) have no `.json` twin and no renderer at all.
     """
     out = []
     for md in sorted(REPO_ROOT.glob("sim/*/records/*.md")):
@@ -155,11 +248,39 @@ def committed_records() -> list[tuple[str, Path, dict]]:
         name = name.removesuffix(" record")           # run_iq_sensitivity.py record
         if name not in RENDERERS:
             continue
-        doc = json.loads(js.read_text())
-        if name in HARD_ARTIFACT_KEY:
-            doc = copy.deepcopy(doc)
-            doc["links"] = {**doc["links"], **ARTIFACT_LINK_BACKFILL}
-        out.append((name, md, doc))
+        out.append((name, md, json.loads(js.read_text())))
+    return out
+
+
+def probe_broken(renderer_map: dict) -> dict[str, str]:
+    """`{record path: missing key}` for every committed record that raises KeyError
+    when its renderer is given the raw `.json` twin.  Any other exception propagates:
+    loud, the way a record-level failure should be.
+    """
+    broken = {}
+    for name, md, doc in committed_records():
+        render = renderer_map.get(name)
+        if render is None:
+            continue
+        try:
+            render(doc)
+        except KeyError as e:
+            broken[md.relative_to(REPO_ROOT).as_posix()] = e.args[0]
+    return broken
+
+
+def doc_strings(value) -> set[str]:
+    """Every string the record document itself carries, at any depth -- the paths a
+    trailer may legitimately name because the record itself says so."""
+    out: set[str] = set()
+    if isinstance(value, str):
+        out.add(value)
+    elif isinstance(value, dict):
+        for v in value.values():
+            out |= doc_strings(v)
+    elif isinstance(value, list):
+        for v in value:
+            out |= doc_strings(v)
     return out
 
 
@@ -337,48 +458,180 @@ class EveryRendererGoesThroughTheHelperTest(unittest.TestCase):
 class CommittedRecordsTest(unittest.TestCase):
     """End to end over the committed corpus: the trailer still reaches the record.
 
-    Re-rendered from each record's own `.json` twin; nothing is written and no committed
-    record is touched (`.github/scripts/check_records_append_only.py` enforces that
-    independently).
+    Every committed record is re-rendered from its own raw `.json` twin -- no
+    backfill, no key injected into a committed document.  A record whose renderer
+    resolves a later-added key by hard subscript cannot re-render; those are pinned
+    in `RENDER_EXCLUSIONS` with the missing key and the reason, and the registry is
+    guarded in both directions so the next retroactive breakage is named rather than
+    absorbed.  Nothing is written and no committed record is touched
+    (`.github/scripts/check_records_append_only.py` enforces that independently).
     """
 
-    def rendered(self) -> list[tuple[str, Path, str]]:
-        """Every committed record its renderer can still re-render.
+    SIM_PATH = re.compile(r"sim/[A-Za-z0-9][\w./-]*")
 
-        A record predating a schema field its renderer now resolves by hard key cannot be
-        re-rendered -- unrelated to the trailer, and it fails identically with or without
-        this consolidation -- so those are reported by
-        `test_the_corpus_covers_every_renderer_in_the_table` rather than silently dropped.
+    def test_the_exclusion_registry_matches_the_corpus_exactly(self):
+        """The ratchet, in both directions: the registry can neither silently grow
+        nor rot.
+
+        Growth: a renderer gaining a hard subscript retroactively breaks
+        already-committed records (7023a693 did it to two of these), and the old
+        mechanism here absorbed that silently.  Rot: an entry whose record re-renders
+        again is a stale allowlist entry; a changed key is an entry whose failure
+        mode moved; a path the corpus no longer has is a registry pointing nowhere.
+        """
+        corpus_paths = {md.relative_to(REPO_ROOT).as_posix()
+                        for _, md, _ in committed_records()}
+        broken = probe_broken(RENDERERS)
+        unregistered = {p: k for p, k in broken.items() if p not in RENDER_EXCLUSIONS}
+        self.assertEqual(
+            unregistered, {},
+            "a committed record raises KeyError and is not in RENDER_EXCLUSIONS -- a "
+            "renderer change retroactively broke it; pin it there with the key and the "
+            "reason, or fix the renderer:\n"
+            + "\n".join(f"  {p}: missing key {k!r}" for p, k in sorted(unregistered.items())))
+        stale = sorted(p for p in RENDER_EXCLUSIONS if p not in broken)
+        self.assertEqual(
+            stale, [],
+            "a RENDER_EXCLUSIONS entry no longer raises from its raw twin -- remove the "
+            "stale entry so the registry stays an exclusion list:\n"
+            + "\n".join(f"  {p}" for p in stale))
+        moved = {p: (RENDER_EXCLUSIONS[p][0], k) for p, k in broken.items()
+                 if p in RENDER_EXCLUSIONS and RENDER_EXCLUSIONS[p][0] != k}
+        self.assertEqual(
+            moved, {},
+            "a RENDER_EXCLUSIONS entry raises on a different key than pinned -- update "
+            "the entry:\n"
+            + "\n".join(f"  {p}: pinned {a!r}, raises {b!r}"
+                        for p, (a, b) in sorted(moved.items())))
+        gone = sorted(p for p in RENDER_EXCLUSIONS if p not in corpus_paths)
+        self.assertEqual(
+            gone, [],
+            "a RENDER_EXCLUSIONS entry names a record the corpus no longer has "
+            "(records are append-only; investigate before removing):\n"
+            + "\n".join(f"  {p}" for p in gone))
+
+    def test_a_renderer_gaining_a_hard_subscript_fails_loudly_not_silently(self):
+        """The regression the registry exists to catch, simulated on a stub wrapper
+        over the real corpus (no real renderer is edited).
+
+        This is the #336-shaped change: a renderer gains a hard subscript for a key
+        its committed records lack.  The probe must report it as named, per-record
+        breakage -- record path plus missing key -- which is what
+        `test_the_exclusion_registry_matches_the_corpus_exactly` turns into a failure.
+        The absorbed version of history: PR #366's review widened a backfill for
+        exactly such a breakage and the corpus floor never moved.
+        """
+        future_key = "simulated_retroactive_subscript"
+        real = RENDERERS["sim/iq-top/run_iq_campaign.py"]
+
+        def upgraded(doc):
+            doc["links"][future_key]                    # the hard subscript, "added today"
+            return real(doc)
+
+        broken = probe_broken({**RENDERERS, "sim/iq-top/run_iq_campaign.py": upgraded})
+        newly = {p: k for p, k in broken.items() if k == future_key}
+        self.assertTrue(newly, "the retroactive breakage was absorbed silently")
+        affected = {md.relative_to(REPO_ROOT).as_posix()
+                    for name, md, _ in committed_records()
+                    if name == "sim/iq-top/run_iq_campaign.py"}
+        self.assertEqual(set(newly), affected,
+                         "the newly broken records must be named one-for-one")
+
+    def fixture_records(self) -> list[tuple[str, Path, dict, str]]:
+        """The synthetic fixture docs, rendered through their real renderer."""
+        out = []
+        for name, seed in sorted(FIXTURE_SEEDS.items()):
+            doc = fixture_doc(seed)
+            out.append((name, REPO_ROOT / seed, doc, RENDERERS[name](doc)))
+        return out
+
+    def rendered_records(self) -> list[tuple[str, Path, dict, str]]:
+        """`(renderer, md path, record document, rendered text)` for every trailer
+        check: re-renderable corpus records from their raw twin, plus -- for a
+        renderer whose committed records are all registry-excluded -- the synthetic
+        fixture doc, so the trailer contract never loses a renderer to the registry.
         """
         out = []
         for name, md, doc in committed_records():
-            try:
-                out.append((name, md, RENDERERS[name](doc)))
-            except KeyError:
+            rel = md.relative_to(REPO_ROOT).as_posix()
+            if rel in RENDER_EXCLUSIONS:
                 continue
+            try:
+                text = RENDERERS[name](doc)
+            except KeyError as e:
+                self.fail(
+                    f"{rel} raises KeyError on {e.args[0]!r} and is not in "
+                    "RENDER_EXCLUSIONS -- a renderer change retroactively broke a "
+                    "committed record. Pin it in the registry with the key and the "
+                    "reason (or fix the renderer); do not absorb it.")
+            out.append((name, md, doc, text))
+        out.extend(self.fixture_records())
         return out
 
-    def test_the_corpus_is_not_empty(self):
-        """A ratchet, not a count: records are only ever added, so this floor may rise
-        and must never fall.  It drops if a renderer stops being able to re-render its
-        own committed evidence, which is itself the regression worth failing on.
+    def rendered(self) -> list[tuple[str, Path, str]]:
+        """The re-renderable corpus records only: `(renderer, md path, text)`."""
+        fixture_md = {REPO_ROOT / seed for seed in FIXTURE_SEEDS.values()}
+        return [(name, md, text) for name, md, _, text in self.rendered_records()
+                if md not in fixture_md]
 
-        Two of the 31 evidence records -- `sim/bias-core-op-branch`'s and
-        `sim/pnp-mismatch`'s first, both from 2026-08-25/26 -- predate the batch backend
-        and raise on a `batch` key in the record BODY, above the trailer; that is
-        unrelated to this contract and identical before and after the consolidation.
+    def test_the_corpus_is_not_empty(self):
+        """A derived ratchet, not a bare literal: adding a record raises the floor
+        automatically, and a renderer change that breaks an existing record cannot
+        net out against another that was fixed -- the registry-exactness test names
+        such a breakage before this count is reached.
         """
-        self.assertGreaterEqual(len(self.rendered()), 29)
+        floor = len(committed_records()) - len(RENDER_EXCLUSIONS)
+        self.assertEqual(len(self.rendered()), floor)
 
     def test_the_corpus_covers_every_renderer_in_the_table(self):
-        """Each of the ten renderers is driven by at least one real record, so none of
-        them is covered by source grep alone."""
-        covered = {name for name, _, _ in self.rendered()}
-        self.assertEqual(set(RENDERERS) - covered, set(),
-                         "no committed record exercises this renderer's trailer")
+        """Each of the ten renderers is driven by at least one real record or, where
+        the registry excludes all of a renderer's records, by the synthetic fixture --
+        so none of them is covered by source grep alone.  The fixture table is pinned
+        to exactly the renderers the real corpus no longer reaches: a renderer that
+        regains real coverage cannot keep a stale fixture, and one that loses real
+        coverage cannot lose its trailer check silently.
+        """
+        real = {name for name, md, _ in committed_records()
+                if md.relative_to(REPO_ROOT).as_posix() not in RENDER_EXCLUSIONS}
+        self.assertEqual(
+            set(FIXTURE_SEEDS), set(RENDERERS) - real,
+            "the fixture table must name exactly the renderers whose committed records "
+            "are all registry-excluded")
+        self.assertEqual(set(RENDERERS) - (real | set(FIXTURE_SEEDS)), set(),
+                         "no committed record or fixture exercises this renderer's trailer")
+
+    def test_no_rendered_trailer_names_a_path_outside_the_record_s_own_evidence(self):
+        """A trailer must not send a reader to another experiment's evidence.
+
+        The absorbed #366 backfill injected
+        `sim/bias-core-smoke/artifacts/manifest.json` -- a directory belonging to a
+        different experiment, and nonexistent -- into the re-rendered trailers of
+        eleven records across nine experiment directories, twice inside prose telling
+        the reader to `klt artifact verify` it.  Allowed instead: the record's own
+        experiment, the renderer's own `Written by` path, a path the canonical
+        append-only sentence itself names (`sim/README.md` -- the normative source the
+        trailer must point at), and a path the record's own raw document genuinely
+        carries (bias-core records borrow a bias-core-smoke testbench and say so).
+        Anything else is an injected path.
+        """
+        for name, md, _, text in self.rendered_records():
+            rel = md.relative_to(REPO_ROOT).as_posix()
+            own = rel.split("/")[1]
+            carried = doc_strings(json.loads(md.with_suffix(".json").read_text()))
+            foreign = sorted(
+                {p for raw in self.SIM_PATH.findall(trailer(text))
+                 for p in {raw, raw.rstrip(".")}
+                 if not p.startswith(f"sim/{own}/") and p != name
+                 and p not in carried and p not in sim_common.RECORD_APPEND_ONLY})
+            with self.subTest(rel):
+                self.assertEqual(
+                    foreign, [],
+                    "the re-rendered trailer names a path outside this record's own "
+                    "experiment and its own document -- an injected path, not record "
+                    "content")
 
     def test_every_record_closes_with_the_one_canonical_sentence(self):
-        for name, md, text in self.rendered():
+        for name, md, _, text in self.rendered_records():
             with self.subTest(md.relative_to(REPO_ROOT).as_posix()):
                 self.assertEqual(text.count(sim_common.RECORD_APPEND_ONLY), 1)
                 self.assertTrue(text.endswith(
@@ -393,9 +646,7 @@ class CommittedRecordsTest(unittest.TestCase):
         These are the exact three lines the four drifted texts lived on, plus a check
         that no renderer smuggles a fourth field in beside them.
         """
-        docs = {p: d for _, p, d in committed_records()}
-        for name, md, text in self.rendered():
-            doc = docs[md]
+        for name, md, doc, text in self.rendered_records():
             with self.subTest(md.relative_to(REPO_ROOT).as_posix()):
                 got = unlinked(trailer(text).split("\n"))
                 self.assertIn(got[0], ("## Links", "- **Links**:"))
@@ -417,7 +668,7 @@ class CommittedRecordsTest(unittest.TestCase):
         """`(none; cites ...)`, `(none - first record for this claim)` and `(none; the
         original records are untouched)` were three renderers' private wordings of
         `sim/README.md`'s one word."""
-        for name, md, text in self.rendered():
+        for name, md, _, text in self.rendered_records():
             with self.subTest(md.relative_to(REPO_ROOT).as_posix()):
                 line = next(ln for ln in trailer(text).splitlines()
                             if ln.startswith("- **Supersedes**: "))
