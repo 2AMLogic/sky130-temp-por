@@ -199,7 +199,7 @@ part of the claim and travel with it):
   pinned to its inventory by content hash. The inventories live in
   `manifests/inventories/`; the passing envelopes `klt signoff --attest N
   --inventory ... -o` produced live in `manifests/attestations/`.
-  - **Item 9** (`item-9.json`, 43/43 checks): 40 files present (every
+  - **Item 9** (`item-9.json`, 45/45 checks): 42 files present (every
     `sim/*/experiment.json`, testbench schematic or `.spice`, campaign
     runner, the corner runner, `sim/pdk.json`, `spiceinit`, `xschemrc`), the
     cold start, and the PDK/tool pins. `sim/pdk.json` is inventoried, so a PDK
@@ -215,7 +215,7 @@ part of the claim and travel with it):
     marked `"local_only": true` and is **never run under `--check` on any
     host**; re-attesting runs it, as does `python3 sim/bin/corner-run.py
     sim/bias-core-smoke --dry-run` on its own. CI does re-attest the rest of
-    the envelope unconditionally (since #303): all 40 files this envelope
+    the envelope unconditionally (since #303): all 42 files this envelope
     recorded a hash for are re-hashed — which is how 8 of them were found
     stale on `main` — and the inventory pin, the check count and every
     committed outcome are diffed.
