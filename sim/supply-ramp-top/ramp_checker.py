@@ -217,7 +217,6 @@ def analyze(w: dict[str, list[float]], vf: float, rate: float) -> dict:
     # --- IBIAS (shared node) ---
     pos = [i for i in range(n) if t[i] > 0]
     ib_pos = [ib[i] for i in pos]
-    t_pos = [t[i] for i in pos]
     ib_end = sum(ib[i] for i in last) / len(last)
     ib_step = None
     ib_p2p_post = None
