@@ -1766,9 +1766,12 @@ def decimate(cols, keep_dt, thresholds, keep_at=None):
 
     Keep the first and last sample, plus any sample where ``dt >= keep_dt`` since the last kept
     row, or a column with a non-None entry in ``thresholds`` (aligned with ``cols``) moved by at
-    least that much, or ``keep_at(t)`` is true.  Returns kept rows (row-major).
+    least that much, or ``keep_at(t)`` is true.  Returns kept rows (row-major).  An empty input
+    returns ``[]``; a single-sample input returns that one row exactly once.
     """
     n = len(cols[0])
+    if n <= 1:
+        return [[c[0] for c in cols]] if n else []
     trig = [(k, th) for k, th in enumerate(thresholds) if k and th is not None]
     rows = [[c[0] for c in cols]]
     last = rows[0]
