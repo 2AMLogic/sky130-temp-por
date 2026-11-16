@@ -9,6 +9,15 @@ Chronological record of recently merged pull requests and closed issues. This fi
 
 ### 2026-11-16
 
+- **PR #406**: fix: repo-root-relative DR annotation paths; scope malformed-row check to DR rows
+- **PR #400**: refactor: drop dead local assignments flagged by ruff F841
+- **PR #395**: evidence: live pnp-mismatch record from store-routed runner (#325 acceptance step 6)
+- **PR #390**: refactor(sim): route the last two hand-rolled append-only guards through refuse_existing
+- **Issue #397** (closed): CI gate conflict: artifact-manifest byte rule vs closed append-only corners/ blocks store-routed re-runs
+- **Issue #394** (closed): check_decision_record_index.py: wrong ::error annotation path, and malformed-row check applies to the whole README
+- **Issue #391** (closed): Remove the four unused locals ruff F841 flags (the half of #361's residue it left behind)
+- **Issue #369** (closed): Convert the last two hand-rolled append-only guards in sim/bin/ to sim_common.refuse_existing
+- **Issue #335** (closed): Live verification: one real record from a store-routed runner (issue #325 acceptance step 6)
 - **PR #379**: sim: mismatch Monte Carlo record and mode for the por_comparator thresholds (issue #348)
 - **PR #352**: docs(layout): drop _klt_common.py's stale caller count and provenance claim
 - **PR #392**: test: guard the one-definition pin-refusal invariant as source contract
