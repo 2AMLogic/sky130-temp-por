@@ -18,10 +18,22 @@ envelope recorded hashes for, and requires equality. Today that is:
   against its ``provenance.input.content_hash`` — the drawn layout stream;
 - a `klt lvs` envelope's ``layout`` and ``reference`` netlists against its
   ``environment.layout_sha256`` / ``environment.reference_sha256`` — the two
-  halves of the compare. The LVS envelope shape carries no
-  ``provenance.input.content_hash`` a manifest pin could bind to
-  (`klt signoff` cannot pin it), so this re-hash is the only machine
-  freshness gate an LVS citation has.
+  halves of the compare. A manifest does not have to pin an LVS citation
+  (items 4 and 11's ``lvs.json`` carry no ``content_hash`` in the manifest),
+  so this re-hash is the only machine freshness gate an unpinned LVS
+  citation has. The committed ``lvs.json`` *does* carry a
+  ``provenance.input.content_hash``; whether a citation needs a pin is
+  `klt signoff`'s call, not this script's.
+
+The manifest's own pin is checked too (issue #389). Every citation that
+carries a ``content_hash`` must equal the cited envelope's
+``provenance.input.content_hash`` (the convention in ``manifests/README.md``).
+`klt signoff` grades that pin only by degrading the item to ``unmet`` /
+``stale_evidence`` — never by failing — and the committed report is a
+faithful render of whatever the manifest says, so a mis-pin passes the
+byte-compare too. A citation carrying no ``content_hash`` is not pin-checked
+(the skip is keyed on the absent pin, not on the envelope's kind); a pin whose
+envelope records no ``provenance.input.content_hash`` fails closed.
 
 Two shapes of indirection sit above those hashes, and both are walked:
 
@@ -49,11 +61,18 @@ diffs the inventory pin, the check count and every committed outcome. One
 mechanism per behaviour (`.loom/docs/ci-principles.md`), and the canary
 exercises the pinned tool's own feature rather than a repo-owned copy of it.
 
-Exit 0 prints one summary line naming the count of verified hash pairs.
-Exit 1 prints one ``STALE`` line per drifted or missing artifact — naming
-the item, the envelope, the role, the recorded hash and the actual hash —
-and one ``UNMAPPABLE`` line per evidence entry, citation or ``file`` form
-the checker cannot resolve to committed files.
+Exit 0 prints one summary line naming the count of verified hash pairs and
+of verified manifest pins. Exit 1 prints one ``STALE`` line per drifted or
+missing artifact — naming the item, the envelope, the role, the recorded hash
+and the actual hash — one ``UNMAPPABLE`` line per evidence entry, citation or
+``file`` form the checker cannot resolve to committed files, and one
+``MISPINNED`` line per citation whose manifest pin disagrees with the
+envelope.
+
+``MISPINNED`` is a third label, not ``STALE`` or ``UNMAPPABLE``: nothing
+drifted on disk, so "re-render the evidence" is the wrong remedy, and the
+entry's shape is fine. The remedy is to re-pin the manifest to the envelope's
+``provenance.input.content_hash`` and re-render the report.
 
 ``UNMAPPABLE`` is an error rather than a skip (`.loom/docs/ci-principles.md`):
 a manifest item walked past in silence is a check that cannot run looking
@@ -188,6 +207,7 @@ def main(argv):
               "map".format(manifest_path), file=sys.stderr)
         return 1
     checked = 0
+    pins = 0
     for item_id, entry in sorted(evidence.items()):
         try:
             citations = _citations(entry)
@@ -210,6 +230,28 @@ def main(argv):
                     "item {}: cited envelope {} cannot be read: {}").format(
                         item_id, envelope_path, exc)))
                 continue
+            if "content_hash" in citation:
+                pins += 1
+                pinned = _norm(citation["content_hash"]) if isinstance(
+                    citation["content_hash"], str) else None
+                recorded_pin = ((envelope.get("provenance") or {}).get(
+                    "input") or {}).get("content_hash")
+                if not isinstance(recorded_pin, str) or not recorded_pin:
+                    failures.append(("MISPINNED", (
+                        "item {}: {} is pinned to {} but the envelope records "
+                        "no provenance.input.content_hash, so the pin cannot "
+                        "be validated").format(
+                            item_id, envelope_path,
+                            _describe(citation["content_hash"]))))
+                elif pinned != _norm(recorded_pin):
+                    failures.append(("MISPINNED", (
+                        "item {}: {} is pinned to {} but the envelope's "
+                        "provenance.input.content_hash is {} — re-pin the "
+                        "manifest to the envelope's "
+                        "provenance.input.content_hash and re-render the "
+                        "report").format(
+                            item_id, envelope_path, pinned,
+                            _norm(recorded_pin))))
             try:
                 pairs = _pairs(envelope, envelope_path.parent)
             except Unmappable as exc:
@@ -237,7 +279,8 @@ def main(argv):
             print("check-citations: {}: {}".format(label, line), file=sys.stderr)
         return 1
     print("check-citations: {} recorded artifact hash(es) verified "
-          "fresh against the committed files".format(checked))
+          "fresh against the committed files; {} manifest pin(s) verified "
+          "against their envelopes".format(checked, pins))
     return 0
 
 
