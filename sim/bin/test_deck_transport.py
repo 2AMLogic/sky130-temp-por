@@ -7,11 +7,11 @@ difference matters.  The request-construction classes get a `klt` stub, prepende
 outputs are shaped, so request construction, the shipped-`.spiceinit` path,
 report-to-result mapping and the no-local-fallback failure path are all exercised without
 a batch job.  The per-runner CLI probes in the last class get **no** replaying stub
-either: they spawn real runners against a *tripwire* `klt` that records and refuses the
-one verb that can submit a campaign (`sim`), delegating every other verb to the real
-tool.  `cli()` asserts the tripwire stayed silent after every probe, so an argv a runner
-*accepts* fails the suite instead of submitting (see that class's docstring, PR #359,
-and issue #363).
+either: they spawn real runners against a *tripwire* `klt` that records and refuses
+every verb -- `sim`, the one that can submit a campaign, included -- so no probe can
+execute the real tool at all.  `cli()` asserts the tripwire stayed silent after every
+probe, so an argv a runner *accepts* fails the suite instead of submitting (see that
+class's docstring, PR #359, and issue #363).
 
 The last two classes widen that scope from the request to the CLI that feeds it, across
 every `sim/*/run_*.py` rather than only the two bespoke ones: `batch.capacity_wait_s` is
@@ -99,30 +99,23 @@ json.dump({"schema_version": 3, "mode": "decks", "status": "pass", "unit_count":
 # TRIPWIRE_LOG and refused, so a probe argv argparse accepts cannot reach the fleet --
 # no matter its shape, option types, option positions, or whether the runner parses
 # with parse_args or parse_known_args (issue #363).  `--version` is answered the way
-# STUB_KLT does, and every other verb delegates to the real `klt` found further down
-# PATH (skipping the tripwire's own directory), because runners probe capabilities at
-# startup -- measured on `run_accuracy_mc.py`: it gates on `klt artifact put --help`
-# before argparse ever runs, and a tripwire that refused that would break even a
-# `--help` probe.
+# STUB_KLT does, and every other verb is refused too, never delegated: measured across
+# all 11 CAPACITY_WAIT_RUNNERS, no probe invokes `klt` at all -- `--help` exits rc 0
+# and an argv argparse rejects exits rc 2, both inside argparse, and the runners'
+# capability gate (`klt artifact put --help`, via evidence_store.preflight_or_exit)
+# runs inside the subcommand handlers, which no probe ever reaches.  Refusing every
+# verb keeps the containment absolute: no probe can execute the real, credentialed
+# `klt` on this host.
 TRIPWIRE_KLT = """#!/usr/bin/env python3
 import os, sys
 args = sys.argv[1:]
 if args[:1] == ["--version"]:
     print("klt 9.9.9-stub")
     sys.exit(0)
-if args[:1] == ["sim"]:
-    open(os.environ["TRIPWIRE_LOG"], "a").write(" ".join(args) + "\\n")
-    sys.stderr.write("klt tripwire: `klt sim` refused -- a probe must never submit\\n")
-    sys.exit(3)
-here = os.path.dirname(os.path.abspath(__file__))
-real = next((os.path.join(d, "klt")
-             for d in os.environ["PATH"].split(os.pathsep)
-             if d and os.path.abspath(d) != here
-             and os.access(os.path.join(d, "klt"), os.X_OK)), None)
-if real is None:
-    sys.stderr.write("klt tripwire: no real klt on PATH for a non-submitting verb\\n")
-    sys.exit(127)
-os.execv(real, [real, *args])
+open(os.environ["TRIPWIRE_LOG"], "a").write(" ".join(args) + "\\n")
+sys.stderr.write("klt tripwire: `klt %s` refused -- probes get `--version` only\\n"
+                 % (args[0] if args else "<no args>"))
+sys.exit(3)
 """
 
 
@@ -594,10 +587,12 @@ class CapacityWaitFlagReachesEveryRunnersParser(unittest.TestCase):
 
     The guarantee is therefore environmental, independent of argv shape: every probe
     runs behind a *tripwire* `klt` that records and refuses the one verb that can
-    submit (`sim`), delegating every other verb to the real tool so startup capability
-    probes keep working.  `cli()` asserts after every run that the tripwire stayed
-    silent, naming the argv that reached it -- a probe whose argv argparse accepts
-    fails the suite instead of submitting.  The expected argparse outcome is a required
+    submit (`sim`) -- and every other verb too, so no probe can execute the real
+    tool.  No probe reaches `klt` at all (measured: every probe exits inside
+    argparse; see TRIPWIRE_KLT's comment).  `cli()` asserts after every run that the
+    tripwire stayed silent, naming the argv that reached it -- a probe whose argv
+    argparse accepts fails the suite instead of submitting.  The expected argparse
+    outcome is a required
     argument (`help` or `rejected`), so a future probe must state what argparse should
     have done and fails loudly if the runner accepted the argv instead; that also keeps
     the guarantee intact if a runner ever migrates to `parse_known_args`.  The token
@@ -643,8 +638,9 @@ class CapacityWaitFlagReachesEveryRunnersParser(unittest.TestCase):
         self.assertEqual(
             tripped, "",
             f"the tripwire klt was invoked by {rel} with {list(argv)} -- the probe "
-            "reached `klt sim` instead of being stopped by argparse.  Nothing was "
-            "submitted (the tripwire refused it), but this argv is not probe-safe:\n"
+            "reached `klt` instead of being stopped by argparse.  Nothing reached the "
+            "real tool (the tripwire refuses every verb), but this argv is not "
+            "probe-safe:\n"
             + tripped)
         if expect == "help":
             self.assertEqual(p.returncode, 0, p.stderr)
@@ -672,11 +668,12 @@ class CapacityWaitFlagReachesEveryRunnersParser(unittest.TestCase):
         self.assertEqual(p.stdout.strip(), "klt 9.9.9-stub")
         self.assertEqual(self.tripwire_log.read_text(), "")
 
-    def test_the_tripwire_delegates_non_submitting_verbs_past_itself(self):
-        """Runners gate on capability probes at startup (`klt artifact put --help`), so
-        everything that is not `sim` must behave as the real klt: the tripwire skips
-        its own PATH directory and delegates.  A fake `klt` behind it proves the
-        delegation without needing the real tool installed."""
+    def test_the_tripwire_refuses_every_verb_except_version(self):
+        """Containment is absolute: no probe may execute the real, credentialed `klt`.
+        Nothing on the probe path invokes `klt` before argparse (measured across all
+        11 runners -- see TRIPWIRE_KLT's comment), so refusing every non-`--version`
+        verb breaks nothing; a fake `klt` behind the tripwire proves it is never
+        reached."""
         behind = tempfile.TemporaryDirectory(prefix="klt-behind-")
         self.addCleanup(behind.cleanup)
         real = Path(behind.name) / "klt"
@@ -687,9 +684,10 @@ class CapacityWaitFlagReachesEveryRunnersParser(unittest.TestCase):
             capture_output=True, text=True,
             env={**os.environ, "PATH": f"{self.klt.parent}{os.pathsep}{behind.name}",
                  "TRIPWIRE_LOG": str(self.tripwire_log)})
-        self.assertEqual(p.returncode, 0, p.stderr)
-        self.assertIn("delegated artifact put --help", p.stdout)
-        self.assertEqual(self.tripwire_log.read_text(), "")
+        self.assertNotEqual(p.returncode, 0, p.stdout)
+        self.assertIn("tripwire", p.stderr)
+        self.assertNotIn("delegated", p.stdout)
+        self.assertIn("artifact put --help", self.tripwire_log.read_text())
 
     def test_a_valid_float_value_alone_is_refused_before_any_subprocess(self):
         """PR #359's original regression: `--wait-for-capacity 0.5` parses and submits,
