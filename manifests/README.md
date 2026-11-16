@@ -403,6 +403,13 @@ When the layout or design evidence moves, regenerate the report
 and commit them together — the workflow revision pin and the report move in
 the same PR by construction.
 
+Workflow edits carry the same obligation: item 10's hygiene roster pins
+`.github/workflows/*.yml` by content hash, so any PR that touches a workflow
+file stales its committed envelope by construction. Re-attest in the same PR
+(`klt signoff --attest 10 --inventory manifests/inventories/item-10.json -o
+manifests/attestations/item-10.json`) or the `signoff` job's unconditional
+`--check` fails with `status: drifted`.
+
 Provenance hygiene per `docs/design-evidence-tiers.md` ("Provenance hygiene
 in evidence records"): the committed report cites repo-relative paths only
 and embeds content hashes, never host or author identifiers.
