@@ -183,6 +183,59 @@ def _ref_write_wave_fixture_gz(path, doc):
         gz.write(json.dumps(doc, separators=(",", ":")).encode())
 
 
+def _ref_decimate(cols, keep_dt, thresholds):
+    """Frozen selection semantics of the pre-consolidation write_trace loop (pre-1e17ab35):
+    keep the first and last sample, plus any sample whose dt from the last kept row is
+    >= keep_dt or whose threshold column moved by >= its threshold.  n == 0 -> no rows,
+    n == 1 -> that one row exactly once (the old call sites wrote header-only / one-row
+    traces and never duplicated the sole sample)."""
+    n = len(cols[0])
+    if n == 0:
+        return []
+    trig = [(k, th) for k, th in enumerate(thresholds) if k and th is not None]
+    rows = [[c[0] for c in cols]]
+    last = rows[0]
+    for i in range(1, n - 1):
+        cur = [c[i] for c in cols]
+        if cur[0] - last[0] >= keep_dt or any(abs(cur[k] - last[k]) >= th for k, th in trig):
+            rows.append(cur)
+            last = cur
+    if n > 1:
+        rows.append([c[n - 1] for c in cols])
+    return rows
+
+
+class DecimateTest(unittest.TestCase):
+    """decimate() contract: short waves keep the old per-call-site behavior (n == 0 -> [],
+    n == 1 -> one row, never the double-append the loop form produced), n >= 2 stays
+    first+last+change-triggered (issue #341 review)."""
+
+    def test_edge_lengths(self):
+        cols = [[0.0, 1e-3, 2e-3], [0.0, 1.0, 2.0], [3.3, 3.3, 1.1]]
+        self.assertEqual(sc.decimate([[], [], []], 0.2e-3, [None, 0.002, 0.002]), [])
+        single = [[0.0], [1.0], [3.3]]
+        self.assertEqual(sc.decimate(single, 0.2e-3, [None, 0.002, 0.002]), [[0.0, 1.0, 3.3]])
+        self.assertEqual(sc.decimate(cols, 1.0, [None, None, None]),
+                         [[0.0, 0.0, 3.3], [2e-3, 2.0, 1.1]])
+
+    def test_keep_at_and_threshold_move(self):
+        cols = [[0.0, 1e-4, 2e-4, 3e-4], [0.0, 0.0, 1.0, 1.0]]
+        self.assertEqual(sc.decimate(cols, 1.0, [None, None], keep_at=lambda t: t >= 2e-4),
+                         [[0.0, 0.0], [2e-4, 1.0], [3e-4, 1.0]])
+        self.assertEqual(sc.decimate(cols, 1.0, [None, 0.5]),
+                         [[0.0, 0.0], [2e-4, 1.0], [3e-4, 1.0]])
+
+    def test_parity_random(self):
+        rng = random.Random(341)
+        for _ in range(300):
+            n = rng.randint(0, 400)
+            dt = rng.choice([1e-5, 0.2e-3, 5e-4, 1e-3])
+            t = [k * dt * rng.choice([0.0, 0.5, 1.0]) for k in range(n)]
+            cols = [t] + [[rng.choice([0.0, 0.5, 1.0, 3.3]) for _ in range(n)] for _ in range(rng.randint(1, 4))]
+            th = [None] + [rng.choice([None, 0.002, 0.5]) for _ in range(len(cols) - 1)]
+            self.assertEqual(sc.decimate(cols, 0.2e-3, th), _ref_decimate(cols, 0.2e-3, th))
+
+
 DOC = {"plotname": "Synthetic (controlled) -- test", "stimulus": {"vf": 3.3},
        "variables": [{"index": 0, "name": "time"}, {"index": 1, "name": "V(VDD)"}],
        "points": [[0.0, 0.0], [1e-06, 1.5], [2e-06, 3.3]]}
