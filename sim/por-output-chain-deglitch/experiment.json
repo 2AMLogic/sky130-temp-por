@@ -1,0 +1,147 @@
+{
+  "slug": "por-output-chain-deglitch",
+  "title": "por_output_chain cell-level deglitch/one-shot transient: sub-deglitch pulse rejection and RESETn release delay over the full PVT matrix, ideal bias and ideal POR_RAW stimulus",
+  "claim": "Issue #349 -- NOT a spec claim (no deglitch or reset-pulse-width target exists anywhere in spec/; design/por_output_chain.md and DR-003 Sec8 both defer any such number). Closes the second clause of the characterization report's gap 3: por_output_chain previously had NO cell-level record at all -- it was exercised only inside the whole-block campaigns (E9-E11, E14), where its behaviour is mixed with the non-physical solver branches those campaigns report, and its deglitch delay, RESETn asserted level and short-pulse behaviour were measured nowhere on their own. This experiment drives the UNCHANGED design/por_output_chain.sym from ideal comparator and bias inputs (a constant 1 uA into IBIAS, one POR_RAW PWL: a sub-deglitch pulse first, a settle gap, then the real trip) at every point of the full 45-point PVT matrix and records, per point: the delay from the POR_RAW trip to RESETn's release, the absolute release time, the released and asserted RESETn levels, and rail-band physicality guards on the four internal nodes (TIM, NDG, TRIP, RSTB) that carry the deglitch/one-shot mechanism. The sub-deglitch pulse is rejected BY CONSTRUCTION of the stimulus ordering -- the real trip is the last edge, so a release delayed by the normal deglitch time after the trip proves the earlier pulse contributed nothing -- and the release-delay window excludes a glitch-honoring reading outright (it would precede the trip and read negative). The 1 uA ideal bias is the same convention sim/iq-top's ideal-bias variant uses and is in the range bias_core actually delivers (0.78-1.2 uA across the matrix, sim/bias-core-startup and the glitch-top delivered-bias measurement); it is NOT the shared-bias assembly, and nothing here claims the cell behaves identically under real bias_core drive.",
+  "provenance": "schematic",
+  "provenance_source": "sim/por-output-chain-deglitch/testbench/tb_por_output_chain_deglitch.sch",
+  "schematic": "testbench/tb_por_output_chain_deglitch.sch",
+  "statistical_convention": "N/A (corner-matrix check, not a distribution claim)",
+  "corners": {
+    "process": ["tt", "ss", "ff", "sf", "fs"],
+    "temperature_c": [-40, 27, 125],
+    "supply_v": [2.97, 3.3, 3.63]
+  },
+  "quick_subset": [
+    ["tt", 27, 3.3],
+    ["ss", -40, 2.97],
+    ["ff", 125, 3.63]
+  ],
+  "deck": {
+    "options": ["wnflag=1"],
+    "params": {
+      "ibias": "1u",
+      "tg0": "100u",
+      "tg1": "200u",
+      "tpre": "1.999m",
+      "ttrip": "2m",
+      "tstop": "10m"
+    },
+    "analyses": [
+      "tran 10u 10m uic"
+    ]
+  },
+  "measurements": [
+    {
+      "name": "release_delay",
+      "expr": "1e-2 - 2e-3 - integ(v(resetn) gt 1.65)[length(v(resetn))-1]",
+      "unit": "s",
+      "min": 0.0005,
+      "max": 0.004,
+      "note": "Delay from the POR_RAW trip (the PWL's last edge, a ~1 us rise completing at the ttrip param = 2 ms -- both numbers are literals here because a .param is not readable as a vector in the .control section) to RESETn crossing 1.65 V rising. integ() of the boolean v(resetn) gt 1.65 over the tran's own (non-uniform) time grid is the total time spent released, so tstop - it is the release instant; the [length(...)-1] index takes the running integral's final element, and the grid is whatever ngspice accepted (verified non-uniform in the local probe, so the count-based mean() x length() x tstep idiom of sim/native-device-characterization/ would NOT be valid here). This cell's deglitch delay has NEVER been measured before this experiment, so the window is a harness-liveness band around the tt/27 C/3.3 V local probe (1.204 ms) and the design/por_output_chain.md smoke test (1.72 ms at bias_core's ~0.78 uA real bias, i.e. consistent with this probe's 1.204 ms at 1 uA ideal), NOT a spec claim and not a deglitch-time target. The lower bound (0.5 ms) sits 5x above the 100 us injected pulse width, so a corner that failed to reject the pulse (release at ~1.5 ms, BEFORE the 2 ms trip, reading a negative delay) and a corner with an instantaneous pass-through both fail loudly; the upper bound (4 ms) is ~3.3x the probe value and keeps a never-releasing corner (delay ~8 ms) outside the band. A FAIL here is evidence, not a harness error."
+    },
+    {
+      "name": "t_release",
+      "expr": "1e-2 - integ(v(resetn) gt 1.65)[length(v(resetn))-1]",
+      "unit": "s",
+      "min": 0.0022,
+      "max": 0.006,
+      "note": "The absolute release instant in the 10 ms window (tstop - time spent above 1.65 V; same extraction as release_delay, without the trip literal). Stated separately so the record shows WHEN in the window RESETn released: it must land after the 2 ms trip (lower bound = trip + 200 us) and far inside the window (upper bound 6 ms, ~2x the probe's 3.204 ms). A glitch-honoring corner releases at ~1.5 ms and fails this band explicitly, not only via release_delay's arithmetic."
+    },
+    {
+      "name": "rstn_released",
+      "expr": "maximum(v(resetn))",
+      "unit": "V",
+      "min": 1.8,
+      "max": 3.8,
+      "note": "RESETn's released (rail-high) drive level. The cell has no load in this testbench, so this is the push-pull output stage's own high level: XMOP's pull-up against the always-on MASSIST native pull-down (design/por_output_chain.md records MASSIST alone at 9.4-31.9 uA across this matrix, so the released level settles where MOP's drive balances that bleed -- 3.014 V of a 3.3 V rail in the local probe, i.e. a real, supply-dependent drop, not a hard rail). The window is a harness-liveness band, NOT the (unratified) por-digital valid-high spec row: the lower bound (1.8 V) is above the worst case's own half-rail crossing (1.815 V at 3.63 V) only in the sense that a released level collapsing to it would mean MASSIST overwhelms MOP -- the known open sizing trade-off -- and would fail loudly; the upper bound covers every matrix supply with overshoot margin."
+    },
+    {
+      "name": "rstn_asserted",
+      "expr": "minimum(v(resetn))",
+      "unit": "V",
+      "min": -0.05,
+      "max": 0.01,
+      "note": "RESETn's asserted (low) level, taken as the minimum over the whole window -- the cell is asserted from t=0 (below-floor default: POR_RAW low, release NAND pinned, MASSIST on) until release, so the window minimum IS the asserted level. The probe measured -4.4 uV (a sub-mV edge-undershoot artifact of the push-pull stage, consistent with design/por_output_chain.md's own 6.5e-10 V .op value); the band's -50 mV lower bound tolerates that undershoot class and its +10 mV upper bound keeps a genuinely floating or partially released low state outside. This is a liveness band, NOT the (unratified) valid-low-floor spec row -- no floor value is claimed here."
+    },
+    {
+      "name": "tim_max",
+      "expr": "maximum(v(xdut.tim))",
+      "unit": "V",
+      "min": -1.0,
+      "max": 4.7,
+      "note": "Physicality guard (sim/README.md Branch selection rule 4), same convention as sim/temp-core-startup/'s own na/nb bounds, on TIM -- XCTIM, the one-shot timing node the release decision is read from. The bound is the rails plus about a volt of margin (VSS - 1 V .. 3.63 V + ~1 V = 4.7 V as the fixed upper number), so one band covers every corner: a solver landing that drives this node outside the rails fails this loudly instead of reading as a plausible delay. Not a functional assertion about the one-shot's polarity."
+    },
+    {
+      "name": "tim_min",
+      "expr": "minimum(v(xdut.tim))",
+      "unit": "V",
+      "min": -1.0,
+      "max": 4.7,
+      "note": "Same rail-band physicality guard as tim_max, on the same node's minimum (the probe saw only a -1.7 mV edge undershoot)."
+    },
+    {
+      "name": "ndg_max",
+      "expr": "maximum(v(xdut.ndg))",
+      "unit": "V",
+      "min": -1.0,
+      "max": 4.7,
+      "note": "Same rail-band physicality guard, on NDG -- XCDG, the deglitch filter capacitor node (the probe saw a +20.6 mV overshoot ABOVE the rail from charge injection, well inside the band)."
+    },
+    {
+      "name": "ndg_min",
+      "expr": "minimum(v(xdut.ndg))",
+      "unit": "V",
+      "min": -1.0,
+      "max": 4.7,
+      "note": "Same rail-band physicality guard, on the NDG node's minimum."
+    },
+    {
+      "name": "trip_max",
+      "expr": "maximum(v(xdut.trip))",
+      "unit": "V",
+      "min": -1.0,
+      "max": 4.7,
+      "note": "Same rail-band physicality guard, on TRIP -- the nA-limited trip detector's output that feeds the release NAND."
+    },
+    {
+      "name": "trip_min",
+      "expr": "minimum(v(xdut.trip))",
+      "unit": "V",
+      "min": -1.0,
+      "max": 4.7,
+      "note": "Same rail-band physicality guard, on the TRIP node's minimum."
+    },
+    {
+      "name": "rstb_max",
+      "expr": "maximum(v(xdut.rstb))",
+      "unit": "V",
+      "min": -1.0,
+      "max": 4.7,
+      "note": "Same rail-band physicality guard, on RSTB -- the release NAND output that drives the push-pull stage and MAST."
+    },
+    {
+      "name": "rstb_min",
+      "expr": "minimum(v(xdut.rstb))",
+      "unit": "V",
+      "min": -1.0,
+      "max": 4.7,
+      "note": "Same rail-band physicality guard, on the RSTB node's minimum."
+    }
+  ],
+  "spread_checks": [
+    {
+      "measurement": "release_delay",
+      "min_spread": 0.0001,
+      "note": "Corner-blindness guard, same convention as sim/bias-core-startup/'s own vref spread check: if every corner returns the same release delay, the .lib/.temp injection is not taking effect. The delay is set by current-starved charging of CDG/CTIM against corner- and temperature-dependent thresholds and a supply-dependent gate overdrive, so its spread across a 5x3x3 matrix should be far above this 100 us floor; 100 us is also 1/5 of the smallest release_delay window width, so a corner-blind harness fails the spread check before any window boundary artifact could mask it."
+    }
+  ],
+  "notes": [
+    "NOT a spec claim: no deglitch time, reset pulse width, valid-low floor or released-level target is ratified anywhere in spec/ (design/por_output_chain.md Sizing and DR-003 Sec8 defer all of them). Every window in this manifest is a harness-liveness band derived from the local tt/27 C/3.3 V probe and the recorded basis in each note; the record this experiment produces states the same. Nothing here relaxes or proposes a spec value.",
+    "One analysis, self-contained expressions: the batch backend accepts exactly one deck analysis (sim/bin/corner-run.py build_batch_request), so the deck is a single 'tran 10u 10m uic' and every measurement is ONE self-contained expression -- the sibling manifests' 'let nlast = length(v(...))-1' helper line is not available on this path. The crossing extraction instead indexes the running integral's final element: integ(v(resetn) gt 1.65)[length(v(resetn))-1]. Verified against real ngspice in the pre-submit local probe; the count-based mean()*length()*tstep idiom of sim/native-device-characterization/ is only valid on that experiment's uniform DC sweeps (the tran time grid is non-uniform, verified: ngspice-47 emitted 1076 accepted points of varying spacing for this deck).",
+    "Stimulus ordering is the short-pulse rejection mechanism: POR_RAW is ONE PWL -- rise at tg0 (100 us), fall at tg1 (200 us), hold low through tpre (1.999 ms), then rise to the rail at ttrip (2 ms, a ~1 us ramp) and stay high. The real trip is therefore the LAST edge; RESETn has exactly one rising half-rail-class crossing in the whole window, and the release delay landing in the normal deglitch band after the trip proves the 100 us pulse (5x below the probe's measured deglitch time) was rejected -- a pulse-honoring corner releases ~1.5 ms, i.e. BEFORE the trip, and fails both release windows outright.",
+    "The 1 uA IBIAS is ideal, not the shared-bias assembly: bias_core sources 0.78-1.2 uA into the shared IBIAS node across the matrix (sim/bias-core-startup isup; the glitch-top delivered-bias XMPIB measurement), and sim/iq-top's ideal-bias variant uses exactly 1 uA. This cell has no enable and MBD is its ungated always-on mirror diode (DR-010), so an ideal 1 uA injection is a well-defined cell-level stimulus. Nothing here claims the cell behaves identically under real bias_core drive; the whole-block campaigns (E9-E11, E14) cover that context.",
+    "The deglitch delay has never been measured for this cell before this experiment (design/por_output_chain.md's own transient smoke test is a single tt/27 C/3.3 V point at real bias, not a record), so there is no prior number to bracket: the release_delay window is derived from the pre-submit local probe (1.204 ms at tt/27 C/3.3 V) and the design doc's 1.72 ms at ~0.78 uA real bias, with ~4x/3.3x margin either side, and each measurement's note says so.",
+    "Model-bin legality of the cell's two awkward devices under the CURRENT pin (open_pdks f6eeac7d, sim/pdk.json), re-verified 2026-11-14 before the first fleet submit: XMN1 (nfet_g5v0d10v5 L=20 W=0.42) is inside the top L bin (8-20.2 um, W floor 0.42 um) and XMASSIST (nfet_05v0_nvt L=25 W=1) is inside its fixed menu (L top bin 8-25.25 um, W bin 1-10 um). No model_not_found is expected -- unlike E9's first as-drawn run, which predated issue #101's XMN1 fix. Note the ngspice 'pdits negative' BSIM parameter-check abort that firing would otherwise look like: the harness's spiceinit (local) and the netlist-carried 'set ng_nomodcheck' (fleet, NOMODCHECK_CONTROL) disable model-parameter checking repo-wide, which is how every existing record of this cell ran; a run without those settings aborts before simulating. This deck is generated by the runner with both in place.",
+    "The full 45-point grid is submitted as ONE klt sim --backend batch request (AC: no local multi-point grid), with the request's batch.capacity_wait_s set (the corner runner's --wait-for-capacity, default 600 s, added by this issue) and a bounded launch-refusal retry, per the host batch-submit rules. The recorded request.json carries the capacity wait it ran with."
+  ]
+}

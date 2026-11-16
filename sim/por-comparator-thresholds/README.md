@@ -68,13 +68,13 @@ python3 -I threshold_extractor.py
 
 # 1. submit the 5x3 grid to the Spot batch fleet: 2 variants x 2 rates
 #    = 4 klt sim requests of 15 points each. Raw outputs go to sim/build/ (gitignored).
-python3 run_thresholds_campaign.py run --run-id main --capacity-wait 2700
+python3 run_thresholds_campaign.py run --run-id main --wait-for-capacity 2700
 #    a request refused for fleet capacity is re-submitted (only the failed
 #    ones; earlier attempts are archived, not overwritten):
-python3 run_thresholds_campaign.py run --run-id main --retry-failed --capacity-wait 2700
+python3 run_thresholds_campaign.py run --run-id main --retry-failed --wait-for-capacity 2700
 
 # 2. optional ll/hh passive-skew supplement (2 x 2 requests of 6 points)
-python3 run_thresholds_campaign.py run --axis passive-skew --run-id skew --capacity-wait 2700
+python3 run_thresholds_campaign.py run --axis passive-skew --run-id skew --wait-for-capacity 2700
 
 # 3. ONE single-corner local cross-check (the only local simulation; never a grid)
 python3 run_thresholds_campaign.py probe --variant ideal-bias --process tt --temp 27

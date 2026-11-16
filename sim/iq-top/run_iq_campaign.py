@@ -12,7 +12,7 @@ Stages (each a subcommand):
   run         build the two generated decks + requests and submit them to the fleet.
   crosscheck  one single-corner (tt / 27 C / 3.30 V) LOCAL probe per state (``--backend local``).
   record      grade every retrieved waveform with iq_checker.py and write the append-only
-              evidence (snapshots, scrubbed klt reports, decimated traces, md + json twins).
+              evidence (snapshots, scrubbed klt reports, uniform-stride thinned traces, md + json twins).
   selftest    run the settling/physicality checker on synthetic settled / drifting currents.
 
 States: por-iq (RESETn forced low by a testbench source), iq-total (natural released
@@ -133,7 +133,7 @@ def cmd_run(args) -> int:
     work = list(states)
     if args.retry_failed:
         work = [s for s in states if not sim_common.report_usable(run_dir / s / sim_common.rate_tag(rate) / "report.json")]
-        say(f"retrying {len(work)} request(s) without a usable report, capacity_wait_s={args.capacity_wait}")
+        say(f"retrying {len(work)} request(s) without a usable report, capacity_wait_s={args.wait_for_capacity}")
     heads = {s: tb_netlist_head(s, run_dir if not args.retry_failed else run_dir / "retry", pdk) for s in work}
     meta = {"run_id": run_id, "started_utc": now.strftime("%Y-%m-%dT%H:%M:%SZ"), "states": states, "klt_client": sim_common.klt_version(),
             "klt_sim_backend_env": os.environ.get("KLT_SIM_BACKEND"), "git": git_info}
@@ -141,13 +141,13 @@ def cmd_run(args) -> int:
         (run_dir / "run.json").write_text(json.dumps(meta, indent=2) + "\n")
 
     def one(state):
-        req = build_request("netlist.spice", man, "batch", args.capacity_wait)
+        req = build_request("netlist.spice", man, "batch", args.wait_for_capacity)
         return sim_common.submit_request(state, rate, run_dir, build_netlist(heads[state], state, man), req, "", len(grid(man)))
 
     results = sim_common.fan_out(one, work, args.jobs)
     old = json.loads((run_dir / "run.json").read_text())
     if args.retry_failed:
-        old.setdefault("retries", []).append({"at_utc": datetime.now(timezone.utc).strftime("%Y-%m-%dT%H:%M:%SZ"), "capacity_wait_s": args.capacity_wait, "results": results})
+        old.setdefault("retries", []).append({"at_utc": datetime.now(timezone.utc).strftime("%Y-%m-%dT%H:%M:%SZ"), "capacity_wait_s": args.wait_for_capacity, "results": results})
     else:
         old["submit_results"] = results
     (run_dir / "run.json").write_text(json.dumps(old, indent=2) + "\n")
@@ -179,7 +179,8 @@ def cmd_crosscheck(args) -> int:
 # --------------------------------------------------------------------------
 
 
-def decimate(wave: dict, keep: list[str], n: int = 400) -> dict:
+def thin_uniform(wave: dict, keep: list[str], n: int = 400) -> dict:
+    """Uniform-stride thinning to ~n samples (last point kept); NOT sim_common.decimate, which is change-triggered."""
     t = wave["time"]
     step = max(1, len(t) // n)
     idx = list(range(0, len(t), step))
@@ -252,7 +253,7 @@ def analyze_state(state: str, run_dir: Path, man: dict, traces: dict) -> dict:
         if g.get("invalid_input"):  # NaN/inf/ragged samples: no trace, so no NaN/Infinity tokens reach the trace JSON
             continue
         keep = ["v(vdd)", "v(resetn)", "i(bvdd)", *qc.SUBCELLS.values(), "i(vrst)", "v(ptat)", "v(ctat)"]
-        traces.setdefault(state, {})[cid] = decimate(wave, keep)
+        traces.setdefault(state, {})[cid] = thin_uniform(wave, keep)
     return {"requests": req, "points": pts}
 
 
@@ -597,7 +598,7 @@ def main(argv: list[str]) -> int:
     r.add_argument("--jobs", type=int, default=2)
     r.add_argument("--run-id")
     r.add_argument("--retry-failed", action="store_true")
-    r.add_argument("--capacity-wait", type=float, default=0)
+    sim_common.add_capacity_wait_arg(r)
     r.add_argument("--allow-dirty", action="store_true", help="submit from a dirty tree (debugging only; such a run's source revision does not resolve)")
     x = sub.add_parser("crosscheck")
     x.add_argument("--run-id", required=True)
