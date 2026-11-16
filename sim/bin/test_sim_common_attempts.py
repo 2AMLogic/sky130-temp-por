@@ -222,9 +222,7 @@ class NoRunnerOpenCodesTheseHelpersTest(unittest.TestCase):
         A runner may still assign a bare literal for a distinct named case it alone knows
         about (glitch's `deck_attribution`); what it may not do is re-derive the shared
         classification by inspecting `log_text` inline, which is how the thresholds copy
-        lost `timeout` and `error:<codes>`.  Deliberately NOT implicated:
-        `run_iq_campaign.classify_failure`, a different helper with a `timestep_too_small`
-        branch and a `klt:` prefix that never assigns `error_class`.
+        lost `timeout` and `error:<codes>`.
         """
         offenders = []
         for f in self.RUNNERS:
