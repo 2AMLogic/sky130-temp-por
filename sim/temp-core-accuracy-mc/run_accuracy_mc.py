@@ -1080,16 +1080,15 @@ def cmd_compare(args):
     now = datetime.now(timezone.utc)
     rid = f"{now:%Y%m%d-%H%M%S}-{gits['baseline']['sha']}"
     rec_dir = SIM_DIR / SLUG
-    if (rec_dir / "records" / f"{rid}.md").exists():
-        sys.exit(f"refusing to overwrite record {rid}")
+    # Raw per-sample CSVs and nominal logs stage in git-ignored scratch and are stored
+    # below; only the manifest and its summary are committed (sim/README.md).
+    snap, cdir = rec_dir / "netlist-snapshots" / rid, evidence_store.stage_dir_for(SLUG, rid)
+    sim_common.refuse_existing((rec_dir / "records" / f"{rid}.md", rec_dir / "records" / f"{rid}.json",
+                                snap, cdir, evidence_store.manifest_path(SLUG, rid)))
     pdk = json.loads((SIM_DIR / "pdk.json").read_text())
     graded = {}
     for name, d in (("baseline", base_dir), (variant, var_dir)):
         graded[name] = _grade_variant(d)
-    # Raw per-sample CSVs and nominal logs stage in git-ignored scratch and are stored
-    # below; only the manifest and its summary are committed (sim/README.md).
-    snap, cdir = rec_dir / "netlist-snapshots" / rid, evidence_store.stage_dir_for(SLUG, rid)
-    sim_common.refuse_existing((snap, cdir, evidence_store.manifest_path(SLUG, rid)))
     for d in (rec_dir / "records", snap, cdir):
         d.mkdir(parents=True, exist_ok=True)
     fleet = {}
