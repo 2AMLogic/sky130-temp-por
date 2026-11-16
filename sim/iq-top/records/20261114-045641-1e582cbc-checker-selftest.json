@@ -1,0 +1,287 @@
+{
+ "author": "313063438+loom-fleet-dispatch[bot]@users.noreply.github.com",
+ "cases": [
+  {
+   "case": "settled_constant_por",
+   "drift_rel": 0.0,
+   "expected": "ok",
+   "got": "ok",
+   "i_total_a": 2e-05,
+   "ok": true,
+   "pk_pk_rel": 0.0,
+   "reasons": [],
+   "state": "por-iq",
+   "sum_minus_direct_rel": 1.6940658945086004e-16
+  },
+  {
+   "case": "settled_constant_total",
+   "drift_rel": 0.0,
+   "expected": "ok",
+   "got": "ok",
+   "i_total_a": 2e-05,
+   "ok": true,
+   "pk_pk_rel": 0.0,
+   "reasons": [],
+   "state": "iq-total",
+   "sum_minus_direct_rel": 0.0
+  },
+  {
+   "case": "drifting_total",
+   "drift_rel": 0.05714285714285721,
+   "expected": "unsettled",
+   "got": "unsettled",
+   "i_total_a": 2.916666666666667e-05,
+   "ok": true,
+   "pk_pk_rel": 0.05714285714285709,
+   "reasons": [
+    "window-to-window drift 5.714% > 1%",
+    "trailing pk-pk 5.714% > 2%"
+   ],
+   "state": "iq-total",
+   "sum_minus_direct_rel": -1.1616451848058975e-16
+  },
+  {
+   "case": "drifting_por",
+   "drift_rel": 0.05714285714285721,
+   "expected": "unsettled",
+   "got": "unsettled",
+   "i_total_a": 2.916666666666667e-05,
+   "ok": true,
+   "pk_pk_rel": 0.05714285714285709,
+   "reasons": [
+    "window-to-window drift 5.714% > 1%",
+    "trailing pk-pk 5.714% > 2%"
+   ],
+   "state": "por-iq",
+   "sum_minus_direct_rel": 1.1616451848058975e-16
+  },
+  {
+   "case": "ripple_5pct_total",
+   "drift_rel": 0.0,
+   "expected": "unsettled",
+   "got": "unsettled",
+   "i_total_a": 2e-05,
+   "ok": true,
+   "pk_pk_rel": 0.10000000000000005,
+   "reasons": [
+    "trailing pk-pk 10.000% > 2%"
+   ],
+   "state": "iq-total",
+   "sum_minus_direct_rel": 0.0
+  },
+  {
+   "case": "not_released_total",
+   "drift_rel": 0.0,
+   "expected": "unsettled",
+   "got": "unsettled",
+   "i_total_a": 2e-05,
+   "ok": true,
+   "pk_pk_rel": 0.0,
+   "reasons": [
+    "RESETn not released (trailing mean 0.000 V <= 0.8*VDD)"
+   ],
+   "state": "iq-total",
+   "sum_minus_direct_rel": 0.0
+  },
+  {
+   "case": "negative_supply_current",
+   "drift_rel": 0.0,
+   "expected": "non-physical-branch",
+   "got": "non-physical-branch",
+   "i_total_a": -2e-05,
+   "ok": true,
+   "pk_pk_rel": 0.0,
+   "reasons": [
+    "settled total supply current -2e-05 A <= 0",
+    "sub-cell bias_core settled supply current -2e-06 A < -1e-09",
+    "sub-cell por_comparator settled supply current -4e-06 A < -1e-09",
+    "sub-cell por_output_chain settled supply current -6e-06 A < -1e-09",
+    "sub-cell temp_core settled supply current -8e-06 A < -1e-09"
+   ],
+   "state": "iq-total",
+   "sum_minus_direct_rel": 0.0
+  },
+  {
+   "case": "railed_ptat",
+   "drift_rel": 0.0,
+   "expected": "non-physical-branch",
+   "got": "non-physical-branch",
+   "i_total_a": 2e-05,
+   "ok": true,
+   "pk_pk_rel": 0.0,
+   "reasons": [
+    "v(ptat) in [5, 5] V outside [-0.30, 3.80]"
+   ],
+   "state": "iq-total",
+   "sum_minus_direct_rel": 0.0
+  },
+  {
+   "case": "ended_before_trailing_window",
+   "drift_rel": null,
+   "expected": "nonconverged",
+   "got": "nonconverged",
+   "i_total_a": null,
+   "ok": true,
+   "pk_pk_rel": null,
+   "reasons": [
+    "simulation ended at 0.01499 s, before the trailing window end 0.03 s"
+   ],
+   "state": "iq-total",
+   "sum_minus_direct_rel": null
+  },
+  {
+   "case": "invalid_nan_all_current",
+   "drift_rel": null,
+   "expected": "nonconverged",
+   "got": "nonconverged",
+   "i_total_a": null,
+   "ok": true,
+   "pk_pk_rel": null,
+   "reasons": [
+    "invalid input: non-finite or non-numeric sample nan in i(bvdd) at index 0"
+   ],
+   "state": "iq-total",
+   "sum_minus_direct_rel": null
+  },
+  {
+   "case": "invalid_nan_one_current",
+   "drift_rel": null,
+   "expected": "nonconverged",
+   "got": "nonconverged",
+   "i_total_a": null,
+   "ok": true,
+   "pk_pk_rel": null,
+   "reasons": [
+    "invalid input: non-finite or non-numeric sample nan in i(bvdd) at index 2996"
+   ],
+   "state": "iq-total",
+   "sum_minus_direct_rel": null
+  },
+  {
+   "case": "invalid_inf_current",
+   "drift_rel": null,
+   "expected": "nonconverged",
+   "got": "nonconverged",
+   "i_total_a": null,
+   "ok": true,
+   "pk_pk_rel": null,
+   "reasons": [
+    "invalid input: non-finite or non-numeric sample inf in i(bvdd) at index 2996"
+   ],
+   "state": "iq-total",
+   "sum_minus_direct_rel": null
+  },
+  {
+   "case": "invalid_nan_voltage",
+   "drift_rel": null,
+   "expected": "nonconverged",
+   "got": "nonconverged",
+   "i_total_a": null,
+   "ok": true,
+   "pk_pk_rel": null,
+   "reasons": [
+    "invalid input: non-finite or non-numeric sample nan in v(vdd) at index 2996"
+   ],
+   "state": "iq-total",
+   "sum_minus_direct_rel": null
+  },
+  {
+   "case": "invalid_inf_voltage",
+   "drift_rel": null,
+   "expected": "nonconverged",
+   "got": "nonconverged",
+   "i_total_a": null,
+   "ok": true,
+   "pk_pk_rel": null,
+   "reasons": [
+    "invalid input: non-finite or non-numeric sample -inf in v(resetn) at index 2996"
+   ],
+   "state": "iq-total",
+   "sum_minus_direct_rel": null
+  },
+  {
+   "case": "invalid_nan_time",
+   "drift_rel": null,
+   "expected": "nonconverged",
+   "got": "nonconverged",
+   "i_total_a": null,
+   "ok": true,
+   "pk_pk_rel": null,
+   "reasons": [
+    "invalid input: non-finite or non-numeric sample nan in time at index 1500"
+   ],
+   "state": "iq-total",
+   "sum_minus_direct_rel": null
+  },
+  {
+   "case": "invalid_inf_time",
+   "drift_rel": null,
+   "expected": "nonconverged",
+   "got": "nonconverged",
+   "i_total_a": null,
+   "ok": true,
+   "pk_pk_rel": null,
+   "reasons": [
+    "invalid input: non-finite or non-numeric sample inf in time at index 3000"
+   ],
+   "state": "iq-total",
+   "sum_minus_direct_rel": null
+  },
+  {
+   "case": "invalid_unequal_columns",
+   "drift_rel": null,
+   "expected": "nonconverged",
+   "got": "nonconverged",
+   "i_total_a": null,
+   "ok": true,
+   "pk_pk_rel": null,
+   "reasons": [
+    "invalid input: column i(bvdd) has 3000 samples, time has 3001"
+   ],
+   "state": "iq-total",
+   "sum_minus_direct_rel": null
+  },
+  {
+   "case": "invalid_duplicate_time",
+   "drift_rel": null,
+   "expected": "nonconverged",
+   "got": "nonconverged",
+   "i_total_a": null,
+   "ok": true,
+   "pk_pk_rel": null,
+   "reasons": [
+    "invalid input: time not strictly increasing at index 1500 (0.01499 -> 0.01499)"
+   ],
+   "state": "iq-total",
+   "sum_minus_direct_rel": null
+  },
+  {
+   "case": "invalid_reversed_time",
+   "drift_rel": null,
+   "expected": "nonconverged",
+   "got": "nonconverged",
+   "i_total_a": null,
+   "ok": true,
+   "pk_pk_rel": null,
+   "reasons": [
+    "invalid input: time not strictly increasing at index 1500 (0.01499 -> 0.014989)"
+   ],
+   "state": "iq-total",
+   "sum_minus_direct_rel": null
+  }
+ ],
+ "fixtures_regraded_from_disk": {
+  "drifting_total": "unsettled",
+  "settled_constant_total": "ok"
+ },
+ "git": {
+  "branch": "feature/issue-351",
+  "dirty": false,
+  "sha": "1e582cbc"
+ },
+ "kind": "settling/physicality checker self-test (synthetic currents, no simulation)",
+ "overall_pass": true,
+ "record_id": "20261114-045641-1e582cbc-checker-selftest",
+ "supersedes": null,
+ "timestamp": "2026-11-14T04:56:41Z"
+}
