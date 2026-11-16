@@ -590,6 +590,8 @@ def classify_error(corner: dict, log_text: str) -> str:
     """`error_class` for a corner that produced no usable result (display only, never a grade)."""
     if "could not find a valid modelname" in log_text:
         return "model_not_found"
+    if "timestep too small" in log_text.lower():
+        return "timestep_too_small"
     codes = [d.get("code") for d in corner.get("diagnostics", [])]
     if any(c and "timeout" in c for c in codes):
         return "timeout"
@@ -1764,9 +1766,12 @@ def decimate(cols, keep_dt, thresholds, keep_at=None):
 
     Keep the first and last sample, plus any sample where ``dt >= keep_dt`` since the last kept
     row, or a column with a non-None entry in ``thresholds`` (aligned with ``cols``) moved by at
-    least that much, or ``keep_at(t)`` is true.  Returns kept rows (row-major).
+    least that much, or ``keep_at(t)`` is true.  Returns kept rows (row-major).  An empty input
+    returns ``[]``; a single-sample input returns that one row exactly once.
     """
     n = len(cols[0])
+    if n <= 1:
+        return [[c[0] for c in cols]] if n else []
     trig = [(k, th) for k, th in enumerate(thresholds) if k and th is not None]
     rows = [[c[0] for c in cols]]
     last = rows[0]

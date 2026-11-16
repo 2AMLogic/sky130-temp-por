@@ -6,12 +6,12 @@ difference matters.  The request-construction classes get a `klt` stub, prepende
 `PATH` by their own `setUp`, answering `--version` and `sim` the way the real verb's
 outputs are shaped, so request construction, the shipped-`.spiceinit` path,
 report-to-result mapping and the no-local-fallback failure path are all exercised without
-a batch job.  The per-runner CLI probes in the last class get **no** stub: they spawn real
-runners against the real `klt`, and stay fleet-free only because every argv they pass is
-one argparse rejects before the runner reaches `cmd_run` -- `cli()` enforces that rather
-than leaving it to each test.  So do not read this line as a blanket guarantee for the
-whole file: an argv a runner *accepts* submits a real campaign (see that class's
-docstring, and PR #359).
+a batch job.  The per-runner CLI probes in the last class get **no** replaying stub
+either: they spawn real runners against a *tripwire* `klt` that records and refuses
+every verb -- `sim`, the one that can submit a campaign, included -- so no probe can
+execute the real tool at all.  `cli()` asserts the tripwire stayed silent after every
+probe, so an argv a runner *accepts* fails the suite instead of submitting (see that
+class's docstring, PR #359, and issue #363).
 
 The last two classes widen that scope from the request to the CLI that feeds it, across
 every `sim/*/run_*.py` rather than only the two bespoke ones: `batch.capacity_wait_s` is
@@ -31,11 +31,12 @@ import importlib.util
 import json
 import os
 import re
+import shutil
 import stat
 import subprocess
 import sys
 import tempfile
-import unittest
+import unittest.mock
 from pathlib import Path
 
 BIN = Path(__file__).resolve().parent
@@ -92,6 +93,30 @@ json.dump({"schema_version": 3, "mode": "decks", "status": "pass", "unit_count":
                                       "runner_request_features": {"required": ["decks"],
                                                                   "missing": [], "status": "supported"}}}},
           sys.stdout)
+"""
+
+# The per-runner probe class runs its subprocesses behind this *tripwire* `klt` instead
+# of the real tool.  The only verb that can submit a campaign (`sim`) is recorded in
+# TRIPWIRE_LOG and refused, so a probe argv argparse accepts cannot reach the fleet --
+# no matter its shape, option types, option positions, or whether the runner parses
+# with parse_args or parse_known_args (issue #363).  `--version` is answered the way
+# STUB_KLT does, and every other verb is refused too, never delegated: measured across
+# all 11 CAPACITY_WAIT_RUNNERS, no probe invokes `klt` at all -- `--help` exits rc 0
+# and an argv argparse rejects exits rc 2, both inside argparse, and the runners'
+# capability gate (`klt artifact put --help`, via evidence_store.preflight_or_exit)
+# runs inside the subcommand handlers, which no probe ever reaches.  Refusing every
+# verb keeps the containment absolute: no probe can execute the real, credentialed
+# `klt` on this host.
+TRIPWIRE_KLT = """#!/usr/bin/env python3
+import os, sys
+args = sys.argv[1:]
+if args[:1] == ["--version"]:
+    print("klt 9.9.9-stub")
+    sys.exit(0)
+open(os.environ["TRIPWIRE_LOG"], "a").write(" ".join(args) + "\\n")
+sys.stderr.write("klt tripwire: `klt %s` refused -- probes get `--version` only\\n"
+                 % (args[0] if args else "<no args>"))
+sys.exit(3)
 """
 
 
@@ -425,9 +450,14 @@ CAPACITY_WAIT_RUNNERS = {
 CANONICAL_FLAG = "--wait-for-capacity"
 DEPRECATED_ALIAS = "--capacity-wait"
 
-# Argv tokens that argparse is guaranteed to reject, so a subprocess probe below can
-# never reach a runner's `cmd_run` and submit to the fleet.  `--help` exits 0 inside
-# argparse; each of the other two makes `parse_args()` exit 2 there.
+# Tokens argparse rejects *in the positions today's probes place them*: `--help` exits 0
+# inside argparse, and each of the other two makes `parse_args()` exit 2 there.  On its
+# own the set promises nothing about position or option type -- as the value of a bare
+# string option (`--run-id`, `--author`) `not-a-number` parses fine on every runner and
+# would submit -- so this is only a cheap pre-check that fails inside the test process,
+# before any subprocess.  The actual guarantee is the tripwire `klt` every probe runs
+# behind, plus the expected argparse outcome each probe must declare (see the probe
+# class below).
 NOT_A_NUMBER = "not-a-number"              # rejected by `type=float`
 UNRECOGNISED_PROBE = "--loom-339-unrecognised-probe"   # rejected as a leftover option
 SUBMIT_FREE_TOKENS = frozenset({"--help", NOT_A_NUMBER, UNRECOGNISED_PROBE})
@@ -542,41 +572,198 @@ class CapacityWaitFlagReachesEveryRunnersParser(unittest.TestCase):
     """Source guards cannot see a parser built inside `main()`, so drive each runner's
     real CLI in a subprocess.
 
-    Every probe here must be stopped *by argparse itself*, before the chosen subcommand's
-    `fn` is called.  These runners submit to the Spot batch fleet, and a dispatch worker
-    exports `KLT_SIM_BACKEND=batch`, so any argv a runner ACCEPTS launches a real campaign
+    These runners submit to the Spot batch fleet, and a dispatch worker exports
+    `KLT_SIM_BACKEND=batch`, so any argv a runner ACCEPTS launches a real campaign
     from the test suite -- `.github/workflows/self-checks.yml` drives this file, so that
-    would be once per self-check run on every credentialed host.  `cli()` enforces the
-    invariant for every current and future probe rather than trusting each test to pick a
-    safe argv, because trusting each test is exactly what failed: the first version of
-    this class asserted only the *absence* of an `invalid value` message and so probed
-    `--wait-for-capacity 0.5`, which is a valid float.  It parsed, reached `cmd_run`, and
+    would be once per self-check run on every credentialed host.  Trusting each test to
+    pick a safe argv is exactly what failed twice: the first version of this class
+    probed `--wait-for-capacity 0.5`, a valid float that parsed, reached `cmd_run`, and
     submitted a live Monte Carlo campaign (job `klt-sim-aa1c808dee03`) on every run of
-    this file, while still reporting OK -- caught in review on PR #359."""
+    this file while still reporting OK -- caught in review on PR #359.  The token
+    pre-check that replaced it only promised its set for the positions today's probes
+    place them in: `--run-id not-a-number`, the value of a bare string option, satisfies
+    the set and is accepted by every runner in the table below (measured in issue
+    #363 -- the runner built a 36-point campaign and attempted one `klt sim` per point,
+    exiting 0).
 
-    def cli(self, rel: str, *argv: str):
-        """Drive one runner's real CLI on an argv argparse is guaranteed to reject."""
+    The guarantee is therefore environmental, independent of argv shape: every probe
+    runs behind a *tripwire* `klt` that records and refuses the one verb that can
+    submit (`sim`) -- and every other verb too, so no probe can execute the real
+    tool.  No probe reaches `klt` at all (measured: every probe exits inside
+    argparse; see TRIPWIRE_KLT's comment).  `cli()` asserts after every run that the
+    tripwire stayed silent, naming the argv that reached it -- a probe whose argv
+    argparse accepts fails the suite instead of submitting.  The expected argparse
+    outcome is a required
+    argument (`help` or `rejected`), so a future probe must state what argparse should
+    have done and fails loudly if the runner accepted the argv instead; that also keeps
+    the guarantee intact if a runner ever migrates to `parse_known_args`.  The token
+    pre-check stays only as a cheap fail-fast -- see its comment for what it promises.
+
+    Measured, on the issue-#363 worktree with a temporarily added
+    `cli(rel, "--run-id", NOT_A_NUMBER, expect=...)` probe: the suite fails at the
+    tripwire assertion naming the argv, the marker records every attempted `klt sim`,
+    and `find sim/build -name batch-receipt.json` stays at 0 -- no fleet job id ever
+    appears."""
+
+    def setUp(self):
+        self.tmp = tempfile.TemporaryDirectory(prefix="klt-tripwire-")
+        self.addCleanup(self.tmp.cleanup)
+        bindir = Path(self.tmp.name) / "bin"
+        bindir.mkdir()
+        self.klt = bindir / "klt"
+        self.klt.write_text(TRIPWIRE_KLT)
+        self.klt.chmod(self.klt.stat().st_mode | stat.S_IXUSR)
+        self.tripwire_log = Path(self.tmp.name) / "tripwire.log"
+        self.tripwire_log.touch()
+
+    def cli(self, rel: str, *argv: str, expect: str):
+        """Drive one runner's real CLI behind the tripwire, asserting the argparse
+        outcome the probe declares: `help` (exit 0, usage on stdout, empty stderr) or
+        `rejected` (exit 2, argparse's message on stderr)."""
+        if expect not in ("help", "rejected"):
+            self.fail(f"expect={expect!r} is not one of 'help'/'rejected'")
         self.assertTrue(
             SUBMIT_FREE_TOKENS.intersection(argv),
-            f"refusing to run {rel} with {list(argv)}: every probe in this class must "
-            f"carry one of {sorted(SUBMIT_FREE_TOKENS)} so argparse stops it before the "
-            "runner can submit to the fleet")
-        return subprocess.run([sys.executable, "-I", str(REPO / "sim" / rel),
-                               *CAPACITY_WAIT_RUNNERS[rel], *argv],
-                              cwd=REPO, capture_output=True, text=True)
+            f"refusing to run {rel} with {list(argv)}: this fast pre-check only fails "
+            f"before any subprocess when a probe carries one of {sorted(SUBMIT_FREE_TOKENS)} "
+            "in a position argparse rejects; the submit-free guarantee is the tripwire, "
+            "not this set")
+        p = subprocess.run(
+            [sys.executable, "-I", str(REPO / "sim" / rel),
+             *CAPACITY_WAIT_RUNNERS[rel], *argv],
+            cwd=REPO, capture_output=True, text=True,
+            env={**os.environ,
+                 "PATH": f"{Path(self.klt).parent}{os.pathsep}{os.environ['PATH']}",
+                 "TRIPWIRE_LOG": str(self.tripwire_log)})
+        tripped = self.tripwire_log.read_text()
+        self.assertEqual(
+            tripped, "",
+            f"the tripwire klt was invoked by {rel} with {list(argv)} -- the probe "
+            "reached `klt` instead of being stopped by argparse.  Nothing reached the "
+            "real tool (the tripwire refuses every verb), but this argv is not "
+            "probe-safe:\n"
+            + tripped)
+        if expect == "help":
+            self.assertEqual(p.returncode, 0, p.stderr)
+            self.assertIn("usage:", p.stdout)
+            self.assertEqual(p.stderr, "", "expected a clean --help run")
+        else:
+            self.assertEqual(p.returncode, 2, p.stderr)
+            self.assertTrue(p.stderr.strip(), "expected argparse's rejection on stderr")
+        return p
+
+    def test_the_tripwire_refuses_sim_and_records_the_attempt(self):
+        p = subprocess.run([str(self.klt), "sim", "req.json", "--backend", "batch"],
+                           capture_output=True, text=True,
+                           env={**os.environ, "TRIPWIRE_LOG": str(self.tripwire_log)})
+        self.assertNotEqual(p.returncode, 0, p.stderr)
+        self.assertIn("tripwire", p.stderr)
+        self.assertIn("sim req.json", self.tripwire_log.read_text())
+
+    def test_the_tripwire_answers_version_without_tripping(self):
+        """So a version check cannot perturb a probe -- and a `--help` probe, which
+        exits inside argparse, never reaches `klt` at all."""
+        p = subprocess.run([str(self.klt), "--version"], capture_output=True, text=True,
+                           env={**os.environ, "TRIPWIRE_LOG": str(self.tripwire_log)})
+        self.assertEqual(p.returncode, 0, p.stderr)
+        self.assertEqual(p.stdout.strip(), "klt 9.9.9-stub")
+        self.assertEqual(self.tripwire_log.read_text(), "")
+
+    def test_the_tripwire_refuses_every_verb_except_version(self):
+        """Containment is absolute: no probe may execute the real, credentialed `klt`.
+        Nothing on the probe path invokes `klt` before argparse (measured across all
+        11 runners -- see TRIPWIRE_KLT's comment), so refusing every non-`--version`
+        verb breaks nothing; a fake `klt` behind the tripwire proves it is never
+        reached."""
+        behind = tempfile.TemporaryDirectory(prefix="klt-behind-")
+        self.addCleanup(behind.cleanup)
+        real = Path(behind.name) / "klt"
+        real.write_text("#!/bin/sh\necho \"delegated $*\"\n")
+        real.chmod(real.stat().st_mode | stat.S_IXUSR)
+        p = subprocess.run(
+            [sys.executable, str(self.klt), "artifact", "put", "--help"],
+            capture_output=True, text=True,
+            env={**os.environ, "PATH": f"{self.klt.parent}{os.pathsep}{behind.name}",
+                 "TRIPWIRE_LOG": str(self.tripwire_log)})
+        self.assertNotEqual(p.returncode, 0, p.stdout)
+        self.assertIn("tripwire", p.stderr)
+        self.assertNotIn("delegated", p.stdout)
+        self.assertIn("artifact put --help", self.tripwire_log.read_text())
+
+    def test_a_valid_float_value_alone_is_refused_before_any_subprocess(self):
+        """PR #359's original regression: `--wait-for-capacity 0.5` parses and submits,
+        so the pre-check must refuse it inside the test process -- proven here by
+        arming `subprocess.run` to fail the test if it is ever reached."""
+        def explode(*a, **k):
+            raise AssertionError("subprocess.run was reached")
+        with unittest.mock.patch.object(subprocess, "run", side_effect=explode):
+            with self.assertRaises(AssertionError) as caught:
+                self.cli("temp-core-accuracy-mc/run_accuracy_mc.py",
+                         CANONICAL_FLAG, "0.5", expect="rejected")
+        self.assertIn("refusing to run", str(caught.exception))
+        self.assertNotIn("subprocess.run was reached", str(caught.exception))
+
+    def test_cli_fails_when_the_tripwire_was_tripped(self):
+        """The companion to the pre-check test above: `cli()`'s post-probe assertion
+        fires on a non-empty marker, so a probe that DID reach `klt` fails the suite.
+        Hermetic by construction -- the runner is driven with `--help`, which exits
+        inside argparse and never invokes anything, so the only possible failure is
+        the marker this test armed; it needs no `klt` and no credentials."""
+        self.tripwire_log.write_text("sim req.json\n")
+        with self.assertRaises(AssertionError) as caught:
+            self.cli("bias-core-op-branch/run_op_branch.py", "--help", expect="help")
+        self.assertIn("reached `klt`", str(caught.exception))
+
+    @unittest.skipUnless(
+        os.environ.get("KLT_ARTIFACT_BROKER") and shutil.which("klt"),
+        "the trip fires at the broker-gated capability probe inside cmd_run; without "
+        "KLT_ARTIFACT_BROKER and a real klt on PATH, evidence_store.preflight() "
+        "raises before any klt call, the marker stays empty, and this would pass "
+        "for the wrong reason")
+    def test_an_argv_argparse_accepts_fails_the_suite_at_the_tripwire(self):
+        """The direct testbench for this class's guarantee: `--run-id not-a-number`
+        parses on every runner (see SUBMIT_FREE_TOKENS), so an argv argparse ACCEPTS
+        must fail the suite at `cli()`'s tripwire assertion -- the probe reached
+        `klt` at the capability gate (`klt artifact put --help`, via
+        evidence_store.preflight_or_exit, the first `klt` an accepted argv gets to)
+        instead of being stopped by argparse.  The tripwire refused it, so no
+        campaign is built and nothing reaches the real tool; measured idempotent
+        (0.1 s, no sim/build, clean `git status`)."""
+        with self.assertRaises(AssertionError) as caught:
+            self.cli("temp-core-accuracy-mc/run_accuracy_mc.py",
+                     "--run-id", NOT_A_NUMBER, expect="rejected")
+        msg = str(caught.exception)
+        self.assertIn("reached `klt`", msg)
+        self.assertIn("artifact put --help", msg)
+
+    def test_every_probe_subprocess_runs_behind_the_tripwire(self):
+        """The guard is wired into the environment, not asserted per argv: whatever the
+        probe's argv turns out to be, its subprocess gets the tripwire first on PATH
+        and the marker path in the environment."""
+        seen = {}
+
+        def record(*a, **k):
+            seen.update(k)
+            return argparse.Namespace(returncode=0, stdout="usage: x", stderr="")
+
+        with unittest.mock.patch.object(subprocess, "run", side_effect=record):
+            self.cli("bias-core-op-branch/run_op_branch.py", "--help", expect="help")
+        self.assertTrue(seen["env"]["PATH"].startswith(f"{self.klt.parent}{os.pathsep}"),
+                        seen["env"]["PATH"])
+        self.assertEqual(seen["env"]["TRIPWIRE_LOG"], str(self.tripwire_log))
 
     def test_every_runner_names_the_canonical_flag_in_its_own_help(self):
         for rel in CAPACITY_WAIT_RUNNERS:
             with self.subTest(rel):
-                p = self.cli(rel, "--help")
-                self.assertEqual(p.returncode, 0, p.stderr)
+                p = self.cli(rel, "--help", expect="help")
                 self.assertIn(CANONICAL_FLAG, p.stdout)
 
     def test_no_runner_advertises_the_deprecated_alias(self):
         """One name in `--help`, so an operator learns the spelling the host rule uses."""
         for rel in CAPACITY_WAIT_RUNNERS:
             with self.subTest(rel):
-                self.assertNotIn(DEPRECATED_ALIAS, self.cli(rel, "--help").stdout)
+                self.assertNotIn(DEPRECATED_ALIAS,
+                                 self.cli(rel, "--help", expect="help").stdout)
 
     def test_every_runner_still_accepts_the_deprecated_alias(self):
         """Six runners shipped under `--capacity-wait` and READMEs, operator notes and
@@ -585,7 +772,7 @@ class CapacityWaitFlagReachesEveryRunnersParser(unittest.TestCase):
         for rel in CAPACITY_WAIT_RUNNERS:
             for flag in (CANONICAL_FLAG, DEPRECATED_ALIAS):
                 with self.subTest(f"{rel} {flag}"):
-                    err = self.cli(rel, flag, NOT_A_NUMBER).stderr
+                    err = self.cli(rel, flag, NOT_A_NUMBER, expect="rejected").stderr
                     self.assertIn("invalid float value", err)
                     self.assertNotIn("unrecognized arguments", err)
 
@@ -603,8 +790,7 @@ class CapacityWaitFlagReachesEveryRunnersParser(unittest.TestCase):
         absence of an `invalid value` message is also satisfied by a crash, a capacity
         refusal or a completed fleet job."""
         rel = "temp-core-accuracy-mc/run_accuracy_mc.py"
-        p = self.cli(rel, CANONICAL_FLAG, "0.5", UNRECOGNISED_PROBE)
-        self.assertEqual(p.returncode, 2, p.stderr)
+        p = self.cli(rel, CANONICAL_FLAG, "0.5", UNRECOGNISED_PROBE, expect="rejected")
         self.assertNotIn("invalid int value", p.stderr)
         self.assertNotIn("invalid float value", p.stderr)
         self.assertIn("unrecognized arguments", p.stderr)

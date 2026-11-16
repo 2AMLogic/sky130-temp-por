@@ -189,15 +189,6 @@ def thin_uniform(wave: dict, keep: list[str], n: int = 400) -> dict:
     return {"time_s": [t[i] for i in idx], **{k: [wave[k][i] for i in idx] for k in keep if k in wave}}
 
 
-def classify_failure(corner: dict, log_text: str) -> str:
-    if "could not find a valid modelname" in log_text:
-        return "model_not_found"
-    if "timestep too small" in log_text.lower():
-        return "timestep_too_small"
-    codes = sorted({d.get("code") for d in corner.get("diagnostics", []) if d.get("code")})
-    return "klt:" + ",".join(codes) if codes else "no_waveform"
-
-
 def analyze_state(state: str, run_dir: Path, man: dict, traces: dict) -> dict:
     rate = man["measurement"]["rate_v_per_s"]
     d = run_dir / state / sim_common.rate_tag(rate)
@@ -237,7 +228,7 @@ def analyze_state(state: str, run_dir: Path, man: dict, traces: dict) -> dict:
                    "diagnostics": [f"{dg.get('severity')}/{dg.get('code')}: {scrub(dg.get('message', ''), run_dir)[:300]}" for dg in c.get("diagnostics", [])]})
         wp = Path(art["waveform"]) if art.get("waveform") else None
         if wp is None or not wp.is_file():
-            pt.update({"status": "nonconverged", "reason": "no waveform retrieved: " + classify_failure(c, log_text)})
+            pt.update({"status": "nonconverged", "reason": "no waveform retrieved: " + sim_common.classify_error(c, log_text)})
             continue
         try:
             wave = qc.load_wave(wp)
