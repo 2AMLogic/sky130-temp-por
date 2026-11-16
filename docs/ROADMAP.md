@@ -4,9 +4,10 @@ sky130-temp-por is a temperature sensor + power-on-reset block on sky130, ported
 from [gf180-temp-por](https://github.com/2AMLogic/gf180-temp-por) and built with
 [klayout-tools](https://github.com/2AMLogic/klayout-tools) (`klt`), xschem and ngspice.
 
-Status as of 2026-11-13, `main` @ `5870ad5c`.
-
-The live queue is [`WORK_PLAN.md`](../WORK_PLAN.md) (generated from labels); the
+Status as of 2026-11-15, `main` @ `98a0d49c`. This page is hand-written and
+re-anchored only when a roadmap pass runs — no cadence is promised between
+passes, so it is expected to lag the tracker in between; the live queue is
+[`WORK_PLAN.md`](../WORK_PLAN.md) (generated from labels), and the
 verdict of record for the T1 checklist is
 [`manifests/signoff-report.json`](../manifests/signoff-report.json), not this page.
 
@@ -36,32 +37,34 @@ The signoff report grades `layout/temp_por_top/` at **7 of 11 T1 items met**.
   listed in that report's section 6: non-physical solver branches in the
   whole-block Iq, brown-out and glitch campaigns; no mismatch Monte Carlo on the
   POR thresholds; no cell-level record for `por_output_chain`.
-- **Recent work (PRs #294 to #330).** The sim runners were consolidated onto
-  shared `sim/bin/sim_common.py` helpers and the last two local ngspice grid
-  launchers now submit through `klt sim` (#330). Records derive their PDK and
-  tool versions from the run instead of hardcoding them (#300, #313, #315), and
-  attested files are re-hashed in CI (#301, #305).
+- **Recent work (PRs #294 to #383).** The sim runners were consolidated onto
+  shared `sim/bin/sim_common.py` helpers: one fleet-PDK reader whose stamp is
+  checked against the `sim/pdk.json` pin in every record (#332, #343), the
+  remaining runners routed through the shared evidence store (#336, #372), one
+  append-only-trailer renderer for every record (#366), and the dead boolean
+  scaffolding left over from that consolidation removed (#373). The last two
+  local ngspice grid launchers now submit through `klt sim` (#330). Records
+  derive their PDK and tool versions from the run instead of hardcoding them
+  (#300, #313, #315), and attested files are re-hashed in CI (#301, #305). The
+  docs caught up too: `spec/README.md` now indexes all seven decision records
+  with a per-DR status table (#375), and the characterization report cites the
+  mirror-degeneration record and no longer describes #86 as open (#370).
 
 ## Now (can start today; one pull request each)
 
 | What | Done when | Issue |
 |---|---|---|
 | Count the node-violation phases the glitch checker actually emits in the `NONPHYSICAL breakdown` line | a selftest case that fails on `main` passes, for both glitch classes; existing records untouched | #291 (ready; its labels are inconsistent, see below) |
-| Land the evidence-store routing of the six remaining sim runners | PR #336 merged; no new raw corner bytes under `sim/*/corners/` | #325 |
-| Land the single fleet-PDK reader in `sim_common` | PR #332 merged; no private copies left in the runners | #328 |
-| Compare the recorded runner PDK stamp with the `sim/pdk.json` pin | a record whose stamp differs from the pin is flagged by a test | #333 (awaiting curation) |
-| Remove dead boolean scaffolding in the brown-out and glitch synth stand-ins | the selftests pass with the dead branches gone | #334 (proposal) |
-| Index DR-004, DR-005 and DR-007 in `spec/README.md` | every file in `spec/decision-records/` is listed with its status | no issue yet |
-| Bring `docs/characterization-report.md` up to date: cite the mirror-degeneration record `sim/temp-core-accuracy-mc/records/20261107-235128-679442ca` and stop describing #86 as open | the record has an evidence entry; the coverage check still passes | no issue yet |
-| Mismatch Monte Carlo on the `por_comparator` thresholds | a new record under `sim/por-comparator-thresholds/records/` reports VPOR up, VPOR down and hysteresis spread per corner | no issue yet |
-| Cell-level testbench and record for `por_output_chain` | `sim/<new experiment>/` with `experiment.json`, a testbench and one full-grid record, cited in the report | no issue yet |
+| Mismatch Monte Carlo on the `por_comparator` thresholds | a new record under `sim/por-comparator-thresholds/records/` reports VPOR up, VPOR down and hysteresis spread per corner | #348 (in flight, `loom:building`) |
+| Cell-level testbench and record for `por_output_chain` | `sim/<new experiment>/` with `experiment.json`, a testbench and one full-grid record, cited in the report | #349 (in flight, `loom:building`; PR #374 open) |
 
 ## Next
 
 Unblocked by a named item above or by a ruling listed under "Blocked and waiting".
 
-- **Live check of one store-routed record** (#335): after PR #336 merges, one real
-  record from a store-routed runner, per #325's acceptance step 6.
+- **Live check of one store-routed record** (#335, curated): PR #336 has
+  merged, so what remains is one real record from a store-routed runner, per
+  #325's acceptance step 6.
 - **Re-qualify cited evidence under the current PDK pin** (#189): every record
   the characterization report cites was taken under the earlier open_pdks pin.
   Done when each cited experiment has a superseding record under `f6eeac7` and
