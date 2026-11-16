@@ -179,8 +179,6 @@ RENDER_EXCLUSIONS: dict[str, tuple[str, str]] = {
 FIXTURE_SEEDS: dict[str, str] = {
     "sim/bias-core-op-branch/run_op_branch.py":
         "sim/bias-core-op-branch/records/20261113-160939-9211b20a.md",
-    "sim/pnp-mismatch/run_pnp_mismatch.py":
-        "sim/pnp-mismatch/records/20261113-160939-9211b20a.md",
 }
 
 
