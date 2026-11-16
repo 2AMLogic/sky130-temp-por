@@ -122,7 +122,7 @@ class ToolsLineTest(unittest.TestCase):
         self.assertIn("fleet `unknown`", tools)
         self.assertIn("on Spot `unknown`", tools)
         self.assertIn("fleet runner klt `unknown`", tools)
-        self.assertIn("reported `unknown`", pdk_line)
+        self.assertIn("no PDK stamp", pdk_line)
         self.assertNotIn("mismatch", tools)
         # The client's own klt string is a legitimate input and stays; nothing about the
         # FLEET may carry a version when no job reported one.
@@ -172,7 +172,7 @@ class PdkLineTest(unittest.TestCase):
         """The grid ran on the fleet, so the runners' own stamp is reported separately
         from the recording host's install -- neither stands in for the other."""
         _, (pdk_line, _) = build([ran(runner_pdk="open_pdks " + "c" * 40), ran(runner_pdk="open_pdks " + "c" * 40)])
-        self.assertIn("the fleet runners that executed the grid reported `open_pdks " + "c" * 40 + "`", pdk_line)
+        self.assertIn("the fleet runners that executed the grid reported PDK `open_pdks " + "c" * 40 + "`", pdk_line)
 
     def test_the_client_resolved_pdk_is_never_cited_as_the_fleet_s(self):
         """The defect this change removes: `provenance.pdk` is the PDK the *client*
@@ -188,7 +188,7 @@ class PdkLineTest(unittest.TestCase):
         """`unknown` beats borrowing the client's value when the runner stamped nothing."""
         prov, (pdk_line, _) = build([ran(runner_pdk=None, client_pdk="open_pdks " + "9" * 40)])
         self.assertEqual(prov["fleet_pdk"], "unknown")
-        self.assertIn("reported `unknown`", pdk_line)
+        self.assertIn("no PDK stamp", pdk_line)
         self.assertNotIn("9" * 40, pdk_line)
 
     def test_disagreeing_fleet_pdks_are_both_reported(self):
