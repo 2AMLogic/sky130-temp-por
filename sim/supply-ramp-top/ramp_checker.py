@@ -45,7 +45,6 @@ Definitions (``vf`` = final supply of the point, ``rate`` = constant dVDD/dt)
 from __future__ import annotations
 
 import gzip
-import json
 import math
 import sys
 from pathlib import Path
@@ -59,6 +58,7 @@ from sim_common import (  # noqa: E402,F401  (shared hardened loader + waveform 
     load_wave,
     schmitt,
     write_gz_rows,
+    write_wave_fixture,
 )
 
 # --- exploratory grading constants (NOT ratified bounds) -------------------
@@ -454,7 +454,7 @@ def run_selftest(fixture_dir: Path | None = None) -> list[dict]:
                 "ok": got == want and ok_codes,
             }
         )
-        if fixture_dir is not None:
+        if fixture_dir is not None and name in ("double_release", "single_release"):
             fixture_dir.mkdir(parents=True, exist_ok=True)
             names = [c for c in wave if c in CORE]
             doc = {
@@ -462,9 +462,7 @@ def run_selftest(fixture_dir: Path | None = None) -> list[dict]:
                 "variables": [{"index": i, "name": c} for i, c in enumerate(names)],
                 "points": [[wave[c][k] for c in names] for k in range(len(wave["time"]))],
             }
-            if name in ("double_release", "single_release"):
-                with open(fixture_dir / f"{name}.wave.json", "w") as fh:
-                    json.dump(doc, fh, separators=(",", ":"))
+            write_wave_fixture(fixture_dir / f"{name}.wave.json", doc)
     return out
 
 

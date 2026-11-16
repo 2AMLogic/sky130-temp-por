@@ -209,8 +209,8 @@ class CoverageNoteTest(unittest.TestCase):
             "ff": {"runner_pdk": None, "job": "j2"}})})
         self.assertEqual(prov["fleet_pdk_reporting"], 1)
         self.assertEqual(prov["fleet_pdk_jobs"], 3)
-        self.assertIn("reported `open_pdks " + "a" * 40 + "` (from 1 of 3 fleet jobs; "
-                      "the rest reported none)", pdk_line)
+        self.assertIn("reported PDK `open_pdks " + "a" * 40 + "`", pdk_line)
+        self.assertIn("1 of 3 fleet jobs reported a stamp", pdk_line)
 
     def test_a_partial_engine_says_how_many_jobs_reported(self):
         prov, (_, tools) = lines({"pnp": ran(procs={"tt": {"engine": "46", "job": "j0"},
@@ -225,7 +225,7 @@ class CoverageNoteTest(unittest.TestCase):
     def test_no_coverage_at_all_stays_plain_unknown(self):
         _, (pdk_line, tools) = lines({"pnp": ran(procs={"tt": {"engine": None, "runner_pdk": None, "job": "j0"},
                                                         "ss": {"engine": None, "runner_pdk": None, "job": "j1"}})})
-        self.assertIn("reported `unknown`", pdk_line)
+        self.assertIn("no PDK stamp", pdk_line)
         self.assertNotIn("0 of 2", pdk_line)
         self.assertIn("fleet engine unknown;", tools)
 
@@ -295,7 +295,7 @@ class PdkLineTest(unittest.TestCase):
         prov, (pdk_line, _) = lines({"nominal": ran(runner_pdk="open_pdks " + "c" * 40),
                                      "pnp": ran(runner_pdk="open_pdks " + "c" * 40)})
         self.assertEqual(prov["fleet_pdk"], "open_pdks " + "c" * 40)
-        self.assertIn("the fleet runners that executed the grid reported `open_pdks "
+        self.assertIn("the fleet runners that executed the grid reported PDK `open_pdks "
                       + "c" * 40 + "`", pdk_line)
 
     def test_the_client_resolved_pdk_is_never_cited_as_the_fleet_s(self):
@@ -310,7 +310,7 @@ class PdkLineTest(unittest.TestCase):
     def test_a_runner_that_reports_no_stamp_is_unknown_not_the_client_s(self):
         prov, (pdk_line, _) = lines({"nominal": ran(runner_pdk=None, client_pdk="open_pdks " + "9" * 40)})
         self.assertEqual(prov["fleet_pdk"], "unknown")
-        self.assertIn("reported `unknown`", pdk_line)
+        self.assertIn("no PDK stamp", pdk_line)
         self.assertNotIn("9" * 40, pdk_line)
 
     def test_disagreeing_fleet_pdks_are_both_reported(self):
@@ -370,7 +370,7 @@ class FleetPinVerdictLineTest(unittest.TestCase):
                                      "pnp": ran(runner_pdk=None)})
         self.assertEqual(prov["fleet_matches_pin"], "match")
         self.assertEqual((prov["fleet_pdk_jobs"], prov["fleet_pdk_reporting"]), (2, 1))
-        self.assertIn("from 1 of 2 fleet jobs", pdk_line)
+        self.assertIn("1 of 2 fleet jobs reported a stamp", pdk_line)
         self.assertIn(sim_common.pin_state(True), pdk_line.split("; the fleet runners", 1)[1])
 
     def test_the_line_states_what_an_equal_commit_does_not_establish(self):
