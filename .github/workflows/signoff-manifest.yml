@@ -48,7 +48,33 @@ jobs:
           fi
           echo "signoff-report.json is current"
 
-      - name: Cited artifacts must still hash to what their envelopes recorded
+      - name: The graded T1 verdict must not regress below the committed floor
+        env:
+          # Raise when an item legitimately becomes `met`. Lowering this is a
+          # deliberate, reviewable one-line edit -- which is the whole point:
+          # klt re-renders the report, it never re-renders this number.
+          # See manifests/README.md ("CI: freshness is enforced, not remembered").
+          T1_MET_FLOOR: "7"
+        run: |
+          python3 -I - /tmp/signoff-fresh.json <<'PY'
+          import json, os, sys
+          report = json.load(open(sys.argv[1]))
+          floor = int(os.environ["T1_MET_FLOOR"])
+          count = report["t1_met_count"]
+          for item in report.get("items", []):
+              if item.get("tier") == "T1" and item.get("reason") is not None:
+                  print("T1 item {}: status={} reason={}".format(
+                      item.get("id"), item.get("status"), item.get("reason")))
+          print("t1_met_count={} floor={}".format(count, floor))
+          if count < floor:
+              print("::error::t1_met_count is {} but the committed floor is {} -- "
+                    "a graded T1 item regressed (see the reason lines above; "
+                    "stale_evidence usually means a mis-pinned citation). "
+                    "See manifests/README.md.".format(count, floor))
+              sys.exit(1)
+          PY
+
+      - name: Cited artifacts must hash to their envelopes' records and the manifest pins must match them
         run: python3 manifests/check-citations.py manifests/sky130-temp-por.json
 
       - name: Re-attest item 10 (repo hygiene) against its committed envelope

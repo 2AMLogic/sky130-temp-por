@@ -362,6 +362,42 @@ push/PR:
    is a diagnostics gap in the tool, filed as klayout-tools#5460 per the
    friction protocol, not worked around here.
 
+**Two assertions bound the *grade*, not just the render (#389).** The
+byte-compare proves the committed report is a faithful render of the manifest;
+it says nothing about what that render grades. A mis-pinned citation makes
+`klt signoff` degrade the item to `unmet` / `reason: "stale_evidence"` while
+exiting `3` as it always does, so the committed report then faithfully
+records the regression and every gate above stays green (PR #385 did exactly
+this to item 9, `t1_met_count` 7 -> 6). Two checks close it:
+
+- **Floor on `t1_met_count`** -- the step "The graded T1 verdict must not
+  regress below the committed floor" in `signoff-manifest.yml` reads
+  `t1_met_count` from the *fresh* render and fails below `T1_MET_FLOOR`, a
+  step-level `env:` literal (currently `"7"`). **Raising the floor in the
+  same PR is the normal way to record progress** when an item becomes `met`;
+  lowering it is a deliberate, reviewable one-line edit. The same step prints
+  every T1 item with a non-null `reason` (today the four `no_evidence`
+  items) on every run, so `stale_evidence` is visible in a green log. A
+  comparison against the base branch's report was rejected: it needs
+  baseline resolution for `push` vs `pull_request` and leaves a legitimate
+  re-scope no reviewable escape hatch.
+- **Pin check** -- `check-citations.py` requires every citation that carries
+  a `content_hash` to equal the cited envelope's
+  `provenance.input.content_hash` (the convention above: cite the
+  envelope's *recorded input hash*, not the envelope's own file hash). A
+  mismatch is a `MISPINNED` failure -- a third label alongside `STALE` and
+  `UNMAPPABLE`, because nothing drifted on disk and the entry's shape is
+  fine; the remedy is to re-pin and re-render. A pin whose envelope records
+  no `provenance.input.content_hash` also fails (fail closed). A citation
+  with **no** pin (items 4 and 11's `lvs.json`) is not pin-checked: whether
+  a citation needs a pin is `klt signoff`'s call. The summary line reports
+  both counts (6 artifact hashes, 6 pins today).
+
+The floor catches the general class without naming the cause; the pin check
+names the cause without catching a different one. The tool gap behind both is
+filed as klayout-tools#5903 (no exit-status or threshold distinction between
+"unmet: no evidence" and "unmet: stale pin") per the friction protocol.
+
 When the layout or design evidence moves, regenerate the report
 (`Regenerate` above), update any affected citation or pin in the manifest,
 and commit them together — the workflow revision pin and the report move in
@@ -375,7 +411,8 @@ and embeds content hashes, never host or author identifiers.
 
 Two workflows run on every push to `main` and every PR:
 
-- `signoff-manifest.yml` -- the signoff freshness gate described above.
+- `signoff-manifest.yml` -- the signoff freshness gate described above,
+  including the `t1_met_count` floor and the manifest-pin check.
 - `self-checks.yml` -- fast, deterministic, stdlib-only checks (no SPICE, no
   layout composition, no klt, no xschem):
   - `python3 -m unittest layout/bin/test_pad_island_census.py` (the three
