@@ -50,6 +50,33 @@ two separately recorded variants (`variants` in `experiment.json`):
   bare process name straight through to `.lib`, so this axis is reachable.
   Combined MOS-corner x resistor-skew points (for example ss MOS with high
   resistors) are **not** run.
+- **mc** (supplement, issue #348, separate records ending in
+  `-mismatch-mc`): local **mismatch Monte Carlo** on the `real-bias-core`
+  variant only — process sections `tt_mm, ss_mm` x temperature
+  `-40, 27, 125 C`, at the primary 100 V/s rate, N = 20 mismatch samples per
+  corner (klt `monte_carlo` block, `vary: mismatch`; local mismatch only,
+  never `MC_PR_SWITCH` global process MC). One `klt sim` request per
+  (process, temperature) = 6 requests: the measured worst-corner cost of the
+  real-bias-core 100 V/s grid is 142 s, so 20 x 142 s = 2840 s fits the
+  fleet's 3600 s per-job ceiling with headroom, while a request folding the
+  three temperatures together (60 x 142 s = 8520 s) would hit
+  `batch_job_timeout` — the failure `sim/temp-core-accuracy-mc` already
+  recorded. Each request's seed is the base seed plus a distinct offset
+  (`tt/-40C -> 20261115` … `ss/125C -> 20261120`; klt derives per-sample
+  seeds from the corner index, which is 0 in every one-corner request here,
+  so a shared base seed would re-draw the same realisations in all six).
+  Each sample is its own transient VDD sweep and returns its own waveform;
+  `threshold_extractor.py` extracts that sample's VPOR-up / VPOR-down, and
+  hysteresis is computed **per sample**. The record reports, per corner, the
+  mean and sample sigma (Bessel, n-1) of the three metrics over the valid
+  samples, the N, and the statistical resolution of that sigma,
+  `1/sqrt(2(N_valid-1))` (16.2% at N = 20). Disclosures: the MC points run
+  **without** the half-rate quasi-staticity guard; temperatures draw
+  **independent** realisation sets, so per-corner statistics are valid and no
+  per-sample temperature-drift or temperature-correlation claim is made; the
+  ideal-bias variant, ff/sf/fs, the ll/hh axis, global process MC and
+  post-layout parasitics are not sampled. Evidence only — the record states
+  no threshold and edits neither `spec/` nor DR-004.
 
 ## Cold-start invocation (from a clean checkout)
 
@@ -76,12 +103,17 @@ python3 run_thresholds_campaign.py run --run-id main --retry-failed --wait-for-c
 # 2. optional ll/hh passive-skew supplement (2 x 2 requests of 6 points)
 python3 run_thresholds_campaign.py run --axis passive-skew --run-id skew --wait-for-capacity 2700
 
+# 2b. mismatch Monte Carlo supplement (issue #348): 6 requests, one per
+#     (process, temperature), N = 20 mismatch samples each, real-bias-core only
+python3 run_thresholds_campaign.py run --axis mc --run-id mc --capacity-wait 600
+
 # 3. ONE single-corner local cross-check (the only local simulation; never a grid)
 python3 run_thresholds_campaign.py probe --variant ideal-bias --process tt --temp 27
 
 # 4. extract + write the append-only evidence (records/, corners/, netlist-snapshots/)
 python3 run_thresholds_campaign.py record --run-id main --author "<name>" --probe-note-file <note.md>
 python3 run_thresholds_campaign.py record --run-id skew --author "<name>"
+python3 run_thresholds_campaign.py record --run-id mc --author "<name>"
 ```
 
 The driver never launches ngspice over a grid itself. Every multi-point run
@@ -166,13 +198,14 @@ fleet exactly.
   needs the `[TBD]` `por-digital-min-vdd` input (porting-plan §2.3), which
   this campaign cannot supply. VPOR-down,min (2.535 V, real bias) is the
   number that ceiling would be checked against.
-- **What these numbers do not cover:** mismatch Monte Carlo (comparator
-  offset and divider-ratio mismatch are the likely dominant spread for a
-  ratio-set threshold), combined MOS x resistor-skew corners, post-layout
-  parasitics, and sweep rates other than 100/50 V/s. Fast-ramp behaviour of
-  the assembled block is `sim/supply-ramp-top/`'s job. A DR-003 amendment
-  should add a Monte Carlo margin before treating +257 mV as the design
-  margin.
+- **What these numbers do not cover:** the corner tables are corner values of
+  the nominal drawn circuit. Mismatch Monte Carlo is now run as the `--axis
+  mc` supplement (real-bias-core, tt/ss, N = 20 per corner, issue #348); a
+  DR-003 amendment should weigh its distributions before treating +257 mV as
+  the design margin. Still not covered: combined MOS x resistor-skew corners,
+  post-layout parasitics (MC included), sweep rates other than 100/50 V/s,
+  and mismatch on the ideal-bias variant. Fast-ramp behaviour of the
+  assembled block is `sim/supply-ramp-top/`'s job.
 
 ### Passive-skew supplement (ll/hh x -40/27/125 C, tt MOS): 6/6 per variant
 
@@ -198,6 +231,46 @@ corners or the margin of the main grid.
 replaced by the klt-extracted lumped-RC netlist (`layout/por_comparator/pex/`). New record ids; the schematic records above are
 untouched. Delta table, extraction model, and the `klt pex` blocker (pin order, MOS flavour) are in
 [`layout/por_comparator/pex/README.md`](../../layout/por_comparator/pex/README.md). Run with `run --variant <name>-postlayout`
+
+### Mismatch Monte Carlo supplement (issue #348): real-bias-core, tt/ss x -40/27/125 C, N = 20 per corner
+
+Record: `records/20261115-002854-ad5bbeda-real-bias-core-mismatch-mc.md` (+
+`.json`); fleet jobs `klt-sim-75437447430e`, `klt-sim-fcad8d4af43e`,
+`klt-sim-f0072776735a`, `klt-sim-d71889c27127`, `klt-sim-2e35a2e1c04a`,
+`klt-sim-c4092f427b38` (one per (process, temperature), 20 mismatch samples
+each, seeds 20261115-20261120, primary 100 V/s only, no half-rate guard).
+Per corner, over the **valid** samples (Bessel (n-1) sigmas; hysteresis per
+sample):
+
+| corner | N valid/N run | VPOR-up mean ± sigma (V) | VPOR-down mean ± sigma (V) | hysteresis mean ± sigma (mV) | sigma resolution | excluded |
+|---|---|---|---|---|---|---|
+| tt/-40C | 13/20 | 2.7789 ± 0.1520 | 2.6195 ± 0.1444 | 159.4 ± 7.6 | 20.4% | 7 |
+| tt/27C | 10/20 | 2.7023 ± 0.1157 | 2.5521 ± 0.1127 | 150.2 ± 14.4 | 23.6% | 10 |
+| tt/125C | 15/20 | 2.7396 ± 0.1478 | 2.5874 ± 0.1405 | 152.2 ± 7.4 | 18.9% | 5 |
+| ss/-40C | 11/20 | 2.7675 ± 0.1033 | 2.6082 ± 0.0979 | 159.3 ± 5.5 | 22.4% | 9 |
+| ss/27C | 13/20 | 2.7344 ± 0.1006 | 2.5776 ± 0.0957 | 156.9 ± 5.0 | 20.4% | 7 |
+| ss/125C | 19/20 | 2.7283 ± 0.1405 | 2.5749 ± 0.1335 | 153.3 ± 7.1 | 16.7% | 1 |
+
+Two findings the corner tables could not show:
+
+- **The mismatch spread of the thresholds is an order of magnitude larger
+  than the corner envelope.** VPOR-up spans 18 mV across the whole 5x3
+  corner grid of the nominal circuit; under mismatch its sigma is
+  100-152 mV at every simulated corner. The record states the resolution of
+  each sigma (17-24% at these N) alongside.
+- **38 of 120 samples never release reset at all**: POR_RAW held low through
+  the entire 0 -> 3.63 V -> 0 sweep (up AND down `no_transition`), with
+  `bias_core`'s VREF healthy (1.14-1.38 V at the intended branch), i.e. the
+  failure is downstream of the reference. One further sample shows
+  `multiple_transitions` on the DOWN segment. The per-corner distributions
+  therefore describe the **releasing subset** only; the failed-release
+  fraction (5-50% per corner) is part of the mismatch behaviour, and neither
+  DR-004's +257 mV corner margin nor a release-subset sigma describes those
+  samples.
+
+Evidence only, as everywhere in this campaign: no threshold is proposed,
+`spec/` and DR-004 are untouched. Temperatures draw independent realisation
+sets, so no per-sample temperature-drift claim is made.
 (post-layout variants are never part of the default `run`).
 
 ### Fleet friction (reported, not worked around locally)

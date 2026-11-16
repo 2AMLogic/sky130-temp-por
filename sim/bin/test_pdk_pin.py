@@ -11,6 +11,11 @@ Since issue #292 ``find_pdk()`` is a thin wrapper over corner-run.py's own
 resolver both entry points go through -- and, since issue #304, that there is
 exactly *one* loaded copy of it per process to go through.
 
+Since issue #388 it also asserts the pin-refusal *message* invariant as a
+source contract: one ``pdk_mismatch_message`` definition repo-wide, every
+``not pdk.matches_pin`` guard raising through it, and the two-site
+fail-closed asymmetry (see ``PdkMismatchMessageInvariantTests``).
+
 Run: python3 -I sim/bin/test_pdk_pin.py
 """
 from __future__ import annotations
@@ -18,6 +23,7 @@ from __future__ import annotations
 import importlib.util
 import json
 import os
+import re
 import subprocess
 import sys
 import tempfile
@@ -195,6 +201,143 @@ class LoaderSingleCopyTests(unittest.TestCase):
         self.assertIs(netlist.corner_run(), cr)
         self.assertIs(netlist.corner_run().Pdk, cr.Pdk)
         self.assertIs(netlist.corner_run().HarnessError, cr.HarnessError)
+
+
+def raise_statement(lines: list[str], guard_idx: int) -> str | None:
+    """The raise statement serving the ``if`` guard at ``guard_idx``, or None.
+
+    A one-line ``if ...: raise ...`` guard is the line itself; otherwise walk
+    forward past blank/comment lines to the first ``raise`` and collect
+    through the paren-balanced end of the statement, so multi-line raises
+    come back whole.
+    """
+    guard = lines[guard_idx]
+    _, _, tail = guard.partition(":")
+    if "raise" in tail:
+        return guard
+    collected: list[str] = []
+    depth: int | None = None
+    for line in lines[guard_idx + 1:guard_idx + 10]:
+        if depth is None:
+            stripped = line.strip()
+            if not stripped or stripped.startswith("#"):
+                continue
+            if not stripped.startswith("raise"):
+                return None
+            depth = line.count("(") - line.count(")")
+        else:
+            depth += line.count("(") - line.count(")")
+        collected.append(line)
+        if depth <= 0:
+            break
+    return "\n".join(collected) if collected else None
+
+
+class PdkMismatchMessageInvariantTests(unittest.TestCase):
+    """``pdk_mismatch_message`` is the one refusal text every pin guard raises (issue #388).
+
+    #338/PR #355 routed the last hand-copied pin-refusal messages onto
+    ``cr.pdk_mismatch_message`` and recorded the invariant only in a docstring
+    (``design/netlist.py``). The drifted copies it replaced went unnoticed for
+    ~2 months with every test green, so the invariant is asserted here at the
+    source level, in the shape of ``test_runner_fleet_pdk.py``'s guards:
+
+    * exactly one definition across ``sim/`` and ``design/``, and the message
+      literal only in ``sim/bin/corner-run.py``;
+    * every ``not pdk.matches_pin`` guard -- derived from the sources, not
+      listed -- raises through the helper, so a sixth site joins the contract
+      or fails here;
+    * the refusal asymmetry is a two-way table: the fail-closed sites are
+      named with expected counts, and the overridable ones must keep offering
+      ``--allow-pdk-mismatch``.
+
+    The asymmetry is deliberate (issue #338): ``--print-env`` output is eval'd
+    by ``pdk-env.sh`` and must never offer an override, and
+    ``design/netlist.py``'s argparse exposes no ``--allow-pdk-mismatch`` flag
+    to offer. This guard preserves that behavior; it does not revise it.
+
+    Stdlib source matching only: no runner is imported, and every scan skips
+    this file itself because it quotes the needles it asserts on.
+    """
+
+    # Repo-relative posix path -> expected number of fail-closed guards in it.
+    # The two entries: design/netlist.py's find_pdk() guard and corner-run.py's
+    # --print-env guard. A fail-closed guard that appears, disappears or gains
+    # an override must update this table deliberately.
+    FAIL_CLOSED = {
+        "design/netlist.py": 1,
+        "sim/bin/corner-run.py": 1,
+    }
+
+    GUARD_RE = re.compile(r"^\s*(?:el)?if\b.*\bnot pdk\.matches_pin\b")
+
+    def sources(self) -> dict[str, list[str]]:
+        """Every ``.py`` under ``sim/`` and ``design/`` except this file, as {rel: lines}."""
+        this_file = Path(__file__).resolve()
+        found = {
+            p.relative_to(REPO).as_posix(): p.read_text().splitlines()
+            for root in ("sim", "design")
+            for p in sorted((REPO / root).rglob("*.py"))
+            if p.resolve() != this_file
+        }
+        self.assertTrue(found, "no sources found under sim/ and design/")
+        return found
+
+    def test_pdk_mismatch_message_has_exactly_one_definition(self):
+        hits = [(rel, n) for rel, lines in self.sources().items()
+                for n, line in enumerate(lines, start=1)
+                if re.search(r"\bdef\s+pdk_mismatch_message\s*\(", line)]
+        self.assertEqual(
+            sorted({rel for rel, _ in hits}), ["sim/bin/corner-run.py"],
+            "pdk_mismatch_message must have exactly one definition, in "
+            "sim/bin/corner-run.py; found:\n  "
+            + "\n  ".join(f"{rel}:{n}" for rel, n in hits))
+
+    def test_the_message_literal_lives_only_in_corner_run(self):
+        needle = "is open_pdks"
+        hits = [(rel, n) for rel, lines in self.sources().items()
+                for n, line in enumerate(lines, start=1)
+                if needle in line]
+        self.assertEqual(
+            sorted({rel for rel, _ in hits}), ["sim/bin/corner-run.py"],
+            f"the pin-refusal literal {needle!r} escaped corner-run.py:\n  "
+            + "\n  ".join(f"{rel}:{n}" for rel, n in hits))
+
+    def test_every_refusal_guard_raises_through_the_helper(self):
+        fail_closed: dict[str, list[str]] = {}
+        for rel, lines in self.sources().items():
+            for n, line in enumerate(lines):
+                if not self.GUARD_RE.match(line):
+                    continue
+                where = f"{rel}:{n + 1}"
+                raise_src = raise_statement(lines, n)
+                self.assertIsNotNone(
+                    raise_src, f"{where}: 'not pdk.matches_pin' guard does not "
+                    "raise -- a pin refusal must refuse")
+                self.assertIn(
+                    "pdk_mismatch_message", raise_src,
+                    f"{where}: pin refusal does not route through "
+                    "pdk_mismatch_message (hand-copied message text?)")
+                if "allow_pdk_mismatch" in line:
+                    self.assertIn(
+                        "--allow-pdk-mismatch", raise_src,
+                        f"{where}: overridable guard no longer offers "
+                        "--allow-pdk-mismatch")
+                else:
+                    self.assertNotIn(
+                        "--allow-pdk-mismatch", raise_src,
+                        f"{where}: fail-closed guard offers the "
+                        "--allow-pdk-mismatch override it must not offer")
+                    fail_closed.setdefault(rel, []).append(where)
+        self.assertEqual(
+            {rel: len(sites) for rel, sites in fail_closed.items()},
+            self.FAIL_CLOSED,
+            "fail-closed pin refusals drifted from the two-way table (a site "
+            "appeared, disappeared or changed side):\n  expected "
+            f"{self.FAIL_CLOSED}\n  found: "
+            + "; ".join(f"{rel}: {', '.join(sites)}"
+                        for rel, sites in sorted(fail_closed.items()))
+            + "\n  update FAIL_CLOSED deliberately if the asymmetry changed")
 
 
 if __name__ == "__main__":
