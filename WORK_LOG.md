@@ -9,6 +9,10 @@ Chronological record of recently merged pull requests and closed issues. This fi
 
 ### 2026-11-15
 
+- **PR #375**: docs(spec): index all seven decision records in spec/README with per-DR status table
+- **Issue #346** (closed): Index DR-004, DR-005 and DR-007 in spec/README.md
+- **PR #366**: refactor(sim): render every record's append-only trailer from one sim_common helper
+- **Issue #337** (closed): Consolidate the duplicated record-markdown trailer into sim_common (10 renderers, 4 drifted footer texts)
 - **PR #370**: docs(report): index the mirror-degeneration record and retire #86 as an open owner
 - **Issue #347** (closed): Characterization report: cite the mirror-degeneration record and correct the #86 wording
 

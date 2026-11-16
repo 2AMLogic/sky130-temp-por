@@ -421,17 +421,15 @@ def absent(pdk_d: dict) -> list[str]:
     It does report one -- so the claim was stated, not observed, and went stale into
     append-only records that can no longer be corrected (issue #328).  Its replacement
     then declined to make the pin comparison, which issue #333 made available.  Both
-    halves are derived from this record's own `pdk` block now
-    (`sim_common.fleet_pdk_clause()` over `fleet_pdk` and `fleet_matches_pin`), so what
-    remains is the limitation that is still true: the comparison is of open_pdks commits,
-    not of the model library.
+    halves are derived from this record's own `pdk` block now, through the shared
+    renderer (`sim_common.fleet_pdk_sentence()`, issue #368), which also states what
+    the commit comparison does not establish and closes on the evidence this record
+    does have: the local cross-check.
     """
     return ABSENT + [
-        f"{sim_common.fleet_pdk_clause(pdk_d['fleet_pdk'], pdk_d['fleet_matches_pin'])}"
-        f" -- {pdk_d['fleet_pdk_reporting']} of {pdk_d['fleet_pdk_jobs']} fleet jobs reported a"
-        " stamp, and the verdict is recorded as `pdk.fleet_matches_pin`. That comparison is of"
-        f" commits only, so {sim_common.PIN_COMMIT_LIMIT}; agreement with the local cross-check"
-        " is this record's only evidence on the library itself.",
+        sim_common.fleet_pdk_sentence(
+            pdk_d, "agreement with the local cross-check is this record's only evidence"
+                   " on the library itself"),
     ]
 
 

@@ -179,6 +179,37 @@ record, snapshot and corner evidence, and point at the old one via
 testbenches, campaign drivers, `experiment.json` and READMEs are not evidence
 and remain editable.
 
+### Re-rendering a record from its twin
+
+`sim/bin/test_record_footer.py` (self-checks workflow) keeps the two halves of
+a record accountable to each other: every committed record that its renderer
+can still re-render is re-rendered from the `.json` twin alone and its trailer
+checked against `sim_common.record_footer_lines()` — one canonical append-only
+sentence, `Timestamp / author` and `Supersedes` taken from the `.json`, no
+private wording. That is a **property check on the trailer, not a
+byte-equality check**: a re-render is allowed to differ from the committed
+`.md` (deliberate renderer-wording changes, and link-bullet order following
+the `links` dict), so the contract is "it renders and the trailer has the
+canonical properties", not "it reproduces the file byte for byte".
+
+Some committed records cannot be re-rendered at all (eleven as of
+November 2026): their renderer resolves a `links` or record key by hard
+subscript that the record does not carry, because the key was added to the
+schema or the renderer after the record was written. These stay valid
+committed evidence; the live list is `RENDER_EXCLUSIONS` in
+`sim/bin/test_record_footer.py`, each entry pinned with the missing key and
+the reason. The set is **open**, not a historical footnote — growth comes from
+a renderer gaining a hard subscript, which retroactively breaks records
+already committed, as commit `7023a693` did to two of them the day after they
+were committed. The test therefore fails loudly, naming the record and the
+key, on any unregistered breakage, on a registry entry that no longer raises,
+and on a derived corpus floor that such a change can no longer net out
+against. Renderers whose committed records are all in the registry keep
+trailer coverage through a synthetic fixture doc built in the test. The three
+hand-written records with no `.json` twin (`brownout-top`'s fleet timeout and
+`supply-ramp-top`'s local probe and fleet refusal) are outside the round-trip
+set by construction — they have no renderer at all.
+
 ### New evidence goes to the artifact store
 
 New runs do not commit raw bytes — this holds for **every** runner in the repo,
