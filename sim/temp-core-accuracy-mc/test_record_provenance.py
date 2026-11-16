@@ -25,17 +25,22 @@ runner's per-process-job wiring and the lines it renders.
 Stdlib only: no SPICE, no PDK, no fleet, no record written.  `LoadTermContractTest`
 builds a run directory of stub `report.json` files under a temp dir so the real
 `load_term()` is exercised against the same shape the other tests stub.
+`CompareAppendOnlyGuardTest` (issue #402) drives the real `cmd_compare()` against a
+temp bench to pin its append-only guard: both record twins refused, pathful
+message, in one five-path call that fires before grading runs.
 
 Run: python3 -I sim/temp-core-accuracy-mc/test_record_provenance.py
 """
 from __future__ import annotations
 
+import argparse
 import json
 import re
 import shutil
 import sys
 import tempfile
 import unittest
+from datetime import datetime
 from pathlib import Path
 
 HERE = Path(__file__).resolve().parent
@@ -428,6 +433,137 @@ class RenderedLinesCarryNoLiteralTest(unittest.TestCase):
         for line in (fleet_half, tools_fleet):
             self.assertNotRegex(line, r"ngspice-\d|\b[0-9a-f]{40}\b|\b\d+\.\d+\.\d+\b",
                                 f"a default version survived into {line!r}")
+
+
+class _FixedDatetime(datetime):
+    """`datetime` stand-in with a frozen `now()`: makes `cmd_compare`'s rid deterministic."""
+
+    @classmethod
+    def now(cls, tz=None):
+        return cls(2026, 11, 16, 12, 0, 0, tzinfo=tz)
+
+
+class _StubStore:
+    """`evidence_store` stand-in: no-op preflight, stage/manifest paths inside a temp tree.
+
+    The real `stage_dir_for()` points at repo-level scratch (`sim/.work/.stage`) and
+    `manifest_path()` at the tracked `manifests/artifacts/`; stubbing both keeps every
+    collision case inside the temp bench, so no test writes anything into the repo.
+    """
+
+    def __init__(self, root):
+        self.root = root
+
+    def preflight_or_exit(self):
+        pass
+
+    def stage_dir_for(self, bench, run_id):
+        return self.root / "stage" / bench / run_id
+
+    def manifest_path(self, bench, run_id):
+        return self.root / "manifests" / f"{bench}-{run_id}.manifest.json"
+
+
+class _GradingReached(Exception):
+    """Raised by the stubbed `_grade_variant`: execution got past the append-only guard."""
+
+
+class CompareAppendOnlyGuardTest(unittest.TestCase):
+    """`cmd_compare`'s append-only guard covers both record twins and names the path (issue #402).
+
+    The guard used to hand-roll one check, on the `.md` twin only, with a message naming
+    the record id -- so a tree holding the `.json` without the `.md` sailed through and
+    `compare` went on to overwrite the committed `.json`.  It now makes ONE five-path
+    `sim_common.refuse_existing` call -- `cmd_record`'s shape -- before any grading runs.
+
+    Drives the real `cmd_compare()` with a frozen clock, a stubbed store and a grading
+    sentinel: every refusal below fires before grading, so no SPICE, no PDK, no fleet
+    and no record is written.  Stdlib only.
+    """
+
+    SHA = "ab" * 20
+    NOW = "20261116-120000"  # what _FixedDatetime renders; rid = NOW-SHA
+
+    def _patch(self, name, obj):
+        self.addCleanup(setattr, ram, name, getattr(ram, name))
+        setattr(ram, name, obj)
+
+    def _run_compare(self, collide=None):
+        """Drive `cmd_compare()` in a temp bench; return `(raised exception, rid, rec_dir, store_root)`.
+
+        `collide(rid, rec_dir, store_root)` pre-creates the obstruction under test.  The
+        returned exception is SystemExit (the refusal) or _GradingReached (past the
+        guard) -- which one is itself the fail-fast answer.
+        """
+        bench = Path(tempfile.mkdtemp())
+        self.addCleanup(shutil.rmtree, bench, ignore_errors=True)
+        run = bench / "build" / "run1"
+        run.mkdir(parents=True)
+        (run / "run.json").write_text(json.dumps({"git": {"sha": self.SHA, "dirty": False}}))
+        sim = bench / "sim"
+        rec_dir = sim / ram.SLUG
+        (rec_dir / "records").mkdir(parents=True)
+        (sim / "pdk.json").write_text("{}")
+        store_root = bench / "store"
+        rid = f"{self.NOW}-{self.SHA}"
+        if collide:
+            collide(rid, rec_dir, store_root)
+        self._patch("SIM_DIR", sim)
+        self._patch("BUILD", bench / "build")
+        self._patch("evidence_store", _StubStore(store_root))
+        self._patch("datetime", _FixedDatetime)
+
+        def _grading(_run_dir):
+            raise _GradingReached()
+
+        self._patch("_grade_variant", _grading)
+        args = argparse.Namespace(run_id="run1", variant="baseline", allow_dirty=True)
+        try:
+            ram.cmd_compare(args)
+        except (SystemExit, _GradingReached) as exc:
+            return exc, rid, rec_dir, store_root
+        self.fail("cmd_compare returned; neither refused nor reached grading")
+
+    def test_a_json_twin_without_its_md_refuses_naming_that_json(self):
+        """The hole this closes: `.json` alone must abort, saying which file is in the way."""
+        exc, rid, rec_dir, _ = self._run_compare(
+            lambda rid, rec_dir, root: (rec_dir / "records" / f"{rid}.json").touch())
+        self.assertIsInstance(exc, SystemExit)
+        self.assertIn(str(rec_dir / "records" / f"{rid}.json"), str(exc))
+
+    def test_the_md_twin_alone_still_refuses_naming_that_md(self):
+        """No regression on what already worked -- and the message is now the pathful one."""
+        exc, rid, rec_dir, _ = self._run_compare(
+            lambda rid, rec_dir, root: (rec_dir / "records" / f"{rid}.md").touch())
+        self.assertIsInstance(exc, SystemExit)
+        self.assertIn(str(rec_dir / "records" / f"{rid}.md"), str(exc))
+
+    def test_an_empty_records_dir_reaches_grading(self):
+        """The control: nothing in the way, the guard passes and grading begins."""
+        exc, *_ = self._run_compare()
+        self.assertIsInstance(exc, _GradingReached)
+
+    def test_a_pre_existing_snapshot_dir_still_refuses(self):
+        """The old second guard's coverage must survive the fold into the one call."""
+        exc, rid, rec_dir, _ = self._run_compare(
+            lambda rid, rec_dir, root: (rec_dir / "netlist-snapshots" / rid).mkdir(parents=True))
+        self.assertIsInstance(exc, SystemExit)
+        self.assertIn(str(rec_dir / "netlist-snapshots" / rid), str(exc))
+
+    def test_a_pre_existing_stage_dir_still_refuses(self):
+        exc, rid, _rec_dir, store_root = self._run_compare(
+            lambda rid, rec_dir, root: (root / "stage" / ram.SLUG / rid).mkdir(parents=True))
+        self.assertIsInstance(exc, SystemExit)
+        self.assertIn(str(store_root / "stage" / ram.SLUG / rid), str(exc))
+
+    def test_a_pre_existing_manifest_still_refuses(self):
+        def collide(rid, _rec_dir, root):
+            pth = root / "manifests" / f"{ram.SLUG}-{rid}.manifest.json"
+            pth.parent.mkdir(parents=True)
+            pth.touch()
+        exc, rid, _rec_dir, store_root = self._run_compare(collide)
+        self.assertIsInstance(exc, SystemExit)
+        self.assertIn(str(store_root / "manifests" / f"{ram.SLUG}-{rid}.manifest.json"), str(exc))
 
 
 if __name__ == "__main__":
