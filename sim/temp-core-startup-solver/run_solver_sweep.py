@@ -204,7 +204,7 @@ def grade_wave(wave, scenario, variant):
         return {"status": "nonconverged", "reason": "non-finite samples"}
     if t[-1] < TSTOP * 0.999:
         return {"status": "nonconverged", "reason": f"ended at {t[-1]:.4g}s < tstop"}
-    te, tb = t[-1], t[-1] - 1e-3
+    tb = t[-1] - 1e-3
     m = {
         "ptat": wave["v(ptat)"][-1], "ctat": wave["v(ctat)"][-1],
         "na": wave["v(xdut.na)"][-1], "nb": wave["v(xdut.nb)"][-1],

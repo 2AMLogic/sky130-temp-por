@@ -432,7 +432,6 @@ def synth_a(vf=3.3, st=None, t_obs=T_OBS_REF, behavior="ok", coarse=None, tstop=
     st = dict(st or REF_A)
     tl = timeline_a(st)
     ts = _grid_a(st, t_obs, coarse, tstop)
-    v_mid, v_il = FRAC_MID * vf, FRAC_IL * vf
     t_on = st["t0"] + st["te"] * 0.5  # POR_RAW crosses V_MID half way up the injection edge
     t_off = tl["t_fall_start"] + st["te"] * 0.5 + 30e-6  # POR_RAW recovers a little after the injection ends
     dwell = (t_off - t_on) if (not tl["control"] and behavior != "no_effect") else 0.0

@@ -1071,11 +1071,9 @@ def main(argv: list[str]) -> int:
     record_json = records_dir / f"{record_id}.json"
     snapshot = snapshots_dir / f"{record_id}.spice"
 
-    for path in (record_md, record_json, snapshot, corners_dir, art_manifest):
-        if path.exists():
-            raise HarnessError(
-                f"{path} already exists — sim/ is append-only, refusing to overwrite"
-            )
+    sim_common.refuse_existing(
+        (record_md, record_json, snapshot, corners_dir, art_manifest)
+    )
 
     if not args.dry_run:
         # Fail closed before simulating: no broker/klt means no run, no fallback.
