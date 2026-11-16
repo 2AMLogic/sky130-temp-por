@@ -203,13 +203,16 @@ class LoaderSingleCopyTests(unittest.TestCase):
         self.assertIs(netlist.corner_run().HarnessError, cr.HarnessError)
 
 
-def raise_statement(lines: list[str], guard_idx: int) -> str | None:
+def raise_statement(lines: list[str], guard_idx: int, where: str = "") -> str | None:
     """The raise statement serving the ``if`` guard at ``guard_idx``, or None.
 
     A one-line ``if ...: raise ...`` guard is the line itself; otherwise walk
-    forward past blank/comment lines to the first ``raise`` and collect
-    through the paren-balanced end of the statement, so multi-line raises
-    come back whole.
+    forward past blank/comment lines to the first statement. If that is not a
+    ``raise`` (bind-then-raise is unsupported) return None. Otherwise collect
+    through the paren-balanced end of the statement -- however long -- so
+    multi-line raises come back whole. A statement still open at end of file
+    raises ``AssertionError`` naming ``where`` rather than returning partial
+    text.
     """
     guard = lines[guard_idx]
     _, _, tail = guard.partition(":")
@@ -217,7 +220,7 @@ def raise_statement(lines: list[str], guard_idx: int) -> str | None:
         return guard
     collected: list[str] = []
     depth: int | None = None
-    for line in lines[guard_idx + 1:guard_idx + 10]:
+    for line in lines[guard_idx + 1:]:
         if depth is None:
             stripped = line.strip()
             if not stripped or stripped.startswith("#"):
@@ -229,8 +232,46 @@ def raise_statement(lines: list[str], guard_idx: int) -> str | None:
             depth += line.count("(") - line.count(")")
         collected.append(line)
         if depth <= 0:
-            break
-    return "\n".join(collected) if collected else None
+            return "\n".join(collected)
+    if collected:
+        raise AssertionError(
+            f"{where or f'line {guard_idx + 1}'}: raise statement after the "
+            "guard is unterminated (unbalanced parentheses to end of file)")
+    return None
+
+
+class RaiseStatementTests(unittest.TestCase):
+    """``raise_statement`` itself: window, truncation and non-raise handling (#398)."""
+
+    def test_one_line_guard_is_the_statement(self):
+        lines = ["if not pdk.matches_pin: raise X(1)", "other()"]
+        self.assertEqual(raise_statement(lines, 0), lines[0])
+
+    def test_short_raise(self):
+        lines = ["if g:", "    # why", "", "    raise X(", "        a,", "    )", "y()"]
+        self.assertEqual(raise_statement(lines, 0), "\n".join(lines[3:6]))
+
+    def test_long_raise_is_returned_whole(self):
+        body = [f"        part{i}," for i in range(20)]
+        lines = ["if g:", "    raise X(", *body, "        '--allow-pdk-mismatch',", "    )"]
+        got = raise_statement(lines, 0)
+        self.assertIn("--allow-pdk-mismatch", got)
+        self.assertTrue(got.endswith("    )"))
+
+    def test_raise_on_last_line_of_file(self):
+        self.assertEqual(raise_statement(["if g:", "    raise X()"], 0), "    raise X()")
+
+    def test_unterminated_raise_fails_loudly_naming_site(self):
+        with self.assertRaises(AssertionError) as cm:
+            raise_statement(["if g:", "    raise X(", "        a,"], 0, "f.py:1")
+        self.assertIn("f.py:1", str(cm.exception))
+        self.assertIn("unterminated", str(cm.exception))
+
+    def test_non_raise_first_statement_returns_none(self):
+        self.assertIsNone(raise_statement(["if g:", "    msg = f()", "    raise X(msg)"], 0))
+
+    def test_guard_at_end_of_file_returns_none(self):
+        self.assertIsNone(raise_statement(["if g:"], 0))
 
 
 class PdkMismatchMessageInvariantTests(unittest.TestCase):
@@ -310,10 +351,11 @@ class PdkMismatchMessageInvariantTests(unittest.TestCase):
                 if not self.GUARD_RE.match(line):
                     continue
                 where = f"{rel}:{n + 1}"
-                raise_src = raise_statement(lines, n)
+                raise_src = raise_statement(lines, n, where)
                 self.assertIsNotNone(
-                    raise_src, f"{where}: 'not pdk.matches_pin' guard does not "
-                    "raise -- a pin refusal must refuse")
+                    raise_src, f"{where}: first statement after the 'not pdk.matches_pin' "
+                    "guard is not a raise; bind-then-raise is not supported by "
+                    "this helper -- raise directly through pdk_mismatch_message")
                 self.assertIn(
                     "pdk_mismatch_message", raise_src,
                     f"{where}: pin refusal does not route through "
