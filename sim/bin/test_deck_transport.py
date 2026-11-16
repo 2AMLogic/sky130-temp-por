@@ -31,6 +31,7 @@ import importlib.util
 import json
 import os
 import re
+import shutil
 import stat
 import subprocess
 import sys
@@ -701,6 +702,39 @@ class CapacityWaitFlagReachesEveryRunnersParser(unittest.TestCase):
                          CANONICAL_FLAG, "0.5", expect="rejected")
         self.assertIn("refusing to run", str(caught.exception))
         self.assertNotIn("subprocess.run was reached", str(caught.exception))
+
+    def test_cli_fails_when_the_tripwire_was_tripped(self):
+        """The companion to the pre-check test above: `cli()`'s post-probe assertion
+        fires on a non-empty marker, so a probe that DID reach `klt` fails the suite.
+        Hermetic by construction -- the runner is driven with `--help`, which exits
+        inside argparse and never invokes anything, so the only possible failure is
+        the marker this test armed; it needs no `klt` and no credentials."""
+        self.tripwire_log.write_text("sim req.json\n")
+        with self.assertRaises(AssertionError) as caught:
+            self.cli("bias-core-op-branch/run_op_branch.py", "--help", expect="help")
+        self.assertIn("reached `klt`", str(caught.exception))
+
+    @unittest.skipUnless(
+        os.environ.get("KLT_ARTIFACT_BROKER") and shutil.which("klt"),
+        "the trip fires at the broker-gated capability probe inside cmd_run; without "
+        "KLT_ARTIFACT_BROKER and a real klt on PATH, evidence_store.preflight() "
+        "raises before any klt call, the marker stays empty, and this would pass "
+        "for the wrong reason")
+    def test_an_argv_argparse_accepts_fails_the_suite_at_the_tripwire(self):
+        """The direct testbench for this class's guarantee: `--run-id not-a-number`
+        parses on every runner (see SUBMIT_FREE_TOKENS), so an argv argparse ACCEPTS
+        must fail the suite at `cli()`'s tripwire assertion -- the probe reached
+        `klt` at the capability gate (`klt artifact put --help`, via
+        evidence_store.preflight_or_exit, the first `klt` an accepted argv gets to)
+        instead of being stopped by argparse.  The tripwire refused it, so no
+        campaign is built and nothing reaches the real tool; measured idempotent
+        (0.1 s, no sim/build, clean `git status`)."""
+        with self.assertRaises(AssertionError) as caught:
+            self.cli("temp-core-accuracy-mc/run_accuracy_mc.py",
+                     "--run-id", NOT_A_NUMBER, expect="rejected")
+        msg = str(caught.exception)
+        self.assertIn("reached `klt`", msg)
+        self.assertIn("artifact put --help", msg)
 
     def test_every_probe_subprocess_runs_behind_the_tripwire(self):
         """The guard is wired into the environment, not asserted per argv: whatever the
