@@ -1,19 +1,29 @@
 #!/usr/bin/env python3
 """Shared ``klt``-invocation plumbing for this repo's layout build scripts.
 
-One caller today: ``layout/bin/compose-cell.py``, the per-cell
-gen/compose/DRC/extract/LVS chain. The contract kept here is about *the
-tool*, not about that one chain -- shell out to ``klt ... --format json``,
-treat a missing or unparsable JSON response as fatal, treat an ``error``
-object in an otherwise well-formed response as fatal (but *not* every
-non-zero exit -- see :func:`run_klt`), serialize every committed
-artifact with one fixed JSON spelling (see :func:`write_json`), and WARN
-(not fail) when the installed ``klt``'s commit drifts from
-``layout/pdk.json``'s pin (see :func:`check_klt_pin`, issue #51). Keeping
-it in its own module rather than inline in ``compose-cell.py`` is what
-lets a second ``klt``-driving script inherit the contract by import
-instead of restating it; there is no such second script yet, and no
-extraction history behind this file -- it was written here, as-is.
+The contract kept here is about *the tool*, not about any one caller's
+chain -- shell out to ``klt ... --format json``, treat a missing or
+unparsable JSON response as fatal, treat an ``error`` object in an
+otherwise well-formed response as fatal (but *not* every non-zero exit --
+see :func:`run_klt`), serialize every committed artifact with one fixed
+JSON spelling (see :func:`write_json`), and WARN (not fail) when the
+installed ``klt``'s commit drifts from ``layout/pdk.json``'s pin (see
+:func:`check_klt_pin`, issue #51). Keeping it in its own module rather than
+inline in one caller is what lets every ``klt``-driving script in
+``layout/bin/`` inherit that contract by import instead of restating it --
+that is the point of the module, and it is the part of this docstring that
+is this file's own to keep accurate.
+
+Which siblings import it, and which names they take, is a fact about
+*other* files that nothing in CI checks, so re-derive it rather than
+trusting a count written here::
+
+    git grep -n "^from _klt_common import" -- 'layout/bin/*.py'
+
+As of f8c1f3ca (2026-11-14) that is ``attest-layout.py`` (``BuildError``,
+``run_klt``), ``check-promotion.py`` (``BuildError``, ``run_klt``,
+``write_json``) and ``compose-cell.py`` (all four names, including
+``check_klt_pin`` -- the per-cell gen/compose/DRC/extract/LVS chain).
 
 These are scripts, not an installed package, so an importer puts this
 file's own directory on ``sys.path`` and imports it by bare module name.
