@@ -55,7 +55,7 @@ jobs:
       - name: Artifact manifests are well-formed, artifact-only and byte-free
         run: python3 -I .github/scripts/check_artifact_manifests.py
 
-      - name: Citation-freshness checker selftest (artifact and LVS compare branches, list-valued evidence entries, object `file` references, unmappable shapes)
+      - name: Citation-freshness checker selftest (artifact and LVS compare branches, manifest-pin MISPINNED branch, list-valued evidence entries, object `file` references, unmappable shapes)
         run: python3 -I manifests/test_check_citations.py
 
       - name: PDK pin enforcement tests (refuse a tree whose revision is not the sim/pdk.json pin)
@@ -111,6 +111,9 @@ jobs:
 
       - name: POR-comparator threshold extractor selftest
         run: python3 -I sim/por-comparator-thresholds/threshold_extractor.py
+
+      - name: POR-comparator mismatch-MC statistics reduction selftest (synthetic fixture, no SPICE, no PDK)
+        run: python3 -I sim/por-comparator-thresholds/test_mc_statistics.py
 
       - name: Iq checker selftest (invalid-waveform rejection, irregular sampling)
         run: python3 -I sim/iq-top/iq_checker.py

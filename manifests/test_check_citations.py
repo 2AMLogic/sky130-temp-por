@@ -15,8 +15,8 @@ the **envelope's own directory**:
   `provenance.input.content_hash`;
 - a `klt lvs` envelope's `layout` / `reference` netlists against
   `environment.layout_sha256` / `reference_sha256` — the only machine
-  freshness gate an LVS citation has, since its shape carries no
-  `provenance.input.content_hash` for a manifest pin to bind to.
+  freshness gate an LVS citation has when the manifest does not pin it
+  (items 4 and 11 carry no `content_hash` for `lvs.json`).
 
 Two shapes of indirection above those hashes are walked (#302), and both
 are checked here because getting either wrong is silent:
@@ -32,6 +32,10 @@ An entry, citation or `file` form the checker cannot resolve is an
 `UNMAPPABLE` failure, not a skip. That rule is about those repo-controlled
 *shapes* only — a readable envelope with no recognized hash shape still
 counts zero and stays green, which is what `UnmappedEnvelopeTest` pins.
+
+The manifest's own `content_hash` pin is checked as well (#389): it must
+equal the envelope's `provenance.input.content_hash`, under a third label,
+`MISPINNED` (`ManifestPinTest`).
 
 `klt signoff --attest` envelopes are deliberately **out** of scope since
 #303: items 1, 9 and 10 mark their toolchain-bound commands
@@ -518,6 +522,92 @@ class UnmappableEntryTest(unittest.TestCase):
         self.assertNotIn("re-render the evidence", err)
 
 
+class ManifestPinTest(unittest.TestCase):
+    """The manifest's own `content_hash` pin is checked (issue #389).
+
+    `klt signoff` grades the pin only by degrading the item to `unmet` /
+    `stale_evidence`; the byte-compared report then faithfully renders the
+    mis-pin, so nothing else in CI fails.
+    """
+
+    GDS_BYTES = b"GDS-BYTES\n"
+
+    def _drc(self):
+        return {DRC: _drc_envelope(self.GDS_BYTES), GDS: self.GDS_BYTES}
+
+    def test_matching_pin_passes_and_is_counted(self):
+        pin = _sha(self.GDS_BYTES)
+        with _repo(self._drc(), {"3": {"file": DRC, "content_hash": pin}}):
+            rc, out, err = _run()
+        self.assertEqual(rc, 0, err)
+        self.assertIn("1 manifest pin(s)", out)
+
+    def test_bare_pin_equals_prefixed_envelope_hash(self):
+        pin = hashlib.sha256(self.GDS_BYTES).hexdigest()
+        with _repo(self._drc(), {"3": {"file": DRC, "content_hash": pin}}):
+            rc, _out, err = _run()
+        self.assertEqual(rc, 0, err)
+
+    def test_mismatched_pin_is_mispinned_not_stale(self):
+        """The #385 shape: pinned to something other than provenance.input."""
+        envelope = self._drc()[DRC]
+        wrong = _sha(envelope)  # the envelope's own file hash
+        with _repo(self._drc(), {"9": {"file": DRC, "content_hash": wrong}}):
+            rc, _out, err = _run()
+        self.assertEqual(rc, 1)
+        lines = [ln for ln in err.splitlines() if "MISPINNED" in ln]
+        self.assertEqual(len(lines), 1, err)
+        self.assertIn("item 9", lines[0])
+        self.assertIn(DRC, lines[0])
+        self.assertIn(wrong[len("sha256:"):], lines[0])
+        self.assertIn(_sha(self.GDS_BYTES)[len("sha256:"):], lines[0])
+        self.assertNotIn("STALE", err)
+
+    def test_pin_with_no_envelope_hash_fails_closed(self):
+        envelope = json.dumps({"schema_version": 1, "status": "clean"}).encode()
+        with _repo({DRC: envelope},
+                   {"3": {"file": DRC, "content_hash": _sha(b"x")}}):
+            rc, _out, err = _run()
+        self.assertEqual(rc, 1)
+        self.assertIn("MISPINNED", err)
+        self.assertIn("cannot be validated", err)
+
+    def test_citation_without_a_pin_is_not_pin_checked(self):
+        """LVS shape with no manifest pin stays green, though its envelope
+        carries a provenance.input.content_hash (the skip keys on the pin)."""
+        layout, reference = b"* layout\n", b"* reference\n"
+        envelope = json.loads(_lvs_envelope(layout, reference))
+        envelope["provenance"] = {"input": {"content_hash": _sha(layout)}}
+        files = {LVS: json.dumps(envelope).encode(),
+                 "layout/temp_por_top/temp_por_top.spice": layout,
+                 "layout/temp_por_top/temp_por_top.ref.spice": reference}
+        with _repo(files, {"4": {"file": LVS}}):
+            rc, out, err = _run()
+        self.assertEqual(rc, 0, err)
+        self.assertIn("0 manifest pin(s)", out)
+
+    def test_list_entry_with_one_pinned_and_one_unpinned_citation(self):
+        layout, reference = b"* layout\n", b"* reference\n"
+        files = {ERC: _erc_envelope(self.GDS_BYTES), GDS: self.GDS_BYTES,
+                 LVS: _lvs_envelope(layout, reference),
+                 "layout/temp_por_top/temp_por_top.spice": layout,
+                 "layout/temp_por_top/temp_por_top.ref.spice": reference}
+        entry = [{"file": ERC, "content_hash": _sha(self.GDS_BYTES)},
+                 {"file": LVS}]
+        with _repo(files, {"11": entry}):
+            rc, out, err = _run()
+        self.assertEqual(rc, 0, err)
+        self.assertIn("1 manifest pin(s)", out)
+
+    def test_mispin_in_a_list_entry_is_reported(self):
+        files = {ERC: _erc_envelope(self.GDS_BYTES), GDS: self.GDS_BYTES}
+        entry = [{"file": ERC, "content_hash": _sha(b"other")}]
+        with _repo(files, {"11": entry}):
+            rc, _out, err = _run()
+        self.assertEqual(rc, 1)
+        self.assertIn("MISPINNED", err)
+
+
 class RealManifestTest(unittest.TestCase):
     """The committed manifest's own shapes, not a synthetic fixture."""
 
@@ -535,6 +625,25 @@ class RealManifestTest(unittest.TestCase):
         erc = json.loads((root / ERC).read_text())
         self.assertIsInstance(erc["file"], dict)
         self.assertEqual(erc["file"]["scope"], "repo")
+
+    def test_committed_pins_match_their_envelopes(self):
+        """`main`'s six pins are checked, so the pin branch cannot go dead."""
+        root = Path(__file__).resolve().parent.parent
+        previous = Path.cwd()
+        os.chdir(root)
+        try:
+            out, err = io.StringIO(), io.StringIO()
+            saved = sys.stdout, sys.stderr
+            sys.stdout, sys.stderr = out, err
+            try:
+                rc = cc.main(["check-citations.py",
+                              "manifests/sky130-temp-por.json"])
+            finally:
+                sys.stdout, sys.stderr = saved
+        finally:
+            os.chdir(previous)
+        self.assertEqual(rc, 0, err.getvalue())
+        self.assertIn("6 manifest pin(s)", out.getvalue())
 
 
 if __name__ == "__main__":

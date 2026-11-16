@@ -48,8 +48,9 @@ def file_status(path):
 def index_rows(readme_text):
     """Parse the README's table. Returns (rows, malformed): rows are
     (stem, status_word_or_None, line_number) for every row whose first cell
-    names a DR-00N; malformed is (line_number, line) for every pipe row that
-    does not split into exactly four cells."""
+    names a DR-00N; malformed is (line_number, line) for every decision-record
+    pipe row (a row naming a DR-00N stem) that does not split into exactly
+    four cells. Unrelated tables are not this check's scope."""
     rows, malformed = [], []
     for lineno, line in enumerate(readme_text.splitlines(), start=1):
         stripped = line.strip()
@@ -57,7 +58,8 @@ def index_rows(readme_text):
             continue
         cells = [c.strip() for c in stripped.strip("|").split("|")]
         if len(cells) != 4:
-            malformed.append((lineno, stripped))
+            if STEM_RE.search(stripped):
+                malformed.append((lineno, stripped))
             continue
         m = STEM_RE.search(cells[0])
         if not m:
@@ -91,9 +93,9 @@ def check(records_dir, readme_path):
         file_stems.add(stem)
         status, lineno = file_status(path)
         if status is None:
-            violations.append((str(path.relative_to(records_dir.parents[2])), f"{stem}: no `- **Status**:` bullet found (fail-closed)"))
+            violations.append((str(path.relative_to(records_dir.parents[1])), f"{stem}: no `- **Status**:` bullet found (fail-closed)"))
         elif status not in VOCABULARY:
-            violations.append((str(path.relative_to(records_dir.parents[2])), f"{stem}: line {lineno}: status word '{status}' is outside the vocabulary {sorted(VOCABULARY)}"))
+            violations.append((str(path.relative_to(records_dir.parents[1])), f"{stem}: line {lineno}: status word '{status}' is outside the vocabulary {sorted(VOCABULARY)}"))
         if stem not in indexed:
             violations.append((README, f"no index table row names {stem} ({path.name}); a prose mention does not count"))
             continue
@@ -183,6 +185,23 @@ def selftest():
         write_record(dr_dir, "DR-003-c.md", "proposed")
         write_readme(root, [row("DR-001", "proposed"), row("DR-002", "ratified"), row("DR-003", "proposed") + " extra |"])
         rc |= expect_failure("malformed row", "does not split into four cells")
+
+        # Scoping: the malformed-row check covers decision-record rows only.
+        # An unrelated non-four-cell table elsewhere in the README must NOT be
+        # reported, while a DR-naming row that fails to split into four cells
+        # still must be. (A DR row mangled past its stem cell is still caught
+        # fail-closed by the "no index table row names DR-00N" check.)
+        write_record(dr_dir, "DR-003-c.md", "proposed")
+        write_readme(
+            root,
+            [row("DR-001", "proposed"), row("DR-002", "ratified"), row("DR-003", "proposed") + " extra |"],
+            prose="| Key | Value |\n  |---|---|\n  | foo | bar |",
+        )
+        got = check(dr_dir, readme)
+        bad = [msg for _, msg in got if "does not split into four cells" in msg]
+        if len(bad) != 1 or "DR-003" not in bad[0]:
+            print(f"selftest FAILED: scoping — expected exactly the DR-003 mangled row reported, unrelated table ignored (got {got})", file=sys.stderr)
+            rc = 1
 
         # Fail-closed: no records discovered at all.
         for p in dr_dir.glob("DR-*.md"):

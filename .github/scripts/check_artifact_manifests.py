@@ -18,7 +18,15 @@ schema_version 1):
               the corner name) is the experiment slug. Same slug — or an
               unnamed / unattributable name, which cannot be checked (fail
               safe) — is duplication; different slugs are distinct files
-              sharing bytes, not duplication.
+              sharing bytes, not duplication. A tracked path under the closed
+              sim/<slug>/corners/ tree is exempt: check_records_append_only.py
+              makes those trees closed historical evidence -- nothing in them
+              can be added, edited, moved or removed (#325) -- so a copy there
+              is pre-store history a same-experiment re-run cannot avoid
+              re-creating, not a live second copy. A batch request.json is a
+              deterministic function of an unchanged grid: the re-derived
+              20261115 bytes equal the 20261113 committed bytes exactly
+              (sha256 8d2bbb3c...), yet no edit may touch either copy (#397).
 Each manifest needs its '.summary.md' twin. Stdlib only; no klt, no broker
 (`klt artifact verify` needs the broker and runs from fleet workers).
 
@@ -104,6 +112,16 @@ def slug(path):
     return None
 
 
+def in_closed_corners(path):
+    """True for a tracked path under the closed sim/<slug>/corners/ tree.
+
+    Mirrors check_records_append_only.py's protected glob sim/*/corners/*
+    (the slug component may not be '.work', matching slug() below).
+    """
+    parts = path.split("/")
+    return parts[0] == "sim" and len(parts) > 3 and parts[1] != ".work" and parts[2] == "corners"
+
+
 def run(repo):
     tracked = [p for p in git(repo, "ls-files", "-z").decode().split("\0") if p]
     manifests = sorted(p for p in tracked if re.fullmatch(re.escape(ART_DIR) + r"/[^/]+\.manifest\.json", p))
@@ -121,7 +139,7 @@ def run(repo):
     sizes = {s for s, _ in stored.values()}
     if stored:
         for p in tracked:
-            if p.startswith(ART_DIR + "/") or not (repo / p).is_file():
+            if p.startswith(ART_DIR + "/") or in_closed_corners(p) or not (repo / p).is_file():
                 continue
             f = repo / p
             if f.stat().st_size in sizes and (h := hashlib.sha256(f.read_bytes()).hexdigest()) in stored:
@@ -130,7 +148,11 @@ def run(repo):
                 # entry: an unnamed object or an unattributable path cannot be
                 # scoped, so it fails safe; a same-slug name is duplication;
                 # a different-slug name is a distinct experiment sharing bytes
-                # (clean-pass corner stubs across experiments).
+                # (clean-pass corner stubs across experiments). Tracked paths
+                # under the closed sim/<slug>/corners/ tree are skipped above:
+                # they are protected, immutable history (#325), so a byte match
+                # there is history a re-run necessarily recreates, not a live
+                # second copy (#397).
                 ps = slug(p)
                 why = None
                 for n in names[h]:
@@ -190,8 +212,12 @@ def selftest():
     case("empty entries fails", lambda d: d.update(entries=[]), False)
     case("absolute name fails", lambda d: d["entries"][0].update(name="/etc/x"), False)
     case("arn in manifest fails", lambda d: d["entries"][0].update(name="arn:aws:x"), False)
-    case("same-experiment staging bytes fail",
+    case("same-experiment duplicate outside corners/ fails",
          lambda d: d["entries"][0].update(name="sim/.work/.stage/exp/20260101-000000-abc/tt.log"), False,
+         lambda r: (r / "sim" / "exp").mkdir(parents=True)
+         or (r / "sim" / "exp" / "tt.log").write_bytes(b"payload\n"))
+    case("same-experiment duplicate under closed corners/ passes",
+         lambda d: d["entries"][0].update(name="sim/.work/.stage/exp/20260101-000000-abc/tt.log"), True,
          lambda r: (r / "sim" / "exp" / "corners" / "20260101-000000-abc").mkdir(parents=True)
          or (r / "sim" / "exp" / "corners" / "20260101-000000-abc" / "tt.log").write_bytes(b"payload\n"))
     case("cross-experiment staging bytes pass",
@@ -206,8 +232,8 @@ def selftest():
          lambda r: (r / "sim").mkdir() or (r / "sim" / "tt.log").write_bytes(b"payload\n"))
     case("unattributable name fails safe",
          lambda d: d["entries"][0].update(name="sim/.work/scratch/x/tt.log"), False,
-         lambda r: (r / "sim" / "exp" / "corners" / "20260101-000000-abc").mkdir(parents=True)
-         or (r / "sim" / "exp" / "corners" / "20260101-000000-abc" / "tt.log").write_bytes(b"payload\n"))
+         lambda r: (r / "sim" / "exp").mkdir(parents=True)
+         or (r / "sim" / "exp" / "tt.log").write_bytes(b"payload\n"))
     case("unrelated tracked file passes", lambda d: None, True,
          lambda r: (r / "sim").mkdir() or (r / "sim" / "o.log").write_bytes(b"other!!\n"))
 

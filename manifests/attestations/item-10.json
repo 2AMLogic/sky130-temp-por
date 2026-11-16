@@ -17,14 +17,14 @@
         "role": "hygiene",
         "path": ".github/workflows/self-checks.yml",
         "passed": true,
-        "content_hash": "sha256:b4af840b194d322b2cf733a849c4f15802cbdaf3697e7de5571d7b67e878d1fa"
+        "content_hash": "sha256:6defc164727c60889bc824e11fb4f339f07001bcf72d49019570dd30e119c50c"
       },
       {
         "check": "present",
         "role": "hygiene",
         "path": ".github/workflows/signoff-manifest.yml",
         "passed": true,
-        "content_hash": "sha256:64d688b89596d131fc693a3468dd3e782a9a54db369560279b2b6d51aa6a576d"
+        "content_hash": "sha256:3e192695019dd938fde8ab57c4f333df504b4024f10af6e0387fddc8020c64b5"
       },
       {
         "check": "present",
@@ -119,7 +119,7 @@
     ]
   },
   "provenance": {
-    "klt_version": "0.8.0",
+    "klt_version": "0.9.3.dev59+g3b0df2c6b8e8",
     "klayout_version": null,
     "pdk": null,
     "deck": null,

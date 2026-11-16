@@ -260,8 +260,17 @@ under `manifests/`. Object names are klt staging paths
 experiment slug: a runner committing its own raw bytes still fails, while
 byte-identical files across different experiments (e.g. the 4-line clean-pass
 corner stubs, which differ only in the corner name) are distinct evidence, not
-duplication. Unnamed or unattributable object names fail safe. Evidence
-committed before this change stays where it is.
+duplication. One exemption: a tracked path under the closed
+`sim/<experiment>/corners/` tree does not trip the same-experiment byte
+rule — `check_records_append_only.py` (`CLOSED_TO_ADDITIONS`) already makes
+those trees closed historical evidence, nothing in them can be added, edited,
+moved or removed (#325), so a copy there is pre-store history a
+same-experiment re-run cannot avoid re-creating, not a live second copy; the
+two gates are complementary, not contradictory. A batch `request.json` is a
+deterministic function of an unchanged grid: the re-derived bytes equal the
+committed bytes exactly, yet no edit may touch either copy (#397). Unnamed or
+unattributable object names fail safe. Evidence committed before this change
+stays where it is.
 
 **The rule is enforced, not only documented.**
 `.github/scripts/check_records_append_only.py` fails a change that *adds* any

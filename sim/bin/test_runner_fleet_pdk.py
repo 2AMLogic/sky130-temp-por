@@ -51,7 +51,8 @@ from pathlib import Path
 HERE = Path(__file__).resolve().parent
 REPO_ROOT = HERE.parent.parent
 for _d in ("sim/brownout-top", "sim/glitch-top", "sim/supply-ramp-top", "sim/iq-top",
-           "sim/temp-core-startup-solver", "sim/temp-core-accuracy-mc", "sim/bin"):
+           "sim/temp-core-startup-solver", "sim/temp-core-accuracy-mc",
+           "sim/por-comparator-thresholds", "sim/bin"):
     sys.path.insert(0, str(REPO_ROOT / _d))
 
 import sim_common  # noqa: E402
@@ -62,6 +63,7 @@ import run_iq_campaign as riq  # noqa: E402
 import run_iq_sensitivity as ris  # noqa: E402
 import run_ramp_campaign as rr  # noqa: E402
 import run_solver_sweep as rss  # noqa: E402
+import run_thresholds_campaign as rtc  # noqa: E402
 
 RUNNER_STAMP = "open_pdks " + "c" * 40          # what the fleet machine ran under
 CLIENT_STAMP = "open_pdks " + "9" * 40          # what the CLIENT resolved -- never the fleet's
@@ -184,6 +186,13 @@ def _accuracy_mc(run_dir: Path, pin: dict, **kw) -> dict:
     return {k: prov[k] for k in FLEET_KEYS}
 
 
+def _thresholds_mc(run_dir: Path, pin: dict, **kw) -> dict:
+    """Driven at the mismatch-MC record's seam: the per-request `runner_pdk()` list
+    (issue #348's `run --axis mc` record path) -> `fleet_pdk_fields`."""
+    rep = stub_report([one_corner()], **kw)
+    return sim_common.fleet_pdk_fields(rtc.mc_runner_pdks([rep]), pin)
+
+
 FLEET_KEYS = ("fleet_pdk", "fleet_pdk_jobs", "fleet_pdk_reporting", "fleet_matches_pin")
 
 RUNNERS = {
@@ -194,6 +203,7 @@ RUNNERS = {
     "iq-top/run_iq_sensitivity.py": _iq_sensitivity,
     "temp-core-startup-solver/run_solver_sweep.py": _solver,
     "temp-core-accuracy-mc/run_accuracy_mc.py": _accuracy_mc,
+    "por-comparator-thresholds/run_thresholds_campaign.py": _thresholds_mc,
 }
 
 

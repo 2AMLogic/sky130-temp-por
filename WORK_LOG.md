@@ -7,8 +7,44 @@ Chronological record of recently merged pull requests and closed issues. This fi
 - [2026-09](work_log/WORK_LOG_2026-09.md)
 - [2026-08](work_log/WORK_LOG_2026-08.md)
 
+### 2026-11-16
+
+- **PR #379**: sim: mismatch Monte Carlo record and mode for the por_comparator thresholds (issue #348)
+- **PR #352**: docs(layout): drop _klt_common.py's stale caller count and provenance claim
+- **PR #392**: test: guard the one-definition pin-refusal invariant as source contract
+- **PR #396**: test(sim): pin non-re-renderable records in an explicit, doubly-guarded registry
+- **PR #357**: refactor(sim): dispatch write_wave_fixture on the .gz suffix and adopt it in the last two checkers
+- **PR #381**: refactor(sim): render the fleet-PDK record sentence from one shared renderer
+- **Issue #348** (closed): por-comparator-thresholds: mismatch Monte Carlo on VPOR up, VPOR down and hysteresis
+- **Issue #344** (closed): Delete the false provenance narrative in _klt_common.py's docstring: three importers, not "one caller today", and README calls the same file a byte-for-byte port
+- **Issue #388** (closed): No source-level guard test for the single-definition invariant #338 just established (pdk_mismatch_message)
+- **Issue #367** (closed): Nine committed sim records cannot be re-rendered from their own .json twin (renderers resolve post-dating schema keys by hard key)
+- **Issue #351** (closed): Route the last two checkers' wave-fixture writers through sim_common.write_wave_fixture (ea999aa7 residue; 345 KiB uncompressed in-tree)
+- **Issue #368** (closed): Dedupe the fleet-PDK record sentence: one sim_common renderer, not six hand-assembled bridges
+
 ### 2026-11-15
 
+- **PR #374**: feat(sim): first cell-level PVT record for por_output_chain, plus batch-submit capacity wait
+- **PR #359**: refactor(sim): declare the fleet capacity-wait flag once, defaulting to the host rule
+- **PR #393**: ci: guard the decision-record index in spec/README.md with a self-checking checker
+- **PR #382**: chore(sim): remove the four unused imports ruff F401 flags
+- **PR #387**: docs(roadmap): re-anchor the Now list to main @ 98a0d49c and state the re-anchor trigger
+- **PR #355**: refactor(sim): route the last two PDK pin refusals through cr.pdk_mismatch_message
+- **PR #377**: refactor(sim): rename iq-top's stride thinner decimate to thin_uniform
+- **PR #372**: refactor(sim): route the thresholds per-point .log and error_class through sim_common
+- **PR #354**: refactor(sim): build the deck-list record's batch provenance in sim_common, not twice
+- **PR #373**: refactor(sim): drop dead boolean scaffolding from brownout/glitch checker stand-ins
+- **PR #383**: refactor(census): make the sibling memo actually cache, drop dead run_census(cell_dir=) and the double cell.json parse
+- **Issue #349** (closed): Add a cell-level testbench and PVT record for por_output_chain
+- **Issue #339** (closed): Consolidate the fleet capacity-wait flag: one field, eleven CLI declarations, two names, nine defaulting it off
+- **Issue #361** (closed): Remove the four unused imports ruff F401 flags: one 25e5f542 residue plus three never used in their file
+- **Issue #362** (closed): docs/ROADMAP.md: re-anchor the Now list against current main and state what triggers a re-anchor
+- **Issue #338** (closed): Route the last two PDK pin-mismatch messages through cr.pdk_mismatch_message (#292 residue, already drifted to pdk.variant)
+- **Issue #356** (closed): iq-top: rename run_iq_campaign.decimate — the bare name is sim_common's change-triggered decimator everywhere else in sim/
+- **Issue #365** (closed): por-comparator-thresholds: route the last inline point_log and error_class copies through sim_common (10db1d54 residue; the error_class copy cannot say `timeout`)
+- **Issue #350** (closed): Consolidate the record's deck-list batch provenance block into sim_common (#297 residue: 45 identical lines in both bespoke runners)
+- **Issue #334** (closed): Remove dead boolean scaffolding in the brownout/glitch synth stand-ins (`and False` guard, no-op `pass` branch, subsumed disjunct)
+- **Issue #364** (closed): pad-island-census.py: three inert leftovers — a memo cache that never caches, an unused run_census(cell_dir=), and a double cell.json parse
 - **PR #375**: docs(spec): index all seven decision records in spec/README with per-DR status table
 - **Issue #346** (closed): Index DR-004, DR-005 and DR-007 in spec/README.md
 - **PR #366**: refactor(sim): render every record's append-only trailer from one sim_common helper
