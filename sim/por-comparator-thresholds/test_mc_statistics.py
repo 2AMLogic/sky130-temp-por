@@ -1,11 +1,11 @@
 #!/usr/bin/env python3
-"""Tests for the mismatch Monte Carlo statistics reduction (issue #348).
+"""Tests for the mismatch Monte Carlo statistics reduction (issues #348, #401).
 
 The `--axis mc` record reports, per corner, the mean and sample sigma (Bessel,
 n-1) of VPOR-up, VPOR-down and hysteresis over the VALID samples, plus the
 statistical resolution of that sigma as a number.  The defect class this pins:
 a statistics layer that quietly mis-measures the very spread it exists to
-report.  Four ways that happens, each with a test:
+report.  Ways that happens, each with a test:
 
   * a population (n) divisor instead of Bessel (n-1) -- understates sigma;
   * hysteresis sigma combined from the two MARGINAL sigmas instead of computed
@@ -17,6 +17,22 @@ report.  Four ways that happens, each with a test:
   * an all-invalid corner rendered as sigma = 0 -- "nothing was measured" must
     stay a three-state NO-RESULT, never a measurement of zero spread;
   * the resolution figure itself: 1/sqrt(2(N-1)), exact.
+
+The #401 diagnostic reduction pins a second defect class: a reduction that
+DISCARDS the enable/clamp-path evidence (the netlist saves `v(bias_ok)` and the
+comparator-internal nodes; discarding them is exactly why 38 failed-release
+realisations could not be attributed), mislabels the mechanism, or quietly
+re-baselines a non-reproduction:
+
+  * the trace and per-sample fields keep the diagnostic nodes when the netlist
+    saves them, and stay absent (never zero) when it does not;
+  * the peak sampling interpolates at tstop/2, the VDD peak;
+  * the stuck-class labels follow their stated criteria, and "no data" is
+    `None`, never a mechanism;
+  * the mechanism statement is computed from the per-sample classes -- one
+    mechanism only when every sample carries it, a split when mixed;
+  * the seed-for-seed reproduction comparison states a mismatch, never absorbs
+    it.
 
 Stdlib only: no SPICE, no PDK, no fleet, no records written.
 
@@ -169,6 +185,263 @@ class AllInvalidCorner(unittest.TestCase):
         self.assertIsNone(st["stats"]["vpor_up_v"]["sigma_v"])
         self.assertAlmostEqual(st["stats"]["vpor_up_v"]["mean_v"], 2.70, places=15)
         self.assertIsNone(st["sigma_resolution"])
+
+
+# --------------------------------------------------------------------------
+# issue #401: the enable/clamp-path diagnostic reduction
+# --------------------------------------------------------------------------
+
+import gzip  # noqa: E402
+import tempfile  # noqa: E402
+import unittest as ut  # noqa: E402
+
+TSTOP = 72.6e-3  # the 100 V/s sweep: 2 x 3.63 V / 100 V/s
+TPEAK = TSTOP / 2
+
+
+def diag_wave():
+    """A synthetic MC-sample waveform carrying the four diagnostic nodes + the original four.
+
+    VDD is a triangle peaking at tstop/2; bias_ok rises mid-up-sweep; cmpo rises at the
+    (nominal) release; n1 mirrors cmpo inverted; sns follows vdd through a fixed ratio."""
+    t = [i * 1e-4 for i in range(int(TSTOP / 1e-4) + 1)]
+    vdd = [min(3.63, 100 * x, max(0.0, 2 * 3.63 - 100 * x)) for x in t]
+    return {
+        "time": t,
+        "v(vdd)": vdd,
+        "v(por_raw)": [0.0 if x < 0.0271 else 3.0 for x in t],
+        "v(vref)": [min(1.25, v) for v in vdd],
+        "v(ibias)": [1e-6 if v > 1.0 else 0.0 for v in vdd],
+        "v(bias_ok)": [0.0 if x < 0.02 else 3.5 for x in t],
+        "v(xdut.cmpo)": [0.0 if x < 0.0271 else 3.4 for x in t],
+        "v(xdut.n1)": [3.5 if x < 0.0271 else 0.2 for x in t],
+        "v(xdut.sns)": [0.4615 * v for v in vdd],
+    }
+
+class DiagnosticTraceColumns(ut.TestCase):
+    def test_trace_keeps_the_diagnostic_nodes_when_saved(self):
+        with tempfile.TemporaryDirectory() as td:
+            p = Path(td) / "mc0.trace.csv.gz"
+            rows = m.write_trace(p, diag_wave())
+            header = gzip.open(p, "rt").readline().strip().split(",")
+            self.assertIn("v(bias_ok)", header)
+            self.assertIn("v(xdut.cmpo)", header)
+            self.assertIn("v(xdut.n1)", header)
+            self.assertIn("v(xdut.sns)", header)
+            # a diagnostic column's change is itself a keep trigger: the bias_ok step
+            # (0 -> 3.5 V at t = 20 ms, between anchors) must appear as its own row
+            body = [ln.split(",") for ln in gzip.open(p, "rt").read().strip().splitlines()[1:]]
+            self.assertEqual(len(body), rows)
+            bias_col = header.index("v(bias_ok)")
+            steps = [r for r in body if float(r[bias_col]) > 1.0]
+            self.assertGreaterEqual(len(steps), 1)
+            self.assertGreater(rows, 3)  # anchors alone would give exactly 3 on this span
+
+    def test_trace_without_the_nodes_is_unchanged(self):
+        """A netlist that does not save the diagnostic nodes still writes the original trace."""
+        wave = {k: v for k, v in diag_wave().items() if not k.startswith("v(xdut") and k != "v(bias_ok)"}
+        with tempfile.TemporaryDirectory() as td:
+            p = Path(td) / "mc0.trace.csv.gz"
+            m.write_trace(p, wave)
+            header = gzip.open(p, "rt").readline().strip().split(",")
+            self.assertEqual(header, ["time", "v(vdd)", "v(por_raw)", "v(vref)", "v(ibias)"])
+
+
+class DiagnosticFields(ut.TestCase):
+    def test_sweep_max_and_at_peak_interpolation(self):
+        d = m.mc_diag_fields(diag_wave(), TPEAK)
+        # max over the sweep
+        self.assertAlmostEqual(d["bias_ok_max_v"], 3.5, places=12)
+        self.assertAlmostEqual(d["xdut_cmpo_max_v"], 3.4, places=12)
+        self.assertAlmostEqual(d["xdut_n1_max_v"], 3.5, places=12)
+        # at the sweep peak (t = tstop/2): sns tracks the 0.4615 divider ratio at 3.63 V
+        self.assertAlmostEqual(d["vdd_at_peak_v"], 3.63, places=12)
+        self.assertAlmostEqual(d["xdut_sns_at_peak_v"], 0.4615 * 3.63, places=3)
+        self.assertAlmostEqual(d["bias_ok_at_peak_v"], 3.5, places=12)
+        self.assertAlmostEqual(d["xdut_cmpo_at_peak_v"], 3.4, places=12)
+        # the max of sns equals its peak value here (the triangle peaks at the same time)
+        self.assertAlmostEqual(d["xdut_sns_max_v"], 0.4615 * 3.63, places=3)
+
+    def test_at_peak_interpolates_linearly_inside_a_segment(self):
+        """tpeak lands mid-segment: the value is interpolated, not the bracketing sample."""
+        w = diag_wave()
+        # pick a peak time strictly inside a 1e-4 segment on the sns ramp (up-sweep, linear)
+        tpeak = 0.01505  # mid-segment on the rising VDD ramp
+        d = m.mc_diag_fields(w, tpeak)
+        expect = 0.4615 * 100 * tpeak  # sns = ratio x vdd, vdd = rate*t on the ramp
+        self.assertAlmostEqual(d["xdut_sns_at_peak_v"], expect, places=10)
+        self.assertNotEqual(d["xdut_sns_at_peak_v"], 0.4615 * 100 * 0.015)
+
+    def test_missing_nodes_are_absent_never_zero(self):
+        """A waveform without the diagnostic nodes yields NO diagnostic fields -- never zeros."""
+        wave = {k: v for k, v in diag_wave().items() if not k.startswith("v(xdut") and k != "v(bias_ok)"}
+        d = m.mc_diag_fields(wave, TPEAK)
+        self.assertEqual(d, {"vdd_at_peak_v": 3.63})  # the peak supply itself is still sampled
+        # ...and a waveform without a time column at all
+        self.assertEqual(m.mc_diag_fields({"v(bias_ok)": [1.0]}, TPEAK), {})
+
+    def test_field_naming_lowercases_and_flattens(self):
+        d = m.mc_diag_fields(diag_wave(), TPEAK)
+        for node in m.MC_DIAG_NODES:
+            key = node[2:-1].replace(".", "_")
+            self.assertIn(f"{key}_max_v", d)
+            self.assertIn(f"{key}_at_peak_v", d)
+
+
+def stuck_sample(**diag):
+    """A failed-release sample with the given diagnostic fields."""
+    s = {"sample": 0, "valid": False, "reason": "NO_RESULT (no_transition on the UP segment)", "stuck_class": None,
+         "vdd_at_peak_v": 3.63}
+    s.update(diag)
+    return s
+
+
+class StuckClassification(ut.TestCase):
+    def test_enable_clamp_when_bias_ok_never_reached_a_rail_swing(self):
+        """BIAS_OK sitting well below the peak supply means NOKX still held the pulldown on."""
+        self.assertEqual(m.mc_stuck_class({"vdd_at_peak_v": 3.63, "bias_ok_at_peak_v": 0.2, "bias_ok_max_v": 0.3,
+                                           "xdut_cmpo_max_v": 0.01}), "enable-clamp")
+
+    def test_comparator_stuck_when_bias_ok_asserted_but_cmpo_never_rose(self):
+        self.assertEqual(m.mc_stuck_class({"vdd_at_peak_v": 3.63, "bias_ok_at_peak_v": 3.6, "bias_ok_max_v": 3.6,
+                                           "xdut_cmpo_max_v": 0.02}), "comparator-stuck")
+
+    def test_extractor_miss_when_both_released(self):
+        self.assertEqual(m.mc_stuck_class({"vdd_at_peak_v": 3.63, "bias_ok_at_peak_v": 3.6, "bias_ok_max_v": 3.6,
+                                           "xdut_cmpo_max_v": 3.3}), "extractor-miss")
+
+    def test_criterion_boundaries_are_stated_and_inclusive(self):
+        """Exactly at a criterion counts as the released side (>= threshold)."""
+        at_frac = m.MC_BIAS_OK_ASSERTED_FRAC * 3.63
+        self.assertEqual(m.mc_stuck_class({"vdd_at_peak_v": 3.63, "bias_ok_at_peak_v": at_frac, "xdut_cmpo_max_v": m.MC_CMPO_RELEASED_V}), "extractor-miss")
+        self.assertEqual(m.mc_stuck_class({"vdd_at_peak_v": 3.63, "bias_ok_at_peak_v": at_frac, "xdut_cmpo_max_v": m.MC_CMPO_RELEASED_V - 1e-9}), "comparator-stuck")
+        self.assertEqual(m.mc_stuck_class({"vdd_at_peak_v": 3.63, "bias_ok_at_peak_v": at_frac - 1e-9, "xdut_cmpo_max_v": 0.0}), "enable-clamp")
+
+    def test_no_data_is_no_mechanism(self):
+        self.assertIsNone(m.mc_stuck_class(None))
+        self.assertIsNone(m.mc_stuck_class({}))
+        self.assertIsNone(m.mc_stuck_class({"bias_ok_max_v": None}))
+        # bias evidence without the peak supply to normalise against is unclassifiable too
+        self.assertIsNone(m.mc_stuck_class({"bias_ok_at_peak_v": 3.6, "xdut_cmpo_max_v": 0.0}))
+
+    def test_missing_cmpo_with_asserted_bias_ok_is_no_mechanism(self):
+        """CMPO absent (node not saved) cannot prove 'CMPO never rose' -- never invented as 0."""
+        self.assertIsNone(m.mc_stuck_class({"vdd_at_peak_v": 3.63, "bias_ok_at_peak_v": 3.6, "bias_ok_max_v": 3.6}))
+
+
+class MechanismStatement(ut.TestCase):
+    def test_all_enable_clamp_names_the_mechanism(self):
+        stuck = [(None, stuck_sample(stuck_class="enable-clamp")) for _ in range(3)]
+        txt = m.mc_mechanism_statement(stuck)
+        self.assertIn("Mechanism established", txt)
+        self.assertIn("enable/clamp path never released", txt)
+        self.assertIn("all 3", txt)
+
+    def test_all_comparator_stuck_refutes_the_enable_path(self):
+        stuck = [(None, stuck_sample(stuck_class="comparator-stuck")) for _ in range(2)]
+        txt = m.mc_mechanism_statement(stuck)
+        self.assertIn("Mechanism established", txt)
+        self.assertIn("refuting the enable-path candidate", txt)
+
+    def test_mixed_outcome_is_enumerated_not_absorbed(self):
+        stuck = [(None, stuck_sample(stuck_class="enable-clamp")),
+                 (None, stuck_sample(stuck_class="comparator-stuck")),
+                 (None, stuck_sample(stuck_class=None))]
+        txt = m.mc_mechanism_statement(stuck)
+        self.assertIn("mixed", txt)
+        self.assertIn("enable/clamp path never released", txt)
+        self.assertIn("refuting the enable-path candidate", txt)
+        self.assertIn("no mechanism is established for them", txt)
+        self.assertNotIn("Mechanism established", txt)
+
+    def test_no_data_states_no_mechanism_plainly(self):
+        stuck = [(None, stuck_sample(stuck_class=None)) for _ in range(2)]
+        txt = m.mc_mechanism_statement(stuck)
+        self.assertIn("No mechanism established", txt)
+
+    def test_all_same_statements_are_not_headline_plus_lowercase_fragment(self):
+        """The all-same-class statement is one sentence: no lowercase fragment after the bold headline."""
+        for cls in ("enable-clamp", "comparator-stuck", "extractor-miss"):
+            stuck = [(None, stuck_sample(stuck_class=cls)) for _ in range(2)]
+            self.assertNotRegex(m.mc_mechanism_statement(stuck), r"\*\* [a-z]", msg=cls)
+        stuck = [(None, stuck_sample(stuck_class=None)) for _ in range(2)]
+        self.assertNotRegex(m.mc_mechanism_statement(stuck), r"\*\* [a-z]")
+
+    def test_empty_is_empty(self):
+        self.assertEqual(m.mc_mechanism_statement([]), "")
+
+
+def repro_record(samples_by_corner):
+    """A minimal record dict for mc_reproduction: {corner: {sample: fields}}."""
+    return {"record_id": "old", "corners": [
+        {"process": p, "temperature_c": t, "samples": [dict(sample=i, **fields) for i, fields in ss.items()]}
+        for (p, t), ss in samples_by_corner.items()]}
+
+
+def repro_fields(vup=2.70, valid=True, reason=None, seed=519744602):
+    return {"seed": seed, "process_seed": 1, "mismatch_seed": 2, "valid": valid, "reason": reason,
+            "vup": vup, "vdn": vup - 0.15, "hys": 0.15, "vref_max_v": 1.25}
+
+
+class ReproductionCompare(ut.TestCase):
+    def old_and_new(self, **override):
+        f = repro_fields(**override)
+        old = repro_record({("tt", 27): {0: repro_fields(), 1: repro_fields(vup=2.72)}})
+        new = repro_record({("tt", 27): {0: dict(repro_fields()), 1: dict(repro_fields(vup=2.72))}})
+        return old, new, f
+
+    def test_identical_pattern_is_reproduced(self):
+        old, new, _ = self.old_and_new()
+        r = m.mc_reproduction(old, new)
+        self.assertTrue(r["pattern_reproduced"])
+        self.assertTrue(r["seeds_all_match"])
+        self.assertTrue(r["values_all_within_tol"])
+        self.assertEqual(r["mismatch_count"], 0)
+        self.assertEqual(r["samples_compared"], 2)
+        self.assertAlmostEqual(r["max_abs_delta_v"], 0.0, places=15)
+
+    def test_pattern_flip_is_stated_not_absorbed(self):
+        old, new, _ = self.old_and_new()
+        new["corners"][0]["samples"][1]["valid"] = False
+        new["corners"][0]["samples"][1]["reason"] = "NO_RESULT (no_transition on the UP segment)"
+        r = m.mc_reproduction(old, new)
+        self.assertFalse(r["pattern_reproduced"])
+        self.assertFalse(r["pattern_all_match"])
+        self.assertEqual(r["mismatch_count"], 1)
+        self.assertIn("valid", r["mismatches"][0]["fields"])
+
+    def test_seed_drift_is_reported_separately_from_values(self):
+        old, new, _ = self.old_and_new()
+        new["corners"][0]["samples"][0]["mismatch_seed"] = 99
+        r = m.mc_reproduction(old, new)
+        self.assertFalse(r["seeds_all_match"])
+        self.assertFalse(r["pattern_reproduced"])  # seeds are part of the pattern contract
+        self.assertTrue(r["pattern_all_match"])  # but the pass/fail pattern itself still matches
+        self.assertEqual(r["mismatch_count"], 1)
+
+    def test_value_drift_beyond_tolerance_is_reported_with_the_delta(self):
+        old, new, _ = self.old_and_new()
+        new["corners"][0]["samples"][0]["vup"] += 5e-4  # 0.5 mV > the 0.1 mV tolerance
+        r = m.mc_reproduction(old, new)
+        self.assertFalse(r["values_all_within_tol"])
+        self.assertTrue(r["pattern_reproduced"])  # values alone do not flip the pattern verdict...
+        self.assertTrue(r["pattern_all_match"])
+        self.assertAlmostEqual(r["max_abs_delta_v"], 5e-4, places=15)
+        self.assertIn("vup", r["mismatches"][0]["fields"])
+
+    def test_value_drift_within_tolerance_is_not_a_mismatch(self):
+        old, new, _ = self.old_and_new()
+        new["corners"][0]["samples"][0]["vup"] += 9e-6  # 9 uV < the 0.1 mV tolerance
+        r = m.mc_reproduction(old, new)
+        self.assertTrue(r["values_all_within_tol"])
+        self.assertEqual(r["mismatch_count"], 0)
+
+    def test_samples_missing_on_one_side_are_counted_not_compared(self):
+        old, new, _ = self.old_and_new()
+        new["corners"][0]["samples"] = new["corners"][0]["samples"][:1]
+        r = m.mc_reproduction(old, new)
+        self.assertEqual(r["samples_compared"], 1)
+        self.assertEqual(r["mismatch_count"], 0)
 
 
 if __name__ == "__main__":
