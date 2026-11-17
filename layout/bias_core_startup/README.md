@@ -220,14 +220,24 @@ itself `klt drc`-clean. Evidence: `downstream-check.request.json`/
 
 ## The one thing this layout does not yet say
 
-Same disclosure as `bias_core_settle_flag`: `klt gen` **cannot draw sky130's
-`hvi` (75/20) thick-oxide marker**, so every device in this cell is the
-design's 5V `g5v0d10v5` `W`/`L` drawn in the 1.8V domain's geometry.
-`klt drc`'s sky130 deck reads no `hvi` rule, and `klt lvs` deliberately maps
-both voltage flavours onto one device class, so the `match` above is exactly
-as clean as it would be with the marker present. Filed generically as
-[`2AMLogic/klayout-tools#1912`](https://github.com/2AMLogic/klayout-tools/issues/1912);
-the **topology** of this device group is verified against the schematic and
-the floorplan is not expected to change when the gap closes, but this cell
-must not be treated as 5V-domain sign-off until it is redrawn with the
-marker and re-run against a deck that checks the `hvi` thresholds.
+Same disclosure as `bias_core_settle_flag`, and time-scoped the same way: at
+the pin that rendered this stream (`klt 0.7.1.dev1610+g758c6e224053`),
+`klt gen` **could not draw sky130's `hvi` (75/20) thick-oxide marker**, so
+every device in this cell is the design's 5V `g5v0d10v5` `W`/`L` drawn in
+the 1.8V domain's geometry. `klt drc`'s sky130 deck then read no `hvi` rule,
+and `klt lvs` deliberately mapped both voltage flavours onto one device
+class, so the `match` above is exactly as clean as it would be with the
+marker present. Filed generically as
+[`2AMLogic/klayout-tools#1912`](https://github.com/2AMLogic/klayout-tools/issues/1912),
+which has since closed as COMPLETED: the klt `0.9.2` release draws the
+sky130 marker pair — `hvi` (75/20) + `lvtn` (125/44), the `nvt` flavour's
+markers — with the HV marker rules checked (measured on PR #419's
+`por_output_chain` re-render, head `81837fe3`). This stream still predates
+that pin and carries no marker, and drawing the marker on 5V devices with a
+well tap ring is itself still blocked by
+[klayout-tools#6025](https://github.com/2AMLogic/klayout-tools/issues/6025)
+(open); the **topology** of this device group is verified against the
+schematic and the floorplan is not expected to change when the marker can be
+drawn, but this cell must not be treated as 5V-domain sign-off until it is
+redrawn with the marker and re-run against a deck that checks the `hvi`
+thresholds.

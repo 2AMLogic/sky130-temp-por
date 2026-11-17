@@ -241,14 +241,16 @@ python3 layout/bin/check-promotion.py layout/bias_core_settle_flag/cell.json
 
 ## The one thing this layout does not yet say
 
-`klt gen` **cannot draw sky130's `hvi` (75/20) thick-oxide marker**, so every
+**At the pin that rendered this stream (`klt 0.7.1.dev1610+g758c6e224053`,
+the `layout/pdk.json` pin of the 2026-10-27 regeneration),** `klt gen`
+**could not draw sky130's `hvi` (75/20) thick-oxide marker**, so every
 device in this cell is the design's 5V `g5v0d10v5` `W`/`L` drawn in the 1.8V
 domain's geometry. `klayout_tools.gen_layer_params`'
-`_PDK_VOLTAGE_FLAVOR_LAYERS` has an empty `sky130` entry, so
-`voltage_flavor: "hvi"` resolves to no layer and reports
+`_PDK_VOLTAGE_FLAVOR_LAYERS` then had an empty `sky130` entry, so
+`voltage_flavor: "hvi"` resolved to no layer and reported
 `voltage_flavor_mark_present: false` rather than drawing anything — even
-though the curated sky130 *extraction* deck already declares
-`MOSFlavour(marker=(75, 20), flavour="hvi")` and `pdk_models` already binds
+though the curated sky130 *extraction* deck already declared
+`MOSFlavour(marker=(75, 20), flavour="hvi")` and `pdk_models` already bound
 that flavour to the real `sky130_fd_pr__nfet_g5v0d10v5` /
 `sky130_fd_pr__pfet_g5v0d10v5` subcircuits.
 
@@ -261,9 +263,28 @@ so the `match` above is exactly as clean as it would be if the marker were
 there. Filed generically per this repo's friction protocol as
 [`2AMLogic/klayout-tools#1912`](https://github.com/2AMLogic/klayout-tools/issues/1912).
 
+**Update (issue #420, 2026-11-17) — the drawing half of this gap has closed
+upstream; the disclosure above remains true of this stream.**
+[#1912](https://github.com/2AMLogic/klayout-tools/issues/1912) closed as
+COMPLETED, and at the klt `0.9.2` release (`046ba74652fc`, where PR #419
+moves the repo's `layout/pdk.json` pin) `klt gen mos_array` accepts sky130
+`voltage_flavor: "nvt"` and draws that flavour's marker pair — `hvi` (75/20)
++ `lvtn` (125/44) — with the HV marker rules checked rather than skipped
+(measured on PR #419's `por_output_chain` re-render, head `81837fe3`). This
+cell's committed stream still predates that pin and still carries no `hvi`
+marker, so the sign-off statement below stands. Drawing the marker on this
+cell's guard-ringed 5V devices is itself still blocked upstream: the marker
+covers only the device array, so a flavour-marked device with a well tap
+ring trips the deck's `nwell.enclosed.hvi.1` rule —
+[klayout-tools#6025](https://github.com/2AMLogic/klayout-tools/issues/6025),
+open, measured at `0.9.2` and on `main` (`0.9.3.dev239`) per PR #419's
+README.
+
 What that means for this increment: the **topology** of this device group is
 verified against the schematic, and the floorplan is not expected to change
-when the gap closes — the fix is a marker-layer overlay over the same unit
+when the marker can be drawn here (still gated on
+[klayout-tools#6025](https://github.com/2AMLogic/klayout-tools/issues/6025),
+see the update above) — the fix is a marker-layer overlay over the same unit
 devices, plus (a question #1912 raises but does not assume) whether the 5V
 flavour's own minimum `L`/`W` should widen the drawn device. Its **device
 flavour** is not verified, and this cell must not be treated as 5V-domain
