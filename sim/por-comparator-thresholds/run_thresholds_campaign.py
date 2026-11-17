@@ -346,6 +346,69 @@ def classify_mc_sample(extract: dict | None) -> tuple[bool, str | None]:
     return False, extract.get("verdict") or "unextractable waveform"
 
 
+# Enable/clamp-path diagnostic reduction (issue #401): the netlist already saves
+# v(bias_ok) and the comparator-internal nodes; these fields keep them per sample
+# instead of discarding them at reduction time, so a failed-release ("no_transition")
+# realisation can be attributed to a mechanism from data.
+MC_DIAG_NODES = ("v(bias_ok)", "v(xdut.cmpo)", "v(xdut.n1)", "v(xdut.sns)")
+# Diagnostic classification criteria -- labels on recorded evidence, never thresholds:
+# the raw per-sample values are recorded beside every label, so the classification can
+# be re-derived from the record without agreeing with the criterion.
+# BIAS_OK is bias_core's rail-swing OK output, but it ALSO follows VDD through the weak
+# XMO1P pullup whenever NOKX has not turned XMO1N on, so "ever above an absolute level"
+# is not an assertion test.  Asserted AT THE PEAK means the at-peak level is a rail
+# swing: >= MC_BIAS_OK_ASSERTED_FRAC of the at-peak supply (measured 0.9998 on the
+# healthy tt/27C probe; a never-asserted sample holds near 0 against the XMO1N pulldown).
+MC_BIAS_OK_ASSERTED_FRAC = 0.9
+MC_CMPO_RELEASED_V = 0.5  # CMPO held at VSS by XMDCMPO vs swung toward the VDDA load rail
+
+
+def mc_diag_fields(wave: dict, tpeak_s: float) -> dict:
+    """Per-sample diagnostic fields of the enable/clamp path, from one sample's waveform.
+
+    For each saved node: the sweep max (did it ever get there?) and the value at the
+    sweep peak (t = tstop/2, where VDD tops out at its 3.63 V peak), linearly
+    interpolated at that time.  `vdd_at_peak_v` is the at-peak supply itself, so the
+    BIAS_OK assertion criterion can be stated relative to the actual peak (mismatch or
+    not, the sweep peaks at 3.63 V by construction).  Nodes the netlist does not save
+    are simply absent -- never invented as 0.  Field names lowercase the node with
+    `.` -> `_` (`v(xdut.cmpo)` -> `xdut_cmpo_max_v` / `xdut_cmpo_at_peak_v`)."""
+    out: dict = {}
+    if "time" not in wave:
+        return out
+    if "v(vdd)" in wave:
+        out["vdd_at_peak_v"] = sim_common.interp_at(wave["time"], wave["v(vdd)"], tpeak_s)
+    for col in MC_DIAG_NODES:
+        if col not in wave:
+            continue
+        key = col[2:-1].replace(".", "_")  # strip "v(" ... ")"; flatten subcircuit dots
+        out[f"{key}_max_v"] = max(wave[col])
+        out[f"{key}_at_peak_v"] = sim_common.interp_at(wave["time"], wave[col], tpeak_s)
+    return out
+
+
+def mc_stuck_class(diag: dict | None) -> str | None:
+    """Mechanism class of ONE failed-release realisation, from its diagnostic fields.
+
+    `enable-clamp`: BIAS_OK never asserted -- at the sweep peak its level is not a rail
+    swing (below MC_BIAS_OK_ASSERTED_FRAC of the at-peak supply), so BIAS_OKB stayed
+    high, XMDCMPO kept CMPO pulled to VSS and XMENSRC kept the load supply VDDA
+    disconnected: the comparator never had a chance, whatever its inputs did (the
+    issue's leading candidate).  `comparator-stuck`: BIAS_OK asserted (clamp released)
+    yet CMPO never rose -- the comparator's own bias/tail path held the output low,
+    refuting the enable-path candidate for that realisation.  `extractor-miss`: BIAS_OK
+    asserted AND CMPO rose, yet the sweep was graded no_transition -- a contradiction
+    against the extractor, flagged, never folded away.  None when the diagnostic data is
+    missing: absence of evidence is not evidence of any mechanism."""
+    if not diag or diag.get("bias_ok_at_peak_v") is None or diag.get("vdd_at_peak_v") is None:
+        return None
+    if diag["bias_ok_at_peak_v"] < MC_BIAS_OK_ASSERTED_FRAC * diag["vdd_at_peak_v"]:
+        return "enable-clamp"
+    if diag.get("xdut_cmpo_max_v", 0.0) < MC_CMPO_RELEASED_V:
+        return "comparator-stuck"
+    return "extractor-miss"
+
+
 def corner_mc_stats(samples: list[dict]) -> dict:
     """Mean and sample sigma (Bessel, n-1) of VPOR-up / VPOR-down / hysteresis over the VALID samples of one corner.
 
@@ -376,6 +439,64 @@ def corner_mc_stats(samples: list[dict]) -> dict:
     return out
 
 
+REPRO_TOL_V = 1e-4  # 0.1 mV: a seed-for-seed replay is deterministic; anything above this is a difference
+REPRO_MISMATCH_CAP = 10  # mismatches listed in full in the record; beyond that, counted only
+
+
+def mc_reproduction(old: dict, new: dict) -> dict:
+    """Seed-for-seed reproduction check of a regenerated MC record against its predecessor.
+
+    Aligns corners by (process, temperature_c) and samples by index, then compares, per
+    sample: the three derived seeds, the pass/fail pattern (valid flag + exclusion
+    reason verbatim), and the extracted values (vup / vdn / hys / vref_max) within
+    REPRO_TOL_V.  Pure; the record renders the result verbatim -- a non-reproduction is
+    stated, never quietly re-baselined (issue #401, finding 6's caveat)."""
+    fields = ("seed", "process_seed", "mismatch_seed", "valid", "reason", "vup", "vdn", "hys", "vref_max_v")
+    tol = {"vup": REPRO_TOL_V, "vdn": REPRO_TOL_V, "hys": REPRO_TOL_V, "vref_max_v": REPRO_TOL_V}
+    old_c = {(c["process"], c["temperature_c"]): {s["sample"]: s for s in c["samples"]} for c in old["corners"]}
+    mismatches, n_cmp, max_delta = [], 0, None
+    seeds_ok = pattern_ok = values_ok = True
+    for nc in new["corners"]:
+        key = (nc["process"], nc["temperature_c"])
+        osmp = old_c.get(key, {})
+        for ns in nc["samples"]:
+            o = osmp.get(ns["sample"])
+            if o is None:
+                continue
+            n_cmp += 1
+            diff = {}
+            for f in fields:
+                a, b = o.get(f), ns.get(f)
+                if f in tol and a is not None and b is not None:
+                    d = abs(a - b)
+                    max_delta = d if max_delta is None else max(max_delta, d)
+                    if d > tol[f]:
+                        values_ok = False
+                        diff[f] = {"old": a, "new": b}
+                elif a != b:
+                    if f in ("seed", "process_seed", "mismatch_seed"):
+                        seeds_ok = False
+                    if f in ("valid", "reason"):
+                        pattern_ok = False
+                    diff[f] = {"old": a, "new": b}
+            if diff:
+                mismatches.append({"corner": f"{nc['process']}/{nc['temperature_c']}C", "sample": ns["sample"], "fields": diff})
+    out = {
+        "against": old["record_id"],
+        "tol_v": REPRO_TOL_V,
+        "corners_compared": sum(1 for c in new["corners"] if (c["process"], c["temperature_c"]) in old_c),
+        "samples_compared": n_cmp,
+        "seeds_all_match": seeds_ok,
+        "pattern_all_match": pattern_ok,
+        "values_all_within_tol": values_ok,
+        "max_abs_delta_v": max_delta,
+        "pattern_reproduced": seeds_ok and pattern_ok,
+        "mismatch_count": len(mismatches),
+        "mismatches": mismatches[:REPRO_MISMATCH_CAP],
+    }
+    return out
+
+
 def mc_samples(rep: dict, man: dict, corners_dir: Path, run_dir: Path) -> list[dict]:
     """Per-sample extraction of ONE mismatch-MC request's report (one (process, temperature) corner).
 
@@ -384,6 +505,7 @@ def mc_samples(rep: dict, man: dict, corners_dir: Path, run_dir: Path) -> list[d
     WITHIN the sample.  A per-sample log and change-triggered trace are staged as fleet
     evidence; the returned list is sorted by sample index."""
     out = []
+    tpeak_s = 0.5 * tstop_for(man["monte_carlo"]["rate_v_per_s"], man)
     for c in rep["corners"]:
         mcj = c.get("monte_carlo") or {}
         smp = mcj.get("sample_index")
@@ -404,7 +526,9 @@ def mc_samples(rep: dict, man: dict, corners_dir: Path, run_dir: Path) -> list[d
             pt["extract"] = tx.analyze(wave, man["polarity"]["up"], man["polarity"]["down"])
             pt["trace_rows"] = write_trace(corners_dir / f"mc{0 if smp is None else smp}.trace.csv.gz", wave)
             pt["vref_max_v"] = max(wave["v(vref)"]) if "v(vref)" in wave else None
+            pt.update(mc_diag_fields(wave, tpeak_s))
         pt["valid"], pt["reason"] = classify_mc_sample(pt["extract"])
+        pt["stuck_class"] = mc_stuck_class(pt) if not pt["valid"] and "no_transition" in (pt["reason"] or "") else None
         ex = pt.get("extract") or {}
         pt["vup"] = ex.get("up", {}).get("vdd_v")
         pt["vdn"] = ex.get("down", {}).get("vdd_v")
@@ -417,6 +541,8 @@ def mc_samples(rep: dict, man: dict, corners_dir: Path, run_dir: Path) -> list[d
             lines += ["# up: " + json.dumps({k: v for k, v in ex["up"].items() if k != "edges"}),
                       "# down: " + json.dumps({k: v for k, v in ex["down"].items() if k != "edges"}),
                       f"# hysteresis_v: {ex.get('hysteresis_v')}"]
+        if any(k.endswith("_max_v") for k in pt):
+            lines.append("# diag (issue #401): " + json.dumps({k: pt[k] for k in pt if k.endswith(("_max_v", "_at_peak_v")) or k == "stuck_class"}))
         lines += ["", "# ==== klt diagnostics ===="] + [f"| {d['severity']}/{d['code']}: {d['message']}" for d in pt["diagnostics"]]
         corners_dir.mkdir(parents=True, exist_ok=True)
         (corners_dir / f"mc{0 if smp is None else smp}.log").write_text("\n".join(lines) + "\n")
@@ -431,8 +557,11 @@ def mc_samples(rep: dict, man: dict, corners_dir: Path, run_dir: Path) -> list[d
 
 
 def write_trace(path: Path, wave: dict, dv: float = 0.002, anchor_s: float = 0.2e-3) -> int:
-    """Change-triggered trace (VDD, POR_RAW, VREF, IBIAS): a row whenever a column moved >= dv, or an anchor."""
-    cols = [c for c in ("time", "v(vdd)", "v(por_raw)", "v(vref)", "v(ibias)") if c in wave]
+    """Change-triggered trace (VDD, POR_RAW, VREF, IBIAS, plus the enable/clamp-path
+    diagnostic nodes when the netlist saves them): a row whenever a column moved >= dv,
+    or an anchor.  The diagnostic nodes (issue #401) are conditionally included so a
+    netlist without the extra `.save` lines still writes the original four-column trace."""
+    cols = [c for c in ("time", "v(vdd)", "v(por_raw)", "v(vref)", "v(ibias)") + MC_DIAG_NODES if c in wave]
     rows = sim_common.decimate([wave[c] for c in cols], anchor_s, [None] + [dv] * (len(cols) - 1))
     path.parent.mkdir(parents=True, exist_ok=True)
     with gzip.open(path, "wt") as fh:
@@ -626,7 +755,9 @@ MC_MARGIN_CONTEXT = (
 
 def mc_per_sample_csv(path: Path, samples: list[dict], proc: str, temp: float) -> None:
     cols = ["process", "temperature_c", "sample", "valid", "reason", "vpor_up_v", "vpor_down_v", "hysteresis_v",
-            "vref_max_v", "klt_status", "runtime_s", "seed", "process_seed", "mismatch_seed"]
+            "vref_max_v", "klt_status", "runtime_s", "seed", "process_seed", "mismatch_seed",
+            "stuck_class", "bias_ok_max_v", "bias_ok_at_peak_v", "xdut_cmpo_max_v", "xdut_cmpo_at_peak_v",
+            "xdut_n1_at_peak_v", "xdut_sns_at_peak_v"]
     lines = [",".join(cols)]
     for s in samples:
         ex = s.get("extract") or {}
@@ -634,14 +765,16 @@ def mc_per_sample_csv(path: Path, samples: list[dict], proc: str, temp: float) -
         dn = (ex.get("down") or {}).get("vdd_v")
         hys = ex.get("hysteresis_v")
         vref = s.get("vref_max_v")
+        fmt = lambda x: "" if x is None else f"{x:.7g}"  # noqa: E731
         lines.append(",".join([
             proc, f"{temp:g}", str(s["sample"]), str(int(s["valid"])), (s.get("reason") or "").replace(",", ";"),
-            "" if up is None else f"{up:.7g}",
-            "" if dn is None else f"{dn:.7g}",
-            "" if hys is None else f"{hys:.7g}",
-            "" if vref is None else f"{vref:.7g}",
+            fmt(up), fmt(dn), fmt(hys), fmt(vref),
             str(s.get("klt_status")), f"{s.get('runtime_s'):g}" if s.get("runtime_s") is not None else "",
             str(s.get("seed")), str(s.get("process_seed")), str(s.get("mismatch_seed")),
+            str(s.get("stuck_class") or ""),
+            fmt(s.get("bias_ok_max_v")), fmt(s.get("bias_ok_at_peak_v")),
+            fmt(s.get("xdut_cmpo_max_v")), fmt(s.get("xdut_cmpo_at_peak_v")),
+            fmt(s.get("xdut_n1_at_peak_v")), fmt(s.get("xdut_sns_at_peak_v")),
         ]))
     path.write_text("\n".join(lines) + "\n")
 
@@ -655,6 +788,44 @@ def fms(stats: dict | None, key: str, scale: float = 1.0, spec: str = ".4f") -> 
     if s is not None:
         txt += f" ± {s * scale:{spec}}"
     return txt
+
+
+def mc_mechanism_statement(stuck: list[tuple[dict, dict]]) -> str:
+    """The mechanism statement this record's stuck-sample diagnostics support.
+
+    Data-driven, never aspirational: the verdict is computed from the per-sample
+    `stuck_class` fields (issue #401).  One mechanism named only when ALL failed-release
+    realisations carry the same class; a mixed outcome is enumerated as a split; samples
+    without diagnostic data are named as unestablished rather than absorbed into any
+    class."""
+    if not stuck:
+        return ""
+    n = len(stuck)
+    classes = [s.get("stuck_class") for _, s in stuck]
+    counts = {k: classes.count(k) for k in ("enable-clamp", "comparator-stuck", "extractor-miss", None)}
+    sentences = {
+        "enable-clamp": lambda k: f"in {k} the enable/clamp path never released (BIAS_OK never asserted -- at the sweep peak its level is "
+        f"not a rail swing, below {MC_BIAS_OK_ASSERTED_FRAC:g} of the at-peak supply, so BIAS_OKB stayed high, XMDCMPO held CMPO at VSS and "
+        "XMENSRC kept the load rail VDDA disconnected)",
+        "comparator-stuck": lambda k: f"in {k} the clamp DID release (BIAS_OK asserted) yet CMPO never rose above {MC_CMPO_RELEASED_V:g} V -- "
+        "the comparator's own bias/tail path held the output low, refuting the enable-path candidate for those realisations",
+        "extractor-miss": lambda k: f"in {k} both the enable path released AND CMPO rose, yet the sweep graded no_transition -- "
+        "a contradiction against the edge extractor, flagged here and not folded into any mechanism",
+        None: lambda k: f"{k} carry no per-sample diagnostic data (no waveform retrieved), so no mechanism is established for them",
+    }
+    if all(c == "enable-clamp" for c in classes):
+        return (f"**Mechanism established, all {n} failed-release realisations: the enable/clamp path never released.** "
+                + sentences["enable-clamp"](n) + ".")
+    if all(c == "comparator-stuck" for c in classes):
+        return (f"**Mechanism established, all {n} failed-release realisations: the comparator's bias/tail path, not the enable path.** "
+                + sentences["comparator-stuck"](n) + ".")
+    if all(c == "extractor-miss" for c in classes):
+        return (f"**No circuit mechanism established, all {n} failed-release realisations: the instrumented data contradicts the grading.** "
+                + sentences["extractor-miss"](n) + ".")
+    if all(c is None for c in classes):
+        return f"**No mechanism established.** " + sentences[None](n) + "."
+    parts = [sentences[k](counts[k]) for k in ("enable-clamp", "comparator-stuck", "extractor-miss", None) if counts[k]]
+    return "**Mechanism: mixed across the " + f"{n} failed-release realisations** -- " + "; ".join(parts) + "."
 
 
 def render_mc_md(rec: dict) -> str:
@@ -712,7 +883,7 @@ def render_mc_md(rec: dict) -> str:
             vrefs = [s["vref_max_v"] for _, s in stuck if s.get("vref_max_v") is not None]
             vref_txt = (f" In every one of them `bias_core`'s reference came up (max v(vref) over the sweep "
                         f"{min(vrefs):.3f}-{max(vrefs):.3f} V, the intended 1.25 V branch), so the failure is downstream of the "
-                        "reference -- not a bias_core startup failure; the cause is not established further here."
+                        "reference -- not a bias_core startup failure."
                         if vrefs and len(vrefs) == len(stuck) else
                         (f" Max v(vref) over the sweep among them: {min(vrefs):.3f}-{max(vrefs):.3f} V." if vrefs else
                          " No v(vref) waveform was retrieved for them, so a reference-side cause is not excluded."))
@@ -722,6 +893,47 @@ def render_mc_md(rec: dict) -> str:
             L.append(f"The per-corner distributions above therefore describe only the **releasing subset** of each corner; the failed-release "
                      f"fraction is part of the mismatch behaviour this record measures, and DR-004's corner margin does not capture it.")
             L.append("")
+            L.append("### Failed-release mechanism diagnostics (issue #401)")
+            L.append(f"Per-sample reduction of the enable/clamp path the netlist already saves (`v(bias_ok)`, `v(xdut.cmpo)`, `v(xdut.n1)`, "
+                     f"`v(xdut.sns)`): each node's sweep max and its value at the sweep peak (t = tstop/2, interpolated; the VDD peak is "
+                     f"{rec['matrix']['peak_v']:g} V). `BIAS_OK asserted` means its at-peak level is a rail swing -- at least "
+                     f"{MC_BIAS_OK_ASSERTED_FRAC:g} of the at-peak supply; `CMPO released` means max v(xdut.cmpo) >= {MC_CMPO_RELEASED_V:g} V. "
+                     "Both are diagnostic labels on recorded evidence, and the raw values below can be re-read against any other criterion. "
+                     "`sns` at the peak carries the input-differential check: SNS sits at the divider ratio times the peak whether or not the "
+                     "comparator trips, so a stuck sample still shows a release-direction differential.")
+            L.append("")
+            L.append("| corner | sample | class | BIAS_OK max (V) | BIAS_OK @peak (V) | VDD @peak (V) | CMPO max (V) | CMPO @peak (V) | N1 @peak (V) | SNS @peak (V) | vref max (V) |")
+            L.append("|---|---|---|---|---|---|---|---|---|---|---|")
+            for c, s in stuck:
+                fmtv = lambda k: "n/a" if s.get(k) is None else f"{s[k]:.3f}"  # noqa: E731
+                L.append(f"| {c['process']}/{cr.fmt_temp(c['temperature_c'])}C | mc{s['sample']} | {s.get('stuck_class') or 'n/a'} | "
+                         f"{fmtv('bias_ok_max_v')} | {fmtv('bias_ok_at_peak_v')} | {fmtv('vdd_at_peak_v')} | {fmtv('xdut_cmpo_max_v')} | "
+                         f"{fmtv('xdut_cmpo_at_peak_v')} | {fmtv('xdut_n1_at_peak_v')} | {fmtv('xdut_sns_at_peak_v')} | {fmtv('vref_max_v')} |")
+            L.append("")
+            L.append(mc_mechanism_statement(stuck))
+            L.append("")
+    if rec.get("reproduction"):
+        r = rec["reproduction"]
+        L.append(f"## Reproduction of record {r['against']} (seed-for-seed)")
+        verdict = ("**Reproduced.** " if r["pattern_reproduced"] else "**NOT reproduced.** ")
+        L.append(verdict + f"{r['samples_compared']} samples across {r['corners_compared']} corner entries compared against the predecessor record "
+                 f"by (process, temperature, sample index): derived seeds {'all match' if r['seeds_all_match'] else 'DIFFER'}, "
+                 f"pass/fail pattern (valid flag + exclusion reason) {'all match' if r['pattern_all_match'] else 'DIFFERS'}, "
+                 f"extracted values {'all within' if r['values_all_within_tol'] else 'EXCEED'} the stated "
+                 f"{r['tol_v'] * 1e3:.1f} mV tolerance"
+                 + (f" (max absolute delta {r['max_abs_delta_v'] * 1e3:.3f} mV)" if r["max_abs_delta_v"] is not None else "")
+                 + ". A non-reproduction is stated here, never quietly re-baselined: the predecessor record stands as committed evidence.")
+        if r["mismatch_count"]:
+            L.append("")
+            L.append(f"Mismatching samples ({r['mismatch_count']}"
+                     + (f", listing first {len(r['mismatches'])}):" if r["mismatch_count"] > len(r["mismatches"]) else "):"))
+            L.append("")
+            L.append("| corner | sample | field | old | new |")
+            L.append("|---|---|---|---|---|")
+            for m in r["mismatches"]:
+                for f, d in m["fields"].items():
+                    L.append(f"| {m['corner']} | mc{m['sample']} | {f} | {d['old']} | {d['new']} |")
+        L.append("")
     L.append("## Statistical disclosures (stated, not hidden)")
     L.append("- **NOT a spec claim.** This record supplies a distribution as evidence; it proposes no threshold. `spec/` is untouched and DR-004 is not edited.")
     L.append("- **Independent realisation sets per temperature**: each temperature is its own transient run and its own request, so temperatures draw "
@@ -836,9 +1048,14 @@ def cmd_record_mc(args, man: dict, run_dir: Path, meta: dict) -> int:
                    "axis_note": "mismatch Monte Carlo supplement: real-bias-core only, _mm sections (local mismatch), primary rate only, no half-rate guard"},
         "definitions": {**man["grading"]["definitions"],
                         "mismatch sample": mc["execution"],
-                        "edge extraction": f"VDD sample step <= {tx.MAX_BRACKET_V * 1e3:g} mV around an edge, linear interpolation inside the bracket; POR_RAW state evaluated for VDD >= {tx.V_VALID:g} V only"},
+                        "edge extraction": f"VDD sample step <= {tx.MAX_BRACKET_V * 1e3:g} mV around an edge, linear interpolation inside the bracket; POR_RAW state evaluated for VDD >= {tx.V_VALID:g} V only",
+                        "BIAS_OK asserted (diagnostic)": f"at the sweep peak, v(bias_ok) >= {MC_BIAS_OK_ASSERTED_FRAC:g} x the at-peak supply -- a rail swing; a diagnostic label on recorded evidence, the raw per-sample max and at-peak values are recorded beside every label (issue #401). BIAS_OK follows VDD through bias_core's weak XMO1P pullup whenever the NOKX pulldown is off, so a max-over-sweep test cannot distinguish assertion",
+                        "CMPO released (diagnostic)": f"max v(xdut.cmpo) over the sweep >= {MC_CMPO_RELEASED_V:g} V; while it is below, XMDCMPO holds CMPO at VSS (the clamp) when BIAS_OKB is high (issue #401)",
+                        "sweep peak": f"t = tstop/2 of the {mc['rate_v_per_s']:g} V/s triangle, where VDD reaches its {man['sweep']['peak_v']:g} V peak; at-peak values are linearly interpolated at that time",
+                        "stuck class": "mechanism class of a failed-release realisation from its diagnostics: enable-clamp (BIAS_OK never asserted), comparator-stuck (BIAS_OK asserted, CMPO never rose), extractor-miss (both released yet graded no_transition); None = no diagnostic data"},
         "requests": requests,
         "corners": corners,
+        "reproduction": reproduction,
         "probe": "",
         "absent_coverage": man["absent_coverage"],
         "links": {
@@ -848,11 +1065,20 @@ def cmd_record_mc(args, man: dict, run_dir: Path, meta: dict) -> int:
         },
     }
     rec_dir.mkdir(parents=True, exist_ok=True)
+    if args.against_record:
+        old_path = HERE / "records" / f"{args.against_record}.json"
+        if not old_path.is_file():
+            raise SystemExit(f"--against-record: {old_path} not found")
+        record["reproduction"] = mc_reproduction(json.loads(old_path.read_text()), record)
     (rec_dir / f"{record_id}.json").write_text(json.dumps(record, indent=1, sort_keys=True, default=float) + "\n")
     (rec_dir / f"{record_id}.md").write_text(render_mc_md(record))
     ok = sum(1 for c in corners if c["stats"]["result"] == "OK")
+    repro_txt = ""
+    if record.get("reproduction"):
+        r = record["reproduction"]
+        repro_txt = f"  (reproduction vs {r['against']}: {'REPRODUCED' if r['pattern_reproduced'] else 'NOT reproduced'}, {r['mismatch_count']} mismatching samples)"
     print(f"record {variant}: {record_id}  ({ok}/{len(corners)} corners with a distribution, "
-          f"{sum(c['stats']['n_valid'] for c in corners)} valid samples of {mc['n_per_corner'] * len(units)})")
+          f"{sum(c['stats']['n_valid'] for c in corners)} valid samples of {mc['n_per_corner'] * len(units)}){repro_txt}")
     return 0
 
 
@@ -988,6 +1214,7 @@ def main(argv: list[str]) -> int:
     c.add_argument("--probe-note-file")
     c.add_argument("--author")
     c.add_argument("--supersedes")
+    c.add_argument("--against-record", help="mc axis: compare this run seed-for-seed against a prior mismatch-mc record id (issue #401)")
     c.add_argument("--allow-dirty", action="store_true")
     sub.add_parser("selftest")
     args = ap.parse_args(argv)

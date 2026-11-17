@@ -67,7 +67,15 @@ two separately recorded variants (`variants` in `experiment.json`):
   so a shared base seed would re-draw the same realisations in all six).
   Each sample is its own transient VDD sweep and returns its own waveform;
   `threshold_extractor.py` extracts that sample's VPOR-up / VPOR-down, and
-  hysteresis is computed **per sample**. The record reports, per corner, the
+  hysteresis is computed **per sample**. Since issue #401 the reduction also
+  keeps, per sample, the enable/clamp-path nodes the netlist already saves
+  (`v(bias_ok)`, `v(xdut.cmpo)`, `v(xdut.n1)`, `v(xdut.sns)`: sweep max +
+  value at the sweep peak) and classifies every failed-release realisation
+  (`enable-clamp` / `comparator-stuck` / `extractor-miss`, criteria stated in
+  the record), so a non-release is attributed from data rather than argued.
+  A re-run can state seed-for-seed reproduction against a predecessor record
+  (`record --against-record <record-id>`; a non-reproduction is stated, never
+  re-baselined). The record reports, per corner, the
   mean and sample sigma (Bessel, n-1) of the three metrics over the valid
   samples, the N, and the statistical resolution of that sigma,
   `1/sqrt(2(N_valid-1))` (16.2% at N = 20). Disclosures: the MC points run
@@ -114,6 +122,10 @@ python3 run_thresholds_campaign.py probe --variant ideal-bias --process tt --tem
 python3 run_thresholds_campaign.py record --run-id main --author "<name>" --probe-note-file <note.md>
 python3 run_thresholds_campaign.py record --run-id skew --author "<name>"
 python3 run_thresholds_campaign.py record --run-id mc --author "<name>"
+#    a re-run of the same seeded MC grid states seed-for-seed reproduction against
+#    the record it re-runs (issue #401):
+python3 run_thresholds_campaign.py record --run-id mc2 --author "<name>" \
+    --against-record <prior-mismatch-mc-record-id> --supersedes <prior-mismatch-mc-record-id>
 ```
 
 The driver never launches ngspice over a grid itself. Every multi-point run
