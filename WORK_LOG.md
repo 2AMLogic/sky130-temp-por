@@ -9,6 +9,8 @@ Chronological record of recently merged pull requests and closed issues. This fi
 
 ### 2026-11-17
 
+- **PR #427**: docs: cite real-bias-core corner envelope (22 mV, 16 mV tt/ss) in mismatch-MC comparisons
+- **Issue #386** (closed): characterization-report/README: the '18 mV corner envelope' compared against the mismatch sigmas is the ideal-bias span, not real-bias-core's
 - **PR #423**: chore(loom): resync installed Loom to v0.19.1306
 - **PR #422**: feat(sim): keep the enable/clamp-path MC diagnostics; POR non-release mechanism established — bias_core BIAS_OK never asserts
 - **Issue #401** (closed): por_comparator: 38 of 120 local-mismatch realisations never release POR_RAW, and the count is not the upper tail of the releasing distribution
