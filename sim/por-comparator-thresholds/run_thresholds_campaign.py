@@ -404,7 +404,10 @@ def mc_stuck_class(diag: dict | None) -> str | None:
         return None
     if diag["bias_ok_at_peak_v"] < MC_BIAS_OK_ASSERTED_FRAC * diag["vdd_at_peak_v"]:
         return "enable-clamp"
-    if diag.get("xdut_cmpo_max_v", 0.0) < MC_CMPO_RELEASED_V:
+    cmpo_max = diag.get("xdut_cmpo_max_v")
+    if cmpo_max is None:
+        return None
+    if cmpo_max < MC_CMPO_RELEASED_V:
         return "comparator-stuck"
     return "extractor-miss"
 
@@ -814,16 +817,20 @@ def mc_mechanism_statement(stuck: list[tuple[dict, dict]]) -> str:
         None: lambda k: f"{k} carry no per-sample diagnostic data (no waveform retrieved), so no mechanism is established for them",
     }
     if all(c == "enable-clamp" for c in classes):
-        return (f"**Mechanism established, all {n} failed-release realisations: the enable/clamp path never released.** "
-                + sentences["enable-clamp"](n) + ".")
+        return (f"**Mechanism established, all {n} failed-release realisations: the enable/clamp path never released** "
+                f"(in all {n}, BIAS_OK never asserted -- at the sweep peak its level is not a rail swing, below {MC_BIAS_OK_ASSERTED_FRAC:g} "
+                "of the at-peak supply, so BIAS_OKB stayed high, XMDCMPO held CMPO at VSS and XMENSRC kept the load rail VDDA disconnected).")
     if all(c == "comparator-stuck" for c in classes):
-        return (f"**Mechanism established, all {n} failed-release realisations: the comparator's bias/tail path, not the enable path.** "
-                + sentences["comparator-stuck"](n) + ".")
+        return (f"**Mechanism established, all {n} failed-release realisations: the comparator's bias/tail path, not the enable path** "
+                f"(in all {n} the clamp DID release -- BIAS_OK asserted -- yet CMPO never rose above {MC_CMPO_RELEASED_V:g} V; "
+                "the comparator's own bias/tail path held the output low, refuting the enable-path candidate).")
     if all(c == "extractor-miss" for c in classes):
-        return (f"**No circuit mechanism established, all {n} failed-release realisations: the instrumented data contradicts the grading.** "
-                + sentences["extractor-miss"](n) + ".")
+        return (f"**No circuit mechanism established, all {n} failed-release realisations: the instrumented data contradicts the grading** "
+                f"(in all {n} both the enable path released AND CMPO rose, yet the sweep graded no_transition -- "
+                "a contradiction against the edge extractor, flagged here and not folded into any mechanism).")
     if all(c is None for c in classes):
-        return f"**No mechanism established.** " + sentences[None](n) + "."
+        return (f"**No mechanism established.** All {n} failed-release realisations carry no per-sample diagnostic data "
+                "(no waveform retrieved), so no mechanism is established for them.")
     parts = [sentences[k](counts[k]) for k in ("enable-clamp", "comparator-stuck", "extractor-miss", None) if counts[k]]
     return "**Mechanism: mixed across the " + f"{n} failed-release realisations** -- " + "; ".join(parts) + "."
 

@@ -324,6 +324,10 @@ class StuckClassification(ut.TestCase):
         # bias evidence without the peak supply to normalise against is unclassifiable too
         self.assertIsNone(m.mc_stuck_class({"bias_ok_at_peak_v": 3.6, "xdut_cmpo_max_v": 0.0}))
 
+    def test_missing_cmpo_with_asserted_bias_ok_is_no_mechanism(self):
+        """CMPO absent (node not saved) cannot prove 'CMPO never rose' -- never invented as 0."""
+        self.assertIsNone(m.mc_stuck_class({"vdd_at_peak_v": 3.63, "bias_ok_at_peak_v": 3.6, "bias_ok_max_v": 3.6}))
+
 
 class MechanismStatement(ut.TestCase):
     def test_all_enable_clamp_names_the_mechanism(self):
@@ -354,6 +358,14 @@ class MechanismStatement(ut.TestCase):
         stuck = [(None, stuck_sample(stuck_class=None)) for _ in range(2)]
         txt = m.mc_mechanism_statement(stuck)
         self.assertIn("No mechanism established", txt)
+
+    def test_all_same_statements_are_not_headline_plus_lowercase_fragment(self):
+        """The all-same-class statement is one sentence: no lowercase fragment after the bold headline."""
+        for cls in ("enable-clamp", "comparator-stuck", "extractor-miss"):
+            stuck = [(None, stuck_sample(stuck_class=cls)) for _ in range(2)]
+            self.assertNotRegex(m.mc_mechanism_statement(stuck), r"\*\* [a-z]", msg=cls)
+        stuck = [(None, stuck_sample(stuck_class=None)) for _ in range(2)]
+        self.assertNotRegex(m.mc_mechanism_statement(stuck), r"\*\* [a-z]")
 
     def test_empty_is_empty(self):
         self.assertEqual(m.mc_mechanism_statement([]), "")
