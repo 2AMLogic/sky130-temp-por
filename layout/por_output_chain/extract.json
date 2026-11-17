@@ -1,44 +1,57 @@
 {
-  "schema_version": 3,
-  "file": "por_output_chain.gds",
+  "schema_version": 4,
+  "file": {
+    "path": "layout/por_output_chain/por_output_chain.gds",
+    "scope": "repo"
+  },
   "deck": "sky130",
   "top": "por_output_chain",
   "dbu_um": 0.001,
   "netlist_path": "por_output_chain.spice",
-  "netlist_sha256": "ed9cb90f3c150de5c0351566cd044a69fea5c335a4f986989aa0a738e026ef77",
-  "netlist_normalized_sha256": "61a6560f64ee1d6319b8cecf3b5ca517915d4ce60adbdeb83a118cd28368f3f4",
+  "netlist_sha256": "63e20a4f5be2793a05ccf0922c1c9a8f1af88321ae86556ac750ae11852d2993",
+  "netlist_normalized_sha256": "774e6c8417663109bbf9943408c70b4b53db2cf75be5cea5e451582105d70ceb",
   "status": "extracted",
-  "device_count": 33,
+  "device_count": 34,
   "net_count": 18,
   "pin_count": 18,
   "device_counts": {
-    "nfet": 14,
+    "nfet": 15,
     "pfet": 14,
     "sky130_fd_pr__model__cap_mim": 5
   },
   "dummy_devices_dropped": 0,
   "ignored_layers": [
     {
-      "layer": 93,
-      "datatype": 44,
-      "shapes": 28
-    },
-    {
       "layer": 95,
       "datatype": 20,
-      "shapes": 28
+      "shapes": 29
     }
   ],
   "device_recognition_only_layers": [
+    {
+      "layer": 75,
+      "datatype": 20,
+      "shapes": 1
+    },
     {
       "layer": 89,
       "datatype": 44,
       "shapes": 5
     },
     {
+      "layer": 93,
+      "datatype": 44,
+      "shapes": 29
+    },
+    {
       "layer": 94,
       "datatype": 20,
       "shapes": 21
+    },
+    {
+      "layer": 125,
+      "datatype": 44,
+      "shapes": 1
     }
   ],
   "device_classes": [
@@ -47,7 +60,15 @@
     "pnp",
     "sky130_fd_pr__model__cap_mim",
     "sky130_fd_pr__model__cap_mim_m4",
-    "resistor"
+    "resistor",
+    "diode_pw2nd_05v5",
+    "diode_pw2nd_05v5_lvt",
+    "diode_pw2nd_05v5_nvt",
+    "diode_pw2nd_11v0",
+    "diode_pd2nw_05v5",
+    "diode_pd2nw_05v5_lvt",
+    "diode_pd2nw_05v5_hvt",
+    "diode_pd2nw_11v0"
   ],
   "devices": [
     {
@@ -73,7 +94,7 @@
           "array_index": null
         },
         {
-          "cell": "mos_array$1",
+          "cell": "mn1__core",
           "array_index": null
         }
       ]
@@ -101,7 +122,7 @@
           "array_index": null
         },
         {
-          "cell": "mos_array$24",
+          "cell": "mnan2__core",
           "array_index": null
         }
       ]
@@ -129,7 +150,7 @@
           "array_index": null
         },
         {
-          "cell": "mos_array$23",
+          "cell": "mnan1__core",
           "array_index": null
         }
       ]
@@ -157,7 +178,7 @@
           "array_index": null
         },
         {
-          "cell": "mos_array",
+          "cell": "mbd__core",
           "array_index": null
         }
       ]
@@ -185,7 +206,7 @@
           "array_index": null
         },
         {
-          "cell": "mos_array$8",
+          "cell": "mdgnt__core",
           "array_index": null
         }
       ]
@@ -213,7 +234,7 @@
           "array_index": null
         },
         {
-          "cell": "mos_array$27",
+          "cell": "mon__core",
           "array_index": null
         }
       ]
@@ -241,7 +262,7 @@
           "array_index": null
         },
         {
-          "cell": "mos_array$13",
+          "cell": "mpt__core",
           "array_index": null
         }
       ]
@@ -269,7 +290,7 @@
           "array_index": null
         },
         {
-          "cell": "mos_array$9",
+          "cell": "mg1p__core",
           "array_index": null
         }
       ]
@@ -297,7 +318,7 @@
           "array_index": null
         },
         {
-          "cell": "mos_array$19",
+          "cell": "mdbpt__core",
           "array_index": null
         }
       ]
@@ -325,7 +346,7 @@
           "array_index": null
         },
         {
-          "cell": "mos_array$25",
+          "cell": "mast__core",
           "array_index": null
         }
       ]
@@ -353,7 +374,7 @@
           "array_index": null
         },
         {
-          "cell": "mos_array$6",
+          "cell": "mdgpi__core",
           "array_index": null
         }
       ]
@@ -381,7 +402,7 @@
           "array_index": null
         },
         {
-          "cell": "mos_array$12",
+          "cell": "mg2n__core",
           "array_index": null
         }
       ]
@@ -409,7 +430,7 @@
           "array_index": null
         },
         {
-          "cell": "mos_array$26",
+          "cell": "mop__core",
           "array_index": null
         }
       ]
@@ -437,7 +458,7 @@
           "array_index": null
         },
         {
-          "cell": "mos_array$2",
+          "cell": "mpd__core",
           "array_index": null
         }
       ]
@@ -465,7 +486,7 @@
           "array_index": null
         },
         {
-          "cell": "mos_array$3",
+          "cell": "mp2__core",
           "array_index": null
         }
       ]
@@ -493,7 +514,7 @@
           "array_index": null
         },
         {
-          "cell": "mos_array$11",
+          "cell": "mg2p__core",
           "array_index": null
         }
       ]
@@ -521,7 +542,7 @@
           "array_index": null
         },
         {
-          "cell": "mos_array$14",
+          "cell": "mtsw__core",
           "array_index": null
         }
       ]
@@ -549,7 +570,7 @@
           "array_index": null
         },
         {
-          "cell": "mos_array$16",
+          "cell": "mdapi__core",
           "array_index": null
         }
       ]
@@ -577,7 +598,7 @@
           "array_index": null
         },
         {
-          "cell": "mos_array$22",
+          "cell": "mnap2__core",
           "array_index": null
         }
       ]
@@ -605,7 +626,7 @@
           "array_index": null
         },
         {
-          "cell": "mos_array$21",
+          "cell": "mnap1__core",
           "array_index": null
         }
       ]
@@ -633,30 +654,35 @@
           "array_index": null
         },
         {
-          "cell": "mos_array$5",
+          "cell": "mdgpt__core",
           "array_index": null
         }
       ]
     },
     {
       "name": "$29",
-      "class": "sky130_fd_pr__model__cap_mim",
+      "class": "nfet",
       "nets": {
-        "a": "VSS",
-        "b": "NDG"
+        "s": "VSS",
+        "g": "VDD",
+        "d": "RESETn",
+        "b": "VSS"
       },
       "params": {
-        "c_f": 2.5036e-13,
-        "area_um2": 121.0,
-        "perimeter_um": 44.0
+        "l_um": 25.0,
+        "w_um": 1.0,
+        "as_um2": 0.42,
+        "ad_um2": 0.42,
+        "ps_um": 2.84,
+        "pd_um": 2.84
       },
       "instance_path": [
         {
-          "cell": "cdg__cdg",
+          "cell": "massist__massist",
           "array_index": null
         },
         {
-          "cell": "cap_array",
+          "cell": "massist__core",
           "array_index": null
         }
       ]
@@ -684,7 +710,7 @@
           "array_index": null
         },
         {
-          "cell": "mos_array$17",
+          "cell": "mdant__core",
           "array_index": null
         }
       ]
@@ -694,20 +720,20 @@
       "class": "sky130_fd_pr__model__cap_mim",
       "nets": {
         "a": "VSS",
-        "b": "TIM"
+        "b": "NDG"
       },
       "params": {
-        "c_f": 1.58928e-12,
-        "area_um2": 784.0,
-        "perimeter_um": 112.0
+        "c_f": 2.5036e-13,
+        "area_um2": 121.0,
+        "perimeter_um": 44.0
       },
       "instance_path": [
         {
-          "cell": "ctim0__ctim0",
+          "cell": "cdg__cdg",
           "array_index": null
         },
         {
-          "cell": "cap_array$1",
+          "cell": "cdg__core",
           "array_index": null
         }
       ]
@@ -726,11 +752,11 @@
       },
       "instance_path": [
         {
-          "cell": "ctim1__ctim1",
+          "cell": "ctim0__ctim0",
           "array_index": null
         },
         {
-          "cell": "cap_array$2",
+          "cell": "ctim0__core",
           "array_index": null
         }
       ]
@@ -749,11 +775,11 @@
       },
       "instance_path": [
         {
-          "cell": "ctim2__ctim2",
+          "cell": "ctim1__ctim1",
           "array_index": null
         },
         {
-          "cell": "cap_array$3",
+          "cell": "ctim1__core",
           "array_index": null
         }
       ]
@@ -772,11 +798,34 @@
       },
       "instance_path": [
         {
+          "cell": "ctim2__ctim2",
+          "array_index": null
+        },
+        {
+          "cell": "ctim2__core",
+          "array_index": null
+        }
+      ]
+    },
+    {
+      "name": "$34",
+      "class": "sky130_fd_pr__model__cap_mim",
+      "nets": {
+        "a": "VSS",
+        "b": "TIM"
+      },
+      "params": {
+        "c_f": 1.58928e-12,
+        "area_um2": 784.0,
+        "perimeter_um": 112.0
+      },
+      "instance_path": [
+        {
           "cell": "ctim3__ctim3",
           "array_index": null
         },
         {
-          "cell": "cap_array$4",
+          "cell": "ctim3__core",
           "array_index": null
         }
       ]
@@ -804,7 +853,7 @@
           "array_index": null
         },
         {
-          "cell": "mos_array$7",
+          "cell": "mdgni__core",
           "array_index": null
         }
       ]
@@ -832,7 +881,7 @@
           "array_index": null
         },
         {
-          "cell": "mos_array$15",
+          "cell": "mdis__core",
           "array_index": null
         }
       ]
@@ -860,7 +909,7 @@
           "array_index": null
         },
         {
-          "cell": "mos_array$18",
+          "cell": "mdbni__core",
           "array_index": null
         }
       ]
@@ -888,7 +937,7 @@
           "array_index": null
         },
         {
-          "cell": "mos_array$20",
+          "cell": "mrlk__core",
           "array_index": null
         }
       ]
@@ -916,7 +965,7 @@
           "array_index": null
         },
         {
-          "cell": "mos_array$4",
+          "cell": "mnd__core",
           "array_index": null
         }
       ]
@@ -944,7 +993,7 @@
           "array_index": null
         },
         {
-          "cell": "mos_array$10",
+          "cell": "mg1n__core",
           "array_index": null
         }
       ]
@@ -955,7 +1004,7 @@
       "name": "IBIAS",
       "pin": true,
       "device_count": 3,
-      "net_id": 13,
+      "net_id": 3,
       "pin_index": 0,
       "label_positions_um": [
         {
@@ -974,7 +1023,7 @@
       "name": "ND1",
       "pin": true,
       "device_count": 4,
-      "net_id": 10,
+      "net_id": 6,
       "pin_index": 1,
       "label_positions_um": [
         {
@@ -988,7 +1037,7 @@
       "name": "NDG",
       "pin": true,
       "device_count": 5,
-      "net_id": 8,
+      "net_id": 7,
       "pin_index": 2,
       "label_positions_um": [
         {
@@ -1030,7 +1079,7 @@
       "name": "NDL",
       "pin": true,
       "device_count": 5,
-      "net_id": 3,
+      "net_id": 13,
       "pin_index": 5,
       "label_positions_um": [
         {
@@ -1044,7 +1093,7 @@
       "name": "NNAND",
       "pin": true,
       "device_count": 2,
-      "net_id": 9,
+      "net_id": 8,
       "pin_index": 6,
       "label_positions_um": [
         {
@@ -1072,7 +1121,7 @@
       "name": "PDN",
       "pin": true,
       "device_count": 7,
-      "net_id": 2,
+      "net_id": 4,
       "pin_index": 8,
       "label_positions_um": [
         {
@@ -1100,7 +1149,7 @@
       "name": "PGDGB",
       "pin": true,
       "device_count": 4,
-      "net_id": 6,
+      "net_id": 11,
       "pin_index": 10,
       "label_positions_um": [
         {
@@ -1114,7 +1163,7 @@
       "name": "POR_RAW",
       "pin": true,
       "device_count": 2,
-      "net_id": 4,
+      "net_id": 10,
       "pin_index": 11,
       "label_positions_um": [
         {
@@ -1132,8 +1181,8 @@
     {
       "name": "RESETn",
       "pin": true,
-      "device_count": 4,
-      "net_id": 11,
+      "device_count": 5,
+      "net_id": 12,
       "pin_index": 12,
       "label_positions_um": [
         {
@@ -1152,7 +1201,7 @@
       "name": "RSTB",
       "pin": true,
       "device_count": 6,
-      "net_id": 12,
+      "net_id": 9,
       "pin_index": 13,
       "label_positions_um": [
         {
@@ -1180,7 +1229,7 @@
       "name": "TRIP",
       "pin": true,
       "device_count": 4,
-      "net_id": 7,
+      "net_id": 2,
       "pin_index": 15,
       "label_positions_um": [
         {
@@ -1193,7 +1242,7 @@
     {
       "name": "VDD",
       "pin": true,
-      "device_count": 26,
+      "device_count": 27,
       "net_id": 18,
       "pin_index": 16,
       "label_positions_um": [
@@ -1212,7 +1261,7 @@
     {
       "name": "VSS",
       "pin": true,
-      "device_count": 31,
+      "device_count": 33,
       "net_id": 19,
       "pin_index": 17,
       "label_positions_um": [
@@ -1231,12 +1280,13 @@
   ],
   "warnings": [
     "5 drawn capacitors ('sky130_fd_pr__model__cap_mim') written as a fixed-value 'C' card (the deck's nominal area+perimeter value) -- PDK process corners (e.g. mimcap_ff/mimcap_ss) do not apply to it, so schematic-vs-extracted deltas at non-typical corners include a capacitor-corner term; pass --pdk to bind the PDK capacitor subcircuit instead. See docs/cli/extract.md's 'SPICE model binding' section.",
-    "2 layers (93/44, 95/20) carrying 56 shapes are outside 'sky130' deck's connectivity graph -- this geometry is invisible to extraction, so a net routed only through it extracts as multiple disconnected nets instead of one, which will silently mismatch a downstream `klt lvs` reference netlist -- see ignored_layers[] for the full per-layer shape counts. See docs/cli/extract.md's 'ignored_layers' field documentation."
+    "1 layer (95/20) carrying 29 shapes is outside 'sky130' deck's connectivity graph -- this geometry is invisible to extraction, so a net routed only through it extracts as multiple disconnected nets instead of one, which will silently mismatch a downstream `klt lvs` reference netlist -- see ignored_layers[] for the full per-layer shape counts. See docs/cli/extract.md's 'ignored_layers' field documentation."
   ],
   "black_box_regions": [],
   "abstracted_cells": [],
   "unmodelled_poly": [],
   "merged_net_labels": [],
+  "split_net_labels": [],
   "voltage_domain_warnings": [],
   "missing_flavour_markers": [],
   "unsupported_devices": [],
@@ -1250,19 +1300,22 @@
   "declared_pins": null,
   "def_pins": null,
   "label_layers": null,
+  "device_models": null,
   "probes": [],
   "pdk": null,
   "provenance": {
-    "klt_version": "0.7.1.dev1610+g758c6e224053",
-    "klayout_version": "0.30.12",
+    "klt_version": "0.9.2",
+    "klt_git_commit": "046ba74652fc096bd97071fc3237f7159dd40183",
+    "klt_reinstall_spec": "klayout-tools==0.9.2",
+    "klayout_version": "0.30.13",
     "pdk": null,
     "deck": {
       "name": "sky130",
-      "content_hash": "sha256:773f73886500d88310f3c3ebe671aad84de425473e9eb6b7ae5a22902416e973",
-      "released": false
+      "content_hash": "sha256:36027b82e3b16075e72b8e21775cde47ba7d08b7636efa4b73e9c34732a28efd",
+      "released": true
     },
     "input": {
-      "content_hash": "sha256:972f931b040aad0c476d4a98e1d82a2298e04ccdae64138cdefb74dcf3aae967",
+      "content_hash": "sha256:c42327830431abb2f3f9beaa06daec25b07c0cd254c8cf56e25a8362db210be8",
       "role": "layout"
     }
   },
@@ -1270,20 +1323,20 @@
   "spef_path": null,
   "subcircuit": null,
   "metrics": {
-    "extract__device__count": 33,
+    "extract__device__count": 34,
     "extract__net__count": 18,
     "extract__pin__count": 18
   },
   "timing": {
     "stages": {
       "read_layout": 0.001,
-      "device_extraction": 0.05,
+      "device_extraction": 0.078,
       "diagnostics": 0.0,
       "netlist_write": 0.001,
       "netlist_hash": 0.0,
       "netlist_normalized_hash": 0.0
     },
-    "total_seconds": 0.149,
-    "unattributed_seconds": 0.096
+    "total_seconds": 0.091,
+    "unattributed_seconds": 0.011
   }
 }

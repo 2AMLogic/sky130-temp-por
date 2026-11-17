@@ -170,12 +170,27 @@ first exercised by ``layout/ro_ring5/``:
     Element-card name prefixes removed from the generated reference. A
     ``+`` continuation line after a removed card is removed with it. Whatever
     this removes is an *LVS exclusion* and must be disclosed in the cell's
-    README (``layout/por_output_chain/`` drops ``XMASSIST``, a native-Vt NMOS
-    klt can neither draw nor compare).
+    README (``layout/temp_por_top/`` drops ``XMASSIST``, a native-Vt NMOS,
+    from its block-level reference; ``layout/por_output_chain/`` drew that
+    device and dropped the exclusion once klayout-tools grew the ``nvt``
+    voltage flavor -- see that README's blocker history).
 ``lvs.expand_multiplier``
     Names of element cards carrying ``m=N`` that are rewritten as N
     single-instance cards (``<name>_0``..) because ``klt lvs``'s plain-element
     converter refuses multiplied devices; the layout must draw N devices.
+``lvs.options.compare_mos_flavour``
+    Forwarded verbatim (like every ``lvs.options`` entry) and, when set,
+    switches the LVS request's layout side from the pre-extracted ``netlist``
+    shape to inline extraction of the composed ``<cell>.gds``: the option
+    compares MOS flavour (klayout-tools#3650 -- a reference
+    ``sky130_fd_pr__nfet_05v0_nvt`` card then matches only a layout device
+    carrying the native-Vt marker, class ``nfet__nvt``), and a pre-extracted
+    netlist carries no flavour, so ``klt lvs`` rejects the combination. The
+    standalone ``klt extract`` run of the chain still writes the committed
+    ``extract.json``/``<cell>.spice`` (generic ``nfet``/``pfet`` cards -- the
+    deck's flavour binning is an LVS-inline behavior, not an extract-report
+    one); the ``lvs.json`` response names ``<cell>.gds`` as its layout input
+    so the two stay distinguishable in the committed evidence.
 
 ``extract.top_cell_pins`` / ``extract.hierarchical_cells``
     Forwarded to ``klt extract`` as ``--top-cell-pins`` and
@@ -683,10 +698,26 @@ def compose_cell(spec: dict, spec_dir: Path, out_dir: Path) -> dict:
         # 3-terminal resistor ``X`` cards klt extract writes since
         # klayout-tools#2336 (without it they read back as unmatched
         # subcircuit stubs, not resistors).
-        "layout": {
-            "netlist": str(Path(extract["netlist_path"]).name),
-            "deck": deck,
-        },
+        #
+        # ``options.compare_mos_flavour`` (klayout-tools#3650) compares MOS
+        # flavour, which only the *inline-extracted* layout shape carries --
+        # a pre-extracted netlist has no flavour, and klt lvs application-errors
+        # on the combination rather than silently comparing unflavoured. When
+        # the cell opts in, hand klt lvs the composed stream instead of the
+        # extracted netlist so the flavoured devices (e.g. ``mos_array``'s
+        # ``voltage_flavor`` markers) take part in the compare.
+        **(
+            {
+                "layout": {"file": f"{cell}.gds", "deck": deck},
+            }
+            if lvs_options.get("compare_mos_flavour")
+            else {
+                "layout": {
+                    "netlist": str(Path(extract["netlist_path"]).name),
+                    "deck": deck,
+                },
+            }
+        ),
         "reference": {
             "netlist": reference_path.name,
             "form": "subckt-call",

@@ -147,7 +147,10 @@ part of the claim and travel with it):
   recorded checks are *not* clean and are not cited — DRC is
   clean (0 violations, #243: leaf streams regenerated at the pinned klt), ERC
   clean (#260), and an LVS `match` (152/152
-  devices, 71/71 nets) that excludes the native-Vt `XMASSIST` (#97). See
+  devices, 71/71 nets) that excludes the native-Vt `XMASSIST` (#97 — the
+  tool gap that forced the exclusion is since fixed upstream, and the leaf
+  itself now draws the device; the committed top evidence predates that and
+  still carries the exclusion until its own re-render). See
   `layout/temp_por_top/README.md`.
 - **Item 3 — DRC clean: `met`** via `layout/temp_por_top/drc.json` (`status:
   clean`, 0 violations), pinned to
@@ -168,9 +171,13 @@ part of the claim and travel with it):
 - **Item 4 — LVS clean: `met`** via `layout/temp_por_top/lvs.json`. The
   block-level `temp_por_top` LVS reports `status: match`, **152/152
   devices and 71/71 nets**. **Not proven by this envelope:** it is not a
-  full-block compare. The native-Vt `XMASSIST` device is excluded via
-  `lvs.drop_prefixes` because klt cannot draw or compare it
-  (klayout-tools#2912, #97); see `layout/temp_por_top/README.md`. It also
+  full-block compare. The committed evidence excludes the native-Vt
+  `XMASSIST` device via `lvs.drop_prefixes` — the exclusion klayout-tools#2912
+  once forced. That gap is since fixed upstream (klt `0.9.2` draws and
+  compares the device, and the `por_output_chain` leaf uses that with no
+  exclusion, #97), but the committed top evidence predates it and still
+  carries the exclusion until `temp_por_top` is recomposed against the
+  new leaf stream; see `layout/temp_por_top/README.md`. It also
   carries disclosed warnings: the `PNP` compare is scoped to `NE`, so `AE`
   is not verified; the reference has `R=0`/`C=0` placeholders on the
   `res_xhigh_po` and MiM caps, so their values are not compared; and the

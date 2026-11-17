@@ -130,6 +130,10 @@
       "generator_report": "gen/mon.gen.json"
     },
     {
+      "id": "massist",
+      "generator_report": "gen/massist.gen.json"
+    },
+    {
       "id": "nwt_mpd",
       "generator_report": "gen/nwt_mpd.gen.json"
     },
@@ -421,6 +425,7 @@
       "mast",
       "mop",
       "mon",
+      "massist",
       "nwt_mpd",
       "nwt_mp2",
       "nwt_mpt",
@@ -689,6 +694,10 @@
       "stub_vss": {
         "x": -6.0,
         "y": -6.085
+      },
+      "massist": {
+        "x": 185.0,
+        "y": 33.0
       }
     }
   },
@@ -1901,6 +1910,10 @@
         {
           "block": "stub_resetn",
           "port": "CONN"
+        },
+        {
+          "block": "massist",
+          "port": "U0_D"
         }
       ],
       "legs": [
@@ -1981,6 +1994,30 @@
             [
               172.46,
               43.0
+            ]
+          ]
+        },
+        {
+          "from_pin": {
+            "block": "mop",
+            "port": "U0_D"
+          },
+          "to_pin": {
+            "block": "massist",
+            "port": "U0_D"
+          },
+          "waypoints_um": [
+            [
+              169.46,
+              43.0
+            ],
+            [
+              210.63,
+              43.0
+            ],
+            [
+              210.63,
+              33.5
             ]
           ]
         }
@@ -2265,6 +2302,10 @@
         {
           "block": "nwt_mop",
           "port": "TAP_N"
+        },
+        {
+          "block": "massist",
+          "port": "U0_G"
         }
       ],
       "legs": [
@@ -2787,6 +2828,30 @@
               58.81
             ]
           ]
+        },
+        {
+          "from_pin": {
+            "block": "stub_vdd",
+            "port": "CONN"
+          },
+          "to_pin": {
+            "block": "massist",
+            "port": "U0_G"
+          },
+          "waypoints_um": [
+            [
+              -4.5,
+              58.81
+            ],
+            [
+              197.92,
+              58.81
+            ],
+            [
+              197.92,
+              34.76
+            ]
+          ]
         }
       ]
     },
@@ -2893,6 +2958,10 @@
         {
           "block": "ctim3",
           "port": "C0_BOT"
+        },
+        {
+          "block": "massist",
+          "port": "U0_S"
         }
       ],
       "legs": [
@@ -3393,6 +3462,30 @@
             [
               297.32,
               12.5
+            ]
+          ]
+        },
+        {
+          "from_pin": {
+            "block": "stub_vss",
+            "port": "CONN"
+          },
+          "to_pin": {
+            "block": "massist",
+            "port": "U0_S"
+          },
+          "waypoints_um": [
+            [
+              -4.5,
+              -6.0
+            ],
+            [
+              185.21,
+              -6.0
+            ],
+            [
+              185.21,
+              33.5
             ]
           ]
         }
