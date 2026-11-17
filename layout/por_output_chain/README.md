@@ -220,9 +220,17 @@ committed one is the first that was routed, DRC-clean and LVS-clean.
 `drc.json` `coverage`): 23 deck scopes (`cap2m capm ct difftap li licon m1 m2
 m3 m4 m5 npc nsdm nwell poly psdm rpm urpm via via2 via3 via4 x`), 113 deck
 rules checked — the curated sky130 deck's spacing/width/enclosure/area/angle/
-grid rules on the layers this cell draws, including the HV-nwell-enclosure
-rule `nwell.enclosed.hvi.1` (which passes vacuously here: the stream draws no
-`hvi` marker yet — see the `XMASSIST` section). Not covered: 40 rules
+grid rules on the layers this cell draws, including the HV marker rules
+`hvi.angle.1`/`hvi.ongrid.1`/`lvtn.angle.1`/`lvtn.ongrid.1` and the
+HV-nwell-enclosure rule `nwell.enclosed.hvi.1`: the stream draws the
+`hvi`/`lvtn` marker pair on `massist` only (one shape each — the native `nvt`
+flavour marker; see the `XMASSIST` section), so those rules are genuinely
+checked, not skipped (`nwell.enclosed.hvi.1` moved out of `rules_skipped`
+precisely because that marker now exists). `nwell.enclosed.hvi.1` passes
+because that lone marker encloses no n-well — `massist` is a single NMOS with
+no abutted n-well tap ring inside its marker; the same rule is exactly what
+trips ×14 when the `hvi` marker is drawn on the 28 guard-ringed 5 V devices
+(klayout-tools#6025). Not covered: 40 rules
 reported as skipped — the `*.angle.1`/`*.ongrid.1` pairs on marker layers
 this cell does not draw (`dnwell`, `hvntm`, `hvtp`, `hvtr`, `mf`, `ncm`,
 `nsm`, `pad`, `pwbm`, `pwde`, `pwell_rs`, `rpm`, `tunm`, `uhvi`, `urpm`,
