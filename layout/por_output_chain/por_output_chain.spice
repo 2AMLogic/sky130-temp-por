@@ -77,14 +77,16 @@ M$26 RSTB PGDG VDD VDD pfet L=0.5U W=4U AS=1.68P AD=1.68P PS=8.84U PD=8.84U
 M$27 RSTB TRIP VDD VDD pfet L=0.5U W=4U AS=1.68P AD=1.68P PS=8.84U PD=8.84U
 * device instance $28 r0 *1 60.95,50.81 pfet
 M$28 NDGP PDN VDD VDD pfet L=10U W=10U AS=4.2P AD=4.2P PS=20.84U PD=20.84U
-* device instance $29 r0 *1 193.82,4 sky130_fd_pr__model__cap_mim
-C$29 VSS NDG 2.5036e-13
-* device instance $30 r0 *1 217.32,12.5 sky130_fd_pr__model__cap_mim
-C$30 VSS TIM 1.58928e-12
-* device instance $31 r0 *1 249.32,12.5 sky130_fd_pr__model__cap_mim
+* device instance $29 r0 *1 197.92,33.5 nfet
+M$29 RESETn VDD VSS VSS nfet L=25U W=1U AS=0.42P AD=0.42P PS=2.84U PD=2.84U
+* device instance $30 r0 *1 193.82,4 sky130_fd_pr__model__cap_mim
+C$30 VSS NDG 2.5036e-13
+* device instance $31 r0 *1 217.32,12.5 sky130_fd_pr__model__cap_mim
 C$31 VSS TIM 1.58928e-12
-* device instance $32 r0 *1 281.32,12.5 sky130_fd_pr__model__cap_mim
+* device instance $32 r0 *1 249.32,12.5 sky130_fd_pr__model__cap_mim
 C$32 VSS TIM 1.58928e-12
-* device instance $33 r0 *1 313.32,12.5 sky130_fd_pr__model__cap_mim
+* device instance $33 r0 *1 281.32,12.5 sky130_fd_pr__model__cap_mim
 C$33 VSS TIM 1.58928e-12
+* device instance $34 r0 *1 313.32,12.5 sky130_fd_pr__model__cap_mim
+C$34 VSS TIM 1.58928e-12
 .ENDS por_output_chain

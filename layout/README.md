@@ -459,14 +459,17 @@ calls against its own `design/netlist/*.spice` subckt:
 
 - [`layout/por_comparator/`](por_comparator/README.md) (#82): 21 devices,
   `klt drc` clean, `klt lvs` `match` 21/21 devices.
-- [`layout/por_output_chain/`](por_output_chain/README.md) (#97): 28 MOS and
-  5 MiM capacitors drawn, `klt drc` clean, `klt lvs` `match` 33/33 devices and
-  18/18 nets **with one disclosed exclusion**: `XMASSIST`, the native-Vt NMOS
-  `sky130_fd_pr__nfet_05v0_nvt`, which klt can neither draw (`mos_array` has
-  no native flavor) nor compare (`klt lvs` does not know the model), so it is
-  absent from both the layout and the generated reference
-  ([klayout-tools#2912](https://github.com/2AMLogic/klayout-tools/issues/2912)).
-  The cell is therefore not a complete layout of its subckt. Its
+- [`layout/por_output_chain/`](por_output_chain/README.md) (#97): 29 MOS
+  (including the native-Vt `XMASSIST`, `sky130_fd_pr__nfet_05v0_nvt`, drawn
+  with `mos_array`'s `voltage_flavor: "nvt"` since the klt `0.9.2` pin bump)
+  and 5 MiM capacitors drawn, `klt drc` clean, `klt lvs` `match` 34/34
+  devices and 18/18 nets **with no exclusion** — the reference card that
+  klayout-tools#2912 once refused is now read and compared. Disclosed limit:
+  the compare is flavour-blind (topology + `L`/`W`), because turning on
+  `compare_mos_flavour` needs the 28 5 V devices drawn with their `hvi`
+  marker, which is blocked on
+  [klayout-tools#6025](https://github.com/2AMLogic/klayout-tools/issues/6025);
+  the leaf's README records the negative controls. Its
   `lvs.expand_multiplier` option (new in `compose-cell.py`) writes the
   reference's `m=4` capacitor as four single devices, as the layout draws it.
 
@@ -505,10 +508,10 @@ Per issue #36, this fleet prefers landing DRC-clean/LVS-blocked increments
 (isolated to a known, upstream-filed gap) over waiting on the upstream fix.
 As of issue #81, all six `bias_core_*` sub-blocks and the `bias_core`
 full-cell assembly are DRC-clean and LVS `match` at the `0ce8c64842d9` pin.
-`por_comparator` (#82), `por_output_chain` (#97, minus the native device it
-cannot yet draw) and `temp_core` (#104) are DRC-clean and LVS `match` as
-well. `temp_por_top` (#240) places the four leaf streams and wires the nets
-`design/temp_por_top.sch` connects; see
+`por_comparator` (#82), `por_output_chain` (#97, complete since the klt
+`0.9.2` pin bump drew its native device) and `temp_core` (#104) are
+DRC-clean and LVS `match` as well. `temp_por_top` (#240) places the four
+leaf streams and wires the nets `design/temp_por_top.sch` connects; see
 [`temp_por_top/README.md`](temp_por_top/README.md) for its results and what
 blocks a clean sign-off (tracked from
 [#4](https://github.com/2AMLogic/sky130-temp-por/issues/4)).
