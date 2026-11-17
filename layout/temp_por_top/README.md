@@ -46,9 +46,14 @@ The rebuilt GDS is byte-identical to the committed one.
   `0.8.1.dev604+g4f345a577997`, not the `758c6e2` pin the layout and DRC
   were produced at.
 - **LVS: `match`, 152/152 devices, 71/71 nets — with `XMASSIST` excluded**
-  (`lvs.drop_prefixes`), because klt cannot draw or compare the native-Vt
-  device ([#97](https://github.com/2AMLogic/sky130-temp-por/issues/97)). So
-  this is **not** a full-block match. Also disclosed by klt: `PNP` compared on
+  (`lvs.drop_prefixes`). The tool gap that once forced that exclusion
+  (klayout-tools#2912) is since fixed upstream — klt `0.9.2` draws and
+  compares the native-Vt device, and the `por_output_chain` leaf now uses
+  that with no exclusion
+  ([#97](https://github.com/2AMLogic/sky130-temp-por/issues/97)) — but this
+  committed top evidence predates the fix and still carries the exclusion
+  until its own re-render. So this is **not** a full-block match. Also
+  disclosed by klt: `PNP` compared on
   `NE` only; resistor/MiM values not compared (reference `R=0`/`C=0`
   placeholders); `topology.flattened` (reference flattened).
 - LVS needs `extract.hierarchical_cells` + `lvs.flatten_layout`: flat

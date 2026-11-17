@@ -3,7 +3,7 @@
  "_comment": [
   "Cell descriptor for layout/bin/compose-cell.py -- see layout/README.md for the recipe",
   "and layout/por_output_chain/README.md for this cell's floorplan, routing, results and the",
-  "native-device (MASSIST) blocker. Issue #97 (T1 item 2 partial leaf)."
+  "native-device (MASSIST) history: drawn since the klt 0.9.2 pin bump (voltage_flavor nvt), LVS compares it flavoured. Issue #97 (T1 item 2 partial leaf)."
  ],
  "pdk": {
   "variant": "sky130A",
@@ -427,6 +427,22 @@
     "cols": 1,
     "dummy": 0,
     "flavor": "nfet",
+    "gate_contact": true
+   }
+  },
+  {
+   "id": "massist",
+   "generator": "mos_array",
+   "cell_name": "massist",
+   "orientation": "none",
+   "params": {
+    "w_um": 1,
+    "l_um": 25,
+    "rows": 1,
+    "cols": 1,
+    "dummy": 0,
+    "flavor": "nfet",
+    "voltage_flavor": "nvt",
     "gate_contact": true
    }
   },
@@ -946,6 +962,7 @@
    "mast",
    "mop",
    "mon",
+   "massist",
    "nwt_mpd",
    "nwt_mp2",
    "nwt_mpt",
@@ -1214,6 +1231,10 @@
    "stub_vss": {
     "x": -6.0,
     "y": -6.085
+   },
+   "massist": {
+    "x": 185.0,
+    "y": 33.0
    }
   }
  },
@@ -2426,6 +2447,10 @@
     {
      "block": "stub_resetn",
      "port": "CONN"
+    },
+    {
+     "block": "massist",
+     "port": "U0_D"
     }
    ],
    "legs": [
@@ -2506,6 +2531,30 @@
       [
        172.46,
        43.0
+      ]
+     ]
+    },
+    {
+     "from_pin": {
+      "block": "mop",
+      "port": "U0_D"
+     },
+     "to_pin": {
+      "block": "massist",
+      "port": "U0_D"
+     },
+     "waypoints_um": [
+      [
+       169.46,
+       43.0
+      ],
+      [
+       210.63,
+       43.0
+      ],
+      [
+       210.63,
+       33.5
       ]
      ]
     }
@@ -2790,6 +2839,10 @@
     {
      "block": "nwt_mop",
      "port": "TAP_N"
+    },
+    {
+     "block": "massist",
+     "port": "U0_G"
     }
    ],
    "legs": [
@@ -3312,6 +3365,30 @@
        58.81
       ]
      ]
+    },
+    {
+     "from_pin": {
+      "block": "stub_vdd",
+      "port": "CONN"
+     },
+     "to_pin": {
+      "block": "massist",
+      "port": "U0_G"
+     },
+     "waypoints_um": [
+      [
+       -4.5,
+       58.81
+      ],
+      [
+       197.92,
+       58.81
+      ],
+      [
+       197.92,
+       34.76
+      ]
+     ]
     }
    ]
   },
@@ -3418,6 +3495,10 @@
     {
      "block": "ctim3",
      "port": "C0_BOT"
+    },
+    {
+     "block": "massist",
+     "port": "U0_S"
     }
    ],
    "legs": [
@@ -3920,6 +4001,30 @@
        12.5
       ]
      ]
+    },
+    {
+     "from_pin": {
+      "block": "stub_vss",
+      "port": "CONN"
+     },
+     "to_pin": {
+      "block": "massist",
+      "port": "U0_S"
+     },
+     "waypoints_um": [
+      [
+       -4.5,
+       -6.0
+      ],
+      [
+       185.21,
+       -6.0
+      ],
+      [
+       185.21,
+       33.5
+      ]
+     ]
     }
    ]
   }
@@ -3954,9 +4059,6 @@
  "lvs": {
   "reference": "design/netlist/por_output_chain.spice",
   "subckt": "por_output_chain",
-  "drop_prefixes": [
-   "XMASSIST"
-  ],
   "expand_multiplier": [
    "XCTIM"
   ]
