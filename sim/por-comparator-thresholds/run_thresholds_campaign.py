@@ -1055,7 +1055,6 @@ def cmd_record_mc(args, man: dict, run_dir: Path, meta: dict) -> int:
                         "stuck class": "mechanism class of a failed-release realisation from its diagnostics: enable-clamp (BIAS_OK never asserted), comparator-stuck (BIAS_OK asserted, CMPO never rose), extractor-miss (both released yet graded no_transition); None = no diagnostic data"},
         "requests": requests,
         "corners": corners,
-        "reproduction": reproduction,
         "probe": "",
         "absent_coverage": man["absent_coverage"],
         "links": {
