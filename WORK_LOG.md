@@ -9,6 +9,9 @@ Chronological record of recently merged pull requests and closed issues. This fi
 
 ### 2026-11-17
 
+- **PR #423**: chore(loom): resync installed Loom to v0.19.1306
+- **PR #422**: feat(sim): keep the enable/clamp-path MC diagnostics; POR non-release mechanism established — bias_core BIAS_OK never asserts
+- **Issue #401** (closed): por_comparator: 38 of 120 local-mismatch realisations never release POR_RAW, and the count is not the upper tail of the releasing distribution
 - **PR #421**: docs: time-scope stale klt hvi-marker capability statements to their render pins
 - **PR #419**: feat(layout): draw the native-Vt XMASSIST in por_output_chain; LVS match 34/34 with no exclusion
 - **Issue #420** (closed): Stale tool-capability and blocker statements in layout/ and docs/ after klt grew the native-Vt (hvi+lvtn) flavour
