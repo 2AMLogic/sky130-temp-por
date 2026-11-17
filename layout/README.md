@@ -414,9 +414,10 @@ And one more, found building issue #61's `ec`/`vss` promotions:
 
 **Update (issue #420, 2026-11-17) — finding 3 is closed: the tool draws the
 sky130 marker.** [klayout-tools#1912](https://github.com/2AMLogic/klayout-tools/issues/1912)
-closed as COMPLETED, and at the klt `0.9.2` release (`046ba74652fc`, where
-PR #419 moves the `layout/pdk.json` pin from `0.8.0`/`c572046be644`)
-`klt gen mos_array` accepts sky130 `voltage_flavor: "nvt"` and draws that
+closed as COMPLETED, and at the klt `0.9.2` release (`046ba74652fc`, which
+the repo's `layout/pdk.json` pin moved to from `0.8.0`/`c572046be644`;
+PR #419, merged) `klt gen mos_array` accepts sky130 `voltage_flavor: "nvt"`
+and draws that
 flavour's marker pair — `hvi` (75/20) + `lvtn` (125/44) — with the HV marker
 rules (`hvi.angle.1`/`hvi.ongrid.1`, `nwell.enclosed.hvi.1`, and their
 `lvtn` counterparts) genuinely checked rather than skipped: measured on PR

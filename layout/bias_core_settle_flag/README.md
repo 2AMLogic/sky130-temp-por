@@ -266,8 +266,9 @@ there. Filed generically per this repo's friction protocol as
 **Update (issue #420, 2026-11-17) — the drawing half of this gap has closed
 upstream; the disclosure above remains true of this stream.**
 [#1912](https://github.com/2AMLogic/klayout-tools/issues/1912) closed as
-COMPLETED, and at the klt `0.9.2` release (`046ba74652fc`, where PR #419
-moves the repo's `layout/pdk.json` pin) `klt gen mos_array` accepts sky130
+COMPLETED, and at the klt `0.9.2` release (`046ba74652fc`, which the repo's
+`layout/pdk.json` pin moved to; PR #419, merged) `klt gen mos_array` accepts
+sky130
 `voltage_flavor: "nvt"` and draws that flavour's marker pair — `hvi` (75/20)
 + `lvtn` (125/44) — with the HV marker rules checked rather than skipped
 (measured on PR #419's `por_output_chain` re-render, head `81837fe3`). This
