@@ -172,14 +172,25 @@ is **the first sub-block in this repo to reach a full LVS match**: none of
 the three gaps blocking the sibling cells touches a MOS device, so this group
 was free to go the whole way.
 
-It carries one disclosure of its own, which no step of the chain can see:
-`klt gen` cannot draw sky130's `hvi` (75/20) thick-oxide marker, so these 5V
-`g5v0d10v5` devices are drawn in the 1.8V domain's geometry, `klt drc` reads
-no `hvi` rule, and `klt lvs` deliberately maps both flavours onto one device
-class — so the match above is exactly as clean as it would be with the marker
-present. Filed as
-[`2AMLogic/klayout-tools#1912`](https://github.com/2AMLogic/klayout-tools/issues/1912);
-see that cell's own README for what the match does and does not assert.
+It carries one disclosure of its own, which no step of the chain can see: at
+the pin that rendered this stream (`758c6e224053`, the `layout/pdk.json` pin
+of the 2026-10-27 regeneration), `klt gen` could not draw sky130's `hvi`
+(75/20) thick-oxide marker
+([klayout-tools#1912](https://github.com/2AMLogic/klayout-tools/issues/1912)),
+so these 5V `g5v0d10v5` devices are drawn in the 1.8V domain's geometry, the
+deck read no `hvi` rule, and `klt lvs` deliberately mapped both flavours onto
+one device class — so the match above is exactly as clean as it would be with
+the marker present. The tool has since caught up: at the klt `0.9.2` release
+`klt gen` draws the sky130 marker pair — `hvi` (75/20) + `lvtn` (125/44), the
+`nvt` flavour's markers — with the HV marker rules checked rather than
+skipped (measured on PR #419's `por_output_chain` re-render, head `81837fe3`),
+so this paragraph now describes the older pin's evidence, not the current
+tool. The stream still carries no `hvi` marker, and the cell is not a 5V
+sign-off until redrawn — drawing the marker on these guard-ringed 5V devices
+is itself still blocked by
+[`klayout-tools#6025`](https://github.com/2AMLogic/klayout-tools/issues/6025)
+(still open). See that cell's own README for what the match does and does
+not assert.
 
 ## `bias_core_startup`: the startup kick chain (issue #38, part of #34)
 
@@ -202,7 +213,9 @@ match — none of these 9 devices are the `sky130_fd_pr__pnp_05v5_W3p40L3p40`
 device `2AMLogic/klayout-tools#1894` blocks, so this group was free to go
 the whole way, and it carries the same `hvi`-marker disclosure
 `bias_core_settle_flag` does
-([`2AMLogic/klayout-tools#1912`](https://github.com/2AMLogic/klayout-tools/issues/1912)).
+([`2AMLogic/klayout-tools#1912`](https://github.com/2AMLogic/klayout-tools/issues/1912),
+closed since — this stream predates the klt `0.9.2` pin that draws the
+`hvi`+`lvtn` pair, and still carries no marker).
 An earlier draft hit a new, distinct `gen-compose` gap — promoting several
 of an earlier stage's `pins[]` ports through a bundle net at a different
 `routing.layer_role` via a `"stages"`/`blocks[].from_stage` two-pass
@@ -236,7 +249,9 @@ of the per-*leg* form in this repo.
 `match` — 15/15 devices, 13/13 nets, 13/13 pins, 0 mismatches.** The third
 sub-block in this repo to reach a full LVS match, and the largest; it
 carries the same `hvi`-marker disclosure the other two do
-([`2AMLogic/klayout-tools#1912`](https://github.com/2AMLogic/klayout-tools/issues/1912)).
+([`2AMLogic/klayout-tools#1912`](https://github.com/2AMLogic/klayout-tools/issues/1912),
+closed since — these streams predate the klt `0.9.2` pin that draws the
+`hvi`+`lvtn` pair, and still carry no marker).
 No new tool gap was hit building it.
 
 ## Known klt gaps hit building this recipe
@@ -343,16 +358,18 @@ once `klt` is upgraded past #1930.
 Two more, both found building `layout/bias_core_settle_flag/` (the first MOS
 cell in this repo) and both filed the same way:
 
-3. **`klt gen` can draw no thick-oxide/medium-voltage marker on the sky130
-   family**, for any `voltage_flavor` value, even though the curated sky130
-   *extraction* deck declares the matching `MOSFlavour(marker=(75, 20),
+3. **`klt gen` drew no thick-oxide/medium-voltage marker on the sky130
+   family at any pin this recipe was built under**, for any `voltage_flavor`
+   value, even though the curated sky130 *extraction* deck declares the
+   matching `MOSFlavour(marker=(75, 20),
    flavour="hvi")` and `pdk_models` binds it to the real `g5v0d10v5`
-   subcircuits. Since no `klt drc` rule reads `hvi`, and `klt lvs` maps both
+   subcircuits. Since no `klt drc` rule read `hvi`, and `klt lvs` mapped both
    flavours onto one device class, a 5V design drawn in the 1.8V domain
-   passes the whole chain clean —
+   passed the whole chain clean —
    [`2AMLogic/klayout-tools#1912`](https://github.com/2AMLogic/klayout-tools/issues/1912).
-   This is an open caveat on both of this repo's LVS-matching cells
-   (`bias_core_settle_flag` and `bias_core_startup`).
+   This was an open caveat on both of this repo's LVS-matching cells
+   (`bias_core_settle_flag` and `bias_core_startup`) at their render pins;
+   the gap itself has closed — see the update at the end of this section.
 4. **A via-ladder's intermediate landing pad can silently short an unrelated
    net.** `gen-compose`'s route-vs-route check deliberately excludes a
    multi-hop ladder's intermediate pads (they are not on the leg's own
@@ -394,6 +411,26 @@ And one more, found building issue #61's `ec`/`vss` promotions:
    destroy the ring. Filed generically as
    [`2AMLogic/klayout-tools#1960`](https://github.com/2AMLogic/klayout-tools/issues/1960);
    both PNP cells pay for it with a `ring_gap_side` opening (see #61 above).
+
+**Update (issue #420, 2026-11-17) — finding 3 is closed: the tool draws the
+sky130 marker.** [klayout-tools#1912](https://github.com/2AMLogic/klayout-tools/issues/1912)
+closed as COMPLETED, and at the klt `0.9.2` release (`046ba74652fc`, which
+the repo's `layout/pdk.json` pin moved to from `0.8.0`/`c572046be644`;
+PR #419, merged) `klt gen mos_array` accepts sky130 `voltage_flavor: "nvt"`
+and draws that
+flavour's marker pair — `hvi` (75/20) + `lvtn` (125/44) — with the HV marker
+rules (`hvi.angle.1`/`hvi.ongrid.1`, `nwell.enclosed.hvi.1`, and their
+`lvtn` counterparts) genuinely checked rather than skipped: measured on PR
+#419's `por_output_chain` re-render (head `81837fe3`) by a layer/datatype
+scan of the committed streams and that cell's `drc.json` coverage. Finding 3
+above is the historical record of the pre-`0.9.2` pins; the bias and
+`temp_core` streams it describes still carry no marker layer. Still open,
+and the reason those 5V `g5v0d10v5` devices are not yet drawn with their own
+`hvi` marker: the marker covers only the device array, so a flavour-marked
+device with a well tap ring trips `nwell.enclosed.hvi.1` —
+[`klayout-tools#6025`](https://github.com/2AMLogic/klayout-tools/issues/6025),
+open, measured at `0.9.2` and on `main` (`0.9.3.dev239`) per PR #419's
+README.
 
 ## `bias_core`: the full-cell assembly (issue #40, the final step of #34)
 
@@ -460,7 +497,11 @@ verticals and met2 tracks, joined at small hand-made junction blocks
 (`jct_m1.gds`). That technique was needed because a `gen-compose` leg cannot
 change plane at a waypoint, filed as
 [klayout-tools#2930](https://github.com/2AMLogic/klayout-tools/issues/2930).
-The 5 V `hvi` marker caveat (#1912) applies here too.
+The 5 V `hvi` marker caveat (#1912) applied at this cell's render pin
+(`758c6e224053`) too — the stream still carries no marker. The tool draws
+the `hvi` (75/20) + `lvtn` (125/44) pair since klt `0.9.2` (measured on PR
+#419's `por_output_chain` re-render), so this is a pending re-render, not a
+tool limit.
 
 ## What's next
 

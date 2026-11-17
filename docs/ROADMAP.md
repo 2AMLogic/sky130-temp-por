@@ -20,7 +20,7 @@ The signoff report grades `layout/temp_por_top/` at **7 of 11 T1 items met**.
 | 1 Design sources | met | `design/` (four leaf cells and `temp_por_top`), attested in `manifests/attestations/` |
 | 2 Layout | met | `layout/temp_por_top/temp_por_top.gds` (#240) |
 | 3 DRC clean | met | `layout/temp_por_top/drc.json` |
-| 4 LVS clean | met, with an exclusion | `layout/temp_por_top/lvs.json`: 152/152 devices with native-Vt `XMASSIST` excluded (#97) |
+| 4 LVS clean | met, with an exclusion | `layout/temp_por_top/lvs.json`: 152/152 devices with native-Vt `XMASSIST` excluded (#97) — pending re-render of `temp_por_top`, not a tool limit (the leaf draws it at klt `0.9.2`, PR #419) |
 | 5 Corner verification vs a ratified spec | unmet | only two of eight spec rows are ratified (DR-003) |
 | 6 Monte Carlo for statistical claims | unmet | MC records exist under `sim/` as harness records, not as envelopes the report accepts, and back no ratified row |
 | 7 Post-layout verification | unmet | `klt pex` artifacts exist for `por_comparator` only (`layout/por_comparator/pex/`, #124) |
@@ -94,8 +94,9 @@ Unblocked by a named item above or by a ruling listed under "Blocked and waiting
 - **Block-level post-layout verification (item 7).** *Can `klt pex` extract
   `temp_por_top` given the pin-order and MOS-flavour limits recorded in
   `layout/por_comparator/pex/README.md`?*
-- **Full-block LVS.** *When does klt draw and compare the native-Vt NMOS?* Then
-  #97 and an item-4 match with no exclusion.
+- **Full-block LVS.** The question is answered — klt draws and compares the
+  native-Vt NMOS at the klt `0.9.2` pin (#97, closed) — so the path to an
+  item-4 match with no exclusion is the `temp_por_top` re-render.
 - **Remaining ladder rungs** from the README: post-layout re-verification,
   shuttle seat, measured silicon (`measurements/` is empty by design).
 
@@ -104,9 +105,14 @@ Unblocked by a named item above or by a ruling listed under "Blocked and waiting
 - **#137, ratification of DR-004 and DR-005**: waits on the two independent keys
   (triage note of 2026-10-15). DR-006 and DR-007 have no ratification issue.
   This gates items 5 and 6.
-- **#97, `por_output_chain` with `XMASSIST`**: waits on
-  [klayout-tools#2912](https://github.com/2AMLogic/klayout-tools/issues/2912)
-  (native-Vt NMOS generation and LVS), open as read today.
+- **#97 follow-on, `temp_por_top` re-render with `XMASSIST`**: #97 itself is
+  closed completed — no longer tool-blocked
+  ([klayout-tools#2912](https://github.com/2AMLogic/klayout-tools/issues/2912)
+  closed; the leaf draws and compares the device at the klt `0.9.2` pin,
+  PR #419, merged). What remains: the `temp_por_top` re-render that retires
+  the block-level LVS exclusion, and the flavour-blind compare limit —
+  drawing the 5V devices' own `hvi` marker is blocked by
+  [klayout-tools#6025](https://github.com/2AMLogic/klayout-tools/issues/6025).
 - **#153, tightened-solver brown-out re-run**: four pilots hit the 3600 s job
   limit; waits on a choice among the three options in the issue body.
 - **#327, `corner-run.py` batch path**: waits on a ruling on whether to also
