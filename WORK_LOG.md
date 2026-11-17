@@ -9,6 +9,24 @@ Chronological record of recently merged pull requests and closed issues. This fi
 
 ### 2026-11-16
 
+- **PR #416**: test(sim): cover the tripwire's two live-fire paths -- a tripped marker and an accepted argv
+- **PR #414**: fix: cmd_compare's append-only guard covers both record twins, pathfully, before grading
+- **PR #413**: test(sim): put per-runner CLI probes behind a tripwire klt that refuses klt sim
+- **PR #412**: docs: state the closed-corners/ exemption in the manifest byte-rule paragraph
+- **PR #411**: ci: bound graded T1 count and check manifest pins against envelopes
+- **PR #410**: test: retire pnp-mismatch's stale FIXTURE_SEEDS entry (Fixes #408)
+- **PR #407**: test: make raise_statement fail loudly on long or unterminated raises
+- **PR #385**: refactor(sim): route iq-top's classify_failure through sim_common.classify_error (one vocabulary for the klt timeout)
+- **PR #378**: refactor(sim): route thresholds trace decimation through sim_common.decimate
+- **Issue #415** (closed): test(sim): ship the two now-possible regression tests for the deck-transport tripwire
+- **Issue #408** (closed): self-checks red on main since #395: run_pnp_mismatch.py regained real corpus coverage, so its FIXTURE_SEEDS entry is stale
+- **Issue #403** (closed): sim/README.md: state the closed-corners/ exemption in the artifact-manifest byte-rule paragraph
+- **Issue #402** (closed): run_accuracy_mc.py's record guard is a third wording #369's greps missed, and it only checks the .md
+- **Issue #398** (closed): raise_statement() in test_pdk_pin.py silently truncates long raises and rejects bind-then-raise
+- **Issue #389** (closed): CI cannot see a T1 signoff regression: nothing bounds t1_met_count or checks the manifest pin against the envelope's provenance.input.content_hash
+- **Issue #371** (closed): iq-top: route the sixth classify_error copy through sim_common (10db1d54 residue; renamed classify_failure, two vocabularies for one klt timeout)
+- **Issue #363** (closed): Tighten the capacity-wait CLI probe guard: cli() checks token presence, not that argparse rejects it
+- **Issue #341** (closed): Route the fifth campaign's trace writer through sim_common.decimate, and delete the dead read_trace (1e17ab35 residue)
 - **PR #406**: fix: repo-root-relative DR annotation paths; scope malformed-row check to DR rows
 - **PR #400**: refactor: drop dead local assignments flagged by ruff F841
 - **PR #395**: evidence: live pnp-mismatch record from store-routed runner (#325 acceptance step 6)
