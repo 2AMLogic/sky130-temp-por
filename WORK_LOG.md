@@ -7,6 +7,13 @@ Chronological record of recently merged pull requests and closed issues. This fi
 - [2026-09](work_log/WORK_LOG_2026-09.md)
 - [2026-08](work_log/WORK_LOG_2026-08.md)
 
+### 2026-11-17
+
+- **PR #421**: docs: time-scope stale klt hvi-marker capability statements to their render pins
+- **PR #419**: feat(layout): draw the native-Vt XMASSIST in por_output_chain; LVS match 34/34 with no exclusion
+- **Issue #420** (closed): Stale tool-capability and blocker statements in layout/ and docs/ after klt grew the native-Vt (hvi+lvtn) flavour
+- **Issue #97** (closed): Lay out por_output_chain as the next DRC/LVS-verified POR leaf
+
 ### 2026-11-16
 
 - **PR #416**: test(sim): cover the tripwire's two live-fire paths -- a tripped marker and an accepted argv
