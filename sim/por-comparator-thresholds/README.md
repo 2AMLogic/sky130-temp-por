@@ -265,10 +265,10 @@ sample):
 
 Two findings the corner tables could not show:
 
-- **The mismatch spread of the thresholds is an order of magnitude larger
-  than the corner envelope.** VPOR-up spans 18 mV across the whole 5x3
-  corner grid of the nominal circuit; under mismatch its sigma is
-  100-152 mV at every simulated corner. The record states the resolution of
+- **The mismatch spread of the thresholds is 4.5-6.9x the same-variant
+  corner envelope.** Across the real-bias-core 5x3 corner grid VPOR-up spans
+  22 mV (16 mV across the tt/ss corners the MC actually samples); under
+  mismatch its sigma is 100-152 mV at every simulated corner. The record states the resolution of
   each sigma (17-24% at these N) alongside.
 - **38 of 120 samples never release reset at all**: POR_RAW held low through
   the entire 0 -> 3.63 V -> 0 sweep (up AND down `no_transition`), with
