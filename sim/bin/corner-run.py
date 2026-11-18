@@ -762,19 +762,11 @@ def submit_batch(
     verbatim: there is no local fallback.
 
     `capacity_wait_s` (request batch.capacity_wait_s) makes klt itself wait out a
-    Spot capacity refusal; `sim_common.cap_retry` is the separate, bounded
-    resubmit for the shared fleet's BATCH_MAX_CONCURRENT_INSTANCES cap, which
-    capacity_wait_s does not cover (sim_common.py) -- so both are armed.
+    fleet capacity refusal; there is no caller-side resubmit loop.
     """
     d = run_dir / "batch"
-    retry = (
-        sim_common.cap_retry(d, exp.slug, min(180, capacity_wait_s), max_retries=40)
-        if capacity_wait_s
-        else None
-    )
     outcome = sim_common.submit_prepared(
         d, netlist, request, f"{exp.slug}: {len(matrix)} points -> batch fleet", exp.slug,
-        retry=retry,
     )
     report_path = d / "report.json"
     if not sim_common.report_usable(report_path):
@@ -1012,8 +1004,7 @@ def parse_args(argv: list[str]) -> argparse.Namespace:
         type=float,
         default=600.0,
         help="batch backend: seconds the submit may wait out fleet capacity and "
-        "concurrency-cap refusals -- sets request batch.capacity_wait_s and arms a "
-        "bounded launch-refusal retry (sim_common.cap_retry); 0 disables both. "
+        "concurrency-cap refusals -- sets request batch.capacity_wait_s; 0 disables. "
         "Default 600 (host batch-submit rules)",
     )
     return p.parse_args(argv)

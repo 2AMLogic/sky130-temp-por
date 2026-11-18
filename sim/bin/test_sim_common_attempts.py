@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 """Tests for the shared archived-attempt reader (issue #293). Stdlib only, no SPICE.
 
-``cap_retry`` archives each refused submit as ``attemptN/report.json`` (klt's stdout)
+``submit_prepared`` archives each superseded submit as ``attemptN/report.json`` (klt's stdout)
 plus ``attemptN/klt.stderr``, and klt writes its JSON error envelope to *stderr* when
 it refuses before producing a report.  Every campaign runner used to carry its own
 reader of those directories; the copies had drifted apart (three read only

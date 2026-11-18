@@ -229,9 +229,7 @@ def submit_one(req: dict, head: str, man: dict, run_dir: Path, capacity_wait_s: 
     d = run_dir / req["tag"]
     res = sim_common.submit_prepared(
         d, build_netlist(head, req), build_request(req, man, "batch", capacity_wait_s, timeout_s),
-        f"{req['tag']}: {len(corners_of(man))} points -> batch fleet", req["tag"],
-        # a refused LAUNCH is retried later (bounded; never replaced by a local grid)
-        retry=sim_common.cap_retry(d, req["tag"], min(180, capacity_wait_s), max_retries=40) if capacity_wait_s else None)
+        f"{req['tag']}: {len(corners_of(man))} points -> batch fleet", req["tag"])
     return {"tag": req["tag"], **res}
 
 
