@@ -7,6 +7,11 @@ Chronological record of recently merged pull requests and closed issues. This fi
 - [2026-09](work_log/WORK_LOG_2026-09.md)
 - [2026-08](work_log/WORK_LOG_2026-08.md)
 
+### 2026-11-18
+
+- **PR #431**: ci: add the merge_group trigger and teach the append-only gate merge-group baselines
+- **Issue #429** (closed): Merge queue: add the merge_group trigger and adapt the PR-metadata gates
+
 ### 2026-11-17
 
 - **PR #427**: docs: cite real-bias-core corner envelope (22 mV, 16 mV tt/ss) in mismatch-MC comparisons
