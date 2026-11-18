@@ -71,9 +71,6 @@ Unblocked by a named item above or by a ruling listed under "Blocked and waiting
   moved results are listed. Needs the `corner-run.py` batch path to accept the
   four experiments it refuses today (#327), and the netlisting failure recorded
   on #189 (2026-11-04) re-checked.
-- **Replace `layout/bin/attest-layout.py` with `klt signoff --attest 2`** (#308):
-  declined (closed not planned, 2026-11-18) until klayout-tools gains recipe-file
-  binding (klayout-tools#6744) or caller-summary carrying (klayout-tools#5573).
 - **Ratification pull requests for DR-004 and DR-005** (#137): one per DR,
   flipping status and the README rows it covers. They can be prepared; they
   merge only when both keys are recorded.
@@ -119,7 +116,7 @@ Unblocked by a named item above or by a ruling listed under "Blocked and waiting
 - **#327, `corner-run.py` batch path**: waits on a ruling on whether to also
   remove the local grid default set by #219. Its "fix the batch path only"
   option is what #189 needs.
-- **#308, #314, #321**: cleanup proposals routed for a decision. **#303**: PR #305 merged; the issue stays open until someone runs the
+- **#321**: the only cleanup proposal still awaiting a decision (#308 declined, closed not planned 2026-11-18, see "Not planned"; #314 closed completed 2026-11-18). **#303**: PR #305 merged; the issue stays open until someone runs the
   scratch-commit demonstration with `xschem` absent and posts the result.
 - **#291** carries ready, triage and curating labels at once after an
   interrupted curation; it may need a label repair before it is drawn.
@@ -138,3 +135,8 @@ evidence-gap work listed under Now; the items themselves wait on ratification.
   (`manifests/README.md`, "What CI covers (and does not)").
 - Local multi-corner or Monte Carlo grids (those go through `klt sim`), or
   edits to the append-only records under `sim/**/records/`.
+- Replacing `layout/bin/attest-layout.py` with `klt signoff --attest 2` (#308,
+  closed not planned, 2026-11-18). Revisit only if klayout-tools gains
+  recipe-file binding or caller-summary carrying. The recipe-file request,
+  klayout-tools#6744, was itself declined (closed not planned, 2026-11-18); the
+  caller-summary request, klayout-tools#5573, is still open.
