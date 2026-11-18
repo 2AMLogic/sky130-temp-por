@@ -3,6 +3,7 @@
 Current roadmap derived from GitHub label state. The region below is maintained by the Loom Guide role.
 
 <!-- guide:plan-body:start -->
+_Generated: 2026-11-18T23:42:41Z (snapshot; compare against live labels)_
 ## Operator Attention: Merge-Risk-Hold Pileup
 
 Judge-approved PRs under a hold (`loom:blocked` or `loom:operator`) — only a human merge decision is missing.
@@ -58,8 +59,6 @@ Issues carrying `loom:curated`.
 ## Proposed (Architect / Hermit)
 
 - **#137**: Run the two-key ratification ceremony on DR-004 and DR-005 *(architect)* *(held)*
-- **#308**: Replace layout/bin/attest-layout.py with klt signoff --attest 2 (native since klt 0.9.0; needs the CI pin bumped from 0.8.0) *(hermit)* *(held)*
-- **#314**: Remove the caller-side fleet concurrency-cap retry (cap_retry): klt has waited this refusal out itself since 0.8.0 *(hermit)* *(held)*
 - **#321**: Remove undeclared descriptor keys from compose-cell.py (lvs.params, lvs.drop_kwargs, blocks[].from_stage): no committed cell recipe uses them *(hermit)* *(held)*
 - **#327**: corner-run.py: finish the batch path (it refuses 4 of 5 experiments) and retire the local ngspice grid loop *(hermit)* *(held)*
 - **#353**: Collapse the four `supersedes` encodings into one: the display placeholder `(none)` is load-bearing machine state in two runners *(hermit)* *(held)*
@@ -80,6 +79,6 @@ Issues carrying `loom:curated`.
 | PRs awaiting review | 0 |
 | Approved PRs awaiting merge | 0 |
 | Curated | 5 |
-| Architect / Hermit proposals | 6 |
+| Architect / Hermit proposals | 4 |
 | Active epics | 1 |
 <!-- guide:plan-body:end -->
