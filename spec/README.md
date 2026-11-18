@@ -11,7 +11,7 @@
   decision itself). The table below is the index of every `DR-*.md` file;
   the status is copied from each file's own `Status` line, and the last
   column names the README target-specification row(s) the record addresses.
-  `DR-004` through `DR-007` are all `proposed` recommendations awaiting the
+  `DR-004` through `DR-008` are all `proposed` recommendations awaiting the
   two-key ceremony (see [`ratification/`](../ratification/)) — none of them
   is ratified.
 
@@ -24,10 +24,13 @@
   | [`DR-005`](decision-records/DR-005-temp-buffer-scope-and-load-assumption.md) | `temp_buffer` scope, PTAT/CTAT output load assumption, and the Sensor-output row | `proposed` (recommendation only; ratification is the two-key ceremony) | Sensor output (`[TBD]`); discusses `[TBD-1]`/`[TBD-5]` as constraints without recommending them |
   | [`DR-006`](decision-records/DR-006-iq-rows-recommendation.md) | Recommended sky130 Iq rows (`[TBD-4..6]`) from the committed `sim/iq-top` evidence | `proposed` (recommendation only; ratification is the two-key ceremony) | Iq (block total): `[TBD-4]` por-iq, `[TBD-5]` temp-iq, `[TBD-6]` iq-total — finds them not yet recommendable (17 of 45 iq-total points non-`ok`) and names the missing experiments |
   | [`DR-007`](decision-records/DR-007-temp-core-accuracy-recommendation.md) | `temp_core` accuracy (`[TBD-1]`): the 3-sigma mismatch figure is real; recommended design change and a provisional budget | `proposed` (recommendation only; ratification is the two-key ceremony) | Temperature error, untrimmed `[TBD-1]` (both the untrimmed and 1-point-trim columns) |
+  | [`DR-008`](decision-records/DR-008-relocate-ratified-target-spec-rows.md) | Relocate the two ratified target-spec rows (1 and 6) from README.md to `spec/target-spec.md` so README prose edits stop staling item 10 | `proposed` (restructure only; changes no value or row status; does not self-ratify) | rows 1 and 6 — location only |
 - [`ratification/`](../ratification/) — the two-key ratification process
   (`market-key`, `ee-key`) `DR-003`'s recommendation and any future
   `target-spec.md` ratification goes through.
 
-No `target-spec.md` exists yet — per the porting plan §4, that is a future
-deliverable, populated from device-characterization evidence rather than
-asserted ahead of it.
+[`target-spec.md`](target-spec.md) holds only the two rows DR-003 ratified (operating
+temperature and supply), relocated from the README by `DR-008`. The full table is
+still a future deliverable per the porting plan §4, populated from
+device-characterization evidence rather than asserted ahead of it; the
+placeholder rows stay in the repo README until then.
