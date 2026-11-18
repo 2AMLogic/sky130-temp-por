@@ -2,9 +2,9 @@
   "schema_version": 1,
   "kind": "t1-attestation-inventory",
   "t1_item": 10,
-  "description": "Repo hygiene: README, LICENSE and the CI workflows, backed by the stdlib-only audit commands self-checks.yml runs on every push. The SPICE campaigns, layout composition and DRC/LVS are not covered (see manifests/README.md, What CI covers).",
+  "description": "Repo hygiene: the ratified target-spec rows (spec/target-spec.md), LICENSE and the CI workflows, backed by the stdlib-only audit commands self-checks.yml runs on every push. The SPICE campaigns, layout composition and DRC/LVS are not covered (see manifests/README.md, What CI covers).",
   "hygiene": [
-    "README.md",
+    "spec/target-spec.md",
     "LICENSE",
     ".github/workflows/self-checks.yml",
     ".github/workflows/signoff-manifest.yml"
