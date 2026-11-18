@@ -299,5 +299,6 @@ floor against sky130 models and a real `IBIAS`/`POR_RAW` from `bias_core`/
 `por_comparator` is expected follow-on work
 (`spec/porting-plan.md` §2.3/§2.4/§4 item 2), not a defect in this port — do
 not read any voltage, duration, or current figure in this document as a
-ratified or even provisional target; `spec/target-spec.md` does not exist
-yet in this repo (`spec/porting-plan.md` §4 item 4).
+ratified or even provisional target; `spec/target-spec.md` holds only
+DR-003's two ratified rows, not a complete ratified table (`spec/porting-plan.md`
+§4 item 4).

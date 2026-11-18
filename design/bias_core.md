@@ -206,5 +206,5 @@ Monte Carlo, or characterization-grade sizing. Re-sizing once sky130 device
 characterization lands (`spec/porting-plan.md` §4 item 2) is expected
 follow-on work, not a defect in this port — do not read any voltage or
 current figure in this document as a ratified or even provisional target;
-`spec/target-spec.md` does not exist yet in this repo (`spec/porting-plan.md`
-§4 item 4).
+`spec/target-spec.md` holds only DR-003's two ratified rows, not a complete
+ratified table (`spec/porting-plan.md` §4 item 4).
