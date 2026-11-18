@@ -24,7 +24,8 @@ it is not a full-block compare (#97). Item 11
 (structural power delivery) is `met`: [`erc.json`](layout/temp_por_top/erc.json)
 is clean against the block-specific supply spec (#260). Items 5 to 8 are unmet.
 `spec/` is partially ratified: DR-003 finalized the operating-temperature
-and supply rows through the two-key process, while the remaining target rows
+and supply rows through the two-key process (their values are in
+`spec/target-spec.md`), while the remaining target rows
 are still explicit placeholders (`spec/README.md`,
 `spec/decision-records/`, `ratification/`). See "Target specification"
 below for the maturity-ladder detail. sky130 is fully supported by the
@@ -63,7 +64,10 @@ one ramp rate has not been verified at all.
 
 Ratified by [DR-003](spec/decision-records/DR-003-ratify-target-spec-recommendation.md)
 through the two-key path, per the operator ruling of 2026-10-02 on issue #31:
-**only** the operating-temperature and supply rows are final. Every other row
+**only** the operating-temperature and supply rows are final, and their values live
+in [`spec/target-spec.md`](spec/target-spec.md)
+([DR-008](spec/decision-records/DR-008-relocate-ratified-target-spec-rows.md)).
+Every other row
 is an explicit placeholder (`[TBD-n]`, numbering per DR-003) until measured;
 no T1 tier is awarded and no draft number below is a ratified target.
 The supply value follows [DR-001](spec/decision-records/DR-001-supply-flavor.md),
@@ -72,12 +76,12 @@ DR-001 and DR-002 remain `proposed`.
 
 | Parameter | Target | Stretch | Status |
 |---|---|---|---|
-| Operating temperature | −40…+125 °C | — | ratified (DR-003) |
+| Operating temperature | see [`spec/target-spec.md`](spec/target-spec.md) | — | ratified (DR-003) |
 | Temperature error, untrimmed | [TBD-1] | [TBD-1] | not ratified |
 | Sensor output | [TBD] (draft: analog PTAT + CTAT pads) | [TBD] (draft: digital out via SAR pairing) | not ratified |
 | POR thresholds VPOR↑ / VPOR↓ | [TBD-2] (re-derive against sky130 models) | — | not ratified |
 | POR hysteresis | [TBD-3] | — | not ratified |
-| Supply | 2.97–3.63 V (3.3 V ±10 %) | — | ratified (DR-003) |
+| Supply | see [`spec/target-spec.md`](spec/target-spec.md) | — | ratified (DR-003) |
 | Iq (block total) | [TBD-4] por-iq / [TBD-5] temp-iq / [TBD-6] iq-total | [TBD-4..6] | not ratified |
 | Supply-ramp coverage | [TBD] (draft: ramp-rate sweep in the POR testbench matrix) | — | not ratified |
 
@@ -109,7 +113,7 @@ rung is complete yet.**
 ## Repo layout
 
 ```
-spec/          decision records + ratification process (target spec partially ratified: rows 1 and 6 under DR-003)
+spec/          decision records + ratification process (ratified rows 1 and 6 in target-spec.md, DR-003)
 design/        schematics / netlists (xschem)
 sim/           testbenches + PVT corner results (ngspice)
 layout/        GDS + DRC/LVS reports (klayout-tools driven)
