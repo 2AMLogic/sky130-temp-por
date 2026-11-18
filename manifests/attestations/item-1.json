@@ -209,16 +209,140 @@
     ]
   },
   "provenance": {
-    "klt_version": "0.8.0",
+    "klt_version": "0.9.2",
     "klayout_version": null,
     "pdk": null,
     "deck": null,
     "input": {
-      "path": {
-        "path": "manifests/inventories/item-1.json",
-        "scope": "repo"
-      },
-      "content_hash": "sha256:b1990815591dde58c272344f128ee5cdcf0695e6580c9ffaa15ba7a3ca2101be"
+      "paths": [
+        {
+          "path": {
+            "path": "design/bias_core.sch",
+            "scope": "repo"
+          },
+          "content_hash": "sha256:12cc848927e57d719fe87b59b013b5e728af3b683ec57555ceca39e79cc0defd"
+        },
+        {
+          "path": {
+            "path": "design/bias_core.sym",
+            "scope": "repo"
+          },
+          "content_hash": "sha256:5ee4ae57a32819237b189f7802b5aa1a593656c7d8e8ca369b47a64be3ee4f87"
+        },
+        {
+          "path": {
+            "path": "design/netlist.py",
+            "scope": "repo"
+          },
+          "content_hash": "sha256:d35b2b570bc7f730d0388330c2c598fee8b2052610fe5af98349f3f681a919e4"
+        },
+        {
+          "path": {
+            "path": "design/netlist/bias_core.spice",
+            "scope": "repo"
+          },
+          "content_hash": "sha256:49daee3a53d0ed9c68352afe646dbf0dfd06d2477fe216d85ef0e1481839e55d"
+        },
+        {
+          "path": {
+            "path": "design/netlist/por_comparator.spice",
+            "scope": "repo"
+          },
+          "content_hash": "sha256:1071bd8c29d1fcd67ef7023856ceb9a8b76ec978c8cfbe20409ce68fc4995fd9"
+        },
+        {
+          "path": {
+            "path": "design/netlist/por_output_chain.spice",
+            "scope": "repo"
+          },
+          "content_hash": "sha256:275a5a0639636e0367fbd7f9fe585216fbe51c62bc13c271c60e507cc53562eb"
+        },
+        {
+          "path": {
+            "path": "design/netlist/temp_core.spice",
+            "scope": "repo"
+          },
+          "content_hash": "sha256:d8ae348bdd572fa3be2b25f9dfbe359da34a03173e368e8a6c525f765121c0c0"
+        },
+        {
+          "path": {
+            "path": "design/netlist/temp_por_top.spice",
+            "scope": "repo"
+          },
+          "content_hash": "sha256:af1844081039ac3bef9b6e92ec95b629bbb19785c366c09bc8e3d07dda70bb36"
+        },
+        {
+          "path": {
+            "path": "design/por_comparator.sch",
+            "scope": "repo"
+          },
+          "content_hash": "sha256:5bad87fb3817f250aa5cf32f1dbaae39175471f5b13d254d51abd28b180b4a13"
+        },
+        {
+          "path": {
+            "path": "design/por_comparator.sym",
+            "scope": "repo"
+          },
+          "content_hash": "sha256:caef6a48e56204a7f42e7890e47aa7a0c20a0437e61e0271e4c5eff2c2035725"
+        },
+        {
+          "path": {
+            "path": "design/por_output_chain.sch",
+            "scope": "repo"
+          },
+          "content_hash": "sha256:52741b6bdb419783442f90c589d440b6f1a34c45ea9825120ab55e2ac2d9cfc6"
+        },
+        {
+          "path": {
+            "path": "design/por_output_chain.sym",
+            "scope": "repo"
+          },
+          "content_hash": "sha256:109caf9486f028841403d883c731eb6a9a7e49ecedce145f304d33d7b056ec14"
+        },
+        {
+          "path": {
+            "path": "design/temp_core.sch",
+            "scope": "repo"
+          },
+          "content_hash": "sha256:8c973acce7a867e254abb33a13f330c55e14abe4946e4a277a6af5c74d718a6d"
+        },
+        {
+          "path": {
+            "path": "design/temp_core.sym",
+            "scope": "repo"
+          },
+          "content_hash": "sha256:1802d459e124fd2a7338a13b48149bbae66bba5c5b7230884032179343c7f5dc"
+        },
+        {
+          "path": {
+            "path": "design/temp_por_top.sch",
+            "scope": "repo"
+          },
+          "content_hash": "sha256:b6777e4436932837aec9b2037db0c19de27d02ecd0222c61e4776ebe0f3b232e"
+        },
+        {
+          "path": {
+            "path": "design/temp_por_top.sym",
+            "scope": "repo"
+          },
+          "content_hash": "sha256:dfd55d5530c728848f25a1d58f46f98f2b3602cbc5f1538480f5c7b1c3535080"
+        },
+        {
+          "path": {
+            "path": "design/xschemrc",
+            "scope": "repo"
+          },
+          "content_hash": "sha256:6309bb8d908a8b7ea102dcdac05a15e90735bc1d3aa95df02780faa9adf43c55"
+        },
+        {
+          "path": {
+            "path": "manifests/inventories/item-1.json",
+            "scope": "repo"
+          },
+          "content_hash": "sha256:b1990815591dde58c272344f128ee5cdcf0695e6580c9ffaa15ba7a3ca2101be"
+        }
+      ],
+      "content_hash": "sha256:13dc6afd01e28779093fd3cd7659cb9460f959334f985b4e5cea43ac26cde34d"
     }
   }
 }

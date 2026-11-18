@@ -106,8 +106,14 @@ blind spots are stated here (coverage honesty: a verdict's blind spots are
 part of the claim and travel with it):
 
 - **Item 1 — Design sources: `met`** via the artifact-anchored attestation
-  `item-1.json` (22/22 checks, #220), pinned to its inventory by content hash
-  like items 9 and 10. (Since klayout-tools#2718 items 1, 2, 9 and 10 accept
+  `item-1.json` (22/22 checks, #220), pinned by an aggregate content hash
+  over a *set* (`provenance.input.paths`: the 17 sources it records plus the
+  inventory itself) — the same set form as item 2, unlike items 9 and 10,
+  which are pinned to their single inventory file
+  (`provenance.input.path`). Consequence: any design-source edit moves item
+  1's aggregate hash, so after re-attesting you must also re-pin item 1 in
+  `manifests/sky130-temp-por.json`; a `MISPINNED` from `check-citations.py`
+  here means "re-pin", not "look for drift on disk". (Since klayout-tools#2718 items 1, 2, 9 and 10 accept
   only an artifact-anchored envelope, so the old native LVS envelope no longer
   satisfies it.) The inventory (`inventories/item-1.json`) lists the 10 xschem
   sources (`design/*.sch`, `*.sym`), the export tool and `design/xschemrc`,
@@ -126,11 +132,14 @@ part of the claim and travel with it):
   running `python3 design/netlist.py --check` directly. What `--check` *does*
   enforce, on a stock runner and since #303 unconditionally: all 17 files
   this envelope recorded a `content_hash` for are re-hashed, and the
-  inventory pin, the check count and every committed outcome are diffed, so
-  an edited source turns the `signoff` job red. That is the gap that let
-  `design/netlist.py` sit stale in this envelope from `6d11c6ec` until #298
-  with every job green — the manifest pins the envelope to its *inventory*
-  file's hash, never to the sources, so nothing in the graded chain noticed.
+  aggregate input pin, the check count and every committed outcome are
+  diffed, so an edited source turns the `signoff` job red. That is the gap
+  that let `design/netlist.py` sit stale in this envelope from `6d11c6ec`
+  until #298 with every job green — at the time the manifest pinned the
+  envelope to its *inventory* file's hash, never to the sources, so nothing
+  in the graded chain noticed. (Today item 1's pin is the aggregate over the
+  sources and the inventory, but the graded render still compares
+  pin-to-recorded and never re-hashes disk, so the conclusion stands.)
   After editing anything in the inventory, re-run `klt signoff --attest 1
   --inventory manifests/inventories/item-1.json -o
   manifests/attestations/item-1.json` locally (that run *does* execute the
@@ -260,7 +269,7 @@ goes green on evidence it does not actually have.
 push/PR:
 
 1. installs the **same pinned `klt` build** the committed report was
-   rendered with (a `pip install` of the klayout-tools git rev — the
+   rendered with (a `pip install` of the released klayout-tools version — the
    tier skeleton is bundled inside the installed package, so a checklist
    change like the 2026-09-17 item-11 addition only reaches this repo
    through a deliberate pin bump),
@@ -274,8 +283,10 @@ push/PR:
 4. re-attests items 10, 9 and 1 against their committed envelopes
    (`klt signoff --attest N ... --check`), **unconditionally — no toolchain
    guard, no skipped step**. Each `--check` re-hashes every file that item's
-   inventory lists (4 + 40 + 17 = 61 today) and diffs the whole envelope:
-   the inventory pin, the check count, and every committed check outcome. So
+   inventory lists (4 + 42 + 17 = 63 today) and diffs the whole envelope:
+   the input pin (item 1: the aggregate over its sources and inventory;
+   items 9 and 10: the inventory file's hash), the check count, and every
+   committed check outcome. So
    an edit to any attested design source, testbench or hygiene file that
    lands without a re-attestation turns this job red.
 
