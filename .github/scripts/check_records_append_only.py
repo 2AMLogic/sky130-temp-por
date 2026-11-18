@@ -39,6 +39,12 @@ Baseline resolution (first match wins):
   push                  $GITHUB_EVENT_BEFORE; an all-zeros value means an
                         initial push, checked against the empty tree
                         (explicit pass: no prior commit, nothing to protect)
+  merge_group           $GITHUB_MG_BASE_SHA (the event's merge_group.base_sha;
+                        github.base_ref is empty on a merge queue trial merge)
+                        vs HEAD, the trial-merge commit ($GITHUB_MG_HEAD_SHA
+                        must match HEAD when plumbed); an absent, all-zeros or
+                        unavailable base fails — a trial merge always has a
+                        real base, never an initial-push pass
   anything else         exit 2: pass --baseline explicitly
 
 Missing history is an error, not a skip: an unresolvable baseline exits 2
@@ -55,7 +61,10 @@ Usage:
                                             and nested), fresh store-era run,
                                             live-file edits, and baseline
                                             resolution (missing, initial push,
-                                            push before-commit, PR merge base)
+                                            push before-commit, PR merge base,
+                                            merge-group base: absent,
+                                            all-zeros, unavailable, head
+                                            mismatch, add passes, edit caught)
 
 Exit codes: 0 pass, 1 append-only violation (paths listed), 2 unusable
 invocation or unresolvable baseline.
@@ -154,6 +163,36 @@ def resolve_baseline(repo, env, explicit):
                 f"git fetch --no-tags --force origin '{before}'."
             )
         return commit_sha(repo, before), f"pushed-from commit {before}"
+
+    if event == "merge_group":
+        base = env.get("GITHUB_MG_BASE_SHA", "")
+        if not base:
+            raise BaselineError(
+                "GITHUB_MG_BASE_SHA is not set for a merge_group event; the "
+                "workflow must plumb github.event.merge_group.base_sha "
+                "(github.base_ref is empty on a merge queue trial merge). "
+                "Pass --baseline explicitly outside the merge queue."
+            )
+        if is_zero_sha(base):
+            raise BaselineError(
+                f"merge_group base sha is all zeros ({base}); a merge queue "
+                f"trial merge always has a real base commit, so this is not "
+                f"an initial push. Refusing to pass without a baseline."
+            )
+        if not rev_exists(repo, base):
+            raise BaselineError(
+                f"merge_group base {base} is not present in this checkout "
+                f"(shallow clone or pruned history). Fetch it explicitly: "
+                f"git fetch --no-tags --force origin '{base}'."
+            )
+        head = env.get("GITHUB_MG_HEAD_SHA", "")
+        if head and commit_sha(repo, "HEAD") != head:
+            raise BaselineError(
+                f"checkout HEAD is not the merge group's head sha {head}; the "
+                f"append-only diff must compare the base against the "
+                f"trial-merge commit."
+            )
+        return commit_sha(repo, base), f"merge-group base {base}"
 
     raise BaselineError(
         f"no baseline source: GITHUB_EVENT_NAME is '{event or 'unset'}'. Pass "
@@ -424,7 +463,79 @@ def selftest():
             f"rc={p.returncode} {p.stderr}",
         )
 
-        # 14. evidence fixtures: flat + nested snapshots/corners
+        # 14. merge_group (merge-queue trial merge) without a base fails
+        # explicitly — a required check must never silently skip
+        p = run(env_extra={"GITHUB_EVENT_NAME": "merge_group"})
+        check(
+            "merge_group without a base fails explicitly",
+            p.returncode == 2 and "merge_group" in p.stderr,
+            f"rc={p.returncode} {p.stderr}",
+        )
+
+        # 15. a merge_group all-zeros base is NOT an initial-push pass
+        p = run(env_extra={
+            "GITHUB_EVENT_NAME": "merge_group",
+            "GITHUB_MG_BASE_SHA": "0" * 40,
+        })
+        check(
+            "merge_group all-zeros base fails, not an initial push",
+            p.returncode == 2,
+            f"rc={p.returncode} {p.stdout}{p.stderr}",
+        )
+
+        # 16. a merge_group base not present in the checkout fails explicitly
+        p = run(env_extra={
+            "GITHUB_EVENT_NAME": "merge_group",
+            "GITHUB_MG_BASE_SHA": "1234567890abcdef1234567890abcdef12345678",
+        })
+        check(
+            "merge_group with an unavailable base fails explicitly",
+            p.returncode == 2 and "not present in this checkout" in p.stderr,
+            f"rc={p.returncode} {p.stderr}",
+        )
+
+        # 17. a merge_group with the base plumbed and the head matching the
+        # checkout (the trial-merge commit) passes on an added record
+        p = run(env_extra={
+            "GITHUB_EVENT_NAME": "merge_group",
+            "GITHUB_MG_BASE_SHA": base_sha,
+            "GITHUB_MG_HEAD_SHA": commit_sha(repo, "HEAD"),
+        })
+        check(
+            "merge_group adding a record passes",
+            p.returncode == 0,
+            p.stderr,
+        )
+
+        # 18. a merge_group base against an edited record catches the edit
+        (rec / "r1.json").write_text('{"verdict": "PASS", "v": 55}\n')
+        commit_all("tamper r1.json (merge_group case)")
+        p = run(env_extra={
+            "GITHUB_EVENT_NAME": "merge_group",
+            "GITHUB_MG_BASE_SHA": base_sha,
+        })
+        check(
+            "merge_group with an explicit base catches an edit",
+            p.returncode == 1 and "sim/exp/records/r1.json" in p.stderr,
+            f"rc={p.returncode} {p.stderr}",
+        )
+        (rec / "r1.json").write_text('{"verdict": "PASS", "v": 1}\n')
+        commit_all("restore r1.json (merge_group case)")
+
+        # 19. a merge_group whose head sha is not the checkout HEAD fails:
+        # the diff must run on the trial-merge commit the event describes
+        p = run(env_extra={
+            "GITHUB_EVENT_NAME": "merge_group",
+            "GITHUB_MG_BASE_SHA": base_sha,
+            "GITHUB_MG_HEAD_SHA": base_sha,
+        })
+        check(
+            "merge_group head-sha mismatch with HEAD fails",
+            p.returncode == 2 and "trial-merge" in p.stderr,
+            f"rc={p.returncode} {p.stderr}",
+        )
+
+        # 20. evidence fixtures: flat + nested snapshots/corners
         git(repo, "checkout", "-q", "main")
         snap = exp / "netlist-snapshots"
         cor = exp / "corners"
@@ -573,7 +684,7 @@ def selftest():
     if failures:
         print(f"selftest FAILED: {len(failures)} case(s): {', '.join(failures)}", file=sys.stderr)
         return 1
-    print("selftest ok: record and evidence (flat/nested) add/modify/delete/move, live-file and baseline fixtures all behave")
+    print("selftest ok: record and evidence (flat/nested) add/modify/delete/move, live-file, baseline (push, pull_request, merge_group) fixtures all behave")
     return 0
 
 
