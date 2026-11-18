@@ -72,7 +72,8 @@ Unblocked by a named item above or by a ruling listed under "Blocked and waiting
   four experiments it refuses today (#327), and the netlisting failure recorded
   on #189 (2026-11-04) re-checked.
 - **Replace `layout/bin/attest-layout.py` with `klt signoff --attest 2`** (#308):
-  after the CI pin moves from klt 0.8.0 to 0.9.0.
+  declined (closed not planned, 2026-11-18) until klayout-tools gains recipe-file
+  binding (klayout-tools#6744) or caller-summary carrying (klayout-tools#5573).
 - **Ratification pull requests for DR-004 and DR-005** (#137): one per DR,
   flipping status and the README rows it covers. They can be prepared; they
   merge only when both keys are recorded.
