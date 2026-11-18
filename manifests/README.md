@@ -190,7 +190,8 @@ part of the claim and travel with it):
   the target spec is only **partially ratified** (DR-003 is `ratified`, scoped,
   issue #78: operating temperature and supply are final; six rows, including
   POR thresholds, hysteresis, Iq and supply-ramp coverage, stay `[TBD]`;
-  no `target-spec.md` exists), so item 5's "vs a ratified spec" has nothing
+  `spec/target-spec.md` holds only those two ratified rows, not a complete
+  ratified table), so item 5's "vs a ratified spec" has nothing
   complete to verify against, and this repo's PVT-corner and mismatch
   Monte-Carlo records live under `sim/` as the sim harness's own JSON
   records — which are not `klt sim`/`klt yield` envelopes, so no passing

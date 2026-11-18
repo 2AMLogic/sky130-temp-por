@@ -30,8 +30,9 @@ The signoff report grades `layout/temp_por_top/` at **7 of 11 T1 items met**.
 | 11 Power delivery (structural) | met | `layout/temp_por_top/erc.json` against the block supply spec (#260) |
 
 - **Spec.** DR-003 is ratified for the operating-temperature and supply rows.
-  DR-001, DR-002 and DR-004 to DR-007 are `proposed`; six target rows are still
-  `[TBD]` and no `spec/target-spec.md` exists.
+  DR-001, DR-002 and DR-004 to DR-008 are `proposed`; six target rows are still
+  `[TBD]`; `spec/target-spec.md` holds only the two ratified rows, not a complete
+  ratified table.
 - **Simulation.** Fourteen experiment directories under `sim/`, summarised with
   their FAILs in `docs/characterization-report.md`. The open evidence gaps are
   listed in that report's section 6: non-physical solver branches in the
