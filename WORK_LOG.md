@@ -9,6 +9,21 @@ Chronological record of recently merged pull requests and closed issues. This fi
 
 ### 2026-11-18
 
+- **PR #444**: docs(roadmap): move declined #308 item to Not planned and reconcile decided issues
+- **PR #442**: docs: state the real blocker on the attest-layout replacement roadmap item
+- **PR #440**: docs: fix stale claims that target-spec.md does not exist
+- **PR #439**: refactor: drop inert capacity_wait_s parameter from submit_batch
+- **PR #436**: ci: bump signoff klt pin to 0.9.2 and re-render manifests
+- **PR #435**: spec: relocate ratified target-spec rows to spec/target-spec.md and pin them in item 10
+- **PR #434**: refactor(sim): drop caller-side fleet concurrency-cap retry in favor of klt capacity_wait_s
+- **Issue #443** (closed): docs/ROADMAP.md: the declined #308 item sits under ## Next, and line 119 still calls it undecided
+- **Issue #441** (closed): docs/ROADMAP.md:75 names a satisfied klt-pin prerequisite for the attest-layout.py replacement (#308)
+- **Issue #438** (closed): Six live docs still assert spec/target-spec.md does not exist (false after PR #435)
+- **Issue #437** (closed): corner-run.py: submit_batch's capacity_wait_s parameter is inert after #314
+- **Issue #433** (closed): Bump signoff-manifest CI pin klayout-tools 0.8.0 -> 0.9.x and re-render manifests
+- **Issue #342** (closed): Guide's automated docs tick reds the signoff gate whenever it edits README.md (hashed in item-10's hygiene envelope)
+- **Issue #314** (closed): Remove the caller-side fleet concurrency-cap retry (cap_retry): klt has waited this refusal out itself since 0.8.0
+- **Issue #308** (closed): Replace layout/bin/attest-layout.py with klt signoff --attest 2 (native since klt 0.9.0; needs the CI pin bumped from 0.8.0)
 - **PR #431**: ci: add the merge_group trigger and teach the append-only gate merge-group baselines
 - **Issue #429** (closed): Merge queue: add the merge_group trigger and adapt the PR-metadata gates
 
