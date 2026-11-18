@@ -299,7 +299,7 @@ class SubmitWithStubbedKlt(unittest.TestCase):
         with self.assertRaises(cr.HarnessError):
             cr.submit_batch(
                 self.exp, self.matrix, "* netlist\n.end\n",
-                self.request(), self.tmp / "run-noretry", capacity_wait_s=0,
+                self.request(), self.tmp / "run-noretry",
             )
         self.assertEqual(len(self.log.read_text().splitlines()), 1)  # one refusal, no retry
 

@@ -753,7 +753,6 @@ def submit_batch(
     netlist: str,
     request: dict,
     run_dir: Path,
-    capacity_wait_s: float = 0,
 ) -> tuple[dict, dict]:
     """Submit the grid as one `klt sim --backend batch` request.
 
@@ -761,8 +760,9 @@ def submit_batch(
     itself. A submit that yields no usable report is a HarnessError quoting klt
     verbatim: there is no local fallback.
 
-    `capacity_wait_s` (request batch.capacity_wait_s) makes klt itself wait out a
-    fleet capacity refusal; there is no caller-side resubmit loop.
+    Waiting out a fleet capacity refusal is klt's job, armed by the request's
+    batch.capacity_wait_s (written by `build_batch_request`); there is no
+    caller-side resubmit loop here.
     """
     d = run_dir / "batch"
     outcome = sim_common.submit_prepared(
@@ -1099,9 +1099,7 @@ def main(argv: list[str]) -> int:
                 print(f"  {corner.id}")
             print("\n(dry run: nothing submitted, nothing written under sim/<experiment>/)")
             return 0
-        report, fleet = submit_batch(
-            exp, matrix, batch_netlist, request, run_dir, args.wait_for_capacity
-        )
+        report, fleet = submit_batch(exp, matrix, batch_netlist, request, run_dir)
         results = results_from_report(exp, matrix, report, corners_dir, args.timeout)
         for i, res in enumerate(results, start=1):
             write_batch_corner_log(res, corners_dir / f"{res['corner_id']}.log")
