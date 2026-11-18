@@ -1219,65 +1219,6 @@ def fleet_job_fields(report: dict) -> dict:
     return fields
 
 
-CONCURRENCY_CAP_MARKER = "BATCH_MAX_CONCURRENT_INSTANCES"
-
-
-def concurrency_capped(*texts: str) -> bool:
-    """True when any text is klt's error envelope for the shared fleet's concurrent-instance cap refusal.
-
-    klt's capacity_wait_s only waits out Spot capacity refusals, not this cap
-    (2AMLogic/klayout-tools#2917).  The refusal creates no instance and runs no
-    corner.  Strict on purpose: a report that carries per-corner results is never a
-    refusal, even if it mentions the marker.
-    """
-    for text in texts:
-        try:
-            body = json.loads(text)
-        except (json.JSONDecodeError, TypeError):
-            continue
-        if isinstance(body, dict) and "corners" not in body and CONCURRENCY_CAP_MARKER in str((body.get("error") or {}).get("message", "")):
-            return True
-    return False
-
-
-def cap_retry(d: Path, label: str, poll_s: float, budget_s: float | None = None, max_retries: int | None = None,
-              evidence: str = "launch-refused", sleep=None, clock=None):
-    """`retry` hook for submit_prepared: wait out a fleet concurrency-cap refusal and resubmit (never a local grid).
-
-    Retries while the run was refused at the cap and the bounds allow another wait:
-    at most `max_retries` retries and/or `budget_s` seconds in total (the next
-    wait must fit in the budget).  Every refusal is kept as evidence in `d`:
-    evidence="launch-refused" -> launch-refused-N.txt (stdout+stderr);
-    evidence="attempt" -> attemptN/report.json + klt.stderr, as an archived earlier attempt.
-    `sleep`/`clock` are injectable for tests.
-    """
-    import time
-    sleep, clock = sleep or time.sleep, clock or time.monotonic
-    start = clock()
-
-    def retry(p, n):
-        # klt writes its --format json error envelope to stderr, not stdout: check both
-        if not concurrency_capped(p.stdout, p.stderr):
-            return False
-        if max_retries is not None and n > max_retries:
-            return False
-        if budget_s is not None and clock() - start + poll_s > budget_s:
-            return False
-        if evidence == "attempt":
-            k = 1
-            while (d / f"attempt{k}").exists():
-                k += 1
-            (d / f"attempt{k}").mkdir(parents=True)
-            (d / f"attempt{k}" / "report.json").write_text(p.stdout)
-            (d / f"attempt{k}" / "klt.stderr").write_text(p.stderr)
-        else:
-            (d / f"launch-refused-{n}.txt").write_text(p.stdout + p.stderr)
-        say(f"[wait]   {label}: fleet concurrency cap reached; resubmitting in {poll_s:.0f} s")
-        sleep(poll_s)
-        return True
-    return retry
-
-
 def _json_document(text: str):
     """Parse a JSON document that may be preceded by non-JSON noise (klt prints a plain
     line ahead of its error envelope).  None when nothing parses."""
@@ -1307,7 +1248,7 @@ def attempt_message(ad: Path) -> str:
 def attempt_messages(d: Path, run_dir: Path, repo_root: Path, cap: int = 400) -> list[str]:
     """A request's `failed_earlier_attempts`: one scrubbed line per `attemptN/` under `d`, oldest first.
 
-    `cap_retry`/`submit_prepared` archive each superseded submit as `attemptN/report.json`
+    `submit_prepared` archives each superseded submit as `attemptN/report.json`
     (klt's stdout) + `attemptN/klt.stderr`; both are read, because klt writes its
     `--format json` error envelope to stderr when it refuses before any report exists.
     Sorted numerically, so attempt10 follows attempt9 rather than attempt1.
@@ -1320,15 +1261,13 @@ def attempt_messages(d: Path, run_dir: Path, repo_root: Path, cap: int = 400) ->
 
 
 def submit_prepared(d: Path, netlist: str | None, request: dict, submit_msg: str, done_label: str,
-                    retry=None, files: dict[str, str] | None = None) -> dict:
+                    files: dict[str, str] | None = None) -> dict:
     """Archive d's earlier attempt, write netlist.spice + request.json, run `klt sim --backend batch`.
 
     An earlier attempt's report.json/klt.stderr is archived to attemptN/, never
     overwritten. `submit_msg`/`done_label` are the texts after "[submit] " and
-    "[done]   " in the log lines. `retry(proc, n)`, if given, is called after
-    each klt run (n = 1, 2, ...) and returns True to run klt again on the same
-    request (e.g. a bounded launch-refusal wait); only the last run's output is
-    written to report.json/klt.stderr.
+    "[done]   " in the log lines. A fleet capacity refusal is waited out by klt itself
+    (`batch.capacity_wait_s` in the request); this makes exactly one klt run.
 
     `netlist` is None for a `decks[]` request, which carries no `netlist` field; its
     per-unit decks and inputs are passed as `files`, a map of d-relative paths to their
@@ -1353,12 +1292,7 @@ def submit_prepared(d: Path, netlist: str | None, request: dict, submit_msg: str
     (d / "request.json").write_text(json.dumps(request, indent=2) + "\n")
     cmd = ["klt", "sim", str(d / "request.json"), "--backend", "batch", "-o", str(d / "out"), "--format", "json"]
     say(f"[submit] {submit_msg}")
-    runs = 0
-    while True:
-        p = subprocess.run(cmd, capture_output=True, text=True, timeout=4 * 3600)
-        runs += 1
-        if not (retry and retry(p, runs)):
-            break
+    p = subprocess.run(cmd, capture_output=True, text=True, timeout=4 * 3600)
     (d / "report.json").write_text(p.stdout)
     (d / "klt.stderr").write_text(p.stderr)
     try:

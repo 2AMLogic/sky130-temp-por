@@ -854,7 +854,6 @@ def main(argv: list[str]) -> int:
         request,
         f"{SLUG}: {len(points)} Monte Carlo decks -> batch fleet",
         SLUG,
-        retry=sim_common.cap_retry(submit_dir, SLUG, 180, max_retries=19),
         files=files,
     )
     report = json.loads((submit_dir / "report.json").read_text() or "{}")

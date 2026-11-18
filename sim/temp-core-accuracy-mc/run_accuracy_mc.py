@@ -311,10 +311,8 @@ def cmd_run(args):
         req = build_request(term, "batch", args.n, seed, ([proc], SUPPLIES) if proc else None, capacity_wait_s=args.wait_for_capacity)
         units = (1 if term == "nominal" else args.n) * len(SUPPLIES) * (1 if proc else len(PROCS))
         name = f"{term}/{proc or 'all-proc'}"
-        # the fleet has a shared instance cap; a refused LAUNCH is retried later (never replaced by a local grid)
         res = sim_common.submit_prepared(
-            d, build_netlist(term, variant), req, f"{name}: {units} ngspice units -> batch fleet", name,
-            retry=sim_common.cap_retry(d, name, 180, max_retries=59))
+            d, build_netlist(term, variant), req, f"{name}: {units} ngspice units -> batch fleet", name)
         return {"term": term, "proc": proc, **res}
 
     units_list = [(t, None) if t == "nominal" else (t, pr) for t in terms for pr in ([None] if t == "nominal" else PROCS)]
