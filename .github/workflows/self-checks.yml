@@ -8,6 +8,7 @@ on:
   push:
     branches: [main]
   pull_request:
+  merge_group:
 
 jobs:
   self-checks:
@@ -16,6 +17,13 @@ jobs:
       # Not a default runner variable; the append-only evidence check reads it
       # to find the pushed-from commit on pushes to main.
       GITHUB_EVENT_BEFORE: ${{ github.event.before }}
+      # Merge-queue trial merges (merge_group event): the append-only evidence
+      # check baselines against the event's merge_group.base_sha (github.base_ref
+      # is empty there) and verifies the checkout is the trial-merge commit
+      # (merge_group.head_sha). Empty strings on push/pull_request events, whose
+      # baseline resolution is unchanged.
+      GITHUB_MG_BASE_SHA: ${{ github.event.merge_group.base_sha }}
+      GITHUB_MG_HEAD_SHA: ${{ github.event.merge_group.head_sha }}
     steps:
       - uses: actions/checkout@v4
         with:
