@@ -65,8 +65,9 @@ are documented in `experiment.json`'s own `notes`.
 converged, every physicality guard held, both corner-sensitivity spread
 checks passed (the harness is provably corner-aware, not repeating one point
 45 times). PDK: sky130A @ open_pdks `c6d73a35f524070e85faff4a6a9eef49553ebc2b`
-(matches `sim/pdk.json`). Not a `spec/target-spec.md` claim — that file does
-not exist yet (`spec/porting-plan.md` §4 item 4).
+(matches `sim/pdk.json`). Not a `spec/target-spec.md` claim — that file holds
+only DR-003's two ratified rows, not a complete ratified table
+(`spec/porting-plan.md` §4 item 4).
 
 ### Vth (constant-current extraction, linear region, `VDS` = 100 mV)
 
