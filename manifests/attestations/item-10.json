@@ -36,9 +36,9 @@
       {
         "check": "present",
         "role": "hygiene",
-        "path": "README.md",
+        "path": "spec/target-spec.md",
         "passed": true,
-        "content_hash": "sha256:e49eae4812bd40de53795af9a28387044db1ba503e7a510fe27bc692ffa637f3"
+        "content_hash": "sha256:cc934fe9fcdcc53c22e125d719d4cbbb589ff44e67b3eab121aaf49eee69786a"
       },
       {
         "check": "command",
@@ -128,7 +128,7 @@
         "path": "manifests/inventories/item-10.json",
         "scope": "repo"
       },
-      "content_hash": "sha256:4afc99fe28c2accb3405fbdb7d5bb492d09a7e4c7f6d6d03329a4b9465816836"
+      "content_hash": "sha256:5015a1e3f6ab6c80fa7110330ad501d8f4f6dbf5f17ce4c9948edc7fe422e741"
     }
   }
 }

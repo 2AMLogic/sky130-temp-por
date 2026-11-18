@@ -163,8 +163,7 @@ def submit_mc(unit: tuple[str, float, int], variant_name: str, head: str, man: d
     res = sim_common.submit_prepared(
         d, netlist, req,
         f"{variant_name} mc {label}: N={mc['n_per_corner']} mismatch samples, seed {req['monte_carlo']['seed']} -> batch fleet",
-        f"{variant_name} mc {label}",
-        retry=sim_common.cap_retry(d, f"mc {label}", 180, max_retries=59))
+        f"{variant_name} mc {label}")
     return {"variant": variant_name, "process": proc, "temperature_c": temp,
             "seed_offset": offset, "seed": req["monte_carlo"]["seed"], **res}
 

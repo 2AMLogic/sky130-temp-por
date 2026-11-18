@@ -210,20 +210,15 @@ def build_request(req: dict, man: dict, backend: str, capacity_wait_s: float = 0
     )
 
 
-concurrency_capped = sim_common.concurrency_capped  # shared with the other campaigns (klayout-tools#2917)
+def submit_one(req: dict, head: str, man: dict, run_dir: Path, capacity_wait_s: float = 0, variant_key: str | None = None) -> dict:
+    """Submit one request; klt waits out a fleet capacity refusal itself (``batch.capacity_wait_s``).
 
-
-def submit_one(req: dict, head: str, man: dict, run_dir: Path, capacity_wait_s: float = 0, variant_key: str | None = None,
-               slot_wait_s: float = 0, slot_poll_s: float = 300, _sleep=None, _clock=None) -> dict:
-    """Submit one request; on a fleet concurrency-cap refusal, retry every ``slot_poll_s`` until ``slot_wait_s`` is spent.
-
-    Every refused attempt is archived (attemptN/), never overwritten or hidden.
+    An earlier attempt's report is archived (attemptN/), never overwritten or hidden.
     """
     d = run_dir / req["tag"]
-    retry = sim_common.cap_retry(d, req["tag"], slot_poll_s, budget_s=slot_wait_s, evidence="attempt", sleep=_sleep, clock=_clock) if slot_wait_s > 0 else None
     res = sim_common.submit_prepared(
         d, build_netlist(head, req, man, variant_key), build_request(req, man, "batch", capacity_wait_s),
-        f"{req['tag']}: {declared_counts(man)['points_per_request']} points -> batch fleet", req["tag"], retry=retry)
+        f"{req['tag']}: {declared_counts(man)['points_per_request']} points -> batch fleet", req["tag"])
     return {"tag": req["tag"], **res}
 
 
@@ -302,17 +297,16 @@ def cmd_run(args) -> int:
     head = tb_netlist_head(run_dir / ("retry" if args.retry_failed else "."), pdk)
     if meta is None:
         meta = {"run_id": run_id, "started_utc": now.strftime("%Y-%m-%dT%H:%M:%SZ"), "source": gi, "klt_client": sim_common.klt_version(),
-                "klt_sim_backend_env": os.environ.get("KLT_SIM_BACKEND"), "declared": declared_counts(man), "solver_variant": variant_key, "capacity_wait_s": args.wait_for_capacity, "slot_wait_s": args.slot_wait,
+                "klt_sim_backend_env": os.environ.get("KLT_SIM_BACKEND"), "declared": declared_counts(man), "solver_variant": variant_key, "capacity_wait_s": args.wait_for_capacity,
                 "submitted_tags": [r["tag"] for r in reqs]}
         (run_dir / "run.json").write_text(json.dumps(meta, indent=2) + "\n")
     say(f"run id {run_id}: {len(reqs)} request(s), solver variant {variant_key}")
     results = sim_common.fan_out(
-        lambda r: submit_one(r, head, man, run_dir, args.wait_for_capacity, variant_key, args.slot_wait, args.slot_poll),
+        lambda r: submit_one(r, head, man, run_dir, args.wait_for_capacity, variant_key),
         reqs, args.jobs)
     old = json.loads((run_dir / "run.json").read_text()) if args.retry_failed else meta
     if args.retry_failed:
         old.setdefault("retries", []).append({"at_utc": datetime.now(timezone.utc).strftime("%Y-%m-%dT%H:%M:%SZ"), "capacity_wait_s": args.wait_for_capacity,
-                                             "slot_wait_s": args.slot_wait,
                                              "source": gi, "klt_client": sim_common.klt_version(), "klt_sim_backend_env": os.environ.get("KLT_SIM_BACKEND"),
                                              "submitted_tags": [r["tag"] for r in reqs], "results": results})
     else:
@@ -946,8 +940,6 @@ def main(argv: list[str]) -> int:
     r.add_argument("--only", action="append", help="submit only this declared request tag (repeatable); the rest stay NOT_COVERED")
     r.add_argument("--retry-failed", action="store_true")
     sim_common.add_capacity_wait_arg(r)
-    r.add_argument("--slot-wait", type=float, default=0, help="seconds to keep resubmitting a request the fleet refused at its concurrent-instance cap (klayout-tools#2917); each refusal is archived")
-    r.add_argument("--slot-poll", type=float, default=300, help="seconds between concurrency-cap resubmissions")
     r.add_argument("--allow-dirty", action="store_true")
     x = sub.add_parser("probe")
     x.add_argument("--tag", required=True)

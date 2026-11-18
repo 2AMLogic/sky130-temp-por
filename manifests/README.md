@@ -235,7 +235,7 @@ part of the claim and travel with it):
     recorded a hash for are re-hashed — which is how 8 of them were found
     stale on `main` — and the inventory pin, the check count and every
     committed outcome are diffed.
-  - **Item 10** (`item-10.json`, 10/10 checks): `README.md`, `LICENSE` and
+  - **Item 10** (`item-10.json`, 10/10 checks): `spec/target-spec.md` (the ratified rows), `LICENSE` and
     both workflows present, plus six stdlib-only audit commands
     `self-checks.yml` also runs (netlist pinout invariants, JSON
     well-formedness, characterization coverage, append-only checker

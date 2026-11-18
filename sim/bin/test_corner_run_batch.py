@@ -292,23 +292,7 @@ class SubmitWithStubbedKlt(unittest.TestCase):
     def test_default_wait_for_capacity_is_600(self):
         self.assertEqual(cr.parse_args([]).wait_for_capacity, 600.0)
 
-    def test_concurrency_cap_refusal_is_retried_under_capacity_wait(self):
-        # BATCH_MAX_CONCURRENT_INSTANCES is a refusal capacity_wait_s does not
-        # cover: submit_batch must arm cap_retry and get a clean report on the
-        # second attempt, keeping the refusal as evidence (never a local grid).
-        counter = self.tmp / "capfail.count"
-        counter.write_text("0")
-        os.environ["STUB_KLT_CAPFAIL"] = str(counter)
-        run = self.tmp / "run-retry"
-        report, fleet = cr.submit_batch(
-            self.exp, self.matrix, "* netlist\n.end\n", self.request(), run, capacity_wait_s=0.01
-        )
-        self.assertEqual(len(report["corners"]), 45)
-        self.assertEqual(fleet["batch"]["job_id"], "job-123")
-        self.assertEqual(len(self.log.read_text().splitlines()), 2)  # refusal + retry
-        self.assertTrue((run / "batch" / "launch-refused-1.txt").is_file())
-
-    def test_zero_capacity_wait_does_not_retry_a_concurrency_cap_refusal(self):
+    def test_concurrency_cap_refusal_is_a_single_klt_run(self):
         counter = self.tmp / "capfail-noretry.count"
         counter.write_text("0")
         os.environ["STUB_KLT_CAPFAIL"] = str(counter)
