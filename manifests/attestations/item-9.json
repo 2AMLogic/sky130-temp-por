@@ -164,7 +164,7 @@
         "role": "testbench",
         "path": "sim/pnp-mismatch/run_pnp_mismatch.py",
         "passed": true,
-        "content_hash": "sha256:062ea05107342c79f4dcfeb788b11b65c64702845b129f337e192c9065f79134"
+        "content_hash": "sha256:7ec8afd356707ef5082fe91851ff30a71540bdcccca009df518580981ec5859b"
       },
       {
         "check": "present",
@@ -342,7 +342,7 @@
     ]
   },
   "provenance": {
-    "klt_version": "0.8.0",
+    "klt_version": "0.9.2",
     "klayout_version": null,
     "pdk": null,
     "deck": null,
