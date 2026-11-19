@@ -111,6 +111,9 @@ jobs:
       - name: Accuracy-MC operating-point cross-check refuses an unreadable pinned record (never renders a 0-comparison cross-check as agreement)
         run: python3 -I sim/temp-core-accuracy-mc/test_transient_crosscheck.py
 
+      - name: PNP-mismatch grader signal-vs-sigma check records a zero-mean failure instead of crashing (issue #446)
+        run: python3 -I sim/pnp-mismatch/test_pnp_mismatch.py
+
       - name: Pad-island census unit tests
         run: python3 -m unittest layout/bin/test_pad_island_census.py
 

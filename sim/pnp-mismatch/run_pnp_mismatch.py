@@ -455,14 +455,25 @@ def evaluate(point: Point, samples: list[dict[str, float]]) -> dict:
             )
         else:
             signal = abs(st["mean"])
-            add(
-                f"signal_vs_sigma[{pair.vector}]",
-                signal > 0 and sigma / signal <= SIGNAL_RATIO_MAX,
-                f"sigma/|mean dVBE| = {sigma / signal:.4f} (mismatch spread "
-                f"{sigma * 1e3:.4f} mV against a {signal * 1e3:.3f} mV PTAT signal "
-                f"from the 1-vs-8-parallel array's own VT*ln(8) term; must be <= "
-                f"{SIGNAL_RATIO_MAX:g})",
-            )
+            if signal > 0.0:
+                ratio = sigma / signal
+                add(
+                    f"signal_vs_sigma[{pair.vector}]",
+                    ratio <= SIGNAL_RATIO_MAX,
+                    f"sigma/|mean dVBE| = {ratio:.4f} (mismatch spread "
+                    f"{sigma * 1e3:.4f} mV against a {signal * 1e3:.3f} mV PTAT signal "
+                    f"from the 1-vs-8-parallel array's own VT*ln(8) term; must be <= "
+                    f"{SIGNAL_RATIO_MAX:g})",
+                )
+            else:
+                add(
+                    f"signal_vs_sigma[{pair.vector}]",
+                    False,
+                    f"sigma/|mean dVBE| is undefined: the measured mean dVBE is zero "
+                    f"({sigma * 1e3:.4f} mV mismatch spread against a 0 V PTAT signal "
+                    f"from the 1-vs-8-parallel array's own VT*ln(8) term; the ratio "
+                    f"cannot be computed, so the check fails)",
+                )
 
     return {
         "corner_id": point.corner_id,
