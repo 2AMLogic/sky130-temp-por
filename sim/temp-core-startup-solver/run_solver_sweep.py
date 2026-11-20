@@ -181,17 +181,6 @@ def cmd_probe(args):
     return 0
 
 
-def interp(t, y, tq):
-    import bisect
-    i = bisect.bisect_left(t, tq)
-    if i <= 0:
-        return y[0]
-    if i >= len(t):
-        return y[-1]
-    f = (tq - t[i - 1]) / (t[i] - t[i - 1])
-    return y[i - 1] + f * (y[i] - y[i - 1])
-
-
 def grade_wave(wave, scenario, variant):
     """Same quantities and windows as the experiment.json measurements, read from the saved waveform."""
     import math
@@ -209,8 +198,8 @@ def grade_wave(wave, scenario, variant):
         "ptat": wave["v(ptat)"][-1], "ctat": wave["v(ctat)"][-1],
         "na": wave["v(xdut.na)"][-1], "nb": wave["v(xdut.nb)"][-1],
         "isup": -wave["i(bvdd)"][-1], "bias_ok": wave["v(bias_ok)"][-1],
-        "ptat_settled": abs(wave["v(ptat)"][-1] - interp(t, wave["v(ptat)"], tb)),
-        "ctat_settled": abs(wave["v(ctat)"][-1] - interp(t, wave["v(ctat)"], tb)),
+        "ptat_settled": abs(wave["v(ptat)"][-1] - sim_common.interp_at(t, wave["v(ptat)"], tb)),
+        "ctat_settled": abs(wave["v(ctat)"][-1] - sim_common.interp_at(t, wave["v(ctat)"], tb)),
     }
     fails = [k for k, (lo, hi) in WINDOWS.items() if not (lo <= m[k] <= hi)]
     return {"status": "pass" if not fails else "fail", "m": m, "fails": fails}
