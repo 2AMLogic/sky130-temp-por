@@ -53,8 +53,9 @@
     "                    #453 block-wide re-render then moved",
     "                    layout/temp_por_top/ to 0.9.2 as well (compose, DRC,",
     "                    extraction, LVS and ERC all at this one build), so",
-    "                    every stream the top embeds plus the top's own",
-    "                    evidence now share this pin."
+    "                    the top's own evidence and the por_output_chain",
+    "                    stream it embeds now share this pin; bias_core,",
+    "                    por_comparator and temp_core still carry theirs."
   ],
   "variant": "sky130A",
   "open_pdks_commit": "f6eeac7dad085ffcc829ccfd721f7b4ce39edcf7",
