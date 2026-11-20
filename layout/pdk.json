@@ -47,10 +47,14 @@
     "                    its tag commit, so the prefix match still applies);",
     "                    then to 0.9.2 for the native-Vt voltage flavor",
     "                    (#97): that bump regenerated layout/por_output_chain/",
-    "                    only -- the other cells' committed evidence stays at",
-    "                    the build that produced it, recorded per stream",
-    "                    (their own klt_version fields / READMEs), pending a",
-    "                    block-wide re-render."
+    "                    only at first -- the other cells' committed evidence",
+    "                    stayed at the build that produced it, recorded per",
+    "                    stream (their own klt_version fields / READMEs). The",
+    "                    #453 block-wide re-render then moved",
+    "                    layout/temp_por_top/ to 0.9.2 as well (compose, DRC,",
+    "                    extraction, LVS and ERC all at this one build), so",
+    "                    every stream the top embeds plus the top's own",
+    "                    evidence now share this pin."
   ],
   "variant": "sky130A",
   "open_pdks_commit": "f6eeac7dad085ffcc829ccfd721f7b4ce39edcf7",
