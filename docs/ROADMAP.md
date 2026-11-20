@@ -23,7 +23,7 @@ The signoff report grades `layout/temp_por_top/` at **7 of 11 T1 items met**.
 | 4 LVS clean | met, with an exclusion | `layout/temp_por_top/lvs.json`: 152/152 devices with native-Vt `XMASSIST` excluded (#97) — pending re-render of `temp_por_top`, not a tool limit (the leaf draws it at klt `0.9.2`, PR #419) |
 | 5 Corner verification vs a ratified spec | unmet | only two of eight spec rows are ratified (DR-003) |
 | 6 Monte Carlo for statistical claims | unmet | MC records exist under `sim/` as harness records, not as envelopes the report accepts, and back no ratified row |
-| 7 Post-layout verification | unmet | `klt pex` artifacts exist for `por_comparator` only (`layout/por_comparator/pex/`, #124) |
+| 7 Post-layout verification | unmet | cell-level `klt pex` report for `por_comparator` passes at the klt `0.9.2` pin (single tt/27C point, `layout/por_comparator/pex/klt-pex.rerun.report.json`, #454); the block-level report item 7 grades on still waits on the `temp_por_top` re-render (#453) |
 | 8 Characterization report | unmet | `docs/characterization-report.md` exists but records FAILs and gaps, so it is not a passing check |
 | 9 Testbenches shipped | met | `manifests/attestations/`, item 9 |
 | 10 Repo hygiene | met | `manifests/attestations/`, item 10 |
@@ -90,9 +90,11 @@ Unblocked by a named item above or by a ruling listed under "Blocked and waiting
   artifacts or real states of the design?*
 - **Brown-out and glitch envelopes.** *Do the NONPHYSICAL points resolve under a
   tightened solver (#153)?* Only then can an envelope be proposed.
-- **Block-level post-layout verification (item 7).** *Can `klt pex` extract
-  `temp_por_top` given the pin-order and MOS-flavour limits recorded in
-  `layout/por_comparator/pex/README.md`?*
+- **Block-level post-layout verification (item 7).** *The pin-order limit is
+  retired — the `klt pex` re-run at the `0.9.2` pin passes on `por_comparator`
+  (#454). What remains: the `hvi` marker re-render (klt pin bump, #467), the
+  `temp_por_top` re-compose (#453), and then whether `klt pex` can grade the
+  extracted block within the fleet's job limits (#153 may recur).*
 - **Full-block LVS.** The question is answered — klt draws and compares the
   native-Vt NMOS at the klt `0.9.2` pin (#97, closed) — so the path to an
   item-4 match with no exclusion is the `temp_por_top` re-render.
@@ -110,8 +112,12 @@ Unblocked by a named item above or by a ruling listed under "Blocked and waiting
   closed; the leaf draws and compares the device at the klt `0.9.2` pin,
   PR #419, merged). What remains: the `temp_por_top` re-render that retires
   the block-level LVS exclusion, and the flavour-blind compare limit —
-  drawing the 5V devices' own `hvi` marker is blocked by
-  [klayout-tools#6025](https://github.com/2AMLogic/klayout-tools/issues/6025).
+  drawing the 5V devices' own `hvi` marker was blocked by
+  [klayout-tools#6025](https://github.com/2AMLogic/klayout-tools/issues/6025),
+  which closed 2026-11-18 (fix
+  [#6185](https://github.com/2AMLogic/klayout-tools/pull/6185), merged past
+  the `v0.9.2` tag and in no klt release yet; the pin bump that carries it is
+  [#467](https://github.com/2AMLogic/sky130-temp-por/issues/467)).
 - **#153, tightened-solver brown-out re-run**: four pilots hit the 3600 s job
   limit; waits on a choice among the three options in the issue body.
 - **#327, `corner-run.py` batch path**: waits on a ruling on whether to also
