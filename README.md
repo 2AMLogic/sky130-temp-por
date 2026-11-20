@@ -17,10 +17,11 @@ harnesses with recorded PVT-corner results; `layout/` has all six
 `temp_por_top` block layout. The signoff report grades the block against its
 own layout, `layout/temp_por_top/`: **7/11 T1 items met** (1, 2, 3, 4, 9, 10, 11).
 Item 3 is [`drc.json`](layout/temp_por_top/drc.json) `clean`. Item 4 is
-[`lvs.json`](layout/temp_por_top/lvs.json) `match` (152/152 devices) with the
-native-Vt `XMASSIST` excluded — a pending re-render of `temp_por_top`, not a
-tool limit (the leaf draws the device at the klt `0.9.2` pin; PR #419) — so
-it is not a full-block compare (#97). Item 11
+[`lvs.json`](layout/temp_por_top/lvs.json) `match` (153/153 devices, 71/71
+nets) with the native-Vt `XMASSIST` included and no exclusion (the top was
+re-rendered from the current leaf streams at the klt `0.9.2` pin, #453); the
+compare is flavour-blind until the 5 V devices' `hvi` marker can be drawn
+(klayout-tools#6025). Item 11
 (structural power delivery) is `met`: [`erc.json`](layout/temp_por_top/erc.json)
 is clean against the block-specific supply spec (#260). Items 5 to 8 are unmet.
 `spec/` is partially ratified: DR-003 finalized the operating-temperature
@@ -97,11 +98,11 @@ with per-cell PVT sim results recorded in `sim/`; spec ratification and
 layout are both advancing in parallel rather than in strict ladder order —
 DR-003 has ratified the operating-temperature and supply rows while the
 remaining target rows stay open, and `layout/` has the
-assembled `temp_por_top` block, with clean DRC and an LVS match that excludes
-the native startup-assist device (`XMASSIST`, #97) — the exclusion persists
-only because `temp_por_top`'s committed evidence predates the leaf's
-re-render, which draws the device at the klt `0.9.2` pin (PR #419), not for
-lack of tool support. Its
+assembled `temp_por_top` block, with clean DRC and a full-block LVS match
+(153/153 devices) that includes the native startup-assist device
+(`XMASSIST`, #97) with no exclusion since the #453 re-render at the
+klt `0.9.2` pin (the compare stays flavour-blind until the `hvi` marker can
+be drawn, klayout-tools#6025). Its
 ERC is clean against the block-specific supply spec (#260), so structural
 power-delivery item 11 is `met`; the signoff report renders 7/11 T1 items met
 (`manifests/signoff-report.json`). The `bias_core` assembly (clean DRC,
