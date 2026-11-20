@@ -3,7 +3,7 @@
 Current roadmap derived from GitHub label state. The region below is maintained by the Loom Guide role.
 
 <!-- guide:plan-body:start -->
-_Generated: 2026-11-20T06:37:51Z (snapshot; compare against live labels)_
+_Generated: 2026-11-20T19:06:38Z (snapshot; compare against live labels)_
 ## Operator Attention: Merge-Risk-Hold Pileup
 
 Judge-approved PRs under a hold (`loom:blocked` or `loom:operator`) — only a human merge decision is missing.
@@ -21,12 +21,16 @@ _None._
 `loom:important`; taken before unlabelled work.
 
 - **#291**: glitch-top: NONPHYSICAL breakdown line counts 0 node violations while rows tag them (pre-dip/post-dip not counted)
+- **#453**: Re-compose temp_por_top from the current por_output_chain stream: retire the XMASSIST LVS exclusion and re-run DRC/LVS/ERC at klt 0.9.2
+- **#455**: bias_core OK-detector: BIAS_OK never asserts in 38 of 120 mismatch samples, so reset never releases; find the device and fix the design
 
 ## Ready
 
 Human-approved issues (`loom:issue`) ready for implementation — excluding held (`loom:blocked`/`loom:operator`/`loom:frozen`), `loom:building`, and issues closed by an open `loom:pr` PR (listed under Approved).
 
 - **#291**: glitch-top: NONPHYSICAL breakdown line counts 0 node violations while rows tag them (pre-dip/post-dip not counted)
+- **#453**: Re-compose temp_por_top from the current por_output_chain stream: retire the XMASSIST LVS exclusion and re-run DRC/LVS/ERC at klt 0.9.2
+- **#455**: bias_core OK-detector: BIAS_OK never asserts in 38 of 120 mismatch samples, so reset never releases; find the device and fix the design
 
 ## In Progress
 
@@ -73,8 +77,8 @@ Issues carrying `loom:curated`.
 |------|-------|
 | Operator merge-risk holds | 0 |
 | Very important | 0 |
-| Important | 1 |
-| Ready (`loom:issue`, net of holds/building/merge-pending) | 1 |
+| Important | 3 |
+| Ready (`loom:issue`, net of holds/building/merge-pending) | 3 |
 | In Progress (`loom:building`) | 0 |
 | PRs awaiting review | 0 |
 | Approved PRs awaiting merge | 0 |
