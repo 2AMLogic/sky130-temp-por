@@ -200,14 +200,14 @@
           },
           {
             "name": "RESETn",
-            "x_um": 173.96,
+            "x_um": 172.46,
             "y_um": 43.0,
             "layer": {
-              "layer": 67,
+              "layer": 69,
               "datatype": 20
             },
-            "width_um": 0.17,
-            "direction_deg": 0
+            "width_um": 0.42,
+            "direction_deg": 90
           }
         ]
       }
@@ -253,13 +253,13 @@
           },
           {
             "name": "EN",
-            "x_um": -10.0,
+            "x_um": -8.5,
             "y_um": 23.720000000000002,
             "layer": {
-              "layer": 67,
+              "layer": 69,
               "datatype": 20
             },
-            "width_um": 0.17,
+            "width_um": 0.42,
             "direction_deg": 180
           },
           {
@@ -728,7 +728,7 @@
     },
     {
       "net": "RESETn",
-      "layer_role": "metal2",
+      "layer_role": "metal3",
       "width_um": 0.3,
       "legs": [
         {
@@ -742,7 +742,7 @@
           },
           "waypoints_um": [
             [
-              173.96,
+              172.46,
               620
             ],
             [
