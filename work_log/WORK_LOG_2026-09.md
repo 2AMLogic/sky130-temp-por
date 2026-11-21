@@ -2,6 +2,17 @@
 
 Sections moved byte-for-byte from [WORK_LOG.md](../WORK_LOG.md) by `loom-daemon work-docs archive`.
 
+### 2026-09-21
+
+- **PR #73**: fix: land bias_core supply legs on the real pads (block-local ports)
+- **PR #72**: refactor: drop dead helpers and stale doc claims from sim_common.py
+- **PR #70**: feat: add klt erc supply spec and report for bias_core (T1 item 11)
+- **PR #68**: feat: add klt signoff block manifest as the T1 verdict of record
+- **Issue #69** (closed): bias_core assembly: supply routes are single continuous rail islands but connect to none of the blocks' internal supply pads
+- **Issue #71** (closed): Remove dead parse_measurements()/_cr() and write_log() from sim_common.py: zero callers, stale 'actually used' docstring claims
+- **Issue #66** (closed): T1 item 11 (power delivery, structural): no klt erc supply spec or report in this repo
+- **Issue #67** (closed): Commit a klt signoff block manifest so this block's T1 state is graded, not hand-read
+
 ### 2026-09-17
 
 - **PR #65**: feat: compose bias_core sub-blocks into one DRC-clean assembly
