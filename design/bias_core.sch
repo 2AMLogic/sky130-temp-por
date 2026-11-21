@@ -656,7 +656,14 @@ release, which is safe by construction -- an argument from the comparator's
 threshold direction, not from any gf180mcu number. XCOK holds NOKX up
 through the first microseconds of a rail ramp so BIAS_OK cannot glitch valid
 before anything is biased; XMO1P is deliberately weak and XMO1N strong for
-the same reason.} -1180 3130 0 0 0.4 0.4 {}
+the same reason. Issue #455's second fix adds MOKH (PFET, gate=BIAS_OK,
+VDD->NOKX): the loop-off window between NKG release and loop takeover rides
+NOKO at 0.5-0.8 V, which the bare XMOK2/XMOK2P ratio could not reject (tt/27
+probe: BIAS_OK chatter at 1.15/1.25/1.36 V, POR_RAW multiple_transitions);
+MOKH triples the pull-up drive XMOK2 must overcome while BIAS_OK is low, so
+assertion needs the settled rail-to-rail NOKO, and its gate feedback makes
+both transitions regenerative. Release is unaffected: MOKH is off while
+BIAS_OK is high, so on a falling rail NOKX follows XMOK2P alone.} -1180 3130 0 0 0.4 0.4 {}
 N -960 3230 -960 3190 {}
 C {devices/lab_pin.sym} -960 3190 0 0 {name=l141 lab=VDD}
 N -1000 3260 -1060 3260 {}
@@ -816,4 +823,19 @@ W=4
 nf=1
 mult=1
 model=nfet_g5v0d10v5
+spiceprefix=X}
+N -20 3490 -20 3450 {}
+C {devices/lab_pin.sym} -20 3450 0 0 {name=l183 lab=VDD}
+N -60 3520 -120 3520 {}
+C {devices/lab_pin.sym} -120 3520 0 0 {name=l184 lab=BIAS_OK}
+N -20 3550 -20 3590 {}
+C {devices/lab_pin.sym} -20 3590 0 0 {name=l185 lab=NOKX}
+N -20 3520 30 3520 {}
+C {devices/lab_pin.sym} 30 3520 0 0 {name=l186 lab=VDD}
+C {sky130_fd_pr/pfet_g5v0d10v5.sym} -40 3520 0 0 {name=MOKH
+L=4
+W=2
+nf=1
+mult=1
+model=pfet_g5v0d10v5
 spiceprefix=X}
