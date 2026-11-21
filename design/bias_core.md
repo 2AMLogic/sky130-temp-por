@@ -64,6 +64,35 @@ oversight:
   condition, per issue #6, is a **reproducible, correctly-wired topology**,
   not a characterized one.
 
+### OK-detector re-sizing (issue #455)
+
+The settle detector is the one stage whose sky130 sizing departs from the
+carried-over gf180 numbers, re-derived in #455 after the mismatch Monte
+Carlo showed 38 of 120 realisations never releasing reset (the gf180
+carried-over `RT/R1` = 0.05 left a 2.75 mV settle signal, smaller than the
+detector's own ~5 mV input-referred mismatch offset sigma). Three committed
+changes (`bf125674`, `4a0deb8a`, `50e1d37f`):
+
+| device | was | now | why |
+| --- | --- | --- | --- |
+| `XRT` | L 17.5 | L 350.0 | `RT/R1` = 1: the settled signal is a full DVBE (41.7–71.2 mV over −40…125 C, PTAT, ratio-of-same-flavour so no corner spread of its own), ~10x the re-measured offset sigma; assertion point 50 % of settled loop current |
+| `XMOL1`/`XMOL2` | W2 L4 | W4 L16 | area x8 (sigma_vth 2.90 → 1.03 mV); halved W/L halves the mirror's gm, the dominant current-error term drops ~5.7x |
+| `XMOKA`/`XMOKB` | W8 L4 | W16 L8 | area x4 (sigma_vth 2.12 → 1.06 mV) at unchanged W/L, so the stage operating point is unchanged |
+| `XMOK2` | W2 L4 | W8 L4 | with `XMOK2P` and the new `XMOKH` below: the settled DC fight is ≥ 2:1, so "BIAS_OK low" is not a self-consistent settled operating point at any smoke corner |
+| `XMOK2P` | W1 L4 | W0.5 L4 | halves the standing NOKX pull-up so the helper fits inside the original settled margin |
+| `XMOKH` | — (new) | W2 L4, pfet, gate=`BIAS_OK`, VDD→NOKX | regenerative output hysteresis: while `BIAS_OK` is low it holds NOKX up through the loop-off window (NOKO rides 0.5–0.8 V between NKG release and loop takeover, which the bare `XMOK2`/`XMOK2P` ratio could not reject — BIAS_OK chatter, POR_RAW `multiple_transitions`); assertion needs the settled rail-to-rail NOKO (~1.9–2.05 V) |
+
+The `helper/XMOK2` W/L ratio sets the NOKO assertion threshold (~1.0 V at
+tt/27 C: above the 0.73–0.78 V loop-off window plateau, below the settled
+1.5–2.05 V); the `XMOK2`/`XMOK2P`+`XMOKH` current ratio keeps every settled
+cold `.op` on the BIAS_OK-high side. Release on a falling rail follows
+`XMOK2P` alone (`XMOKH` is off while `BIAS_OK` is high). Evidence:
+`sim/bias-core-smoke`, `sim/bias-core-startup`, `sim/bias-core-op-branch`
+re-run records and the `sim/por-comparator-thresholds` mismatch campaigns
+(#455); the schematic annotation in `design/bias_core.sch` carries the same
+argument device by device. `layout/bias_core_settle_flag/` is out of step
+until #473 lands.
+
 ## Verification done for this issue
 
 Non-goals for issue #6 explicitly exclude PVT corner verification,
