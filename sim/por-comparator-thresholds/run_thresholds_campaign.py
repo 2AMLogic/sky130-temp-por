@@ -1100,6 +1100,10 @@ def render_mc_md(rec: dict) -> str:
                 L.append("")
                 L.append(mc_okdet_attribution_statement(okdet_attribution(rec["corners"])))
                 L.append("")
+    if rec.get("probe"):
+        L.append("## Local deterministic single-device cross-check (`--backend local`-class probes, one ngspice -b each)")
+        L.append(rec["probe"])
+        L.append("")
     if rec.get("reproduction"):
         r = rec["reproduction"]
         L.append(f"## Reproduction of record {r['against']} (seed-for-seed)")
@@ -1245,7 +1249,7 @@ def cmd_record_mc(args, man: dict, run_dir: Path, meta: dict) -> int:
                         "stuck class": "mechanism class of a failed-release realisation from its diagnostics: enable-clamp (BIAS_OK never asserted), comparator-stuck (BIAS_OK asserted, CMPO never rose), extractor-miss (both released yet graded no_transition); None = no diagnostic data"},
         "requests": requests,
         "corners": corners,
-        "probe": "",
+        "probe": (Path(args.probe_note_file).read_text().strip() if args.probe_note_file else ""),
         "absent_coverage": man["absent_coverage"],
         "links": {
             "testbench": "sim/" + SLUG + "/" + v["schematic"], "manifest": f"sim/{SLUG}/experiment.json", "driver": f"sim/{SLUG}/run_thresholds_campaign.py",
@@ -1399,14 +1403,14 @@ def main(argv: list[str]) -> int:
     p.add_argument("--process", default="tt")
     p.add_argument("--temp", type=float, default=27)
     p.add_argument("--run-id")
-    c = sub.add_parser("record")
-    c.add_argument("--run-id", required=True)
-    c.add_argument("--variant", action="append", choices=variants)
-    c.add_argument("--probe-note-file")
-    c.add_argument("--author")
-    c.add_argument("--supersedes")
-    c.add_argument("--against-record", help="mc axis: compare this run seed-for-seed against a prior mismatch-mc record id (issue #401)")
-    c.add_argument("--allow-dirty", action="store_true")
+    r = sub.add_parser("record")
+    r.add_argument("--run-id", required=True)
+    r.add_argument("--variant", action="append", choices=variants)
+    r.add_argument("--probe-note-file")
+    r.add_argument("--author")
+    r.add_argument("--supersedes")
+    r.add_argument("--against-record", help="mc axis: compare this run seed-for-seed against a prior mismatch-mc record id (issue #401)")
+    r.add_argument("--allow-dirty", action="store_true")
     sub.add_parser("selftest")
     args = ap.parse_args(argv)
     return {"run": cmd_run, "probe": cmd_probe, "record": cmd_record, "selftest": cmd_selftest}[args.cmd](args)
