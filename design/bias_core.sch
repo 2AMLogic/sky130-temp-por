@@ -657,13 +657,26 @@ threshold direction, not from any gf180mcu number. XCOK holds NOKX up
 through the first microseconds of a rail ramp so BIAS_OK cannot glitch valid
 before anything is biased; XMO1P is deliberately weak and XMO1N strong for
 the same reason. Issue #455's second fix adds MOKH (PFET, gate=BIAS_OK,
-VDD->NOKX): the loop-off window between NKG release and loop takeover rides
-NOKO at 0.5-0.8 V, which the bare XMOK2/XMOK2P ratio could not reject (tt/27
-probe: BIAS_OK chatter at 1.15/1.25/1.36 V, POR_RAW multiple_transitions);
-MOKH triples the pull-up drive XMOK2 must overcome while BIAS_OK is low, so
-assertion needs the settled rail-to-rail NOKO, and its gate feedback makes
-both transitions regenerative. Release is unaffected: MOKH is off while
-BIAS_OK is high, so on a falling rail NOKX follows XMOK2P alone.} -1180 3130 0 0 0.4 0.4 {}
+VDD->NOKX, L=4 W=2): the
+loop-off window between NKG release and loop takeover rides NOKO at
+0.5-0.8 V, which the bare XMOK2/XMOK2P ratio could not reject (tt/27 probe:
+BIAS_OK chatter at 1.15/1.25/1.36 V, POR_RAW multiple_transitions); MOKH
+holds NOKX up through that window while BIAS_OK is low, so assertion needs
+the settled rail-to-rail NOKO, and its gate feedback makes both transitions
+regenerative. The 1/8 ratio is the constraint pair: strong enough that
+subthreshold XMOK2 cannot pull NOKX low before the loop runs, weak enough
+that XMOK2 at settled NOKO still wins the DC fight with MOKH on. Measured
+at the binding corner (fs/125 C/3.63 V cold .op, node dump): NOKO settles
+1.687 V while XMOK2 and the helper each carried ~29 uA -- a 1:1 tie that left
+"BIAS_OK low" self-consistent (smoke FAILs at tt/27 >= 3.3 V, tt/ss/ff/fs
+125 C across three helper sizings). The tie is broken by ratio, not by a
+weaker helper: XMOK2 W 2 -> 8 and XMOK2P W 1 -> 0.5, so XMOK2 wins the
+settled fight >= 2:1 (fs/125/3.63 .op: NOKX 0.36 mV, BIAS_OK railed) while
+the helper/XMOK2 W/L ratio (and so the NOKO ~1.0 V assertion threshold at
+tt/27 C, above the 0.73-0.78 V loop-off window plateau, below the settled
+1.5-2.05 V) is unchanged. Release is
+unaffected: MOKH is off while BIAS_OK is high, so on a falling rail NOKX
+follows XMOK2P alone.} -1180 3130 0 0 0.4 0.4 {}
 N -960 3230 -960 3190 {}
 C {devices/lab_pin.sym} -960 3190 0 0 {name=l141 lab=VDD}
 N -1000 3260 -1060 3260 {}
@@ -764,7 +777,7 @@ N 480 3260 530 3260 {}
 C {devices/lab_pin.sym} 530 3260 0 0 {name=l168 lab=VSS}
 C {sky130_fd_pr/nfet_g5v0d10v5.sym} 460 3260 0 0 {name=MOK2
 L=4
-W=2
+W=8
 nf=1
 mult=1
 model=nfet_g5v0d10v5
@@ -779,7 +792,7 @@ N -960 3520 -910 3520 {}
 C {devices/lab_pin.sym} -910 3520 0 0 {name=l172 lab=VDD}
 C {sky130_fd_pr/pfet_g5v0d10v5.sym} -980 3520 0 0 {name=MOK2P
 L=4
-W=1
+W=0.5
 nf=1
 mult=1
 model=pfet_g5v0d10v5
