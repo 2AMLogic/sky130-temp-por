@@ -444,7 +444,8 @@ def render_md(rec):
     if tr:
         L += ["| point | n valid | input-referred cycle-avg residual: mean / sd (mV) | PTAT ripple pp (mV): nominal / worst sample | CTAT ripple pp (mV): nominal / worst sample |", "|---|---|---|---|---|"]
         for pt, r in sorted(tr.items()):
-            L.append(f"| {pt[0]} / {pt[1]:.2f} V / {pt[2]:g} C | {r['resid_stats']['n']} | {f3(r['resid_stats']['mean'])} / {f3(r['resid_stats']['sd'])} | "
+            label = pt if isinstance(pt, str) else f"{pt[0]} / {pt[1]:.2f} V / {pt[2]:g} C"
+            L.append(f"| {label} | {r['resid_stats']['n']} | {f3(r['resid_stats']['mean'])} / {f3(r['resid_stats']['sd'])} | "
                      f"{f3(r['nom_ptat_pp_mV'])} / {f3(r['ptat_pp_stats']['max_abs'])} | {f3(r['nom_ctat_pp_mV'])} / {f3(r['ctat_pp_stats']['max_abs'])} |")
         L += [""]
         worst_dc, worst_tran = rec["comparison"]["worst_static_sd_mV"], rec["comparison"]["worst_transient_sd_mV"]
