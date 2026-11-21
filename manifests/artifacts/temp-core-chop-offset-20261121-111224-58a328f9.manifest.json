@@ -1,0 +1,33 @@
+{
+  "schema_version": 1,
+  "entries": [
+    {
+      "sha256": "ab52cd819ba463096038079ffa758da941850410f6b25cc1aeca6d2fbc6046ee",
+      "size": 145516,
+      "kind": "evidence",
+      "producer": {
+        "tool": "klt",
+        "version": "0.9.3.dev2575+g6bd18bbc8637",
+        "loom.repo": "2AMLogic/sky130-temp-por",
+        "commit": "f9fd8455e08173e9cef059b1e4a341a06eada4fa"
+      },
+      "uri": "artifact:evidence/2AMLogic__sky130-temp-por/ab/ab52cd819ba463096038079ffa758da941850410f6b25cc1aeca6d2fbc6046ee",
+      "name": "sim/.work/.stage/temp-core-chop-offset/20261121-111224-58a328f9/samples-dc.csv",
+      "media_type": "text/csv"
+    },
+    {
+      "sha256": "8300ca7712d1cdcd9cd4fadc47b3991f883ba57849bab5ad9743c330f37231c2",
+      "size": 852,
+      "kind": "evidence",
+      "producer": {
+        "tool": "klt",
+        "version": "0.9.3.dev2575+g6bd18bbc8637",
+        "loom.repo": "2AMLogic/sky130-temp-por",
+        "commit": "f9fd8455e08173e9cef059b1e4a341a06eada4fa"
+      },
+      "uri": "artifact:evidence/2AMLogic__sky130-temp-por/83/8300ca7712d1cdcd9cd4fadc47b3991f883ba57849bab5ad9743c330f37231c2",
+      "name": "sim/.work/.stage/temp-core-chop-offset/20261121-111224-58a328f9/samples-tran.csv",
+      "media_type": "text/csv"
+    }
+  ]
+}
