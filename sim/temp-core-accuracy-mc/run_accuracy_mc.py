@@ -142,17 +142,52 @@ def join_continuations(text):
 # XMP1..3 go L4 W8 -> L4 W32 (4x area) and each gets a series res_xhigh_po between VDD and its source pin; the
 # cascodes XMPC1..3 (L1 W8) are unchanged.  R = W2 L660 of res_xhigh_po = 679 kOhm at tt/27 C (measured with one
 # local op point: 0.3 V across it draws 0.442 uA, the 0.44 uA leg current DR-007 quotes -> ~0.3 V drop).
-VARIANTS = ["baseline", "mirror-degen"]
+VARIANTS = ["baseline", "mirror-degen", "chop-degen"]
 MIRROR_LEGS = ["XMP1", "XMP2", "XMP3"]
 DEGEN_W, DEGEN_L = 2, 660
 MIRROR_W_NEW = 32
-VARIANT_EXTRA_MIRROR = {"mirror-degen": [f"XRDEG{i}" for i in (1, 2, 3)]}  # degeneration resistors belong to the mirror term
+VARIANT_EXTRA_MIRROR = {v: [f"XRDEG{i}" for i in (1, 2, 3)] for v in ("mirror-degen", "chop-degen")}  # degeneration resistors belong to the mirror term
 VARIANT_DESC = {
     "baseline": "committed design/netlist unchanged",
     "mirror-degen": (f"XMP1..3 rewritten L4 W8 -> L4 W{MIRROR_W_NEW} (ad/as/pd/ps/nrd/nrs rescaled with W; cascodes XMPC1..3 unchanged), "
                      f"series sky130_fd_pr__res_xhigh_po W={DEGEN_W} L={DEGEN_L} (about 679 kOhm at tt/27 C) XRDEG1..3 between VDD and each "
                      "mirror source (new nodes SDG1..3); the XRDEG resistors are part of the `mirror` mismatch group"),
 }
+
+# Variant "chop-degen" (issue #461, DR-007 item 1): composes the mirror-degen rewrite (reused verbatim above)
+# with a CHOPPED amplifier -- again a rewrite of the generated deck only, never of design/.  The input pair
+# XMI1/XMI2 is re-wired onto fresh nodes (gates NGA1/NGA2, drains ND1/ND2) behind two cross-coupled
+# transmission-gate choppers: an input chopper between NA/NB and NGA1/NGA2, and an output chopper between
+# ND1/ND2 and N1/N2 (the mirror-load nodes, whose gate connection N1 is unchanged).  Swapping the control
+# phase crosses BOTH choppers, so the first stage's input AND output polarity flip together: the loop polarity
+# is unchanged while the stage's input-referred offset alternates sign between the phases.  A DC solve of each
+# phase on the same mismatch draw, then averaging the two, cancels the first-order offset -- that residual is
+# what sim/temp-core-chop-offset measures.  The 16 switch instances (8 switches x nfet+pfet pass halves) are
+# part of the `amp` mismatch group (DR-007 item 1 is an amplifier-offset question, so switch mismatch belongs
+# with the amplifier measurement).
+CHOP_VARIANT = "chop-degen"
+CHOP_VHI, CHOP_VLO = 2.5, 0.0  # control swing: hi turns the nfet half of a pass gate on for the 0.6-0.9 V signal nodes
+CHOP_SW = {  # switch -> (node1, node2, phase whose control level closes it); gates NGA1/NGA2 and drains ND1/ND2
+    "SWI1": ("NA", "NGA1", "a"), "SWI2": ("NB", "NGA2", "a"),
+    "SWI3": ("NA", "NGA2", "b"), "SWI4": ("NB", "NGA1", "b"),
+    "SWO1": ("ND1", "N1", "a"), "SWO2": ("ND2", "N2", "a"),
+    "SWO3": ("ND1", "N2", "b"), "SWO4": ("ND2", "N1", "b"),
+}
+CHOP_SW_PARAMS = ("L=0.5 W=2 nf=1 ad=0.58 as=0.58 pd=4.58 ps=4.58 nrd=0.145 nrs=0.145 sa=0 sb=0 sd=0 mult=1 m=1")
+CHOP_MI_EXPECT = {"XMI1": ("N1", "NA"), "XMI2": ("N2", "NB")}  # (drain, gate) the rewrite refuses anything else
+CHOP_MI_NEW = {"XMI1": ("ND1", "NGA1"), "XMI2": ("ND2", "NGA2")}
+VARIANT_EXTRA_AMP = {CHOP_VARIANT: [f"X{sw}{p}" for sw in CHOP_SW for p in ("N", "P")]}  # chopper switches belong to the amplifier term
+VARIANT_DESC[CHOP_VARIANT] = (
+    "mirror-degen rewrite (reused: XMP1..3 L4 W32 + XRDEG1..3 in the `mirror` group) plus a chopped amplifier: XMI1/XMI2 re-wired "
+    "(drains N1/N2 -> ND1/ND2, gates NA/NB -> NGA1/NGA2) behind cross-coupled transmission-gate choppers XSWI1..4 (input, NA/NB to "
+    "NGA1/NGA2) and XSWO1..4 (output, ND1/ND2 to N1/N2), nfet+pfet pass halves sky130_fd_pr__{n,p}fet_g5v0d10v5 L=0.5 W=2, controlled "
+    "by CHA/CHAB and CHB/CHBB; phase A connects straight through, phase B crosses both choppers (loop polarity unchanged, amplifier "
+    "offset sign flipped); the 16 switch instances are part of the `amp` mismatch group"
+)
+# Clocked check defaults (sim/temp-core-chop-offset): make-before-break overlap (duty > 50 %, so a gate is never
+# left floating), 10 kHz, settle 30 cycles, average 20 integer cycles.
+CHOP_TRAN_DEFAULT = {"period_s": 100e-6, "rise_s": 0.2e-6, "fall_s": 0.2e-6, "duty": 0.55,
+                     "settle_s": 3e-3, "ncycles_avg": 20, "tstop_s": 5e-3, "tmax_s": 0.5e-6}
 
 
 def degenerate_mirror(lines):
@@ -180,22 +215,97 @@ def degenerate_mirror(lines):
     return out
 
 
+def chop_switch_lines():
+    """The 16 chopper switch instances (8 transmission gates x nfet/pfet halves), emitted in a fixed order.
+
+    Sizing copies the committed XMPASS/XMINVP devices (L=0.5 W=2): deliberately small, i.e. a conservative
+    (large) switch-mismatch contribution for the residual measurement.  Pin order is the models' own
+    ``d g s b``: the CLOCK drives the gate (pin 2) and the two signal nodes land on d/s -- a pass transistor
+    is symmetric, so either assignment of the signal nodes to d/s is the same device.  Bulks follow the
+    cell's own convention (VSS / VDD).  The nfet gate takes the phase control, the pfet gate its inverse.
+    """
+    out = []
+    for sw, (n1, n2, ph) in CHOP_SW.items():
+        g, gi = ("CHA", "CHAB") if ph == "a" else ("CHB", "CHBB")
+        out += [f"X{sw}N {n1} {g} {n2} VSS sky130_fd_pr__nfet_g5v0d10v5 {CHOP_SW_PARAMS}",
+                f"X{sw}P {n1} {gi} {n2} VDD sky130_fd_pr__pfet_g5v0d10v5 {CHOP_SW_PARAMS}"]
+    return out
+
+
+def chop_dc_control(phase):
+    """The four control sources for a DC phase solve: phase A straight through, phase B crossed."""
+    hi = phase == "a"
+    return [f"VCKA CHA 0 {CHOP_VHI if hi else CHOP_VLO:g}", f"VCKAB CHAB 0 {CHOP_VLO if hi else CHOP_VHI:g}",
+            f"VCKB CHB 0 {CHOP_VLO if hi else CHOP_VHI:g}", f"VCKBB CHBB 0 {CHOP_VHI if hi else CHOP_VLO:g}"]
+
+
+def chop_tran_control(tr):
+    """The four control sources for the clocked transient: complementary PULSE pairs with make-before-break
+    overlap (duty > 50 %, CHB delayed half a period), so a chopper gate node is never left floating."""
+    per, r, f, pw, td = tr["period_s"], tr["rise_s"], tr["fall_s"], tr["duty"] * tr["period_s"], tr["period_s"] / 2
+    return [f"VCKA CHA 0 PULSE({CHOP_VLO:g} {CHOP_VHI:g} 0 {r:.6g} {f:.6g} {pw:.6g} {per:.6g})",
+            f"VCKAB CHAB 0 PULSE({CHOP_VHI:g} {CHOP_VLO:g} 0 {r:.6g} {f:.6g} {pw:.6g} {per:.6g})",
+            f"VCKB CHB 0 PULSE({CHOP_VLO:g} {CHOP_VHI:g} {td:.6g} {r:.6g} {f:.6g} {pw:.6g} {per:.6g})",
+            f"VCKBB CHBB 0 PULSE({CHOP_VHI:g} {CHOP_VLO:g} {td:.6g} {r:.6g} {f:.6g} {pw:.6g} {per:.6g})"]
+
+
+def chop_amplifier(lines, phase=None, tran=None):
+    """chop-degen amplifier rewrite on continuation-joined temp_core lines.
+
+    Re-wires XMI1/XMI2 (gates NA/NB -> NGA1/NGA2, drains N1/N2 -> ND1/ND2) and inserts the chopper switch
+    instances plus the four control sources before the cell's `.ends`.  ``phase`` ("a"/"b") selects the DC
+    control state; ``tran`` (a CHOP_TRAN_DEFAULT-shaped dict) emits the clocked PULSE controls instead.
+
+    The DEVICE lines are identical for both DC phases -- only the four control-source literals differ -- so
+    two requests that share corners/seed/N draw the same per-sample mismatch (the pairing property the
+    two-phase residual solve in sim/temp-core-chop-offset depends on; same derivation-by-corner-index property
+    the per-process-section split already relies on).
+    """
+    out, seen = [], []
+    for ln in lines:
+        tok = ln.split()
+        if tok and tok[0].upper() in CHOP_MI_EXPECT:
+            name = tok[0].upper()
+            exp = CHOP_MI_EXPECT[name]
+            if tok[1].upper() != exp[0] or tok[2].upper() != exp[1]:
+                raise SystemExit(f"{name}: unexpected netlist (drain={tok[1]} gate={tok[2]}); chop rewrite refuses")
+            tok[1], tok[2] = CHOP_MI_NEW[name]
+            ln = " ".join(tok)
+            seen.append(name)
+        out.append(ln)
+    if sorted(seen) != sorted(CHOP_MI_EXPECT):
+        raise SystemExit(f"chop-degen: rewrote {sorted(seen)} of {sorted(CHOP_MI_EXPECT)} input-pair devices")
+    if tran is not None:
+        ctrl = chop_tran_control(tran)
+    elif phase in ("a", "b"):
+        ctrl = chop_dc_control(phase)
+    else:
+        raise SystemExit("chop-degen needs phase 'a' or 'b' (or a transient clock dict)")
+    ends = [i for i, l in enumerate(out) if l.strip().lower() == ".ends"]
+    at = ends[-1] if ends else len(out)
+    return out[:at] + chop_switch_lines() + ctrl + out[at:]
+
+
 def temp_core_group(inst, variant="baseline"):
     for g, members in GROUPS.items():
         if inst.upper() in members:
             return g
     if inst.upper() in VARIANT_EXTRA_MIRROR.get(variant, []):
         return "mirror"
+    if inst.upper() in VARIANT_EXTRA_AMP.get(variant, []):
+        return "amp"
     return "other"
 
 
-def transform_cell(name, active, variant="baseline"):
+def transform_cell(name, active, variant="baseline", phase=None, tran=None):
     """Return the cell netlist with every device whose group is not in ``active`` routed through its mmoff wrapper."""
     txt = (REPO_ROOT / "design" / "netlist" / f"{name}.spice").read_text()
     out = []
     src = join_continuations(txt)
-    if variant == "mirror-degen" and name == "temp_core":
+    if variant in ("mirror-degen", "chop-degen") and name == "temp_core":
         src = degenerate_mirror(src)
+    if variant == CHOP_VARIANT and name == "temp_core":
+        src = chop_amplifier(src, phase=phase, tran=tran)
     for ln in src:
         tok = ln.split()
         if tok and tok[0].upper().startswith("X") and not ln.startswith(("*", ".")):
@@ -215,27 +325,49 @@ def transform_cell(name, active, variant="baseline"):
     return "\n".join(l for l in out if l.strip().lower() != ".end") + "\n"
 
 
-def build_netlist(term, variant="baseline"):
+def tran_measurements(tr):
+    """The clocked-transient measurements: PTAT/CTAT peak-to-peak (ripple) and integer-cycle averages, plus the
+    supply current average, over the settled window [settle_s, settle_s + ncycles_avg * period_s]."""
+    t0, t1 = tr["settle_s"], tr["settle_s"] + tr["ncycles_avg"] * tr["period_s"]
+    ms = []
+    for nm, expr, unit in (("ptat", "v(ptat)", "V"), ("ctat", "v(ctat)", "V")):
+        ms += [{"name": f"{nm}_pp", "spice": f".meas tran {nm}_pp PP {expr} FROM={t0:.6g} TO={t1:.6g}", "unit": unit},
+               {"name": f"{nm}_avg", "spice": f".meas tran {nm}_avg AVG {expr} FROM={t0:.6g} TO={t1:.6g}", "unit": unit}]
+    ms.append({"name": "isup_avg", "spice": f".meas tran isup_avg AVG i(vsup) FROM={t0:.6g} TO={t1:.6g}", "unit": "A"})
+    return ms
+
+
+def build_netlist(term, variant="baseline", phase=None, tran=None):
+    if variant == CHOP_VARIANT and tran is None and phase not in ("a", "b"):
+        raise SystemExit(f"variant {variant} needs phase 'a' or 'b' (or a transient clock via tran=...)")
+    if variant != CHOP_VARIANT and (phase is not None or tran is not None):
+        raise SystemExit(f"--phase/--tran apply to {CHOP_VARIANT} only, not {variant}")
+    if phase is not None and tran is not None:
+        raise SystemExit("phase (DC solve) and tran (clocked transient) are mutually exclusive")
     if term in ("nominal", "all"):
         active = set(TERMS)
     elif term == "none":
         active = set()
     else:
         active = {term}
+    head = f"* generated by sim/{SLUG}/run_accuracy_mc.py (term={term}{'' if variant == 'baseline' else ', variant=' + variant}" \
+        + (f", phase={phase}" if phase else "") + (", clocked transient" if tran else "") + ") -- do not edit"
     lines = [
-        f"* generated by sim/{SLUG}/run_accuracy_mc.py (term={term}{'' if variant == 'baseline' else ', variant=' + variant}) -- do not edit",
+        head,
         *([f"* variant {variant}: {VARIANT_DESC[variant]}"] if variant != "baseline" else []),
-        "* DC temperature sweep inside one ngspice process; EN tied to VDD; bias_core + temp_core as in the #86 solver bench.",
+        "* DC temperature sweep inside one ngspice process; EN tied to VDD; bias_core + temp_core as in the #86 solver bench."
+        if tran is None else
+        "* Clocked chopping transient (make-before-break overlap); EN tied to VDD; bias_core + temp_core as in the #86 solver bench.",
         "* ng_nomodcheck: carried in the netlist because the fleet runner ignores options.ngspice_init",
         *sim_common.NOMODCHECK_CONTROL.splitlines(),
-        ".options wnflag=1",
+        ".options wnflag=1" if tran is None else ".options wnflag=1 method=gear",
         "VSUP VDD 0 3.3",
         "XBIAS VDD 0 IBIAS VREF BIAS_OK bias_core",
         "XDUT VDD 0 IBIAS VDD PTAT CTAT temp_core",
         "",
         wrapper_defs() if term not in ("nominal", "all") else "",
         transform_cell("bias_core", active, variant),
-        transform_cell("temp_core", active, variant),
+        transform_cell("temp_core", active, variant, phase=phase, tran=tran),
         ".end",
     ]
     return "\n".join(lines) + "\n"
@@ -267,9 +399,11 @@ def build_request(term, backend, n, seed, corners=None, timeout=1800, capacity_w
     )
 
 
-def variant_dir(base, variant):
-    """baseline lives in the run directory itself (unchanged layout); a variant in <run dir>/<variant>/"""
-    return base if variant == "baseline" else base / variant
+def variant_dir(base, variant, phase=None):
+    """baseline lives in the run directory itself (unchanged layout); a variant in <run dir>/<variant>/
+    (the chop-degen DC phases nest one level deeper: <run dir>/chop-degen/phase-<a|b>/)"""
+    d = base if variant == "baseline" else base / variant
+    return d / f"phase-{phase}" if phase else d
 
 
 def cmd_run(args):
@@ -281,11 +415,13 @@ def cmd_run(args):
         sys.exit("--variant needs --run-id: the variant shares the run id (and pin) of its baseline run")
     run_id, run_dir, now = sim_common.open_run(
         BUILD, args.run_id, git["sha"], reuse="allow" if args.resume else None,
-        sub=None if variant == "baseline" else variant)
+        sub=None if variant == "baseline" else f"{variant}{'' if args.phase is None else '/' + f'phase-{args.phase}'}")
     terms = args.term or ["nominal", *RUN_TERMS]
     this = {"variant": variant, "capacity_wait_s": args.wait_for_capacity, "started_utc": now.strftime("%Y-%m-%dT%H:%M:%SZ"), "klt_client": sim_common.klt_version(),
             "klt_sim_backend_env": os.environ.get("KLT_SIM_BACKEND"), "git": git, "terms": terms,
             "n": args.n, "seed": args.seed}
+    if args.phase:
+        this["phase"] = args.phase
     if args.resume and (run_dir / "run.json").is_file():
         meta = json.loads((run_dir / "run.json").read_text())
         meta.setdefault("resumes", []).append(this)
@@ -312,7 +448,7 @@ def cmd_run(args):
         units = (1 if term == "nominal" else args.n) * len(SUPPLIES) * (1 if proc else len(PROCS))
         name = f"{term}/{proc or 'all-proc'}"
         res = sim_common.submit_prepared(
-            d, build_netlist(term, variant), req, f"{name}: {units} ngspice units -> batch fleet", name)
+            d, build_netlist(term, variant, phase=args.phase), req, f"{name}: {units} ngspice units -> batch fleet", name)
         return {"term": term, "proc": proc, **res}
 
     units_list = [(t, None) if t == "nominal" else (t, pr) for t in terms for pr in ([None] if t == "nominal" else PROCS)]
@@ -327,12 +463,13 @@ def cmd_probe(args):
     """SINGLE-corner LOCAL probe (never a grid): one process/supply, n samples (default 3)."""
     run_dir = BUILD / args.run_id
     for term in args.term:
-        d = run_dir / "probe" / term
+        d = run_dir / "probe" / term if args.phase is None else run_dir / "probe" / f"phase-{args.phase}" / term
         d.mkdir(parents=True, exist_ok=True)
-        (d / "netlist.spice").write_text(build_netlist(term, args.variant))
+        (d / "netlist.spice").write_text(build_netlist(term, args.variant, phase=args.phase))
         req = build_request(term, "local", args.n, args.seed, ([args.process], [args.supply]))
         (d / "request.json").write_text(json.dumps(req, indent=2) + "\n")
-        say(f"[probe] local single corner {term} {args.process} {args.supply} V, n={args.n}")
+        say(f"[probe] local single corner {term} {args.process} {args.supply} V"
+            + (f" phase {args.phase}" if args.phase else "") + f", n={args.n}")
         pr = sim_common.run_local_probe(d)
         say(f"[probe] exit {pr.returncode}")
     return 0
@@ -1264,6 +1401,8 @@ def main():
     r.add_argument("--allow-dirty", action="store_true")
     r.add_argument("--variant", choices=VARIANTS, default="baseline",
                    help="deck variant (issue #284); 'mirror-degen' needs --run-id of the baseline run and writes under <run dir>/mirror-degen/")
+    r.add_argument("--phase", choices=["a", "b"], default=None,
+                   help="chop-degen only: which chopper phase the DC deck solves (required for that variant)")
     sim_common.add_capacity_wait_arg(r)
     r.set_defaults(fn=cmd_run)
     p = sub.add_parser("probe")
@@ -1274,6 +1413,7 @@ def main():
     p.add_argument("--n", type=int, default=3)
     p.add_argument("--seed", type=int, default=DEFAULT_SEED)
     p.add_argument("--variant", choices=VARIANTS, default="baseline")
+    p.add_argument("--phase", choices=["a", "b"], default=None)
     p.set_defaults(fn=cmd_probe)
     rc = sub.add_parser("record")
     rc.add_argument("--run-id", required=True)
@@ -1282,7 +1422,7 @@ def main():
     rc.set_defaults(fn=cmd_record)
     cp = sub.add_parser("compare", help="issue #284: grade a baseline + mirror-degen run pair (nominal/none/mirror) into one new record")
     cp.add_argument("--run-id", required=True)
-    cp.add_argument("--variant", choices=VARIANTS[1:], default="mirror-degen")
+    cp.add_argument("--variant", choices=["mirror-degen"], default="mirror-degen")
     cp.add_argument("--allow-dirty", action="store_true")
     cp.set_defaults(fn=cmd_compare)
     a = ap.parse_args()
