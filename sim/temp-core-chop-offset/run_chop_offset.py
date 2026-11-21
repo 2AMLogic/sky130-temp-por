@@ -284,7 +284,7 @@ def single_phase_residual_mV(ents, nominal_ents, phase="a", sens=DR007_SENSITIVI
     e, nom_e = ents[phase]["corners"], _nominal_of(nominal_ents[phase])
     out = {}
     for key, samples in sorted(e.items()):
-        nom = nom_e.get(key)
+        nom, _nom_why = nom_e.get(key, (None, ["nominal point missing"]))
         if nom is None:
             continue
         vals = {t: [] for t in m.TEMPS}
