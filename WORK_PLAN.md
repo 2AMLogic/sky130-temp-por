@@ -3,7 +3,7 @@
 Current roadmap derived from GitHub label state. The region below is maintained by the Loom Guide role.
 
 <!-- guide:plan-body:start -->
-_Generated: 2026-11-20T23:24:20Z (snapshot; compare against live labels)_
+_Generated: 2026-11-21T07:25:20Z (snapshot; compare against live labels)_
 ## Operator Attention: Merge-Risk-Hold Pileup
 
 Judge-approved PRs under a hold (`loom:blocked` or `loom:operator`) — only a human merge decision is missing.
@@ -21,7 +21,6 @@ _None._
 `loom:important`; taken before unlabelled work.
 
 - **#291**: glitch-top: NONPHYSICAL breakdown line counts 0 node violations while rows tag them (pre-dip/post-dip not counted)
-- **#453**: Re-compose temp_por_top from the current por_output_chain stream: retire the XMASSIST LVS exclusion and re-run DRC/LVS/ERC at klt 0.9.2
 - **#455**: bias_core OK-detector: BIAS_OK never asserts in 38 of 120 mismatch samples, so reset never releases; find the device and fix the design
 - **#458**: Declare the item 5 and item 6 spec-row sets in the manifest and cite klt sim / klt yield envelopes, with unratified rows marked as such
 
@@ -36,8 +35,6 @@ Human-approved issues (`loom:issue`) ready for implementation — excluding held
 
 Issues currently being built (`loom:building`).
 
-- **#453**: Re-compose temp_por_top from the current por_output_chain stream: retire the XMASSIST LVS exclusion and re-run DRC/LVS/ERC at klt 0.9.2
-- **#454**: T1 item 7: produce a graded klt pex report (por_comparator re-run and re-render first, then block-level temp_por_top)
 - **#455**: bias_core OK-detector: BIAS_OK never asserts in 38 of 120 mismatch samples, so reset never releases; find the device and fix the design
 - **#457**: Scope the supply-ramp cross-check to its variant so the next record cannot inherit it
 - **#461**: temp_core: build DR-007 chopped-amplifier + degenerated-mirror sim variant and measure chopper residual offset (part a of #456)
@@ -47,14 +44,14 @@ Issues currently being built (`loom:building`).
 
 PRs waiting on Judge (`loom:review-requested`).
 
-- **#465**: fix: reset the supply-ramp cross-check for each variant
-- **#466**: refactor(sim): drop run_solver_sweep's interp() duplicate of sim_common.interp_at
+_None._
 
 ## Approved (Awaiting Merge)
 
 PRs that passed review and are queued for Champion auto-merge (`loom:pr`).
 
-- **#464**: fix(layout): recompose temp_por_top onto the massist leaf stream, retire the XMASSIST LVS exclusion
+- **#465**: fix: reset the supply-ramp cross-check for each variant
+- **#466**: refactor(sim): drop run_solver_sweep's interp() duplicate of sim_common.interp_at
 
 ## Proposed
 
@@ -65,10 +62,10 @@ Issues carrying `loom:curated`.
 - **#189**: Re-qualify cited sky130 evidence under open_pdks f6eeac7 (split from #188) *(curated)* *(held)*
 - **#303**: Gate items 1 and 9 with klt's own local_only attestation check instead of the repo's re-hasher *(curated)* *(held)*
 - **#376**: Self-check: assert every spec/decision-records/DR-*.md is indexed in spec/README.md with its own status *(curated)* *(held)*
-- **#453**: Re-compose temp_por_top from the current por_output_chain stream: retire the XMASSIST LVS exclusion and re-run DRC/LVS/ERC at klt 0.9.2 *(curated)*
 - **#454**: T1 item 7: produce a graded klt pex report (por_comparator re-run and re-render first, then block-level temp_por_top) *(curated)*
 - **#455**: bias_core OK-detector: BIAS_OK never asserts in 38 of 120 mismatch samples, so reset never releases; find the device and fix the design *(curated)*
 - **#461**: temp_core: build DR-007 chopped-amplifier + degenerated-mirror sim variant and measure chopper residual offset (part a of #456) *(curated)*
+- **#470**: Three cell READMEs still call klayout-tools#6025 open (outside #454's AC-6 scope) *(curated)*
 
 ## Proposed (Architect / Hermit)
 
@@ -87,11 +84,11 @@ Issues carrying `loom:curated`.
 |------|-------|
 | Operator merge-risk holds | 0 |
 | Very important | 0 |
-| Important | 4 |
+| Important | 3 |
 | Ready (`loom:issue`, net of holds/building/merge-pending) | 2 |
-| In Progress (`loom:building`) | 6 |
-| PRs awaiting review | 2 |
-| Approved PRs awaiting merge | 1 |
+| In Progress (`loom:building`) | 4 |
+| PRs awaiting review | 0 |
+| Approved PRs awaiting merge | 2 |
 | Curated | 9 |
 | Architect / Hermit proposals | 4 |
 | Active epics | 1 |
