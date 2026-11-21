@@ -456,7 +456,7 @@ def render_md(rec):
     else:
         L += ["**NOT AVAILABLE** (no transient point produced usable results); only the static figure is claimed.", ""]
     # fleet / not run
-    if rec["not_run"]:
+    if rec["not_run_units"]:
         L += [f"**PARTIAL: units NOT-RUN (fleet refusal/timeout): {', '.join(rec['not_run'])}.** Nothing was substituted by a local grid.", ""]
     # limits
     L += ["## Not measured / limits of this record", "",
