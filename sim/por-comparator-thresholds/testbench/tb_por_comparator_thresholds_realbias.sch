@@ -51,5 +51,9 @@ C {devices/lab_pin.sym} 500 320 0 0 {name=bcbok lab=BIAS_OK}
 C {devices/code_shown.sym} 1100 -300 0 0 {name=SAVES only_toplevel=false value="
 .save v(vdd) v(por_raw) v(vref) v(ibias) v(bias_ok) i(bvdd)
 .save v(xdut.sns) v(xdut.snsb) v(xdut.n1) v(xdut.cmpo)
+* issue #455: OK-detector internal nodes of the real bias_core, so a failed-release
+* realisation can be attributed inside the settle detector (input pair / mirror / output
+* stage) from per-sample node levels, not only from BIAS_OK itself
+.save v(xbias.na) v(xbias.nbtop) v(xbias.pb) v(xbias.tok) v(xbias.noko) v(xbias.nokl) v(xbias.nokx) v(xbias.nkg)
 .options method=gear trtol=50
 "}

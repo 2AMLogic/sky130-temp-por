@@ -98,7 +98,21 @@ def tstop_for(rate: float, man: dict) -> float:
 # --------------------------------------------------------------------------
 
 
-def mc_units(man: dict) -> list[tuple[str, float, int]]:
+def mc_effective(man: dict, meta_mc: dict | None = None) -> dict:
+    """The monte_carlo block this run/record uses: manifest defaults, overridden by the
+    run's recorded overrides (issue #455: the fresh-seed tt/ss/ff/sf/fs campaign must be
+    a separately-recorded axis without re-editing the shared manifest between run and
+    record).  Returns a copy; the manifest itself is never mutated."""
+    mc = dict(man["monte_carlo"])
+    if meta_mc:
+        if meta_mc.get("process_override"):
+            mc["process"] = list(meta_mc["process_override"])
+        if meta_mc.get("seed_override") is not None:
+            mc["seed"] = int(meta_mc["seed_override"])
+    return mc
+
+
+def mc_units(man: dict, mc: dict | None = None) -> list[tuple[str, float, int]]:
     """[(process, temperature, seed_offset)]: one klt request per (process, temperature), never a bigger grid.
 
     Request sizing (recorded in experiment.json monte_carlo.request_sizing): the measured
@@ -116,22 +130,21 @@ def mc_units(man: dict) -> list[tuple[str, float, int]]:
     order, so the six realisation sets are distinct and the mapping is stated in the
     record.
     """
-    mc = man["monte_carlo"]
+    mc = mc or man["monte_carlo"]
     return [(p, t, i + 1) for i, (p, t) in enumerate((p, t) for p in mc["process"] for t in mc["temperature_c"])]
 
 
-def mc_request_seed(man: dict, offset: int) -> int:
-    return man["monte_carlo"]["seed"] + offset
+def mc_request_seed(mc: dict, offset: int) -> int:
+    return mc["seed"] + offset
 
 
-def build_mc_request(proc: str, temp: float, offset: int, man: dict, backend: str, capacity_wait_s: float = 0) -> dict:
+def build_mc_request(proc: str, temp: float, offset: int, mc: dict, man: dict, backend: str, capacity_wait_s: float = 0) -> dict:
     """ONE mismatch Monte Carlo request: one `_mm` process section, one temperature, N mismatch samples.
 
     The `_mm` .lib section turns on the model library's local-mismatch sigmas and klt's
     `monte_carlo` block (vary=mismatch) re-runs the single corner point N times with
     per-sample seeds derived from `seed`.  Local mismatch only -- this is never
     MC_PR_SWITCH global process Monte Carlo."""
-    mc = man["monte_carlo"]
     sw = man["sweep"]
     rate = mc["rate_v_per_s"]
     tstop = tstop_for(rate, man)
@@ -144,7 +157,7 @@ def build_mc_request(proc: str, temp: float, offset: int, man: dict, backend: st
             {"name": "por_raw_max", "spice": ".meas tran por_raw_max MAX v(por_raw)", "unit": "V"},
         ],
         1500, capacity_wait_s,
-        monte_carlo={"n": mc["n_per_corner"], "seed": mc_request_seed(man, offset), "vary": mc["vary"]},
+        monte_carlo={"n": mc["n_per_corner"], "seed": mc_request_seed(mc, offset), "vary": mc["vary"]},
     )
 
 
@@ -153,11 +166,10 @@ def mc_dir(run_dir: Path, variant_name: str, proc: str, temp: float) -> Path:
     return run_dir / variant_name / f"mc_{proc}_{cr.fmt_temp(temp)}c"
 
 
-def submit_mc(unit: tuple[str, float, int], variant_name: str, head: str, man: dict, run_dir: Path, capacity_wait_s: float) -> dict:
+def submit_mc(unit: tuple[str, float, int], variant_name: str, head: str, mc: dict, man: dict, run_dir: Path, capacity_wait_s: float) -> dict:
     proc, temp, offset = unit
-    mc = man["monte_carlo"]
     netlist = build_netlist(head, man["variants"][variant_name], mc["rate_v_per_s"])
-    req = build_mc_request(proc, temp, offset, man, "batch", capacity_wait_s)
+    req = build_mc_request(proc, temp, offset, mc, man, "batch", capacity_wait_s)
     d = mc_dir(run_dir, variant_name, proc, temp)
     label = f"{proc}/{cr.fmt_temp(temp)}C"
     res = sim_common.submit_prepared(
@@ -238,12 +250,14 @@ def cmd_run(args) -> int:
         if args.variant:
             raise SystemExit("--axis mc runs only the monte_carlo.variant (real-bias-core); drop --variant")
         variants = [man["monte_carlo"]["variant"]]
-        work = list(mc_units(man))
+        mc = mc_effective(man, {"process_override": args.mc_process, "seed_override": args.mc_seed})
+        work = list(mc_units(man, mc))
         if args.retry_failed:
             work = [(p, t, o) for p, t, o in work
                     if not sim_common.report_usable(mc_dir(run_dir, variants[0], p, t) / "report.json")]
     else:
         variants = args.variant or [v for v in man["variants"] if not v.endswith("-postlayout")]  # post-layout variants only on explicit --variant
+        mc = None
         work = [(v, r) for v in variants for r, _ in all_rates(man)]
         if args.retry_failed:
             work = [(v, r) for v, r in work if not sim_common.report_usable(run_dir / v / rate_tag(r) / "report.json")]
@@ -253,26 +267,27 @@ def cmd_run(args) -> int:
         "started_utc": now.strftime("%Y-%m-%dT%H:%M:%SZ"),
         "variants": variants,
         "axis": axis,
-        "process": processes(man, axis),
+        "process": mc["process"] if axis == "mc" else processes(man, axis),
         "git": git_info,
         "klt_client": sim_common.klt_version(),
         "klt_sim_backend_env": os.environ.get("KLT_SIM_BACKEND"),
         "work": [list(item) for item in work],
     }
     if axis == "mc":
-        mc = man["monte_carlo"]
         meta.update({
             "monte_carlo": {"n_per_corner": mc["n_per_corner"], "seed": mc["seed"], "vary": mc["vary"],
                             "rate_v_per_s": mc["rate_v_per_s"], "variant": variants[0],
-                            "requests": [{"process": p, "temperature_c": t, "seed_offset": o, "seed": mc_request_seed(man, o)} for p, t, o in mc_units(man)],
+                            "process_override": args.mc_process or None,
+                            "seed_override": args.mc_seed,
+                            "requests": [{"process": p, "temperature_c": t, "seed_offset": o, "seed": mc_request_seed(mc, o)} for p, t, o in mc_units(man, mc)],
                             "request_sizing": mc["request_sizing"]},
         })
-    n_units = (f"{len(work)} requests x N={man['monte_carlo']['n_per_corner']} mismatch samples"
+    n_units = (f"{len(work)} requests x N={mc['n_per_corner']} mismatch samples"
                if axis == "mc" else f"{len(work)} request(s)")
     say(f"run id {run_id}: {n_units}")
     if axis == "mc":
         results = sim_common.fan_out(
-            lambda u: submit_mc(u, variants[0], heads[variants[0]], man, run_dir, args.wait_for_capacity), work, args.jobs)
+            lambda u: submit_mc(u, variants[0], heads[variants[0]], mc, man, run_dir, args.wait_for_capacity), work, args.jobs)
     else:
         results = sim_common.fan_out(
             lambda vr: submit(vr[0], vr[1], heads[vr[0]], man, run_dir, args.wait_for_capacity, axis), work, args.jobs)
@@ -349,7 +364,16 @@ def classify_mc_sample(extract: dict | None) -> tuple[bool, str | None]:
 # v(bias_ok) and the comparator-internal nodes; these fields keep them per sample
 # instead of discarding them at reduction time, so a failed-release ("no_transition")
 # realisation can be attributed to a mechanism from data.
-MC_DIAG_NODES = ("v(bias_ok)", "v(xdut.cmpo)", "v(xdut.n1)", "v(xdut.sns)")
+# The v(xbias.*) nodes (issue #455) instrument the OK-detector itself: the input pair's
+# gates (NA vs NBTOP -- the R_T drop is the whole settle signal), the TOK tail source,
+# the mirror diode (NOKL) and its output (NOKO), the NOKX output-stage node and the
+# start-up clamp gate (NKG).  They are conditionally consumed exactly like the others:
+# a netlist that does not save them simply reports no fields, never zeros.
+MC_DIAG_NODES = (
+    "v(bias_ok)", "v(xdut.cmpo)", "v(xdut.n1)", "v(xdut.sns)",
+    "v(xbias.na)", "v(xbias.nbtop)", "v(xbias.pb)", "v(xbias.tok)",
+    "v(xbias.noko)", "v(xbias.nokl)", "v(xbias.nokx)", "v(xbias.nkg)",
+)
 # Diagnostic classification criteria -- labels on recorded evidence, never thresholds:
 # the raw per-sample values are recorded beside every label, so the classification can
 # be re-derived from the record without agreeing with the criterion.
@@ -409,6 +433,93 @@ def mc_stuck_class(diag: dict | None) -> str | None:
     if cmpo_max < MC_CMPO_RELEASED_V:
         return "comparator-stuck"
     return "extractor-miss"
+
+
+# OK-detector sub-attribution (issue #455): WHERE inside the enable path an
+# `enable-clamp` realisation is stuck, from the xbias.* nodes.  The levels below are
+# diagnostic labels on recorded evidence (the raw per-sample values sit beside every
+# label in the record), measured against the healthy tt/27C operating point
+# (TOK 1.96 V, NOKL 0.75 V, NOKO 1.50 V, NOKX 1.8 mV, NKG ~0 V) and the devices'
+# threshold magnitudes, not against any spec.
+MC_TOK_PRESENT_V = 1.0     # TOK (XMPOK tail source) is delivering headroom
+MC_NOKO_DRIVEN_V = 0.5     # NOKO high enough that XMOK2 can conduct (> |Vth|)
+MC_NOKX_LOW_V = 0.5        # NOKX discharged (output stage won the ratio fight)
+MC_NKG_LOW_V = 0.1         # start-up clamp XMOKC off (XKICK holding NKG down)
+
+
+def mc_okdet_subclass(diag: dict | None) -> str | None:
+    """Sub-mechanism of ONE `enable-clamp` realisation, inside bias_core's OK-detector.
+
+    `first-stage-unbalanced` (the dominant candidate): TOK is present and the clamp is
+    off, yet NOKO never rose -- the XMOKA/XMOKB pair + XML1/XML2 mirror stage never
+    delivered net current to NOKO, i.e. the mismatch offset of that stage exceeded the
+    R_T settle signal.  `output-stage-fight`: NOKO rose but NOKX never discharged --
+    XMOK2 vs XMOK2P lost the ratio fight (the issue's alternative candidate).  `tok-
+    collapsed`: the XMPOK tail source never delivered headroom.  `clamp-on`: the
+    start-up clamp (NKG/XMOKC) was still holding NOKO down.  None when the xbias.*
+    nodes were not saved -- the coarse `stuck_class` still applies."""
+    if not diag or diag.get("xbias_tok_at_peak_v") is None:
+        return None
+    tok = diag["xbias_tok_at_peak_v"]
+    nkg = diag.get("xbias_nkg_at_peak_v")
+    noko = diag.get("xbias_noko_at_peak_v")
+    nokx = diag.get("xbias_nokx_at_peak_v")
+    if tok is None or noko is None or nokx is None:
+        return None
+    if tok < MC_TOK_PRESENT_V:
+        return "tok-collapsed"
+    if nkg is not None and nkg > MC_NKG_LOW_V:
+        return "clamp-on"
+    if noko < MC_NOKO_DRIVEN_V:
+        return "first-stage-unbalanced"
+    if nokx > MC_NOKX_LOW_V:
+        return "output-stage-fight"
+    return "contradiction-nokx-low"
+
+
+def okdet_attribution(corners: list[dict]) -> dict:
+    """Aggregate OK-detector sub-attribution over an MC record's corners (pure).
+
+    Splits the no_transition realisations by their recorded `okdet_class`
+    (`mc_okdet_subclass`), and collects the measured settle signal (NBTOP - NA at the
+    sweep peak) and NOKO levels of the releasing samples beside the failing ones, so
+    the record can state the margin the detector actually had.  An enable-clamp sample
+    without xbias.* data is counted as `uninstrumented`, never folded into a class."""
+    sub_counts: dict[str | None, int] = {}
+    fail_signal, fail_noko, ok_noko, ok_signal = [], [], [], []
+    for c in corners:
+        for s in c["samples"]:
+            if s["valid"]:
+                if s.get("xbias_noko_at_peak_v") is not None:
+                    ok_noko.append(s["xbias_noko_at_peak_v"])
+                if s.get("xbias_nbtop_at_peak_v") is not None and s.get("xbias_na_at_peak_v") is not None:
+                    ok_signal.append(s["xbias_nbtop_at_peak_v"] - s["xbias_na_at_peak_v"])
+                continue
+            if "no_transition" not in (s.get("reason") or ""):
+                continue
+            if s.get("stuck_class") != "enable-clamp":
+                sub = "not-enable-clamp"
+            else:
+                sub = s.get("okdet_class")
+                if sub is None:
+                    sub = "uninstrumented"
+            sub_counts[sub] = sub_counts.get(sub, 0) + 1
+            if s.get("xbias_nbtop_at_peak_v") is not None and s.get("xbias_na_at_peak_v") is not None:
+                fail_signal.append(s["xbias_nbtop_at_peak_v"] - s["xbias_na_at_peak_v"])
+            if s.get("xbias_noko_at_peak_v") is not None:
+                fail_noko.append(s["xbias_noko_at_peak_v"])
+
+    def rng(v):
+        return None if not v else {"min": min(v), "max": max(v), "n": len(v)}
+
+    return {
+        "sub_counts": sub_counts,
+        "n_failed": sum(sub_counts.values()),
+        "failing_settle_signal_v": rng(fail_signal),
+        "failing_noko_at_peak_v": rng(fail_noko),
+        "releasing_noko_at_peak_v": rng(ok_noko),
+        "releasing_settle_signal_v": rng(ok_signal),
+    }
 
 
 def corner_mc_stats(samples: list[dict]) -> dict:
@@ -531,6 +642,7 @@ def mc_samples(rep: dict, man: dict, corners_dir: Path, run_dir: Path) -> list[d
             pt.update(mc_diag_fields(wave, tpeak_s))
         pt["valid"], pt["reason"] = classify_mc_sample(pt["extract"])
         pt["stuck_class"] = mc_stuck_class(pt) if not pt["valid"] and "no_transition" in (pt["reason"] or "") else None
+        pt["okdet_class"] = mc_okdet_subclass(pt) if pt.get("stuck_class") == "enable-clamp" else None
         ex = pt.get("extract") or {}
         pt["vup"] = ex.get("up", {}).get("vdd_v")
         pt["vdn"] = ex.get("down", {}).get("vdd_v")
@@ -758,8 +870,11 @@ MC_MARGIN_CONTEXT = (
 def mc_per_sample_csv(path: Path, samples: list[dict], proc: str, temp: float) -> None:
     cols = ["process", "temperature_c", "sample", "valid", "reason", "vpor_up_v", "vpor_down_v", "hysteresis_v",
             "vref_max_v", "klt_status", "runtime_s", "seed", "process_seed", "mismatch_seed",
-            "stuck_class", "bias_ok_max_v", "bias_ok_at_peak_v", "xdut_cmpo_max_v", "xdut_cmpo_at_peak_v",
-            "xdut_n1_at_peak_v", "xdut_sns_at_peak_v"]
+            "stuck_class", "okdet_class", "bias_ok_max_v", "bias_ok_at_peak_v", "xdut_cmpo_max_v", "xdut_cmpo_at_peak_v",
+            "xdut_n1_at_peak_v", "xdut_sns_at_peak_v",
+            "xbias_na_at_peak_v", "xbias_nbtop_at_peak_v", "settle_signal_at_peak_v",
+            "xbias_tok_at_peak_v", "xbias_nokl_at_peak_v", "xbias_noko_at_peak_v", "xbias_nokx_at_peak_v",
+            "xbias_nkg_at_peak_v", "xbias_pb_at_peak_v"]
     lines = [",".join(cols)]
     for s in samples:
         ex = s.get("extract") or {}
@@ -767,16 +882,22 @@ def mc_per_sample_csv(path: Path, samples: list[dict], proc: str, temp: float) -
         dn = (ex.get("down") or {}).get("vdd_v")
         hys = ex.get("hysteresis_v")
         vref = s.get("vref_max_v")
+        na, nbtop = s.get("xbias_na_at_peak_v"), s.get("xbias_nbtop_at_peak_v")
+        sig = None if na is None or nbtop is None else nbtop - na
         fmt = lambda x: "" if x is None else f"{x:.7g}"  # noqa: E731
         lines.append(",".join([
             proc, f"{temp:g}", str(s["sample"]), str(int(s["valid"])), (s.get("reason") or "").replace(",", ";"),
             fmt(up), fmt(dn), fmt(hys), fmt(vref),
             str(s.get("klt_status")), f"{s.get('runtime_s'):g}" if s.get("runtime_s") is not None else "",
             str(s.get("seed")), str(s.get("process_seed")), str(s.get("mismatch_seed")),
-            str(s.get("stuck_class") or ""),
+            str(s.get("stuck_class") or ""), str(s.get("okdet_class") or ""),
             fmt(s.get("bias_ok_max_v")), fmt(s.get("bias_ok_at_peak_v")),
             fmt(s.get("xdut_cmpo_max_v")), fmt(s.get("xdut_cmpo_at_peak_v")),
             fmt(s.get("xdut_n1_at_peak_v")), fmt(s.get("xdut_sns_at_peak_v")),
+            fmt(na), fmt(nbtop), fmt(sig),
+            fmt(s.get("xbias_tok_at_peak_v")), fmt(s.get("xbias_nokl_at_peak_v")),
+            fmt(s.get("xbias_noko_at_peak_v")), fmt(s.get("xbias_nokx_at_peak_v")),
+            fmt(s.get("xbias_nkg_at_peak_v")), fmt(s.get("xbias_pb_at_peak_v")),
         ]))
     path.write_text("\n".join(lines) + "\n")
 
@@ -834,6 +955,32 @@ def mc_mechanism_statement(stuck: list[tuple[dict, dict]]) -> str:
     return "**Mechanism: mixed across the " + f"{n} failed-release realisations** -- " + "; ".join(parts) + "."
 
 
+def mc_okdet_attribution_statement(att: dict) -> str:
+    """Data-driven attribution sentence for the OK-detector sub-classes (issue #455).
+
+    Reports the measured class split and the measured signal/NOKO ranges verbatim; the
+    device-level interpretation (which devices inside the named stage dominate) is NOT
+    asserted here -- the record's body carries that analysis beside its own arithmetic,
+    and this statement only says what the waveforms say."""
+    n = att["n_failed"]
+    if not n:
+        return "**No failed-release realisation to attribute.**"
+    counts = att["sub_counts"]
+    parts = [f"{v}x `{k}`" for k, v in sorted(counts.items(), key=lambda kv: -kv[1])]
+    L = [f"**OK-detector sub-attribution of the {n} failed-release realisations: " + ", ".join(parts) + ".**"]
+    fs, rs = att["failing_settle_signal_v"], att["releasing_settle_signal_v"]
+    if fs:
+        L.append(f"The failing realisations' own settle signal at the peak was {fs['min'] * 1e3:+.2f} to {fs['max'] * 1e3:+.2f} mV "
+                 f"(n = {fs['n']} instrumented)" + (f", against {rs['min'] * 1e3:+.2f} to {rs['max'] * 1e3:+.2f} mV (n = {rs['n']}) "
+                                                    "for the releasing realisations of the same corners" if rs else "") + ".")
+    fn, rn = att["failing_noko_at_peak_v"], att["releasing_noko_at_peak_v"]
+    if fn:
+        L.append(f"Their NOKO at the peak sat at {fn['min']:.3f}-{fn['max']:.3f} V"
+                 + (f", while every releasing realisation's NOKO sat at {rn['min']:.3f}-{rn['max']:.3f} V" if rn else "")
+                 + " -- the stage output, not the output stage, is where the realisations separate.")
+    return " ".join(L)
+
+
 def render_mc_md(rec: dict) -> str:
     man = rec["manifest_excerpt"]
     mc = rec["monte_carlo"]
@@ -867,13 +1014,20 @@ def render_mc_md(rec: dict) -> str:
              "1/sqrt(2(N-1)) of its valid N -- the number a future amendment must quote with any sigma from this table.")
     L.append("| corner | N valid/N run | VPOR-up mean ± sigma (V) | VPOR-down mean ± sigma (V) | hysteresis mean ± sigma (mV) | sigma resolution | excluded (of N) |")
     L.append("|---|---|---|---|---|---|---|")
+    any_uncond = any(c["stats"]["n_valid"] == c["stats"]["n_samples"] and c["stats"]["n_samples"] for c in rec["corners"])
     for c in rec["corners"]:
         cid = f"{c['process']}/{cr.fmt_temp(c['temperature_c'])}C"
         st = c["stats"]
         res = st["sigma_resolution"]
+        uncond = " (unconditional)" if st["n_valid"] == st["n_samples"] and st["n_samples"] else ""
         L.append(f"| {cid} | {st['n_valid']}/{st['n_samples']} | {fms(st['stats'], 'vpor_up_v')} | {fms(st['stats'], 'vpor_down_v')} | "
                  f"{fms(st['stats'], 'hysteresis_v', 1e3, '.1f')} | {f'{res:.1%}' if res is not None else 'n/a'} | "
-                 f"{len(st['excluded'])}{' (' + st['result'] + ')' if st['result'] != 'OK' else ''} |")
+                 f"{len(st['excluded'])}{' (' + st['result'] + ')' if st['result'] != 'OK' else ''}{uncond} |")
+    if any_uncond:
+        L.append("")
+        L.append("`unconditional` in the last column marks corners where **every** run sample carried both edges (0 exclusions): the "
+                 "mean/sigma of that corner are over ALL N run samples, not a releasing subset (issue #455 acceptance: unconditional "
+                 "sigmas, stated as such rather than inferred from the N valid/N run column).")
     L.append("")
     excl = [(c, e) for c in rec["corners"] for e in c["stats"]["excluded"]]
     if excl:
@@ -918,6 +1072,34 @@ def render_mc_md(rec: dict) -> str:
             L.append("")
             L.append(mc_mechanism_statement(stuck))
             L.append("")
+            # OK-detector sub-attribution (issue #455): where inside the enable path.
+            instrumented = [(c, s) for c, s in stuck if s.get("xbias_noko_at_peak_v") is not None]
+            if instrumented:
+                L.append("### OK-detector sub-attribution (issue #455)")
+                L.append(f"Per-sample levels of the bias_core OK-detector's own nodes at the sweep peak (linearly interpolated at "
+                         f"t = tstop/2), for the failed-release realisations the netlist instruments (the testbench saves "
+                         f"`v(xbias.*)` since issue #455; realisations from records before that change carry no such fields and are "
+                         f"not guessed). `settle signal` is V(NBTOP) - V(NA) -- the I*RT drop across `XRT` is the detector's entire "
+                         "input signal, so the table shows each failing realisation's own signal beside the stage that failed to "
+                         "respond to it. Classification labels (criteria are constants of this driver, stated beside the raw values): "
+                         f"`first-stage-unbalanced` = TOK >= {MC_TOK_PRESENT_V:g} V and NKG <= {MC_NKG_LOW_V:g} V (tail present, clamp off) "
+                         f"yet NOKO < {MC_NOKO_DRIVEN_V:g} V -- the XMOKA/XMOKB + XML1/XML2 stage never delivered net current to NOKO; "
+                         f"`output-stage-fight` = NOKO >= {MC_NOKO_DRIVEN_V:g} V yet NOKX > {MC_NOKX_LOW_V:g} V -- XMOK2 lost the ratio "
+                         f"fight against XMOK2P; `tok-collapsed` = TOK < {MC_TOK_PRESENT_V:g} V; `clamp-on` = NKG > {MC_NKG_LOW_V:g} V.")
+                L.append("")
+                L.append("| corner | sample | class | NA @peak (V) | NBTOP @peak (V) | settle signal (mV) | TOK @peak (V) | NOKL @peak (V) | NOKO @peak (V) | NOKX @peak (V) | NKG @peak (V) |")
+                L.append("|---|---|---|---|---|---|---|---|---|---|---|")
+                for c, s in instrumented:
+                    na, nbtop = s.get("xbias_na_at_peak_v"), s.get("xbias_nbtop_at_peak_v")
+                    sig = None if na is None or nbtop is None else (nbtop - na) * 1e3
+                    fmtv = lambda k: "n/a" if s.get(k) is None else f"{s[k]:.3f}"  # noqa: E731
+                    L.append(f"| {c['process']}/{cr.fmt_temp(c['temperature_c'])}C | mc{s['sample']} | {s.get('okdet_class') or 'n/a'} | "
+                             f"{fmtv('xbias_na_at_peak_v')} | {fmtv('xbias_nbtop_at_peak_v')} | "
+                             f"{'n/a' if sig is None else f'{sig:+.2f}'} | {fmtv('xbias_tok_at_peak_v')} | {fmtv('xbias_nokl_at_peak_v')} | "
+                             f"{fmtv('xbias_noko_at_peak_v')} | {fmtv('xbias_nokx_at_peak_v')} | {fmtv('xbias_nkg_at_peak_v')} |")
+                L.append("")
+                L.append(mc_okdet_attribution_statement(okdet_attribution(rec["corners"])))
+                L.append("")
     if rec.get("reproduction"):
         r = rec["reproduction"]
         L.append(f"## Reproduction of record {r['against']} (seed-for-seed)")
@@ -983,7 +1165,7 @@ def cmd_record_mc(args, man: dict, run_dir: Path, meta: dict) -> int:
     if git_info["dirty"] and not args.allow_dirty:
         raise SystemExit("working tree is dirty: commit first so the record carries a clean-tree SHA")
     now = datetime.now(timezone.utc)
-    mc = man["monte_carlo"]
+    mc = mc_effective(man, meta.get("monte_carlo"))
     variant = meta["variants"][0]
     stamp = now
     record_id = f"{stamp:%Y%m%d}-{stamp:%H%M%S}-{git_info['sha']}-{variant}-mismatch-mc"
@@ -991,7 +1173,7 @@ def cmd_record_mc(args, man: dict, run_dir: Path, meta: dict) -> int:
     corners_dir = evidence_store.stage_dir_for(SLUG, record_id)  # git-ignored scratch; stored below
     sim_common.refuse_existing((rec_dir / f"{record_id}.md", rec_dir / f"{record_id}.json", corners_dir, snap_dir, evidence_store.manifest_path(SLUG, record_id)))
     v = man["variants"][variant]
-    units = [(p, t, o) for p, t, o in mc_units(man)]
+    units = [(p, t, o) for p, t, o in mc_units(man, mc)]
     submit_git = {}
     for mf in sorted(run_dir.glob("run*.json"), key=lambda p: p.stat().st_mtime):
         m = json.loads(mf.read_text())
@@ -1002,7 +1184,7 @@ def cmd_record_mc(args, man: dict, run_dir: Path, meta: dict) -> int:
     for proc, temp, offset in units:
         d = mc_dir(run_dir, variant, proc, temp)
         cid = f"{proc}_{cr.fmt_temp(temp)}c"
-        rq = {"process": proc, "temperature_c": temp, "seed_offset": offset, "seed": mc_request_seed(man, offset),
+        rq = {"process": proc, "temperature_c": temp, "seed_offset": offset, "seed": mc_request_seed(mc, offset),
               "n": mc["n_per_corner"], "tag": f"mc_{cid}", "rate_v_per_s": mc["rate_v_per_s"],
               "tstop_s": tstop_for(mc["rate_v_per_s"], man)}
         attempts = sim_common.attempt_messages(d, run_dir, REPO_ROOT)
@@ -1048,8 +1230,10 @@ def cmd_record_mc(args, man: dict, run_dir: Path, meta: dict) -> int:
         "run_git": meta.get("git"),
         "monte_carlo": {"n_per_corner": mc["n_per_corner"], "seed": mc["seed"], "vary": mc["vary"],
                         "statistical_convention": mc["statistical_convention"], "request_sizing": mc["request_sizing"],
-                        "seed_offsets": mc["seed_offsets"]},
-        "matrix": {"axis": "mc", "process": processes(man, "mc"), "temperature_c": mc["temperature_c"], "peak_v": man["sweep"]["peak_v"],
+                        "seed_offsets": mc["seed_offsets"],
+                        "process_override": (meta.get("monte_carlo") or {}).get("process_override"),
+                        "seed_override": (meta.get("monte_carlo") or {}).get("seed_override")},
+        "matrix": {"axis": "mc", "process": mc["process"], "temperature_c": mc["temperature_c"], "peak_v": man["sweep"]["peak_v"],
                    "rates_v_per_s": [mc["rate_v_per_s"]], "n_corners": len(units), "is_subset": True,
                    "axis_note": "mismatch Monte Carlo supplement: real-bias-core only, _mm sections (local mismatch), primary rate only, no half-rate guard"},
         "definitions": {**man["grading"]["definitions"],
@@ -1202,6 +1386,8 @@ def main(argv: list[str]) -> int:
     r = sub.add_parser("run")
     r.add_argument("--variant", action="append", choices=variants)
     r.add_argument("--axis", choices=AXES, default="main", help="main = tt/ss/ff/sf/fs (the 5x3 grid); passive-skew = ll/hh resistor/cap sections (separate records); mc = mismatch Monte Carlo supplement (real-bias-core, tt/ss x -40/27/125 C, one request per (process, temperature), issue #348)")
+    r.add_argument("--mc-process", action="append", help="mc axis only: override the monte_carlo.process list (repeat once per process, e.g. --mc-process tt --mc-process ff); recorded in run.json and honored by record (issue #455 fresh-seed ff/sf/fs extension)")
+    r.add_argument("--mc-seed", type=int, help="mc axis only: override the monte_carlo.seed base (fresh-seed campaign; recorded in run.json and honored by record)")
     r.add_argument("--jobs", type=int, default=2, help="concurrent fleet submissions (max 2)")
     r.add_argument("--run-id")
     r.add_argument("--retry-failed", action="store_true")
