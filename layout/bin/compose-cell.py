@@ -170,10 +170,11 @@ first exercised by ``layout/ro_ring5/``:
     Element-card name prefixes removed from the generated reference. A
     ``+`` continuation line after a removed card is removed with it. Whatever
     this removes is an *LVS exclusion* and must be disclosed in the cell's
-    README (``layout/temp_por_top/`` drops ``XMASSIST``, a native-Vt NMOS,
-    from its block-level reference; ``layout/por_output_chain/`` drew that
-    device and dropped the exclusion once klayout-tools grew the ``nvt``
-    voltage flavor -- see that README's blocker history).
+    README (``layout/por_output_chain/`` once dropped ``XMASSIST``, a
+    native-Vt NMOS, from its reference, then drew that device and retired the
+    exclusion once klayout-tools grew the ``nvt`` voltage flavor -- see that
+    README's blocker history; ``layout/temp_por_top/`` has since retired it
+    too).
 ``lvs.expand_multiplier``
     Names of element cards carrying ``m=N`` that are rewritten as N
     single-instance cards (``<name>_0``..) because ``klt lvs``'s plain-element

@@ -20,7 +20,7 @@ The signoff report grades `layout/temp_por_top/` at **7 of 11 T1 items met**.
 | 1 Design sources | met | `design/` (four leaf cells and `temp_por_top`), attested in `manifests/attestations/` |
 | 2 Layout | met | `layout/temp_por_top/temp_por_top.gds` (#240) |
 | 3 DRC clean | met | `layout/temp_por_top/drc.json` |
-| 4 LVS clean | met, with an exclusion | `layout/temp_por_top/lvs.json`: 152/152 devices with native-Vt `XMASSIST` excluded (#97) — pending re-render of `temp_por_top`, not a tool limit (the leaf draws it at klt `0.9.2`, PR #419) |
+| 4 LVS clean | met | `layout/temp_por_top/lvs.json`: `match` 153/153 devices, 71/71 nets, native-Vt `XMASSIST` included — no exclusion (re-rendered at klt `0.9.2`, #453). The compare is flavour-blind until the 5 V devices' `hvi` marker can be drawn (klayout-tools#6025) |
 | 5 Corner verification vs a ratified spec | unmet | only two of eight spec rows are ratified (DR-003) |
 | 6 Monte Carlo for statistical claims | unmet | MC records exist under `sim/` as harness records, not as envelopes the report accepts, and back no ratified row |
 | 7 Post-layout verification | unmet | `klt pex` artifacts exist for `por_comparator` only (`layout/por_comparator/pex/`, #124) |
@@ -93,9 +93,15 @@ Unblocked by a named item above or by a ruling listed under "Blocked and waiting
 - **Block-level post-layout verification (item 7).** *Can `klt pex` extract
   `temp_por_top` given the pin-order and MOS-flavour limits recorded in
   `layout/por_comparator/pex/README.md`?*
-- **Full-block LVS.** The question is answered — klt draws and compares the
-  native-Vt NMOS at the klt `0.9.2` pin (#97, closed) — so the path to an
-  item-4 match with no exclusion is the `temp_por_top` re-render.
+- **Full-block LVS.** Answered and delivered — klt draws and compares the
+  native-Vt NMOS at the klt `0.9.2` pin (#97, closed), and the `temp_por_top`
+  re-render (#453) matches 153/153 devices with no exclusion. What remains
+  open is the flavour-aware compare: drawing the 5 V devices' own `hvi`
+  marker is blocked at this pin by
+  [klayout-tools#6025](https://github.com/2AMLogic/klayout-tools/issues/6025);
+  the fix merged after `0.9.2` in
+  [klayout-tools PR #6185](https://github.com/2AMLogic/klayout-tools/pull/6185)
+  (`89b2cc61a9c4`), so it needs a klt release containing that commit.
 - **Remaining ladder rungs** from the README: post-layout re-verification,
   shuttle seat, measured silicon (`measurements/` is empty by design).
 
@@ -104,14 +110,16 @@ Unblocked by a named item above or by a ruling listed under "Blocked and waiting
 - **#137, ratification of DR-004 and DR-005**: waits on the two independent keys
   (triage note of 2026-10-15). DR-006 and DR-007 have no ratification issue.
   This gates items 5 and 6.
-- **#97 follow-on, `temp_por_top` re-render with `XMASSIST`**: #97 itself is
-  closed completed — no longer tool-blocked
-  ([klayout-tools#2912](https://github.com/2AMLogic/klayout-tools/issues/2912)
-  closed; the leaf draws and compares the device at the klt `0.9.2` pin,
-  PR #419, merged). What remains: the `temp_por_top` re-render that retires
-  the block-level LVS exclusion, and the flavour-blind compare limit —
-  drawing the 5V devices' own `hvi` marker is blocked by
-  [klayout-tools#6025](https://github.com/2AMLogic/klayout-tools/issues/6025).
+- **#97 follow-on, flavour-aware LVS**: the `temp_por_top` re-render is done
+  (#453 — the top embeds the current leaf stream, its LVS matches 153/153
+  with no exclusion, and the block-level `lvs.drop_prefixes` entry is
+  retired). What remains is the flavour-blind compare limit: drawing the 5V
+  devices' own `hvi` marker was blocked by
+  [klayout-tools#6025](https://github.com/2AMLogic/klayout-tools/issues/6025);
+  the fix merged after the `0.9.2` pin in
+  [klayout-tools PR #6185](https://github.com/2AMLogic/klayout-tools/pull/6185)
+  (`89b2cc61a9c4`), so a flavoured compare plus the leaf re-render it needs
+  waits on a klt release containing that commit.
 - **#153, tightened-solver brown-out re-run**: four pilots hit the 3600 s job
   limit; waits on a choice among the three options in the issue body.
 - **#327, `corner-run.py` batch path**: waits on a ruling on whether to also

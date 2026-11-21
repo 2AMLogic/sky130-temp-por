@@ -213,13 +213,13 @@
         "command": null,
         "kind": "generic",
         "check_status": "pass",
-        "content_hash": "sha256:8ff2d4dbffe7329f8f8e35450be575c0181ae41cc1beaac7d6e175d30c4b89d8",
+        "content_hash": "sha256:807e41b3745592854b1f8e005c1e60a9314d22f909de684993b782501f775d59",
         "input_verified": true,
         "exit_status": 0,
         "artifact_binding": {
           "t1_item": 2,
           "path": null,
-          "content_hash": "sha256:8ff2d4dbffe7329f8f8e35450be575c0181ae41cc1beaac7d6e175d30c4b89d8",
+          "content_hash": "sha256:807e41b3745592854b1f8e005c1e60a9314d22f909de684993b782501f775d59",
           "input_verified": true,
           "members": [
             {
@@ -227,7 +227,7 @@
                 "path": "layout/temp_por_top/cell.json",
                 "scope": "repo"
               },
-              "content_hash": "sha256:99ae60a6d28f02ef771b5c98e6034cde8027a770db2ae6db8905683dabb9e084",
+              "content_hash": "sha256:345b913ad416a94bd33678fa9e5cacda3ae17a91d8dc5fbe8b23bc4b9d7d8290",
               "status": "verified"
             },
             {
@@ -235,15 +235,15 @@
                 "path": "layout/temp_por_top/temp_por_top.gds",
                 "scope": "repo"
               },
-              "content_hash": "sha256:1af73f5f94333939d5a16268144a396055e88ae9ed1f78f9644676332ca40539",
+              "content_hash": "sha256:746e20de5eb873458d15ec7830b45d9bd919db6a4bb1dabae752341be48157e5",
               "status": "verified"
             }
           ],
-          "summary": "T1 item 2 (Layout): layout/temp_por_top/temp_por_top.gds is composed from the four committed leaf streams by layout/bin/compose-cell.py and rebuilds byte-for-byte. Attests presence and reproducibility only; not a verification claim. Recorded and NOT cited: DRC clean (0 violations) under the pinned klt 758c6e224053; ERC 2 erc.missing_tie (temp_core XMI1/XMI2 nwells, bulk NT by design), LVS match 152/152 with native-Vt XMASSIST excluded (#97). See layout/temp_por_top/README.md.",
+          "summary": "T1 item 2 (Layout): layout/temp_por_top/temp_por_top.gds is composed from the four committed leaf streams by layout/bin/compose-cell.py and rebuilds byte-for-byte. Attests presence and reproducibility only; not a verification claim. Recorded and NOT cited: DRC clean (0 violations), ERC clean (0 findings), LVS match 153/153 devices 71/71 nets with the native-Vt XMASSIST included, no exclusions -- all under the pinned klt 0.9.2 (046ba74652fc). See layout/temp_por_top/README.md.",
           "source": "layout/temp_por_top/cell.json",
           "regeneration": {
             "generator": "python3 layout/bin/compose-cell.py layout/temp_por_top/cell.json --check",
-            "regenerated_hash": "sha256:8ff2d4dbffe7329f8f8e35450be575c0181ae41cc1beaac7d6e175d30c4b89d8",
+            "regenerated_hash": "sha256:807e41b3745592854b1f8e005c1e60a9314d22f909de684993b782501f775d59",
             "executed_by_klt": false
           }
         }
@@ -264,7 +264,7 @@
         "command": null,
         "kind": "drc",
         "check_status": "clean",
-        "content_hash": "sha256:1af73f5f94333939d5a16268144a396055e88ae9ed1f78f9644676332ca40539",
+        "content_hash": "sha256:746e20de5eb873458d15ec7830b45d9bd919db6a4bb1dabae752341be48157e5",
         "input_verified": true,
         "exit_status": 0,
         "coverage": {
@@ -287,16 +287,12 @@
             "capm2.width.1",
             "dnwell.angle.1",
             "dnwell.ongrid.1",
-            "hvi.angle.1",
-            "hvi.ongrid.1",
             "hvntm.angle.1",
             "hvntm.ongrid.1",
             "hvtp.angle.1",
             "hvtp.ongrid.1",
             "hvtr.angle.1",
             "hvtr.ongrid.1",
-            "lvtn.angle.1",
-            "lvtn.ongrid.1",
             "met4.enclosing.capm2.1",
             "mf.angle.1",
             "mf.ongrid.1",
@@ -304,7 +300,6 @@
             "ncm.ongrid.1",
             "nsm.angle.1",
             "nsm.ongrid.1",
-            "nwell.enclosed.hvi.1",
             "pad.angle.1",
             "pad.ongrid.1",
             "pwbm.angle.1",
@@ -337,8 +332,11 @@
             "m3",
             "m4",
             "m5",
+            "npc",
+            "nsdm",
             "nwell",
             "poly",
+            "psdm",
             "rpm",
             "urpm",
             "via",
@@ -365,7 +363,7 @@
         "command": null,
         "kind": "lvs",
         "check_status": "match",
-        "content_hash": "sha256:36c13e22d38fdba691c9342bb80bfff189c559be266fcdbfd84f0b81941ce714",
+        "content_hash": "sha256:7943002dba1f6c4d8d9532bf38a3c7f8074783fdba70ebd9915b469dc33d0fcb",
         "input_verified": true,
         "exit_status": 0
       }
@@ -517,7 +515,7 @@
         "command": null,
         "kind": "erc",
         "check_status": "not_checked",
-        "content_hash": "sha256:1af73f5f94333939d5a16268144a396055e88ae9ed1f78f9644676332ca40539",
+        "content_hash": "sha256:746e20de5eb873458d15ec7830b45d9bd919db6a4bb1dabae752341be48157e5",
         "input_verified": true,
         "exit_status": 0,
         "parts": [
@@ -526,7 +524,7 @@
             "command": null,
             "kind": "erc",
             "check_status": "not_checked",
-            "content_hash": "sha256:1af73f5f94333939d5a16268144a396055e88ae9ed1f78f9644676332ca40539",
+            "content_hash": "sha256:746e20de5eb873458d15ec7830b45d9bd919db6a4bb1dabae752341be48157e5",
             "input_verified": true,
             "exit_status": 0
           },
@@ -535,7 +533,7 @@
             "command": null,
             "kind": "lvs",
             "check_status": "match",
-            "content_hash": "sha256:36c13e22d38fdba691c9342bb80bfff189c559be266fcdbfd84f0b81941ce714",
+            "content_hash": "sha256:7943002dba1f6c4d8d9532bf38a3c7f8074783fdba70ebd9915b469dc33d0fcb",
             "input_verified": true,
             "exit_status": 0
           }
@@ -556,6 +554,10 @@
             "erc.missing_tie:[\"nwell_vdd\"]"
           ],
           "supply_unlabelled_islands": {},
+          "substrate_continuity": {
+            "checked": true,
+            "by_assertion": false
+          },
           "disclosed_undeclared_tie_classes": [
             {
               "class": "p_substrate",

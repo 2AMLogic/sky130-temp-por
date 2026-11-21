@@ -115,9 +115,10 @@ routes with `klt gen-compose` (`compose.request.json` /
 (`drc.json`, `extract.json`, `por_output_chain.spice`, `lvs.request.json`,
 `lvs.json`). `promo_stub.gds` and `promo_stub_v.gds` are byte copies of the
 declare-only pad stubs the other cells use. `layout/pdk.json`'s klt pin moved
-to `0.9.2` for this increment — scoped to this directory: the other cells'
-committed evidence stays at the builds that produced it, pending a block-wide
-re-render.
+to `0.9.2` for this increment — scoped to this directory at the time: the
+other cells' committed evidence stays at the builds that produced it
+(`temp_por_top` has since been re-rendered at `0.9.2` by #453; the remaining
+leaves await their own re-render).
 
 `--check` rebuilds in a temp directory and compares `status`/counts/bbox
 fields (the `drc.json`, `extract.json`, `lvs.json` and `compose.response.json`
@@ -306,8 +307,8 @@ section above.
 5. **No ERC, no parasitic extraction, no simulation** of the laid-out cell.
    `sim/` is untouched.
 6. **Not a signoff citation.** `manifests/` is not cited from this
-   directory. The block-level `temp_por_top` assembly still embeds the
-   **pre-`massist` bytes** of this stream and its own LVS still excludes
-   `XMASSIST` (see `layout/temp_por_top/README.md`); recomposing it and
-   refreshing its attestations belongs to the block-wide re-render, not to
-   this leaf-scoped increment.
+   directory. The block-level `temp_por_top` assembly embeds the current
+   (post-`massist`) bytes of this stream since its #453 re-render, and its
+   LVS matches 153/153 with `XMASSIST` included and no exclusion (see
+   `layout/temp_por_top/README.md`). What still travels from this leaf to
+   the block compare is the flavour-blind limit of gaps 1-2.

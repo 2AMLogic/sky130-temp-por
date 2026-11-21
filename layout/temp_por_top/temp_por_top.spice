@@ -226,57 +226,60 @@ M$13 RSTB TRIP NNAND VSS\x7cvss nfet L=0.5U W=2U AS=0.84P AD=0.84P PS=4.84U
 * device instance $14 r0 *1 0,0 nfet
 M$14 EN\x7cRESETn RSTB VSS\x7cvss VSS\x7cvss nfet L=0.5U W=10U AS=4.2P AD=4.2P
 + PS=20.84U PD=20.84U
-* device instance $15 r0 *1 0,0 pfet
-M$15 PDN PDN VDD\x7cvdd VDD\x7cvdd pfet L=10U W=2U AS=0.84P AD=0.84P PS=4.84U
-+ PD=4.84U
+* device instance $15 r0 *1 0,0 nfet
+M$15 EN\x7cRESETn VDD\x7cvdd VSS\x7cvss VSS\x7cvss nfet L=25U W=1U AS=0.42P
++ AD=0.42P PS=2.84U PD=2.84U
 * device instance $16 r0 *1 0,0 pfet
-M$16 NDL PDN VDD\x7cvdd VDD\x7cvdd pfet L=10U W=2U AS=0.84P AD=0.84P PS=4.84U
+M$16 PDN PDN VDD\x7cvdd VDD\x7cvdd pfet L=10U W=2U AS=0.84P AD=0.84P PS=4.84U
 + PD=4.84U
 * device instance $17 r0 *1 0,0 pfet
-M$17 NTS PDN VDD\x7cvdd VDD\x7cvdd pfet L=10U W=0.5U AS=0.21P AD=0.21P PS=1.84U
-+ PD=1.84U
-* device instance $18 r0 *1 0,0 pfet
-M$18 NDGP PDN VDD\x7cvdd VDD\x7cvdd pfet L=10U W=10U AS=4.2P AD=4.2P PS=20.84U
-+ PD=20.84U
-* device instance $19 r0 *1 0,0 pfet
-M$19 NDG POR_RAW NDGP VDD\x7cvdd pfet L=0.5U W=1U AS=0.42P AD=0.42P PS=2.84U
-+ PD=2.84U
-* device instance $20 r0 *1 0,0 pfet
-M$20 PGDG NDG VDD\x7cvdd VDD\x7cvdd pfet L=2U W=0.5U AS=0.21P AD=0.21P PS=1.84U
-+ PD=1.84U
-* device instance $21 r0 *1 0,0 pfet
-M$21 PGDGB PGDG VDD\x7cvdd VDD\x7cvdd pfet L=0.5U W=2U AS=0.84P AD=0.84P
-+ PS=4.84U PD=4.84U
-* device instance $22 r0 *1 0,0 pfet
-M$22 TIM PGDGB NTS VDD\x7cvdd pfet L=1U W=2U AS=0.84P AD=0.84P PS=4.84U PD=4.84U
-* device instance $23 r0 *1 0,0 pfet
-M$23 ND1 TIM VDD\x7cvdd VDD\x7cvdd pfet L=1U W=2U AS=0.84P AD=0.84P PS=4.84U
+M$17 NDL PDN VDD\x7cvdd VDD\x7cvdd pfet L=10U W=2U AS=0.84P AD=0.84P PS=4.84U
 + PD=4.84U
+* device instance $18 r0 *1 0,0 pfet
+M$18 NTS PDN VDD\x7cvdd VDD\x7cvdd pfet L=10U W=0.5U AS=0.21P AD=0.21P PS=1.84U
++ PD=1.84U
+* device instance $19 r0 *1 0,0 pfet
+M$19 NDGP PDN VDD\x7cvdd VDD\x7cvdd pfet L=10U W=10U AS=4.2P AD=4.2P PS=20.84U
++ PD=20.84U
+* device instance $20 r0 *1 0,0 pfet
+M$20 NDG POR_RAW NDGP VDD\x7cvdd pfet L=0.5U W=1U AS=0.42P AD=0.42P PS=2.84U
++ PD=2.84U
+* device instance $21 r0 *1 0,0 pfet
+M$21 PGDG NDG VDD\x7cvdd VDD\x7cvdd pfet L=2U W=0.5U AS=0.21P AD=0.21P PS=1.84U
++ PD=1.84U
+* device instance $22 r0 *1 0,0 pfet
+M$22 PGDGB PGDG VDD\x7cvdd VDD\x7cvdd pfet L=0.5U W=2U AS=0.84P AD=0.84P
++ PS=4.84U PD=4.84U
+* device instance $23 r0 *1 0,0 pfet
+M$23 TIM PGDGB NTS VDD\x7cvdd pfet L=1U W=2U AS=0.84P AD=0.84P PS=4.84U PD=4.84U
 * device instance $24 r0 *1 0,0 pfet
-M$24 TRIP PDN VDD\x7cvdd VDD\x7cvdd pfet L=10U W=0.5U AS=0.21P AD=0.21P
-+ PS=1.84U PD=1.84U
+M$24 ND1 TIM VDD\x7cvdd VDD\x7cvdd pfet L=1U W=2U AS=0.84P AD=0.84P PS=4.84U
++ PD=4.84U
 * device instance $25 r0 *1 0,0 pfet
-M$25 RSTB PGDG VDD\x7cvdd VDD\x7cvdd pfet L=0.5U W=4U AS=1.68P AD=1.68P
-+ PS=8.84U PD=8.84U
+M$25 TRIP PDN VDD\x7cvdd VDD\x7cvdd pfet L=10U W=0.5U AS=0.21P AD=0.21P
++ PS=1.84U PD=1.84U
 * device instance $26 r0 *1 0,0 pfet
-M$26 RSTB TRIP VDD\x7cvdd VDD\x7cvdd pfet L=0.5U W=4U AS=1.68P AD=1.68P
+M$26 RSTB PGDG VDD\x7cvdd VDD\x7cvdd pfet L=0.5U W=4U AS=1.68P AD=1.68P
 + PS=8.84U PD=8.84U
 * device instance $27 r0 *1 0,0 pfet
-M$27 RSTB EN\x7cRESETn VDD\x7cvdd VDD\x7cvdd pfet L=10U W=0.5U AS=0.21P
-+ AD=0.21P PS=1.84U PD=1.84U
+M$27 RSTB TRIP VDD\x7cvdd VDD\x7cvdd pfet L=0.5U W=4U AS=1.68P AD=1.68P
++ PS=8.84U PD=8.84U
 * device instance $28 r0 *1 0,0 pfet
-M$28 EN\x7cRESETn RSTB VDD\x7cvdd VDD\x7cvdd pfet L=1U W=1U AS=0.42P AD=0.42P
+M$28 RSTB EN\x7cRESETn VDD\x7cvdd VDD\x7cvdd pfet L=10U W=0.5U AS=0.21P
++ AD=0.21P PS=1.84U PD=1.84U
+* device instance $29 r0 *1 0,0 pfet
+M$29 EN\x7cRESETn RSTB VDD\x7cvdd VDD\x7cvdd pfet L=1U W=1U AS=0.42P AD=0.42P
 + PS=2.84U PD=2.84U
-* device instance $29 r0 *1 0,0 sky130_fd_pr__model__cap_mim
-C$29 VSS\x7cvss NDG 2.5036e-13
 * device instance $30 r0 *1 0,0 sky130_fd_pr__model__cap_mim
-C$30 VSS\x7cvss TIM 1.58928e-12
+C$30 VSS\x7cvss NDG 2.5036e-13
 * device instance $31 r0 *1 0,0 sky130_fd_pr__model__cap_mim
 C$31 VSS\x7cvss TIM 1.58928e-12
 * device instance $32 r0 *1 0,0 sky130_fd_pr__model__cap_mim
 C$32 VSS\x7cvss TIM 1.58928e-12
 * device instance $33 r0 *1 0,0 sky130_fd_pr__model__cap_mim
 C$33 VSS\x7cvss TIM 1.58928e-12
+* device instance $34 r0 *1 0,0 sky130_fd_pr__model__cap_mim
+C$34 VSS\x7cvss TIM 1.58928e-12
 .ENDS por__por_output_chain
 
 * cell cmp__por_comparator

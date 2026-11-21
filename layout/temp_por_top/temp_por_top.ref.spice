@@ -196,6 +196,8 @@ XMOP RESETn RSTB VDD VDD sky130_fd_pr__pfet_g5v0d10v5 L=1u W=1u nf=1 ad=0.29 as=
 + sd=0 mult=1 m=1
 XMON RESETn RSTB VSS VSS sky130_fd_pr__nfet_g5v0d10v5 L=0.5u W=10u nf=1 ad=2.9 as=2.9 pd=20.58 ps=20.58 nrd=0.029 nrs=0.029 sa=0
 + sb=0 sd=0 mult=1 m=1
+XMASSIST RESETn VDD VSS VSS sky130_fd_pr__nfet_05v0_nvt L=25u W=1u nf=1 ad=0.29 as=0.29 pd=2.58 ps=2.58 nrd=0.29 nrs=0.29 sa=0 sb=0
++ sd=0 mult=1 m=1
 .ends
 
 .subckt temp_core VDD VSS IBIAS EN PTAT CTAT

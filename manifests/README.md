@@ -153,17 +153,15 @@ part of the claim and travel with it):
   the envelope unless the rebuild is byte-identical. Any edit to either file
   (or to a leaf stream the top embeds) turns the row `stale_evidence`.
   **What it does not claim:** presence and reproducibility only. The top's
-  recorded checks are *not* clean and are not cited — DRC is
-  clean (0 violations, #243: leaf streams regenerated at the pinned klt), ERC
-  clean (#260), and an LVS `match` (152/152
-  devices, 71/71 nets) that excludes the native-Vt `XMASSIST` (#97 — the
-  tool gap that forced the exclusion is since fixed upstream, and the leaf
-  itself now draws the device; the committed top evidence predates that and
-  still carries the exclusion until its own re-render). See
+  recorded checks are *not* cited — DRC is clean (0 violations), ERC clean
+  (0 findings), and an LVS `match` (153/153 devices, 71/71 nets) with the
+  native-Vt `XMASSIST` included and no exclusion (#453 re-rendered the top
+  from the current leaf streams at klt `0.9.2`; the compare stays
+  flavour-blind, see item 4 below). See
   `layout/temp_por_top/README.md`.
 - **Item 3 — DRC clean: `met`** via `layout/temp_por_top/drc.json` (`status:
   clean`, 0 violations), pinned to
-  `content_hash sha256:1af73f5f…ca40539`, the sha256 of the committed
+  `content_hash sha256:746e20de…48157e5`, the sha256 of the committed
   `layout/temp_por_top/temp_por_top.gds` the run executed on, so the
   citation is provably fresh against the current artifact (CI re-asserts
   this). T1 is block-scoped (#259), so this grades the block's own layout,
@@ -178,15 +176,20 @@ part of the claim and travel with it):
   acceptable — it asserts the run was clean inside the coverage it had, and
   this README is where the gaps are disclosed.
 - **Item 4 — LVS clean: `met`** via `layout/temp_por_top/lvs.json`. The
-  block-level `temp_por_top` LVS reports `status: match`, **152/152
-  devices and 71/71 nets**. **Not proven by this envelope:** it is not a
-  full-block compare. The committed evidence excludes the native-Vt
-  `XMASSIST` device via `lvs.drop_prefixes` — the exclusion klayout-tools#2912
-  once forced. That gap is since fixed upstream (klt `0.9.2` draws and
-  compares the device, and the `por_output_chain` leaf uses that with no
-  exclusion, #97), but the committed top evidence predates it and still
-  carries the exclusion until `temp_por_top` is recomposed against the
-  new leaf stream; see `layout/temp_por_top/README.md`. It also
+  block-level `temp_por_top` LVS reports `status: match`, **153/153
+  devices and 71/71 nets**, with the native-Vt `XMASSIST`
+  (`sky130_fd_pr__nfet_05v0_nvt`) included on both sides — the #453
+  re-render recomposed the top from the current leaf streams and retired the
+  `lvs.drop_prefixes` exclusion that klayout-tools#2912 once forced, so this
+  is a full-block compare. **Not proven by this envelope:** the compare is
+  flavour-blind — the extracted netlist bins MOS generically, so the match
+  proves the card's topology and `L`/`W`, not the native-Vt flavour binding
+  itself; a flavoured compare additionally needs the 28 5 V devices drawn
+  with their `hvi` marker, blocked at this pin by
+  [klayout-tools#6025](https://github.com/2AMLogic/klayout-tools/issues/6025)
+  (fix merged after `0.9.2` in
+  [klayout-tools PR #6185](https://github.com/2AMLogic/klayout-tools/pull/6185),
+  `89b2cc61a9c4`). It also
   carries disclosed warnings: the `PNP` compare is scoped to `NE`, so `AE`
   is not verified; the reference has `R=0`/`C=0` placeholders on the
   `res_xhigh_po` and MiM caps, so their values are not compared; and the
@@ -248,12 +251,15 @@ part of the claim and travel with it):
 - **Item 11 — Power delivery (structural): `met`**
   (#259, #260). It cites the block-level
   `layout/temp_por_top/erc.json` (pinned to the GDS
-  `sha256:1af73f5f…ca40539`, the same pin as item 3) and item 4's
+  `sha256:746e20de…48157e5`, the same pin as item 3) and item 4's
   `layout/temp_por_top/lvs.json`. The ERC run uses the block-specific supply
   spec (`layout/temp_por_top/erc-supply-spec.json`, with the `NT` well tie
   for the `temp_core` nwells of `XMI1`/`XMI2`) and reports
-  `erc_status: clean`. VDD and VSS are each one island at the top. The LVS
-  half carries the same `XMASSIST` exclusion as item 4. Until #259 this row
+  `erc_status: clean`; at klt `0.9.2` it is run with `--deck sky130`, which
+  the build needs to decide substrate isolation for `erc.supply_short`
+  (without the deck the check reports `substrate_isolation_undecidable` and
+  this row goes `unmet`). VDD and VSS are each one island at the top. The LVS
+  half is item 4's full-block match (153/153, no exclusion). Until #259 this row
   cited `layout/bias_core/`, which overclaimed: T1 is block-scoped, and the
   `bias_core` evidence (`layout/bias_core/erc.json`,
   `pad-island-census.json`) is sub-block evidence only and is not cited.
