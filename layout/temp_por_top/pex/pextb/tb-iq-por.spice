@@ -1,0 +1,35 @@
+* klt pex block-level testbench (issue #454 step 3): por-iq, the settled supply
+* current in the RESETn-asserted state. Stimulus and state definition =
+* sim/iq-top tb_temp_por_iq_por.sch: physical 0 V start at rate 10000 V/s, held
+* to tstop 30 ms; RESETn (a DUT output) is forced low for the whole run by the
+* 0 V source VRST, which disables temp_core. VRST's current is not part of the
+* VDD measurement; the output stage's contention against it IS inside i(BVDD).
+* This state is the pex Iq spec row because the sim/iq-top record graded it
+* 'ok' at 45/45 corners, while the natural released state (iq-total) hit the
+* known non-physical temp_core branch at 17/45 points including tt/27C/3.30V
+* (sim/iq-top/records/20261009-191705-df85523.md).
+* Measurement (.meas card comes from request-iq-por.json): Iq = trailing-window
+* mean of i(BVDD) over [25, 30] ms, the same trailing window sim/iq-top grades.
+.param rate=10000
+* ng_nomodcheck: same setting as sim/spiceinit; carried in the netlist because the
+* fleet runner ignores options.ngspice_init (see sim/iq-top experiment.json)
+.control
+set ng_nomodcheck
+.endc
+** sch_path: sim/iq-top/testbench/tb_temp_por_iq_por.sch (stimulus source)
+**.subckt tb_temp_por_iq_por
+VSET VSETN 0 3.3
+BVDD VDD 0 V = min(v(VSETN), {rate}*time)
+XDUT VDD 0 PTAT CTAT RESETn temp_por_top
+VRST RESETn 0 0
+.save i(vrst)
+**** begin user architecture code
+
+
+.save v(vdd) v(resetn) i(bvdd) v(ptat) v(ctat) i(vrst)
+.options method=gear trtol=50
+
+
+**** end user architecture code
+**.ends
+.include ../../../../design/netlist/temp_por_top.spice
