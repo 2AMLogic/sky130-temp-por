@@ -520,9 +520,11 @@ def cmd_record(args):
             wm = max(sts, key=lambda t: abs(sts[t]["mean"]))
             wk = max(sts, key=lambda t: sts[t]["max_abs"])
             row.update({"worst_sd": sts[ws]["sd"], "worst_sd_T": ws, "worst_mean": sts[wm]["mean"], "worst_mean_T": wm,
-                        "worst_max": sts[wk]["max_abs"], "stats": {str(t): s for t, s in sts.items()}})
+                        "worst_max": sts[wk]["max_abs"], "worst_max_T": wk,
+                        "stats": {str(t): s for t, s in sts.items()}})
         else:
-            row.update({"worst_sd": None, "worst_sd_T": None, "worst_mean": None, "worst_mean_T": None, "worst_max": None, "stats": {}})
+            row.update({"worst_sd": None, "worst_sd_T": None, "worst_mean": None, "worst_mean_T": None,
+                        "worst_max": None, "worst_max_T": None, "stats": {}})
         per_corner[key] = row
         s = single.get(key)
         if s and sts:
