@@ -9,6 +9,10 @@ Chronological record of recently merged pull requests and closed issues. This fi
 
 ### 2026-11-21
 
+- **PR #466**: refactor(sim): drop run_solver_sweep's interp() duplicate of sim_common.interp_at
+- **PR #465**: fix: reset the supply-ramp cross-check for each variant
+- **Issue #463** (closed): Replace run_solver_sweep.interp with sim_common.interp_at (#170 residue)
+- **Issue #457** (closed): Scope the supply-ramp cross-check to its variant so the next record cannot inherit it
 - **PR #469**: docs: record passing klt pex re-run at the 0.9.2 pin; correct closed klayout-tools#6025 status
 
 ### 2026-11-20
