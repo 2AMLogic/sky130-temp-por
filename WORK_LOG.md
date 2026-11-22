@@ -7,6 +7,15 @@ Chronological record of recently merged pull requests and closed issues. This fi
 - [2026-09](work_log/WORK_LOG_2026-09.md)
 - [2026-08](work_log/WORK_LOG_2026-08.md)
 
+### 2026-11-21
+
+- **PR #469**: docs: record passing klt pex re-run at the 0.9.2 pin; correct closed klayout-tools#6025 status
+
+### 2026-11-20
+
+- **PR #464**: fix(layout): recompose temp_por_top onto the massist leaf stream, retire the XMASSIST LVS exclusion
+- **Issue #453** (closed): Re-compose temp_por_top from the current por_output_chain stream: retire the XMASSIST LVS exclusion and re-run DRC/LVS/ERC at klt 0.9.2
+
 ### 2026-11-19
 
 - **PR #448**: fix: compute pnp-mismatch signal ratio once so a zero mean records a failed check
@@ -369,15 +378,4 @@ Chronological record of recently merged pull requests and closed issues. This fi
 - **PR #76**: docs: embed fleet burndown chart in README
 - **Issue #30** (closed): T1 item 2/10: lay out bias_core (first increment toward layout)
 - **Issue #75** (closed): README: embed the fleet burndown chart (one line)
-
-### 2026-09-21
-
-- **PR #73**: fix: land bias_core supply legs on the real pads (block-local ports)
-- **PR #72**: refactor: drop dead helpers and stale doc claims from sim_common.py
-- **PR #70**: feat: add klt erc supply spec and report for bias_core (T1 item 11)
-- **PR #68**: feat: add klt signoff block manifest as the T1 verdict of record
-- **Issue #69** (closed): bias_core assembly: supply routes are single continuous rail islands but connect to none of the blocks' internal supply pads
-- **Issue #71** (closed): Remove dead parse_measurements()/_cr() and write_log() from sim_common.py: zero callers, stale 'actually used' docstring claims
-- **Issue #66** (closed): T1 item 11 (power delivery, structural): no klt erc supply spec or report in this repo
-- **Issue #67** (closed): Commit a klt signoff block manifest so this block's T1 state is graded, not hand-read
 
