@@ -3,7 +3,7 @@
 Current roadmap derived from GitHub label state. The region below is maintained by the Loom Guide role.
 
 <!-- guide:plan-body:start -->
-_Generated: 2026-11-21T07:25:20Z (snapshot; compare against live labels)_
+_Generated: 2026-11-22T21:02:26Z (snapshot; compare against live labels)_
 ## Operator Attention: Merge-Risk-Hold Pileup
 
 Judge-approved PRs under a hold (`loom:blocked` or `loom:operator`) — only a human merge decision is missing.
@@ -35,23 +35,25 @@ Human-approved issues (`loom:issue`) ready for implementation — excluding held
 
 Issues currently being built (`loom:building`).
 
+- **#454**: T1 item 7: produce a graded klt pex report (por_comparator re-run and re-render first, then block-level temp_por_top)
 - **#455**: bias_core OK-detector: BIAS_OK never asserts in 38 of 120 mismatch samples, so reset never releases; find the device and fix the design
-- **#457**: Scope the supply-ramp cross-check to its variant so the next record cannot inherit it
 - **#461**: temp_core: build DR-007 chopped-amplifier + degenerated-mirror sim variant and measure chopper residual offset (part a of #456)
-- **#463**: Replace run_solver_sweep.interp with sim_common.interp_at (#170 residue)
+- **#470**: Three cell READMEs still call klayout-tools#6025 open (outside #454's AC-6 scope)
 
 ## PRs Awaiting Review
 
 PRs waiting on Judge (`loom:review-requested`).
 
-_None._
+- **#472**: sim: chop-degen temp_core variant + measured chopper residual offset (DR-007 item 1)
+- **#475**: design+sim: fix bias_core OK-detector mismatch margin and chatter; 0 non-releasing mismatch samples (issue #455)
+- **#476**: docs: state klayout-tools#6025 as closed in bias-core and output-chain READMEs
+- **#477**: feat: add block-level klt pex evidence for temp_por_top (cannot-grade, net-label case collision)
 
 ## Approved (Awaiting Merge)
 
 PRs that passed review and are queued for Champion auto-merge (`loom:pr`).
 
-- **#465**: fix: reset the supply-ramp cross-check for each variant
-- **#466**: refactor(sim): drop run_solver_sweep's interp() duplicate of sim_common.interp_at
+_None._
 
 ## Proposed
 
@@ -87,8 +89,8 @@ Issues carrying `loom:curated`.
 | Important | 3 |
 | Ready (`loom:issue`, net of holds/building/merge-pending) | 2 |
 | In Progress (`loom:building`) | 4 |
-| PRs awaiting review | 0 |
-| Approved PRs awaiting merge | 2 |
+| PRs awaiting review | 4 |
+| Approved PRs awaiting merge | 0 |
 | Curated | 9 |
 | Architect / Hermit proposals | 4 |
 | Active epics | 1 |
