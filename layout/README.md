@@ -187,10 +187,14 @@ skipped (measured on PR #419's `por_output_chain` re-render, head `81837fe3`),
 so this paragraph now describes the older pin's evidence, not the current
 tool. The stream still carries no `hvi` marker, and the cell is not a 5V
 sign-off until redrawn — drawing the marker on these guard-ringed 5V devices
-is itself still blocked by
+was blocked by
 [`klayout-tools#6025`](https://github.com/2AMLogic/klayout-tools/issues/6025)
-(still open). See that cell's own README for what the match does and does
-not assert.
+(closed 2026-11-18; the fix,
+[`klayout-tools#6185`](https://github.com/2AMLogic/klayout-tools/pull/6185),
+merged past the `v0.9.2` tag and is in no klt release yet — the pin bump that
+redraws this cell is tracked in
+[#467](https://github.com/2AMLogic/sky130-temp-por/issues/467)). See that
+cell's own README for what the match does and does not assert.
 
 ## `bias_core_startup`: the startup kick chain (issue #38, part of #34)
 
@@ -424,13 +428,17 @@ rules (`hvi.angle.1`/`hvi.ongrid.1`, `nwell.enclosed.hvi.1`, and their
 #419's `por_output_chain` re-render (head `81837fe3`) by a layer/datatype
 scan of the committed streams and that cell's `drc.json` coverage. Finding 3
 above is the historical record of the pre-`0.9.2` pins; the bias and
-`temp_core` streams it describes still carry no marker layer. Still open,
+`temp_core` streams it describes still carry no marker layer. Formerly open,
 and the reason those 5V `g5v0d10v5` devices are not yet drawn with their own
 `hvi` marker: the marker covers only the device array, so a flavour-marked
 device with a well tap ring trips `nwell.enclosed.hvi.1` —
 [`klayout-tools#6025`](https://github.com/2AMLogic/klayout-tools/issues/6025),
-open, measured at `0.9.2` and on `main` (`0.9.3.dev239`) per PR #419's
-README.
+measured at `0.9.2` and on `main` (`0.9.3.dev239`) per PR #419's README. The
+issue closed 2026-11-18 (fix
+[`klayout-tools#6185`](https://github.com/2AMLogic/klayout-tools/pull/6185),
+merged past the `v0.9.2` tag, in no klt release yet); until the pin bump
+([#467](https://github.com/2AMLogic/sky130-temp-por/issues/467)) the streams
+still carry no marker.
 
 ## `bias_core`: the full-cell assembly (issue #40, the final step of #34)
 
@@ -468,8 +476,12 @@ calls against its own `design/netlist/*.spice` subckt:
   klayout-tools#2912 once refused is now read and compared. Disclosed limit:
   the compare is flavour-blind (topology + `L`/`W`), because turning on
   `compare_mos_flavour` needs the 28 5 V devices drawn with their `hvi`
-  marker, which is blocked on
-  [klayout-tools#6025](https://github.com/2AMLogic/klayout-tools/issues/6025);
+  marker, which was blocked on
+  [klayout-tools#6025](https://github.com/2AMLogic/klayout-tools/issues/6025)
+  (closed 2026-11-18; the fix,
+  [#6185](https://github.com/2AMLogic/klayout-tools/pull/6185), is past the
+  `v0.9.2` tag and in no release yet — pin bump tracked in
+  [#467](https://github.com/2AMLogic/sky130-temp-por/issues/467));
   the leaf's README records the negative controls. Its
   `lvs.expand_multiplier` option (new in `compose-cell.py`) writes the
   reference's `m=4` capacitor as four single devices, as the layout draws it.

@@ -115,3 +115,69 @@ Schematic record `20261009-054331-79eebd4-real-bias-core` vs post-layout record 
 - hysteresis delta over 15 comparable points: min -1.4 mV (sf_125c), max +1.2 mV (ff_-40c)
 - max(VPOR-up): schematic 2.7130 V (ss_27c), post-layout 2.7129 V (ss_27c)
 - margin vs 2.97 V low rail: schematic +257 mV, post-layout +257 mV
+
+## Re-run at the klt `0.9.2` pin (issue #454, 2026-11-20): pin order fixed, report `pass`
+
+The #124 run above was produced by klt `0.7.0+g5e5b55992a7f`. Issue #454 step 1
+re-ran the **unchanged** testbench (`pextb/`) on the **unchanged committed
+stream** (`../por_comparator.gds`) at the repo's pinned build, klt `0.9.2`
+(`046ba74652fc`, via `uvx --from "klayout-tools==0.9.2"`), `--pdk-root
+~/.ciel` (open_pdks `f6eeac7dad0…`, the `layout/pdk.json` pin), single tt /
+27 C / 3.63 V corner, backend `local` -- no grid, no fleet submission. Both
+legs together ran in under a minute on the dispatch host.
+
+| file | what |
+|---|---|
+| `klt-pex.rerun.report.json` | the re-run's `klt pex` report -- **status `pass`**, 2/2 delta rows |
+| `por_comparator.pex.rerun.spice` | the re-run's raw extraction (21 devices, 15 nets -- same counts as 0.7.0) |
+
+**Pin order: fixed.** klt `0.9.2` extraction emits the `.SUBCKT` pins in the
+declared `--pins` order -- `.SUBCKT por_comparator VDD VSS IBIAS VREF BIAS_OK
+POR_RAW` -- where `0.7.0` wrote them alphabetically (`BIAS_OK IBIAS POR_RAW VDD
+VREF VSS`, blocker 1 above; fixed upstream by
+[klayout-tools#3269](https://github.com/2AMLogic/klayout-tools/pull/3269)). The
+positional `XDUT VDD 0 IBIAS VREF BIAS_OK POR_RAW por_comparator` instantiation
+is therefore wired correctly now, and the extracted leg produces both crossings
+on its own (`sides.extracted` corner status `pass`, `produced_value: true`):
+
+| spec row (tt/3.63V/27C) | schematic | extracted | delta |
+|---|---|---|---|
+| `vpor_up_approx` | 2.69504 V | 2.69641 V | +0.051 % |
+| `vpor_down_approx` | 2.54701 V | 2.54701 V | 0.0 % |
+
+(The 0.7.0 schematic-side values 2.695039 / 2.547012 reproduce as 2.69504 /
+2.54701.)
+
+**MOS flavour: unchanged, and not a tool gap.** `model_mismatch` still reports
+the 18 MOS extracting as `sky130_fd_pr__{n,p}fet_01v8` against the design's
+`..._g5v0d10v5` (12 n + 6 p; `res_xhigh_po` matches 3/3) -- a property of the
+committed stream (no `hvi` marker, `../README.md` Known gaps 1), not of the
+tool. Retirement is the re-render at a bumped pin: the guard-ringed-marker
+blocker [klayout-tools#6025](https://github.com/2AMLogic/klayout-tools/issues/6025)
+closed 2026-11-18 (fix [klayout-tools#6185](https://github.com/2AMLogic/klayout-tools/pull/6185),
+commit `89b2cc61a9c4`), but that fix sits 1091 commits past the `v0.9.2` tag
+and is in no klt release yet -- the pin bump and `hvi` re-render are tracked in
+[#467](https://github.com/2AMLogic/sky130-temp-por/issues/467). `klt pex` grades
+this run `pass` with the mismatch disclosed in `model_mismatch.detail`, so the
+delta values above compare the layout's drawn `W`/`L` in the 1.8 V model
+domain -- the same disclosure the hand-derived campaign netlist carried.
+
+**Body bias / extraction model** (unchanged from the #124 run):
+`body_bias.status` is `biased` (0 unbiased devices, nets, or PMOS body nets);
+`extraction.model` is the same lumped-RC text as the 0.7.0 run -- single lumped
+series R per net in a star, net-to-ground C from area/perimeter,
+vertical-overlap net-to-net C, quasi-static; no lateral coupling without
+`--critical-net`, no distributed RC, no fringe shielding, no inductance --
+quoted verbatim in `klt-pex.rerun.report.json`'s `extraction.model`.
+
+**`make_sim_netlist.py` is no longer needed for new pex evidence** -- `klt pex`
+at `0.9.2` measures the extracted leg directly. It stays as the disclosed
+derivation of what the #124 PVT campaign actually ran (it additionally rewrote
+the MOS models to `g5v0d10v5`, which a `klt pex` run does not), so the
+committed campaign records remain reproducible.
+
+**For the block-level run** (issue #454 step 3, waits on #453): `klt pex` at
+`0.9.2` already speaks the fleet protocol (`--backend batch`,
+`--wait-for-capacity`, `--submit-only`/`--attach`, `--max-units-per-job`) -- a
+corner grid can go through the batch fleet the same way `klt sim`'s does; no
+upstream dispatch gap to file.

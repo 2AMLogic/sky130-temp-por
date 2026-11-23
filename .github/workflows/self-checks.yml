@@ -120,6 +120,9 @@ jobs:
       - name: Supply-ramp transition-checker selftest fixtures
         run: python3 sim/supply-ramp-top/ramp_checker.py
 
+      - name: Supply-ramp recorder assigns the local cross-check to its probed variant
+        run: python3 -I sim/supply-ramp-top/test_record_crosscheck.py
+
       - name: POR-comparator threshold extractor selftest
         run: python3 -I sim/por-comparator-thresholds/threshold_extractor.py
 
