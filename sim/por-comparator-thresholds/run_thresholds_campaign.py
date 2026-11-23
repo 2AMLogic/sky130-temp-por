@@ -112,6 +112,44 @@ def mc_effective(man: dict, meta_mc: dict | None = None) -> dict:
     return mc
 
 
+def mc_effective_prose(man: dict, mc: dict) -> dict:
+    """Prose fields describing the grid this run/record actually used (issue #481).
+
+    mc_effective() overrides only the numeric grid; the manifest's claim / convention /
+    sizing / seed-offset / absent-coverage strings describe the DEFAULT grid.  With no
+    effective difference from the manifest these are returned verbatim (default-grid records
+    stay byte-identical); otherwise the grid-dependent parts are re-derived from `mc`."""
+    d = man["monte_carlo"]
+    out = {"claim": man["claim"], "statistical_convention": d["statistical_convention"],
+           "request_sizing": d["request_sizing"], "seed_offsets": d["seed_offsets"],
+           "absent_coverage": list(man["absent_coverage"])}
+    if mc["process"] == d["process"] and mc["seed"] == d["seed"]:
+        return out
+    units = mc_units(man, mc)
+    n, old_n = len(units), len(d["process"]) * len(d["temperature_c"])
+    procs, old_procs = "/".join(mc["process"]), "/".join(d["process"])
+    unsampled = [p for p in man["corners"]["process"] if p not in mc["process"]]
+    old_unsampled = [p for p in man["corners"]["process"] if p not in d["process"]]
+    note = (f" [Run override: sections {procs}, base seed {mc['seed']}; the manifest default is "
+            f"{old_procs}, base seed {d['seed']}.]")
+
+    def sections(text: str) -> str:
+        old = f"the {'/'.join(old_unsampled)} sections, "
+        return text.replace(old, f"the {'/'.join(unsampled)} sections, " if unsampled else "")
+
+    if mc["process"] != d["process"]:
+        out["claim"] = man["claim"].replace(f"on {old_procs};", f"on {procs} (run override);")
+    out["statistical_convention"] = sections(d["statistical_convention"])
+    out["request_sizing"] = d["request_sizing"].replace(f"= {old_n} requests", f"= {n} requests") + note
+    head, sep, tail = d["seed_offsets"].partition(". klt derives")
+    mapping = ", ".join(f"{p}/{cr.fmt_temp(t)}C -> {mc_request_seed(mc, o)}" for p, t, o in units)
+    out["seed_offsets"] = (f"Seed for request k = seed + k, k = 1..{n} in (process, temperature) order: {mapping}" + sep
+                           + tail.replace("the six requests", f"the {n} requests").replace("the six realisation sets", f"the {n} realisation sets")
+                           + note)
+    out["absent_coverage"] = [sections(a).replace(f"{old_procs} sections", f"{procs} sections") for a in man["absent_coverage"]]
+    return out
+
+
 def mc_units(man: dict, mc: dict | None = None) -> list[tuple[str, float, int]]:
     """[(process, temperature, seed_offset)]: one klt request per (process, temperature), never a bigger grid.
 
@@ -280,7 +318,7 @@ def cmd_run(args) -> int:
                             "process_override": args.mc_process or None,
                             "seed_override": args.mc_seed,
                             "requests": [{"process": p, "temperature_c": t, "seed_offset": o, "seed": mc_request_seed(mc, o)} for p, t, o in mc_units(man, mc)],
-                            "request_sizing": mc["request_sizing"]},
+                            "request_sizing": mc_effective_prose(man, mc)["request_sizing"]},
         })
     n_units = (f"{len(work)} requests x N={mc['n_per_corner']} mismatch samples"
                if axis == "mc" else f"{len(work)} request(s)")
@@ -1132,8 +1170,9 @@ def render_mc_md(rec: dict) -> str:
              "independent mismatch realisations. Per-corner statistics are valid; this record makes NO per-sample temperature-drift or temperature-correlation claim.")
     L.append("- **Unguarded points**: the MC grid runs the primary 100 V/s rate only, WITHOUT the half-rate quasi-staticity guard. That guard is what makes the "
              "corner-matrix results quasi-static evidence; the MC points inherit the rate choice the nominal campaign established 15/15 at every corner and are disclosed as unguarded.")
+    unsampled_mos = [p for p in ("tt", "ss", "ff", "sf", "fs") if p not in rec["matrix"]["process"]]
     L.append("- **Not sampled**: global process Monte Carlo (MC_PR_SWITCH), the 50 V/s half-rate guard, the ideal-bias variant, the ll/hh passive-skew axis, "
-             "post-layout parasitics, and the ff/sf/fs process sections.")
+             + (f"post-layout parasitics, and the {'/'.join(unsampled_mos)} process sections." if unsampled_mos else "and post-layout parasitics."))
     L.append("")
     L.append("## Margin context (evidence toward a possible future amendment; no proposal)")
     L.append(MC_MARGIN_CONTEXT)
@@ -1170,6 +1209,7 @@ def cmd_record_mc(args, man: dict, run_dir: Path, meta: dict) -> int:
         raise SystemExit("working tree is dirty: commit first so the record carries a clean-tree SHA")
     now = datetime.now(timezone.utc)
     mc = mc_effective(man, meta.get("monte_carlo"))
+    prose = mc_effective_prose(man, mc)
     variant = meta["variants"][0]
     stamp = now
     record_id = f"{stamp:%Y%m%d}-{stamp:%H%M%S}-{git_info['sha']}-{variant}-mismatch-mc"
@@ -1226,15 +1266,15 @@ def cmd_record_mc(args, man: dict, run_dir: Path, meta: dict) -> int:
         "timestamp": stamp.strftime("%Y-%m-%dT%H:%M:%SZ"),
         "author": args.author or cr.default_author(),
         "supersedes": args.supersedes,
-        "manifest_excerpt": {"title": man["title"], "claim": man["claim"], "primary_rate": man["rates"]["primary_v_per_s"][0]},
+        "manifest_excerpt": {"title": man["title"], "claim": prose["claim"], "primary_rate": man["rates"]["primary_v_per_s"][0]},
         "variant": {"name": variant, "description": v["description"], "bias_treatment": v["bias_treatment"], "schematic": "sim/" + SLUG + "/" + v["schematic"], "dut_netlists": v["dut_netlists"], "provenance": v.get("provenance"), "baseline_variant": v.get("baseline_variant")},
         "pdk": pdk_d,
         "tools": tools_d,
         "git": git_info,
         "run_git": meta.get("git"),
         "monte_carlo": {"n_per_corner": mc["n_per_corner"], "seed": mc["seed"], "vary": mc["vary"],
-                        "statistical_convention": mc["statistical_convention"], "request_sizing": mc["request_sizing"],
-                        "seed_offsets": mc["seed_offsets"],
+                        "statistical_convention": prose["statistical_convention"], "request_sizing": prose["request_sizing"],
+                        "seed_offsets": prose["seed_offsets"],
                         "process_override": (meta.get("monte_carlo") or {}).get("process_override"),
                         "seed_override": (meta.get("monte_carlo") or {}).get("seed_override")},
         "matrix": {"axis": "mc", "process": mc["process"], "temperature_c": mc["temperature_c"], "peak_v": man["sweep"]["peak_v"],
@@ -1250,7 +1290,7 @@ def cmd_record_mc(args, man: dict, run_dir: Path, meta: dict) -> int:
         "requests": requests,
         "corners": corners,
         "probe": (Path(args.probe_note_file).read_text().strip() if args.probe_note_file else ""),
-        "absent_coverage": man["absent_coverage"],
+        "absent_coverage": prose["absent_coverage"],
         "links": {
             "testbench": "sim/" + SLUG + "/" + v["schematic"], "manifest": f"sim/{SLUG}/experiment.json", "driver": f"sim/{SLUG}/run_thresholds_campaign.py",
             "extractor": f"sim/{SLUG}/threshold_extractor.py", "netlist_snapshots": f"sim/{SLUG}/netlist-snapshots/{record_id}/",

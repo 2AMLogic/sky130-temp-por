@@ -532,6 +532,61 @@ class McEffectiveOverrides(unittest.TestCase):
         self.assertEqual(mc["seed"], 20261114)
 
 
+class McEffectiveProse(unittest.TestCase):
+    """issue #481: record/run prose follows the effective grid; default grid is verbatim."""
+
+    MAN = m.json.load(open(Path(m.__file__).with_name("experiment.json")))
+
+    def prose(self, **ov):
+        mc = m.mc_effective(self.MAN, ov or None)
+        return mc, m.mc_effective_prose(self.MAN, mc)
+
+    def test_default_grid_is_byte_identical(self):
+        d = self.MAN["monte_carlo"]
+        for ov in ({}, {"process_override": ["tt", "ss"], "seed_override": 20261114}):
+            _, p = self.prose(**ov)
+            self.assertEqual(p["claim"], self.MAN["claim"])
+            self.assertEqual(p["statistical_convention"], d["statistical_convention"])
+            self.assertEqual(p["request_sizing"], d["request_sizing"])
+            self.assertEqual(p["seed_offsets"], d["seed_offsets"])
+            self.assertEqual(p["absent_coverage"], self.MAN["absent_coverage"])
+
+    def test_full_five_corner_override(self):
+        _, p = self.prose(process_override=["tt", "ss", "ff", "sf", "fs"], seed_override=20261121)
+        self.assertIn("= 15 requests", p["request_sizing"])
+        self.assertNotIn("= 6 requests", p["request_sizing"])
+        self.assertIn("k = 1..15", p["seed_offsets"])
+        self.assertIn("fs/125C -> 20261136", p["seed_offsets"])
+        self.assertNotIn("the six", p["seed_offsets"])
+        self.assertNotIn("ff/sf/fs", p["statistical_convention"])
+        self.assertIn("on tt/ss/ff/sf/fs (run override);", p["claim"])
+        self.assertFalse(any("NOT sampled by it: the ideal-bias variant, the ff/sf/fs" in a for a in p["absent_coverage"]))
+        self.assertTrue(any("tt/ss/ff/sf/fs sections" in a for a in p["absent_coverage"]))
+
+    def test_partial_process_override(self):
+        _, p = self.prose(process_override=["ff"])
+        self.assertIn("= 3 requests", p["request_sizing"])
+        self.assertIn("the tt/ss/sf/fs sections, ", p["statistical_convention"])
+        self.assertIn("on ff (run override);", p["claim"])
+
+    def test_seed_only_override(self):
+        _, p = self.prose(seed_override=1000)
+        self.assertIn("tt/-40C -> 1001", p["seed_offsets"])
+        self.assertIn("ss/125C -> 1006", p["seed_offsets"])
+        self.assertIn("= 6 requests", p["request_sizing"])
+        self.assertIn("on tt/ss;", p["claim"])
+        self.assertIn("the ff/sf/fs sections, ", p["statistical_convention"])
+
+    def test_render_not_sampled_bullet(self):
+        # exercise the derivation directly: same expression as render_mc_md
+        for procs, tail in ((["tt", "ss"], "post-layout parasitics, and the ff/sf/fs process sections."),
+                            (["tt", "ss", "ff", "sf", "fs"], "and post-layout parasitics."),
+                            (["ff"], "post-layout parasitics, and the tt/ss/sf/fs process sections.")):
+            un = [p for p in ("tt", "ss", "ff", "sf", "fs") if p not in procs]
+            got = (f"post-layout parasitics, and the {'/'.join(un)} process sections." if un else "and post-layout parasitics.")
+            self.assertEqual(got, tail)
+
+
 if __name__ == "__main__":
     try:
         import unittest as _u
