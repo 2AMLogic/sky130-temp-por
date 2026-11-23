@@ -77,5 +77,18 @@ happens at ss/-40C: the loop-off plateau is 0.64-0.66 V and NOKX switches when N
 crosses the NA mirror reference near VDD 1.8 V. On mc14 BIAS_OK asserts 41 mV earlier
 and while NA is still settling (0.726 -> 0.762 V), POR_RAW pulses high for 7 mV of VDD
 (70 us at 100 V/s) at VDD=1.82 V, 0.8 V below VPOR-up. This is an early-assertion
-glitch of POR_RAW, not an assertion-threshold/plateau collision. No design change was
-made for it; it remains open (see PR).
+glitch of POR_RAW, not an assertion-threshold/plateau collision.
+
+One-variable comparison on the exact ss/-40C mc14 deck (local, ngspice-47):
+
+| variant | verdict | VPOR-up (V) | VPOR-down (V) |
+|---|---|---|---|
+| default | NO_RESULT (up:multiple_transitions) | - | 2.48656 |
+| `.options gmin=1e-11` | OK | 2.63904 | 2.48696 |
+| `.tran ... uic` | OK | 2.63837 | 2.48763 |
+
+The chatter is therefore marginal and solver-state sensitive: a ~1 mV-scale change in the
+numerical solution removes a 7 mV-wide POR_RAW pulse, and the sf/-40C mc16 draw also extracts
+cleanly in the `uic` campaign (record 20261123-210355-a21a8ca0). The underlying early
+BIAS_OK assertion (1.82 V vs 1.86 V on the control, while NA is still settling) is a real
+sensitivity of the detector that this iteration does NOT correct; no design change was made.
