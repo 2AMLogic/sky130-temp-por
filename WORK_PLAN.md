@@ -3,7 +3,7 @@
 Current roadmap derived from GitHub label state. The region below is maintained by the Loom Guide role.
 
 <!-- guide:plan-body:start -->
-_Generated: 2026-11-23T10:11:29Z (snapshot; compare against live labels)_
+_Generated: 2026-11-23T13:11:29Z (snapshot; compare against live labels)_
 ## Operator Attention: Merge-Risk-Hold Pileup
 
 Judge-approved PRs under a hold (`loom:blocked` or `loom:operator`) — only a human merge decision is missing.
@@ -44,8 +44,6 @@ Issues currently being built (`loom:building`).
 
 PRs waiting on Judge (`loom:review-requested`).
 
-- **#472**: sim: chop-degen temp_core variant + measured chopper residual offset (DR-007 item 1)
-- **#475**: design+sim: fix bias_core OK-detector mismatch margin and chatter; 0 non-releasing mismatch samples (issue #455)
 - **#476**: docs: state klayout-tools#6025 as closed in bias-core and output-chain READMEs
 - **#477**: feat: add block-level klt pex evidence for temp_por_top (cannot-grade, net-label case collision)
 
@@ -89,7 +87,7 @@ Issues carrying `loom:curated`.
 | Important | 3 |
 | Ready (`loom:issue`, net of holds/building/merge-pending) | 2 |
 | In Progress (`loom:building`) | 4 |
-| PRs awaiting review | 4 |
+| PRs awaiting review | 2 |
 | Approved PRs awaiting merge | 0 |
 | Curated | 9 |
 | Architect / Hermit proposals | 4 |
