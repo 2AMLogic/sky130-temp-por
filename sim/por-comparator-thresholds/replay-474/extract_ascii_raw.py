@@ -1,5 +1,6 @@
 import sys
-R='/home/ubuntu/GitHub/sky130-temp-por/.loom/worktrees/issue-474/sim/por-comparator-thresholds'
+from pathlib import Path
+R=str(Path(__file__).resolve().parents[1])
 sys.path.insert(0,R)
 import threshold_extractor as tx
 def load(p):
@@ -14,7 +15,8 @@ def load(p):
         else: cur.append(float(t[0]))
         if len(cur)==n: vals.append(cur); cur=[]
     return {nm:[r[k] for r in vals] for k,nm in enumerate(names)}
-for n in sys.argv[1:]:
-    w=load(f'/tmp/i474/rep/{n}.raw')
+# usage: extract_ascii_raw.py <raw-dir> <name>...   (reads <raw-dir>/<name>.raw, ASCII rawfiles)
+for n in sys.argv[2:]:
+    w=load(f'{sys.argv[1]}/{n}.raw')
     r=tx.analyze(w,'rise','fall')
     print(n, len(w['time']), r['verdict'], 'up=%.5f'%(r['up'].get('vdd_v') or -1), 'dn=%.5f'%(r['down'].get('vdd_v') or -1), 'hys=%s'%r.get('hysteresis_v'))

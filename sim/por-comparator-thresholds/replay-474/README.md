@@ -9,6 +9,23 @@ sky130A @ open_pdks f6eeac7d, base deck from `run_thresholds_campaign.py` at
 seeds exactly (tt/-40C mc13: rndseed 2125796897, mismatch_seed 1401514179; local
 replay row count 3656 and VPOR-up 2.85502 V / VPOR-down 2.69226 V equal the record).
 
+## Replaying the committed decks
+
+The three `*.cir` decks are the `klt sim` corner decks for the tt/-40C mc14 draw (default, `gmin=1e-11`,
+`gmin=1e-9`) with two lines **elided** by hand so the decks stay path-independent; they do not run as
+committed. To replay one:
+
+1. `python3 build_mc_replay_request.py tt -40 1 20261202 <dir>` writes `<dir>/netlist.spice` and
+   `<dir>/request.json` (paths resolve from the script's own location, so it runs from any checkout).
+2. Replace `.include <netlist.spice from run_thresholds_campaign.py mk>` with `.include <dir>/netlist.spice`.
+3. Replace the comment `* write <raw>` with `write <dir>/replay.raw` (inside the `.control` block, after `tran`),
+   and set `PDK_ROOT` to the sky130A install (the `.lib` line uses `$PDK_ROOT`).
+4. `ngspice -b <deck>`; then `python3 extract_ascii_raw.py <dir> replay` extracts the thresholds from the ASCII raw.
+   `chatter_trace.py <dir>` needs a `waveform.raw.json` from a `klt sim` run of the request instead.
+
+The `uic` variant has no committed deck: it is the base deck with ` uic` appended to the `tran` card (the
+`monte_carlo.tran_uic` flag in `experiment.json`); its generated decks are in `netlist-snapshots/`.
+
 ## Class 2 -- initial-timepoint abort (tt/-40C mc14, request seed 20261202)
 
 Fleet replay of the unchanged deck: `tt_mm/3.630V/-40C/mc14` -> `timestep_too_small`
@@ -76,8 +93,31 @@ The issue's hypothesis (plateau 0.73-0.78 V reaching a ~1.0 V assertion point) i
 happens at ss/-40C: the loop-off plateau is 0.64-0.66 V and NOKX switches when NOKL
 crosses the NA mirror reference near VDD 1.8 V. On mc14 BIAS_OK asserts 41 mV earlier
 and while NA is still settling (0.726 -> 0.762 V), POR_RAW pulses high for 7 mV of VDD
-(70 us at 100 V/s) at VDD=1.82 V, 0.8 V below VPOR-up. This is an early-assertion
-glitch of POR_RAW, not an assertion-threshold/plateau collision.
+(70 us at 100 V/s) at VDD=1.82 V, 0.8 V below VPOR-up. On ss/-40C this is an early-assertion
+glitch of POR_RAW, not an assertion-threshold/plateau collision (sf/-40C mc16: glitch, not earlier; see below).
+
+The second named chatter case, sf/-40C mc16 (fresh record 20261121-115035-c591b93b, request seed
+20261211 = 20261201 + 10, default startup), was traced from the original fleet job
+(`klt sim --attach klt-sim-c0de828c00a5` with the committed request/netlist snapshot, no new run) with
+`chatter_trace.py`; control = sf/-40C mc15 of the same request (`OK`, up 2.652 V). Same extraction as the ss table:
+
+| quantity | sf mc16 (chatter) | sf mc15 (control) |
+|---|---|---|
+| verdict (default startup) | NO_RESULT (up:multiple_transitions): rise 1.8170 V, fall 1.8232 V, rise 2.7280 V; VPOR-down 2.570 V | OK, up 2.652 V / down 2.4996 V |
+| NOKO loop-off plateau peak | 0.631 V @ VDD~1.66 | 0.619 V @ VDD~1.66 |
+| NOKO collapse (< 0.1 V) | VDD ~1.74 V | VDD ~1.72 V |
+| NOKL meets NA | VDD 1.78-1.80 V | VDD 1.76-1.78 V |
+| BIAS_OK asserts at | 1.818 V | 1.804 V |
+| POR_RAW | pulses high 1.8180-1.8229 V (about 5 mV of VDD, 50 us) | no pulse |
+
+What carries over from ss: the plateau is 0.62-0.63 V, not 0.73-0.78 V, so the issue's plateau-collision
+hypothesis is refuted at sf/-40C too, and POR_RAW again pulses at the BIAS_OK assertion edge, 0.9 V below
+VPOR-up. What does NOT carry over: on sf mc16 BIAS_OK asserts 14 mV *later* than the control, not earlier, so
+the "41 mV earlier, NA still settling" feature is specific to the ss/-40C mc14 draw. With one control per
+case the earliness claim is established for ss only; the common element is the POR_RAW glitch at the
+assertion edge while NA is moving (NA steps 0.693 -> 0.760 V across the assertion step on mc16). The same
+`uic` campaign extracts sf/-40C mc16 cleanly (record 20261123-210355-a21a8ca0, up 2.6724 V corner mean over
+20/20), i.e. the chatter is solver-state sensitive here too.
 
 One-variable comparison on the exact ss/-40C mc14 deck (local, ngspice-47):
 
@@ -89,6 +129,6 @@ One-variable comparison on the exact ss/-40C mc14 deck (local, ngspice-47):
 
 The chatter is therefore marginal and solver-state sensitive: a ~1 mV-scale change in the
 numerical solution removes a 7 mV-wide POR_RAW pulse, and the sf/-40C mc16 draw also extracts
-cleanly in the `uic` campaign (record 20261123-210355-a21a8ca0). The underlying early
-BIAS_OK assertion (1.82 V vs 1.86 V on the control, while NA is still settling) is a real
+cleanly in the `uic` campaign (record 20261123-210355-a21a8ca0). The underlying POR_RAW glitch at the
+BIAS_OK assertion edge (ss: 1.82 V vs 1.86 V on the control, while NA is still settling) is a real
 sensitivity of the detector that this iteration does NOT correct; no design change was made.

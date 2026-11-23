@@ -587,6 +587,28 @@ class McEffectiveProse(unittest.TestCase):
             self.assertEqual(got, tail)
 
 
+class TranUicStartup(unittest.TestCase):
+    """issue #474: `uic` is appended to the MC `.tran` card iff `monte_carlo.tran_uic`, and the
+    corner (non-MC) request never carries it -- pins the MC-axis-only scope the manifest note promises."""
+
+    MAN = {"sweep": {"peak_v": 3.63, "tmax_s": 2e-5}, "rates": {"primary_v_per_s": [100.0]}}
+    MC = {"n_per_corner": 20, "seed": 1, "vary": "mismatch", "rate_v_per_s": 100.0}
+
+    def _args(self, **extra):
+        mc = dict(self.MC, **extra)
+        return m.build_mc_request("tt", -40.0, 0, mc, self.MAN, "local")["analysis"]["args"]
+
+    def test_uic_only_when_flagged(self):
+        self.assertTrue(self._args(tran_uic=True).endswith(" uic"))
+        self.assertNotIn("uic", self._args(tran_uic=False))
+        self.assertNotIn("uic", self._args())
+
+    def test_corner_request_never_uic(self):
+        man = m.sim_common.load_manifest(m.MANIFEST)
+        self.assertTrue(man["monte_carlo"]["tran_uic"])
+        self.assertNotIn("uic", m.build_request(100.0, man, "local")["analysis"]["args"])
+
+
 if __name__ == "__main__":
     try:
         import unittest as _u

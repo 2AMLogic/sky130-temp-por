@@ -1,5 +1,6 @@
 import sys, json
-R='/home/ubuntu/GitHub/sky130-temp-por/.loom/worktrees/issue-474/sim/por-comparator-thresholds'
+from pathlib import Path
+R=str(Path(__file__).resolve().parents[1])
 sys.path.insert(0,R); sys.path.insert(0,R+'/../bin')
 import sim_common, threshold_extractor as tx
 from pathlib import Path

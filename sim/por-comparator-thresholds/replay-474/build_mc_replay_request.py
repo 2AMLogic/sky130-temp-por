@@ -1,6 +1,6 @@
 import sys, json
 from pathlib import Path
-R='/home/ubuntu/GitHub/sky130-temp-por/.loom/worktrees/issue-474/sim/por-comparator-thresholds'
+R=str(Path(__file__).resolve().parents[1])
 sys.path.insert(0,R)
 import run_thresholds_campaign as rc
 man=rc.sim_common.load_manifest(rc.MANIFEST)
