@@ -176,10 +176,7 @@ RENDER_EXCLUSIONS: dict[str, tuple[str, str]] = {
 # hard-subscript keys, with paths derived from that record's own experiment directory
 # and merged so any real value wins.  The committed record on disk stays byte-for-byte
 # as committed and still cannot re-render from its raw twin.
-FIXTURE_SEEDS: dict[str, str] = {
-    "sim/bias-core-op-branch/run_op_branch.py":
-        "sim/bias-core-op-branch/records/20261113-160939-9211b20a.md",
-}
+FIXTURE_SEEDS: dict[str, str] = {}
 
 
 def fixture_doc(seed: str) -> dict:

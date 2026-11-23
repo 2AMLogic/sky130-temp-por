@@ -216,6 +216,15 @@ def diag_wave():
         "v(xdut.cmpo)": [0.0 if x < 0.0271 else 3.4 for x in t],
         "v(xdut.n1)": [3.5 if x < 0.0271 else 0.2 for x in t],
         "v(xdut.sns)": [0.4615 * v for v in vdd],
+        # issue #455 OK-detector nodes (healthy realisation: detector asserted)
+        "v(xbias.na)": [min(0.630, v) for v in vdd],
+        "v(xbias.nbtop)": [min(0.633, v) for v in vdd],
+        "v(xbias.pb)": [min(2.26, v) for v in vdd],
+        "v(xbias.tok)": [min(1.96, v) for v in vdd],
+        "v(xbias.noko)": [0.0 if x < 0.021 else 1.50 for x in t],
+        "v(xbias.nokl)": [0.0 if v < 1.0 else 0.75 for v in vdd],
+        "v(xbias.nokx)": [vdd[0] if x < 0.021 else 0.002 for x in t],
+        "v(xbias.nkg)": [0.0 for _ in t],
     }
 
 class DiagnosticTraceColumns(ut.TestCase):
@@ -239,7 +248,7 @@ class DiagnosticTraceColumns(ut.TestCase):
 
     def test_trace_without_the_nodes_is_unchanged(self):
         """A netlist that does not save the diagnostic nodes still writes the original trace."""
-        wave = {k: v for k, v in diag_wave().items() if not k.startswith("v(xdut") and k != "v(bias_ok)"}
+        wave = {k: v for k, v in diag_wave().items() if not k.startswith(("v(xdut", "v(xbias")) and k != "v(bias_ok)"}
         with tempfile.TemporaryDirectory() as td:
             p = Path(td) / "mc0.trace.csv.gz"
             m.write_trace(p, wave)
@@ -274,7 +283,7 @@ class DiagnosticFields(ut.TestCase):
 
     def test_missing_nodes_are_absent_never_zero(self):
         """A waveform without the diagnostic nodes yields NO diagnostic fields -- never zeros."""
-        wave = {k: v for k, v in diag_wave().items() if not k.startswith("v(xdut") and k != "v(bias_ok)"}
+        wave = {k: v for k, v in diag_wave().items() if not k.startswith(("v(xdut", "v(xbias")) and k != "v(bias_ok)"}
         d = m.mc_diag_fields(wave, TPEAK)
         self.assertEqual(d, {"vdd_at_peak_v": 3.63})  # the peak supply itself is still sampled
         # ...and a waveform without a time column at all
@@ -442,6 +451,158 @@ class ReproductionCompare(ut.TestCase):
         r = m.mc_reproduction(old, new)
         self.assertEqual(r["samples_compared"], 1)
         self.assertEqual(r["mismatch_count"], 0)
+
+
+class OkdetSubclass(unittest.TestCase):
+    """issue #455: the OK-detector sub-attribution must separate the stages of the
+    enable path from recorded node levels, never invent levels the netlist did not
+    save, and never fold an uninstrumented sample into a mechanism class."""
+
+    def sample(self, **over):
+        s = {"xbias_tok_at_peak_v": 1.96, "xbias_nkg_at_peak_v": 0.0,
+             "xbias_noko_at_peak_v": 1.50, "xbias_nokx_at_peak_v": 0.002}
+        s.update(over)
+        return s
+
+    def test_noko_low_with_tail_present_is_first_stage(self):
+        self.assertEqual(m.mc_okdet_subclass(self.sample(xbias_noko_at_peak_v=0.31)), "first-stage-unbalanced")
+
+    def test_noko_high_with_nokx_high_is_output_stage(self):
+        self.assertEqual(m.mc_okdet_subclass(self.sample(xbias_nokx_at_peak_v=2.9)), "output-stage-fight")
+
+    def test_tail_collapsed_and_clamp_on_have_their_own_classes(self):
+        self.assertEqual(m.mc_okdet_subclass(self.sample(xbias_tok_at_peak_v=0.42)), "tok-collapsed")
+        self.assertEqual(m.mc_okdet_subclass(self.sample(xbias_nkg_at_peak_v=0.8)), "clamp-on")
+
+    def test_missing_xbias_nodes_are_none_never_a_class(self):
+        self.assertIsNone(m.mc_okdet_subclass(None))
+        self.assertIsNone(m.mc_okdet_subclass({"bias_ok_at_peak_v": 0.0}))
+
+    def test_attribution_counts_classes_and_ranges(self):
+        corners = [{"samples": [
+            {"valid": True, "reason": None, "xbias_noko_at_peak_v": 1.5, "xbias_na_at_peak_v": 0.630, "xbias_nbtop_at_peak_v": 0.633},
+            {"valid": False, "reason": "no_transition", "stuck_class": "enable-clamp", "okdet_class": "first-stage-unbalanced",
+             "xbias_noko_at_peak_v": 0.30, "xbias_na_at_peak_v": 0.630, "xbias_nbtop_at_peak_v": 0.631},
+            {"valid": False, "reason": "no_transition", "stuck_class": "enable-clamp", "okdet_class": None},  # uninstrumented
+            {"valid": False, "reason": "NO_RESULT (up:multiple_transitions, down:no_transition)"},  # not no_transition-only
+        ]}]
+        att = m.okdet_attribution(corners)
+        self.assertEqual(att["n_failed"], 3)
+        self.assertEqual(att["sub_counts"], {"first-stage-unbalanced": 1, "uninstrumented": 1, "not-enable-clamp": 1})
+        self.assertAlmostEqual(att["failing_settle_signal_v"]["min"], 0.001, places=12)
+        self.assertAlmostEqual(att["releasing_settle_signal_v"]["min"], 0.003, places=12)
+        self.assertAlmostEqual(att["releasing_noko_at_peak_v"]["min"], 1.5, places=12)
+        st = m.mc_okdet_attribution_statement(att)
+        self.assertIn("1x `first-stage-unbalanced`", st)
+        self.assertIn("1x `uninstrumented`", st)
+
+    def test_attribution_with_no_failures_says_so(self):
+        att = m.okdet_attribution([{"samples": [{"valid": True, "reason": None}]}])
+        self.assertEqual(att["n_failed"], 0)
+        self.assertIn("No failed-release", m.mc_okdet_attribution_statement(att))
+
+
+class McEffectiveOverrides(unittest.TestCase):
+    """issue #455: --mc-process/--mc-seed override the manifest for ONE run and are
+    honored by the record; the manifest itself is never mutated, and no overrides
+    means byte-identical behaviour to the pre-override path."""
+
+    MAN = {"monte_carlo": {"process": ["tt", "ss"], "temperature_c": [-40, 27, 125], "seed": 20261114,
+                           "n_per_corner": 20, "vary": "mismatch", "rate_v_per_s": 100.0,
+                           "request_sizing": "x", "statistical_convention": "y", "seed_offsets": "z", "execution": "e"}}
+
+    def test_no_override_is_the_manifest(self):
+        self.assertEqual(m.mc_effective(self.MAN), self.MAN["monte_carlo"])
+        self.assertEqual(m.mc_units(self.MAN), m.mc_units(self.MAN, m.mc_effective(self.MAN)))
+
+    def test_process_and_seed_overrides_apply_without_mutation(self):
+        mc = m.mc_effective(self.MAN, {"process_override": ["tt", "ss", "ff", "sf", "fs"], "seed_override": 20261121})
+        self.assertEqual(mc["process"], ["tt", "ss", "ff", "sf", "fs"])
+        self.assertEqual(mc["seed"], 20261121)
+        self.assertEqual(self.MAN["monte_carlo"]["process"], ["tt", "ss"])  # manifest untouched
+        units = m.mc_units(self.MAN, mc)
+        self.assertEqual(len(units), 15)
+        self.assertEqual(units[0][2], 1)
+        self.assertEqual(units[-1][2], 15)
+        self.assertEqual(m.mc_request_seed(mc, 15), 20261121 + 15)
+
+    def test_none_overrides_are_ignored(self):
+        mc = m.mc_effective(self.MAN, {"process_override": None, "seed_override": None})
+        self.assertEqual(mc["process"], ["tt", "ss"])
+        self.assertEqual(mc["seed"], 20261114)
+
+
+class McEffectiveProse(unittest.TestCase):
+    """issue #481: record/run prose follows the effective grid; default grid is verbatim."""
+
+    MAN = m.json.load(open(Path(m.__file__).with_name("experiment.json")))
+
+    def prose(self, **ov):
+        mc = m.mc_effective(self.MAN, ov or None)
+        return mc, m.mc_effective_prose(self.MAN, mc)
+
+    def test_default_grid_is_byte_identical(self):
+        d = self.MAN["monte_carlo"]
+        for ov in ({}, {"process_override": ["tt", "ss"], "seed_override": 20261114}):
+            _, p = self.prose(**ov)
+            self.assertEqual(p["claim"], self.MAN["claim"])
+            self.assertEqual(p["statistical_convention"], d["statistical_convention"])
+            self.assertEqual(p["request_sizing"], d["request_sizing"])
+            self.assertEqual(p["seed_offsets"], d["seed_offsets"])
+            self.assertEqual(p["absent_coverage"], self.MAN["absent_coverage"])
+
+    def test_full_five_corner_override(self):
+        _, p = self.prose(process_override=["tt", "ss", "ff", "sf", "fs"], seed_override=20261121)
+        self.assertIn("= 15 requests", p["request_sizing"])
+        self.assertNotIn("= 6 requests", p["request_sizing"])
+        self.assertIn("k = 1..15", p["seed_offsets"])
+        self.assertIn("fs/125C -> 20261136", p["seed_offsets"])
+        self.assertNotIn("the six", p["seed_offsets"])
+        self.assertNotIn("ff/sf/fs", p["statistical_convention"])
+        self.assertIn("on tt/ss/ff/sf/fs (run override);", p["claim"])
+        self.assertFalse(any("NOT sampled by it: the ideal-bias variant, the ff/sf/fs" in a for a in p["absent_coverage"]))
+        self.assertTrue(any("tt/ss/ff/sf/fs sections" in a for a in p["absent_coverage"]))
+
+    def test_partial_process_override(self):
+        _, p = self.prose(process_override=["ff"])
+        self.assertIn("= 3 requests", p["request_sizing"])
+        self.assertIn("the tt/ss/sf/fs sections, ", p["statistical_convention"])
+        self.assertIn("on ff (run override);", p["claim"])
+
+    def test_seed_only_override(self):
+        _, p = self.prose(seed_override=1000)
+        self.assertIn("tt/-40C -> 1001", p["seed_offsets"])
+        self.assertIn("ss/125C -> 1006", p["seed_offsets"])
+        self.assertIn("= 6 requests", p["request_sizing"])
+        self.assertIn("on tt/ss;", p["claim"])
+        self.assertIn("the ff/sf/fs sections, ", p["statistical_convention"])
+
+    def _not_sampled_line(self, rec):
+        out = m.render_mc_md(rec)
+        lines = [ln for ln in out.splitlines() if ln.startswith("- **Not sampled**:")]
+        self.assertEqual(len(lines), 1)
+        return lines[0]
+
+    @staticmethod
+    def _rec(name):
+        import json
+        return json.loads((HERE / "records" / name).read_text())
+
+    def test_render_not_sampled_bullet_five_corner(self):
+        line = self._not_sampled_line(self._rec("20261121-115035-c591b93b-real-bias-core-mismatch-mc.json"))
+        self.assertTrue(line.endswith("and post-layout parasitics."), line)
+        self.assertNotIn("ff/sf/fs process sections", line)
+
+    def test_render_not_sampled_bullet_tt_ss(self):
+        line = self._not_sampled_line(self._rec("20261121-114636-63e27cba-real-bias-core-mismatch-mc.json"))
+        self.assertIn("post-layout parasitics, and the ff/sf/fs process sections.", line)
+
+    def test_render_not_sampled_bullet_partial(self):
+        import copy
+        rec = copy.deepcopy(self._rec("20261121-114636-63e27cba-real-bias-core-mismatch-mc.json"))
+        rec["matrix"]["process"] = ["ff"]
+        line = self._not_sampled_line(rec)
+        self.assertIn("the tt/ss/sf/fs process sections.", line)
 
 
 if __name__ == "__main__":
