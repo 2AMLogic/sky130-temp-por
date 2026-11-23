@@ -22,6 +22,7 @@
       "tramp": "100u",
       "tstop": "10m"
     },
+    "supply_param": "vsup",
     "analyses": [
       "tran 10u 10m uic",
       "let nlast = length(v(ptat))-1"
