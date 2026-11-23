@@ -3,7 +3,7 @@
 Current roadmap derived from GitHub label state. The region below is maintained by the Loom Guide role.
 
 <!-- guide:plan-body:start -->
-_Generated: 2026-11-22T21:02:26Z (snapshot; compare against live labels)_
+_Generated: 2026-11-23T10:11:29Z (snapshot; compare against live labels)_
 ## Operator Attention: Merge-Risk-Hold Pileup
 
 Judge-approved PRs under a hold (`loom:blocked` or `loom:operator`) — only a human merge decision is missing.
@@ -74,7 +74,7 @@ Issues carrying `loom:curated`.
 - **#137**: Run the two-key ratification ceremony on DR-004 and DR-005 *(architect)* *(held)*
 - **#321**: Remove undeclared descriptor keys from compose-cell.py (lvs.params, lvs.drop_kwargs, blocks[].from_stage): no committed cell recipe uses them *(hermit)* *(held)*
 - **#327**: corner-run.py: finish the batch path (it refuses 4 of 5 experiments) and retire the local ngspice grid loop *(hermit)* *(held)*
-- **#353**: Collapse the four `supersedes` encodings into one: the display placeholder `(none)` is load-bearing machine state in two runners *(hermit)* *(held)*
+- **#353**: Collapse the four `supersedes` encodings into one: the display placeholder `(none)` is load-bearing machine state in two runners *(hermit)*
 
 ## Epics
 
