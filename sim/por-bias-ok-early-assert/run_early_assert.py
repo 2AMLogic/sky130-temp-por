@@ -40,8 +40,11 @@ import sim_common  # noqa: E402
 
 cr = sim_common.load_corner_run()
 
-OFFSET_OLD = "XMOL2 NOKO NOKL VSS VSS"
-OFFSET_NEW = "VOFF NOKLG NOKL DC {voff}\nXMOL2 NOKO NOKLG VSS VSS"
+# device -> (original line prefix, replacement with a series VOFF source behind the device's gate)
+OFFSETS = {
+    "XMOL2": ("XMOL2 NOKO NOKL VSS VSS", "VOFF NOKLG NOKL DC {voff}\nXMOL2 NOKO NOKLG VSS VSS"),
+    "XMOKA": ("XMOKA NOKO NA TOK VDD", "VOFF NAG NA DC {voff}\nXMOKA NOKO NAG TOK VDD"),
+}
 WAVE = "wave.dat"
 
 
@@ -52,37 +55,40 @@ class Point:
     rate: float
     start: str
     offset_mv: int
+    device: str = "XMOL2"
 
     @property
     def point_id(self) -> str:
         t = f"m{abs(int(self.temp_c))}c" if self.temp_c < 0 else f"{int(self.temp_c)}c"
         o = f"{'p' if self.offset_mv >= 0 else 'm'}{abs(self.offset_mv):03d}"
-        return f"{self.proc}_{t}_r{self.rate:g}_{self.start}_off{o}"
+        return f"{self.proc}_{t}_r{self.rate:g}_{self.start}_{self.device.lower()}_off{o}"
 
 
 def build_points(grid: str, man: dict) -> list[Point]:
     g = man["grids"][grid]
     pairs = [tuple(p) for p in g["paired"]] if "paired" in g else [(p, t) for p in g["process"] for t in g["temperature_c"]]
-    pts = [Point(p, t, r, s, o) for p, t in pairs for r in g["rate_v_per_s"] for s in g["starts"] for o in g["offset_mv"]]
+    offs = g["offset_mv"]  # {device: [mV, ...]}
+    pts = [Point(p, t, r, s, o, d) for p, t in pairs for r in g["rate_v_per_s"] for s in g["starts"] for d, ol in offs.items() for o in ol]
     rs = g.get("rate_sweep")
     if rs:
-        pts += [Point(p, t, r, s, o) for p, t in pairs for r in rs["rate_v_per_s"] for s in rs["starts"] for o in g["offset_mv"]]
+        pts += [Point(p, t, r, s, o, d) for p, t in pairs for r in rs["rate_v_per_s"] for s in rs["starts"] for d, ol in offs.items() for o in ol]
     return pts
 
 
-def derived_bias_core() -> str:
+def derived_bias_core(device: str) -> str:
+    old, new = OFFSETS[device]
     txt = (NETLIST_DIR / "bias_core.spice").read_text()
-    if txt.count(OFFSET_OLD) != 1:
-        raise cr.HarnessError(f"expected exactly one {OFFSET_OLD!r} in design/netlist/bias_core.spice")
-    return sim_common.drop_end(txt.replace(OFFSET_OLD, OFFSET_NEW))
+    if txt.count(old) != 1:
+        raise cr.HarnessError(f"expected exactly one {old!r} in design/netlist/bias_core.spice")
+    return sim_common.drop_end(txt.replace(old, new))
 
 
-def build_body(head: str) -> str:
+def build_body(head: str, device: str) -> str:
     dut = "".join(sim_common.drop_end((NETLIST_DIR / n).read_text()) for n in ("por_comparator.spice", "por_output_chain.spice"))
-    return head + "\n" + dut + derived_bias_core()
+    return head + "\n" + dut + derived_bias_core(device)
 
 
-def build_deck(pt: Point, body: str) -> str:
+def build_deck(pt: Point, bodies: dict) -> str:
     tstop = 2 * 3.63 / pt.rate
     tmax = 0.002 / pt.rate
     lines = [
@@ -95,7 +101,7 @@ def build_deck(pt: Point, body: str) -> str:
     ]
     if pt.start == "gmin":
         lines.append(".options gmin=1e-11")
-    lines.append(body)
+    lines.append(bodies[pt.device])
     uic = " uic" if pt.start == "uic" else ""
     lines += [
         ".control",
@@ -113,7 +119,7 @@ def build_deck(pt: Point, body: str) -> str:
     return "\n".join(lines)
 
 
-def deck_unit(pt: Point, body: str, timeout: int) -> tuple[dict, dict[str, str]]:
+def deck_unit(pt: Point, body: dict, timeout: int) -> tuple[dict, dict[str, str]]:
     base = f"units/{pt.point_id}"
     unit = {"id": pt.point_id, "deck": f"{base}/deck.spice", "inputs": [{"path": f"{base}/spiceinit", "name": ".spiceinit"}],
             "outputs": [WAVE], "timeout_s": timeout}
@@ -156,7 +162,7 @@ def run_probe(args, pdk, man) -> int:
     d = BUILD_DIR / "probe" / pt.point_id
     d.mkdir(parents=True, exist_ok=True)
     head = sim_common.netlist_tb_head(TESTBENCH, d / "tb", pdk)
-    req, files = build_request([pt], build_body(head), pdk, "local", args)
+    req, files = build_request([pt], {d: build_body(head, d) for d in OFFSETS}, pdk, "local", args)
     for rel, text in files.items():
         (d / rel).parent.mkdir(parents=True, exist_ok=True)
         (d / rel).write_text(text)
@@ -186,7 +192,7 @@ def render_md(rec: dict) -> str:
          f"- **Subset reason**: {rec['matrix']['subset_reason']}", "",
          "## Verdict", "", rec["verdict"], "",
          "## Per-point results", "",
-         "Offset is forced on XMOL2's gate (mV). BIAS_OK = VDD of first BIAS_OK assertion on the UP ramp; VPOR-up = genuine POR_RAW release; "
+         "Offset (mV) is forced behind the gate of the device named in the point id (xmol2 = mirror output leg, xmoka = OK-detector input device on NA). BIAS_OK = VDD of first BIAS_OK assertion on the UP ramp; VPOR-up = genuine POR_RAW release; "
          "pulse = POR_RAW release-then-reassert before it (start VDD, width mV of VDD / us measured); RESETn = whether a pulse reached RESETn.", "",
          "| point | class | BIAS_OK (V) | VPOR-up (V) | pulses | pulse start (V) | width (mV) | width (us) | RESETn early (V) |",
          "|---|---|---|---|---|---|---|---|---|"]
@@ -219,7 +225,7 @@ def verdict(points: list[dict]) -> str:
 
 def parse_args(argv):
     p = argparse.ArgumentParser(description="forced-offset early-BIAS_OK experiment (issue #495)")
-    p.add_argument("--grid", choices=("pilot", "full"), default="pilot")
+    p.add_argument("--grid", choices=("pilot", "pilot-extended", "full"), default="pilot")
     p.add_argument("--probe", metavar="POINT_ID", help="run ONE point locally (debug, nothing recorded)")
     p.add_argument("--max-workers", type=int, default=8)
     p.add_argument("--subset-reason", default="")
@@ -245,7 +251,7 @@ def main(argv) -> int:
     run_dir = BUILD_DIR / record_id
     run_dir.mkdir(parents=True, exist_ok=True)
     head = sim_common.netlist_tb_head(TESTBENCH, run_dir / "tb", pdk)
-    body = build_body(head)
+    body = {d: build_body(head, d) for d in OFFSETS}
     request, files = build_request(points, body, pdk, "batch", args)
     print(f"experiment: {SLUG}  record: {record_id}  points: {len(points)}")
     if args.dry_run:
@@ -276,13 +282,13 @@ def main(argv) -> int:
         if wave:
             (stage / f"{pt.point_id}.wave.dat").write_text(wave)
         results.append({"point_id": pt.point_id, "process": pt.proc, "temperature_c": pt.temp_c, "rate_v_per_s": pt.rate,
-                        "start": pt.start, "offset_mv": pt.offset_mv, "grade": g,
+                        "start": pt.start, "device": pt.device, "offset_mv": pt.offset_mv, "grade": g,
                         "solver": sim_common.log_solver(raw) if u else None})
         print(f"{pt.point_id:<40} {g['class']:<17} bias_ok={vv(g.get('bias_ok_up_v'))} por_up={vv(g.get('por_up_v'))} pulses={g.get('pulse_count')}")
     sim_common.snapshot_deck_request(sub, stage, run_dir, REPO_ROOT)
     art_manifest, art_summary = evidence_store.store_or_exit(SLUG, record_id, stage)
     snap.parent.mkdir(parents=True, exist_ok=True)
-    snap.write_text(body + "\n.end\n")
+    snap.write_text("\n".join(f"* ===== derived netlist, offset device {d} =====\n{b}\n" for d, b in body.items()) + ".end\n")
     pdk_block, tools_block, batch_block = sim_common.deck_list_record_blocks(
         pdk, pin, report, points=results, capacity_wait_s=args.wait_for_capacity,
         attempts=sim_common.attempt_messages(sub, run_dir, REPO_ROOT))

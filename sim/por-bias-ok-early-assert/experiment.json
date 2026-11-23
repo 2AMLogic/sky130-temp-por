@@ -7,19 +7,150 @@
   "schematic": "testbench/tb_bias_ok_early_assert.sch",
   "statistical_convention": "N/A (deterministic forced-offset sweep of the nominal drawn circuit, not a distribution claim). The offset axis is a sensitivity sweep; sigma_XMOL ~2.9 mV (issue #455) is used only to label +-3 sigma ~ +-9 mV input-referred.",
   "offset": {
-    "device": "XMOL2",
-    "injection": "VOFF NOKLG NOKL DC {voff}; XMOL2 gate moved from NOKL to NOKLG (positive voff raises XMOL2's gate over the diode-connected XMOL1's)",
-    "sweep_mv": [-12, -9, -6, -3, 0, 3, 6, 9, 12]
+    "devices": {
+      "XMOL2": "VOFF NOKLG NOKL DC {voff}; XMOL2 gate moved from NOKL to NOKLG (mirror output leg)",
+      "XMOKA": "VOFF NAG NA DC {voff}; XMOKA gate moved from NA to NAG (OK-detector input device; the XMOKA/XMOKB pair compares NA against NBTOP)"
+    },
+    "sign": "positive voff raises the named device's gate over its original node",
+    "note": "sigma_XMOL ~2.9 mV input-referred (issue #455); offsets beyond ~+-9 mV are >3 sigma and are swept only to bracket the onset, not as realistic draws"
   },
-  "sweep": {"peak_v": 3.63, "construction": "V(VDD) = min(peak, rate*t, max(0, 2*peak - rate*t)); max time step = 2 mV of VDD (0.002/rate s) at every rate; total time 2*peak/rate"},
+  "sweep": {
+    "peak_v": 3.63,
+    "construction": "V(VDD) = min(peak, rate*t, max(0, 2*peak - rate*t)); max time step = 2 mV of VDD (0.002/rate s) at every rate; total time 2*peak/rate"
+  },
   "starts": {
     "default": "tran with default initial condition (DC op first)",
     "uic": "tran ... uic (the start the #474 MC campaign records use)",
     "gmin": ".options gmin=1e-11 (the #474 replay's second solver variant)"
   },
   "grids": {
-    "pilot": {"process": ["ss"], "temperature_c": [-40], "rate_v_per_s": [100], "starts": ["default", "uic", "gmin"], "offset_mv": [-12, -9, -6, -3, 0, 3, 6, 9, 12]},
-    "full": {"process": ["ss", "tt", "ff"], "temperature_c": [-40, 27, 125], "paired": [["ss", -40], ["tt", 27], ["ff", 125]], "rate_v_per_s": [100], "starts": ["default", "uic", "gmin"], "offset_mv": [-9, -6, -3, 0, 3, 6, 9], "rate_sweep": {"rate_v_per_s": [10, 1000], "starts": ["default", "uic"]}}
+    "pilot": {
+      "process": [
+        "ss"
+      ],
+      "temperature_c": [
+        -40
+      ],
+      "rate_v_per_s": [
+        100
+      ],
+      "starts": [
+        "default",
+        "uic",
+        "gmin"
+      ],
+      "offset_mv": {
+        "XMOL2": [
+          -12,
+          0,
+          12
+        ],
+        "XMOKA": [
+          -24,
+          -18,
+          -12,
+          -6,
+          0,
+          6,
+          12,
+          18,
+          24
+        ]
+      }
+    },
+    "full": {
+      "process": [
+        "ss",
+        "tt",
+        "ff"
+      ],
+      "temperature_c": [
+        -40,
+        27,
+        125
+      ],
+      "paired": [
+        [
+          "ss",
+          -40
+        ],
+        [
+          "tt",
+          27
+        ],
+        [
+          "ff",
+          125
+        ]
+      ],
+      "rate_v_per_s": [
+        100
+      ],
+      "starts": [
+        "default",
+        "uic",
+        "gmin"
+      ],
+      "offset_mv": {
+        "XMOKA": [
+          -24,
+          -12,
+          0,
+          12,
+          24
+        ],
+        "XMOL2": [
+          -12,
+          0,
+          12
+        ]
+      },
+      "rate_sweep": {
+        "rate_v_per_s": [
+          10,
+          1000
+        ],
+        "starts": [
+          "default",
+          "uic"
+        ]
+      }
+    },
+    "pilot-extended": {
+      "process": [
+        "ss"
+      ],
+      "temperature_c": [
+        -40
+      ],
+      "rate_v_per_s": [
+        100
+      ],
+      "starts": [
+        "default",
+        "uic"
+      ],
+      "offset_mv": {
+        "XMOKA": [
+          -120,
+          -90,
+          -60,
+          -36,
+          36,
+          60,
+          90,
+          120
+        ],
+        "XMOL2": [
+          -90,
+          -60,
+          -36,
+          36,
+          60,
+          90
+        ]
+      }
+    }
   },
   "absent_coverage": [
     "Offset is forced on XMOL2 only (input-referred mirror offset); offsets on the other OK-detector devices (XMOKA/XMOKB pair, XMOK2) and global process Monte Carlo are NOT swept.",
