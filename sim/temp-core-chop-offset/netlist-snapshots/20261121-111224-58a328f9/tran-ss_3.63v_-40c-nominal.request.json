@@ -1,0 +1,60 @@
+{
+  "netlist": "netlist.spice",
+  "backend": "batch",
+  "models": {
+    "pdk": "sky130A",
+    "lib": "libs.tech/combined/sky130.lib.spice"
+  },
+  "corners": {
+    "process": [
+      "ss"
+    ],
+    "supply_v": {
+      "vsup": [
+        3.63
+      ]
+    },
+    "temperature_c": [
+      -40
+    ]
+  },
+  "analysis": {
+    "kind": "tran",
+    "args": "5e-07 0.005 0 5e-07 uic"
+  },
+  "measurements": [
+    {
+      "name": "ptat_pp",
+      "spice": ".meas tran ptat_pp PP v(ptat) FROM=0.003 TO=0.005",
+      "unit": "V"
+    },
+    {
+      "name": "ptat_avg",
+      "spice": ".meas tran ptat_avg AVG v(ptat) FROM=0.003 TO=0.005",
+      "unit": "V"
+    },
+    {
+      "name": "ctat_pp",
+      "spice": ".meas tran ctat_pp PP v(ctat) FROM=0.003 TO=0.005",
+      "unit": "V"
+    },
+    {
+      "name": "ctat_avg",
+      "spice": ".meas tran ctat_avg AVG v(ctat) FROM=0.003 TO=0.005",
+      "unit": "V"
+    },
+    {
+      "name": "isup_avg",
+      "spice": ".meas tran isup_avg AVG i(vsup) FROM=0.003 TO=0.005",
+      "unit": "A"
+    }
+  ],
+  "options": {
+    "timeout_s": 3000,
+    "keep_artifacts": true
+  },
+  "batch": {
+    "runner_version_check": "warn",
+    "capacity_wait_s": 600.0
+  }
+}

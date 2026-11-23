@@ -1,0 +1,37 @@
+{
+  "slug": "temp-core-chop-offset",
+  "title": "temp_core chopped-amplifier residual input offset: two-phase DC solve and clocked transient check of the `chop-degen` deck variant",
+  "issue": 461,
+  "claim": "Issue #461 (part a of #456) -- NOT a spec claim and no spec/ or design/ edit; DR-007 is untouched. Measures the residual input-referred offset of a chopped, degenerated-mirror temp_core amplifier under local mismatch, against DR-007 item 1's <= 0.05 mV design target (there a sigma assumption, explicitly unverified by that DR). A measured miss is a valid outcome. This experiment supplies the variant and its offset record; #462 consumes them for the all-terms campaign, startup run and report.",
+  "method": {
+    "deck": "variant `chop-degen` of sim/temp-core-accuracy-mc (the #284 mirror-degen rewrite composed with cross-coupled input/output transmission-gate choppers around the input pair; the 16 switch instances belong to the `amp` mismatch term, XRDEG1..3 to `mirror`). A rewrite of the generated deck only; design/ and spec/ are not edited.",
+    "static_two_phase_dc": "per mismatch sample, BOTH chop phases solved as DC temperature sweeps on the same physical draw (phase A/B decks differ only in the four chopper control literals, so paired klt requests sharing corners/seed/N re-draw the same devices per sample index -- klt derives the sample seed from the corner index, the property the #105 campaign's per-process-section split already relies on; the measured single-phase-vs-paired cancellation ratio is the empirical check, ~0.707 would mean broken pairing). Each phase guard-checked on its own (the #105 guard set); only complete, fully valid pairs averaged (incomplete pairs counted invalid, never substituted); the pair average vs the variant's own phase-averaged nominal at the same PVT, referred to the amplifier input through G = dPTAT/dVos = 26 V/V (DR-007's (R2+R2TRIM)/R1; the chopper adds no device in that path).",
+    "clocked_transient": "tt/3.30 V/27 C plus the worst static-residual point (default ss/3.63 V/-40 C, the #105 historical worst amp-term corner): real make-before-break chopping clock (10 kHz, 55 % duty overlap, 0.2 us edges, 0/2.5 V swing), settle 3 ms (30 cycles), average over 20 integer cycles; PTAT/CTAT peak-to-peak ripple reported separately from the input-referred cycle-average residual vs the no-mismatch transient at the same PVT (same statistic and units as the DC leg: sample sd, input-referred mV, vs the no-mismatch reference). The larger of the DC and transient residuals is the reported one.",
+    "controls": "the variant's own `none` term graded phase-matched against the variant's `nominal` on the expected 15-corner grid with the driver's existing three-state grader (a missing corner reads NOT VERIFIED); phase-pair completeness and guard exclusions counted and disclosed; DR-007's 0.05 mV compared against the measured sample sd, with mean (systematic) and max |.| alongside."
+  },
+  "corners": {
+    "static": "process tt/ss/ff/sf/fs (`_mm`) x supply 2.97/3.30/3.63 V = 15 corners; temperature swept -40..125 C inside each ngspice process, evaluated at -40/27/125 C",
+    "clocked": ["tt/3.30 V/27 C", "the worst static-residual point (default ss/3.63 V/-40 C per record 20261011-165907-69d13ac)"]
+  },
+  "monte_carlo": {
+    "static_n_per_corner_per_phase": 100,
+    "clocked_n_per_point": 8,
+    "vary": "mismatch",
+    "seed": 20261121,
+    "execution": "one klt sim request per (term, phase, process section) for the DC legs and per (point, term) for the transient legs, --backend batch with batch.capacity_wait_s 600; never a local grid. Phase A and B requests share seed and corner list; process section k uses seed + k (the #105 convention)."
+  },
+  "not_measured": [
+    "auto-zero alternative (DR-007 allows chop OR auto-zero; only the chopper is built)",
+    "global process Monte Carlo (MC_PR_SWITCH)",
+    "systematic / gradient / layout-dependent mismatch, stress, aging, self-heating",
+    "layout parasitics and clock wiring capacitance; the clock is an ideal source, not a real generator",
+    "the downstream filter that must remove the reported ripple (readout chain, not this block)",
+    "same-draw identity between the transient and DC legs (different corner-axis shapes; the transient uses its own no-mismatch reference)"
+  ],
+  "cites": {
+    "dr007": "spec/decision-records/DR-007-temp-core-accuracy-recommendation.md (item 1: <= 0.05 mV design target, an assumption the DR does not verify)",
+    "baseline_record": "sim/temp-core-accuracy-mc/records/20261011-165907-69d13ac.md",
+    "mirror_degen_record": "sim/temp-core-accuracy-mc/records/20261107-235128-679442ca.md",
+    "driver": "sim/temp-core-accuracy-mc/run_accuracy_mc.py (variant + deck builder, --phase)"
+  }
+}

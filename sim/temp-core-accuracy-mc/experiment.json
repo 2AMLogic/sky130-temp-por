@@ -37,6 +37,10 @@
     "other": "all bias_core devices and every temp_core device not listed above",
     "all": "every device has mismatch live (the aggregate)"
   },
+  "variants": {
+    "mirror-degen": "issue #284 / DR-007 item 2: XMP1..3 rewritten L4 W8 -> L4 W32 with series res_xhigh_po W2 L660 XRDEG1..3 (new nodes SDG1..3); XRDEG1..3 join the `mirror` term; measured by records 20261107-235128-679442ca (and its run) via `run --variant mirror-degen` + `compare`",
+    "chop-degen": "issue #461 / DR-007 item 1: the mirror-degen rewrite composed with a chopped amplifier -- XMI1/XMI2 re-wired (gates NA/NB -> NGA1/NGA2, drains N1/N2 -> ND1/ND2) behind cross-coupled transmission-gate choppers XSWI1..4 (input) and XSWO1..4 (output), nfet+pfet halves sky130_fd_pr__{n,p}fet_g5v0d10v5 L=0.5 W=2, controlled by CHA/CHAB + CHB/CHBB; phase A connects straight through, phase B crosses both choppers (loop polarity unchanged, amplifier offset sign flipped); the 16 switch instances join the `amp` term, XRDEG1..3 stay in `mirror`. The DC deck needs `--phase a|b`; the two phase decks are device-identical (only the four control-source literals differ), so paired requests sharing corners/seed/N draw the same per-sample mismatch. The residual-offset measurement itself lives in sim/temp-core-chop-offset/ (issue #461), not in this campaign's `record`/`compare` stages."
+  },
   "operating_point_guards": {
     "scope": "applied to EVERY sample at -40, 27 and 125 C; a failing sample is INVALID, excluded from the statistics, counted and disclosed, never trimmed or substituted",
     "ptat_V": [0.3, 2.6],
