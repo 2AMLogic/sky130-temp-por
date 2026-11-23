@@ -489,8 +489,7 @@ def main(argv: list[str]) -> int:
     r.add_argument("--split-process", action="store_true", help="one fleet request per MOS corner (9 points each) for a variant whose single 45-corner job exceeds the fleet wall-clock ceiling")
     c = sub.add_parser("record")
     c.add_argument("--run-id", required=True)
-    c.add_argument("--author")
-    c.add_argument("--supersedes")
+    sim_common.add_record_args(c)
     args = ap.parse_args(argv)
     return {"run": cmd_run, "record": cmd_record}[args.cmd](args)
 

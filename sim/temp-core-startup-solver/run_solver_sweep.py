@@ -534,7 +534,7 @@ def cmd_record(args):
         "repeats_cross_scenario": {c: cs for c, cs in repeats.items() if len({x.split("__")[0] for x in cs}) > 1},
         "not_run_combos": not_run, "acceptance": "partial" if not_run else "complete",
         "caveats": [base_caveat(res)], "resumes": meta.get("resumes", []),
-        "supersedes": args.supersedes or "(none)",
+        "supersedes": args.supersedes,
         "author": cr.default_author(),
         "links": {"record": f"sim/{SLUG}/records/{rid}.md", "json": f"sim/{SLUG}/records/{rid}.json",
                   "driver": f"sim/{SLUG}/run_solver_sweep.py",
@@ -624,7 +624,7 @@ def cmd_record(args):
            if rec["links"]["artifact_manifest"] else "- no per-point logs were produced (every combo was refused), so this record has no artifact manifest"),
           "- windows are copied unchanged from the two `experiment.json` files (no relaxation)", "",
           f"- **Timestamp**: {rec['timestamp']}", f"- **Author**: {rec['author']}",
-          f"- **Supersedes**: {rec['supersedes']}"
+          f"- **Supersedes**: {rec['supersedes'] or '(none)'}"
           + (f" -- re-runs that record's coverage on this host at {10 - len(not_run)} of 10 combos ({'including' if not 'en-high__base' in not_run else 'without'} the EN-high `base` control); the superseded record is untouched and remains the evidence for its own run" if args.supersedes else " -- adds evidence next to `ee63b45`; those records are untouched")]
     (rec_dir / "records" / f"{rid}.md").write_text("\n".join(L) + "\n")
     print(rid)
