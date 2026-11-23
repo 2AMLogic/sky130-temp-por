@@ -577,14 +577,32 @@ class McEffectiveProse(unittest.TestCase):
         self.assertIn("on tt/ss;", p["claim"])
         self.assertIn("the ff/sf/fs sections, ", p["statistical_convention"])
 
-    def test_render_not_sampled_bullet(self):
-        # exercise the derivation directly: same expression as render_mc_md
-        for procs, tail in ((["tt", "ss"], "post-layout parasitics, and the ff/sf/fs process sections."),
-                            (["tt", "ss", "ff", "sf", "fs"], "and post-layout parasitics."),
-                            (["ff"], "post-layout parasitics, and the tt/ss/sf/fs process sections.")):
-            un = [p for p in ("tt", "ss", "ff", "sf", "fs") if p not in procs]
-            got = (f"post-layout parasitics, and the {'/'.join(un)} process sections." if un else "and post-layout parasitics.")
-            self.assertEqual(got, tail)
+    def _not_sampled_line(self, rec):
+        out = m.render_mc_md(rec)
+        lines = [ln for ln in out.splitlines() if ln.startswith("- **Not sampled**:")]
+        self.assertEqual(len(lines), 1)
+        return lines[0]
+
+    @staticmethod
+    def _rec(name):
+        import json
+        return json.loads((HERE / "records" / name).read_text())
+
+    def test_render_not_sampled_bullet_five_corner(self):
+        line = self._not_sampled_line(self._rec("20261121-115035-c591b93b-real-bias-core-mismatch-mc.json"))
+        self.assertTrue(line.endswith("and post-layout parasitics."), line)
+        self.assertNotIn("ff/sf/fs process sections", line)
+
+    def test_render_not_sampled_bullet_tt_ss(self):
+        line = self._not_sampled_line(self._rec("20261121-114636-63e27cba-real-bias-core-mismatch-mc.json"))
+        self.assertIn("post-layout parasitics, and the ff/sf/fs process sections.", line)
+
+    def test_render_not_sampled_bullet_partial(self):
+        import copy
+        rec = copy.deepcopy(self._rec("20261121-114636-63e27cba-real-bias-core-mismatch-mc.json"))
+        rec["matrix"]["process"] = ["ff"]
+        line = self._not_sampled_line(rec)
+        self.assertIn("the tt/ss/sf/fs process sections.", line)
 
 
 class TranUicStartup(unittest.TestCase):
