@@ -1,38 +1,41 @@
 {
-  "schema_version": 3,
-  "file": "bias_core_settle_flag.gds",
+  "schema_version": 4,
+  "file": {
+    "path": "layout/bias_core_settle_flag/bias_core_settle_flag.gds",
+    "scope": "repo"
+  },
   "deck": "sky130",
   "top": "bias_core_settle_flag",
   "dbu_um": 0.001,
   "netlist_path": "bias_core_settle_flag.spice",
-  "netlist_sha256": "d0902a825183af8d4d43ddf0b3061e1f863c14256359792dd6af064fa5068dfd",
-  "netlist_normalized_sha256": "3586b865986910f5e4093e5e0f9845314fac1440d7d52e73d55a49117506345c",
+  "netlist_sha256": "4aead78f8276eded672d1f6734ec303c8e8dd08875692993f94048cc095e0c2e",
+  "netlist_normalized_sha256": "a5a37fd2fbebbb01cf50e5afa03336c5520794a696e2e85774182ae861a1abc0",
   "status": "extracted",
-  "device_count": 10,
+  "device_count": 11,
   "net_count": 11,
   "pin_count": 11,
   "device_counts": {
     "nfet": 5,
-    "pfet": 5
+    "pfet": 6
   },
   "dummy_devices_dropped": 0,
   "ignored_layers": [
     {
-      "layer": 93,
-      "datatype": 44,
-      "shapes": 10
-    },
-    {
       "layer": 95,
       "datatype": 20,
-      "shapes": 10
+      "shapes": 11
     }
   ],
   "device_recognition_only_layers": [
     {
+      "layer": 93,
+      "datatype": 44,
+      "shapes": 11
+    },
+    {
       "layer": 94,
       "datatype": 20,
-      "shapes": 7
+      "shapes": 8
     }
   ],
   "device_classes": [
@@ -41,95 +44,19 @@
     "pnp",
     "sky130_fd_pr__model__cap_mim",
     "sky130_fd_pr__model__cap_mim_m4",
-    "resistor"
+    "resistor",
+    "diode_pw2nd_05v5",
+    "diode_pw2nd_05v5_lvt",
+    "diode_pw2nd_05v5_nvt",
+    "diode_pw2nd_11v0",
+    "diode_pd2nw_05v5",
+    "diode_pd2nw_05v5_lvt",
+    "diode_pd2nw_05v5_hvt",
+    "diode_pd2nw_11v0"
   ],
   "devices": [
     {
       "name": "$1",
-      "class": "nfet",
-      "nets": {
-        "s": "vss",
-        "g": "nokl",
-        "d": "nokl",
-        "b": "vss"
-      },
-      "params": {
-        "l_um": 4.0,
-        "w_um": 2.0,
-        "as_um2": 0.84,
-        "ad_um2": 0.84,
-        "ps_um": 4.84,
-        "pd_um": 4.84
-      },
-      "instance_path": [
-        {
-          "cell": "mol1__mol1_nfet",
-          "array_index": null
-        },
-        {
-          "cell": "mos_array$5",
-          "array_index": null
-        }
-      ]
-    },
-    {
-      "name": "$10",
-      "class": "pfet",
-      "nets": {
-        "s": "noko",
-        "g": "na",
-        "d": "tok",
-        "b": "vdd"
-      },
-      "params": {
-        "l_um": 4.0,
-        "w_um": 8.0,
-        "as_um2": 3.36,
-        "ad_um2": 3.36,
-        "ps_um": 16.84,
-        "pd_um": 16.84
-      },
-      "instance_path": [
-        {
-          "cell": "moka__moka_pfet",
-          "array_index": null
-        },
-        {
-          "cell": "mos_array$2",
-          "array_index": null
-        }
-      ]
-    },
-    {
-      "name": "$2",
-      "class": "nfet",
-      "nets": {
-        "s": "vss",
-        "g": "nokl",
-        "d": "noko",
-        "b": "vss"
-      },
-      "params": {
-        "l_um": 4.0,
-        "w_um": 2.0,
-        "as_um2": 0.84,
-        "ad_um2": 0.84,
-        "ps_um": 4.84,
-        "pd_um": 4.84
-      },
-      "instance_path": [
-        {
-          "cell": "mol2__mol2_nfet",
-          "array_index": null
-        },
-        {
-          "cell": "mos_array$6",
-          "array_index": null
-        }
-      ]
-    },
-    {
-      "name": "$3",
       "class": "nfet",
       "nets": {
         "s": "vss",
@@ -151,41 +78,125 @@
           "array_index": null
         },
         {
-          "cell": "mos_array$7",
+          "cell": "mokc_nfet__core",
+          "array_index": null
+        }
+      ]
+    },
+    {
+      "name": "$10",
+      "class": "pfet",
+      "nets": {
+        "s": "tok",
+        "g": "nbtop",
+        "d": "nokl",
+        "b": "vdd"
+      },
+      "params": {
+        "l_um": 8.0,
+        "w_um": 16.0,
+        "as_um2": 6.72,
+        "ad_um2": 6.72,
+        "ps_um": 32.84,
+        "pd_um": 32.84
+      },
+      "instance_path": [
+        {
+          "cell": "mokb__mokb_pfet",
+          "array_index": null
+        },
+        {
+          "cell": "mokb_pfet__core",
+          "array_index": null
+        }
+      ]
+    },
+    {
+      "name": "$11",
+      "class": "pfet",
+      "nets": {
+        "s": "noko",
+        "g": "na",
+        "d": "tok",
+        "b": "vdd"
+      },
+      "params": {
+        "l_um": 8.0,
+        "w_um": 16.0,
+        "as_um2": 6.72,
+        "ad_um2": 6.72,
+        "ps_um": 32.84,
+        "pd_um": 32.84
+      },
+      "instance_path": [
+        {
+          "cell": "moka__moka_pfet",
+          "array_index": null
+        },
+        {
+          "cell": "moka_pfet__core",
+          "array_index": null
+        }
+      ]
+    },
+    {
+      "name": "$2",
+      "class": "nfet",
+      "nets": {
+        "s": "vss",
+        "g": "nokl",
+        "d": "nokl",
+        "b": "vss"
+      },
+      "params": {
+        "l_um": 16.0,
+        "w_um": 4.0,
+        "as_um2": 1.68,
+        "ad_um2": 1.68,
+        "ps_um": 8.84,
+        "pd_um": 8.84
+      },
+      "instance_path": [
+        {
+          "cell": "mol1__mol1_nfet",
+          "array_index": null
+        },
+        {
+          "cell": "mol1_nfet__core",
+          "array_index": null
+        }
+      ]
+    },
+    {
+      "name": "$3",
+      "class": "nfet",
+      "nets": {
+        "s": "vss",
+        "g": "nokl",
+        "d": "noko",
+        "b": "vss"
+      },
+      "params": {
+        "l_um": 16.0,
+        "w_um": 4.0,
+        "as_um2": 1.68,
+        "ad_um2": 1.68,
+        "ps_um": 8.84,
+        "pd_um": 8.84
+      },
+      "instance_path": [
+        {
+          "cell": "mol2__mol2_nfet",
+          "array_index": null
+        },
+        {
+          "cell": "mol2_nfet__core",
           "array_index": null
         }
       ]
     },
     {
       "name": "$4",
-      "class": "nfet",
-      "nets": {
-        "s": "vss",
-        "g": "noko",
-        "d": "nokx",
-        "b": "vss"
-      },
-      "params": {
-        "l_um": 4.0,
-        "w_um": 2.0,
-        "as_um2": 0.84,
-        "ad_um2": 0.84,
-        "ps_um": 4.84,
-        "pd_um": 4.84
-      },
-      "instance_path": [
-        {
-          "cell": "mok2__mok2_nfet",
-          "array_index": null
-        },
-        {
-          "cell": "mos_array$8",
-          "array_index": null
-        }
-      ]
-    },
-    {
-      "name": "$5",
       "class": "nfet",
       "nets": {
         "s": "vss",
@@ -207,13 +218,69 @@
           "array_index": null
         },
         {
-          "cell": "mos_array$9",
+          "cell": "mo1n_nfet__core",
+          "array_index": null
+        }
+      ]
+    },
+    {
+      "name": "$5",
+      "class": "nfet",
+      "nets": {
+        "s": "vss",
+        "g": "noko",
+        "d": "nokx",
+        "b": "vss"
+      },
+      "params": {
+        "l_um": 4.0,
+        "w_um": 8.0,
+        "as_um2": 3.36,
+        "ad_um2": 3.36,
+        "ps_um": 16.84,
+        "pd_um": 16.84
+      },
+      "instance_path": [
+        {
+          "cell": "mok2__mok2_nfet",
+          "array_index": null
+        },
+        {
+          "cell": "mok2_nfet__core",
           "array_index": null
         }
       ]
     },
     {
       "name": "$6",
+      "class": "pfet",
+      "nets": {
+        "s": "vdd",
+        "g": "pb",
+        "d": "nokx",
+        "b": "vdd"
+      },
+      "params": {
+        "l_um": 4.0,
+        "w_um": 0.5,
+        "as_um2": 0.21,
+        "ad_um2": 0.21,
+        "ps_um": 1.84,
+        "pd_um": 1.84
+      },
+      "instance_path": [
+        {
+          "cell": "mok2p__mok2p_pfet",
+          "array_index": null
+        },
+        {
+          "cell": "mok2p_pfet__core",
+          "array_index": null
+        }
+      ]
+    },
+    {
+      "name": "$7",
       "class": "pfet",
       "nets": {
         "s": "vdd",
@@ -235,35 +302,7 @@
           "array_index": null
         },
         {
-          "cell": "mos_array",
-          "array_index": null
-        }
-      ]
-    },
-    {
-      "name": "$7",
-      "class": "pfet",
-      "nets": {
-        "s": "vdd",
-        "g": "pb",
-        "d": "nokx",
-        "b": "vdd"
-      },
-      "params": {
-        "l_um": 4.0,
-        "w_um": 1.0,
-        "as_um2": 0.42,
-        "ad_um2": 0.42,
-        "ps_um": 2.84,
-        "pd_um": 2.84
-      },
-      "instance_path": [
-        {
-          "cell": "mok2p__mok2p_pfet",
-          "array_index": null
-        },
-        {
-          "cell": "mos_array$3",
+          "cell": "mpok_pfet__core",
           "array_index": null
         }
       ]
@@ -291,7 +330,7 @@
           "array_index": null
         },
         {
-          "cell": "mos_array$4",
+          "cell": "mo1p_pfet__core",
           "array_index": null
         }
       ]
@@ -300,26 +339,26 @@
       "name": "$9",
       "class": "pfet",
       "nets": {
-        "s": "tok",
-        "g": "nbtop",
-        "d": "nokl",
+        "s": "nokx",
+        "g": "bias_ok",
+        "d": "vdd",
         "b": "vdd"
       },
       "params": {
         "l_um": 4.0,
-        "w_um": 8.0,
-        "as_um2": 3.36,
-        "ad_um2": 3.36,
-        "ps_um": 16.84,
-        "pd_um": 16.84
+        "w_um": 2.0,
+        "as_um2": 0.84,
+        "ad_um2": 0.84,
+        "ps_um": 4.84,
+        "pd_um": 4.84
       },
       "instance_path": [
         {
-          "cell": "mokb__mokb_pfet",
+          "cell": "mokh__mokh_pfet",
           "array_index": null
         },
         {
-          "cell": "mos_array$1",
+          "cell": "mokh_pfet__core",
           "array_index": null
         }
       ]
@@ -329,19 +368,19 @@
     {
       "name": "bias_ok",
       "pin": true,
-      "device_count": 2,
-      "net_id": 6,
+      "device_count": 3,
+      "net_id": 11,
       "pin_index": 0,
       "label_positions_um": [
         {
           "text": "bias_ok",
           "x_um": -6.415,
-          "y_um": 19.5
+          "y_um": 30.0
         },
         {
           "text": "bias_ok",
-          "x_um": 42.0,
-          "y_um": 6.985
+          "x_um": 81.5,
+          "y_um": 10.985
         }
       ]
     },
@@ -349,13 +388,13 @@
       "name": "na",
       "pin": true,
       "device_count": 1,
-      "net_id": 10,
+      "net_id": 9,
       "pin_index": 1,
       "label_positions_um": [
         {
           "text": "na",
-          "x_um": 20.58,
-          "y_um": 14.21
+          "x_um": 45.58,
+          "y_um": 22.21
         }
       ]
     },
@@ -363,13 +402,13 @@
       "name": "nbtop",
       "pin": true,
       "device_count": 1,
-      "net_id": 9,
+      "net_id": 8,
       "pin_index": 2,
       "label_positions_um": [
         {
           "text": "nbtop",
-          "x_um": 11.42,
-          "y_um": 14.21
+          "x_um": 13.42,
+          "y_um": 22.21
         }
       ]
     },
@@ -377,7 +416,7 @@
       "name": "nkg",
       "pin": true,
       "device_count": 1,
-      "net_id": 4,
+      "net_id": 2,
       "pin_index": 3,
       "label_positions_um": [
         {
@@ -387,7 +426,7 @@
         },
         {
           "text": "nkg",
-          "x_um": 12.788,
+          "x_um": 25.288,
           "y_um": 7.0
         }
       ]
@@ -396,13 +435,13 @@
       "name": "nokl",
       "pin": true,
       "device_count": 4,
-      "net_id": 2,
+      "net_id": 5,
       "pin_index": 4,
       "label_positions_um": [
         {
           "text": "nokl",
-          "x_um": 14.5,
-          "y_um": 9.59
+          "x_um": 19.0,
+          "y_um": 9.84
         }
       ]
     },
@@ -410,21 +449,21 @@
       "name": "noko",
       "pin": true,
       "device_count": 4,
-      "net_id": 3,
+      "net_id": 4,
       "pin_index": 5,
       "label_positions_um": [
         {
           "text": "noko",
-          "x_um": 17.6,
-          "y_um": 7.835
+          "x_um": 40.0,
+          "y_um": 13.485
         }
       ]
     },
     {
       "name": "nokx",
       "pin": true,
-      "device_count": 4,
-      "net_id": 5,
+      "device_count": 5,
+      "net_id": 3,
       "pin_index": 6,
       "label_positions_um": [
         {
@@ -434,8 +473,8 @@
         },
         {
           "text": "nokx",
-          "x_um": 33.5,
-          "y_um": 8.735
+          "x_um": 61.5,
+          "y_um": 13.11
         }
       ]
     },
@@ -443,7 +482,7 @@
       "name": "pb",
       "pin": true,
       "device_count": 2,
-      "net_id": 7,
+      "net_id": 6,
       "pin_index": 7,
       "label_positions_um": [
         {
@@ -453,7 +492,7 @@
         },
         {
           "text": "pb",
-          "x_um": 15.92,
+          "x_um": 29.42,
           "y_um": 11.5
         }
       ]
@@ -462,32 +501,32 @@
       "name": "tok",
       "pin": true,
       "device_count": 3,
-      "net_id": 11,
+      "net_id": 10,
       "pin_index": 8,
       "label_positions_um": [
         {
           "text": "tok",
           "x_um": 5.9,
-          "y_um": 18.24
+          "y_um": 28.24
         }
       ]
     },
     {
       "name": "vdd",
       "pin": true,
-      "device_count": 8,
-      "net_id": 8,
+      "device_count": 10,
+      "net_id": 7,
       "pin_index": 9,
       "label_positions_um": [
         {
           "text": "vdd",
           "x_um": -4.0,
-          "y_um": 26.585
+          "y_um": 43.085
         },
         {
           "text": "vdd",
           "x_um": -0.275,
-          "y_um": 26.5
+          "y_um": 43.0
         }
       ]
     },
@@ -505,19 +544,20 @@
         },
         {
           "text": "vss",
-          "x_um": 8.21,
-          "y_um": -5.21
+          "x_um": 8.92,
+          "y_um": -6.0
         }
       ]
     }
   ],
   "warnings": [
-    "2 layers (93/44, 95/20) carrying 20 shapes are outside 'sky130' deck's connectivity graph -- this geometry is invisible to extraction, so a net routed only through it extracts as multiple disconnected nets instead of one, which will silently mismatch a downstream `klt lvs` reference netlist -- see ignored_layers[] for the full per-layer shape counts. See docs/cli/extract.md's 'ignored_layers' field documentation."
+    "1 layer (95/20) carrying 11 shapes is outside 'sky130' deck's connectivity graph -- this geometry is invisible to extraction, so a net routed only through it extracts as multiple disconnected nets instead of one, which will silently mismatch a downstream `klt lvs` reference netlist -- see ignored_layers[] for the full per-layer shape counts. See docs/cli/extract.md's 'ignored_layers' field documentation."
   ],
   "black_box_regions": [],
   "abstracted_cells": [],
   "unmodelled_poly": [],
   "merged_net_labels": [],
+  "split_net_labels": [],
   "voltage_domain_warnings": [],
   "missing_flavour_markers": [],
   "unsupported_devices": [],
@@ -531,19 +571,22 @@
   "declared_pins": null,
   "def_pins": null,
   "label_layers": null,
+  "device_models": null,
   "probes": [],
   "pdk": null,
   "provenance": {
-    "klt_version": "0.7.1.dev1610+g758c6e224053",
-    "klayout_version": "0.30.12",
+    "klt_version": "0.9.2",
+    "klt_git_commit": "046ba74652fc096bd97071fc3237f7159dd40183",
+    "klt_reinstall_spec": "klayout-tools==0.9.2",
+    "klayout_version": "0.30.14",
     "pdk": null,
     "deck": {
       "name": "sky130",
-      "content_hash": "sha256:773f73886500d88310f3c3ebe671aad84de425473e9eb6b7ae5a22902416e973",
-      "released": false
+      "content_hash": "sha256:36027b82e3b16075e72b8e21775cde47ba7d08b7636efa4b73e9c34732a28efd",
+      "released": true
     },
     "input": {
-      "content_hash": "sha256:32b596432382a008d0f972feba001ce8bb47c5d49fe81886c2a2cb353e0bc50c",
+      "content_hash": "sha256:4510ddc4831f411ae7d3284f87b41874836a575a0bfdb18955e235daa838739f",
       "role": "layout"
     }
   },
@@ -551,20 +594,20 @@
   "spef_path": null,
   "subcircuit": null,
   "metrics": {
-    "extract__device__count": 10,
+    "extract__device__count": 11,
     "extract__net__count": 11,
     "extract__pin__count": 11
   },
   "timing": {
     "stages": {
       "read_layout": 0.001,
-      "device_extraction": 0.011,
+      "device_extraction": 0.019,
       "diagnostics": 0.0,
       "netlist_write": 0.0,
       "netlist_hash": 0.0,
       "netlist_normalized_hash": 0.0
     },
-    "total_seconds": 0.091,
-    "unattributed_seconds": 0.078
+    "total_seconds": 0.027,
+    "unattributed_seconds": 0.007
   }
 }

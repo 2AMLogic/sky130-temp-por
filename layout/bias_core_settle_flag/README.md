@@ -21,15 +21,16 @@ sign-off.
 | Device | Ports (device-card order: `D G S B`) | Size |
 |---|---|---|
 | `XMPOK` | `TOK` `PB` `VDD` `VDD` | `pfet_g5v0d10v5`, `L=4` `W=1` |
-| `XMOKA` | `NOKO` `NA` `TOK` `VDD` | `pfet_g5v0d10v5`, `L=4` `W=8` |
-| `XMOKB` | `NOKL` `NBTOP` `TOK` `VDD` | `pfet_g5v0d10v5`, `L=4` `W=8` |
-| `XMOL1` | `NOKL` `NOKL` `VSS` `VSS` | `nfet_g5v0d10v5`, `L=4` `W=2` |
-| `XMOL2` | `NOKO` `NOKL` `VSS` `VSS` | `nfet_g5v0d10v5`, `L=4` `W=2` |
+| `XMOKA` | `NOKO` `NA` `TOK` `VDD` | `pfet_g5v0d10v5`, `L=8` `W=16` |
+| `XMOKB` | `NOKL` `NBTOP` `TOK` `VDD` | `pfet_g5v0d10v5`, `L=8` `W=16` |
+| `XMOL1` | `NOKL` `NOKL` `VSS` `VSS` | `nfet_g5v0d10v5`, `L=16` `W=4` |
+| `XMOL2` | `NOKO` `NOKL` `VSS` `VSS` | `nfet_g5v0d10v5`, `L=16` `W=4` |
 | `XMOKC` | `NOKO` `NKG` `VSS` `VSS` | `nfet_g5v0d10v5`, `L=1` `W=2` |
-| `XMOK2` | `NOKX` `NOKO` `VSS` `VSS` | `nfet_g5v0d10v5`, `L=4` `W=2` |
-| `XMOK2P` | `NOKX` `PB` `VDD` `VDD` | `pfet_g5v0d10v5`, `L=4` `W=1` |
+| `XMOK2` | `NOKX` `NOKO` `VSS` `VSS` | `nfet_g5v0d10v5`, `L=4` `W=8` |
+| `XMOK2P` | `NOKX` `PB` `VDD` `VDD` | `pfet_g5v0d10v5`, `L=4` `W=0.5` |
 | `XMO1P` | `BIAS_OK` `NOKX` `VDD` `VDD` | `pfet_g5v0d10v5`, `L=4` `W=1` |
 | `XMO1N` | `BIAS_OK` `NOKX` `VSS` `VSS` | `nfet_g5v0d10v5`, `L=0.5` `W=4` |
+| `XMOKH` | `NOKX` `BIAS_OK` `VDD` `VDD` | `pfet_g5v0d10v5`, `L=4` `W=2` (new in #455) |
 
 Eleven nodes cross this group's boundary: `VDD`, `VSS`, `TOK`, `PB`, `NA`,
 `NBTOP`, `NOKO`, `NOKL`, `NKG`, `NOKX`, `BIAS_OK`. `NBTOP` (`XMOKB`'s gate)
@@ -291,3 +292,24 @@ flavour's own minimum `L`/`W` should widen the drawn device. Its **device
 flavour** is not verified, and this cell must not be treated as 5V-domain
 sign-off until it is redrawn with the marker and re-run against a deck that
 checks the `hvi` thresholds.
+
+## Re-render after the #455 OK-detector change (issue #473)
+
+The sections above describe the pre-#455 floorplan (10 devices, 44.3 x 32.7 um);
+the sizes in the device table are the current ones. `design/netlist/bias_core.spice`
+@ `f93433ad` is the reference: `XMOKA`/`XMOKB` `L=8 W=16`, `XMOL1`/`XMOL2` `L=16 W=4`,
+`XMOK2` `W=8`, `XMOK2P` `W=0.5`, and the new regenerative-hysteresis device `XMOKH`
+(`NOKX BIAS_OK VDD VDD`, `L=4 W=2`, `rotate_180` so its drain faces the `NOKX` column).
+`reference.spice` carries the eleven cards verbatim.
+
+Rendered with `klt 0.9.2` (the `layout/pdk.json` pin): **DRC clean (0 violations); extract
+11 devices (5 nfet + 6 pfet), 11 nets; LVS `match` 11/11 devices, 11/11 nets.** The extracted
+`L`/`W` of every device equal the landed cards, and `XMOKH` reads back as gate `bias_ok`,
+drain `nokx`, source/bulk `vdd`. Every named routing leg is `routed: true`. The floorplan is
+re-derived, not patched: the PMOS gate row moved to `y=22.21` (the `W=16` devices are 16 um
+tall), the `vdd` rail is at
+`y=43.0`, and the cell is now about 86.5 x 49.2 um. `pb` keeps its `y=11.5` lane and stub so
+its pad stays where `bias_core` already lands it. The `bias_ok` stub moved to `y=30.0`:
+at `y=19.5`, `layout/bin/check-promotion.py` reported `bias_ok` unrouted.
+`check-promotion.py` now passes for all six promoted pins. The same hvi-marker disclosure as
+above still applies (no marker drawn; #6025).

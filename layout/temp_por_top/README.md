@@ -68,7 +68,7 @@ All artifacts below were produced by this re-render (#453) at one klt build:
   `antenna_tables_omitted: false`), and **the p-substrate tie class is still
   not checked** (unexpressible, disclosed in the spec's `ties_disclosure`; see
   `layout/bias_core/erc-supply-spec.md`).
-- **LVS: `match`, 153/153 devices, 71/71 nets — `XMASSIST` included, no
+- **LVS: `match`, 154/154 devices, 71/71 nets — `XMASSIST` included, no
   exclusion.** The top is recomposed from the current leaf stream (PR #419),
   so the native-Vt `massist` device is drawn, extracted (drain `RESETn`, gate
   `VDD`, source/bulk `VSS`, `L=25 W=1` um) and compared against the
@@ -93,3 +93,9 @@ All artifacts below were produced by this re-render (#453) at one klt build:
 Items 3, 4 and 11 of the signoff manifest cite this block's `drc.json`,
 `lvs.json` and `erc.json` (#259), and render as the signoff report states: 3,
 4 and 11 `met`, item 4 with no exclusion.
+
+## Re-render after the #455 OK-detector change (issue #473)
+
+Recomposed from the re-rendered `bias_core` (new `XMOKH`; `BIAS_OK` pin at `y=130.0`) with
+`klt 0.9.2`: DRC clean, `klt erc` clean, LVS `match` 154/154 devices, 71/71 nets (was 153/153 with no
+`XMOKH`). The item-2 attestation, manifest pins and signoff report were re-rendered with it.

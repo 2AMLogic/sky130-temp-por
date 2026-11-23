@@ -17,7 +17,7 @@ harnesses with recorded PVT-corner results; `layout/` has all six
 `temp_por_top` block layout. The signoff report grades the block against its
 own layout, `layout/temp_por_top/`: **7/11 T1 items met** (1, 2, 3, 4, 9, 10, 11).
 Item 3 is [`drc.json`](layout/temp_por_top/drc.json) `clean`. Item 4 is
-[`lvs.json`](layout/temp_por_top/lvs.json) `match` (153/153 devices, 71/71
+[`lvs.json`](layout/temp_por_top/lvs.json) `match` (154/154 devices, 71/71
 nets) with the native-Vt `XMASSIST` included and no exclusion (the top was
 re-rendered from the current leaf streams at the klt `0.9.2` pin, #453); the
 compare is flavour-blind until the 5 V devices' `hvi` marker can be drawn
@@ -99,7 +99,7 @@ layout are both advancing in parallel rather than in strict ladder order —
 DR-003 has ratified the operating-temperature and supply rows while the
 remaining target rows stay open, and `layout/` has the
 assembled `temp_por_top` block, with clean DRC and a full-block LVS match
-(153/153 devices) that includes the native startup-assist device
+(154/154 devices) that includes the native startup-assist device
 (`XMASSIST`, #97) with no exclusion since the #453 re-render at the
 klt `0.9.2` pin (the compare stays flavour-blind until the `hvi` marker can
 be drawn, klayout-tools#6025). Its

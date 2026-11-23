@@ -16,7 +16,7 @@ Unlike `bias_core_pnp8_leg`'s 8:1 matched-ratio PNP group or
 
 | Device | Ports (device-card order) | Value |
 |---|---|---|
-| `XRT` | `NBTOP` `NB` `VSS` | `res_xhigh_po`, `L=17.5um` (17.5kΩ) |
+| `XRT` | `NBTOP` `NB` `VSS` | `res_xhigh_po`, `L=350.0um` (350kΩ; was `17.5` before #455, re-rendered in #473) |
 | `XR1` | `NB` `EC` `VSS` | `res_xhigh_po`, `L=350.0um` (350kΩ) |
 | `XR2` | `VREF` `ER` `VSS` | `res_xhigh_po`, `L=4104.0um` (4.104MΩ) |
 | `XRZ` | `NZ` `N2` `VSS` | `res_xhigh_po`, `L=1016.0um` (1.016MΩ) |

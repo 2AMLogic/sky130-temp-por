@@ -394,17 +394,17 @@ M$12 ks1 ks1 ks2 VSS\x7cvss nfet L=8U W=1U AS=0.42P AD=0.42P PS=2.84U PD=2.84U
 M$13 VDD\x7cvdd VDD\x7cvdd ks1 VSS\x7cvss nfet L=8U W=1U AS=0.42P AD=0.42P
 + PS=2.84U PD=2.84U
 * device instance $14 r0 *1 0,0 nfet
-M$14 nokl nokl VSS\x7cvss VSS\x7cvss nfet L=4U W=2U AS=0.84P AD=0.84P PS=4.84U
-+ PD=4.84U
+M$14 nokl nokl VSS\x7cvss VSS\x7cvss nfet L=16U W=4U AS=1.68P AD=1.68P PS=8.84U
++ PD=8.84U
 * device instance $15 r0 *1 0,0 nfet
-M$15 noko nokl VSS\x7cvss VSS\x7cvss nfet L=4U W=2U AS=0.84P AD=0.84P PS=4.84U
-+ PD=4.84U
+M$15 noko nokl VSS\x7cvss VSS\x7cvss nfet L=16U W=4U AS=1.68P AD=1.68P PS=8.84U
++ PD=8.84U
 * device instance $16 r0 *1 0,0 nfet
 M$16 noko nkg VSS\x7cvss VSS\x7cvss nfet L=1U W=2U AS=0.84P AD=0.84P PS=4.84U
 + PD=4.84U
 * device instance $17 r0 *1 0,0 nfet
-M$17 nokx noko VSS\x7cvss VSS\x7cvss nfet L=4U W=2U AS=0.84P AD=0.84P PS=4.84U
-+ PD=4.84U
+M$17 nokx noko VSS\x7cvss VSS\x7cvss nfet L=4U W=8U AS=3.36P AD=3.36P PS=16.84U
++ PD=16.84U
 * device instance $18 r0 *1 0,0 nfet
 M$18 BIAS_OK\x7cbias_ok nokx VSS\x7cvss VSS\x7cvss nfet L=0.5U W=4U AS=1.68P
 + AD=1.68P PS=8.84U PD=8.84U
@@ -443,24 +443,25 @@ M$29 nkm pb VDD\x7cvdd VDD\x7cvdd pfet L=4U W=1U AS=0.42P AD=0.42P PS=2.84U
 M$30 tok pb VDD\x7cvdd VDD\x7cvdd pfet L=4U W=1U AS=0.42P AD=0.42P PS=2.84U
 + PD=2.84U
 * device instance $31 r0 *1 0,0 pfet
-M$31 nokl nbtop tok VDD\x7cvdd pfet L=4U W=8U AS=3.36P AD=3.36P PS=16.84U
-+ PD=16.84U
+M$31 nokl nbtop tok VDD\x7cvdd pfet L=8U W=16U AS=6.72P AD=6.72P PS=32.84U
++ PD=32.84U
 * device instance $32 r0 *1 0,0 pfet
-M$32 tok na noko VDD\x7cvdd pfet L=4U W=8U AS=3.36P AD=3.36P PS=16.84U PD=16.84U
+M$32 tok na noko VDD\x7cvdd pfet L=8U W=16U AS=6.72P AD=6.72P PS=32.84U
++ PD=32.84U
 * device instance $33 r0 *1 0,0 pfet
-M$33 nokx pb VDD\x7cvdd VDD\x7cvdd pfet L=4U W=1U AS=0.42P AD=0.42P PS=2.84U
-+ PD=2.84U
+M$33 nokx pb VDD\x7cvdd VDD\x7cvdd pfet L=4U W=0.5U AS=0.21P AD=0.21P PS=1.84U
++ PD=1.84U
 * device instance $34 r0 *1 0,0 pfet
-M$34 BIAS_OK\x7cbias_ok nokx VDD\x7cvdd VDD\x7cvdd pfet L=4U W=1U AS=0.42P
+M$34 VDD\x7cvdd BIAS_OK\x7cbias_ok nokx VDD\x7cvdd pfet L=4U W=2U AS=0.84P
++ AD=0.84P PS=4.84U PD=4.84U
+* device instance $35 r0 *1 0,0 pfet
+M$35 BIAS_OK\x7cbias_ok nokx VDD\x7cvdd VDD\x7cvdd pfet L=4U W=1U AS=0.42P
 + AD=0.42P PS=2.84U PD=2.84U
-* device instance $35 r0 *1 0,0 pnp
-Q$35 VSS\x7cvss VSS\x7cvss na pnp AE=11.56P PE=13.6U AB=12.96P PB=14.4U
-+ AC=12.96P PC=14.4U NE=1
 * device instance $36 r0 *1 0,0 pnp
-Q$36 VSS\x7cvss VSS\x7cvss er pnp AE=11.56P PE=13.6U AB=12.96P PB=14.4U
+Q$36 VSS\x7cvss VSS\x7cvss na pnp AE=11.56P PE=13.6U AB=12.96P PB=14.4U
 + AC=12.96P PC=14.4U NE=1
 * device instance $37 r0 *1 0,0 pnp
-Q$37 VSS\x7cvss VSS\x7cvss ec pnp AE=11.56P PE=13.6U AB=12.96P PB=14.4U
+Q$37 VSS\x7cvss VSS\x7cvss er pnp AE=11.56P PE=13.6U AB=12.96P PB=14.4U
 + AC=12.96P PC=14.4U NE=1
 * device instance $38 r0 *1 0,0 pnp
 Q$38 VSS\x7cvss VSS\x7cvss ec pnp AE=11.56P PE=13.6U AB=12.96P PB=14.4U
@@ -483,16 +484,19 @@ Q$43 VSS\x7cvss VSS\x7cvss ec pnp AE=11.56P PE=13.6U AB=12.96P PB=14.4U
 * device instance $44 r0 *1 0,0 pnp
 Q$44 VSS\x7cvss VSS\x7cvss ec pnp AE=11.56P PE=13.6U AB=12.96P PB=14.4U
 + AC=12.96P PC=14.4U NE=1
-* device instance $45 r0 *1 0,0 res_xhigh_po
-X$45 nbtop nb VSS\x7cvss res_xhigh_po r=17500 L=17.5U W=2U
+* device instance $45 r0 *1 0,0 pnp
+Q$45 VSS\x7cvss VSS\x7cvss ec pnp AE=11.56P PE=13.6U AB=12.96P PB=14.4U
++ AC=12.96P PC=14.4U NE=1
 * device instance $46 r0 *1 0,0 res_xhigh_po
-X$46 nb ec VSS\x7cvss res_xhigh_po r=350000 L=350U W=2U
+X$46 nbtop nb VSS\x7cvss res_xhigh_po r=350000 L=350U W=2U
 * device instance $47 r0 *1 0,0 res_xhigh_po
-X$47 n2 nz VSS\x7cvss res_xhigh_po r=1016000 L=1016U W=2U
+X$47 nb ec VSS\x7cvss res_xhigh_po r=350000 L=350U W=2U
 * device instance $48 r0 *1 0,0 res_xhigh_po
-X$48 VREF\x7cvref er VSS\x7cvss res_xhigh_po r=4104000 L=4104U W=2U
-* device instance $49 r0 *1 0,0 sky130_fd_pr__model__cap_mim
-C$49 nz pg 8.152e-13
+X$48 n2 nz VSS\x7cvss res_xhigh_po r=1016000 L=1016U W=2U
+* device instance $49 r0 *1 0,0 res_xhigh_po
+X$49 VREF\x7cvref er VSS\x7cvss res_xhigh_po r=4104000 L=4104U W=2U
 * device instance $50 r0 *1 0,0 sky130_fd_pr__model__cap_mim
-C$50 VDD\x7cvdd nokx 7.656e-14
+C$50 nz pg 8.152e-13
+* device instance $51 r0 *1 0,0 sky130_fd_pr__model__cap_mim
+C$51 VDD\x7cvdd nokx 7.656e-14
 .ENDS bias__bias_core
