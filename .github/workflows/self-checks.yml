@@ -99,6 +99,9 @@ jobs:
       - name: Every evidence record carries the one canonical append-only trailer (one contract, all ten record renderers)
         run: python3 -I sim/bin/test_record_footer.py
 
+      - name: The supersedes field is falsy for no predecessor in new records, never the (none) sentinel (issue 353)
+        run: python3 -I sim/bin/test_supersedes_contract.py
+
       - name: Solver-sweep record provenance lines (PDK/Tools derived from the run, no literals)
         run: python3 -I sim/temp-core-startup-solver/test_record_provenance.py
 

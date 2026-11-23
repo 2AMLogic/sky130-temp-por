@@ -789,7 +789,7 @@ def cmd_record(args):
                                                        "offtrend_over_threshold": v["offtrend"], "max_abs_offtrend_degC": v["max_abs_offtrend_degC"],
                                                        "stats": {f"{a}|{b}|{c}": s for (a, b, c), s in v["stats"].items()}}
                               for k, v in a.items()} for t, a in anal.items() if a},
-           "supersedes": args.supersedes or "(none)", "author": cr.default_author()}
+           "supersedes": args.supersedes, "author": cr.default_author()}
     (rec_dir / "records" / f"{rid}.json").write_text(json.dumps(rec, indent=2, default=str) + "\n")
     (rec_dir / "records" / f"{rid}.md").write_text(render_md(rec, anal, summ, summ_ctat, rss, ctrl, xcheck, not_run, fleet, meta, args, pdk, prov) + "\n")
     print(rid)
@@ -878,7 +878,7 @@ def render_md(rec, anal, summ, summ_ctat, rss, ctrl, xcheck, not_run, fleet, met
          "- **Statistical convention**: **3 sigma = 3 x the sample standard deviation (n-1) of the temperature error over the valid Monte Carlo samples of one PVT corner**, i.e. a +/-3 sigma half-width about the sample mean; mean and empirical max |error| are tabulated alongside. Global process MC (`MC_PR_SWITCH`) is NOT sampled: the process axis is the five corner sections, mismatch is local only.",
          "- **Error definition**: `err(T) = (PTAT_sample(T) - PTAT_nominal(T)) / S` where nominal is the same-corner no-mismatch run and `S = (PTAT_nom(125 C) - PTAT_nom(-40 C))/165 C` (degC from volts via the nominal full-range slope). *Untrimmed* = as-is. *1-point trim* = ideal multiplicative gain trim so PTAT(27 C) equals nominal at 27 C, error evaluated at -40 and 125 C (27 C is zero by construction; trim resolution/quantization not modelled).",
          f"- **Operating-point trust**: DC sweep (not a cold-start transient). Operating-point trust is taken from the #86 solver-sweep record `{SOLVER_RECORD}` and its limits are inherited (six historical FAILs not reproduced on the current netlist, but some variant combos NOT-RUN; the original FAIL records remain). Physical guards applied to EVERY sample at all three temperatures: " + "; ".join(f"{k} in [{lo:g},{hi:g}]" for k, (lo, hi) in GUARDS.items() if k != BRANCH_GUARD) + "; PTAT strictly increasing over -40/27/125 C; **branch consistency** `" + BRANCH_GUARD + f"` = max over T of |d(T) - median_T d|, d = V(NA)-V(NB), in [{GUARDS[BRANCH_GUARD][0]:g},{GUARDS[BRANCH_GUARD][1]:g}] V (one device realisation keeps its amplifier offset across temperature; a DC solution on another branch at one temperature breaks loop closure there only). A sample failing any guard is INVALID: excluded from the statistics, never trimmed or substituted, and counted below.", ""]
-    if rec["supersedes"] != "(none)":
+    if rec["supersedes"]:
         L += [f"**Supersedes `{rec['supersedes']}`** (that record is left untouched; records are append-only). This is a **re-grade of the same fleet outputs** "
               f"(run id `{rec['run_id']}`, the same {sum(len(f['jobs']) for f in fleet.values())} fleet job ids listed above); **no new simulation was run**. "
               "The only change is the analysis: the branch-consistency guard above was added because the superseded record's guards (absolute windows plus "
@@ -1022,7 +1022,7 @@ def render_md(rec, anal, summ, summ_ctat, rss, ctrl, xcheck, not_run, fleet, met
     L += ["## Links", "", f"- driver `sim/{SLUG}/run_accuracy_mc.py`; json twin `records/{rid}.json`; netlists and requests `netlist-snapshots/{rid}/`",
           (f"- raw per-sample values (`samples-<term>.csv`) and nominal points (`nominal_*.log`) are in the fleet artifact store: manifest `{rec['links']['artifact_manifest']}`, summary `{rec['links']['artifact_summary']}` (check with `klt artifact verify {rec['links']['artifact_manifest']}`)"
            if rec["links"]["artifact_manifest"] else "- no per-sample values were produced (every term was refused), so this record has no artifact manifest"),
-          f"- **Timestamp**: {rec['timestamp']}", f"- **Author**: {rec['author']}", f"- **Supersedes**: {rec['supersedes']}"]
+          f"- **Timestamp**: {rec['timestamp']}", f"- **Author**: {rec['author']}", f"- **Supersedes**: {rec['supersedes'] or '(none)'}"]
     return "\n".join(L)
 
 
@@ -1169,7 +1169,8 @@ def cmd_compare(args):
            "dr007_projection_ratio": DR007_PROJECTION, "headline": head, "per_corner": {f"{k[0]}_{k[1]:.2f}V": r for k, r in cmp_rows.items()},
            "guard_counts": {n: {t: {f"{k[0]}_{k[1]:.2f}V": c for k, c in g.items()} for t, g in gt.items()} for n, gt in guards.items()},
            "nominal_invalid_corners": nom_bad, "none_control": ctrl, "fleet": fleet,
-           "dimensions": {"degen_W": DEGEN_W, "degen_L": DEGEN_L, "mirror_W_new": MIRROR_W_NEW}, "author": cr.default_author()}
+           "dimensions": {"degen_W": DEGEN_W, "degen_L": DEGEN_L, "mirror_W_new": MIRROR_W_NEW}, "supersedes": args.supersedes,
+           "author": cr.default_author()}
     (rec_dir / "records" / f"{rid}.json").write_text(json.dumps(rec, indent=2, default=str) + "\n")
     (rec_dir / "records" / f"{rid}.md").write_text(render_compare_md(rec, graded, variant, guards, cmp_rows, head) + "\n")
     print(rid)
@@ -1247,7 +1248,7 @@ def render_compare_md(rec, graded, variant, guards, cmp_rows, head):
     L += ["## Links", "", f"- driver `sim/{SLUG}/run_accuracy_mc.py` (`run --variant`, `compare`); json twin `records/{rid}.json`; decks and requests `netlist-snapshots/{rid}/<variant>/`",
           (f"- per-variant samples (`<variant>/samples-<term>.csv`) and nominal points are in the fleet artifact store: manifest `{rec['links']['artifact_manifest']}`, summary `{rec['links']['artifact_summary']}` (check with `klt artifact verify {rec['links']['artifact_manifest']}`)"
            if rec["links"]["artifact_manifest"] else "- no per-variant samples were produced (every term was refused), so this record has no artifact manifest"),
-          f"- **Timestamp**: {rec['timestamp']}", f"- **Author**: {rec['author']}", "- **Supersedes**: (none)"]
+          f"- **Timestamp**: {rec['timestamp']}", f"- **Author**: {rec['author']}", f"- **Supersedes**: {rec['supersedes'] or '(none)'}"]
     return "\n".join(L)
 
 
@@ -1283,6 +1284,7 @@ def main():
     cp = sub.add_parser("compare", help="issue #284: grade a baseline + mirror-degen run pair (nominal/none/mirror) into one new record")
     cp.add_argument("--run-id", required=True)
     cp.add_argument("--variant", choices=VARIANTS[1:], default="mirror-degen")
+    cp.add_argument("--supersedes", default=None, help="record id this record replaces (append-only: the old record is untouched)")
     cp.add_argument("--allow-dirty", action="store_true")
     cp.set_defaults(fn=cmd_compare)
     a = ap.parse_args()
