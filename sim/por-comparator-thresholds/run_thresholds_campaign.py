@@ -151,7 +151,9 @@ def build_mc_request(proc: str, temp: float, offset: int, mc: dict, man: dict, b
     return sim_common.base_request(
         "netlist.spice", backend,
         {"process": [f"{proc}_mm"], "supply_v": {"vset": [sw["peak_v"]]}, "temperature_c": [temp]},
-        {"kind": "tran", "args": f"1u {tstop:.9g} 0 {sw['tmax_s']:.3g}"},
+        # Issue #474: the supply starts at a physical 0 V, so every node starts at 0 V; `uic` starts the
+        # transient from that state instead of a DC operating point that fails to converge on some cold draws.
+        {"kind": "tran", "args": f"1u {tstop:.9g} 0 {sw['tmax_s']:.3g}" + (" uic" if mc.get("tran_uic") else "")},
         [
             {"name": "vdd_end", "spice": f".meas tran vdd_end FIND v(vdd) AT={tstop - 1e-6:.9g}", "unit": "V"},
             {"name": "por_raw_max", "spice": ".meas tran por_raw_max MAX v(por_raw)", "unit": "V"},
@@ -168,7 +170,7 @@ def mc_dir(run_dir: Path, variant_name: str, proc: str, temp: float) -> Path:
 
 def submit_mc(unit: tuple[str, float, int], variant_name: str, head: str, mc: dict, man: dict, run_dir: Path, capacity_wait_s: float) -> dict:
     proc, temp, offset = unit
-    netlist = build_netlist(head, man["variants"][variant_name], mc["rate_v_per_s"], mc.get("gmin"))
+    netlist = build_netlist(head, man["variants"][variant_name], mc["rate_v_per_s"])
     req = build_mc_request(proc, temp, offset, mc, man, "batch", capacity_wait_s)
     d = mc_dir(run_dir, variant_name, proc, temp)
     label = f"{proc}/{cr.fmt_temp(temp)}C"
@@ -190,7 +192,7 @@ def tb_netlist_head(variant: dict, run_dir: Path, pdk) -> str:
     return sim_common.netlist_tb_head(HERE / variant["schematic"], run_dir / "tb" / variant["schematic"].split("/")[-1][:-4], pdk)
 
 
-def build_netlist(head: str, variant: dict, rate: float, gmin: float | None = None) -> str:
+def build_netlist(head: str, variant: dict, rate: float) -> str:
     dut = ""
     for name in variant["dut_netlists"]:
         # bare name = design/netlist export; a path with "/" is repo-relative (post-layout extracted DUT, issue #124)
@@ -204,13 +206,6 @@ def build_netlist(head: str, variant: dict, rate: float, gmin: float | None = No
         "* fleet runner ignores options.ngspice_init (see experiment.json ngspice_note)\n"
         + sim_common.NOMODCHECK_CONTROL
     )
-    if gmin is not None:
-        # Issue #474: initial-timepoint conditioning for cold mismatch draws (MC axis only).
-        banner += (
-            f"* issue #474: .options gmin={gmin:g} (ngspice default 1e-12) -- netlist-carried because the\n"
-            "* fleet runner takes no solver options from the request; see experiment.json monte_carlo.gmin\n"
-            f".options gmin={gmin:g}\n"
-        )
     return banner + head + "\n" + dut
 
 

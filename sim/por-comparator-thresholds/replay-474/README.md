@@ -30,17 +30,33 @@ One-variable comparison on that exact deck (only the listed line added):
 | `.options method=gear`, `itl4=100`, `trtol=1`, `cshunt=1e-15` | ABORT | - | - |
 | `.options rshunt=1e12` | completes, but see controls | multiple_transitions | 2.53895 |
 
-Passing controls, same seeds, default vs gmin=1e-11 (thresholds must match):
+`gmin` alone is NOT sufficient. A fleet run of the paired matrix (tt/ss, seed 20261114) with
+`.options gmin=1e-11` carried in the netlist still aborted two cold draws at the initial timepoint
+(tt/-40C mc6, `trouble with node "xdut.bias_okb"`; ss/-40C mc9). tt/-40C mc6 replayed locally
+aborts at gmin 1e-12, 1e-11, 1e-10 and 1e-9, and under `rshunt` 1e10/1e12, `itl1=500`, `gminsteps/srcsteps=0`,
+`reltol=1e-2`, `abstol/vntol` and `pivtol/pivrel` changes (the testbench already sets `method=gear trtol=50`).
 
-| control | default up/down (V) | gmin 1e-11 up/down (V) | delta up/down (mV) |
+What works is `uic` on the `.tran` card. The VDD stimulus starts at a physical 0 V, so the all-zero
+initial state `uic` uses is the physical state, and the DC operating point at VDD=0 -- the solve that
+fails -- is skipped. Same decks, default gmin:
+
+| draw | default | `.tran ... uic` |
+|---|---|---|
+| tt/-40C mc14 (abort draw) | ABORT | completes, up 2.69434 / down 2.53927 V (gmin plateau: 2.694 / 2.540) |
+| tt/-40C mc6 (abort draw)  | ABORT | completes, up 2.80523 / down 2.64442 V |
+
+Passing controls, same seeds, default vs `uic` (thresholds must match):
+
+| control | default up/down (V) | uic up/down (V) | delta up/down (mV) |
 |---|---|---|---|
-| tt/-40C mc13 | 2.85502 / 2.69226 | 2.85394 / 2.69236 | -1.08 / +0.10 |
-| tt/-40C mc0 | 2.61710 / 2.46377 | 2.61705 / 2.46458 | -0.05 / +0.81 |
+| tt/-40C mc13 | 2.85502 / 2.69226 | 2.85437 / 2.69163 | -0.65 / -0.63 |
+| tt/-40C mc0 | 2.61710 / 2.46377 | 2.61830 / 2.46407 | +1.20 / +0.30 |
 
-`rshunt=1e12` is rejected: it turned the mc0 control into `NO_RESULT (down:no_transition)`.
-Conclusion: gmin 1e-11 sits on a flat plateau (2e-12..1e-10 agree within 2 mV), changes
-controls by <= 1.1 mV, and leaves stimulus, corners and grading untouched. The abort is
-a DC-solution conditioning failure at the all-zero supply point, not a design fault.
+(gmin 1e-11 moved the same controls by -1.08/+0.10 and -0.05/+0.81 mV; `rshunt=1e12` broke the
+mc0 control, `NO_RESULT (down:no_transition)`, and is rejected.) Controls move by <= 1.2 mV,
+below the 2 mV VDD sample step. The abort is a DC-solution conditioning failure at the all-zero
+supply point, not a design fault; the fix is harness-side startup (`monte_carlo.tran_uic`), with
+stimulus, corners, sampling and grading unchanged.
 
 ## Class 1 -- POR_RAW chatter (ss/-40C mc14, request seed 20261205)
 
