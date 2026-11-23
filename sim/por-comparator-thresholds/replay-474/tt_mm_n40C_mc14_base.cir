@@ -1,0 +1,19 @@
+* klt sim -- generated corner deck, do not edit
+.options seed=405172071
+.param mc_sample_index=14
+.param mc_process_seed=764971444
+.param mc_mismatch_seed=1104194330
+.lib $PDK_ROOT/sky130A/libs.tech/combined/sky130.lib.spice tt_mm
+.include <netlist.spice from run_thresholds_campaign.py mk>
+.temp -40.0
+.meas tran vdd_end FIND v(vdd) AT=0.072599
+.meas tran por_raw_max MAX v(por_raw)
+.control
+save all
+alter vset=3.63
+set filetype=ascii
+tran 1u 0.0726 0 2e-05
+* write <raw>
+quit
+.endc
+.end

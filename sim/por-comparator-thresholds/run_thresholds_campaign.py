@@ -168,7 +168,7 @@ def mc_dir(run_dir: Path, variant_name: str, proc: str, temp: float) -> Path:
 
 def submit_mc(unit: tuple[str, float, int], variant_name: str, head: str, mc: dict, man: dict, run_dir: Path, capacity_wait_s: float) -> dict:
     proc, temp, offset = unit
-    netlist = build_netlist(head, man["variants"][variant_name], mc["rate_v_per_s"])
+    netlist = build_netlist(head, man["variants"][variant_name], mc["rate_v_per_s"], mc.get("gmin"))
     req = build_mc_request(proc, temp, offset, mc, man, "batch", capacity_wait_s)
     d = mc_dir(run_dir, variant_name, proc, temp)
     label = f"{proc}/{cr.fmt_temp(temp)}C"
@@ -190,7 +190,7 @@ def tb_netlist_head(variant: dict, run_dir: Path, pdk) -> str:
     return sim_common.netlist_tb_head(HERE / variant["schematic"], run_dir / "tb" / variant["schematic"].split("/")[-1][:-4], pdk)
 
 
-def build_netlist(head: str, variant: dict, rate: float) -> str:
+def build_netlist(head: str, variant: dict, rate: float, gmin: float | None = None) -> str:
     dut = ""
     for name in variant["dut_netlists"]:
         # bare name = design/netlist export; a path with "/" is repo-relative (post-layout extracted DUT, issue #124)
@@ -204,6 +204,13 @@ def build_netlist(head: str, variant: dict, rate: float) -> str:
         "* fleet runner ignores options.ngspice_init (see experiment.json ngspice_note)\n"
         + sim_common.NOMODCHECK_CONTROL
     )
+    if gmin is not None:
+        # Issue #474: initial-timepoint conditioning for cold mismatch draws (MC axis only).
+        banner += (
+            f"* issue #474: .options gmin={gmin:g} (ngspice default 1e-12) -- netlist-carried because the\n"
+            "* fleet runner takes no solver options from the request; see experiment.json monte_carlo.gmin\n"
+            f".options gmin={gmin:g}\n"
+        )
     return banner + head + "\n" + dut
 
 
