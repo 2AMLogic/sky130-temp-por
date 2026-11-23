@@ -71,7 +71,7 @@ def build_points(grid: str, man: dict) -> list[Point]:
     pts = [Point(p, t, r, s, o, d) for p, t in pairs for r in g["rate_v_per_s"] for s in g["starts"] for d, ol in offs.items() for o in ol]
     rs = g.get("rate_sweep")
     if rs:
-        pts += [Point(p, t, r, s, o, d) for p, t in pairs for r in rs["rate_v_per_s"] for s in rs["starts"] for d, ol in offs.items() for o in ol]
+        pts += [Point(p, t, r, s, o, d) for p, t in pairs for r in rs["rate_v_per_s"] for s in rs["starts"] for d, ol in rs.get("offset_mv", offs).items() for o in ol]
     return pts
 
 
@@ -214,8 +214,8 @@ def verdict(points: list[dict]) -> str:
     ctrl_bad = [p["point_id"] for p in ctrl if p["grade"]["class"] != "clean"]
     s = f"Point classes: {n}. "
     s += ("Zero-offset controls clean at every point. " if not ctrl_bad else f"Zero-offset controls NOT clean: {ctrl_bad}. ")
-    if "pulse_propagates" in n:
-        s += "VERDICT (c): at least one point is reachable AND propagates to RESETn."
+    if "pulse_propagates" in n or "early_release" in n:
+        s += "VERDICT (c): at least one point releases RESETn prematurely (pulse propagates or POR_RAW releases at BIAS_OK's assertion)."
     elif "pulse_absorbed" in n:
         s += "VERDICT (b): pulse reachable on the forced-offset axis but absorbed before RESETn at every point where it occurs."
     else:

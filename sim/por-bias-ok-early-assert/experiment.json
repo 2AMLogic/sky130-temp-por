@@ -93,16 +93,21 @@
       ],
       "offset_mv": {
         "XMOKA": [
+          -60,
+          -36,
+          -30,
           -24,
           -12,
           0,
           12,
-          24
+          24,
+          36
         ],
         "XMOL2": [
-          -12,
+          -60,
+          -36,
           0,
-          12
+          36
         ]
       },
       "rate_sweep": {
@@ -113,7 +118,19 @@
         "starts": [
           "default",
           "uic"
-        ]
+        ],
+        "offset_mv": {
+          "XMOKA": [
+            -60,
+            -36,
+            -24,
+            0
+          ],
+          "XMOL2": [
+            -60,
+            0
+          ]
+        }
       }
     },
     "pilot-extended": {
@@ -158,5 +175,13 @@
     "The assembly is bias_core + por_comparator + por_output_chain on a shared IBIAS node, not temp_por_top: temp_core is not present, so its startup current draw is not on the supply.",
     "Only the process/temperature pairs listed under grids.full.paired are run (the three binding-style corners), not the 15-point matrix; the subset reason is recorded in every record."
   ],
-  "ngspice_note": "Fleet ngspice may differ from the local one; the solver-state dependence this experiment probes means a local single-point cross-check is recorded beside the batch value."
+  "ngspice_note": "Fleet ngspice may differ from the local one; the solver-state dependence this experiment probes means a local single-point cross-check is recorded beside the batch value.",
+  "classes": {
+    "clean": "one POR_RAW release on the UP ramp, no earlier pulse",
+    "pulse_absorbed": "one or more POR_RAW release-then-reassert pulses before the genuine release; RESETn is not released inside the pulse window (+2 ms settle)",
+    "pulse_propagates": "a pulse releases RESETn",
+    "early_release": "POR_RAW releases and STAYS high within 0.2 V of BIAS_OK's assertion (genuine release ~0.95 V higher in the controls), i.e. a premature release, not a pulse",
+    "no_release": "POR_RAW never releases on the UP ramp (BIAS_OK never asserts: the failed-release class of issue #455)",
+    "no_data": "no waveform returned"
+  }
 }

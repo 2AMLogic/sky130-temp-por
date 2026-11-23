@@ -24,6 +24,7 @@ Definitions (this experiment's own; none is a ratified bound):
 from __future__ import annotations
 
 V_VALID = 1.0
+EARLY_RELEASE_GAP_V = 0.2  # POR_RAW release within this of BIAS_OK assertion = premature release (controls: ~0.95 V)
 
 
 def load_wrdata(text: str) -> dict[str, list[float]]:
@@ -110,11 +111,13 @@ def extract(w: dict[str, list[float]], settle_s: float = 2e-3) -> dict:
 
 
 def verdict_class(r: dict) -> str:
-    """clean | pulse_absorbed | pulse_propagates | no_release | no_data"""
+    """clean | early_release | pulse_absorbed | pulse_propagates | no_release | no_data"""
     if r.get("status") != "ok":
         return "no_data"
     if r["por_up_v"] is None:
         return "no_release"
+    if r["bias_ok_up_v"] is not None and r["por_up_v"] - r["bias_ok_up_v"] < EARLY_RELEASE_GAP_V:
+        return "early_release"
     if r["pulse_count"] == 0:
         return "clean"
     return "pulse_propagates" if any(p["propagates_to_resetn"] for p in r["pulses"]) else "pulse_absorbed"
