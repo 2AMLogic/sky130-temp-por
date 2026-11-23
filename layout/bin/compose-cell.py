@@ -17,8 +17,8 @@ trail for that cell rather than a bare GDS.
 Usage
 -----
 
-    python3 layout/bin/compose-cell.py layout/ro_buf/cell.json
-    python3 layout/bin/compose-cell.py layout/ro_buf/cell.json --check
+    python3 layout/bin/compose-cell.py layout/temp_core/cell.json
+    python3 layout/bin/compose-cell.py layout/temp_core/cell.json --check
 
 ``--check`` re-runs everything into a temporary directory and diffs the
 verdict-bearing fields against what is committed, without touching the
@@ -27,10 +27,10 @@ committed files -- the layout sibling of ``design/netlist.py --check``.
 Descriptor shape
 ----------------
 
-See ``layout/README.md`` and ``layout/ro_buf/cell.json``. In brief::
+See ``layout/README.md`` and ``layout/temp_core/cell.json``. In brief::
 
     {
-      "cell": "ro_buf",
+      "cell": "<cell>",
       "pdk": {"variant": "sky130A", "deck": "sky130"},
       "blocks": [
         {"id": "mn", "generator": "mos_array", "cell_name": "nfet_...",
@@ -41,38 +41,30 @@ See ``layout/README.md`` and ``layout/ro_buf/cell.json``. In brief::
       "routing": {"layer_role": "metal", "width_um": 0.17},
       "connectivity": [...],
       "pins": [...],
-      "lvs": {"reference": "design/ro_array_core.spice", "subckt": "ro_buf"}
+      "lvs": {"reference": "design/<cell>.spice", "subckt": "<cell>"}
     }
 
 Two-pass composition (``"stages"``, #27 step 2)
 ------------------------------------------------
 
-Some gates have two nets that would short if both were routed on the same
-metal layer in one ``klt gen-compose`` call -- ``ro_stage``/``ro_nand2``'s
-always-on starve devices cross-couple their gates to the *opposite* rail
-(``Mph.g = vss``, ``Mnt.g = vddr``), so wiring both crossing nets on the
-base ``"metal"`` role in a single pass is not routable without one net
-running through the other's block or backbone (see ``layout/README.md``'s
-"Composing a gate" section). A cell.json may replace its top-level
-``blocks``/``placement``/``routing``/``connectivity``/``pins`` fields with a
-``"stages"`` list instead, each entry shaped like those same fields plus a
-``"name"`` (required on every stage but the last, which is always named
-after the cell itself and always ends up as ``compose.request.json``/
-``compose.response.json`` with no prefix -- so ``--check`` and the DRC/
-extract/LVS steps below are completely unaware whether a cell used one
-stage or several). A later stage's ``blocks[]`` entry may reference an
-earlier stage's own composed cell instead of a fresh ``klt gen`` call via
-``{"id": ..., "from_stage": "<earlier stage's name>"}``, which resolves to
-that stage's own ``<name>.compose.response.json`` -- a valid
-``generator_report`` in its own right, since ``klt gen-compose``'s response
-already carries ``generator: "gen-compose"`` plus a composed-frame
-``ports[]`` promoted from that stage's own ``pins[]`` (this is what the CLI
-itself calls composition "nesting"). The usual second stage routes the two
-gate-crossing nets on ``"metal2"`` (sky130 met1) with an automatic via-drop
-back to each pin's own base-``"metal"``-role pad, over the first stage's
-already-composed cell -- see ``layout/ro_stage/cell.json`` for a worked
-example and ``layout/ro_stage/README.md`` for why each net landed on the
-layer it did.
+Some cells have two nets that would short if both were routed on the same
+metal layer in one ``klt gen-compose`` call. A cell.json may replace its
+top-level ``blocks``/``placement``/``routing``/``connectivity``/``pins``
+fields with a ``"stages"`` list instead, each entry shaped like those same
+fields plus a ``"name"`` (required on every stage but the last, which is
+always named after the cell itself and always ends up as
+``compose.request.json``/``compose.response.json`` with no prefix -- so
+``--check`` and the DRC/extract/LVS steps below are completely unaware
+whether a cell used one stage or several). A later stage reaches an earlier
+stage's composed cell through a ``blocks[].cell`` entry with ``from_stage``
+(below); see ``layout/temp_core/cell.json`` for a worked example.
+
+``blocks[].from_stage`` (a bare ``{"id": ..., "from_stage": ...}`` block that
+handed a later stage the earlier stage's own ``gen-compose`` response as a
+``generator_report``) is **removed** (#321). No committed cell recipe declared
+it, and the technique is recorded as not routing for this repo's cells (see
+``layout/README.md``). A descriptor that still carries it fails with a
+``BuildError``; use ``blocks[].cell`` with ``from_stage`` instead.
 
 Placing an already-composed sibling cell (``blocks[].cell``, #27 step 3)
 -----------------------------------------------------------------------
@@ -80,8 +72,8 @@ Placing an already-composed sibling cell (``blocks[].cell``, #27 step 3)
 A stage's ``blocks[]`` entry may name an *existing* committed stream instead
 of a generator or an earlier stage::
 
-    {"id": "g", "cell": {"gds_path": "../ro_nand2/ro_nand2.gds",
-                         "cell_name": "ro_nand2", "ports": [...]}}
+    {"id": "g", "cell": {"gds_path": "../<other>/<other>.gds",
+                         "cell_name": "<other>", "ports": [...]}}
 
 ``gds_path`` is relative to **the cell.json**, not to the output directory,
 so it keeps the repo-relative spelling that keeps absolute home paths out of
@@ -91,7 +83,7 @@ this script substitutes the resolved absolute path.
 
 Because a pre-existing stream never reported a ``ports[]`` list to any ``klt
 gen`` response, its ports are hand-declared. Two things that costs, both
-learned building ``layout/ro_ring5/``: the *only* authoritative source for a
+learned the hard way: the *only* authoritative source for a
 two-stage cell's port geometry is its own **intermediate** stage response
 (the final one reports ``"ports": []``), and a port may legitimately be
 declared on a layer other than li1 -- declaring a rail port on met1, where
@@ -102,18 +94,12 @@ rule.
 Re-placing an earlier stage with hand-declared ports (``cell.from_stage``)
 --------------------------------------------------------------------------
 
-``blocks[].from_stage`` (above) hands a later stage the earlier stage's own
-``gen-compose`` *response*, whose ``ports[]`` are exactly that stage's own
-``pins[]`` -- everything a leaf/ring cell's own promotion stages need. An
-**array**-level stage needs the other half: to tap an already-composed
-stage's own interior conductor at a measured coordinate that was never a
-``pins[]`` entry (``ro_array_core``'s ``vdd``/``vss`` promotion stubs start
-on each buffer's/XOR's own tap pad *inside* the composed block, and end on a
-met1 tip that only exists once that stage has drawn it). That is
-``blocks[].cell``'s hand-declared ``ports[]`` shape, pointed at a stage
-rather than at a committed sibling cell::
+A later stage may tap an already-composed earlier stage's own interior
+conductor at a measured coordinate that was never a ``pins[]`` entry. That is
+``blocks[].cell``'s hand-declared ``ports[]`` shape, pointed at a stage rather
+than at a committed sibling cell (``layout/temp_core/cell.json``)::
 
-    {"id": "core", "cell": {"from_stage": "vddstub", "ports": [...]}}
+    {"id": "core", "cell": {"from_stage": "<earlier stage's name>", "ports": [...]}}
 
 ``cell_name`` defaults to the stage's own name (which is what
 ``compose_stage`` names its composed cell) and ``gds_path`` is filled in as
@@ -147,8 +133,8 @@ correctly. Only the unit spelling changes -- no topology, no net names, no
 device count, and the rewritten reference is written to disk
 (``<cell>.ref.spice``) so a reviewer can diff it against the source subckt.
 
-A multi-subckt reference (``lvs.dependencies``) needs two more knobs, both
-first exercised by ``layout/ro_ring5/``:
+A multi-subckt reference (``lvs.dependencies``) needs more knobs, first
+exercised by ``layout/temp_por_top/``:
 
 ``lvs.reference_top``
     Names the reference's top circuit. A file holding three ``.subckt``
@@ -163,9 +149,6 @@ first exercised by ``layout/ro_ring5/``:
     the resulting ``match`` verifies device-for-device and net-for-net
     correspondence, but NOT that the layout's cell hierarchy mirrors the
     schematic's.
-``lvs.drop_kwargs``
-    Pass-through keyword arguments to strip from instance-call lines that
-    are not in ``lvs.params`` -- see ``build_reference``'s transformation 2.
 ``lvs.drop_prefixes``
     Element-card name prefixes removed from the generated reference. A
     ``+`` continuation line after a removed card is removed with it. Whatever
@@ -206,14 +189,17 @@ first exercised by ``layout/ro_ring5/``:
     hierarchical layout netlist is compared against the flattened reference
     (``layout/temp_por_top/``).
 
-Compatibility note: ``lvs.dependency_variants`` (#22/#27) is **removed** (#110).
-It let a top subckt call one dependency at several sizings, rewriting a renamed
-copy per instance. No committed cell recipe declared it, and the generated
-reference bodies of every committed recipe are unchanged by the removal. A
-descriptor that still carries the key now fails with a ``BuildError`` instead
-of being silently ignored; an external recipe that relied on it must express
-each dependency through ``lvs.dependencies`` or keep a pre-#110 copy of this
-script.
+Compatibility note: ``lvs.dependency_variants`` (#22/#27, removed in #110),
+``lvs.params`` and ``lvs.drop_kwargs`` (removed in #321) are **removed**.
+``dependency_variants`` let a top subckt call one dependency at several
+sizings; ``params`` substituted values for a subckt's own parameter names (and
+stripped the ``.subckt`` header defaults); ``drop_kwargs`` stripped
+pass-through keyword arguments from instance-call lines. No committed cell
+recipe declared any of them, and the generated reference bodies of every
+committed recipe are unchanged by the removals. A descriptor that still
+carries one of the keys now fails with a ``BuildError`` naming it instead of
+being silently ignored; an external recipe that relied on one must keep a
+pre-removal copy of this script.
 """
 
 from __future__ import annotations
@@ -266,51 +252,22 @@ def extract_subckt(netlist: Path, subckt: str) -> list[str]:
 def build_reference(
     lines: list[str],
     *,
-    params: dict[str, float] | None,
     drop_prefixes: tuple[str, ...],
-    drop_kwargs: tuple[str, ...] = (),
     expand_multiplier: tuple[str, ...] = (),
 ) -> list[str]:
     """Rewrite an xschem-exported subckt into a klt-lvs-ready reference.
 
-    Four transformations, each deliberately minimal and each visible in the
+    Three transformations, each deliberately minimal and each visible in the
     written-out result:
 
-    1. ``params`` values are substituted for the subckt's own parameter names
-       wherever they appear as an ``=<name>`` value token (this design's
-       starve devices are sized ``L=lstv W=wstv``, so this covers ``L=``/
-       ``W=`` in particular, but is not limited to them), and the parameter
-       defaults are dropped from the ``.subckt`` line. A bare occurrence of
-       the parameter name *inside* a quoted expression (e.g. the ``wstv`` in
-       ``ad='int((1 + 1)/2) * wstv / 1 * 0.29'``, not immediately preceded by
-       ``=``) is deliberately left unevaluated, unchanged from this script's
-       original single-subckt behaviour -- see "The LVS match is
-       width-sensitive" in ``layout/README.md`` for why that is fine (``klt
-       lvs`` does not compare ``ad``/``as``/``pd``/``ps`` for these devices).
-    2. A pass-through keyword argument on an instance-call line (``name=name``
-       -- e.g. ``xg ro en n1 vddr vss ro_nand2 wstv=wstv lstv=lstv cld=cld``,
-       ``ro_ring5``'s own forwarding of its parameters to each sub-gate
-       instance) is dropped entirely rather than substituted, once a
-       multi-subckt reference (``lvs.dependencies``, below) needs to
-       instantiate one already-parameterized subckt from another: the callee
-       subckt's own header no longer declares that parameter (transformation
-       1 already stripped it, replacing every internal use with a literal),
-       so passing it by keyword would name an undeclared parameter.
-       ``drop_kwargs`` extends this to a pass-through parameter that is *not*
-       in ``params`` because nothing surviving the rewrite reads it -- e.g.
-       ``cld``, whose only use is the ``Cld`` load capacitor transformation 3
-       removes. Left in place, ``klt lvs``'s SPICE reader warns
-       ``Not a known parameter for circuit 'RO_STAGE': 'CLD'`` once per
-       instance line and silently ignores it, so dropping it is cosmetic
-       for the verdict but keeps the generated reference free of warnings a
-       reviewer would otherwise have to triage.
-    3. Element cards whose name starts with one of ``drop_prefixes`` are
-       removed -- for this design that is ``ro_stage``/``ro_nand2``'s ``Cld``
-       lumped load capacitor, a *simulation* load model with no physical
+    1. The ``name=value`` parameter defaults are dropped from the ``.subckt``
+       line.
+    2. Element cards whose name starts with one of ``drop_prefixes`` are
+       removed -- e.g. a lumped *simulation* load capacitor with no physical
        counterpart in the layout, not a device the layout omits.
-    4. Unitless ``L=``/``W=`` values gain an explicit ``u`` suffix -- see this
+    3. Unitless ``L=``/``W=`` values gain an explicit ``u`` suffix -- see this
        module's docstring for why (klayout-tools#1492).
-    5. (``expand_multiplier``, issue #97) A named element card carrying
+    4. (``expand_multiplier``, issue #97) A named element card carrying
        ``m=N`` (N > 1) is replaced by N single-instance cards
        ``<name>_0``..``<name>_<N-1>`` with ``m=1``/``MF=1``, because ``klt
        lvs``'s plain-element converter refuses a multiplied device ("one
@@ -318,7 +275,7 @@ def build_reference(
        is the same circuit written the way the layout draws it; the written
        reference shows the expansion.
 
-    A ``+`` continuation line that follows a card removed by step 3 is removed
+    A ``+`` continuation line that follows a card removed by step 2 is removed
     with it (otherwise it would attach to the previous, unrelated card).
     """
     out: list[str] = []
@@ -350,16 +307,17 @@ def build_reference(
                 card = card.replace(toks[0], f"{toks[0]}_{k}", 1)
                 out.append(_GEOMETRY_RE.sub(r"\1=\2u", card))
             continue
-        for name in drop_kwargs:
-            line = re.sub(rf"\s+{re.escape(name)}={re.escape(name)}\b", "", line)
-        if params:
-            for name, value in params.items():
-                line = re.sub(
-                    rf"\s+{re.escape(name)}={re.escape(str(name))}\b", "", line
-                )
-                line = re.sub(rf"=({re.escape(name)})\b", f"={value}", line)
         out.append(_GEOMETRY_RE.sub(r"\1=\2u", line))
     return out
+
+
+#: ``lvs`` keys retired for want of any committed recipe declaring them; a
+#: descriptor still carrying one fails loudly instead of being ignored.
+_RETIRED_LVS_KEYS: dict[str, str] = {
+    "dependency_variants": ("#110; express each dependency through lvs.dependencies"),
+    "params": "#321; no committed recipe declared it",
+    "drop_kwargs": "#321; no committed recipe declared it",
+}
 
 
 def build_lvs_reference(reference_source: Path, lvs_spec: dict) -> list[str]:
@@ -368,28 +326,22 @@ def build_lvs_reference(reference_source: Path, lvs_spec: dict) -> list[str]:
     Returns the reference body: each ``lvs.dependencies`` subckt, then the top
     subckt, every one rewritten by :func:`build_reference`.
 
-    ``lvs.dependency_variants`` (a same-subckt, differently-parametrized
-    dependency renamed per instance) was retired in #110: no committed cell
-    recipe declared it. A descriptor that still carries the key is rejected
-    rather than silently producing a reference with undefined subckt calls
-    (``klt lvs`` drops an unresolvable instance without erroring).
+    ``lvs.dependency_variants`` (#110), ``lvs.params`` and ``lvs.drop_kwargs``
+    (#321) were retired: no committed cell recipe declared them. A descriptor
+    that still carries one is rejected with a ``BuildError`` naming the key
+    rather than silently producing a reference the removed key would have
+    shaped.
     """
-    if "dependency_variants" in lvs_spec:
-        raise BuildError(
-            "lvs.dependency_variants was removed (#110); express each "
-            "dependency through lvs.dependencies"
-        )
-    params = lvs_spec.get("params")
+    for key, hint in _RETIRED_LVS_KEYS.items():
+        if key in lvs_spec:
+            raise BuildError(f"lvs.{key} was removed ({hint})")
     drop_prefixes = tuple(lvs_spec.get("drop_prefixes", ()))
-    drop_kwargs = tuple(lvs_spec.get("drop_kwargs", ()))
     expand_multiplier = tuple(lvs_spec.get("expand_multiplier", ()))
 
     def rewritten(subckt: str) -> list[str]:
         return build_reference(
             extract_subckt(reference_source, subckt),
-            params=params,
             drop_prefixes=drop_prefixes,
-            drop_kwargs=drop_kwargs,
             expand_multiplier=expand_multiplier,
         )
 
@@ -426,12 +378,10 @@ def resolve_cell_block(
         (re)generate, placed via ``klt gen-compose``'s own ``blocks[].cell``
         request shape (``{gds_path, cell_name, ports[], bbox_um}``, #1189 in
         klayout-tools). No ``klt gen`` call: there is nothing to generate,
-        only an existing stream to place. See
-        ``layout/ro_ring5-connectivity-poc/README.md`` for why this needs
-        hand-declared ``ports[]`` (a pre-existing cell never reported a
-        ``ports[]`` list to any ``klt gen`` response the way a fresh
-        primitive does). Its ``gds_path`` is written relative to the
-        **cell.json** (e.g. ``"../ro_nand2/ro_nand2.gds"``), which keeps the
+        only an existing stream to place. This needs hand-declared
+        ``ports[]`` (a pre-existing cell never reported a ``ports[]`` list to
+        any ``klt gen`` response the way a fresh primitive does). Its ``gds_path`` is written relative to the
+        **cell.json** (e.g. ``"../<other>/<other>.gds"``), which keeps the
         repo-relative spelling that keeps absolute home paths out of the
         committed provenance. Rebuilding in place (``out_dir`` is the cell's
         own directory) that resolves correctly as written; ``--check``
@@ -482,17 +432,10 @@ def compose_stage(
     """Run one stage's ``gen`` (per new block) + ``gen-compose`` (place/route).
 
     A stage's ``blocks[]`` entries are either freshly generated (the
-    ``generator``/``params``/``cell_name`` shape ``compose_cell`` always
-    supported) or a reference to an *earlier* stage's own composed output
-    (``block["from_stage"]``, naming that earlier stage's ``name``) -- which
-    ``klt gen-compose`` accepts unmodified as a further ``generator_report``,
-    since its own response already carries ``generator: "gen-compose"`` plus
-    a ``ports[]`` promoted from that stage's own ``pins[]`` (see this
-    module's docstring and ``layout/README.md``'s "Two-pass composition"
-    section for why a cell ever needs more than one stage: routing two nets
-    that would otherwise cross on the same metal layer, resolved by moving
-    one of them to a second routing-metal level in a second pass over the
-    first pass's own composed output).
+    ``generator``/``params``/``cell_name`` shape) or an already-composed
+    stream (``block["cell"]``, which may itself name an *earlier* stage via
+    ``cell.from_stage``). See this module's docstring and ``layout/README.md``
+    for why a cell ever needs more than one stage.
 
     The **final** stage (``is_final=True``) writes ``compose.request.json``/
     ``compose.response.json`` with no prefix, and its ``options.cell_name``
@@ -511,19 +454,10 @@ def compose_stage(
     blocks_request = []
     for block in stage["blocks"]:
         if "from_stage" in block:
-            ref_name = block["from_stage"]
-            blocks_request.append(
-                {
-                    "id": block["id"],
-                    "generator_report": stage_responses[ref_name],
-                    **(
-                        {"orientation": block["orientation"]}
-                        if block.get("orientation", "none") != "none"
-                        else {}
-                    ),
-                }
+            raise BuildError(
+                f"{block['id']}: blocks[].from_stage was removed (#321); "
+                "use blocks[].cell with from_stage and hand-declared ports"
             )
-            continue
         if "cell" in block:
             cell_block = resolve_cell_block(
                 block["cell"],
@@ -724,10 +658,9 @@ def compose_cell(spec: dict, spec_dir: Path, out_dir: Path) -> dict:
             "form": "subckt-call",
             "deck": deck,
             # A multi-subckt reference (lvs.dependencies) leaves klt lvs more
-            # than one candidate top circuit -- for ro_ring5, RO_NAND2 and
-            # RO_STAGE are top circuits of the *file* even though the design
-            # instantiates them from RO_RING5, because the reader sees three
-            # definitions and no single root. `reference.top` names the one
+            # than one candidate top circuit -- every subckt definition in
+            # the file is a top circuit as far as the reader is concerned,
+            # because it sees several definitions and no single root. `reference.top` names the one
             # to compare against; klt errors out rather than guessing.
             **(
                 {"top": lvs_spec["reference_top"]}
