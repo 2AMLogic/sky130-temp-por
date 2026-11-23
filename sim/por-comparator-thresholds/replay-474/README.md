@@ -5,26 +5,37 @@ Replays of two residual classes from the #455 fresh-seed campaign (record
 fleet request per corner (`klt sim --backend batch --wait-for-capacity 600`),
 sky130A @ open_pdks f6eeac7d, base deck from `run_thresholds_campaign.py` at
 `50e1d37f`-equivalent netlist (XRT L=350, XMOK2 L=4 W=8). Seeds are the record's:
-`build_mc_replay_request.py tt -40 1 20261202` reproduces the recorded per-sample
+`build_mc_replay_request.py tt -40 1 20261202 <dir>` reproduces the recorded per-sample
 seeds exactly (tt/-40C mc13: rndseed 2125796897, mismatch_seed 1401514179; local
 replay row count 3656 and VPOR-up 2.85502 V / VPOR-down 2.69226 V equal the record).
 
 ## Replaying the committed decks
 
-The three `*.cir` decks are the `klt sim` corner decks for the tt/-40C mc14 draw (default, `gmin=1e-11`,
-`gmin=1e-9`) with two lines **elided** by hand so the decks stay path-independent; they do not run as
-committed. To replay one:
+The four decks replay tt/-40 C mc14 with the same per-draw seeds. They cover the
+default startup, two `gmin` values and the accepted `uic` startup. Run these
+commands from the repository root with the pinned sky130A PDK and ngspice-47.
+Each deck reads `netlist.spice` and writes its own ASCII raw file in the replay directory.
 
-1. `python3 build_mc_replay_request.py tt -40 1 20261202 <dir>` writes `<dir>/netlist.spice` and
-   `<dir>/request.json` (paths resolve from the script's own location, so it runs from any checkout).
-2. Replace `.include <netlist.spice from run_thresholds_campaign.py mk>` with `.include <dir>/netlist.spice`.
-3. Replace the comment `* write <raw>` with `write <dir>/replay.raw` (inside the `.control` block, after `tran`),
-   and set `PDK_ROOT` to the sky130A install (the `.lib` line uses `$PDK_ROOT`).
-4. `ngspice -b <deck>`; then `python3 extract_ascii_raw.py <dir> replay` extracts the thresholds from the ASCII raw.
-   `chatter_trace.py <dir>` needs a `waveform.raw.json` from a `klt sim` run of the request instead.
+```sh
+replay_dir=$(mktemp -d)
+tools_dir="$PWD/sim/por-comparator-thresholds/replay-474"
+export PDK_ROOT="${PDK_ROOT:-$HOME/.ciel}"
+python3 "$tools_dir/build_mc_replay_request.py" tt -40 1 20261202 "$replay_dir"
+cp "$tools_dir"/*.cir "$replay_dir/"
+cd "$replay_dir"
+echo 'source tt_mm_n40C_mc14_uic.cir' | ngspice -n -p
+python3 "$tools_dir/extract_ascii_raw.py" . tt_mm_n40C_mc14_uic
+```
 
-The `uic` variant has no committed deck: it is the base deck with ` uic` appended to the `tran` card (the
-`monte_carlo.tran_uic` flag in `experiment.json`); its generated decks are in `netlist-snapshots/`.
+The expected result is VPOR-up 2.69434 V and VPOR-down 2.53927 V. The `-n` flag
+skips user initialization. Loading the repository's `sim/spiceinit` as
+`.spiceinit` gave 2.71669 V and 2.56197 V on the same deck. To replay the
+original abort, source `tt_mm_n40C_mc14_base.cir` in the same way.
+
+The helper's `request.json` uses the current manifest's `uic` startup. For a
+`klt sim` replay of the original chatter traces, use the corresponding default-startup
+request and netlist from the [#455 fresh-seed snapshots](../netlist-snapshots/20261121-115035-c591b93b-real-bias-core-mismatch-mc/).
+Run `chatter_trace.py <dir>` on the sample directory containing `waveform.raw.json`.
 
 ## Class 2 -- initial-timepoint abort (tt/-40C mc14, request seed 20261202)
 
