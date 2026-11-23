@@ -195,6 +195,7 @@ DRIVER_ARGV: dict[str, list[list[str]]] = {
     "run_reassert_diagnosis.py": _STAGES,
     "run_solver_sweep.py": _STAGES,
     "run_accuracy_mc.py": _STAGES + [["compare", "--run-id", "selftest-none"]],
+    "run_chop_offset.py": _STAGES,
     # single-command runners: one invocation does run + record
     "run_op_branch.py": [[]],
     "run_pnp_mismatch.py": [[]],
