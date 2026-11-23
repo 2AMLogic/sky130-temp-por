@@ -159,6 +159,14 @@ number, limit and verdict, for tooling):
 | Timestamp / author | UTC timestamp and who (human or agent) ran it |
 | Supersedes | prior `<record-id>` this corrects or re-runs; `(none)` otherwise |
 
+**`supersedes` in the `.json` twin (issue #353).** New records store a falsy value
+(`null`) when there is no predecessor; `(none)` is the *rendered* markdown fallback only
+(`rec['supersedes'] or '(none)'`) and is never written into the JSON. Records committed
+before this rule are append-only evidence and keep their legacy encodings, which all
+mean "no predecessor": `null`, `""`, `"(none)"`, and an absent key. A corpus consumer
+must treat all four as falsy. Runners declare `--author`/`--supersedes` through
+`sim_common.add_record_args()`; `sim/bin/test_supersedes_contract.py` guards the contract.
+
 ### Append-only rule
 
 `records/*`, `netlist-snapshots/*` and `corners/*` files (flat and nested
