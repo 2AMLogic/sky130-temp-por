@@ -184,12 +184,12 @@ Two things the match does **not** assert, both worth stating so nobody reads
 more into it than it carries:
 
 1. **Source/drain assignment is not preserved, and is not meant to be.**
-   `klt extract` reads `XMOKA` back as `M$10 tok NA noko vdd` — drain and
+   `klt extract` reads `XMOKA` back as `M$11 tok NA noko vdd` — drain and
    source swapped relative to the device card's `NOKO NA TOK VDD` — because
-   that device is the `"rotate_180"` one and the extractor names the terminals
+   that device is `"rotate_180"` and the extractor names the terminals
    from geometry. A 4-terminal MOS is S/D symmetric and `NetlistComparer`
-   treats it so; nothing is wrong, and the other nine devices read back in
-   the schematic's own order.
+   treats it so; nothing is wrong, and every device that is not `rotate_180`
+   reads back in the schematic's own order.
 2. **`AS`/`AD`/`PS`/`PD` are not compared.** The extracted values come from
    the drawn diffusion (e.g. `AS=0.84P` for a `W=2` device) and the design's
    own cards carry xschem's estimates (`as=0.58`); `klt lvs` compares
@@ -305,7 +305,7 @@ the sizes in the device table are the current ones. `design/netlist/bias_core.sp
 Rendered with `klt 0.9.2` (the `layout/pdk.json` pin): **DRC clean (0 violations); extract
 11 devices (5 nfet + 6 pfet), 11 nets; LVS `match` 11/11 devices, 11/11 nets.** The extracted
 `L`/`W` of every device equal the landed cards, and `XMOKH` reads back as gate `bias_ok`,
-drain `nokx`, source/bulk `vdd`. Every named routing leg is `routed: true`. The floorplan is
+drain `vdd`, source `nokx`, bulk `vdd`. Every named routing leg is `routed: true`. The floorplan is
 re-derived, not patched: the PMOS gate row moved to `y=22.21` (the `W=16` devices are 16 um
 tall), the `vdd` rail is at
 `y=43.0`, and the cell is now about 86.5 x 49.2 um. `PB` keeps its `y=11.5` lane and stub so

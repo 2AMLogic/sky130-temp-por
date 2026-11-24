@@ -151,13 +151,13 @@ cell's own LVS run.
      defeating its own stated purpose for exactly that case.
   2. **`klt extract`'s SPICE netlist writer drops a MiM capacitor's
      device-class/model-name token from its `C` card entirely.** Every
-     resistor `R` card correctly carries a trailing model name
-     (`R$3 nbtop NB vsubs 17500 res_xhigh_po`), but every capacitor `C` card
-     does not (`C$1 NZ PG 8.152e-13` — no fifth token at all, confirmed in
-     this cell's own committed `bias_core_passives.spice`). Read back by
-     `NetlistSpiceReader` (as `klt lvs` does for both sides), a `C` card
-     with no model name becomes the generic `CAP` class rather than the
-     specific `sky130_fd_pr__model__cap_mim` a reference declares — so no
+     resistor card correctly carries its device-class name
+     (`X$3 nbtop NB vsubs res_xhigh_po r=350000 L=350U W=2U`), but every
+     capacitor `C` card does not (`C$1 NZ PG 8.152e-13` — no fifth token at all,
+     confirmed in this cell's own committed `bias_core_passives.spice`).
+     Read back by `NetlistSpiceReader` (as `klt lvs` does for both sides), a
+     `C` card with no model name becomes the generic `CAP` class rather than
+     the specific `sky130_fd_pr__model__cap_mim` a reference declares — so
      capacitor in any composed cell using `cap_array` can ever be paired
      against a class-carrying reference, independent of gap 1 above.
 
