@@ -1,11 +1,14 @@
 #!/usr/bin/env python3
 """Synthetic-waveform pins for pulse_extractor.py (issue #495). Run: python3 sim/por-bias-ok-early-assert/test_pulse_extractor.py"""
+import json
+import re
 import sys
 import unittest
 from pathlib import Path
 
 sys.path.insert(0, str(Path(__file__).resolve().parent))
 import pulse_extractor as pe  # noqa: E402
+import run_early_assert as rea  # noqa: E402
 
 
 def wave(bok_at, por_windows, rst_windows=(), peak=3.6, rate=100.0, step=0.002):
@@ -53,6 +56,43 @@ class Extractor(unittest.TestCase):
 
     def test_no_data(self):
         self.assertEqual(pe.verdict_class(pe.extract(pe.load_wrdata(""))), "no_data")
+
+
+class ProbeTable(unittest.TestCase):
+    def setUp(self):
+        self.man = json.loads(rea.MANIFEST.read_text())
+
+    def test_every_grid_point_is_probeable(self):
+        table = rea.probe_table(self.man)
+        for grid in self.man["grids"]:
+            ids = {p.point_id for p in rea.build_points(grid, self.man)}
+            self.assertTrue(ids, f"grid {grid!r} built no points")
+            for pid in ids:
+                self.assertIn(pid, table, f"{pid} ({grid}) missing from the --probe lookup table")
+
+    def test_pilot_extended_only_point_is_probeable(self):
+        table = rea.probe_table(self.man)
+        self.assertIn("ss_m40c_r100_default_xmoka_offm120", table)
+        other = {p.point_id for g in ("pilot", "full") for p in rea.build_points(g, self.man)}
+        self.assertNotIn("ss_m40c_r100_default_xmoka_offm120", other)
+
+    def test_docstring_probe_example_resolves(self):
+        m = re.search(r"run_early_assert\.py --probe (\S+)", rea.__doc__)
+        self.assertIsNotNone(m, "docstring has no --probe example")
+        self.assertIn(m.group(1), rea.probe_table(self.man))
+
+    def test_settle_s_default_and_override(self):
+        self.assertEqual(rea.settle_seconds({}), 2e-3)
+        self.assertEqual(rea.settle_seconds({"settle_s": 5e-3}), 5e-3)
+
+    def test_manifest_prose_matches_grids(self):
+        swept = {d for g in self.man["grids"].values() for d in g["offset_mv"]}
+        self.assertEqual(swept, {"XMOL2", "XMOKA"})
+        prose = self.man["claim"] + self.man["provenance_source"] + self.man["absent_coverage"][0]
+        for d in sorted(swept):
+            self.assertIn(d, prose, f"swept device {d} not named in the manifest prose")
+        self.assertNotIn("XMOL2 only", self.man["claim"])
+        self.assertNotIn("XMOL2 only", self.man["absent_coverage"][0])
 
 
 if __name__ == "__main__":
