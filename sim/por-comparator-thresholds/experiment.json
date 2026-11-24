@@ -12,6 +12,8 @@
     "vary": "mismatch",
     "variant": "real-bias-core",
     "rate_v_per_s": 100.0,
+    "tran_uic": true,
+    "tran_uic_note": "Issue #474: the MC transient runs with `uic`. The VDD stimulus starts at a physical 0 V (V(VDD) = min(peak, rate*t, ...)), so the all-zero start IS the physical initial state; without uic ngspice first solves a DC operating point at VDD=0, which aborted 13 of 420 cold (-40 C) draws of the #455 campaigns with `timestep_too_small; initial timepoint`. Replay evidence and the one-variable comparison (gmin, rshunt, itl, uic): sim/por-comparator-thresholds/replay-474/README.md. Stimulus, corners and grading are unchanged.",
     "process": ["tt", "ss"],
     "temperature_c": [-40, 27, 125],
     "request_sizing": "One klt sim request per (process, temperature) = 6 requests, N = 20 mismatch samples each, at the primary 100 V/s rate. Sizing arithmetic: the measured worst-corner cost of the real-bias-core 100 V/s grid is 142 s (corners/20261009-054331-79eebd4-real-bias-core/r100/klt-report.json, per-corner runtime_s; the 15-corner request summed to 1924 s), so one request is 20 x 142 s = 2840 s of serial fleet wall clock, 21% under the fleet's 3600 s per-job ceiling; N = 24 would sit at 3408 s inside the same ceiling and N = 20 is the recorded choice with the larger headroom (the sigma resolution at N = 20 is 16.2%). Folding the three temperatures into one request would be 60 x 142 s = 8520 s -> batch_job_timeout, the exact failure sim/temp-core-accuracy-mc recorded for its first 3000-unit requests.",

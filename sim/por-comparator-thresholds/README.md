@@ -285,6 +285,19 @@ Evidence only, as everywhere in this campaign: no threshold is proposed,
 sets, so no per-sample temperature-drift claim is made.
 (post-layout variants are never part of the default `run`).
 
+#### Transient startup of the MC records (issue #474)
+
+The two records `records/20261123-210152-13bbc7b2-real-bias-core-mismatch-mc.md` (paired, seed 20261114,
+tt/ss, 120/120 valid) and `records/20261123-210355-a21a8ca0-real-bias-core-mismatch-mc.md` (fresh, seed 20261201,
+tt/ss/ff/sf/fs, 300/300 valid) were run with **`.tran ... uic`** (`monte_carlo.tran_uic` in `experiment.json`: the
+all-zero initial state, no DC operating point at VDD=0). The records themselves do not carry this: the run data
+(`sim/.work/`) that rendered them is not retained, so they were not re-rendered, and the `.tran` args are recoverable
+only from `netlist-snapshots/*/request.json`. This is the controlled variable separating them from the #455 pair
+(`20261121-114636-63e27cba`, `20261121-115035-c591b93b`, default startup), and it is the cause the "NOT reproduced"
+delta of the paired record leaves unnamed. Records rendered from this commit on state the startup in a
+"Transient startup" line and in `monte_carlo.tran_uic`. Evidence and the one-variable comparison:
+`replay-474/README.md`.
+
 ### Fleet friction (reported, not worked around locally)
 
 25 batch launches were refused before a request ran: 22 by the shared
