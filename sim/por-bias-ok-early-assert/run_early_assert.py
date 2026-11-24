@@ -12,7 +12,7 @@ the fleet refuses).  `--probe POINT_ID` runs ONE point locally for a debug cross
     run_early_assert.py --grid pilot --wait-for-capacity 600
     run_early_assert.py --grid full  --wait-for-capacity 600
     run_early_assert.py --grid full --dry-run
-    run_early_assert.py --probe ss_m40c_r100_uic_offp006
+    run_early_assert.py --probe ss_m40c_r100_uic_xmol2_offp012
 """
 from __future__ import annotations
 
@@ -73,6 +73,14 @@ def build_points(grid: str, man: dict) -> list[Point]:
     if rs:
         pts += [Point(p, t, r, s, o, d) for p, t in pairs for r in rs["rate_v_per_s"] for s in rs["starts"] for d, ol in rs.get("offset_mv", offs).items() for o in ol]
     return pts
+
+
+def probe_table(man: dict) -> dict[str, Point]:
+    return {p.point_id: p for g in man["grids"] for p in build_points(g, man)}
+
+
+def settle_seconds(man: dict) -> float:
+    return man.get("settle_s", 2e-3)
 
 
 def derived_bias_core(device: str) -> str:
@@ -155,7 +163,7 @@ def grade(pt: Point, wave_text: str | None, settle_s: float) -> dict:
 
 
 def run_probe(args, pdk, man) -> int:
-    pts = {p.point_id: p for p in build_points("full", man) + build_points("pilot", man)}
+    pts = probe_table(man)
     if args.probe not in pts:
         raise cr.HarnessError(f"no point {args.probe!r}; use --dry-run to list ids")
     pt = pts[args.probe]
@@ -170,7 +178,7 @@ def run_probe(args, pdk, man) -> int:
     print(f"[probe] local single point {pt.point_id} (debug only, nothing recorded)")
     proc = sim_common.run_local_probe(d)
     out = d / "out"
-    res = grade(pt, unit_wave(out, pt.point_id), man["settle_s"] if "settle_s" in man else 2e-3)
+    res = grade(pt, unit_wave(out, pt.point_id), settle_seconds(man))
     print(f"[probe] klt exit {proc.returncode}")
     print(json.dumps(res, indent=2, default=str))
     return 0 if proc.returncode == 0 else 1
@@ -275,7 +283,7 @@ def main(argv) -> int:
     results = []
     for pt in points:
         wave = unit_wave(sub / "out", pt.point_id)
-        g = grade(pt, wave, 2e-3)
+        g = grade(pt, wave, settle_seconds(man))
         u = units.get(pt.point_id)
         raw = sim_common.deck_streams(report, u) if u else "*** no unit returned"
         (stage / f"{pt.point_id}.log").write_text(files[f"units/{pt.point_id}/deck.spice"] + "\n----- ngspice output -----\n" + raw[-20000:])

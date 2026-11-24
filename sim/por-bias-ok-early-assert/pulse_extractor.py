@@ -43,10 +43,6 @@ def load_wrdata(text: str) -> dict[str, list[float]]:
     return out
 
 
-def _lerp(x0, y0, x1, y1, y):
-    return x0 if y1 == y0 else x0 + (x1 - x0) * (y - y0) / (y1 - y0)
-
-
 def _runs(t, vdd, sig, hi_idx):
     """Maximal high runs of sig>0.5*vdd over samples [0, hi_idx]; returns list of dicts."""
     runs, cur = [], None
