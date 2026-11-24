@@ -395,6 +395,74 @@ class SubmitWithStubbedKlt(unittest.TestCase):
         block = cr.fleet_pdk_block(fleet["pdk"]["installed_commit"], LOCAL_COMMIT, PIN)
         self.assertEqual(block["fleet_matches_pin"], "not-reported")
 
+    # ------------------------------------------------------------------
+    # a multi-sweep experiment submits one fleet job per sweep (issue #327)
+    # ------------------------------------------------------------------
+
+    def two_sweep_fleet(self, commit1, commit2):
+        """Submit twice through the real `submit_batch`, each report stamped by its own
+        runner, and fold them the way `main()` does."""
+        subs = []
+        for i, commit in enumerate((commit1, commit2), start=1):
+            rep = fake_report(self.matrix, fleet_commit=commit)
+            rep["environment"]["remote"]["job_id"] = f"job-{i}"
+            rep["environment"]["engine_version"] = f"4{i}"
+            Path(os.environ["STUB_KLT_REPORT"]).write_text(json.dumps(rep))
+            _, info = cr.submit_batch(
+                self.exp, self.matrix, "* netlist\n.end\n", self.request(),
+                self.tmp / "run", subdir=f"batch-sweep{i}",
+            )
+            subs.append((f"batch-sweep{i}", info))
+        return cr.merge_fleet(subs)
+
+    def multi_record(self, fleet):
+        rec = self.minimal_record(fleet, fleet_commit=PINNED)
+        pdk = {"variant": "sky130A", **fleet["pdk"]}
+        pdk.update(cr.fleet_pdk_block(fleet["pdk_commits"], LOCAL_COMMIT, PIN))
+        rec["pdk"] = pdk
+        rec["tools"]["ngspice"] = fleet["ngspice"]
+        return rec
+
+    def test_an_off_pin_second_sweep_makes_the_record_a_mismatch(self):
+        fleet = self.two_sweep_fleet(PINNED, "0" * 40)
+        rec = self.multi_record(fleet)
+        self.assertEqual(rec["pdk"]["fleet_matches_pin"], "mismatch")
+        self.assertIs(rec["pdk"]["matches_pin"], False)
+        self.assertIn("0" * 40, rec["pdk"]["installed_commit"])
+        self.assertIn(PINNED, rec["pdk"]["installed_commit"])
+        self.assertIn("MISMATCH", cr.render_record(rec))
+
+    def test_an_unstamped_first_sweep_does_not_hide_an_off_pin_second(self):
+        fleet = self.two_sweep_fleet("unknown", "0" * 40)
+        self.assertEqual(
+            cr.fleet_pdk_block(fleet["pdk_commits"], LOCAL_COMMIT, PIN)["fleet_matches_pin"],
+            "mismatch",
+        )
+
+    def test_both_sweeps_on_pin_keep_every_submissions_provenance(self):
+        fleet = self.two_sweep_fleet(PINNED, PINNED)
+        rec = self.multi_record(fleet)
+        self.assertEqual(rec["pdk"]["fleet_matches_pin"], "match")
+        self.assertEqual(rec["pdk"]["installed_commit"], PINNED)
+        subs = rec["batch"]["submissions"]
+        self.assertEqual([x["job_id"] for x in subs], ["job-1", "job-2"])
+        for x in subs:
+            self.assertEqual(x["installed_commit"], PINNED)
+            self.assertEqual(x["models_lib_sha256"], "ab" * 32)
+            self.assertEqual(x["remote"]["runner_klt_version"], "0.7.1-runner")
+        self.assertEqual(rec["tools"]["ngspice"], "ngspice 41 (fleet) / ngspice 42 (fleet)")
+        text = cr.render_record(rec)
+        self.assertIn("Fleet submissions (one per sweep)", text)
+        self.assertIn("job-1", text)
+        self.assertIn("job-2", text)
+        self.assertIn(f"open_pdks {PINNED}", text.split("Fleet submissions")[1])
+
+    def test_fleet_pdk_block_takes_one_commit_or_many(self):
+        self.assertEqual(cr.fleet_pdk_block(PINNED, LOCAL_COMMIT, PIN)["fleet_matches_pin"], "match")
+        self.assertEqual(
+            cr.fleet_pdk_block([PINNED, "0" * 40], LOCAL_COMMIT, PIN)["fleet_matches_pin"], "mismatch"
+        )
+
     def minimal_record(self, fleet, fleet_commit):
         results = cr.results_from_report(
             self.exp, self.matrix, fake_report(self.matrix), EXPERIMENT / "corners" / "TEST", 300

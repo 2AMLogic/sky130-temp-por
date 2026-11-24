@@ -52,7 +52,6 @@ import evidence_store
 SIM_DIR = Path(__file__).resolve().parent.parent
 REPO_ROOT = SIM_DIR.parent
 PDK_PIN_FILE = SIM_DIR / "pdk.json"
-SPICEINIT_FILE = SIM_DIR / "spiceinit"
 XSCHEMRC_FILE = SIM_DIR / "xschemrc"
 BUILD_DIR = SIM_DIR / "build"
 
@@ -589,7 +588,7 @@ def build_batch_request(
 fleet_pdk_commit = sim_common.fleet_pdk_commit
 
 
-def fleet_pdk_block(fleet_commit: str, local_commit: str, pin: dict) -> dict:
+def fleet_pdk_block(fleet_commit, local_commit: str, pin: dict) -> dict:
     """The fleet overlay of a BATCH record's `pdk` block: whose install
     `installed_commit` describes, and how it compares with the `sim/pdk.json` pin.
 
@@ -604,8 +603,13 @@ def fleet_pdk_block(fleet_commit: str, local_commit: str, pin: dict) -> dict:
     `**MISMATCH vs sim/pdk.json pin**` and exited 3.  Unverifiable is not wrong
     (issue #333).  `matches_pin` stays beside it as the two-state form older readers and
     already-written records use, derived from the verdict so they cannot disagree.
+
+    `fleet_commit` is one commit string, or an iterable of them -- one per fleet
+    submission (a multi-sweep experiment submits one job per sweep). The verdict covers
+    every submission, so one off-pin runner makes the record `mismatch`.
     """
-    verdict = sim_common.fleet_pin_verdict([fleet_commit], pin)
+    commits = [fleet_commit] if isinstance(fleet_commit, str) else list(fleet_commit)
+    verdict = sim_common.fleet_pin_verdict(commits, pin)
     return {
         "local_installed_commit": local_commit,
         "fleet_matches_pin": verdict,
@@ -781,6 +785,38 @@ def submit_batch(
     }
 
 
+def merge_fleet(submissions: list[tuple[str, dict]]) -> dict:
+    """Fold every fleet submission's provenance into one `fleet` dict.
+
+    `submissions` is `(request subdir, submit_batch() fleet dict)` in plan order. A
+    multi-sweep experiment submits one Spot job per sweep, and each may land on a
+    different runner, so nothing here may read the first submission alone: the pin
+    verdict inputs (`pdk_commits`), the cited commit and engine (distinct values,
+    joined), and each submission's own runner provenance are all kept.
+    """
+    infos = [info for _, info in submissions]
+    commits = [i["pdk"]["installed_commit"] for i in infos]
+    engines = list(dict.fromkeys(i["ngspice"] for i in infos))
+    pdk = dict(infos[0]["pdk"])
+    pdk["installed_commit"] = ", ".join(dict.fromkeys(commits))
+    batch = dict(infos[0]["batch"])
+    batch["submissions"] = [
+        {
+            "request": subdir,
+            "job_id": i["batch"]["job_id"],
+            "status": i["batch"]["status"],
+            "runner_klt": i["batch"]["runner_klt"],
+            "fleet_pdk_version": i["batch"]["fleet_pdk_version"],
+            "installed_commit": i["pdk"]["installed_commit"],
+            "models_lib_sha256": i["batch"].get("models_lib_sha256"),
+            "ngspice": i["ngspice"],
+            "remote": i["batch"].get("remote"),
+        }
+        for subdir, i in submissions
+    ]
+    return {"pdk": pdk, "pdk_commits": commits, "ngspice": " / ".join(engines), "batch": batch}
+
+
 def run_local(
     exp: Experiment,
     pdk: Pdk,
@@ -888,7 +924,12 @@ def render_record(record: dict) -> str:
         if len(b.get("submissions") or []) > 1:
             lines.append(
                 "  - Fleet submissions (one per sweep): "
-                + "; ".join(f"`{x['request']}` job `{x['job_id']}` ({x['status']})" for x in b["submissions"])
+                + "; ".join(
+                    f"`{x['request']}` job `{x['job_id']}` ({x['status']}), runner klt "
+                    f"`{x.get('runner_klt')}`, runner PDK stamp `{x.get('fleet_pdk_version')}`, "
+                    f"engine `{x.get('ngspice')}`"
+                    for x in b["submissions"]
+                )
             )
     elif r.get("backend") == "local":
         lines.append(
@@ -1141,28 +1182,17 @@ def main(argv: list[str]) -> int:
         print("\n(dry run: nothing submitted, nothing written under sim/<experiment>/)")
         return 0
 
-    fleet = None
+    fleet_subs: list[tuple[str, dict]] = []
     reports: dict[str, dict] = {}  # unit name -> merged report
     for unit, group, subdir, request in plan:
         if backend == "batch":
             report, fleet_info = submit_batch(exp, group, sim_netlist, request, run_dir, subdir)
-            if fleet is None:
-                fleet = fleet_info
-                fleet["batch"]["submissions"] = []
-            b = fleet_info["batch"]
-            fleet["batch"]["submissions"].append(
-                {
-                    "request": subdir,
-                    "job_id": b["job_id"],
-                    "status": b["status"],
-                    "runner_klt": b["runner_klt"],
-                    "fleet_pdk_version": b["fleet_pdk_version"],
-                }
-            )
+            fleet_subs.append((subdir, fleet_info))
         else:
             report = run_local(exp, pdk, group[0], sim_netlist, request, run_dir, subdir)
         merged = reports.setdefault(unit.name, {"corners": []})
         merged["corners"] += report.get("corners", [])
+    fleet = merge_fleet(fleet_subs) if fleet_subs else None
     results = results_from_reports(
         exp, matrix, [(u, reports[u.name]) for u in units], corners_dir, args.timeout
     )
@@ -1211,7 +1241,7 @@ def main(argv: list[str]) -> int:
         # PDK and engine the fleet reports (the pin is checked against that).
         pdk_record.update(fleet["pdk"])
         pdk_record.update(
-            fleet_pdk_block(pdk_record["installed_commit"], pdk.installed_commit, pin))
+            fleet_pdk_block(fleet["pdk_commits"], pdk.installed_commit, pin))
         tools["ngspice"] = fleet["ngspice"]
 
     record = {
