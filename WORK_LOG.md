@@ -9,6 +9,11 @@ Chronological record of recently merged pull requests and closed issues. This fi
 
 ### 2026-11-24
 
+- **PR #505**: feat(sim): measure POR thresholds against extracted bias_core parasitics
+- **Issue #487** (closed): sim: measure VPOR up/down/hysteresis with the extracted bias_core against the re-rendered layout
+- **Issue #490** (closed): docs: four stale "153/153" LVS device counts after the #473 re-render landed 154/154
+- **Issue #473** (closed): layout: re-implement bias_core_settle_flag (and re-assembly bias_core / temp_por_top) after the #455 OK-detector schematic changes
+- **PR #488**: layout: re-render OK-detector leaf and assemblies for the landed #455 schematic
 - **PR #498**: sim: deterministic forced-offset reproduction of early BIAS_OK / POR_RAW pulse
 - **PR #496**: docs(layout): make generated .ref.spice banner describe build_reference accurately
 - **Issue #495** (closed): bias_core OK detector: early BIAS_OK assertion glitches POR_RAW at VDD~1.82 V on cold mismatch draws (uncorrected, now masked by the uic startup)
