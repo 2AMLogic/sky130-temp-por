@@ -78,6 +78,14 @@
       "provenance": "post-layout extraction of por_comparator only (see ideal-bias-postlayout); bias_core is schematic-level",
       "dut_netlists": ["layout/por_comparator/pex/por_comparator.pex.sim.spice", "design/netlist/bias_core.spice"],
       "baseline_variant": "real-bias-core"
+    },
+    "real-bias-core-biaspex": {
+      "description": "BIAS-CORE POST-LAYOUT (issue #487): same testbench, stimulus, corner grid and rates as real-bias-core; the schematic bias_core is replaced by the klt-extracted (lumped RC) netlist of layout/bias_core/bias_core.gds (the post-#473/#488 render). por_comparator stays the schematic export.",
+      "bias_treatment": "REAL bias_core, extracted layout, drives IBIAS, VREF and BIAS_OK, identical stimulus to real-bias-core. Only bias_core is extracted; never mixed with the por_comparator post-layout variants (one extraction per record).",
+      "schematic": "testbench/tb_por_comparator_thresholds_realbias.sch",
+      "provenance": "post-layout extraction of bias_core only (klt extract --parasitics --deck sky130, lumped RC), derived by layout/bias_core/pex/make_sim_netlist.py (net-alias collapse + 01v8->g5v0d10v5 MOS model rewrite; see that script and layout/bias_core/pex/README.md)",
+      "dut_netlists": ["por_comparator.spice", "layout/bias_core/pex/bias_core.pex.sim.spice"],
+      "baseline_variant": "real-bias-core"
     }
   },
   "grading": {
