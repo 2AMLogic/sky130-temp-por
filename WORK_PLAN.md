@@ -3,7 +3,7 @@
 Current roadmap derived from GitHub label state. The region below is maintained by the Loom Guide role.
 
 <!-- guide:plan-body:start -->
-_Generated: 2026-11-23T13:11:29Z (snapshot; compare against live labels)_
+_Generated: 2026-11-24T13:45:00Z (snapshot; compare against live labels)_
 ## Operator Attention: Merge-Risk-Hold Pileup
 
 Judge-approved PRs under a hold (`loom:blocked` or `loom:operator`) — only a human merge decision is missing.
@@ -21,7 +21,6 @@ _None._
 `loom:important`; taken before unlabelled work.
 
 - **#291**: glitch-top: NONPHYSICAL breakdown line counts 0 node violations while rows tag them (pre-dip/post-dip not counted)
-- **#455**: bias_core OK-detector: BIAS_OK never asserts in 38 of 120 mismatch samples, so reset never releases; find the device and fix the design
 - **#458**: Declare the item 5 and item 6 spec-row sets in the manifest and cite klt sim / klt yield envelopes, with unratified rows marked as such
 
 ## Ready
@@ -35,8 +34,6 @@ Human-approved issues (`loom:issue`) ready for implementation — excluding held
 
 Issues currently being built (`loom:building`).
 
-- **#454**: T1 item 7: produce a graded klt pex report (por_comparator re-run and re-render first, then block-level temp_por_top)
-- **#455**: bias_core OK-detector: BIAS_OK never asserts in 38 of 120 mismatch samples, so reset never releases; find the device and fix the design
 - **#461**: temp_core: build DR-007 chopped-amplifier + degenerated-mirror sim variant and measure chopper residual offset (part a of #456)
 - **#470**: Three cell READMEs still call klayout-tools#6025 open (outside #454's AC-6 scope)
 
@@ -45,7 +42,6 @@ Issues currently being built (`loom:building`).
 PRs waiting on Judge (`loom:review-requested`).
 
 - **#476**: docs: state klayout-tools#6025 as closed in bias-core and output-chain READMEs
-- **#477**: feat: add block-level klt pex evidence for temp_por_top (cannot-grade, net-label case collision)
 
 ## Approved (Awaiting Merge)
 
@@ -63,16 +59,14 @@ Issues carrying `loom:curated`.
 - **#303**: Gate items 1 and 9 with klt's own local_only attestation check instead of the repo's re-hasher *(curated)* *(held)*
 - **#376**: Self-check: assert every spec/decision-records/DR-*.md is indexed in spec/README.md with its own status *(curated)* *(held)*
 - **#454**: T1 item 7: produce a graded klt pex report (por_comparator re-run and re-render first, then block-level temp_por_top) *(curated)*
-- **#455**: bias_core OK-detector: BIAS_OK never asserts in 38 of 120 mismatch samples, so reset never releases; find the device and fix the design *(curated)*
 - **#461**: temp_core: build DR-007 chopped-amplifier + degenerated-mirror sim variant and measure chopper residual offset (part a of #456) *(curated)*
 - **#470**: Three cell READMEs still call klayout-tools#6025 open (outside #454's AC-6 scope) *(curated)*
 
 ## Proposed (Architect / Hermit)
 
 - **#137**: Run the two-key ratification ceremony on DR-004 and DR-005 *(architect)* *(held)*
-- **#321**: Remove undeclared descriptor keys from compose-cell.py (lvs.params, lvs.drop_kwargs, blocks[].from_stage): no committed cell recipe uses them *(hermit)* *(held)*
-- **#327**: corner-run.py: finish the batch path (it refuses 4 of 5 experiments) and retire the local ngspice grid loop *(hermit)* *(held)*
-- **#353**: Collapse the four `supersedes` encodings into one: the display placeholder `(none)` is load-bearing machine state in two runners *(hermit)*
+- **#499**: Remove the installed klt and broker prerequisites from the deck-transport tripwire test *(hermit)* *(held)*
+- **#504**: Simplify design/netlist.py normalize(): use klt netlist --relative-paths/--no-provenance-header *(hermit)* *(held)*
 
 ## Epics
 
@@ -84,12 +78,12 @@ Issues carrying `loom:curated`.
 |------|-------|
 | Operator merge-risk holds | 0 |
 | Very important | 0 |
-| Important | 3 |
+| Important | 2 |
 | Ready (`loom:issue`, net of holds/building/merge-pending) | 2 |
-| In Progress (`loom:building`) | 4 |
-| PRs awaiting review | 2 |
+| In Progress (`loom:building`) | 2 |
+| PRs awaiting review | 1 |
 | Approved PRs awaiting merge | 0 |
-| Curated | 9 |
-| Architect / Hermit proposals | 4 |
+| Curated | 8 |
+| Architect / Hermit proposals | 3 |
 | Active epics | 1 |
 <!-- guide:plan-body:end -->
