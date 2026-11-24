@@ -33,7 +33,8 @@ ciel enable --pdk-family sky130 -l sky130_fd_pr f6eeac7dad085ffcc829ccfd721f7b4c
 # 2. sanity-check the toolchain and PDK resolution
 python3 sim/bin/corner-run.py --print-env
 
-# 3. run the harness smoke test over the full PVT matrix (45 points, ~2 min)
+# 3. run the harness smoke test over the full PVT matrix (45 points; submitted to the
+#    batch fleet as one klt sim request per sweep, never a serial loop on this host)
 python3 sim/bin/corner-run.py sim/bias-core-smoke
 
 # 4. run the PNP mismatch Monte Carlo (local + global-process; submitted to the
@@ -65,7 +66,7 @@ interactive sessions and the runner resolve the PDK identically.
 | PDK pin | `sim/pdk.json` | open_pdks commit, variant, model-library path, the process-corner names that actually exist in the PDK library |
 | ngspice settings | `sim/spiceinit` | `ngbehavior=hsa` etc. required to read the sky130 libs; copied into the scratch run dir as `.spiceinit` |
 | xschem config | `sim/xschemrc` | project-local rc that sources the PDK's own xschemrc (so `sky130_fd_pr/*.sym` resolves) plus `design/*.sym`, and keeps generated netlists out of the tracked tree |
-| corner runner | `sim/bin/corner-run.py` | netlist → deck → ngspice → parse → record |
+| corner runner | `sim/bin/corner-run.py` | netlist → `klt sim` request (fleet or local) → grade → record |
 | shared helpers | `sim/bin/sim_common.py` | generic helpers bespoke Monte Carlo scripts reuse (PDK resolution glue, log rendering, mismatch-point sweep builders) |
 | env helper | `sim/bin/pdk-env.sh` | `source` it for interactive xschem/ngspice work |
 | experiment | `sim/<slug>/experiment.json` | what is being claimed, which corners, which measurements and their limits |
@@ -158,6 +159,14 @@ number, limit and verdict, for tooling):
 | Links | testbench, manifest, netlist snapshot, raw logs, json record |
 | Timestamp / author | UTC timestamp and who (human or agent) ran it |
 | Supersedes | prior `<record-id>` this corrects or re-runs; `(none)` otherwise |
+
+**`supersedes` in the `.json` twin (issue #353).** New records store a falsy value
+(`null`) when there is no predecessor; `(none)` is the *rendered* markdown fallback only
+(`rec['supersedes'] or '(none)'`) and is never written into the JSON. Records committed
+before this rule are append-only evidence and keep their legacy encodings, which all
+mean "no predecessor": `null`, `""`, `"(none)"`, and an absent key. A corpus consumer
+must treat all four as falsy. Runners declare `--author`/`--supersedes` through
+`sim_common.add_record_args()`; `sim/bin/test_supersedes_contract.py` guards the contract.
 
 ### Append-only rule
 
@@ -378,9 +387,33 @@ express). Such a script still has to behave like the harness:
 | `--quick` | run the manifest's `quick_subset` only |
 | `--subset-reason "…"` | **required** for any subset; recorded verbatim |
 | `--supersedes <record-id>` | record which prior record this replaces |
-| `--author`, `--timeout` | record author (default `git config user.email`), per-corner ngspice timeout |
+| `--author`, `--timeout` | record author (default `git config user.email`), per-corner simulation timeout |
+| `--backend auto\|batch\|local` | `auto` (default): a full or multi-point selection is submitted to the fleet as one `klt sim --backend batch` request per sweep; a single selected point and `--quick` run through `klt sim --backend local`, one request per point. `batch` forces the fleet. `local` accepts a single point or `--quick` only: a local grid exits before launching a simulator, with the command to run it on the fleet. Both backends share one request builder and one grader; a failed submit is quoted verbatim, never retried locally |
+| `--wait-for-capacity SECONDS` | fleet submits wait out capacity refusals (default 600) |
 | `--allow-pdk-mismatch` | run against a non-pinned PDK; the record flags it |
-| `--dry-run` | netlist, print the corner list and one deck, write nothing under `sim/<slug>/` |
+| `--dry-run` | netlist, print the corner list and the `klt sim` request(s) it would run; submit nothing, write no record under `sim/<slug>/` |
+
+Examples:
+
+```bash
+python3 sim/bin/corner-run.py sim/bias-core-startup                    # full grid -> fleet
+python3 sim/bin/corner-run.py sim/bias-core-startup --process tt --temp 27 --supply 3.3 \
+    --subset-reason "one-point debug probe"                              # single point -> local klt
+python3 sim/bin/corner-run.py sim/bias-core-startup --quick \
+    --subset-reason "harness liveness check"                             # quick_subset points -> local klt
+python3 sim/bin/corner-run.py sim/bias-core-startup --dry-run           # show the requests only
+```
+
+Manifest keys the request builder reads from `deck`: `analyses` (real
+analyses; a `let name = expr` entry is a helper that is inlined into every
+measurement expression that uses it), `supply_source` (the DC source klt
+alters per supply, default `v1`) or `supply_param` (a `.param` the testbench's
+PWL stimulus reads, for startup ramps: one parameter row per supply). A
+measurement may carry `"analysis": N` to say which of several real analyses
+produces it (two `dc` sweeps are two requests, joined by process, temperature
+and supply before grading; a missing sweep result fails that corner). Each
+measurement is sent to klt as `meas_<name>` so it cannot replace a circuit node
+vector of the same name.
 
 Exit status: `0` all checks passed, `2` a record was written but something
 failed, `1` harness/setup error (no record written).

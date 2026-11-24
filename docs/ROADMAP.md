@@ -23,7 +23,7 @@ The signoff report grades `layout/temp_por_top/` at **7 of 11 T1 items met**.
 | 4 LVS clean | met | `layout/temp_por_top/lvs.json`: `match` 153/153 devices, 71/71 nets, native-Vt `XMASSIST` included — no exclusion (re-rendered at klt `0.9.2`, #453). The compare is flavour-blind until the 5 V devices' `hvi` marker can be drawn (klayout-tools#6025) |
 | 5 Corner verification vs a ratified spec | unmet | only two of eight spec rows are ratified (DR-003) |
 | 6 Monte Carlo for statistical claims | unmet | MC records exist under `sim/` as harness records, not as envelopes the report accepts, and back no ratified row |
-| 7 Post-layout verification | unmet | cell-level `klt pex` report for `por_comparator` passes at the klt `0.9.2` pin (single tt/27C point, `layout/por_comparator/pex/klt-pex.rerun.report.json`, #454); the block-level `temp_por_top` pex report item 7 grades on is not yet produced (the #453 re-render is done) |
+| 7 Post-layout verification | unmet | cell-level `klt pex` report for `por_comparator` passes at the klt `0.9.2` pin (single tt/27C point, `layout/por_comparator/pex/klt-pex.rerun.report.json`, #454); the block-level `temp_por_top` report now exists but is `status: error` — the extracted leg cannot start because nine composed-sibling net labels differ only by case, which no case-insensitive simulator can load (klayout-tools#7091, closed upstream as a clean refusal with no automatic renaming, so the netlist stays unsimulatable as generated; `layout/temp_por_top/pex/`, #454). Item 7 needs a passing block-level report, which needs the repo-side net-label fix (#501) |
 | 8 Characterization report | unmet | `docs/characterization-report.md` exists but records FAILs and gaps, so it is not a passing check |
 | 9 Testbenches shipped | met | `manifests/attestations/`, item 9 |
 | 10 Repo hygiene | met | `manifests/attestations/`, item 10 |
@@ -92,9 +92,14 @@ Unblocked by a named item above or by a ruling listed under "Blocked and waiting
   tightened solver (#153)?* Only then can an envelope be proposed.
 - **Block-level post-layout verification (item 7).** *The pin-order limit is
   retired — the `klt pex` re-run at the `0.9.2` pin passes on `por_comparator`
-  (#454). What remains: the `hvi` marker re-render (klt pin bump, #467), and
-  then whether `klt pex` can extract `temp_por_top` within the fleet's job
-  limits (#153 may recur).*
+  (#454). The block-level pilot ran (#454, `layout/temp_por_top/pex/`):
+  extraction matches LVS (153 devices / 71 nets, declared pin order) and both
+  schematic legs pass, but the extracted leg cannot start — nine net-label
+  pairs differ only by case and produce duplicate parasitic cards plus
+  case-folded node shorts. klayout-tools#7091 is closed upstream as a clean
+  refusal (no automatic renaming), so the remaining blocker is repo-side (#501).
+  What remains: case-consistent net labels (#501), the `hvi` marker re-render (klt pin bump, #467), then whether the
+  extracted block runs within the fleet's job limits (#153 may recur).*
 - **Full-block LVS.** Answered and delivered — klt draws and compares the
   native-Vt NMOS at the klt `0.9.2` pin (#97, closed), and the `temp_por_top`
   re-render (#453) matches 153/153 devices with no exclusion. What remains

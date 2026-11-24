@@ -642,11 +642,9 @@ def main(argv: list[str]) -> int:
     c.add_argument("--run-id", required=True)
     c.add_argument("--variant", action="append", choices=["as-drawn", "diag-mn1-l20"])
     c.add_argument("--follow-on-file")
-    c.add_argument("--author")
-    c.add_argument("--supersedes")
+    sim_common.add_record_args(c)
     s = sub.add_parser("selftest")
-    s.add_argument("--author")
-    s.add_argument("--supersedes")
+    sim_common.add_record_args(s)
     args = ap.parse_args(argv)
     return {"run": cmd_run, "crosscheck": cmd_crosscheck, "record": cmd_record, "selftest": cmd_selftest}[args.cmd](args)
 

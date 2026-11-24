@@ -540,8 +540,7 @@ def main(argv):
     sim_common.add_capacity_wait_arg(r)
     c = sub.add_parser("record")
     c.add_argument("--run-id", required=True)
-    c.add_argument("--author")
-    c.add_argument("--supersedes")
+    sim_common.add_record_args(c)
     a = ap.parse_args(argv)
     return {"matrix": cmd_matrix, "run": cmd_run, "record": cmd_record}[a.cmd](a)
 

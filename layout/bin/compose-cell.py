@@ -257,7 +257,7 @@ def build_reference(
 ) -> list[str]:
     """Rewrite an xschem-exported subckt into a klt-lvs-ready reference.
 
-    Three transformations, each deliberately minimal and each visible in the
+    Four transformations, each deliberately minimal and each visible in the
     written-out result:
 
     1. The ``name=value`` parameter defaults are dropped from the ``.subckt``
@@ -608,8 +608,8 @@ def compose_cell(spec: dict, spec_dir: Path, out_dir: Path) -> dict:
                 "layout/bin/compose-cell.py",
                 f"* Source: {lvs_spec['reference']} .subckt "
                 f"{lvs_spec['subckt']}{dependency_note}",
-                "* Only unit spellings (and any substituted subckt parameter)",
-                "* differ from the source -- see compose-cell.py's docstring.",
+                "* Mechanically rewritten from the source by build_reference -- see",
+                "* compose-cell.py's docstring for the exact transformations.",
                 *reference_lines,
                 "",
             ]

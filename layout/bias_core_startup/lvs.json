@@ -1,8 +1,14 @@
 {
-  "schema_version": 1,
+  "schema_version": 3,
   "engine": "klayout",
-  "layout": "bias_core_startup.spice",
-  "reference": "bias_core_startup.ref.spice",
+  "layout": {
+    "path": "layout/bias_core_startup/bias_core_startup.spice",
+    "scope": "repo"
+  },
+  "reference": {
+    "path": "layout/bias_core_startup/bias_core_startup.ref.spice",
+    "scope": "repo"
+  },
   "top": "BIAS_CORE_STARTUP",
   "reference_top": "BIAS_CORE_STARTUP",
   "reference_conversion": {
@@ -24,6 +30,7 @@
     "anchor_top_level_pins": null,
     "strict_top_level_pin_count": false,
     "compare_mos_flavour": false,
+    "ignore_mos_bulk": false,
     "supply_nets": [
       "GND",
       "VCC",
@@ -45,6 +52,7 @@
     "instance_count": 0,
     "expected_nets": null,
     "unchecked_expected_pins": [],
+    "excluded_pins": [],
     "findings": [],
     "finding_count": 0
   },
@@ -84,30 +92,40 @@
     "pnp",
     "sky130_fd_pr__model__cap_mim",
     "sky130_fd_pr__model__cap_mim_m4",
-    "resistor"
+    "resistor",
+    "diode_pw2nd_05v5",
+    "diode_pw2nd_05v5_lvt",
+    "diode_pw2nd_05v5_nvt",
+    "diode_pw2nd_11v0",
+    "diode_pd2nw_05v5",
+    "diode_pd2nw_05v5_lvt",
+    "diode_pd2nw_05v5_hvt",
+    "diode_pd2nw_11v0"
   ],
   "environment": {
     "engine": "klayout",
-    "engine_version": "0.30.12",
+    "engine_version": "0.30.14",
     "netgen_binary": null,
     "layout_sha256": "b6aabed6a503be536d2bd7d3f88974ccb84b373d04195af16f853c53df00b1f7",
-    "reference_sha256": "62d41eca71588d859a6436d5689fecfdf0c574db9d0601d842d0ebfad7cf76ff",
+    "reference_sha256": "3f1b9f7364289d2b66ae883cf5c32057d057cded288e7075aa5696d05869d0a9",
     "extracted_netlist": null
   },
   "provenance": {
-    "klt_version": "0.7.1.dev1610+g758c6e224053",
-    "klayout_version": "0.30.12",
+    "klt_version": "0.9.2",
+    "klt_git_commit": "046ba74652fc096bd97071fc3237f7159dd40183",
+    "klt_reinstall_spec": "klayout-tools==0.9.2",
+    "klayout_version": "0.30.14",
     "pdk": null,
     "deck": {
       "name": "sky130",
-      "content_hash": "sha256:773f73886500d88310f3c3ebe671aad84de425473e9eb6b7ae5a22902416e973",
-      "released": false
+      "content_hash": "sha256:36027b82e3b16075e72b8e21775cde47ba7d08b7636efa4b73e9c34732a28efd",
+      "released": true
     },
     "input": {
       "content_hash": "sha256:b6aabed6a503be536d2bd7d3f88974ccb84b373d04195af16f853c53df00b1f7",
       "role": "netlist"
     },
-    "klayout_version_mismatch": false
+    "klayout_version_mismatch": true
   },
   "mismatches": [],
   "net_correspondence": [
