@@ -1,6 +1,9 @@
 {
-  "schema_version": 3,
-  "file": "temp_core.gds",
+  "schema_version": 4,
+  "file": {
+    "path": "layout/temp_core/temp_core.gds",
+    "scope": "repo"
+  },
   "deck": "sky130",
   "top": "temp_core",
   "dbu_um": 0.001,
@@ -20,11 +23,6 @@
   },
   "dummy_devices_dropped": 0,
   "ignored_layers": [
-    {
-      "layer": 93,
-      "datatype": 44,
-      "shapes": 42
-    },
     {
       "layer": 95,
       "datatype": 20,
@@ -53,6 +51,11 @@
       "shapes": 1
     },
     {
+      "layer": 93,
+      "datatype": 44,
+      "shapes": 42
+    },
+    {
       "layer": 94,
       "datatype": 20,
       "shapes": 42
@@ -64,7 +67,15 @@
     "pnp",
     "sky130_fd_pr__model__cap_mim",
     "sky130_fd_pr__model__cap_mim_m4",
-    "resistor"
+    "resistor",
+    "diode_pw2nd_05v5",
+    "diode_pw2nd_05v5_lvt",
+    "diode_pw2nd_05v5_nvt",
+    "diode_pw2nd_11v0",
+    "diode_pd2nw_05v5",
+    "diode_pd2nw_05v5_lvt",
+    "diode_pd2nw_05v5_hvt",
+    "diode_pd2nw_11v0"
   ],
   "devices": [
     {
@@ -1764,7 +1775,7 @@
     "net 'NC|ec' merges 2 distinct labels (NC, ec) onto one net -- KLayout joins multiple labels found on the same electrical net (as '|' here and in the written netlist, matching NetlistSpiceWriter's own node-name escaping); this usually means two differently-named nets were shorted together in the layout -- see docs/cli/extract.md's 'Merged net labels' section.",
     "net 'VSS|vss' merges 2 distinct labels (VSS, vss) onto one net -- KLayout joins multiple labels found on the same electrical net (as '|' here and in the written netlist, matching NetlistSpiceWriter's own node-name escaping); this usually means two differently-named nets were shorted together in the layout -- see docs/cli/extract.md's 'Merged net labels' section.",
     "1 drawn capacitor ('sky130_fd_pr__model__cap_mim') written as a fixed-value 'C' card (the deck's nominal area+perimeter value) -- PDK process corners (e.g. mimcap_ff/mimcap_ss) do not apply to it, so schematic-vs-extracted deltas at non-typical corners include a capacitor-corner term; pass --pdk to bind the PDK capacitor subcircuit instead. See docs/cli/extract.md's 'SPICE model binding' section.",
-    "2 layers (93/44, 95/20) carrying 80 shapes are outside 'sky130' deck's connectivity graph -- this geometry is invisible to extraction, so a net routed only through it extracts as multiple disconnected nets instead of one, which will silently mismatch a downstream `klt lvs` reference netlist -- see ignored_layers[] for the full per-layer shape counts. See docs/cli/extract.md's 'ignored_layers' field documentation."
+    "1 layer (95/20) carrying 38 shapes is outside 'sky130' deck's connectivity graph -- this geometry is invisible to extraction, so a net routed only through it extracts as multiple disconnected nets instead of one, which will silently mismatch a downstream `klt lvs` reference netlist -- see ignored_layers[] for the full per-layer shape counts. See docs/cli/extract.md's 'ignored_layers' field documentation."
   ],
   "black_box_regions": [],
   "abstracted_cells": [],
@@ -1792,6 +1803,7 @@
       ]
     }
   ],
+  "split_net_labels": [],
   "voltage_domain_warnings": [],
   "missing_flavour_markers": [],
   "unsupported_devices": [],
@@ -1805,16 +1817,19 @@
   "declared_pins": null,
   "def_pins": null,
   "label_layers": null,
+  "device_models": null,
   "probes": [],
   "pdk": null,
   "provenance": {
-    "klt_version": "0.7.1.dev1610+g758c6e224053",
-    "klayout_version": "0.30.12",
+    "klt_version": "0.9.2",
+    "klt_git_commit": "046ba74652fc096bd97071fc3237f7159dd40183",
+    "klt_reinstall_spec": "klayout-tools==0.9.2",
+    "klayout_version": "0.30.14",
     "pdk": null,
     "deck": {
       "name": "sky130",
-      "content_hash": "sha256:773f73886500d88310f3c3ebe671aad84de425473e9eb6b7ae5a22902416e973",
-      "released": false
+      "content_hash": "sha256:36027b82e3b16075e72b8e21775cde47ba7d08b7636efa4b73e9c34732a28efd",
+      "released": true
     },
     "input": {
       "content_hash": "sha256:4bb46c257d1346513510c41e7bb6d3eb12629ea2d8b63dab804ee9a394ac4f06",
@@ -1832,13 +1847,13 @@
   "timing": {
     "stages": {
       "read_layout": 0.002,
-      "device_extraction": 0.058,
+      "device_extraction": 0.05,
       "diagnostics": 0.0,
-      "netlist_write": 0.001,
+      "netlist_write": 0.003,
       "netlist_hash": 0.0,
       "netlist_normalized_hash": 0.001
     },
-    "total_seconds": 0.157,
-    "unattributed_seconds": 0.095
+    "total_seconds": 0.084,
+    "unattributed_seconds": 0.028
   }
 }
