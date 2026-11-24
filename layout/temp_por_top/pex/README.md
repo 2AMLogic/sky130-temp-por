@@ -4,7 +4,8 @@
 cannot start.** The cause is measured, single and upstream:
 [klayout-tools#7091](https://github.com/2AMLogic/klayout-tools/issues/7091)
 (net labels differing only by case -> duplicate parasitic card names +
-case-folded node shorts). Per #454's step 6, the report is committed as it is,
+case-folded node shorts; closed upstream as a clean refusal, not a rename, so the
+forward path is repo-side, #501). Per #454's step 6, the report is committed as it is,
 the cause is linked, and the issue stays open. No spec or harness window was
 relaxed; nothing here edits existing records.
 
@@ -61,7 +62,7 @@ backend `local`, single corner. **No grid was run, locally or on the fleet.**
 - Extracted legs (both testbenches): `error` before any analysis started --
   see the blocker. The extracted-netlist **simulation** run time is therefore
   **unmeasured**; what the pilot establishes is that no grid is worth
-  submitting until #7091 is fixed (every fleet point would reproduce the same
+  submitting until the repo-side net-label fix (#501) lands (every fleet point would reproduce the same
   load failure).
 
 ## Blocker: case-colliding net names (single cause, upstream)
@@ -111,8 +112,8 @@ Device-only extraction is unaffected (unique `$n` device names), which is why
   8 extracted vs 5 reference cards (unit-vs-card counting of the MF=4 timer
   cap; both sides instantiate the same model).
 - **Fleet**: nothing was submitted (nothing to dispatch -- see above), so
-  there are no fleet job ids to record for this report. When #7091 is fixed,
-  the 5x3x3 grid goes through the batch fleet with `--wait-for-capacity 600`
+  there are no fleet job ids to record for this report. Once the net labels are
+  case-consistent (#501) and the extracted leg loads, the 5x3x3 grid goes through the batch fleet with `--wait-for-capacity 600`
   (`klt pex` 0.9.2 speaks the fleet protocol: `--backend batch`,
   `--max-units-per-job`, `--submit-only`/`--attach`), never as a local grid.
 
@@ -129,4 +130,4 @@ Device-only extraction is unaffected (unique `$n` device names), which is why
       --outdir <scratch> --backend local --format json \
       > layout/temp_por_top/pex/klt-pex.report.json
 
-Exit code 4 (`status: error`) is the recorded outcome until #7091 is fixed.
+Exit code 4 (`status: error`) is the recorded outcome until the repo-side net-label fix (#501) lands; #7091 itself is closed upstream as a clean refusal, not a rename.
