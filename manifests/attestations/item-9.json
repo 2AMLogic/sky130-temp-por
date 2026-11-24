@@ -178,14 +178,14 @@
         "role": "testbench",
         "path": "sim/por-comparator-thresholds/experiment.json",
         "passed": true,
-        "content_hash": "sha256:6e4f50489fcf3d00f7ce63c80e703de61bcab9ab876d864d42b74f7d56a22f6e"
+        "content_hash": "sha256:0ea82d3216b3e873a66e97ad0873276648d9f9458971b604197274b9f0a0d8d4"
       },
       {
         "check": "present",
         "role": "testbench",
         "path": "sim/por-comparator-thresholds/run_thresholds_campaign.py",
         "passed": true,
-        "content_hash": "sha256:347bd48906537ed5094da6d26b10248faaedf07308966bda0e53ac3e64def09c"
+        "content_hash": "sha256:44f73711137a041575b84dc330ca519143ef9a0e5636ee9f96332e0fb6df1328"
       },
       {
         "check": "present",
@@ -334,7 +334,7 @@
         "role": "tools",
         "passed": true,
         "value": {
-          "klt": "0.7.1.dev1610+g758c6e224053",
+          "klt": "0.9.2",
           "ngspice": "46",
           "xschem": "3.4.7"
         }
@@ -351,7 +351,7 @@
         "path": "manifests/inventories/item-9.json",
         "scope": "repo"
       },
-      "content_hash": "sha256:4e09863f4632c2dfd3d619340037312f7dd32268c64578bb3f0ed1fc59ab51d3"
+      "content_hash": "sha256:a1f79d7e3eea4170890790e2cec0dca4bcc794a089b6ff5831c8fd212820a42f"
     }
   }
 }

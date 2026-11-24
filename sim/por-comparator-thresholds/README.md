@@ -244,6 +244,59 @@ replaced by the klt-extracted lumped-RC netlist (`layout/por_comparator/pex/`). 
 untouched. Delta table, extraction model, and the `klt pex` blocker (pin order, MOS flavour) are in
 [`layout/por_comparator/pex/README.md`](../../layout/por_comparator/pex/README.md). Run with `run --variant <name>-postlayout`
 
+### Bias-core post-layout variant (issue #487): `real-bias-core-biaspex`
+
+Same testbench, stimulus, comparator model, 5x3 grid and both rates (100 / 50 V/s) as `real-bias-core`; the schematic `bias_core` is
+swapped for the klt-extracted lumped-RC netlist of `layout/bias_core/` (the post-#473/#488 render) and **only `bias_core` is extracted**
+(`por_comparator` stays the schematic export; it is never mixed with the `-postlayout` extraction in one record). Extraction model,
+resistor handling and limits: [`layout/bias_core/pex/README.md`](../../layout/bias_core/pex/README.md). Run with
+`run --variant real-bias-core-biaspex --capacity-wait 600` (batch fleet; one local tt/27 C probe first).
+
+Records (new ids; no prior record or snapshot edited):
+
+- extracted: `records/20261124-031933-1df0a90f-real-bias-core-biaspex.md` (+ `.json`), 15/15 points clean at both rates, DUT include
+  `layout/bias_core/pex/bias_core.pex.sim.spice` (sha256 `97e60988...ab79`, see the record's netlist snapshots).
+- schematic baseline: `records/20261124-032201-1de4b460-real-bias-core.md` -- a **fresh** `real-bias-core` run on current main. The
+  2026-10-09 `real-bias-core` record predates the #455 `bias_core` schematic change (its netlist differs from today's
+  `design/netlist/bias_core.spice`), so it is not a like-for-like baseline for an extraction of the post-#455 layout.
+
+Delta (extracted minus schematic), reproduce with
+`python3 -I postlayout_delta.py records/20261124-032201-1de4b460-real-bias-core.json records/20261124-031933-1df0a90f-real-bias-core-biaspex.json`:
+
+Schematic record `20261124-032201-1de4b460-real-bias-core` vs post-layout record `20261124-031933-1df0a90f-real-bias-core-biaspex` (rate 100 V/s; delta = post-layout - schematic)
+
+| corner (process, T) | VPOR-up sch / pex (V) | dUP (mV) | VPOR-down sch / pex (V) | dDOWN (mV) | hyst sch / pex (mV) | dHYST (mV) | status sch / pex |
+|---|---|---|---|---|---|---|---|
+| tt_-40c | 2.7001 / 2.6999 | -0.2 | 2.5444 / 2.5443 | -0.1 | 155.8 / 155.6 | -0.1 | OK / OK |
+| tt_27c | 2.7130 / 2.7125 | -0.6 | 2.5570 / 2.5580 | +0.9 | 156.0 / 154.5 | -1.5 | OK / OK |
+| tt_125c | 2.7082 / 2.7093 | +1.0 | 2.5579 / 2.5610 | +3.0 | 150.3 / 148.3 | -2.0 | OK / OK |
+| ss_-40c | 2.7035 / 2.7030 | -0.4 | 2.5465 / 2.5470 | +0.4 | 156.9 / 156.1 | -0.9 | OK / OK |
+| ss_27c | 2.7162 / 2.7171 | +0.9 | 2.5598 / 2.5609 | +1.1 | 156.3 / 156.2 | -0.1 | OK / OK |
+| ss_125c | 2.7125 / 2.7131 | +0.6 | 2.5595 / 2.5610 | +1.5 | 153.0 / 152.2 | -0.9 | OK / OK |
+| ff_-40c | 2.6970 / 2.6970 | +0.0 | 2.5412 / 2.5412 | -0.0 | 155.8 / 155.8 | +0.0 | OK / OK |
+| ff_27c | 2.7096 / 2.7090 | -0.6 | 2.5541 / 2.5555 | +1.3 | 155.5 / 153.6 | -1.9 | OK / OK |
+| ff_125c | 2.7050 / 2.7052 | +0.2 | 2.5570 / 2.5590 | +2.0 | 148.1 / 146.3 | -1.8 | OK / OK |
+| sf_-40c | 2.6928 / 2.6930 | +0.3 | 2.5372 / 2.5390 | +1.8 | 155.6 / 154.1 | -1.5 | OK / OK |
+| sf_27c | 2.7060 / 2.7070 | +1.1 | 2.5520 / 2.5527 | +0.7 | 153.9 / 154.3 | +0.4 | OK / OK |
+| sf_125c | 2.7030 / 2.7037 | +0.7 | 2.5570 / 2.5581 | +1.2 | 146.1 / 145.6 | -0.5 | OK / OK |
+| fs_-40c | 2.7030 / 2.7030 | +0.0 | 2.5470 / 2.5472 | +0.3 | 156.1 / 155.8 | -0.3 | OK / OK |
+| fs_27c | 2.7150 / 2.7170 | +1.9 | 2.5596 / 2.5610 | +1.3 | 155.4 / 156.0 | +0.6 | OK / OK |
+| fs_125c | 2.7111 / 2.7130 | +1.9 | 2.5583 / 2.5592 | +0.9 | 152.8 / 153.8 | +1.0 | OK / OK |
+
+- VPOR-up delta over 15 comparable points: min -0.6 mV (tt_27c), max +1.9 mV (fs_27c)
+- VPOR-down delta over 15 comparable points: min -0.1 mV (tt_-40c), max +3.0 mV (tt_125c)
+- hysteresis delta over 15 comparable points: min -2.0 mV (tt_125c), max +1.0 mV (fs_125c)
+- max(VPOR-up): schematic 2.7162 V (ss_27c), post-layout 2.7171 V (ss_27c)
+- margin vs 2.97 V low rail: schematic +254 mV, post-layout +253 mV
+
+Reading: extracted `bias_core` parasitics move VPOR-up by -0.6..+1.9 mV, VPOR-down by -0.1..+3.0 mV and hysteresis by -2.0..+1.0 mV.
+The worst-case corners are tt_125c for VPOR-down (+3.0 mV) and hysteresis (-2.0 mV), and fs_27c / fs_125c for VPOR-up (+1.9 mV). The
+binding corner is unchanged (max VPOR-up at ss_27c: 2.7162 V -> 2.7171 V); margin to the 2.97 V low rail is +254 mV schematic vs +253 mV
+extracted. The sweep resolution is 2 mV of VDD per sample (1 mV at 50 V/s), so most deltas are at or near the measurement resolution.
+Every one of the 15 points at each rate converged and the BIAS_OK startup released (single-edge up and down); none was dropped.
+Not covered: lateral coupling, distributed RC (incl. the res_xhigh_po bodies), mismatch Monte Carlo, ll/hh skew, other rates, the
+fast supply ramp of the assembled block. Spec thresholds are not relaxed.
+
 ### Mismatch Monte Carlo supplement (issue #348): real-bias-core, tt/ss x -40/27/125 C, N = 20 per corner
 
 Record: `records/20261115-002854-ad5bbeda-real-bias-core-mismatch-mc.md` (+

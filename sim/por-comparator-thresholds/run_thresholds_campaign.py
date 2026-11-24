@@ -296,7 +296,7 @@ def cmd_run(args) -> int:
             work = [(p, t, o) for p, t, o in work
                     if not sim_common.report_usable(mc_dir(run_dir, variants[0], p, t) / "report.json")]
     else:
-        variants = args.variant or [v for v in man["variants"] if not v.endswith("-postlayout")]  # post-layout variants only on explicit --variant
+        variants = args.variant or [v for v in man["variants"] if not v.endswith(("-postlayout", "-biaspex"))]  # post-layout variants only on explicit --variant
         mc = None
         work = [(v, r) for v in variants for r, _ in all_rates(man)]
         if args.retry_failed:
@@ -1412,8 +1412,9 @@ def cmd_record(args) -> int:
             "binding": b,
             "margin": margin,
             "probe": probe_text,
-            "absent_coverage": [c for c in man["absent_coverage"] if not (variant.endswith("-postlayout") and c.startswith("Post-layout parasitics are not included"))]
-            + (["Post-layout scope: only por_comparator is extracted (lumped RC star per net, vertical-overlap coupling only, no lateral coupling, no distributed RC); the MOS models are rewritten 01v8 -> g5v0d10v5 because the layout lacks the hvi marker; bias_core and the testbench stimulus are schematic-level."] if variant.endswith("-postlayout") else []),
+            "absent_coverage": [c for c in man["absent_coverage"] if not (variant.endswith(("-postlayout", "-biaspex")) and c.startswith("Post-layout parasitics are not included"))]
+            + (["Post-layout scope: only por_comparator is extracted (lumped RC star per net, vertical-overlap coupling only, no lateral coupling, no distributed RC); the MOS models are rewritten 01v8 -> g5v0d10v5 because the layout lacks the hvi marker; bias_core and the testbench stimulus are schematic-level."] if variant.endswith("-postlayout") else [])
+            + (["Post-layout scope: only bias_core is extracted (lumped RC star per net, vertical-overlap coupling only, no lateral coupling, no distributed RC; the ~5.9 mm of res_xhigh_po bodies are the drawn-geometry model cards, so their own distributed capacitance is not extracted beyond the per-net lumped cap); the MOS models are rewritten 01v8 -> g5v0d10v5 because the layout lacks the hvi marker; por_comparator and the testbench stimulus are schematic-level."] if variant.endswith("-biaspex") else []),
             "links": {
                 "testbench": "sim/" + SLUG + "/" + v["schematic"], "manifest": f"sim/{SLUG}/experiment.json", "driver": f"sim/{SLUG}/run_thresholds_campaign.py",
                 "extractor": f"sim/{SLUG}/threshold_extractor.py", "netlist_snapshots": f"sim/{SLUG}/netlist-snapshots/{record_id}/",
@@ -1435,7 +1436,7 @@ def cmd_selftest(_args) -> int:
 def main(argv: list[str]) -> int:
     ap = argparse.ArgumentParser(description=__doc__, formatter_class=argparse.RawDescriptionHelpFormatter)
     sub = ap.add_subparsers(dest="cmd", required=True)
-    variants = ["ideal-bias", "real-bias-core", "ideal-bias-postlayout", "real-bias-core-postlayout"]
+    variants = ["ideal-bias", "real-bias-core", "ideal-bias-postlayout", "real-bias-core-postlayout", "real-bias-core-biaspex"]
     r = sub.add_parser("run")
     r.add_argument("--variant", action="append", choices=variants)
     r.add_argument("--axis", choices=AXES, default="main", help="main = tt/ss/ff/sf/fs (the 5x3 grid); passive-skew = ll/hh resistor/cap sections (separate records); mc = mismatch Monte Carlo supplement (real-bias-core, tt/ss x -40/27/125 C, one request per (process, temperature), issue #348)")
