@@ -2,6 +2,13 @@
 
 Sections moved byte-for-byte from [WORK_LOG.md](../WORK_LOG.md) by `loom-daemon work-docs archive`.
 
+### 2026-09-23
+
+- **PR #77**: fix: strap PNP collectors to VSS and reach LVS match on klt 0.6.0
+- **PR #76**: docs: embed fleet burndown chart in README
+- **Issue #30** (closed): T1 item 2/10: lay out bias_core (first increment toward layout)
+- **Issue #75** (closed): README: embed the fleet burndown chart (one line)
+
 ### 2026-09-21
 
 - **PR #73**: fix: land bias_core supply legs on the real pads (block-local ports)

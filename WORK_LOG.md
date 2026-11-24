@@ -9,6 +9,21 @@ Chronological record of recently merged pull requests and closed issues. This fi
 
 ### 2026-11-24
 
+- **PR #516**: docs: re-quote stale extract cards in two bias_core leaf READMEs
+- **PR #512**: fix(layout): upper-case the bias_core family's net labels so the flat pex netlist loads
+- **PR #511**: fix(sim): re-scope spiceinit provenance, group helper inlining, name sparse-grid cross product
+- **PR #510**: fix(layout): re-render drc/extract evidence for 6 leaf cells onto the released sky130 deck
+- **PR #509**: docs: quantify E8 VPOR-up mismatch tail vs the 2.97 V rail and disposition it as the recorded sigma's expected tail
+- **PR #508**: fix(sim): sync early-assert manifest prose and probe grid lookup
+- **PR #507**: docs(layout): drop unrecorded probe figure from bias_core pex README
+- **Issue #515** (closed): corner-run.py:435 docstring says "both backends" then "the runner" — scope the ngspice_init clause to the fleet runner on the next edit of this file
+- **Issue #514** (closed): layout: two leaf READMEs quote stale extract cards (bias_core_settle_flag M$10, bias_core_passives R$3)
+- **Issue #506** (closed): sim: the pre-flight local probe figure cited in layout/bias_core/pex/README.md has no in-repo record
+- **Issue #502** (closed): 9 cells now record LVS against the released deck while their DRC/extract evidence still cites the unreleased one
+- **Issue #501** (closed): temp_por_top: make composed-sibling net labels case-consistent so klt pex output is simulatable
+- **Issue #500** (closed): sim/por-bias-ok-early-assert: sync stale pre-XMOKA manifest prose and minor runner hygiene
+- **Issue #497** (closed): corner-run.py no longer stages sim/spiceinit: stale provenance docs and a dead constant
+- **Issue #494** (closed): por-comparator-thresholds: VPOR-up exceeds the DR-001 2.97 V low rail on 4 of 120 paired and 5 of 300 fresh mismatch draws
 - **PR #505**: feat(sim): measure POR thresholds against extracted bias_core parasitics
 - **Issue #487** (closed): sim: measure VPOR up/down/hysteresis with the extracted bias_core against the re-rendered layout
 - **Issue #490** (closed): docs: four stale "153/153" LVS device counts after the #473 re-render landed 154/154
@@ -406,11 +421,4 @@ Chronological record of recently merged pull requests and closed issues. This fi
 - **Issue #40** (closed): bias_core: full-cell assembly (compose all device-group sub-blocks)
 - **Issue #31** (closed): T1 item 8/10: aggregate a block-level characterization report
 - **Issue #78** (closed): Run the two-key ratification ceremony on DR-003 (target-spec table)
-
-### 2026-09-23
-
-- **PR #77**: fix: strap PNP collectors to VSS and reach LVS match on klt 0.6.0
-- **PR #76**: docs: embed fleet burndown chart in README
-- **Issue #30** (closed): T1 item 2/10: lay out bias_core (first increment toward layout)
-- **Issue #75** (closed): README: embed the fleet burndown chart (one line)
 
