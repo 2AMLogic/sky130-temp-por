@@ -189,7 +189,9 @@ def build_mc_request(proc: str, temp: float, offset: int, mc: dict, man: dict, b
     return sim_common.base_request(
         "netlist.spice", backend,
         {"process": [f"{proc}_mm"], "supply_v": {"vset": [sw["peak_v"]]}, "temperature_c": [temp]},
-        {"kind": "tran", "args": f"1u {tstop:.9g} 0 {sw['tmax_s']:.3g}"},
+        # Issue #474: the supply starts at a physical 0 V, so every node starts at 0 V; `uic` starts the
+        # transient from that state instead of a DC operating point that fails to converge on some cold draws.
+        {"kind": "tran", "args": f"1u {tstop:.9g} 0 {sw['tmax_s']:.3g}" + (" uic" if mc.get("tran_uic") else "")},
         [
             {"name": "vdd_end", "spice": f".meas tran vdd_end FIND v(vdd) AT={tstop - 1e-6:.9g}", "unit": "V"},
             {"name": "por_raw_max", "spice": ".meas tran por_raw_max MAX v(por_raw)", "unit": "V"},
@@ -317,6 +319,7 @@ def cmd_run(args) -> int:
                             "rate_v_per_s": mc["rate_v_per_s"], "variant": variants[0],
                             "process_override": args.mc_process or None,
                             "seed_override": args.mc_seed,
+                            "tran_uic": bool(mc.get("tran_uic")),
                             "requests": [{"process": p, "temperature_c": t, "seed_offset": o, "seed": mc_request_seed(mc, o)} for p, t, o in mc_units(man, mc)],
                             "request_sizing": mc_effective_prose(man, mc)["request_sizing"]},
         })
@@ -1035,6 +1038,10 @@ def render_mc_md(rec: dict) -> str:
              f"temperature {', '.join(f'{cr.fmt_temp(x)} C' for x in rec['matrix']['temperature_c'])}; "
              f"VDD is the swept variable (0 -> {rec['matrix']['peak_v']} V -> 0), no separate supply axis, at the primary {rec['matrix']['rates_v_per_s'][0]:g} V/s only.")
     L.append(f"- **Statistical convention**: {mc['statistical_convention']}")
+    uic = mc.get("tran_uic")
+    L.append("- **Transient startup**: " + ("`.tran ... uic` (all-zero initial state; the DC operating point at VDD=0 is skipped, issue #474)"
+             if uic else "default (DC operating point at VDD=0 first)" if uic is False
+             else "not recorded (run submitted before the startup flag was recorded)"))
     L.append("")
     L.append("## Request sizing and seeds (why this grid cannot be bigger)")
     L.append(f"- {mc['request_sizing']}")
@@ -1276,7 +1283,9 @@ def cmd_record_mc(args, man: dict, run_dir: Path, meta: dict) -> int:
                         "statistical_convention": prose["statistical_convention"], "request_sizing": prose["request_sizing"],
                         "seed_offsets": prose["seed_offsets"],
                         "process_override": (meta.get("monte_carlo") or {}).get("process_override"),
-                        "seed_override": (meta.get("monte_carlo") or {}).get("seed_override")},
+                        "seed_override": (meta.get("monte_carlo") or {}).get("seed_override"),
+                        # transient startup (issue #474); None = run submitted before the field existed
+                        "tran_uic": (meta.get("monte_carlo") or {}).get("tran_uic")},
         "matrix": {"axis": "mc", "process": mc["process"], "temperature_c": mc["temperature_c"], "peak_v": man["sweep"]["peak_v"],
                    "rates_v_per_s": [mc["rate_v_per_s"]], "n_corners": len(units), "is_subset": True,
                    "axis_note": "mismatch Monte Carlo supplement: real-bias-core only, _mm sections (local mismatch), primary rate only, no half-rate guard"},
