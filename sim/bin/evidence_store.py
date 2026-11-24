@@ -181,9 +181,8 @@ sys.exit(2)
 
 
 # Every `sim/*/run_*.py`, and the argv that must fail closed when the broker is unset.
-# `run`/`record` subcommand drivers check in both; the two single-command runners check
-# first thing in `main()`, so a bare invocation is the gate. `probe` / `--probe` /
-# `--dry-run` submit nothing and write no record, so they are deliberately not listed.
+# Exercise both `run` and `record` for staged drivers. Single-command runners
+# record with no arguments. `probe`, `--probe`, and `--dry-run` skip recording.
 _STAGES = [["run"], ["record", "--run-id", "selftest-none"]]
 DRIVER_ARGV: dict[str, list[list[str]]] = {
     "run_brownout_campaign.py": _STAGES,
@@ -196,6 +195,7 @@ DRIVER_ARGV: dict[str, list[list[str]]] = {
     "run_solver_sweep.py": _STAGES,
     "run_accuracy_mc.py": _STAGES + [["compare", "--run-id", "selftest-none"]],
     # single-command runners: one invocation does run + record
+    "run_early_assert.py": [[]],
     "run_op_branch.py": [[]],
     "run_pnp_mismatch.py": [[]],
 }
