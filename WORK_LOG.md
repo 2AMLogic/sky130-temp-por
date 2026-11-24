@@ -7,6 +7,32 @@ Chronological record of recently merged pull requests and closed issues. This fi
 - [2026-09](work_log/WORK_LOG_2026-09.md)
 - [2026-08](work_log/WORK_LOG_2026-08.md)
 
+### 2026-11-24
+
+- **PR #498**: sim: deterministic forced-offset reproduction of early BIAS_OK / POR_RAW pulse
+- **PR #496**: docs(layout): make generated .ref.spice banner describe build_reference accurately
+- **Issue #495** (closed): bias_core OK detector: early BIAS_OK assertion glitches POR_RAW at VDD~1.82 V on cold mismatch draws (uncorrected, now masked by the uic startup)
+- **PR #491**: sim: start mismatch-MC transient from the all-zero state; 120/120 and 300/300 valid
+- **PR #485**: feat: run corner-run grids through klt sim on the fleet, local only for single points
+- **Issue #484** (closed): compose-cell.py's generated-reference provenance banner understates the transformations (and now names a removed one)
+- **PR #477**: feat: add block-level klt pex evidence for temp_por_top (cannot-grade, net-label case collision)
+- **Issue #474** (closed): Resolve cold-mismatch BIAS_OK chatter and initial-timepoint transient aborts after #455
+- **Issue #327** (closed): corner-run.py: run full grids on the fleet and support all four rejected manifests
+
+### 2026-11-23
+
+- **Issue #493** (closed): Attestation item-9 pins 13 hot sim runner sources, so concurrent sim PRs collide in a conflict only a local_only re-attest can resolve
+- **PR #492**: test(sim): exercise render_mc_md in the MC 'Not sampled' bullet test
+- **Issue #489** (closed): test_mc_statistics: render_mc_md 'Not sampled' bullet has no real test (tautological assertion)
+- **PR #486**: fix(sim): derive MC record prose from effective grid overrides
+- **PR #483**: refactor(layout): retire unused lvs.params, lvs.drop_kwargs and block from_stage
+- **PR #482**: fix: store falsy supersedes in new sim records instead of the (none) sentinel
+- **Issue #481** (closed): por-comparator-thresholds: --axis mc record renders manifest prose for the un-overridden grid when --mc-process/--mc-seed are used
+- **PR #475**: design+sim: fix bias_core OK-detector mismatch margin and chatter; 0 non-releasing mismatch samples (issue #455)
+- **Issue #455** (closed): bias_core OK-detector: BIAS_OK never asserts in 38 of 120 mismatch samples, so reset never releases; find the device and fix the design
+- **Issue #353** (closed): Collapse the four `supersedes` encodings into one: the display placeholder `(none)` is load-bearing machine state in two runners
+- **Issue #321** (closed): Remove undeclared descriptor keys from compose-cell.py (lvs.params, lvs.drop_kwargs, blocks[].from_stage): no committed cell recipe uses them
+
 ### 2026-11-21
 
 - **PR #466**: refactor(sim): drop run_solver_sweep's interp() duplicate of sim_common.interp_at
