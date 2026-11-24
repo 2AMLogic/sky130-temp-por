@@ -186,8 +186,16 @@ class RequestConstruction(unittest.TestCase):
 
     def test_explicit_point_list_is_not_a_grid(self):
         subset = [cr.Corner("tt", 27.0, 3.3), cr.Corner("ss", -40.0, 2.97), cr.Corner("ff", 125.0, 3.63)]
-        with self.assertRaises(cr.HarnessError):
+        with self.assertRaises(cr.HarnessError) as raised:
             cr.batch_axes(subset)
+        msg = str(raised.exception)
+        # the diagnostic names the required cross product (3 x 3 x 3 = 27)...
+        self.assertIn("3 process", msg)
+        self.assertIn("3 temperature", msg)
+        self.assertIn("3 supply", msg)
+        self.assertIn("27 corners", msg)
+        # ...and no longer advises `--backend local`, which a grid refuses
+        self.assertNotIn("--backend local", msg)
 
     def test_batch_netlist_leaves_lib_temp_and_supply_to_klt(self):
         text = cr.build_batch_netlist(self.exp, ["V1 VDD 0 'vsup'", "R1 VDD 0 1k"], self.matrix)
@@ -197,9 +205,9 @@ class RequestConstruction(unittest.TestCase):
         self.assertNotIn(".lib", cards)
         self.assertNotIn(".temp", cards)
         self.assertTrue(text.rstrip().endswith(".end"))
-        # the local path gets `set ng_nomodcheck` from sim/spiceinit; the runner
-        # ignores ngspice_init, so the batch netlist must carry its own control
-        # block or native-device decks abort on the BSIM parameter check
+        # neither klt backend honors options.ngspice_init and neither stages
+        # sim/spiceinit, so the netlist itself carries a `set ng_nomodcheck`
+        # control block or native-device decks abort on the BSIM parameter check
         self.assertIn("set ng_nomodcheck", text)
 
 
@@ -709,10 +717,23 @@ class AllManifestsBuildRequests(unittest.TestCase):
         exp = cr.load_experiment(REPO / "sim" / "temp-core-startup")
         req = cr.build_batch_request(exp, make_pdk(), full_matrix(exp), 300)
         by = {m["name"]: m["expr"] for m in req["measurements"]}
-        self.assertEqual(by["meas_ptat"], "v(ptat)[length(v(ptat))-1]")
+        self.assertEqual(by["meas_ptat"], "v(ptat)[(length(v(ptat))-1)]")
         self.assertEqual(
             by["meas_ptat_settled"],
-            "abs(v(ptat)[length(v(ptat))-1] - v(ptat)[length(v(ptat))-1-100])",
+            "abs(v(ptat)[(length(v(ptat))-1)] - v(ptat)[(length(v(ptat))-1)-100])",
+        )
+
+    def test_helper_substitution_keeps_multiplication_grouping(self):
+        # a helper used multiplicatively must stay grouped when inlined:
+        # `nlast*2` is `(length(v(x))-1)*2`, not `length(v(x))-1*2` (= length-2)
+        self.assertEqual(
+            cr.request_expr("nlast*2", {"nlast": "length(v(x))-1"}),
+            "(length(v(x))-1)*2",
+        )
+        # an index helper in brackets keeps working with the grouping too
+        self.assertEqual(
+            cr.request_expr("v(x)[nlast-100]", {"nlast": "length(v(x))-1"}),
+            "v(x)[(length(v(x))-1)-100]",
         )
 
     def test_startup_supply_is_a_parameter_axis_at_both_ends_of_the_range(self):

@@ -64,7 +64,7 @@ interactive sessions and the runner resolve the PDK identically.
 | Piece | File | Role |
 |---|---|---|
 | PDK pin | `sim/pdk.json` | open_pdks commit, variant, model-library path, the process-corner names that actually exist in the PDK library |
-| ngspice settings | `sim/spiceinit` | `ngbehavior=hsa` etc. required to read the sky130 libs; copied into the scratch run dir as `.spiceinit` |
+| ngspice settings | `sim/spiceinit` | `ngbehavior=hsa` etc. required to read the sky130 libs; the bespoke campaigns render it into per-point `.spiceinit` inputs and `options.ngspice_init` lines, and hand-driven ngspice copies it as `./.spiceinit` — the corner runner itself goes through `klt sim`, which supplies its own init |
 | xschem config | `sim/xschemrc` | project-local rc that sources the PDK's own xschemrc (so `sky130_fd_pr/*.sym` resolves) plus `design/*.sym`, and keeps generated netlists out of the tracked tree |
 | corner runner | `sim/bin/corner-run.py` | netlist → `klt sim` request (fleet or local) → grade → record |
 | shared helpers | `sim/bin/sim_common.py` | generic helpers bespoke Monte Carlo scripts reuse (PDK resolution glue, log rendering, mismatch-point sweep builders) |

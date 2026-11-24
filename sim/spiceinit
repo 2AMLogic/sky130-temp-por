@@ -1,12 +1,18 @@
 * ngspice init settings for the sky130 PDK model libraries.
 *
-* The corner runner copies this file into its scratch run directory as
-* `.spiceinit` before invoking ngspice, so runs do not depend on whatever
-* happens to be in ~/.spiceinit. To drive ngspice by hand with the same
-* settings, copy this file to `.spiceinit` in your working directory.
+* The corner runner does not read this file: every corner goes through
+* `klt sim` (fleet or local), which supplies its own ngspice init, and the
+* netlist the runner builds carries the one deck-level setting itself
+* (`set ng_nomodcheck`, sim_common.NOMODCHECK_CONTROL). The file is read by
+* the bespoke campaigns: sim_common.spiceinit_text renders it, with per-point
+* edits, as the `.spiceinit` a point actually runs under, and
+* sim_common.spiceinit_lines feeds its lines to `options.ngspice_init` on the
+* request paths that honor them. To drive ngspice by hand with these
+* settings, copy this file to `.spiceinit` in your working directory (see
+* sim/README.md and sim/bin/pdk-env.sh).
 *
 * Derived from the PDK's own libs.tech/ngspice/spinit; kept in-repo so the
-* settings a record was produced under are versioned with the harness.
+* settings a run was produced under are versioned with the harness.
 
 set ngbehavior=hsa     ; HSPICE-ish compatibility, required to read PDK libs
 set skywaterpdk        ; skip some checks for faster lib loading

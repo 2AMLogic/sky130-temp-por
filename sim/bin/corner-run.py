@@ -422,21 +422,27 @@ def batch_axes(matrix: list[Corner]) -> tuple[list[str], list[float], list[float
     supplies = sorted({c.supply_v for c in matrix})
     if len(matrix) != len(process) * len(temps) * len(supplies):
         raise HarnessError(
-            "the batch backend submits one grid request, but this corner list is not a "
-            "full process x temperature x supply cross product; run it with --backend local"
+            "one klt sim grid request spans the full process x temperature x supply "
+            "cross product, but this corner list is a sparse selection: "
+            f"{len(process)} process(es) x {len(temps)} temperature(s) x "
+            f"{len(supplies)} supply(ies) requires "
+            f"{len(process) * len(temps) * len(supplies)} corners, {len(matrix)} given"
         )
     return process, temps, supplies
 
 
 def build_batch_netlist(exp: Experiment, body: list[str], matrix: list[Corner]) -> str:
-    """Netlist for the fleet: klt supplies .lib, .temp and the supply alter.
+    """Netlist handed to `klt sim` on both backends: klt supplies .lib, .temp and
+    the supply alter.
 
-    The netlist carries `set ng_nomodcheck` in its own .control block (the same
-    line sim/spiceinit gives the local path): the runner ignores
-    options.ngspice_init (sim_common.FLEET_NOTE), and without it ngspice's BSIM
-    parameter check aborts the deck before simulating on this repo's native
-    nfet_05v0_nvt device (`pdits negative`, XMASSIST) -- the mechanism every
-    bespoke campaign already ships (glitch-top, iq-top, ...)."""
+    The netlist carries `set ng_nomodcheck` in its own .control block
+    (sim_common.NOMODCHECK_CONTROL -- the same setting as this repo's
+    sim/spiceinit `set ng_nomodcheck` line, which this runner does not read):
+    the runner ignores options.ngspice_init (sim_common.FLEET_NOTE), and
+    without it ngspice's BSIM parameter check aborts the deck before
+    simulating on this repo's native nfet_05v0_nvt device (`pdits negative`,
+    XMASSIST) -- the mechanism every bespoke campaign already ships
+    (glitch-top, iq-top, ...)."""
     deck = exp.raw.get("deck", {})
     supplies = sorted({c.supply_v for c in matrix})
     nominal = supplies[len(supplies) // 2]
@@ -498,12 +504,14 @@ MEAS_PREFIX = "meas_"
 def request_expr(expr: str, helpers: dict[str, str]) -> str:
     """The measurement expression as klt sees it.
 
-    `let` helpers are inlined (`v(x)[nlast]` -> `v(x)[length(v(x))-1]`); a `dcN.`
-    plot qualifier is dropped because each sweep is its own request with a single
-    plot.
+    `let` helpers are inlined (`v(x)[nlast]` -> `v(x)[(length(v(x))-1)]`); each
+    substituted body is parenthesized so a helper used multiplicatively keeps
+    its grouping (`nlast*2` -> `(length(v(x))-1)*2`, not `length(v(x))-1*2`).
+    A `dcN.` plot qualifier is dropped because each sweep is its own request
+    with a single plot.
     """
     for name, body in helpers.items():
-        expr = re.sub(rf"(?<![\w.]){re.escape(name)}(?!\w)", lambda _m, b=body: b, expr)
+        expr = re.sub(rf"(?<![\w.]){re.escape(name)}(?!\w)", lambda _m, b=f"({body})": b, expr)
     return re.sub(r"(?<![\w.])dc\d+\.", "", expr)
 
 
