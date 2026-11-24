@@ -4,7 +4,7 @@ v {xschem version=3.4.7 file_version=1.2
 * (issue #102): the same real bias_core + por_comparator quasi-static VDD sweep, with the real
 * por_output_chain (XCHAIN) added on the shared IBIAS node so RESETn is observed too.
 * The forced offset is NOT drawn here: the driver splices a derived bias_core copy whose
-* XMOL2 gate is moved behind a series source VOFF (the deck param 'voff').
+* XMOL2 or XMOKA gate (the point's offset device) is moved behind a series source VOFF (the deck param 'voff').
 *
 * DUT: the unchanged design/por_comparator.sym (subckt por_comparator VDD VSS
 * IBIAS VREF BIAS_OK POR_RAW); the netlist is spliced from the committed
