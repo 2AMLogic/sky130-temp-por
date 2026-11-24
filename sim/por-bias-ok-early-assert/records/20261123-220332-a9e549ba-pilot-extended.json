@@ -1,0 +1,897 @@
+{
+  "author": "313063438+loom-fleet-dispatch[bot]@users.noreply.github.com",
+  "backend": "batch",
+  "batch": {
+    "capacity_wait_s": 600.0,
+    "errored": 0,
+    "failed_earlier_attempts": [],
+    "instance_type": "c7i.4xlarge",
+    "job_id": "klt-sim-1bca9543f0f0",
+    "klt_client": "klt 0.9.3.dev4263+g473bcdb00d05",
+    "klt_sim_backend_env": "batch",
+    "passed": 28,
+    "region": "us-east-1",
+    "report_status": "pass",
+    "runner_klt_version": "0.9.0",
+    "runner_request_features": {
+      "missing": [],
+      "required": [
+        "decks"
+      ],
+      "status": "supported"
+    },
+    "state": "done",
+    "timed_out": 0,
+    "unit_count": 28
+  },
+  "experiment": {
+    "claim": "Issue #495 -- NOT a spec claim (spec/target-spec.md has no ratified POR_RAW-glitch, ramp or reset row as of this record). Replaces the mismatch-seed reproduction of the ss/-40C mc14 pulse (PR #491 replay-474) with a deterministic forced offset: a DC source VOFF in series with the gate of XMOL2 (the output leg of the OK detector's XMOL1/XMOL2 mirror) in a DERIVED copy of design/netlist/bias_core.spice, swept over -12..+12 mV, so the early-assertion / pulse behaviour has a repeatable testbench that does not depend on a mismatch seed. Every point is nominal-process (no _mm section): the offset is the only variation. Records, per point: the VDD at which BIAS_OK first asserts, every POR_RAW high interval on the UP segment other than the genuine release (pulse start/end VDD, width in volts and measured seconds), the genuine VPOR-up, and whether RESETn (real por_output_chain on the shared IBIAS) is released by a pulse. Each point is run under the default start, `uic`, and `gmin=1e-11` so solver-state dependence is stated, not assumed. Design and spec are unchanged.",
+    "provenance": "schematic",
+    "provenance_source": "sim/por-bias-ok-early-assert/testbench/tb_bias_ok_early_assert.sch",
+    "slug": "por-bias-ok-early-assert",
+    "statistical_convention": "N/A (deterministic forced-offset sweep of the nominal drawn circuit, not a distribution claim). The offset axis is a sensitivity sweep; sigma_XMOL ~2.9 mV (issue #455) is used only to label +-3 sigma ~ +-9 mV input-referred.",
+    "title": "Deterministic forced-offset reproduction of the early BIAS_OK assertion / POR_RAW release-then-reassert pulse (bias_core OK detector, real por_comparator + por_output_chain)"
+  },
+  "git": {
+    "branch": "feature/issue-495",
+    "dirty": true,
+    "sha": "a9e549ba"
+  },
+  "grid": "pilot-extended",
+  "links": {
+    "artifact_manifest": "manifests/artifacts/por-bias-ok-early-assert-20261123-220332-a9e549ba-pilot-extended.manifest.json",
+    "artifact_summary": "manifests/artifacts/por-bias-ok-early-assert-20261123-220332-a9e549ba-pilot-extended.summary.md",
+    "netlist_snapshot": "sim/por-bias-ok-early-assert/netlist-snapshots/20261123-220332-a9e549ba-pilot-extended.spice",
+    "runner": "sim/por-bias-ok-early-assert/run_early_assert.py",
+    "testbench": "sim/por-bias-ok-early-assert/testbench/tb_bias_ok_early_assert.sch"
+  },
+  "matrix": {
+    "is_subset": true,
+    "n_points": 28,
+    "process": [
+      "ss"
+    ],
+    "rate_v_per_s": [
+      100
+    ],
+    "subset_reason": "PILOT record at the single ss/-40C corner (where the mc14 pulse was seen) to bracket the pulse onset before the full grid; not a PVT claim",
+    "temperature_c": [
+      -40
+    ]
+  },
+  "pdk": {
+    "installed_commit": "f6eeac7dad085ffcc829ccfd721f7b4ce39edcf7",
+    "lib_file": "$PDK_ROOT/sky130A/libs.tech/combined/sky130.lib.spice",
+    "matches_pin": true,
+    "pinned_commit": "f6eeac7dad085ffcc829ccfd721f7b4ce39edcf7",
+    "root": "<host $PDK_ROOT>",
+    "variant": "sky130A"
+  },
+  "pdk_line": "/home/ubuntu/.ciel/sky130A (open_pdks f6eeac7dad085ffcc829ccfd721f7b4ce39edcf7)",
+  "points": [
+    {
+      "device": "XMOKA",
+      "grade": {
+        "bias_ok_runs_up": 1,
+        "bias_ok_up_v": 1.5550477327104304,
+        "class": "pulse_absorbed",
+        "n_samples": 3663,
+        "na_at_bias_ok_v": 0.59301357,
+        "por_raw_up_peak_ok": true,
+        "por_up_v": 2.7009438317335417,
+        "pulse_count": 1,
+        "pulses": [
+          {
+            "bias_ok_asserted": true,
+            "propagates_to_resetn": false,
+            "t_start_s": 0.01619950319574552,
+            "v_end": 1.7230474212816447,
+            "v_start": 1.619950319574552,
+            "width_s": 0.0010309710170709231,
+            "width_v": 0.10309710170709274
+          }
+        ],
+        "resetn_early_v": null,
+        "resetn_up_v": 2.934724943702658,
+        "status": "ok",
+        "vdd_peak_v": 3.6296115
+      },
+      "offset_mv": -120,
+      "point_id": "ss_m40c_r100_default_xmoka_offm120",
+      "process": "ss",
+      "rate_v_per_s": 100,
+      "solver": "KLU",
+      "start": "default",
+      "temperature_c": -40
+    },
+    {
+      "device": "XMOKA",
+      "grade": {
+        "bias_ok_runs_up": 1,
+        "bias_ok_up_v": 1.5915325190135214,
+        "class": "clean",
+        "n_samples": 3661,
+        "na_at_bias_ok_v": 0.61146305,
+        "por_raw_up_peak_ok": true,
+        "por_up_v": 1.5915953035772468,
+        "pulse_count": 0,
+        "pulses": [],
+        "resetn_early_v": null,
+        "resetn_up_v": 1.8505408663114153,
+        "status": "ok",
+        "vdd_peak_v": 3.6293739
+      },
+      "offset_mv": -90,
+      "point_id": "ss_m40c_r100_default_xmoka_offm090",
+      "process": "ss",
+      "rate_v_per_s": 100,
+      "solver": "KLU",
+      "start": "default",
+      "temperature_c": -40
+    },
+    {
+      "device": "XMOKA",
+      "grade": {
+        "bias_ok_runs_up": 1,
+        "bias_ok_up_v": 1.6239233053664688,
+        "class": "pulse_absorbed",
+        "n_samples": 3692,
+        "na_at_bias_ok_v": 0.61853588,
+        "por_raw_up_peak_ok": true,
+        "por_up_v": 2.7014368759768344,
+        "pulse_count": 1,
+        "pulses": [
+          {
+            "bias_ok_asserted": true,
+            "propagates_to_resetn": false,
+            "t_start_s": 0.016528035009561126,
+            "v_end": 1.7228035211423125,
+            "v_start": 1.6528035009561126,
+            "width_s": 0.0007000002018619986,
+            "width_v": 0.07000002018619988
+          }
+        ],
+        "resetn_early_v": null,
+        "resetn_up_v": 2.9370515279326757,
+        "status": "ok",
+        "vdd_peak_v": 3.6299381
+      },
+      "offset_mv": -60,
+      "point_id": "ss_m40c_r100_default_xmoka_offm060",
+      "process": "ss",
+      "rate_v_per_s": 100,
+      "solver": "KLU",
+      "start": "default",
+      "temperature_c": -40
+    },
+    {
+      "device": "XMOKA",
+      "grade": {
+        "bias_ok_runs_up": 1,
+        "bias_ok_up_v": 1.6510477115031836,
+        "class": "pulse_absorbed",
+        "n_samples": 3663,
+        "na_at_bias_ok_v": 0.62980364,
+        "por_raw_up_peak_ok": true,
+        "por_up_v": 2.70094383173354,
+        "pulse_count": 1,
+        "pulses": [
+          {
+            "bias_ok_asserted": true,
+            "propagates_to_resetn": false,
+            "t_start_s": 0.016710474051952154,
+            "v_end": 1.7230474212818183,
+            "v_start": 1.6710474051952153,
+            "width_s": 0.0005200001608660285,
+            "width_v": 0.052000016086602985
+          }
+        ],
+        "resetn_early_v": null,
+        "resetn_up_v": 2.934724943702658,
+        "status": "ok",
+        "vdd_peak_v": 3.6296115
+      },
+      "offset_mv": -36,
+      "point_id": "ss_m40c_r100_default_xmoka_offm036",
+      "process": "ss",
+      "rate_v_per_s": 100,
+      "solver": "KLU",
+      "start": "default",
+      "temperature_c": -40
+    },
+    {
+      "device": "XMOKA",
+      "grade": {
+        "bias_ok_runs_up": 1,
+        "bias_ok_up_v": 1.7949935196564946,
+        "class": "clean",
+        "n_samples": 3693,
+        "na_at_bias_ok_v": 0.76330331,
+        "por_raw_up_peak_ok": true,
+        "por_up_v": 2.701890669045038,
+        "pulse_count": 0,
+        "pulses": [],
+        "resetn_early_v": null,
+        "resetn_up_v": 2.937269926560684,
+        "status": "ok",
+        "vdd_peak_v": 3.6298435
+      },
+      "offset_mv": 36,
+      "point_id": "ss_m40c_r100_default_xmoka_offp036",
+      "process": "ss",
+      "rate_v_per_s": 100,
+      "solver": "KLU",
+      "start": "default",
+      "temperature_c": -40
+    },
+    {
+      "device": "XMOKA",
+      "grade": {
+        "bias_ok_runs_up": 0,
+        "bias_ok_up_v": null,
+        "class": "no_release",
+        "n_samples": 3642,
+        "na_at_bias_ok_v": null,
+        "por_raw_up_peak_ok": false,
+        "por_up_v": null,
+        "pulse_count": 0,
+        "pulses": [],
+        "resetn_early_v": null,
+        "resetn_up_v": null,
+        "status": "ok",
+        "vdd_peak_v": 3.629952
+      },
+      "offset_mv": 60,
+      "point_id": "ss_m40c_r100_default_xmoka_offp060",
+      "process": "ss",
+      "rate_v_per_s": 100,
+      "solver": "KLU",
+      "start": "default",
+      "temperature_c": -40
+    },
+    {
+      "device": "XMOKA",
+      "grade": {
+        "bias_ok_runs_up": 0,
+        "bias_ok_up_v": null,
+        "class": "no_release",
+        "n_samples": 3642,
+        "na_at_bias_ok_v": null,
+        "por_raw_up_peak_ok": false,
+        "por_up_v": null,
+        "pulse_count": 0,
+        "pulses": [],
+        "resetn_early_v": null,
+        "resetn_up_v": null,
+        "status": "ok",
+        "vdd_peak_v": 3.629952
+      },
+      "offset_mv": 90,
+      "point_id": "ss_m40c_r100_default_xmoka_offp090",
+      "process": "ss",
+      "rate_v_per_s": 100,
+      "solver": "KLU",
+      "start": "default",
+      "temperature_c": -40
+    },
+    {
+      "device": "XMOKA",
+      "grade": {
+        "bias_ok_runs_up": 0,
+        "bias_ok_up_v": null,
+        "class": "no_release",
+        "n_samples": 3642,
+        "na_at_bias_ok_v": null,
+        "por_raw_up_peak_ok": false,
+        "por_up_v": null,
+        "pulse_count": 0,
+        "pulses": [],
+        "resetn_early_v": null,
+        "resetn_up_v": null,
+        "status": "ok",
+        "vdd_peak_v": 3.629952
+      },
+      "offset_mv": 120,
+      "point_id": "ss_m40c_r100_default_xmoka_offp120",
+      "process": "ss",
+      "rate_v_per_s": 100,
+      "solver": "KLU",
+      "start": "default",
+      "temperature_c": -40
+    },
+    {
+      "device": "XMOL2",
+      "grade": {
+        "bias_ok_runs_up": 1,
+        "bias_ok_up_v": 1.70107940641397,
+        "class": "pulse_absorbed",
+        "n_samples": 3682,
+        "na_at_bias_ok_v": 0.66354911,
+        "por_raw_up_peak_ok": true,
+        "por_up_v": 2.700981531776383,
+        "pulse_count": 1,
+        "pulses": [
+          {
+            "bias_ok_asserted": true,
+            "propagates_to_resetn": false,
+            "t_start_s": 0.01705353571176409,
+            "v_end": 1.7230850212936586,
+            "v_start": 1.7053535711764092,
+            "width_s": 0.00017731450117249373,
+            "width_v": 0.017731450117249414
+          }
+        ],
+        "resetn_early_v": null,
+        "resetn_up_v": 2.9347625434783007,
+        "status": "ok",
+        "vdd_peak_v": 3.6296491
+      },
+      "offset_mv": -90,
+      "point_id": "ss_m40c_r100_default_xmol2_offm090",
+      "process": "ss",
+      "rate_v_per_s": 100,
+      "solver": "KLU",
+      "start": "default",
+      "temperature_c": -40
+    },
+    {
+      "device": "XMOL2",
+      "grade": {
+        "bias_ok_runs_up": 1,
+        "bias_ok_up_v": 1.7189380133040808,
+        "class": "pulse_absorbed",
+        "n_samples": 3696,
+        "na_at_bias_ok_v": 0.70787007,
+        "por_raw_up_peak_ok": true,
+        "por_up_v": 2.7021667090410983,
+        "pulse_count": 1,
+        "pulses": [
+          {
+            "bias_ok_asserted": true,
+            "propagates_to_resetn": false,
+            "t_start_s": 0.017200322262121256,
+            "v_end": 1.7233154135777775,
+            "v_start": 1.7200322262121255,
+            "width_s": 3.2831873656519184e-05,
+            "width_v": 0.0032831873656520294
+          }
+        ],
+        "resetn_early_v": null,
+        "resetn_up_v": 2.9359507354268173,
+        "status": "ok",
+        "vdd_peak_v": 3.6291627
+      },
+      "offset_mv": -60,
+      "point_id": "ss_m40c_r100_default_xmol2_offm060",
+      "process": "ss",
+      "rate_v_per_s": 100,
+      "solver": "KLU",
+      "start": "default",
+      "temperature_c": -40
+    },
+    {
+      "device": "XMOL2",
+      "grade": {
+        "bias_ok_runs_up": 1,
+        "bias_ok_up_v": 1.7390476796958658,
+        "class": "clean",
+        "n_samples": 3654,
+        "na_at_bias_ok_v": 0.76128259,
+        "por_raw_up_peak_ok": true,
+        "por_up_v": 2.70231158772607,
+        "pulse_count": 0,
+        "pulses": [],
+        "resetn_early_v": null,
+        "resetn_up_v": 2.9361322342056693,
+        "status": "ok",
+        "vdd_peak_v": 3.6290188
+      },
+      "offset_mv": -36,
+      "point_id": "ss_m40c_r100_default_xmol2_offm036",
+      "process": "ss",
+      "rate_v_per_s": 100,
+      "solver": "KLU",
+      "start": "default",
+      "temperature_c": -40
+    },
+    {
+      "device": "XMOL2",
+      "grade": {
+        "bias_ok_runs_up": 1,
+        "bias_ok_up_v": 1.76329813062102,
+        "class": "clean",
+        "n_samples": 3654,
+        "na_at_bias_ok_v": 0.76190228,
+        "por_raw_up_peak_ok": true,
+        "por_up_v": 2.7008522657600054,
+        "pulse_count": 0,
+        "pulses": [],
+        "resetn_early_v": null,
+        "resetn_up_v": 2.9341711474747565,
+        "status": "ok",
+        "vdd_peak_v": 3.6290577
+      },
+      "offset_mv": 36,
+      "point_id": "ss_m40c_r100_default_xmol2_offp036",
+      "process": "ss",
+      "rate_v_per_s": 100,
+      "solver": "KLU",
+      "start": "default",
+      "temperature_c": -40
+    },
+    {
+      "device": "XMOL2",
+      "grade": {
+        "bias_ok_runs_up": 0,
+        "bias_ok_up_v": null,
+        "class": "no_release",
+        "n_samples": 3649,
+        "na_at_bias_ok_v": null,
+        "por_raw_up_peak_ok": false,
+        "por_up_v": null,
+        "pulse_count": 0,
+        "pulses": [],
+        "resetn_early_v": null,
+        "resetn_up_v": null,
+        "status": "ok",
+        "vdd_peak_v": 3.629548
+      },
+      "offset_mv": 60,
+      "point_id": "ss_m40c_r100_default_xmol2_offp060",
+      "process": "ss",
+      "rate_v_per_s": 100,
+      "solver": "KLU",
+      "start": "default",
+      "temperature_c": -40
+    },
+    {
+      "device": "XMOL2",
+      "grade": {
+        "bias_ok_runs_up": 0,
+        "bias_ok_up_v": null,
+        "class": "no_release",
+        "n_samples": 3642,
+        "na_at_bias_ok_v": null,
+        "por_raw_up_peak_ok": false,
+        "por_up_v": null,
+        "pulse_count": 0,
+        "pulses": [],
+        "resetn_early_v": null,
+        "resetn_up_v": null,
+        "status": "ok",
+        "vdd_peak_v": 3.629952
+      },
+      "offset_mv": 90,
+      "point_id": "ss_m40c_r100_default_xmol2_offp090",
+      "process": "ss",
+      "rate_v_per_s": 100,
+      "solver": "KLU",
+      "start": "default",
+      "temperature_c": -40
+    },
+    {
+      "device": "XMOKA",
+      "grade": {
+        "bias_ok_runs_up": 1,
+        "bias_ok_up_v": 1.555993445102743,
+        "class": "pulse_absorbed",
+        "n_samples": 3686,
+        "na_at_bias_ok_v": 0.59291567,
+        "por_raw_up_peak_ok": true,
+        "por_up_v": 2.7011894724658845,
+        "pulse_count": 1,
+        "pulses": [
+          {
+            "bias_ok_asserted": true,
+            "propagates_to_resetn": false,
+            "t_start_s": 0.016189973040763316,
+            "v_end": 1.7229980212070137,
+            "v_start": 1.6189973040763315,
+            "width_s": 0.001040007171306822,
+            "width_v": 0.10400071713068226
+          }
+        ],
+        "resetn_early_v": null,
+        "resetn_up_v": 2.9359752353016813,
+        "status": "ok",
+        "vdd_peak_v": 3.6291382
+      },
+      "offset_mv": -120,
+      "point_id": "ss_m40c_r100_uic_xmoka_offm120",
+      "process": "ss",
+      "rate_v_per_s": 100,
+      "solver": "KLU",
+      "start": "uic",
+      "temperature_c": -40
+    },
+    {
+      "device": "XMOKA",
+      "grade": {
+        "bias_ok_runs_up": 1,
+        "bias_ok_up_v": 1.5919834158757122,
+        "class": "pulse_absorbed",
+        "n_samples": 3698,
+        "na_at_bias_ok_v": 0.61163315,
+        "por_raw_up_peak_ok": true,
+        "por_up_v": 2.702274564022815,
+        "pulse_count": 1,
+        "pulses": [
+          {
+            "bias_ok_asserted": true,
+            "propagates_to_resetn": false,
+            "t_start_s": 0.016328759544148405,
+            "v_end": 1.7228759211663673,
+            "v_start": 1.6328759544148406,
+            "width_s": 0.0008999996675152673,
+            "width_v": 0.08999996675152677
+          }
+        ],
+        "resetn_early_v": null,
+        "resetn_up_v": 2.9376020241414045,
+        "status": "ok",
+        "vdd_peak_v": 3.6295114
+      },
+      "offset_mv": -90,
+      "point_id": "ss_m40c_r100_uic_xmoka_offm090",
+      "process": "ss",
+      "rate_v_per_s": 100,
+      "solver": "KLU",
+      "start": "uic",
+      "temperature_c": -40
+    },
+    {
+      "device": "XMOKA",
+      "grade": {
+        "bias_ok_runs_up": 1,
+        "bias_ok_up_v": 1.6241176490428386,
+        "class": "pulse_absorbed",
+        "n_samples": 3681,
+        "na_at_bias_ok_v": 0.61840205,
+        "por_raw_up_peak_ok": true,
+        "por_up_v": 2.7022063242387757,
+        "pulse_count": 1,
+        "pulses": [
+          {
+            "bias_ok_asserted": true,
+            "propagates_to_resetn": false,
+            "t_start_s": 0.016533024447311306,
+            "v_end": 1.7233028213674046,
+            "v_start": 1.6533024447311309,
+            "width_s": 0.0007000037663627418,
+            "width_v": 0.07000037663627379
+          }
+        ],
+        "resetn_early_v": null,
+        "resetn_up_v": 2.935994135164268,
+        "status": "ok",
+        "vdd_peak_v": 3.6291193
+      },
+      "offset_mv": -60,
+      "point_id": "ss_m40c_r100_uic_xmoka_offm060",
+      "process": "ss",
+      "rate_v_per_s": 100,
+      "solver": "KLU",
+      "start": "uic",
+      "temperature_c": -40
+    },
+    {
+      "device": "XMOKA",
+      "grade": {
+        "bias_ok_runs_up": 1,
+        "bias_ok_up_v": 1.650475590606889,
+        "class": "pulse_absorbed",
+        "n_samples": 3680,
+        "na_at_bias_ok_v": 0.62849041,
+        "por_raw_up_peak_ok": true,
+        "por_up_v": 2.702371538436744,
+        "pulse_count": 1,
+        "pulses": [
+          {
+            "bias_ok_asserted": true,
+            "propagates_to_resetn": false,
+            "t_start_s": 0.01669616594292718,
+            "v_end": 1.7236166214718798,
+            "v_start": 1.6696165942927181,
+            "width_s": 0.0005400002717916193,
+            "width_v": 0.054000027179161636
+          }
+        ],
+        "resetn_early_v": null,
+        "resetn_up_v": 2.9376483238388817,
+        "status": "ok",
+        "vdd_peak_v": 3.6294651
+      },
+      "offset_mv": -36,
+      "point_id": "ss_m40c_r100_uic_xmoka_offm036",
+      "process": "ss",
+      "rate_v_per_s": 100,
+      "solver": "KLU",
+      "start": "uic",
+      "temperature_c": -40
+    },
+    {
+      "device": "XMOKA",
+      "grade": {
+        "bias_ok_runs_up": 1,
+        "bias_ok_up_v": 1.7949795251535383,
+        "class": "clean",
+        "n_samples": 3704,
+        "na_at_bias_ok_v": 0.76116479,
+        "por_raw_up_peak_ok": true,
+        "por_up_v": 2.701390160044984,
+        "pulse_count": 0,
+        "pulses": [],
+        "resetn_early_v": null,
+        "resetn_up_v": 2.9367987296865468,
+        "status": "ok",
+        "vdd_peak_v": 3.6296853
+      },
+      "offset_mv": 36,
+      "point_id": "ss_m40c_r100_uic_xmoka_offp036",
+      "process": "ss",
+      "rate_v_per_s": 100,
+      "solver": "KLU",
+      "start": "uic",
+      "temperature_c": -40
+    },
+    {
+      "device": "XMOKA",
+      "grade": {
+        "bias_ok_runs_up": 0,
+        "bias_ok_up_v": null,
+        "class": "no_release",
+        "n_samples": 3647,
+        "na_at_bias_ok_v": null,
+        "por_raw_up_peak_ok": false,
+        "por_up_v": null,
+        "pulse_count": 0,
+        "pulses": [],
+        "resetn_early_v": null,
+        "resetn_up_v": null,
+        "status": "ok",
+        "vdd_peak_v": 3.6292065
+      },
+      "offset_mv": 60,
+      "point_id": "ss_m40c_r100_uic_xmoka_offp060",
+      "process": "ss",
+      "rate_v_per_s": 100,
+      "solver": "KLU",
+      "start": "uic",
+      "temperature_c": -40
+    },
+    {
+      "device": "XMOKA",
+      "grade": {
+        "bias_ok_runs_up": 0,
+        "bias_ok_up_v": null,
+        "class": "no_release",
+        "n_samples": 3647,
+        "na_at_bias_ok_v": null,
+        "por_raw_up_peak_ok": false,
+        "por_up_v": null,
+        "pulse_count": 0,
+        "pulses": [],
+        "resetn_early_v": null,
+        "resetn_up_v": null,
+        "status": "ok",
+        "vdd_peak_v": 3.6293258
+      },
+      "offset_mv": 90,
+      "point_id": "ss_m40c_r100_uic_xmoka_offp090",
+      "process": "ss",
+      "rate_v_per_s": 100,
+      "solver": "KLU",
+      "start": "uic",
+      "temperature_c": -40
+    },
+    {
+      "device": "XMOKA",
+      "grade": {
+        "bias_ok_runs_up": 0,
+        "bias_ok_up_v": null,
+        "class": "no_release",
+        "n_samples": 3647,
+        "na_at_bias_ok_v": null,
+        "por_raw_up_peak_ok": false,
+        "por_up_v": null,
+        "pulse_count": 0,
+        "pulses": [],
+        "resetn_early_v": null,
+        "resetn_up_v": null,
+        "status": "ok",
+        "vdd_peak_v": 3.6290407
+      },
+      "offset_mv": 120,
+      "point_id": "ss_m40c_r100_uic_xmoka_offp120",
+      "process": "ss",
+      "rate_v_per_s": 100,
+      "solver": "KLU",
+      "start": "uic",
+      "temperature_c": -40
+    },
+    {
+      "device": "XMOL2",
+      "grade": {
+        "bias_ok_runs_up": 1,
+        "bias_ok_up_v": 1.701605039741675,
+        "class": "pulse_absorbed",
+        "n_samples": 3682,
+        "na_at_bias_ok_v": 0.6641407,
+        "por_raw_up_peak_ok": true,
+        "por_up_v": 2.7005761317159367,
+        "pulse_count": 1,
+        "pulses": [
+          {
+            "bias_ok_asserted": true,
+            "propagates_to_resetn": false,
+            "t_start_s": 0.017042951776183316,
+            "v_end": 1.7236499214822947,
+            "v_start": 1.7042951776183313,
+            "width_s": 0.00019354743863963034,
+            "width_v": 0.01935474386396341
+          }
+        ],
+        "resetn_early_v": null,
+        "resetn_up_v": 2.9343578461972615,
+        "status": "ok",
+        "vdd_peak_v": 3.6292444
+      },
+      "offset_mv": -90,
+      "point_id": "ss_m40c_r100_uic_xmol2_offm090",
+      "process": "ss",
+      "rate_v_per_s": 100,
+      "solver": "KLU",
+      "start": "uic",
+      "temperature_c": -40
+    },
+    {
+      "device": "XMOL2",
+      "grade": {
+        "bias_ok_runs_up": 1,
+        "bias_ok_up_v": 1.719291038151316,
+        "class": "pulse_absorbed",
+        "n_samples": 3691,
+        "na_at_bias_ok_v": 0.70980062,
+        "por_raw_up_peak_ok": true,
+        "por_up_v": 2.7019416532575815,
+        "pulse_count": 1,
+        "pulses": [
+          {
+            "bias_ok_asserted": true,
+            "propagates_to_resetn": false,
+            "t_start_s": 0.01720159089355214,
+            "v_end": 1.7225724718598423,
+            "v_start": 1.720159089355214,
+            "width_s": 2.4133825046283863e-05,
+            "width_v": 0.002413382504628192
+          }
+        ],
+        "resetn_early_v": null,
+        "resetn_up_v": 2.9372156269118226,
+        "status": "ok",
+        "vdd_peak_v": 3.6298978
+      },
+      "offset_mv": -60,
+      "point_id": "ss_m40c_r100_uic_xmol2_offm060",
+      "process": "ss",
+      "rate_v_per_s": 100,
+      "solver": "KLU",
+      "start": "uic",
+      "temperature_c": -40
+    },
+    {
+      "device": "XMOL2",
+      "grade": {
+        "bias_ok_runs_up": 1,
+        "bias_ok_up_v": 1.73905946320837,
+        "class": "clean",
+        "n_samples": 3700,
+        "na_at_bias_ok_v": 0.76282029,
+        "por_raw_up_peak_ok": true,
+        "por_up_v": 2.70150053179653,
+        "pulse_count": 0,
+        "pulses": [],
+        "resetn_early_v": null,
+        "resetn_up_v": 2.9352806399346876,
+        "status": "ok",
+        "vdd_peak_v": 3.6298328
+      },
+      "offset_mv": -36,
+      "point_id": "ss_m40c_r100_uic_xmol2_offm036",
+      "process": "ss",
+      "rate_v_per_s": 100,
+      "solver": "KLU",
+      "start": "uic",
+      "temperature_c": -40
+    },
+    {
+      "device": "XMOL2",
+      "grade": {
+        "bias_ok_runs_up": 1,
+        "bias_ok_up_v": 1.7637143345113009,
+        "class": "clean",
+        "n_samples": 3665,
+        "na_at_bias_ok_v": 0.76252707,
+        "por_raw_up_peak_ok": true,
+        "por_up_v": 2.7014132318156334,
+        "pulse_count": 0,
+        "pulses": [],
+        "resetn_early_v": null,
+        "resetn_up_v": 2.93519344051954,
+        "status": "ok",
+        "vdd_peak_v": 3.62992
+      },
+      "offset_mv": 36,
+      "point_id": "ss_m40c_r100_uic_xmol2_offp036",
+      "process": "ss",
+      "rate_v_per_s": 100,
+      "solver": "KLU",
+      "start": "uic",
+      "temperature_c": -40
+    },
+    {
+      "device": "XMOL2",
+      "grade": {
+        "bias_ok_runs_up": 0,
+        "bias_ok_up_v": null,
+        "class": "no_release",
+        "n_samples": 3652,
+        "na_at_bias_ok_v": null,
+        "por_raw_up_peak_ok": false,
+        "por_up_v": null,
+        "pulse_count": 0,
+        "pulses": [],
+        "resetn_early_v": null,
+        "resetn_up_v": null,
+        "status": "ok",
+        "vdd_peak_v": 3.6291204
+      },
+      "offset_mv": 60,
+      "point_id": "ss_m40c_r100_uic_xmol2_offp060",
+      "process": "ss",
+      "rate_v_per_s": 100,
+      "solver": "KLU",
+      "start": "uic",
+      "temperature_c": -40
+    },
+    {
+      "device": "XMOL2",
+      "grade": {
+        "bias_ok_runs_up": 0,
+        "bias_ok_up_v": null,
+        "class": "no_release",
+        "n_samples": 3650,
+        "na_at_bias_ok_v": null,
+        "por_raw_up_peak_ok": false,
+        "por_up_v": null,
+        "pulse_count": 0,
+        "pulses": [],
+        "resetn_early_v": null,
+        "resetn_up_v": null,
+        "status": "ok",
+        "vdd_peak_v": 3.6293704
+      },
+      "offset_mv": 90,
+      "point_id": "ss_m40c_r100_uic_xmol2_offp090",
+      "process": "ss",
+      "rate_v_per_s": 100,
+      "solver": "KLU",
+      "start": "uic",
+      "temperature_c": -40
+    }
+  ],
+  "record_id": "20261123-220332-a9e549ba-pilot-extended",
+  "supersedes": null,
+  "timestamp": "2026-11-23T22:03:32Z",
+  "tools": {
+    "fleet_ngspice": "unknown",
+    "fleet_note": "submitted as a `klt sim` deck-list (`decks[]`) request, the transport klt documents for a harness that renders its own decks and mints its own evidence from the raw logs (klayout-tools #2804): each point's deck is shipped byte-for-byte and run as `ngspice -b <deck>` in its own directory on the fleet worker, so the artifact is the one this harness mints rather than one klt re-composed from a corner axis. The per-point `.spiceinit` rides as a `decks[].inputs[]` entry, which is how a setting the fleet drops from `options.ngspice_init` still reaches the run",
+    "fleet_runner_klt": "0.9.0",
+    "klt_client": "klt 0.9.3.dev4263+g473bcdb00d05",
+    "ngspice": "ngspice-47 : Circuit level simulation program (host; the grid ran on the fleet)",
+    "platform": "Linux 6.17.0-1019-aws x86_64",
+    "python": "3.12.3",
+    "xschem": "XSCHEM V3.4.7"
+  },
+  "verdict": "Point classes: {'clean': 7, 'no_release': 10, 'pulse_absorbed': 11}. Zero-offset controls clean at every point. VERDICT (b): pulse reachable on the forced-offset axis but absorbed before RESETn at every point where it occurs."
+}
