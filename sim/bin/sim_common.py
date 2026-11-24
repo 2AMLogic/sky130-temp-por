@@ -205,6 +205,18 @@ def add_capacity_wait_arg(
     )
 
 
+def add_record_args(parser: argparse.ArgumentParser) -> None:
+    """Declare the record-provenance flags `--author` and `--supersedes` (issue #353).
+
+    Both default to `None`: "no predecessor" is a falsy value in the record, never the
+    display string `(none)` -- renderers spell that fallback themselves with `x or '(none)'`.
+    Split out of `add_common_args` so a `record`/`grade` subparser that runs no SPICE can
+    take just these two without `--timeout`/`--dry-run`.
+    """
+    parser.add_argument("--author", default=None, help="record author (default: git user.email)")
+    parser.add_argument("--supersedes", default=None, help="record id this record supersedes (append-only: the old record is untouched)")
+
+
 def add_common_args(
     parser: argparse.ArgumentParser,
     *,
@@ -226,8 +238,7 @@ def add_common_args(
         parser.add_argument(
             "--samples", type=int, default=samples_default, help="Monte Carlo samples per point"
         )
-    parser.add_argument("--author", default="", help="record author (default: git user.email)")
-    parser.add_argument("--supersedes", default="", help="record id this run supersedes")
+    add_record_args(parser)
     parser.add_argument(
         "--timeout", type=int, default=timeout_default, help="per-point ngspice timeout (s)"
     )

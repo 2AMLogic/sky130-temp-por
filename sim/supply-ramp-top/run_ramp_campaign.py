@@ -467,7 +467,6 @@ def cmd_record(args) -> int:
     now = datetime.now(timezone.utc)
     variants = args.variant or meta["variants"]
     follow = Path(args.follow_on_file).read_text().strip() if args.follow_on_file else ""
-    xc = None
     xcp = run_dir / "crosscheck" / "report.json"
     out_ids = []
     for idx, variant in enumerate(variants):
@@ -500,6 +499,7 @@ def cmd_record(args) -> int:
             if rp.is_file():
                 (corners_dir / rate_tag(rate)).mkdir(parents=True, exist_ok=True)
                 (corners_dir / rate_tag(rate) / "klt-report.json").write_text(scrub(rp.read_text(), run_dir))
+        xc = None
         if xcp.is_file() and (xcp.parent / "variant.txt").is_file() and (xcp.parent / "variant.txt").read_text().strip() == variant:
             xrep = json.loads(xcp.read_text())
             xcor = (xrep.get("corners") or [None])[0]
@@ -642,11 +642,9 @@ def main(argv: list[str]) -> int:
     c.add_argument("--run-id", required=True)
     c.add_argument("--variant", action="append", choices=["as-drawn", "diag-mn1-l20"])
     c.add_argument("--follow-on-file")
-    c.add_argument("--author")
-    c.add_argument("--supersedes")
+    sim_common.add_record_args(c)
     s = sub.add_parser("selftest")
-    s.add_argument("--author")
-    s.add_argument("--supersedes")
+    sim_common.add_record_args(s)
     args = ap.parse_args(argv)
     return {"run": cmd_run, "crosscheck": cmd_crosscheck, "record": cmd_record, "selftest": cmd_selftest}[args.cmd](args)
 

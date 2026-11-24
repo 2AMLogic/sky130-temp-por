@@ -101,7 +101,7 @@ json.dump({"schema_version": 3, "mode": "decks", "status": "pass", "unit_count":
 # no matter its shape, option types, option positions, or whether the runner parses
 # with parse_args or parse_known_args (issue #363).  `--version` is answered the way
 # STUB_KLT does, and every other verb is refused too, never delegated: measured across
-# all 11 CAPACITY_WAIT_RUNNERS, no probe invokes `klt` at all -- `--help` exits rc 0
+# all CAPACITY_WAIT_RUNNERS, no probe invokes `klt` at all -- `--help` exits rc 0
 # and an argv argparse rejects exits rc 2, both inside argparse, and the runners'
 # capability gate (`klt artifact put --help`, via evidence_store.preflight_or_exit)
 # runs inside the subcommand handlers, which no probe ever reaches.  Refusing every
@@ -430,12 +430,13 @@ class SubmitWithStubbedKlt(unittest.TestCase):
 # guards below fail on any local re-declaration, and the subprocess probes assert the one
 # name actually reaches every runner's own parser rather than only sim_common's.
 
-# runner (relative to sim/) -> the argv prefix that parses a submit.  The two bespoke
-# runners parse at top level and reach the flag through `add_common_args()`; the nine
+# runner (relative to sim/) -> the argv prefix that parses a submit.  The bespoke
+# runners parse at top level and reach the flag through `add_common_args()`; the
 # campaign runners parse their submit on a `run` subparser and call the helper on it.
 CAPACITY_WAIT_RUNNERS = {
     "bias-core-op-branch/run_op_branch.py": [],
     "pnp-mismatch/run_pnp_mismatch.py": [],
+    "por-bias-ok-early-assert/run_early_assert.py": [],
     "brownout-top/run_brownout_campaign.py": ["run"],
     "glitch-top/run_glitch_campaign.py": ["run"],
     "iq-top/run_iq_campaign.py": ["run"],

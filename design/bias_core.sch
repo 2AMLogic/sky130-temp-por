@@ -135,7 +135,7 @@ not one instance with a scaled m/mult parameter, because sky130's PNP model
 scales mult only into the mismatch terms, not into Is, the same quirk
 gf180's pnp_10p00x10p00 has). The amplifier forces V(NA) = V(NB), so
 I = DVBE/R1 and the third leg drops that current on R2 into a matched single
-PNP: VREF = VEB(XQR) + (R2/R1)*DVBE. XRT is the small settle-detect offset
+PNP: VREF = VEB(XQR) + (R2/R1)*DVBE. XRT is the settle-detect offset
 resistor -- see the BIAS_OK band.} -1180 270 0 0 0.4 0.4 {}
 N -960 370 -960 330 {}
 C {devices/lab_pin.sym} -960 330 0 0 {name=l17 lab=NA}
@@ -155,7 +155,7 @@ N -760 400 -820 400 {}
 C {devices/lab_pin.sym} -820 400 0 0 {name=l22 lab=VSS}
 C {sky130_fd_pr/res_xhigh_po.sym} -740 400 0 0 {name=RT
 W=2
-L=17.5
+L=350.0
 model=res_xhigh_po
 spiceprefix=X
 mult=1}
@@ -627,16 +627,23 @@ mult=1
 model=nfet_g5v0d10v5
 spiceprefix=X}
 T {BIAS_OK -- settle detector (gf180 DR-005 startup ordering, step 4;
-carried in shape by this repo's DR-002). XRT taps a small same-flavour
+carried in shape by this repo's DR-002). XRT taps a same-flavour
 fraction of R1 off branch B, so
   V(NBTOP) - V(NA) = I*(R1 + RT) - DVBE,
 which is negative until the loop current reaches R1/(R1+RT) of its settled
-value and is +I*RT (a PVT-stable, PTAT quantity that is a ratio of
-same-flavour resistors times DVBE, so it carries no corner spread of its
-own) once settled. The R1/(R1+RT) = 95.2% figure and the millivolt-scale
-PTAT offset are gf180mcu measurements, not yet re-derived for sky130
-(issue #6 keeps RT/R1 at gf180's ratio as a first-order carryover -- see
-design/bias_core.md).
+value and is +I*RT (a PVT quantity that is a ratio of same-flavour
+resistors times DVBE, so it carries no corner spread of its own) once
+settled. Issue #455 re-derived that ratio for sky130: gf180's carried-over
+RT/R1 = 0.05 left a 2.75 mV (tt/27 C) settle signal -- smaller than the
+detector's own mismatch offset (measured sigma ~5 mV input-referred), so 38
+of 120 mismatch realisations never released reset. RT/R1 = 1 (issue #455)
+makes the settled signal a full DVBE (41.7-71.2 mV over -40..125 C), ~10x
+the measured offset sigma; the R1/(R1+RT) = 50% loop-current assertion
+point follows. The mismatched first stage was re-sized in the same change:
+XMOL1/XMOL2 to W=4 L=16 (area x8, sigma_vth 2.90 -> 1.03 mV; halved W/L
+halves the mirror's gm) and XMOKA/XMOKB to W=16 L=8 (area x4, sigma_vth
+2.12 -> 1.06 mV, same W/L so the operating point is unchanged) -- see
+design/bias_core.md and the issue #455 records.
 XMOKA/XMOKB compare exactly that, XMOK2 turns the comparison into a
 rail-to-rail level, and XMO1P/XMO1N buffer it out. XMOKC forces the answer
 to "not valid" whenever the startup detector says the loop is dead -- without
@@ -649,7 +656,27 @@ release, which is safe by construction -- an argument from the comparator's
 threshold direction, not from any gf180mcu number. XCOK holds NOKX up
 through the first microseconds of a rail ramp so BIAS_OK cannot glitch valid
 before anything is biased; XMO1P is deliberately weak and XMO1N strong for
-the same reason.} -1180 3130 0 0 0.4 0.4 {}
+the same reason. Issue #455's second fix adds MOKH (PFET, gate=BIAS_OK,
+VDD->NOKX, L=4 W=2): the
+loop-off window between NKG release and loop takeover rides NOKO at
+0.5-0.8 V, which the bare XMOK2/XMOK2P ratio could not reject (tt/27 probe:
+BIAS_OK chatter at 1.15/1.25/1.36 V, POR_RAW multiple_transitions); MOKH
+holds NOKX up through that window while BIAS_OK is low, so assertion needs
+the settled rail-to-rail NOKO, and its gate feedback makes both transitions
+regenerative. The 1/8 ratio is the constraint pair: strong enough that
+subthreshold XMOK2 cannot pull NOKX low before the loop runs, weak enough
+that XMOK2 at settled NOKO still wins the DC fight with MOKH on. Measured
+at the binding corner (fs/125 C/3.63 V cold .op, node dump): NOKO settles
+1.687 V while XMOK2 and the helper each carried ~29 uA -- a 1:1 tie that left
+"BIAS_OK low" self-consistent (smoke FAILs at tt/27 >= 3.3 V, tt/ss/ff/fs
+125 C across three helper sizings). The tie is broken by ratio, not by a
+weaker helper: XMOK2 W 2 -> 8 and XMOK2P W 1 -> 0.5, so XMOK2 wins the
+settled fight >= 2:1 (fs/125/3.63 .op: NOKX 0.36 mV, BIAS_OK railed) while
+the helper/XMOK2 W/L ratio (and so the NOKO ~1.0 V assertion threshold at
+tt/27 C, above the 0.73-0.78 V loop-off window plateau, below the settled
+1.5-2.05 V) is unchanged. Release is
+unaffected: MOKH is off while BIAS_OK is high, so on a falling rail NOKX
+follows XMOK2P alone.} -1180 3130 0 0 0.4 0.4 {}
 N -960 3230 -960 3190 {}
 C {devices/lab_pin.sym} -960 3190 0 0 {name=l141 lab=VDD}
 N -1000 3260 -1060 3260 {}
@@ -674,8 +701,8 @@ C {devices/lab_pin.sym} -720 3330 0 0 {name=l147 lab=NOKO}
 N -720 3260 -670 3260 {}
 C {devices/lab_pin.sym} -670 3260 0 0 {name=l148 lab=VDD}
 C {sky130_fd_pr/pfet_g5v0d10v5.sym} -740 3260 0 0 {name=MOKA
-L=4
-W=8
+L=8
+W=16
 nf=1
 mult=1
 model=pfet_g5v0d10v5
@@ -689,8 +716,8 @@ C {devices/lab_pin.sym} -480 3330 0 0 {name=l151 lab=NOKL}
 N -480 3260 -430 3260 {}
 C {devices/lab_pin.sym} -430 3260 0 0 {name=l152 lab=VDD}
 C {sky130_fd_pr/pfet_g5v0d10v5.sym} -500 3260 0 0 {name=MOKB
-L=4
-W=8
+L=8
+W=16
 nf=1
 mult=1
 model=pfet_g5v0d10v5
@@ -704,8 +731,8 @@ C {devices/lab_pin.sym} -240 3330 0 0 {name=l155 lab=VSS}
 N -240 3260 -190 3260 {}
 C {devices/lab_pin.sym} -190 3260 0 0 {name=l156 lab=VSS}
 C {sky130_fd_pr/nfet_g5v0d10v5.sym} -260 3260 0 0 {name=MOL1
-L=4
-W=2
+L=16
+W=4
 nf=1
 mult=1
 model=nfet_g5v0d10v5
@@ -719,8 +746,8 @@ C {devices/lab_pin.sym} 0 3330 0 0 {name=l159 lab=VSS}
 N 0 3260 50 3260 {}
 C {devices/lab_pin.sym} 50 3260 0 0 {name=l160 lab=VSS}
 C {sky130_fd_pr/nfet_g5v0d10v5.sym} -20 3260 0 0 {name=MOL2
-L=4
-W=2
+L=16
+W=4
 nf=1
 mult=1
 model=nfet_g5v0d10v5
@@ -750,7 +777,7 @@ N 480 3260 530 3260 {}
 C {devices/lab_pin.sym} 530 3260 0 0 {name=l168 lab=VSS}
 C {sky130_fd_pr/nfet_g5v0d10v5.sym} 460 3260 0 0 {name=MOK2
 L=4
-W=2
+W=8
 nf=1
 mult=1
 model=nfet_g5v0d10v5
@@ -765,7 +792,7 @@ N -960 3520 -910 3520 {}
 C {devices/lab_pin.sym} -910 3520 0 0 {name=l172 lab=VDD}
 C {sky130_fd_pr/pfet_g5v0d10v5.sym} -980 3520 0 0 {name=MOK2P
 L=4
-W=1
+W=0.5
 nf=1
 mult=1
 model=pfet_g5v0d10v5
@@ -809,4 +836,19 @@ W=4
 nf=1
 mult=1
 model=nfet_g5v0d10v5
+spiceprefix=X}
+N -20 3490 -20 3450 {}
+C {devices/lab_pin.sym} -20 3450 0 0 {name=l183 lab=VDD}
+N -60 3520 -120 3520 {}
+C {devices/lab_pin.sym} -120 3520 0 0 {name=l184 lab=BIAS_OK}
+N -20 3550 -20 3590 {}
+C {devices/lab_pin.sym} -20 3590 0 0 {name=l185 lab=NOKX}
+N -20 3520 30 3520 {}
+C {devices/lab_pin.sym} 30 3520 0 0 {name=l186 lab=VDD}
+C {sky130_fd_pr/pfet_g5v0d10v5.sym} -40 3520 0 0 {name=MOKH
+L=4
+W=2
+nf=1
+mult=1
+model=pfet_g5v0d10v5
 spiceprefix=X}

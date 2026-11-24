@@ -176,10 +176,7 @@ RENDER_EXCLUSIONS: dict[str, tuple[str, str]] = {
 # hard-subscript keys, with paths derived from that record's own experiment directory
 # and merged so any real value wins.  The committed record on disk stays byte-for-byte
 # as committed and still cannot re-render from its raw twin.
-FIXTURE_SEEDS: dict[str, str] = {
-    "sim/bias-core-op-branch/run_op_branch.py":
-        "sim/bias-core-op-branch/records/20261113-160939-9211b20a.md",
-}
+FIXTURE_SEEDS: dict[str, str] = {}
 
 
 def fixture_doc(seed: str) -> dict:
@@ -430,11 +427,10 @@ class EveryRendererGoesThroughTheHelperTest(unittest.TestCase):
 
         Scoped to the ten renderers in the table, NOT to every `sim/*/run_*.py`:
         `run_accuracy_mc.py` and `run_solver_sweep.py` write a differently shaped
-        record with no append-only trailer, and their own `supersedes` handling --
-        including a hardcoded `- **Supersedes**: (none)` markdown line and a `"(none)"`
-        sentinel stored in the MACHINE field -- is issue #353's subject, which is parked
-        on an operator decision.  Widening this grep would pull that decision into this
-        contract rather than enforce this one.
+        record with no append-only trailer; their `supersedes` handling (the falsy
+        contract: `null` in the JSON, `(none)` only in rendered markdown) is pinned by
+        `test_supersedes_contract.py` (issue #353).  Widening this grep would mix the two
+        contracts.
         """
         offenders = [f"{name}:{n}: {line.strip()}"
                      for name, src in self.renderer_sources().items()

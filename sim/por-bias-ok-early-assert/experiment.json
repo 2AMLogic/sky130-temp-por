@@ -1,0 +1,187 @@
+{
+  "slug": "por-bias-ok-early-assert",
+  "title": "Deterministic forced-offset reproduction of the early BIAS_OK assertion / POR_RAW release-then-reassert pulse (bias_core OK detector, real por_comparator + por_output_chain)",
+  "claim": "Issue #495 -- NOT a spec claim (spec/target-spec.md has no ratified POR_RAW-glitch, ramp or reset row as of this record). Replaces the mismatch-seed reproduction of the ss/-40C mc14 pulse (PR #491 replay-474) with a deterministic forced offset: a DC source VOFF in series with the gate of XMOL2 (the output leg of the OK detector's XMOL1/XMOL2 mirror) in a DERIVED copy of design/netlist/bias_core.spice, swept over -12..+12 mV, so the early-assertion / pulse behaviour has a repeatable testbench that does not depend on a mismatch seed. Every point is nominal-process (no _mm section): the offset is the only variation. Records, per point: the VDD at which BIAS_OK first asserts, every POR_RAW high interval on the UP segment other than the genuine release (pulse start/end VDD, width in volts and measured seconds), the genuine VPOR-up, and whether RESETn (real por_output_chain on the shared IBIAS) is released by a pulse. Each point is run under the default start, `uic`, and `gmin=1e-11` so solver-state dependence is stated, not assumed. Design and spec are unchanged.",
+  "provenance": "schematic",
+  "provenance_source": "sim/por-bias-ok-early-assert/testbench/tb_bias_ok_early_assert.sch (DUTs: design/netlist/por_comparator.spice, design/netlist/por_output_chain.spice, and design/netlist/bias_core.spice with the single-line VOFF/XMOL2-gate edit applied by run_early_assert.py)",
+  "schematic": "testbench/tb_bias_ok_early_assert.sch",
+  "statistical_convention": "N/A (deterministic forced-offset sweep of the nominal drawn circuit, not a distribution claim). The offset axis is a sensitivity sweep; sigma_XMOL ~2.9 mV (issue #455) is used only to label +-3 sigma ~ +-9 mV input-referred.",
+  "offset": {
+    "devices": {
+      "XMOL2": "VOFF NOKLG NOKL DC {voff}; XMOL2 gate moved from NOKL to NOKLG (mirror output leg)",
+      "XMOKA": "VOFF NAG NA DC {voff}; XMOKA gate moved from NA to NAG (OK-detector input device; the XMOKA/XMOKB pair compares NA against NBTOP)"
+    },
+    "sign": "positive voff raises the named device's gate over its original node",
+    "note": "sigma_XMOL ~2.9 mV input-referred (issue #455); offsets beyond ~+-9 mV are >3 sigma and are swept only to bracket the onset, not as realistic draws"
+  },
+  "sweep": {
+    "peak_v": 3.63,
+    "construction": "V(VDD) = min(peak, rate*t, max(0, 2*peak - rate*t)); max time step = 2 mV of VDD (0.002/rate s) at every rate; total time 2*peak/rate"
+  },
+  "starts": {
+    "default": "tran with default initial condition (DC op first)",
+    "uic": "tran ... uic (the start the #474 MC campaign records use)",
+    "gmin": ".options gmin=1e-11 (the #474 replay's second solver variant)"
+  },
+  "grids": {
+    "pilot": {
+      "process": [
+        "ss"
+      ],
+      "temperature_c": [
+        -40
+      ],
+      "rate_v_per_s": [
+        100
+      ],
+      "starts": [
+        "default",
+        "uic",
+        "gmin"
+      ],
+      "offset_mv": {
+        "XMOL2": [
+          -12,
+          0,
+          12
+        ],
+        "XMOKA": [
+          -24,
+          -18,
+          -12,
+          -6,
+          0,
+          6,
+          12,
+          18,
+          24
+        ]
+      }
+    },
+    "full": {
+      "process": [
+        "ss",
+        "tt",
+        "ff"
+      ],
+      "temperature_c": [
+        -40,
+        27,
+        125
+      ],
+      "paired": [
+        [
+          "ss",
+          -40
+        ],
+        [
+          "tt",
+          27
+        ],
+        [
+          "ff",
+          125
+        ]
+      ],
+      "rate_v_per_s": [
+        100
+      ],
+      "starts": [
+        "default",
+        "uic",
+        "gmin"
+      ],
+      "offset_mv": {
+        "XMOKA": [
+          -60,
+          -36,
+          -30,
+          -24,
+          -12,
+          0,
+          12,
+          24,
+          36
+        ],
+        "XMOL2": [
+          -60,
+          -36,
+          0,
+          36
+        ]
+      },
+      "rate_sweep": {
+        "rate_v_per_s": [
+          10,
+          1000
+        ],
+        "starts": [
+          "default",
+          "uic"
+        ],
+        "offset_mv": {
+          "XMOKA": [
+            -60,
+            -36,
+            -24,
+            0
+          ],
+          "XMOL2": [
+            -60,
+            0
+          ]
+        }
+      }
+    },
+    "pilot-extended": {
+      "process": [
+        "ss"
+      ],
+      "temperature_c": [
+        -40
+      ],
+      "rate_v_per_s": [
+        100
+      ],
+      "starts": [
+        "default",
+        "uic"
+      ],
+      "offset_mv": {
+        "XMOKA": [
+          -120,
+          -90,
+          -60,
+          -36,
+          36,
+          60,
+          90,
+          120
+        ],
+        "XMOL2": [
+          -90,
+          -60,
+          -36,
+          36,
+          60,
+          90
+        ]
+      }
+    }
+  },
+  "absent_coverage": [
+    "Offset is forced on XMOL2 only (input-referred mirror offset); offsets on the other OK-detector devices (XMOKA/XMOKB pair, XMOK2) and global process Monte Carlo are NOT swept.",
+    "Mismatch Monte Carlo and post-layout parasitics are not run here (out of scope per #495).",
+    "The assembly is bias_core + por_comparator + por_output_chain on a shared IBIAS node, not temp_por_top: temp_core is not present, so its startup current draw is not on the supply.",
+    "Only the process/temperature pairs listed under grids.full.paired are run (the three binding-style corners), not the 15-point matrix; the subset reason is recorded in every record."
+  ],
+  "ngspice_note": "Fleet ngspice may differ from the local one; the solver-state dependence this experiment probes means a local single-point cross-check is recorded beside the batch value.",
+  "classes": {
+    "clean": "one POR_RAW release on the UP ramp, no earlier pulse",
+    "pulse_absorbed": "one or more POR_RAW release-then-reassert pulses before the genuine release; RESETn is not released inside the pulse window (+2 ms settle)",
+    "pulse_propagates": "a pulse releases RESETn",
+    "early_release": "POR_RAW releases and STAYS high within 0.2 V of BIAS_OK's assertion (genuine release ~0.95 V higher in the controls), i.e. a premature release, not a pulse",
+    "no_release": "POR_RAW never releases on the UP ramp (BIAS_OK never asserts: the failed-release class of issue #455)",
+    "no_data": "no waveform returned"
+  }
+}
