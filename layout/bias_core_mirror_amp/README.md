@@ -291,9 +291,14 @@ sky130 marker pair — `hvi` (75/20) + `lvtn` (125/44), the `nvt` flavour's
 markers — with the HV marker rules checked (measured on PR #419's
 `por_output_chain` re-render, head `81837fe3`). This stream still predates
 that pin and carries no marker, and drawing the marker on these
-guard-ringed 5V devices is itself still blocked by
+guard-ringed 5V devices was blocked by
 [klayout-tools#6025](https://github.com/2AMLogic/klayout-tools/issues/6025)
-(open); the **topology** of this device group is verified against the
+(closed 2026-11-18; the fix,
+[klayout-tools#6185](https://github.com/2AMLogic/klayout-tools/pull/6185),
+merged past the `v0.9.2` tag and is in no klt release yet — the pin bump that
+redraws this cell is tracked in
+[#467](https://github.com/2AMLogic/sky130-temp-por/issues/467)); the
+**topology** of this device group is verified against the
 schematic and the floorplan is not expected to change when the marker can be
 drawn, but this cell must not be treated as 5V-domain sign-off until it is
 redrawn with the marker and re-run against a deck that checks the `hvi`

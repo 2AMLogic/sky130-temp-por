@@ -275,19 +275,28 @@ sky130
 (measured on PR #419's `por_output_chain` re-render, head `81837fe3`). This
 cell's committed stream still predates that pin and still carries no `hvi`
 marker, so the sign-off statement below stands. Drawing the marker on this
-cell's guard-ringed 5V devices is itself still blocked upstream: the marker
+cell's guard-ringed 5V devices was blocked upstream: the marker
 covers only the device array, so a flavour-marked device with a well tap
 ring trips the deck's `nwell.enclosed.hvi.1` rule —
 [klayout-tools#6025](https://github.com/2AMLogic/klayout-tools/issues/6025),
-open, measured at `0.9.2` and on `main` (`0.9.3.dev239`) per PR #419's
-README.
+measured at `0.9.2` and on `main` (`0.9.3.dev239`) per PR #419's
+README. The issue closed 2026-11-18 (fix
+[klayout-tools#6185](https://github.com/2AMLogic/klayout-tools/pull/6185),
+merged past the `v0.9.2` tag, in no klt release yet); until the pin bump
+([#467](https://github.com/2AMLogic/sky130-temp-por/issues/467)) the marker
+still cannot be drawn here.
 
 What that means for this increment: the **topology** of this device group is
 verified against the schematic, and the floorplan is not expected to change
-when the marker can be drawn here (still gated on
+when the marker can be drawn here (the blocker,
 [klayout-tools#6025](https://github.com/2AMLogic/klayout-tools/issues/6025),
-see the update above) — the fix is a marker-layer overlay over the same unit
-devices, plus (a question #1912 raises but does not assume) whether the 5V
+closed 2026-11-18 — its fix,
+[klayout-tools#6185](https://github.com/2AMLogic/klayout-tools/pull/6185),
+is past the `v0.9.2` tag and in no klt release yet, so this still gates on
+the [#467](https://github.com/2AMLogic/sky130-temp-por/issues/467) pin
+bump; see the update above) — the redraw is a marker-layer overlay over the
+same unit devices, plus (a question #1912 raises but does not assume)
+whether the 5V
 flavour's own minimum `L`/`W` should widen the drawn device. Its **device
 flavour** is not verified, and this cell must not be treated as 5V-domain
 sign-off until it is redrawn with the marker and re-run against a deck that

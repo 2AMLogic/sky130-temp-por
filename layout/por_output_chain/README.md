@@ -95,8 +95,14 @@ So: the device is drawn, present in the layout, electrically correct
 (`extract.json`: `massist` at `g=VDD d=RESETn s=VSS b=VSS`, `L=25 W=1`) and
 compared by the same LVS run as everything else, with no exclusion. What a
 grader cannot yet see from this chain is the flavour binding itself — that is
-the disclosure above, and it is the remaining work for this leaf once
-klayout-tools#6025 lands.
+the disclosure above, and it is the remaining work for this leaf once a klt
+release carries the fix for
+[klayout-tools#6025](https://github.com/2AMLogic/klayout-tools/issues/6025)
+(closed 2026-11-18; the fix,
+[klayout-tools#6185](https://github.com/2AMLogic/klayout-tools/pull/6185),
+`89b2cc61a9c4`, merged past the `v0.9.2` tag and in no klt release yet — the
+pin bump that redraws this leaf is tracked in
+[#467](https://github.com/2AMLogic/sky130-temp-por/issues/467)).
 
 ## Recipe
 
@@ -290,12 +296,20 @@ section above.
    `nfet_05v0_nvt` card is in the compare, but the flavour-blind compare
    cannot tell that device from a plain 5 V NMOS of the same `L`/`W`. Turning
    the flavoured compare on needs the 28 5 V devices drawn with their `hvi`
-   marker, which is blocked on
+   marker, which was blocked on
    [klayout-tools#6025](https://github.com/2AMLogic/klayout-tools/issues/6025)
-   (measured at `0.9.2` and on `main`).
+   (measured at `0.9.2` and on `main`; closed 2026-11-18 — the fix,
+   [klayout-tools#6185](https://github.com/2AMLogic/klayout-tools/pull/6185),
+   is past the `v0.9.2` tag and in no klt release yet, so it waits on the
+   [#467](https://github.com/2AMLogic/sky130-temp-por/issues/467) pin bump).
 2. **No `hvi` thick-oxide marker** on the 28 5 V devices: the same blocker —
    the marker cannot be drawn DRC-clean next to a well tap ring
-   (klayout-tools#6025). Until then neither `klt drc` nor `klt lvs` sees the
+   ([klayout-tools#6025](https://github.com/2AMLogic/klayout-tools/issues/6025),
+   closed 2026-11-18; the fix,
+   [klayout-tools#6185](https://github.com/2AMLogic/klayout-tools/pull/6185),
+   is past the `v0.9.2` tag and in no klt release yet, pin bump
+   [#467](https://github.com/2AMLogic/sky130-temp-por/issues/467)). Until
+   then neither `klt drc` nor `klt lvs` sees the
    devices' 5 V class (the same disclosure as `por_comparator`, upstream
    [#1912](https://github.com/2AMLogic/klayout-tools/issues/1912), closed;
    the deck-side `nwell.enclosed.hvi.1` rule that now fires exists since
