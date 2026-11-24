@@ -29,8 +29,9 @@ the per-net lumped cap. The result therefore measures routing/interconnect paras
 (the layout labels every pin twice, e.g. `VDD|vdd`; `|` is not a safe SPICE node character) to `NAME`; the `--pins` subckt pin order is
 already the schematic order, asserted by the script, so no wrapper is needed; (2) rewrites the 35 MOS models `01v8` ->
 `g5v0d10v5` (the devices the layout is drawn for; the layout carries no `hvi` marker, so the deck binds the 1.8 V flavour). The result
-is "extracted parasitics + the schematic's device models" and inherits that open `hvi` gap. Only a single local tt/27 C probe was run
-locally (VPOR-up 2.7127 V, single edge, before the batch).
+is "extracted parasitics + the schematic's device models" and inherits that open `hvi` gap. A single local tt/27 C probe preceded the
+batch; its number is not recorded anywhere, so none is quoted here. The recorded evidence is the campaign's own `tt_27c` grid
+point in `sim/por-comparator-thresholds/records/20261124-031933-1df0a90f-real-bias-core-biaspex.json` (and its `.md`).
 
 ## Campaign
 

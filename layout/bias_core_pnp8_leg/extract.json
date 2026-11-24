@@ -1,6 +1,9 @@
 {
-  "schema_version": 3,
-  "file": "bias_core_pnp8_leg.gds",
+  "schema_version": 4,
+  "file": {
+    "path": "layout/bias_core_pnp8_leg/bias_core_pnp8_leg.gds",
+    "scope": "repo"
+  },
   "deck": "sky130",
   "top": "bias_core_pnp8_leg",
   "dbu_um": 0.001,
@@ -15,16 +18,15 @@
     "pnp": 8
   },
   "dummy_devices_dropped": 0,
-  "ignored_layers": [
-    {
-      "layer": 93,
-      "datatype": 44,
-      "shapes": 8
-    }
-  ],
+  "ignored_layers": [],
   "device_recognition_only_layers": [
     {
       "layer": 82,
+      "datatype": 44,
+      "shapes": 8
+    },
+    {
+      "layer": 93,
       "datatype": 44,
       "shapes": 8
     },
@@ -40,7 +42,15 @@
     "pnp",
     "sky130_fd_pr__model__cap_mim",
     "sky130_fd_pr__model__cap_mim_m4",
-    "resistor"
+    "resistor",
+    "diode_pw2nd_05v5",
+    "diode_pw2nd_05v5_lvt",
+    "diode_pw2nd_05v5_nvt",
+    "diode_pw2nd_11v0",
+    "diode_pd2nw_05v5",
+    "diode_pd2nw_05v5_lvt",
+    "diode_pd2nw_05v5_hvt",
+    "diode_pd2nw_11v0"
   ],
   "devices": [
     {
@@ -244,13 +254,12 @@
       ]
     }
   ],
-  "warnings": [
-    "1 layer (93/44) carrying 8 shapes is outside 'sky130' deck's connectivity graph -- this geometry is invisible to extraction, so a net routed only through it extracts as multiple disconnected nets instead of one, which will silently mismatch a downstream `klt lvs` reference netlist -- see ignored_layers[] for the full per-layer shape counts. See docs/cli/extract.md's 'ignored_layers' field documentation."
-  ],
+  "warnings": [],
   "black_box_regions": [],
   "abstracted_cells": [],
   "unmodelled_poly": [],
   "merged_net_labels": [],
+  "split_net_labels": [],
   "voltage_domain_warnings": [],
   "missing_flavour_markers": [],
   "unsupported_devices": [],
@@ -264,16 +273,19 @@
   "declared_pins": null,
   "def_pins": null,
   "label_layers": null,
+  "device_models": null,
   "probes": [],
   "pdk": null,
   "provenance": {
-    "klt_version": "0.7.1.dev1610+g758c6e224053",
-    "klayout_version": "0.30.12",
+    "klt_version": "0.9.2",
+    "klt_git_commit": "046ba74652fc096bd97071fc3237f7159dd40183",
+    "klt_reinstall_spec": "klayout-tools==0.9.2",
+    "klayout_version": "0.30.14",
     "pdk": null,
     "deck": {
       "name": "sky130",
-      "content_hash": "sha256:773f73886500d88310f3c3ebe671aad84de425473e9eb6b7ae5a22902416e973",
-      "released": false
+      "content_hash": "sha256:36027b82e3b16075e72b8e21775cde47ba7d08b7636efa4b73e9c34732a28efd",
+      "released": true
     },
     "input": {
       "content_hash": "sha256:4124bb9ee58e8a1ca90e85fc62f7d39e7ee6dd2ea912db61fc6dd44900d4ca9a",
@@ -290,14 +302,14 @@
   },
   "timing": {
     "stages": {
-      "read_layout": 0.001,
-      "device_extraction": 0.005,
+      "read_layout": 0.0,
+      "device_extraction": 0.006,
       "diagnostics": 0.0,
       "netlist_write": 0.0,
       "netlist_hash": 0.0,
       "netlist_normalized_hash": 0.0
     },
-    "total_seconds": 0.087,
-    "unattributed_seconds": 0.08
+    "total_seconds": 0.01,
+    "unattributed_seconds": 0.003
   }
 }
