@@ -309,6 +309,6 @@ section above.
 6. **Not a signoff citation.** `manifests/` is not cited from this
    directory. The block-level `temp_por_top` assembly embeds the current
    (post-`massist`) bytes of this stream since its #453 re-render, and its
-   LVS matches 153/153 with `XMASSIST` included and no exclusion (see
+   LVS matches 154/154 with `XMASSIST` included and no exclusion (see
    `layout/temp_por_top/README.md`). What still travels from this leaf to
    the block compare is the flavour-blind limit of gaps 1-2.

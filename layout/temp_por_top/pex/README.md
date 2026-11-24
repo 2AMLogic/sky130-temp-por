@@ -9,6 +9,15 @@ forward path is repo-side, #501). Per #454's step 6, the report is committed as 
 the cause is linked, and the issue stays open. No spec or harness window was
 relaxed; nothing here edits existing records.
 
+> **Staleness note (#473, PR #488).** This record predates the #473 re-render
+> of `temp_por_top.gds`. It extracted the superseded stream
+> `sha256:746e20de…` (153 devices, 71 nets, pre-`XMOKH`); the current
+> `../temp_por_top.gds` is `sha256:5eb5432a…` and `klt lvs` now matches
+> 154/154 devices and 71/71 nets. The 153-device counts below describe the old
+> stream, not the current tree. PEX was **not** re-run for #473: the record is
+> already `status: error` from klayout-tools#7091, the repo-side fix is #501,
+> and item 7 belongs to #454.
+
 ## What is here
 
 | file | what |
@@ -49,7 +58,7 @@ Per #454: one point first, to learn the run time before any grid. klt `0.9.2`
 backend `local`, single corner. **No grid was run, locally or on the fleet.**
 
 - Extraction: 1.8 s, `status: extracted`, 153 devices / 71 nets (the same
-  counts `klt lvs` matches 153/153 and 71/71), `.SUBCKT temp_por_top VDD VSS
+  counts `klt lvs` matched 153/153 and 71/71 for that stream, before the #473 re-render), `.SUBCKT temp_por_top VDD VSS
   PTAT CTAT RESETn` in the declared order, so the positional `XDUT` is wired
   correctly (the #3269 pin-order fix holds at the block level too).
 - Schematic legs (both testbenches): `pass` within a 22 s total wall time for
