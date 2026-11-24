@@ -91,7 +91,7 @@
     },
     {
       "gate_id": "gate1",
-      "net": "nb",
+      "net": "NB",
       "gate_area_um2": 64.0,
       "antenna_verdict": "unchecked",
       "levels": [
@@ -169,7 +169,7 @@
     },
     {
       "gate_id": "gate2",
-      "net": "n2",
+      "net": "N2",
       "gate_area_um2": 64.0,
       "antenna_verdict": "unchecked",
       "levels": [
@@ -325,7 +325,7 @@
     },
     {
       "gate_id": "gate4",
-      "net": "nbg",
+      "net": "NBG",
       "gate_area_um2": 16.0,
       "antenna_verdict": "unchecked",
       "levels": [
@@ -559,7 +559,7 @@
     },
     {
       "gate_id": "gate7",
-      "net": "n1",
+      "net": "N1",
       "gate_area_um2": 64.0,
       "antenna_verdict": "unchecked",
       "levels": [
@@ -1027,7 +1027,7 @@
     },
     {
       "gate_id": "gate13",
-      "net": "na",
+      "net": "NA",
       "gate_area_um2": 192.0,
       "antenna_verdict": "unchecked",
       "levels": [
@@ -1261,7 +1261,7 @@
     },
     {
       "gate_id": "gate16",
-      "net": "pg",
+      "net": "PG",
       "gate_area_um2": 104.0,
       "antenna_verdict": "unchecked",
       "levels": [
@@ -1339,7 +1339,7 @@
     },
     {
       "gate_id": "gate17",
-      "net": "pb",
+      "net": "PB",
       "gate_area_um2": 194.0,
       "antenna_verdict": "unchecked",
       "levels": [
@@ -2143,7 +2143,7 @@
     "pdk": null,
     "deck": null,
     "input": {
-      "content_hash": "sha256:0e0575392067fd708b4d5d75770ca56561a1ed673e8ea5b3dc72b461c85816fd",
+      "content_hash": "sha256:b974a0a62b11d7a35d5cd76b0f17d476262e9c94d60f208936bc6533c1474673",
       "role": "layout"
     },
     "spec": {

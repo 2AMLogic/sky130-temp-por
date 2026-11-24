@@ -91,7 +91,7 @@
     },
     {
       "gate_id": "gate1",
-      "net": "nb",
+      "net": "NB",
       "gate_area_um2": 64.0,
       "antenna_verdict": "unchecked",
       "levels": [
@@ -169,7 +169,7 @@
     },
     {
       "gate_id": "gate2",
-      "net": "n2",
+      "net": "N2",
       "gate_area_um2": 64.0,
       "antenna_verdict": "unchecked",
       "levels": [
@@ -325,7 +325,7 @@
     },
     {
       "gate_id": "gate4",
-      "net": "nbg",
+      "net": "NBG",
       "gate_area_um2": 16.0,
       "antenna_verdict": "unchecked",
       "levels": [
@@ -871,7 +871,7 @@
     },
     {
       "gate_id": "gate11",
-      "net": "n1",
+      "net": "N1",
       "gate_area_um2": 64.0,
       "antenna_verdict": "unchecked",
       "levels": [
@@ -949,7 +949,7 @@
     },
     {
       "gate_id": "gate12",
-      "net": "pb",
+      "net": "PB",
       "gate_area_um2": 194.0,
       "antenna_verdict": "unchecked",
       "levels": [
@@ -1183,7 +1183,7 @@
     },
     {
       "gate_id": "gate15",
-      "net": "na",
+      "net": "NA",
       "gate_area_um2": 192.0,
       "antenna_verdict": "unchecked",
       "levels": [
@@ -1339,7 +1339,7 @@
     },
     {
       "gate_id": "gate17",
-      "net": "pg",
+      "net": "PG",
       "gate_area_um2": 104.0,
       "antenna_verdict": "unchecked",
       "levels": [
@@ -3991,7 +3991,7 @@
     },
     {
       "gate_id": "gate51",
-      "net": "NA,na",
+      "net": "NA",
       "gate_area_um2": 128.0,
       "antenna_verdict": "unchecked",
       "levels": [
@@ -4169,8 +4169,8 @@
     },
     {
       "name": "NT",
-      "matched_islands": 1,
-      "expected_islands": 1,
+      "matched_islands": 2,
+      "expected_islands": 2,
       "roles": [],
       "unlabelled_islands": null,
       "unlabelled_area_um2": null,
@@ -5790,11 +5790,11 @@
       "released": true
     },
     "input": {
-      "content_hash": "sha256:5eb5432a3affd1edb0019c6247b216dffc0d85e4373f941a9fe1be95233946d8",
+      "content_hash": "sha256:9cb72633c130665766470dda2f789b68257223349ecd8d13e948e5218ae8f724",
       "role": "layout"
     },
     "spec": {
-      "content_hash": "sha256:48a47ea56c8657ee13184e3d771cd3209cc49dc8aa73103f210bae6b7309b542"
+      "content_hash": "sha256:4cb18d7b99d138be0f33d3a6989b5705b5eca9ff08e4a4a0923fb1eb008bcb0f"
     },
     "devices": [
       {

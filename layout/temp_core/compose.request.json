@@ -321,7 +321,7 @@
       "cell": {
         "ports": [
           {
-            "name": "na",
+            "name": "NA",
             "x_um": 1.7,
             "y_um": 1.7,
             "layer": {
@@ -8148,7 +8148,7 @@
         },
         {
           "block": "xq1",
-          "port": "na"
+          "port": "NA"
         },
         {
           "block": "j_na_xq1_na",
@@ -8231,7 +8231,7 @@
         {
           "from_pin": {
             "block": "xq1",
-            "port": "na"
+            "port": "NA"
           },
           "to_pin": {
             "block": "j_na_xq1_na",

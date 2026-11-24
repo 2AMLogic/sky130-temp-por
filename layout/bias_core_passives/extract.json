@@ -8,8 +8,8 @@
   "top": "bias_core_passives",
   "dbu_um": 0.001,
   "netlist_path": "bias_core_passives.spice",
-  "netlist_sha256": "8ae2cce065780cc9189fbc8c8b6877fd410bbe61a364412c86fddfa6fa36e8f8",
-  "netlist_normalized_sha256": "d652ea013034a070281c0e73019a9a493cfb48d610ecbbfa5ca211c8e7517d00",
+  "netlist_sha256": "770996eba242e792926f2d84858034c7e1f235b126782222afba414bc2f6f17c",
+  "netlist_normalized_sha256": "55b040b5499d9f6ae4b71e945aff770ec24bdf5a682b1d66fd21ec9c33d6b46d",
   "status": "extracted",
   "device_count": 6,
   "net_count": 11,
@@ -69,8 +69,8 @@
       "name": "$1",
       "class": "sky130_fd_pr__model__cap_mim",
       "nets": {
-        "a": "nz",
-        "b": "pg"
+        "a": "NZ",
+        "b": "PG"
       },
       "params": {
         "c_f": 8.152e-13,
@@ -116,7 +116,7 @@
       "class": "res_xhigh_po",
       "nets": {
         "a": "nbtop",
-        "b": "nb",
+        "b": "NB",
         "w": "vsubs"
       },
       "params": {
@@ -141,7 +141,7 @@
       "name": "$4",
       "class": "res_xhigh_po",
       "nets": {
-        "a": "nb",
+        "a": "NB",
         "b": "ec",
         "w": "vsubs"
       },
@@ -167,8 +167,8 @@
       "name": "$5",
       "class": "res_xhigh_po",
       "nets": {
-        "a": "n2",
-        "b": "nz",
+        "a": "N2",
+        "b": "NZ",
         "w": "vsubs"
       },
       "params": {
@@ -218,11 +218,67 @@
   ],
   "nets": [
     {
+      "name": "N2",
+      "pin": true,
+      "device_count": 1,
+      "net_id": 4,
+      "pin_index": 0,
+      "label_positions_um": [
+        {
+          "text": "N2",
+          "x_um": 708.755,
+          "y_um": 1.0
+        }
+      ]
+    },
+    {
+      "name": "NB",
+      "pin": true,
+      "device_count": 2,
+      "net_id": 2,
+      "pin_index": 1,
+      "label_positions_um": [
+        {
+          "text": "NB",
+          "x_um": 352.53,
+          "y_um": 1.0
+        }
+      ]
+    },
+    {
+      "name": "NZ",
+      "pin": true,
+      "device_count": 2,
+      "net_id": 5,
+      "pin_index": 2,
+      "label_positions_um": [
+        {
+          "text": "NZ",
+          "x_um": 1726.865,
+          "y_um": 5.753
+        }
+      ]
+    },
+    {
+      "name": "PG",
+      "pin": true,
+      "device_count": 1,
+      "net_id": 9,
+      "pin_index": 3,
+      "label_positions_um": [
+        {
+          "text": "PG",
+          "x_um": 1739.09,
+          "y_um": 21.71
+        }
+      ]
+    },
+    {
       "name": "ec",
       "pin": true,
       "device_count": 1,
       "net_id": 3,
-      "pin_index": 0,
+      "pin_index": 4,
       "label_positions_um": [
         {
           "text": "ec",
@@ -236,7 +292,7 @@
       "pin": true,
       "device_count": 1,
       "net_id": 7,
-      "pin_index": 1,
+      "pin_index": 5,
       "label_positions_um": [
         {
           "text": "er",
@@ -246,39 +302,11 @@
       ]
     },
     {
-      "name": "n2",
-      "pin": true,
-      "device_count": 1,
-      "net_id": 4,
-      "pin_index": 2,
-      "label_positions_um": [
-        {
-          "text": "n2",
-          "x_um": 708.755,
-          "y_um": 1.0
-        }
-      ]
-    },
-    {
-      "name": "nb",
-      "pin": true,
-      "device_count": 2,
-      "net_id": 2,
-      "pin_index": 3,
-      "label_positions_um": [
-        {
-          "text": "nb",
-          "x_um": 352.53,
-          "y_um": 1.0
-        }
-      ]
-    },
-    {
       "name": "nbtop",
       "pin": true,
       "device_count": 1,
       "net_id": 1,
-      "pin_index": 4,
+      "pin_index": 6,
       "label_positions_um": [
         {
           "text": "nbtop",
@@ -292,40 +320,12 @@
       "pin": true,
       "device_count": 1,
       "net_id": 10,
-      "pin_index": 5,
+      "pin_index": 7,
       "label_positions_um": [
         {
           "text": "nokx",
           "x_um": 5864.37,
           "y_um": 7.71
-        }
-      ]
-    },
-    {
-      "name": "nz",
-      "pin": true,
-      "device_count": 2,
-      "net_id": 5,
-      "pin_index": 6,
-      "label_positions_um": [
-        {
-          "text": "nz",
-          "x_um": 1726.865,
-          "y_um": 5.753
-        }
-      ]
-    },
-    {
-      "name": "pg",
-      "pin": true,
-      "device_count": 1,
-      "net_id": 9,
-      "pin_index": 7,
-      "label_positions_um": [
-        {
-          "text": "pg",
-          "x_um": 1739.09,
-          "y_um": 21.71
         }
       ]
     },
@@ -403,7 +403,7 @@
       "released": true
     },
     "input": {
-      "content_hash": "sha256:d159df54d1986be67d054a811f35616cbc3fef417425d9db7c5a299c7c4d1e95",
+      "content_hash": "sha256:7b7fc9de6beaf1a879d1cd7e9b238dab57c0860711cd5da8087f51b7dbf4d5f7",
       "role": "layout"
     }
   },
@@ -418,13 +418,13 @@
   "timing": {
     "stages": {
       "read_layout": 0.001,
-      "device_extraction": 0.006,
+      "device_extraction": 0.007,
       "diagnostics": 0.0,
       "netlist_write": 0.0,
       "netlist_hash": 0.0,
       "netlist_normalized_hash": 0.0
     },
-    "total_seconds": 0.012,
+    "total_seconds": 0.014,
     "unattributed_seconds": 0.005
   }
 }

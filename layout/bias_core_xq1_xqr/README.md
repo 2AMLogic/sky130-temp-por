@@ -43,7 +43,7 @@ this sub-group alone.
 `Q1_B`) — without it, the `vss` bus jogs directly over `Q1_E`'s own drawn
 pad, the same failure mode `docs/cli/gen-compose.md`'s "Cross-block bus
 routing (`routing.cross_block_layer_role`, #1168)" worked example describes,
-which `layout/bias_core_pnp8_leg/` also hit. `na` (`XQ1`'s emitter) and `er`
+which `layout/bias_core_pnp8_leg/` also hit. `NA` (`XQ1`'s emitter) and `er`
 (`XQR`'s emitter) are each declared as a top-level `pins[]` entry rather than
 a `connectivity[]` net: `klt gen-compose` requires every `connectivity[]` net
 to have at least two `{block, port}` entries ("`pins` must be an array of at
@@ -81,9 +81,9 @@ contact (the gap originally filed as
 ## Verification (as of the `klt 0.6.0` toolchain bump, issue #30)
 
 - **`klt drc --deck sky130`: clean, 0 violations.**
-- **`klt extract --deck sky130`: 2 devices, 3 nets** (`na`, `er`, `vss` —
+- **`klt extract --deck sky130`: 2 devices, 3 nets** (`NA`, `er`, `vss` —
   the formerly unstrapped `vsubs` collector node is gone; `extract.json`'s
-  own `devices[]` reads `{"c": "vss", "b": "vss", "e": "na"}` for `XQ1` and
+  own `devices[]` reads `{"c": "vss", "b": "vss", "e": "NA"}` for `XQ1` and
   `{"c": "vss", "b": "vss", "e": "er"}` for `XQR`, exactly the reference's
   own `XQ1 VSS VSS NA` / `XQR VSS VSS ER` cards).
 - **`klt lvs` against `reference.spice`: match** — 2/2 devices, 3/3 nets,
@@ -98,7 +98,7 @@ contact (the gap originally filed as
 
 ## Full-cell assembly pins (issue #61)
 
-`pins[]` already promoted `na` and `er` — each a lone emitter pin, promoted
+`pins[]` already promoted `NA` and `er` — each a lone emitter pin, promoted
 without routing any metal. `vss` was the gap: a real cross-sub-block net
 (`bias_core`'s own global ground) that this cell only bussed *internally*,
 between `Q0_B` and `Q1_B`, with no externally reachable pad. #40's full-cell
@@ -159,7 +159,7 @@ judgement call, out of this increment's scope.
 | `klt lvs` | `mismatch`, 11 (4 `device.unmatched` + 7 `net.unmatched`) | `mismatch`, 11 (4 + 7) — unchanged |
 
 The extracted-netlist hash being *identical* is the strongest available
-evidence that the ring opening merged nothing and broke nothing: `na`/`er`
+evidence that the ring opening merged nothing and broke nothing: `NA`/`er`
 stay correctly separate, both bases stay on `vss`, and the collector stays
 the same separate `vsubs` node. The LVS mismatch is the same pre-existing,
 well-isolated collector-strap gap documented under "Verification" — **not**
@@ -179,7 +179,7 @@ drc`-clean. Evidence:
 this file. Re-run the whole chain with
 `python3 layout/bin/compose-cell.py layout/bias_core_xq1_xqr/cell.json --check`.
 
-`na`/`er` are unchanged by this issue — both are still promoted directly off
+`NA`/`er` are unchanged by this issue — both are still promoted directly off
 `array.Q0_E`/`array.Q1_E`, and both still compose cleanly downstream.
 
 ### Upstream status (as of 2026-09-23, issue #30's toolchain bump)

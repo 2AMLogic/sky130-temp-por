@@ -107,7 +107,7 @@ multi-stage `"stages"` shape a one-plane floorplan would force:
 |---|---|---|
 | `"metal"` (li1) | `nokl`, `noko`, `nokx`, `bias_ok` | Each is confined to its own column of the channel; their x ranges are disjoint |
 | `"metal2"` (met1) | `vdd`, `vss` | One lane above the PMOS row (`y=26.5`), one below the NMOS row (`y=-6.0`) |
-| `"metal3"` (met2) | `tok`, `pb` | `tok` stays above the PMOS row (`y>=15.47`), `pb` below it (`y<=14.36`) |
+| `"metal3"` (met2) | `tok`, `PB` | `tok` stays above the PMOS row (`y>=15.47`), `PB` below it (`y<=14.36`) |
 
 The rails are the reason for the split: `vdd` has to reach five tap islands
 and three sources spread across the full 44um width, and on li1 every one of
@@ -141,7 +141,7 @@ Until that closes, a cell composing a rail on one plane over signal nets that
 ladder through it must steer the rail explicitly and verify connectivity from
 `klt extract`'s own net list — which is what the LVS `match` below does.
 
-`na`, `nbtop` and `nkg` touch exactly one port in this device group, so each
+`NA`, `nbtop` and `nkg` touch exactly one port in this device group, so each
 is a `pins[]` declare-only top-level pin — a label on the gate pad's own
 already-drawn li1, no metal routed — rather than a `connectivity[]` net.
 
@@ -171,12 +171,12 @@ fields) at the `klt` build `layout/pdk.json` pins.
 - **`klt drc --deck sky130`: clean, 0 violations.**
 - **`klt extract --deck sky130`: 10 devices, 11 nets, 11 pins.**
   `device_counts` reads `{"nfet": 5, "pfet": 5}`. The eleven nets are exactly
-  the eleven boundary nodes — `bias_ok`, `na`, `nbtop`, `nkg`, `nokl`,
-  `noko`, `nokx`, `pb`, `tok`, `vdd`, `vss`, each a named pin, with no
+  the eleven boundary nodes — `bias_ok`, `NA`, `nbtop`, `nkg`, `nokl`,
+  `noko`, `nokx`, `PB`, `tok`, `vdd`, `vss`, each a named pin, with no
   leftover anonymous `$N` node and no separate `vsubs`. Per-net device
   terminal counts match the schematic one for one: `vss` 10 (five sources +
   five bulks), `vdd` 8 (three sources + five bulks), `nokl`/`noko`/`nokx` 4,
-  `tok` 3, `bias_ok`/`pb` 2, `na`/`nbtop`/`nkg` 1.
+  `tok` 3, `bias_ok`/`PB` 2, `NA`/`nbtop`/`nkg` 1.
 - **`klt lvs` against `reference.spice`: `match`** — 10/10 devices, 11/11
   nets, 11/11 pins, `mismatch_count: 0`, `error_count: 0`.
 
@@ -184,7 +184,7 @@ Two things the match does **not** assert, both worth stating so nobody reads
 more into it than it carries:
 
 1. **Source/drain assignment is not preserved, and is not meant to be.**
-   `klt extract` reads `XMOKA` back as `M$10 tok na noko vdd` — drain and
+   `klt extract` reads `XMOKA` back as `M$10 tok NA noko vdd` — drain and
    source swapped relative to the device card's `NOKO NA TOK VDD` — because
    that device is the `"rotate_180"` one and the extractor names the terminals
    from geometry. A 4-terminal MOS is S/D symmetric and `NetlistComparer`
@@ -198,15 +198,15 @@ more into it than it carries:
 
 ## Full-cell assembly pins (issue #56)
 
-This cell's own isolated LVS reference only needed `na`/`nbtop`/`nkg`
+This cell's own isolated LVS reference only needed `NA`/`nbtop`/`nkg`
 exposed. Full-cell `bias_core` assembly (#40) needs every boundary net
 reachable from outside, and #40's own assembly attempt found
-`vdd`/`vss`/`pb`/`nokx`/`bias_ok` had no external pad at all, plus `nkg`'s
+`vdd`/`vss`/`PB`/`nokx`/`bias_ok` had no external pad at all, plus `nkg`'s
 *existing* pad sat too deep inside this cell's own interior for `klt
 gen-compose`'s router to escape without a same-block self-collision (issue
 #1527) — see #56 for the full writeup.
 
-`pins[]` now also promotes `vdd`/`vss`/`pb`/`nokx`/`bias_ok`, and `nkg`'s
+`pins[]` now also promotes `vdd`/`vss`/`PB`/`nokx`/`bias_ok`, and `nkg`'s
 promotion moved off `mokc.U0_G` directly onto a west-edge stub — same
 declare-only metal-stub mechanism `bias_core_mirror_amp/README.md`
 documents, placed at this cell's own genuinely obstruction-free far-west
@@ -216,14 +216,14 @@ edge (past `nwt_mpok`'s guard ring):
 |---|---|---|
 | `vdd` | new leg extending the existing `vdd` bus (`y=26.5`) west from `nwt_mpok.TAP_N` | `stub_vdd.PAD`, `x=-4.0, y=26.585` |
 | `vss` | new leg extending the existing `vss` bus (`y=-6.0`) west from `mol1.U0_S` | `stub_vss.PAD`, `x=-4.0, y=-5.915` |
-| `pb` | new leg branching west from `mpok.U0_G`, reusing `pb`'s own native `y=11.5` channel lane | `stub_pb.PAD`, `x=-4.0, y=11.585` |
+| `PB` | new leg branching west from `mpok.U0_G`, reusing `PB`'s own native `y=11.5` channel lane | `stub_pb.PAD`, `x=-4.0, y=11.585` |
 | `nokx` | new leg branching west from `mo1n.U0_G` (`nokx`'s own existing junction point) at `y=8.0` on `metal3` (its default `metal` role is occupied by `nokl`'s own vertical riser at `x=14.5` across this whole row) | `stub_nokx.PAD`, `x=-4.0, y=8.085` |
 | `nkg` | **re-tapped, not just added to**: converted from a bare declare-only `mokc.U0_G` pin into a routed 2-pin net, new leg west from `mokc.U0_G` at `y=7.0` on `metal3` (same `nokl`-riser conflict `nokx` has, one row below it) | `stub_nkg.PAD`, `x=-4.0, y=7.085` (was `mokc.U0_G` directly, `x=23.92, y=2.61`) |
 | `bias_ok` | new leg branching from `mo1p.U0_D`'s own existing launch point, over the roof at `y=28.0` (above the `vdd` bus's own `y=26.5`), down a dedicated west column | `stub_bias_ok.PAD`, `x=-6.415, y=19.5` |
 
 Every new leg is an *additional* branch off an already-connected pin except
 `nkg`'s (which moves, per the acceptance criteria's own explicit re-verify
-ask) — every other net's existing routing (`na`/`nbtop`/`tok`/`nokl`/`noko`)
+ask) — every other net's existing routing (`NA`/`nbtop`/`tok`/`nokl`/`noko`)
 is byte-for-byte unchanged. `klt drc`/`klt extract`/`klt lvs` all stay
 exactly as they were: 10/10 devices, 11/11 nets, `match` — diffed against
 the pre-#56 committed evidence (the `nkg` move changes only which
@@ -308,7 +308,7 @@ Rendered with `klt 0.9.2` (the `layout/pdk.json` pin): **DRC clean (0 violations
 drain `nokx`, source/bulk `vdd`. Every named routing leg is `routed: true`. The floorplan is
 re-derived, not patched: the PMOS gate row moved to `y=22.21` (the `W=16` devices are 16 um
 tall), the `vdd` rail is at
-`y=43.0`, and the cell is now about 86.5 x 49.2 um. `pb` keeps its `y=11.5` lane and stub so
+`y=43.0`, and the cell is now about 86.5 x 49.2 um. `PB` keeps its `y=11.5` lane and stub so
 its pad stays where `bias_core` already lands it. The `bias_ok` stub moved to `y=30.0`:
 at `y=19.5`, `layout/bin/check-promotion.py` reported `bias_ok` unrouted.
 `check-promotion.py` now passes for all six promoted pins. The same hvi-marker disclosure as

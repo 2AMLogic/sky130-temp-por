@@ -47,14 +47,14 @@
     "  metal2 (met1) vdd (one lane above the PMOS row, y=26.5) and vss (one",
     "                lane below the NMOS row, y=-6.0) -- disjoint by",
     "                construction;",
-    "  metal3 (met2) tok (stays above the PMOS row, y>=15.47) and pb (stays",
+    "  metal3 (met2) tok (stays above the PMOS row, y>=15.47) and PB (stays",
     "                below it, y<=14.36) -- also disjoint.",
     "Every leg is steered explicitly through connectivity[].legs[]",
     "(klayout-tools#1529) rather than left to the nearest-first spanning",
     "tree, so a rail leg cannot wander across another net's via landing pad;",
     "compose.response.json records routed: true for every named leg.",
     "",
-    "na / nbtop / nkg touch exactly one port in this device group, so each",
+    "NA / nbtop / nkg touch exactly one port in this device group, so each",
     "is a pins[] declare-only top-level pin (a label on the gate pad's own",
     "already-drawn li1, no metal routed) rather than a connectivity[] net."
   ],
@@ -1157,7 +1157,7 @@
       ]
     },
     {
-      "net": "pb",
+      "net": "PB",
       "layer_role": "metal3",
       "pins": [
         {
@@ -1681,7 +1681,7 @@
   ],
   "pins": [
     {
-      "net": "na",
+      "net": "NA",
       "block": "moka",
       "port": "U0_G"
     },
@@ -1701,7 +1701,7 @@
       "port": "PAD"
     },
     {
-      "net": "pb",
+      "net": "PB",
       "block": "stub_pb",
       "port": "PAD"
     },

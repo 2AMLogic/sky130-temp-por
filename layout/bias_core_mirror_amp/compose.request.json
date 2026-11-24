@@ -1077,7 +1077,7 @@
       ]
     },
     {
-      "net": "pg",
+      "net": "PG",
       "layer_role": "metal3",
       "pins": [
         {
@@ -1241,7 +1241,7 @@
       ]
     },
     {
-      "net": "pb",
+      "net": "PB",
       "layer_role": "metal2",
       "pins": [
         {
@@ -1409,7 +1409,7 @@
       ]
     },
     {
-      "net": "nbg",
+      "net": "NBG",
       "pins": [
         {
           "block": "mpbn",
@@ -1500,7 +1500,7 @@
       ]
     },
     {
-      "net": "na",
+      "net": "NA",
       "layer_role": "metal3",
       "pins": [
         {
@@ -1572,7 +1572,7 @@
       ]
     },
     {
-      "net": "nt",
+      "net": "NT",
       "pins": [
         {
           "block": "mpt",
@@ -1639,7 +1639,7 @@
       ]
     },
     {
-      "net": "n1",
+      "net": "N1",
       "pins": [
         {
           "block": "mi1",
@@ -1726,7 +1726,7 @@
       ]
     },
     {
-      "net": "n2",
+      "net": "N2",
       "pins": [
         {
           "block": "mi2",
@@ -1833,7 +1833,7 @@
       "port": "U0_D"
     },
     {
-      "net": "nb",
+      "net": "NB",
       "block": "mi2",
       "port": "U0_G"
     },
@@ -1848,22 +1848,22 @@
       "port": "PAD"
     },
     {
-      "net": "pg",
+      "net": "PG",
       "block": "stub_pg",
       "port": "PAD"
     },
     {
-      "net": "pb",
+      "net": "PB",
       "block": "stub_pb",
       "port": "PAD"
     },
     {
-      "net": "n2",
+      "net": "N2",
       "block": "stub_n2",
       "port": "PAD"
     },
     {
-      "net": "na",
+      "net": "NA",
       "block": "stub_na",
       "port": "PAD"
     }

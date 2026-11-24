@@ -1,0 +1,13 @@
+* klt sim -- generated corner deck, do not edit
+.lib /opt/pdk/sky130A/libs.tech/combined/sky130.lib.spice ss
+.include /var/tmp/eda-job-klt-sim-f69593744ef8/inputs/netlist.cir
+.temp 27
+.meas tran t_release_v_ih WHEN v(resetn)=2.64 RISE=1
+.meas tran vdd_at_release FIND v(vdd) WHEN v(resetn)=2.64 RISE=1
+.control
+save all
+alter vset=2.97
+tran 1u 0.03 0 1e-05
+quit
+.endc
+.end

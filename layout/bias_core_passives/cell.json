@@ -163,14 +163,14 @@
   },
   "connectivity": [
     {
-      "net": "nb",
+      "net": "NB",
       "pins": [
         { "block": "rt", "port": "R0_B" },
         { "block": "r1", "port": "R0_A" }
       ]
     },
     {
-      "net": "nz",
+      "net": "NZ",
       "pins": [
         { "block": "rz", "port": "R0_B" },
         { "block": "cc", "port": "C0_BOT" }
@@ -180,8 +180,8 @@
   "pins": [
     { "net": "nbtop", "block": "rt", "port": "R0_A" },
     { "net": "ec", "block": "r1", "port": "R0_B" },
-    { "net": "n2", "block": "rz", "port": "R0_A" },
-    { "net": "pg", "block": "cc", "port": "C0_TOP" },
+    { "net": "N2", "block": "rz", "port": "R0_A" },
+    { "net": "PG", "block": "cc", "port": "C0_TOP" },
     { "net": "vref", "block": "r2", "port": "R0_A" },
     { "net": "er", "block": "r2", "port": "R0_B" },
     { "net": "vdd", "block": "cok", "port": "C0_BOT" },

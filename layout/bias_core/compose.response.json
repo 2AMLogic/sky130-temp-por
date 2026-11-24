@@ -80,7 +80,7 @@
       "generator": null,
       "cell_name": "bias_core_mirror_amp",
       "source_path": "../bias_core_mirror_amp/bias_core_mirror_amp.gds",
-      "source_digest": "sha256:93a04a0e742ab38838665bf11f15fe1f93fbab2b6a4bf2430031501effc93220",
+      "source_digest": "sha256:07c43e73b161e1c215096d0293b074ba93fc517e405e3d8ebc358af670b079ed",
       "offset_um": {
         "x": 0.0,
         "y": 100.0
@@ -101,7 +101,7 @@
       "generator": null,
       "cell_name": "bias_core_xq1_xqr",
       "source_path": "../bias_core_xq1_xqr/bias_core_xq1_xqr.gds",
-      "source_digest": "sha256:4a9821d8274dd0b0cee4e4d9687cb64667f0e47af823204ed88f796fdb7b6e54",
+      "source_digest": "sha256:bae9234d5a6b26876803976ee31b3a3317af061904a599f24befbd7e8d5589f1",
       "offset_um": {
         "x": 150.0,
         "y": 100.0
@@ -143,7 +143,7 @@
       "generator": null,
       "cell_name": "bias_core_startup",
       "source_path": "../bias_core_startup/bias_core_startup.gds",
-      "source_digest": "sha256:e95b0df38411cee836a810e5520d0ad31451ea5fc04a6c09ce40c80ef729e99c",
+      "source_digest": "sha256:592e3ba301934388f0f63a647ce0d825490de552632a473bac000a8be71c3113",
       "offset_um": {
         "x": 1350.0,
         "y": 100.0
@@ -164,7 +164,7 @@
       "generator": null,
       "cell_name": "bias_core_settle_flag",
       "source_path": "../bias_core_settle_flag/bias_core_settle_flag.gds",
-      "source_digest": "sha256:bee88241cae72589156e4aada87dff89eb3e0a0e350b5f6206501a35ef0830e9",
+      "source_digest": "sha256:79ed4defb9ad22ccdd3141a56d98aad423d2edb7169c8743607394f174f0fe60",
       "offset_um": {
         "x": 5450.0,
         "y": 100.0
@@ -185,7 +185,7 @@
       "generator": null,
       "cell_name": "bias_core_passives",
       "source_path": "../bias_core_passives/bias_core_passives.gds",
-      "source_digest": "sha256:7952b95a8ba307114e1fe98f6966f2c43536a8db03c9f4856249404ce5c8e76e",
+      "source_digest": "sha256:e885cd9d7ec411c4ab7497b583a0d6a0bfb94f60f324065748ac863bc4d9a39a",
       "offset_um": {
         "x": -332.5,
         "y": -50.0
@@ -458,15 +458,15 @@
       ]
     },
     {
-      "net": "n2",
+      "net": "N2",
       "pins": [
         {
           "block": "passives",
-          "port": "n2"
+          "port": "N2"
         },
         {
           "block": "mirror_amp",
-          "port": "n2"
+          "port": "N2"
         }
       ],
       "routed": true,
@@ -478,11 +478,11 @@
           "pins": [
             {
               "block": "passives",
-              "port": "n2"
+              "port": "N2"
             },
             {
               "block": "mirror_amp",
-              "port": "n2"
+              "port": "N2"
             }
           ],
           "routed": true,
@@ -494,15 +494,15 @@
       ]
     },
     {
-      "net": "nb",
+      "net": "NB",
       "pins": [
         {
           "block": "passives",
-          "port": "nb"
+          "port": "NB"
         },
         {
           "block": "mirror_amp",
-          "port": "nb"
+          "port": "NB"
         }
       ],
       "routed": true,
@@ -514,11 +514,11 @@
           "pins": [
             {
               "block": "passives",
-              "port": "nb"
+              "port": "NB"
             },
             {
               "block": "mirror_amp",
-              "port": "nb"
+              "port": "NB"
             }
           ],
           "routed": true,
@@ -653,19 +653,19 @@
       ]
     },
     {
-      "net": "pg",
+      "net": "PG",
       "pins": [
         {
           "block": "startup",
-          "port": "pg"
+          "port": "PG"
         },
         {
           "block": "mirror_amp",
-          "port": "pg"
+          "port": "PG"
         },
         {
           "block": "passives",
-          "port": "pg"
+          "port": "PG"
         }
       ],
       "routed": true,
@@ -677,11 +677,11 @@
           "pins": [
             {
               "block": "startup",
-              "port": "pg"
+              "port": "PG"
             },
             {
               "block": "mirror_amp",
-              "port": "pg"
+              "port": "PG"
             }
           ],
           "routed": true,
@@ -694,11 +694,11 @@
           "pins": [
             {
               "block": "passives",
-              "port": "pg"
+              "port": "PG"
             },
             {
               "block": "mirror_amp",
-              "port": "pg"
+              "port": "PG"
             }
           ],
           "routed": false,
@@ -709,11 +709,11 @@
           "pins": [
             {
               "block": "startup",
-              "port": "pg"
+              "port": "PG"
             },
             {
               "block": "passives",
-              "port": "pg"
+              "port": "PG"
             }
           ],
           "routed": true,
@@ -818,19 +818,19 @@
       ]
     },
     {
-      "net": "na",
+      "net": "NA",
       "pins": [
         {
           "block": "xq1_xqr",
-          "port": "na"
+          "port": "NA"
         },
         {
           "block": "mirror_amp",
-          "port": "na"
+          "port": "NA"
         },
         {
           "block": "settle_flag",
-          "port": "na"
+          "port": "NA"
         }
       ],
       "routed": true,
@@ -842,11 +842,11 @@
           "pins": [
             {
               "block": "xq1_xqr",
-              "port": "na"
+              "port": "NA"
             },
             {
               "block": "mirror_amp",
-              "port": "na"
+              "port": "NA"
             }
           ],
           "routed": true,
@@ -859,11 +859,11 @@
           "pins": [
             {
               "block": "settle_flag",
-              "port": "na"
+              "port": "NA"
             },
             {
               "block": "mirror_amp",
-              "port": "na"
+              "port": "NA"
             }
           ],
           "routed": true,
@@ -875,19 +875,19 @@
       ]
     },
     {
-      "net": "pb",
+      "net": "PB",
       "pins": [
         {
           "block": "startup",
-          "port": "pb"
+          "port": "PB"
         },
         {
           "block": "mirror_amp",
-          "port": "pb"
+          "port": "PB"
         },
         {
           "block": "settle_flag",
-          "port": "pb"
+          "port": "PB"
         }
       ],
       "routed": true,
@@ -899,11 +899,11 @@
           "pins": [
             {
               "block": "startup",
-              "port": "pb"
+              "port": "PB"
             },
             {
               "block": "mirror_amp",
-              "port": "pb"
+              "port": "PB"
             }
           ],
           "routed": true,
@@ -916,11 +916,11 @@
           "pins": [
             {
               "block": "settle_flag",
-              "port": "pb"
+              "port": "PB"
             },
             {
               "block": "mirror_amp",
-              "port": "pb"
+              "port": "PB"
             }
           ],
           "routed": true,
@@ -973,7 +973,10 @@
     "pdk": {
       "name": "sky130A",
       "source": "search root: ~/.ciel",
-      "version": "open_pdks f6eeac7dad085ffcc829ccfd721f7b4ce39edcf7"
+      "version": "open_pdks f6eeac7dad085ffcc829ccfd721f7b4ce39edcf7",
+      "ambiguous_sources": [
+        "search root: ~/.volare"
+      ]
     },
     "deck": null,
     "input": null

@@ -1,18 +1,18 @@
 * extracted by klt extract --deck sky130
 
 * cell bias_core_settle_flag
+* pin NA
+* pin PB
 * pin bias_ok
-* pin na
 * pin nbtop
 * pin nkg
 * pin nokl
 * pin noko
 * pin nokx
-* pin pb
 * pin tok
 * pin vdd
 * pin vss
-.SUBCKT bias_core_settle_flag bias_ok na nbtop nkg nokl noko nokx pb tok vdd vss
+.SUBCKT bias_core_settle_flag NA PB bias_ok nbtop nkg nokl noko nokx tok vdd vss
 * device instance $1 r0 *1 48.92,1 nfet
 M$1 noko nkg vss vss nfet L=1U W=2U AS=0.84P AD=0.84P PS=4.84U PD=4.84U
 * device instance $2 r0 *1 16.42,2 nfet
@@ -24,9 +24,9 @@ M$4 bias_ok nokx vss vss nfet L=0.5U W=4U AS=1.68P AD=1.68P PS=8.84U PD=8.84U
 * device instance $5 r0 *1 55.42,4 nfet
 M$5 nokx noko vss vss nfet L=4U W=8U AS=3.36P AD=3.36P PS=16.84U PD=16.84U
 * device instance $6 r0 *1 56.42,23.22 pfet
-M$6 nokx pb vdd vdd pfet L=4U W=0.5U AS=0.21P AD=0.21P PS=1.84U PD=1.84U
+M$6 nokx PB vdd vdd pfet L=4U W=0.5U AS=0.21P AD=0.21P PS=1.84U PD=1.84U
 * device instance $7 r0 *1 2.42,23.47 pfet
-M$7 tok pb vdd vdd pfet L=4U W=1U AS=0.42P AD=0.42P PS=2.84U PD=2.84U
+M$7 tok PB vdd vdd pfet L=4U W=1U AS=0.42P AD=0.42P PS=2.84U PD=2.84U
 * device instance $8 r0 *1 77.42,23.47 pfet
 M$8 bias_ok nokx vdd vdd pfet L=4U W=1U AS=0.42P AD=0.42P PS=2.84U PD=2.84U
 * device instance $9 r0 *1 67.58,23.97 pfet
@@ -34,5 +34,5 @@ M$9 vdd bias_ok nokx vdd pfet L=4U W=2U AS=0.84P AD=0.84P PS=4.84U PD=4.84U
 * device instance $10 r0 *1 13.42,30.97 pfet
 M$10 nokl nbtop tok vdd pfet L=8U W=16U AS=6.72P AD=6.72P PS=32.84U PD=32.84U
 * device instance $11 r0 *1 45.58,30.97 pfet
-M$11 tok na noko vdd pfet L=8U W=16U AS=6.72P AD=6.72P PS=32.84U PD=32.84U
+M$11 tok NA noko vdd pfet L=8U W=16U AS=6.72P AD=6.72P PS=32.84U PD=32.84U
 .ENDS bias_core_settle_flag
