@@ -3,7 +3,7 @@
 * NOT an xschem export. Hand-extracted, verbatim (device cards unmodified
 * except for the wrapping .subckt/.ends and the eleven top-level port
 * names), from design/netlist/bias_core.spice's own XMPOK/XMOKA/XMOKB/
-* XMOL1/XMOL2/XMOKC/XMOK2/XMOK2P/XMO1P/XMO1N device cards -- the settle-flag
+* XMOL1/XMOL2/XMOKC/XMOK2/XMOK2P/XMO1P/XMO1N/XMOKH device cards -- the settle-flag
 * comparator/driver chain that produces bias_core's own BIAS_OK output.
 * Every device card below must stay byte-for-byte identical to the
 * corresponding line in design/netlist/bias_core.spice (continuation lines
@@ -16,28 +16,30 @@
 * supply but is declared a port anyway (it is a two-pin-visible node in the
 * full cell only through these three devices, so declaring it changes
 * nothing electrically and keeps the port list a pure "nodes named by these
-* ten cards" list); NA/NBTOP/NKG are inputs from the mirror/error-amp stack
+* eleven cards" list); NA/NBTOP/NKG are inputs from the mirror/error-amp stack
 * (#35) and the startup kick chain (#38); NOKX is shared with XCOK in the
 * passives sub-block (#37); BIAS_OK is bias_core's own top-level output.
 .subckt bias_core_settle_flag VDD VSS TOK PB NA NBTOP NOKO NOKL NKG NOKX BIAS_OK
 XMPOK TOK PB VDD VDD sky130_fd_pr__pfet_g5v0d10v5 L=4 W=1 nf=1 ad=0.29 as=0.29 pd=2.58 ps=2.58 nrd=0.29 nrs=0.29 sa=0 sb=0 sd=0
 + mult=1 m=1
-XMOKA NOKO NA TOK VDD sky130_fd_pr__pfet_g5v0d10v5 L=4 W=8 nf=1 ad=2.32 as=2.32 pd=16.58 ps=16.58 nrd=0.03625 nrs=0.03625 sa=0
+XMOKA NOKO NA TOK VDD sky130_fd_pr__pfet_g5v0d10v5 L=8 W=16 nf=1 ad=4.64 as=4.64 pd=32.58 ps=32.58 nrd=0.018125 nrs=0.018125 sa=0
 + sb=0 sd=0 mult=1 m=1
-XMOKB NOKL NBTOP TOK VDD sky130_fd_pr__pfet_g5v0d10v5 L=4 W=8 nf=1 ad=2.32 as=2.32 pd=16.58 ps=16.58 nrd=0.03625 nrs=0.03625 sa=0
-+ sb=0 sd=0 mult=1 m=1
-XMOL1 NOKL NOKL VSS VSS sky130_fd_pr__nfet_g5v0d10v5 L=4 W=2 nf=1 ad=0.58 as=0.58 pd=4.58 ps=4.58 nrd=0.145 nrs=0.145 sa=0 sb=0
+XMOKB NOKL NBTOP TOK VDD sky130_fd_pr__pfet_g5v0d10v5 L=8 W=16 nf=1 ad=4.64 as=4.64 pd=32.58 ps=32.58 nrd=0.018125 nrs=0.018125
++ sa=0 sb=0 sd=0 mult=1 m=1
+XMOL1 NOKL NOKL VSS VSS sky130_fd_pr__nfet_g5v0d10v5 L=16 W=4 nf=1 ad=1.16 as=1.16 pd=8.58 ps=8.58 nrd=0.0725 nrs=0.0725 sa=0 sb=0
 + sd=0 mult=1 m=1
-XMOL2 NOKO NOKL VSS VSS sky130_fd_pr__nfet_g5v0d10v5 L=4 W=2 nf=1 ad=0.58 as=0.58 pd=4.58 ps=4.58 nrd=0.145 nrs=0.145 sa=0 sb=0
+XMOL2 NOKO NOKL VSS VSS sky130_fd_pr__nfet_g5v0d10v5 L=16 W=4 nf=1 ad=1.16 as=1.16 pd=8.58 ps=8.58 nrd=0.0725 nrs=0.0725 sa=0 sb=0
 + sd=0 mult=1 m=1
 XMOKC NOKO NKG VSS VSS sky130_fd_pr__nfet_g5v0d10v5 L=1 W=2 nf=1 ad=0.58 as=0.58 pd=4.58 ps=4.58 nrd=0.145 nrs=0.145 sa=0 sb=0
 + sd=0 mult=1 m=1
-XMOK2 NOKX NOKO VSS VSS sky130_fd_pr__nfet_g5v0d10v5 L=4 W=2 nf=1 ad=0.58 as=0.58 pd=4.58 ps=4.58 nrd=0.145 nrs=0.145 sa=0 sb=0
+XMOK2 NOKX NOKO VSS VSS sky130_fd_pr__nfet_g5v0d10v5 L=4 W=8 nf=1 ad=2.32 as=2.32 pd=16.58 ps=16.58 nrd=0.03625 nrs=0.03625 sa=0
++ sb=0 sd=0 mult=1 m=1
+XMOK2P NOKX PB VDD VDD sky130_fd_pr__pfet_g5v0d10v5 L=4 W=0.5 nf=1 ad=0.145 as=0.145 pd=1.58 ps=1.58 nrd=0.58 nrs=0.58 sa=0 sb=0
 + sd=0 mult=1 m=1
-XMOK2P NOKX PB VDD VDD sky130_fd_pr__pfet_g5v0d10v5 L=4 W=1 nf=1 ad=0.29 as=0.29 pd=2.58 ps=2.58 nrd=0.29 nrs=0.29 sa=0 sb=0 sd=0
-+ mult=1 m=1
 XMO1P BIAS_OK NOKX VDD VDD sky130_fd_pr__pfet_g5v0d10v5 L=4 W=1 nf=1 ad=0.29 as=0.29 pd=2.58 ps=2.58 nrd=0.29 nrs=0.29 sa=0 sb=0
 + sd=0 mult=1 m=1
 XMO1N BIAS_OK NOKX VSS VSS sky130_fd_pr__nfet_g5v0d10v5 L=0.5 W=4 nf=1 ad=1.16 as=1.16 pd=8.58 ps=8.58 nrd=0.0725 nrs=0.0725 sa=0
 + sb=0 sd=0 mult=1 m=1
+XMOKH NOKX BIAS_OK VDD VDD sky130_fd_pr__pfet_g5v0d10v5 L=4 W=2 nf=1 ad=0.58 as=0.58 pd=4.58 ps=4.58 nrd=0.145 nrs=0.145 sa=0 sb=0
++ sd=0 mult=1 m=1
 .ends

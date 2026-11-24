@@ -1,6 +1,9 @@
 {
-  "schema_version": 1,
-  "file": "downstream-check.gds",
+  "schema_version": 3,
+  "file": {
+    "path": "layout/bias_core_settle_flag/downstream-check.gds",
+    "scope": "repo"
+  },
   "deck": "sky130",
   "dbu_um": 0.001,
   "status": "clean",
@@ -12,8 +15,14 @@
   "violations": [],
   "coverage": {
     "deck_layers": [
+      "18/20",
+      "19/44",
+      "61/20",
+      "64/13",
+      "64/18",
       "64/20",
       "65/20",
+      "65/44",
       "66/20",
       "66/44",
       "67/20",
@@ -27,27 +36,116 @@
       "71/20",
       "71/44",
       "72/20",
+      "74/21",
+      "74/22",
+      "75/20",
+      "76/20",
+      "76/44",
+      "78/44",
+      "79/20",
+      "80/20",
+      "81/125",
+      "82/64",
+      "86/20",
       "89/44",
-      "97/44"
+      "92/44",
+      "93/44",
+      "94/20",
+      "95/20",
+      "97/44",
+      "124/20",
+      "125/20",
+      "125/44"
     ],
     "layers_checked": [
       "64/20",
       "65/20",
+      "65/44",
       "66/20",
       "66/44",
       "67/20",
       "67/44",
       "68/20",
       "68/44",
-      "69/20"
+      "69/20",
+      "93/44",
+      "94/20",
+      "95/20"
     ],
     "layers_in_stream_without_rules": [
-      "65/44",
       "67/5",
       "68/5",
       "69/5"
     ],
+    "rules_checked": [
+      "diff.angle.1",
+      "diff.enclosing.licon.1",
+      "diff.ongrid.1",
+      "diff.space.1",
+      "diff.width.1",
+      "li1.angle.1",
+      "li1.enclosing.licon1.1",
+      "li1.ongrid.1",
+      "li1.space.1",
+      "li1.width.1",
+      "licon1.angle.1",
+      "licon1.ongrid.1",
+      "licon1.width.1",
+      "mcon.angle.1",
+      "mcon.ongrid.1",
+      "mcon.space.1",
+      "mcon.width.1",
+      "met1.angle.1",
+      "met1.area.1",
+      "met1.enclosing.mcon.1",
+      "met1.enclosing.via.1",
+      "met1.enclosing_adjacent.via.1",
+      "met1.holes_area.1",
+      "met1.ongrid.1",
+      "met1.space.1",
+      "met1.width.1",
+      "met2.angle.1",
+      "met2.area.1",
+      "met2.enclosing.via.1",
+      "met2.enclosing_adjacent.via.1",
+      "met2.holes_area.1",
+      "met2.ongrid.1",
+      "met2.space.1",
+      "met2.width.1",
+      "npc.angle.1",
+      "npc.ongrid.1",
+      "npc.space.1",
+      "npc.width.1",
+      "nsdm.angle.1",
+      "nsdm.ongrid.1",
+      "nsdm.space.1",
+      "nsdm.width.1",
+      "nwell.angle.1",
+      "nwell.ongrid.1",
+      "nwell.space.1",
+      "nwell.width.1",
+      "poly.angle.1",
+      "poly.enclosing.licon.1",
+      "poly.endcap.diff.1",
+      "poly.ongrid.1",
+      "poly.space.1",
+      "poly.width.1",
+      "psdm.angle.1",
+      "psdm.ongrid.1",
+      "psdm.space.1",
+      "psdm.width.1",
+      "tap.angle.1",
+      "tap.enclosing.licon.1",
+      "tap.ongrid.1",
+      "tap.space.1",
+      "tap.width.1",
+      "via.angle.1",
+      "via.ongrid.1",
+      "via.space.1",
+      "via.width.1"
+    ],
     "rules_skipped": [
+      "areaid_re.ongrid.1",
       "capm.enclosing.via3.1",
       "capm.separation.via3.1",
       "capm.space.1",
@@ -56,28 +154,89 @@
       "capm2.separation.via4.1",
       "capm2.space.1",
       "capm2.width.1",
+      "dnwell.angle.1",
+      "dnwell.ongrid.1",
+      "hvi.angle.1",
+      "hvi.ongrid.1",
+      "hvntm.angle.1",
+      "hvntm.ongrid.1",
+      "hvtp.angle.1",
+      "hvtp.ongrid.1",
+      "hvtr.angle.1",
+      "hvtr.ongrid.1",
+      "lvtn.angle.1",
+      "lvtn.ongrid.1",
       "met2.enclosing.via2.1",
+      "met2.enclosing_adjacent.via2.1",
+      "met3.angle.1",
+      "met3.area.1",
       "met3.enclosing.capm.1",
       "met3.enclosing.via2.1",
       "met3.enclosing.via3.1",
+      "met3.enclosing_adjacent.via3.1",
+      "met3.holes_area.1",
+      "met3.ongrid.1",
       "met3.space.1",
       "met3.width.1",
+      "met4.angle.1",
+      "met4.area.1",
       "met4.enclosing.capm2.1",
       "met4.enclosing.via3.1",
       "met4.enclosing.via4.1",
+      "met4.holes_area.1",
+      "met4.ongrid.1",
       "met4.space.1",
       "met4.width.1",
+      "met5.angle.1",
+      "met5.area.1",
       "met5.enclosing.via4.1",
+      "met5.holes_area.1",
+      "met5.ongrid.1",
       "met5.space.1",
       "met5.width.1",
+      "mf.angle.1",
+      "mf.ongrid.1",
+      "ncm.angle.1",
+      "ncm.ongrid.1",
+      "nsm.angle.1",
+      "nsm.ongrid.1",
+      "nwell.enclosed.hvi.1",
+      "pad.angle.1",
+      "pad.ongrid.1",
+      "pwbm.angle.1",
+      "pwbm.ongrid.1",
+      "pwde.angle.1",
+      "pwde.ongrid.1",
+      "pwell_rs.angle.1",
+      "pwell_rs.ongrid.1",
+      "rpm.angle.1",
+      "rpm.ongrid.1",
+      "rpm.width.1",
+      "tunm.angle.1",
+      "tunm.ongrid.1",
+      "uhvi.angle.1",
+      "uhvi.ongrid.1",
+      "urpm.width.1",
+      "vhvi.angle.1",
+      "vhvi.ongrid.1",
+      "via2.angle.1",
+      "via2.ongrid.1",
       "via2.space.1",
       "via2.width.1",
+      "via3.angle.1",
+      "via3.ongrid.1",
       "via3.space.1",
       "via3.width.1",
+      "via4.angle.1",
+      "via4.ongrid.1",
       "via4.space.1",
-      "via4.width.1"
+      "via4.width.1",
+      "vpp.angle.1",
+      "vpp.ongrid.1"
     ],
     "voltage_domain_warnings": [],
+    "unchecked_rules": [],
+    "marker_blind_layers_in_stream": [],
     "deck_scope": [
       "cap2m",
       "capm",
@@ -90,26 +249,811 @@
       "m3",
       "m4",
       "m5",
+      "npc",
+      "nsdm",
       "nwell",
       "poly",
+      "psdm",
+      "rpm",
+      "urpm",
       "via",
       "via2",
       "via3",
-      "via4"
-    ]
+      "via4",
+      "x"
+    ],
+    "unmodeled_rules": [
+      "MR_li.WID.4",
+      "MR_licon.SP.1",
+      "MR_lvtn.OVL.2",
+      "MR_rdl.CON.1",
+      "MR_thkox.CON.1",
+      "MR_tunm.CON.1",
+      "cap2m.11",
+      "cap2m.2b",
+      "cap2m.2b_a",
+      "cap2m.3_a",
+      "cap2m.5",
+      "capm.10",
+      "capm.11",
+      "capm.2b",
+      "capm.2b_a",
+      "capm.5",
+      "capm.6",
+      "capm.7",
+      "capm.8",
+      "ct.3",
+      "ct.3_a",
+      "ct.3_b",
+      "ct.4",
+      "ct.irdrop.1",
+      "ct.irdrop.2",
+      "denmos.1",
+      "denmos.10",
+      "denmos.11",
+      "denmos.12",
+      "denmos.13",
+      "denmos.2",
+      "denmos.3",
+      "denmos.4",
+      "denmos.5",
+      "denmos.6",
+      "denmos.7",
+      "denmos.8",
+      "denmos.9a",
+      "denmos.9b",
+      "depmos.1",
+      "depmos.10",
+      "depmos.11",
+      "depmos.12",
+      "depmos.2",
+      "depmos.3",
+      "depmos.4",
+      "depmos.5",
+      "depmos.6",
+      "depmos.7",
+      "depmos.8",
+      "depmos.9a",
+      "depmos.9b",
+      "difftap.10",
+      "difftap.11",
+      "difftap.1_a",
+      "difftap.1_b",
+      "difftap.1_c",
+      "difftap.2",
+      "difftap.4",
+      "difftap.5",
+      "difftap.6",
+      "difftap.7",
+      "difftap.8",
+      "difftap.9",
+      "dnwell.1",
+      "dnwell.2",
+      "dnwell.3",
+      "dnwell.4",
+      "dnwell.5",
+      "extd.1",
+      "extd.2",
+      "hv.diff.1",
+      "hv.diff.2",
+      "hv.diff.3a",
+      "hv.nwell.1",
+      "hv.poly.2",
+      "hv.poly.3",
+      "hv.poly.4",
+      "hv.poly.6",
+      "hvdifftap.14",
+      "hvdifftap.14a",
+      "hvdifftap.15a",
+      "hvdifftap.15b",
+      "hvdifftap.16",
+      "hvdifftap.17",
+      "hvdifftap.18",
+      "hvdifftap.19",
+      "hvdifftap.20",
+      "hvdifftap.21",
+      "hvdifftap.22",
+      "hvdifftap.23",
+      "hvdifftap.24",
+      "hvdifftap.25",
+      "hvi.1",
+      "hvi.2",
+      "hvi.2a",
+      "hvi.4",
+      "hvntm.1",
+      "hvntm.2",
+      "hvntm.3",
+      "hvntm.4",
+      "hvntm.5",
+      "hvntm.6a",
+      "hvntm.9",
+      "hvnwel.9",
+      "hvnwell.8",
+      "hvpoly.13",
+      "hvpoly.14",
+      "hvtp",
+      "hvtp.1",
+      "hvtp.2",
+      "hvtp.3",
+      "hvtp.4",
+      "hvtp.5",
+      "hvtr.1",
+      "hvtr.2",
+      "hvtr.2_a",
+      "ldntm.1",
+      "ldntm.2",
+      "li.1a",
+      "li.3a",
+      "li.5",
+      "li.6",
+      "li.7",
+      "li.8",
+      "licon.10",
+      "licon.11",
+      "licon.11a",
+      "licon.11c",
+      "licon.12",
+      "licon.13",
+      "licon.13_a",
+      "licon.14",
+      "licon.15",
+      "licon.16",
+      "licon.17",
+      "licon.18",
+      "licon.1_c",
+      "licon.1b/c",
+      "licon.2",
+      "licon.2b",
+      "licon.2c",
+      "licon.2d",
+      "licon.4",
+      "licon.6",
+      "licon.7",
+      "licon.8a",
+      "lvtn.1",
+      "lvtn.12",
+      "lvtn.13",
+      "lvtn.1a",
+      "lvtn.2",
+      "lvtn.3a",
+      "lvtn.3b",
+      "lvtn.4b",
+      "lvtn.9",
+      "m1.11",
+      "m1.3ab",
+      "m1.4a",
+      "m1.4a_a",
+      "m1.5",
+      "m1.x",
+      "m2.11",
+      "m2.3ab",
+      "m2.4_a",
+      "m2.4_b",
+      "m2.5",
+      "m2.via",
+      "m2.x",
+      "m3.11",
+      "m3.3ab",
+      "m3.3cd",
+      "m3.4_a",
+      "m3.via2",
+      "m3.x",
+      "m4.11",
+      "m4.15",
+      "m4.3_a",
+      "m4.5ab",
+      "m4.via3",
+      "m4.x",
+      "m5.3_a",
+      "m5.via4",
+      "m5.x",
+      "mf.1",
+      "mf.2",
+      "mf.3",
+      "moduleCut.1",
+      "n/psdm.10a",
+      "n/psdm.10b",
+      "n/psdm.5a",
+      "n/psdm.5b",
+      "n/psdm.6",
+      "n/psdm.7",
+      "n/psdm.8",
+      "ncm.1",
+      "ncm.2",
+      "ncm.2a",
+      "ncm.3",
+      "ncm.5",
+      "ncm.6",
+      "ncm.7",
+      "ncm.x.3",
+      "npc.4",
+      "nsdm.2",
+      "nsdm.3",
+      "nsdm.4",
+      "nsdm.5",
+      "nsdm.6",
+      "nsdm.6a",
+      "nsdm_psdm_overlap",
+      "nsm.1",
+      "nsm.2",
+      "nsm.3",
+      "nsm.4",
+      "nwell.4",
+      "nwell.5",
+      "nwell.6",
+      "nwell.7",
+      "pad.2",
+      "photo.10",
+      "photo.2",
+      "photo.3",
+      "photo.4",
+      "photo.5.6",
+      "photo.7",
+      "photo.8",
+      "photo.9",
+      "poly.10",
+      "poly.11",
+      "poly.12",
+      "poly.15",
+      "poly.1b",
+      "poly.3",
+      "poly.4",
+      "poly.5",
+      "poly.6",
+      "poly.7",
+      "poly.9",
+      "psdm.2",
+      "psdm.3",
+      "psdm.4",
+      "psdm.5",
+      "psdm.6",
+      "psdm.6a",
+      "pwbm",
+      "pwbm.4",
+      "pwde.1",
+      "pwde.2",
+      "pwdem.3",
+      "pwdem.4",
+      "pwdem.5",
+      "pwres.2",
+      "pwres.3",
+      "pwres.4",
+      "pwres.5",
+      "pwres.6",
+      "pwres.8",
+      "rdl.1",
+      "rdl.2",
+      "rfdiode.1",
+      "rfdiode.2",
+      "rpm.10",
+      "rpm.2",
+      "rpm.3",
+      "rpm.4",
+      "rpm.5",
+      "rpm.6",
+      "rpm.7",
+      "rpm.8",
+      "rpm.9",
+      "thkox.1",
+      "thkox.2",
+      "tunm.1",
+      "tunm.2",
+      "tunm.3",
+      "tunm.4",
+      "tunm.5",
+      "tunm.6a",
+      "tunm.7",
+      "uhvi.1",
+      "uhvi.2",
+      "uhvi.3",
+      "uhvi.4",
+      "uhvi.5",
+      "uhvi.6",
+      "uhvi.7",
+      "urpm.2",
+      "varac.1",
+      "varac.2",
+      "varac.3",
+      "varac.4",
+      "varac.5",
+      "varac.6",
+      "varac.7",
+      "vhvi.1",
+      "vhvi.2",
+      "vhvi.3",
+      "vhvi.5",
+      "vhvi.7",
+      "via.11",
+      "via.12",
+      "via.1b",
+      "via.3",
+      "via.3_a",
+      "via.3_b",
+      "via.4a_a",
+      "via.4b",
+      "via.4c.5c",
+      "via.5a",
+      "via1.14",
+      "via1.5a",
+      "via1.5b",
+      "via2",
+      "via2.11",
+      "via2.12",
+      "via2.14",
+      "via2.1b",
+      "via2.3",
+      "via2.3_a",
+      "via2.3_b",
+      "via2.4_a",
+      "via2.4a",
+      "via2.5",
+      "via3",
+      "via3.1",
+      "via3.11",
+      "via3.12",
+      "via3.13",
+      "via3.4_a",
+      "via3.5",
+      "via4",
+      "via4.1",
+      "via4.3",
+      "via4.3_a",
+      "via4.3_b",
+      "via4.4_a",
+      "vpp.1",
+      "vpp.13",
+      "vpp.3",
+      "vpp.4",
+      "vpp.5",
+      "vpp.5a",
+      "vpp.5b",
+      "vpp.5c",
+      "vpp.8",
+      "vpp.9"
+    ],
+    "schema_version": 1,
+    "known": true,
+    "checked": [
+      "diff.angle.1",
+      "diff.enclosing.licon.1",
+      "diff.ongrid.1",
+      "diff.space.1",
+      "diff.width.1",
+      "li1.angle.1",
+      "li1.enclosing.licon1.1",
+      "li1.ongrid.1",
+      "li1.space.1",
+      "li1.width.1",
+      "licon1.angle.1",
+      "licon1.ongrid.1",
+      "licon1.width.1",
+      "mcon.angle.1",
+      "mcon.ongrid.1",
+      "mcon.space.1",
+      "mcon.width.1",
+      "met1.angle.1",
+      "met1.area.1",
+      "met1.enclosing.mcon.1",
+      "met1.enclosing.via.1",
+      "met1.enclosing_adjacent.via.1",
+      "met1.holes_area.1",
+      "met1.ongrid.1",
+      "met1.space.1",
+      "met1.width.1",
+      "met2.angle.1",
+      "met2.area.1",
+      "met2.enclosing.via.1",
+      "met2.enclosing_adjacent.via.1",
+      "met2.holes_area.1",
+      "met2.ongrid.1",
+      "met2.space.1",
+      "met2.width.1",
+      "npc.angle.1",
+      "npc.ongrid.1",
+      "npc.space.1",
+      "npc.width.1",
+      "nsdm.angle.1",
+      "nsdm.ongrid.1",
+      "nsdm.space.1",
+      "nsdm.width.1",
+      "nwell.angle.1",
+      "nwell.ongrid.1",
+      "nwell.space.1",
+      "nwell.width.1",
+      "poly.angle.1",
+      "poly.enclosing.licon.1",
+      "poly.endcap.diff.1",
+      "poly.ongrid.1",
+      "poly.space.1",
+      "poly.width.1",
+      "psdm.angle.1",
+      "psdm.ongrid.1",
+      "psdm.space.1",
+      "psdm.width.1",
+      "tap.angle.1",
+      "tap.enclosing.licon.1",
+      "tap.ongrid.1",
+      "tap.space.1",
+      "tap.width.1",
+      "via.angle.1",
+      "via.ongrid.1",
+      "via.space.1",
+      "via.width.1"
+    ],
+    "skipped": [],
+    "inapplicable": [
+      {
+        "id": "areaid_re.ongrid.1",
+        "reason": "no_applicable_geometry"
+      },
+      {
+        "id": "capm.enclosing.via3.1",
+        "reason": "no_applicable_geometry"
+      },
+      {
+        "id": "capm.separation.via3.1",
+        "reason": "no_applicable_geometry"
+      },
+      {
+        "id": "capm.space.1",
+        "reason": "no_applicable_geometry"
+      },
+      {
+        "id": "capm.width.1",
+        "reason": "no_applicable_geometry"
+      },
+      {
+        "id": "capm2.enclosing.via4.1",
+        "reason": "no_applicable_geometry"
+      },
+      {
+        "id": "capm2.separation.via4.1",
+        "reason": "no_applicable_geometry"
+      },
+      {
+        "id": "capm2.space.1",
+        "reason": "no_applicable_geometry"
+      },
+      {
+        "id": "capm2.width.1",
+        "reason": "no_applicable_geometry"
+      },
+      {
+        "id": "dnwell.angle.1",
+        "reason": "no_applicable_geometry"
+      },
+      {
+        "id": "dnwell.ongrid.1",
+        "reason": "no_applicable_geometry"
+      },
+      {
+        "id": "hvi.angle.1",
+        "reason": "no_applicable_geometry"
+      },
+      {
+        "id": "hvi.ongrid.1",
+        "reason": "no_applicable_geometry"
+      },
+      {
+        "id": "hvntm.angle.1",
+        "reason": "no_applicable_geometry"
+      },
+      {
+        "id": "hvntm.ongrid.1",
+        "reason": "no_applicable_geometry"
+      },
+      {
+        "id": "hvtp.angle.1",
+        "reason": "no_applicable_geometry"
+      },
+      {
+        "id": "hvtp.ongrid.1",
+        "reason": "no_applicable_geometry"
+      },
+      {
+        "id": "hvtr.angle.1",
+        "reason": "no_applicable_geometry"
+      },
+      {
+        "id": "hvtr.ongrid.1",
+        "reason": "no_applicable_geometry"
+      },
+      {
+        "id": "lvtn.angle.1",
+        "reason": "no_applicable_geometry"
+      },
+      {
+        "id": "lvtn.ongrid.1",
+        "reason": "no_applicable_geometry"
+      },
+      {
+        "id": "met2.enclosing.via2.1",
+        "reason": "no_applicable_geometry"
+      },
+      {
+        "id": "met2.enclosing_adjacent.via2.1",
+        "reason": "no_applicable_geometry"
+      },
+      {
+        "id": "met3.angle.1",
+        "reason": "no_applicable_geometry"
+      },
+      {
+        "id": "met3.area.1",
+        "reason": "no_applicable_geometry"
+      },
+      {
+        "id": "met3.enclosing.capm.1",
+        "reason": "no_applicable_geometry"
+      },
+      {
+        "id": "met3.enclosing.via2.1",
+        "reason": "no_applicable_geometry"
+      },
+      {
+        "id": "met3.enclosing.via3.1",
+        "reason": "no_applicable_geometry"
+      },
+      {
+        "id": "met3.enclosing_adjacent.via3.1",
+        "reason": "no_applicable_geometry"
+      },
+      {
+        "id": "met3.holes_area.1",
+        "reason": "no_applicable_geometry"
+      },
+      {
+        "id": "met3.ongrid.1",
+        "reason": "no_applicable_geometry"
+      },
+      {
+        "id": "met3.space.1",
+        "reason": "no_applicable_geometry"
+      },
+      {
+        "id": "met3.width.1",
+        "reason": "no_applicable_geometry"
+      },
+      {
+        "id": "met4.angle.1",
+        "reason": "no_applicable_geometry"
+      },
+      {
+        "id": "met4.area.1",
+        "reason": "no_applicable_geometry"
+      },
+      {
+        "id": "met4.enclosing.capm2.1",
+        "reason": "no_applicable_geometry"
+      },
+      {
+        "id": "met4.enclosing.via3.1",
+        "reason": "no_applicable_geometry"
+      },
+      {
+        "id": "met4.enclosing.via4.1",
+        "reason": "no_applicable_geometry"
+      },
+      {
+        "id": "met4.holes_area.1",
+        "reason": "no_applicable_geometry"
+      },
+      {
+        "id": "met4.ongrid.1",
+        "reason": "no_applicable_geometry"
+      },
+      {
+        "id": "met4.space.1",
+        "reason": "no_applicable_geometry"
+      },
+      {
+        "id": "met4.width.1",
+        "reason": "no_applicable_geometry"
+      },
+      {
+        "id": "met5.angle.1",
+        "reason": "no_applicable_geometry"
+      },
+      {
+        "id": "met5.area.1",
+        "reason": "no_applicable_geometry"
+      },
+      {
+        "id": "met5.enclosing.via4.1",
+        "reason": "no_applicable_geometry"
+      },
+      {
+        "id": "met5.holes_area.1",
+        "reason": "no_applicable_geometry"
+      },
+      {
+        "id": "met5.ongrid.1",
+        "reason": "no_applicable_geometry"
+      },
+      {
+        "id": "met5.space.1",
+        "reason": "no_applicable_geometry"
+      },
+      {
+        "id": "met5.width.1",
+        "reason": "no_applicable_geometry"
+      },
+      {
+        "id": "mf.angle.1",
+        "reason": "no_applicable_geometry"
+      },
+      {
+        "id": "mf.ongrid.1",
+        "reason": "no_applicable_geometry"
+      },
+      {
+        "id": "ncm.angle.1",
+        "reason": "no_applicable_geometry"
+      },
+      {
+        "id": "ncm.ongrid.1",
+        "reason": "no_applicable_geometry"
+      },
+      {
+        "id": "nsm.angle.1",
+        "reason": "no_applicable_geometry"
+      },
+      {
+        "id": "nsm.ongrid.1",
+        "reason": "no_applicable_geometry"
+      },
+      {
+        "id": "nwell.enclosed.hvi.1",
+        "reason": "no_applicable_geometry"
+      },
+      {
+        "id": "pad.angle.1",
+        "reason": "no_applicable_geometry"
+      },
+      {
+        "id": "pad.ongrid.1",
+        "reason": "no_applicable_geometry"
+      },
+      {
+        "id": "pwbm.angle.1",
+        "reason": "no_applicable_geometry"
+      },
+      {
+        "id": "pwbm.ongrid.1",
+        "reason": "no_applicable_geometry"
+      },
+      {
+        "id": "pwde.angle.1",
+        "reason": "no_applicable_geometry"
+      },
+      {
+        "id": "pwde.ongrid.1",
+        "reason": "no_applicable_geometry"
+      },
+      {
+        "id": "pwell_rs.angle.1",
+        "reason": "no_applicable_geometry"
+      },
+      {
+        "id": "pwell_rs.ongrid.1",
+        "reason": "no_applicable_geometry"
+      },
+      {
+        "id": "rpm.angle.1",
+        "reason": "no_applicable_geometry"
+      },
+      {
+        "id": "rpm.ongrid.1",
+        "reason": "no_applicable_geometry"
+      },
+      {
+        "id": "rpm.width.1",
+        "reason": "no_applicable_geometry"
+      },
+      {
+        "id": "tunm.angle.1",
+        "reason": "no_applicable_geometry"
+      },
+      {
+        "id": "tunm.ongrid.1",
+        "reason": "no_applicable_geometry"
+      },
+      {
+        "id": "uhvi.angle.1",
+        "reason": "no_applicable_geometry"
+      },
+      {
+        "id": "uhvi.ongrid.1",
+        "reason": "no_applicable_geometry"
+      },
+      {
+        "id": "urpm.width.1",
+        "reason": "no_applicable_geometry"
+      },
+      {
+        "id": "vhvi.angle.1",
+        "reason": "no_applicable_geometry"
+      },
+      {
+        "id": "vhvi.ongrid.1",
+        "reason": "no_applicable_geometry"
+      },
+      {
+        "id": "via2.angle.1",
+        "reason": "no_applicable_geometry"
+      },
+      {
+        "id": "via2.ongrid.1",
+        "reason": "no_applicable_geometry"
+      },
+      {
+        "id": "via2.space.1",
+        "reason": "no_applicable_geometry"
+      },
+      {
+        "id": "via2.width.1",
+        "reason": "no_applicable_geometry"
+      },
+      {
+        "id": "via3.angle.1",
+        "reason": "no_applicable_geometry"
+      },
+      {
+        "id": "via3.ongrid.1",
+        "reason": "no_applicable_geometry"
+      },
+      {
+        "id": "via3.space.1",
+        "reason": "no_applicable_geometry"
+      },
+      {
+        "id": "via3.width.1",
+        "reason": "no_applicable_geometry"
+      },
+      {
+        "id": "via4.angle.1",
+        "reason": "no_applicable_geometry"
+      },
+      {
+        "id": "via4.ongrid.1",
+        "reason": "no_applicable_geometry"
+      },
+      {
+        "id": "via4.space.1",
+        "reason": "no_applicable_geometry"
+      },
+      {
+        "id": "via4.width.1",
+        "reason": "no_applicable_geometry"
+      },
+      {
+        "id": "vpp.angle.1",
+        "reason": "no_applicable_geometry"
+      },
+      {
+        "id": "vpp.ongrid.1",
+        "reason": "no_applicable_geometry"
+      }
+    ],
+    "unknown": [],
+    "nothing_checked": false,
+    "nothing_checked_reasons": []
   },
   "provenance": {
-    "klt_version": "0.4.0",
-    "klayout_version": "0.30.10",
+    "klt_version": "0.9.2",
+    "klt_git_commit": "046ba74652fc096bd97071fc3237f7159dd40183",
+    "klt_reinstall_spec": "klayout-tools==0.9.2",
+    "klayout_version": "0.30.14",
     "pdk": null,
     "deck": {
       "name": "sky130",
-      "content_hash": "sha256:a903acb18b47d47e73460b10e9c80edd3466193ffc9da0c01c2103f7fdfcf36f",
+      "content_hash": "sha256:36027b82e3b16075e72b8e21775cde47ba7d08b7636efa4b73e9c34732a28efd",
       "released": true
     },
     "input": {
-      "content_hash": "sha256:356105d857ed6dcc7914d4df7f3b6de3f513ae490aede2cfed5031c94eb0bdbc"
+      "content_hash": "sha256:7174f9bcf03089c01bade81c2b8b28487c2142aecfbd0919b04888c37de40928",
+      "role": "layout"
     },
-    "klayout_version_mismatch": false
+    "klayout_version_mismatch": true
   }
 }

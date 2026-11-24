@@ -12,8 +12,8 @@
   "bbox_um": {
     "x0": -6.5,
     "y0": -6.0,
-    "x1": 40.99,
-    "y1": 26.67
+    "x1": 79.99,
+    "y1": 43.17
   },
   "ports": [
     {
@@ -24,8 +24,8 @@
         "datatype": 20,
         "name": null
       },
-      "x_um": 20.58,
-      "y_um": 14.209999999999997,
+      "x_um": 45.58,
+      "y_um": 22.21,
       "width_um": 0.42000000000000004,
       "direction_deg": 270,
       "block": "moka",
@@ -39,8 +39,8 @@
         "datatype": 20,
         "name": null
       },
-      "x_um": 11.42,
-      "y_um": 14.209999999999997,
+      "x_um": 13.42,
+      "y_um": 22.21,
       "width_um": 0.42000000000000004,
       "direction_deg": 270,
       "block": "mokb",
@@ -54,7 +54,7 @@
         "datatype": 20
       },
       "x_um": -4.0,
-      "y_um": 26.585,
+      "y_um": 43.085,
       "width_um": 0.17,
       "direction_deg": 180,
       "block": "stub_vdd",
@@ -124,7 +124,7 @@
         "datatype": 20
       },
       "x_um": -6.415,
-      "y_um": 19.5,
+      "y_um": 30.0,
       "width_um": 0.17,
       "direction_deg": 270,
       "block": "stub_bias_ok",
@@ -138,18 +138,19 @@
       "generator": "mos_array",
       "cell_name": "mpok_pfet",
       "source_path": "gen/mpok.gds",
-      "source_digest": "sha256:4b2b78e7d8eea036d1f5309070b815d40220988a19bf4f830945fc2621c8a01a",
+      "source_digest": "sha256:a17bc5576eb29de60db7ff84a0219acbb984e7a2627707d41df21a28f4e8f1fd",
       "offset_um": {
         "x": 0.0,
-        "y": 15.97
+        "y": 23.97
       },
       "bbox_um": {
         "x0": -0.15,
-        "y0": 13.700000000000001,
+        "y0": 21.7,
         "x1": 4.99,
-        "y1": 16.12
+        "y1": 24.119999999999997
       },
       "orientation": "mirror_y",
+      "placed_cell_name": "mpok__mpok_pfet",
       "abuts": []
     },
     {
@@ -158,18 +159,19 @@
       "generator": "mos_array",
       "cell_name": "mokb_pfet",
       "source_path": "gen/mokb.gds",
-      "source_digest": "sha256:ac3b4ae7e8b4f9f00ab53785c1c52b2502b7f93ff060a747e02e7a63513e93cb",
+      "source_digest": "sha256:266d3d8be4a83397f57f95aeaf2da3b73739b0bc28336528299201432738ce73",
       "offset_um": {
         "x": 9.0,
-        "y": 22.97
+        "y": 38.97
       },
       "bbox_um": {
         "x0": 8.85,
-        "y0": 13.7,
-        "x1": 13.99,
-        "y1": 23.119999999999997
+        "y0": 21.7,
+        "x1": 17.990000000000002,
+        "y1": 39.12
       },
       "orientation": "mirror_y",
+      "placed_cell_name": "mokb__mokb_pfet",
       "abuts": []
     },
     {
@@ -178,18 +180,19 @@
       "generator": "mos_array",
       "cell_name": "moka_pfet",
       "source_path": "gen/moka.gds",
-      "source_digest": "sha256:2f49ffb272b2a9531717172843c255bae5e336d2c94699032a5be1c293baabd7",
+      "source_digest": "sha256:9adff46112ec8587c45a3b4e72d4a1abbbb5dd3320c9b0e78ac5847be6b7b8eb",
       "offset_um": {
-        "x": 23.0,
-        "y": 22.97
+        "x": 50.0,
+        "y": 38.97
       },
       "bbox_um": {
-        "x0": 18.009999999999998,
-        "y0": 13.7,
-        "x1": 23.15,
-        "y1": 23.119999999999997
+        "x0": 41.01,
+        "y0": 21.7,
+        "x1": 50.15,
+        "y1": 39.12
       },
       "orientation": "rotate_180",
+      "placed_cell_name": "moka__moka_pfet",
       "abuts": []
     },
     {
@@ -198,18 +201,19 @@
       "generator": "mos_array",
       "cell_name": "mok2p_pfet",
       "source_path": "gen/mok2p.gds",
-      "source_digest": "sha256:2178cc0bf7fd8153a95c56bed039a8ac3240770584e27f8422d35bf61c62e545",
+      "source_digest": "sha256:936981f8edde2698e84e41f3294b8d116ecc1e11678161fd9baa5ba48a969501",
       "offset_um": {
-        "x": 27.0,
-        "y": 15.97
+        "x": 54.0,
+        "y": 23.47
       },
       "bbox_um": {
-        "x0": 26.85,
-        "y0": 13.700000000000001,
-        "x1": 31.990000000000002,
-        "y1": 16.12
+        "x0": 53.85,
+        "y0": 21.7,
+        "x1": 58.99,
+        "y1": 23.619999999999997
       },
       "orientation": "mirror_y",
+      "placed_cell_name": "mok2p__mok2p_pfet",
       "abuts": []
     },
     {
@@ -218,18 +222,19 @@
       "generator": "mos_array",
       "cell_name": "mo1p_pfet",
       "source_path": "gen/mo1p.gds",
-      "source_digest": "sha256:68b0ee7697820d57dd76e1e6c2f6b3e16f62b7821626fa2a6d4da631cd1b09e4",
+      "source_digest": "sha256:1e12c8a3846ea6a42d0b35b938953d792aeae0fb32444b30b4473d9f8c0d1cd7",
       "offset_um": {
-        "x": 36.0,
-        "y": 15.97
+        "x": 75.0,
+        "y": 23.97
       },
       "bbox_um": {
-        "x0": 35.85,
-        "y0": 13.700000000000001,
-        "x1": 40.99,
-        "y1": 16.12
+        "x0": 74.85,
+        "y0": 21.7,
+        "x1": 79.99,
+        "y1": 24.119999999999997
       },
       "orientation": "mirror_y",
+      "placed_cell_name": "mo1p__mo1p_pfet",
       "abuts": []
     },
     {
@@ -238,7 +243,7 @@
       "generator": "mos_array",
       "cell_name": "mol1_nfet",
       "source_path": "gen/mol1.gds",
-      "source_digest": "sha256:65d8b49c2cccf718da6e3c819613290af6eee5f4c0dc8fae4bbb291ee7bf9db9",
+      "source_digest": "sha256:ba6352dd95b18fd362bd501e3e1c005077c01875c92cb24d03d18860288c4cd5",
       "offset_um": {
         "x": 8.0,
         "y": 0.0
@@ -246,10 +251,11 @@
       "bbox_um": {
         "x0": 7.875,
         "y0": -0.15,
-        "x1": 12.965,
-        "y1": 2.97
+        "x1": 24.965,
+        "y1": 4.97
       },
       "orientation": "none",
+      "placed_cell_name": "mol1__mol1_nfet",
       "abuts": []
     },
     {
@@ -258,18 +264,19 @@
       "generator": "mos_array",
       "cell_name": "mol2_nfet",
       "source_path": "gen/mol2.gds",
-      "source_digest": "sha256:8496f60bc538d294b7fdaf5b9f11e8e8fcc8508705dea9086ac44aac48d80c8f",
+      "source_digest": "sha256:5943ca389e623a5fd16eb2a8a4e57c7dd173c5f5f91610886b167107cc885c16",
       "offset_um": {
-        "x": 15.5,
+        "x": 28.0,
         "y": 0.0
       },
       "bbox_um": {
-        "x0": 15.375,
+        "x0": 27.875,
         "y0": -0.15,
-        "x1": 20.465,
-        "y1": 2.97
+        "x1": 44.965,
+        "y1": 4.97
       },
       "orientation": "none",
+      "placed_cell_name": "mol2__mol2_nfet",
       "abuts": []
     },
     {
@@ -278,18 +285,19 @@
       "generator": "mos_array",
       "cell_name": "mokc_nfet",
       "source_path": "gen/mokc.gds",
-      "source_digest": "sha256:df042eab64503f30dc1ab67cdfc592ee9bdf9fc7cb88b476f31566660d77f213",
+      "source_digest": "sha256:ae1e994cc00f418f947ddbd96170d26ae5a9c8b3592a1c307732821ab2a47ace",
       "offset_um": {
-        "x": 23.0,
+        "x": 48.0,
         "y": 0.0
       },
       "bbox_um": {
-        "x0": 22.875,
+        "x0": 47.875,
         "y0": -0.15,
-        "x1": 24.965,
+        "x1": 49.965,
         "y1": 2.97
       },
       "orientation": "none",
+      "placed_cell_name": "mokc__mokc_nfet",
       "abuts": []
     },
     {
@@ -298,18 +306,19 @@
       "generator": "mos_array",
       "cell_name": "mok2_nfet",
       "source_path": "gen/mok2.gds",
-      "source_digest": "sha256:f8275b186a4c96a7064484eb688d4fab2b394a19ca1e7490774c0148dea64e06",
+      "source_digest": "sha256:552005b23d173116cea147dff130a8819b7135b5b11dd8d3bc3bf17bf2165e30",
       "offset_um": {
-        "x": 28.0,
+        "x": 53.0,
         "y": 0.0
       },
       "bbox_um": {
-        "x0": 27.875,
+        "x0": 52.875,
         "y0": -0.15,
-        "x1": 32.965,
-        "y1": 2.97
+        "x1": 57.965,
+        "y1": 8.97
       },
       "orientation": "none",
+      "placed_cell_name": "mok2__mok2_nfet",
       "abuts": []
     },
     {
@@ -318,18 +327,40 @@
       "generator": "mos_array",
       "cell_name": "mo1n_nfet",
       "source_path": "gen/mo1n.gds",
-      "source_digest": "sha256:53f2cd19393c2b207a4f2c99c14051a34b69fa3dfa93ab906bd667e5dc2e8d29",
+      "source_digest": "sha256:d1bb9d9afb2f5d4a980c2182a3af77cc75d7bb72b362ccb5e66c862eb3e52ad3",
       "offset_um": {
-        "x": 36.0,
+        "x": 75.0,
         "y": 0.0
       },
       "bbox_um": {
-        "x0": 35.875,
+        "x0": 74.875,
         "y0": -0.15,
-        "x1": 37.465,
+        "x1": 76.465,
         "y1": 4.97
       },
       "orientation": "none",
+      "placed_cell_name": "mo1n__mo1n_nfet",
+      "abuts": []
+    },
+    {
+      "id": "mokh",
+      "source": "generator_report",
+      "generator": "mos_array",
+      "cell_name": "mokh_pfet",
+      "source_path": "gen/mokh.gds",
+      "source_digest": "sha256:d84a71d09c3c7e5aeb67825e671f65f84ae5f965dc53ac1966ee900e999e5ec7",
+      "offset_um": {
+        "x": 70.0,
+        "y": 24.97
+      },
+      "bbox_um": {
+        "x0": 65.01,
+        "y0": 21.7,
+        "x1": 70.15,
+        "y1": 25.119999999999997
+      },
+      "orientation": "rotate_180",
+      "placed_cell_name": "mokh__mokh_pfet",
       "abuts": []
     },
     {
@@ -338,18 +369,19 @@
       "generator": "guard_ring",
       "cell_name": "nwt_mpok",
       "source_path": "gen/nwt_mpok.gds",
-      "source_digest": "sha256:b7dd6f5fef1d98bc3ec3fb60f87108ae444acc9f83d06c73595a02864cd0e5bd",
+      "source_digest": "sha256:9c62d2aeb2ee7e4f9c19d142da60df9ea979e04921c050cb02b9e6a63c0961fe",
       "offset_um": {
         "x": -2.04,
-        "y": 14.2
+        "y": 22.2
       },
       "bbox_um": {
         "x0": -2.24,
-        "y0": 14.0,
+        "y0": 22.0,
         "x1": 0.0,
-        "y1": 16.24
+        "y1": 24.24
       },
       "orientation": "none",
+      "placed_cell_name": "nwt_mpok__nwt_mpok",
       "abuts": []
     },
     {
@@ -358,18 +390,19 @@
       "generator": "guard_ring",
       "cell_name": "nwt_mokb",
       "source_path": "gen/nwt_mokb.gds",
-      "source_digest": "sha256:460c05a060badb61d669a9368c8c214f1cc3308549fc8e01333fe38bdc0163d3",
+      "source_digest": "sha256:a07d2fbbd0b7f60da85426062916fb210a2e32deb820508dfabe6193c9d60ddc",
       "offset_um": {
         "x": 6.96,
-        "y": 14.2
+        "y": 22.2
       },
       "bbox_um": {
         "x0": 6.76,
-        "y0": 14.0,
+        "y0": 22.0,
         "x1": 9.0,
-        "y1": 16.24
+        "y1": 24.24
       },
       "orientation": "none",
+      "placed_cell_name": "nwt_mokb__nwt_mokb",
       "abuts": []
     },
     {
@@ -378,18 +411,19 @@
       "generator": "guard_ring",
       "cell_name": "nwt_moka",
       "source_path": "gen/nwt_moka.gds",
-      "source_digest": "sha256:41a80db5841bb0f70ca9ac4e0b397ff324384ed65d54588c4bd782857e63b0da",
+      "source_digest": "sha256:247108b82acc6a0069c571b3ae5b0a65c75a126d40df43b203316ff7e227cdbf",
       "offset_um": {
-        "x": 19.01,
-        "y": 23.17
+        "x": 46.01,
+        "y": 39.17
       },
       "bbox_um": {
-        "x0": 18.810000000000002,
-        "y0": 22.970000000000002,
-        "x1": 21.05,
-        "y1": 25.21
+        "x0": 45.809999999999995,
+        "y0": 38.97,
+        "x1": 48.05,
+        "y1": 41.21
       },
       "orientation": "none",
+      "placed_cell_name": "nwt_moka__nwt_moka",
       "abuts": []
     },
     {
@@ -398,18 +432,19 @@
       "generator": "guard_ring",
       "cell_name": "nwt_mok2p",
       "source_path": "gen/nwt_mok2p.gds",
-      "source_digest": "sha256:5201cc097dcdf5cc0f8c50c846070ac316e16fdb8ad1e0450449a1f3776ed3ff",
+      "source_digest": "sha256:235927e5eae271b1c230467fec7d2e3cce700845db527c3b92010860742116c9",
       "offset_um": {
-        "x": 24.96,
-        "y": 14.2
+        "x": 51.96,
+        "y": 22.2
       },
       "bbox_um": {
-        "x0": 24.76,
-        "y0": 14.0,
-        "x1": 27.0,
-        "y1": 16.24
+        "x0": 51.76,
+        "y0": 22.0,
+        "x1": 54.0,
+        "y1": 24.24
       },
       "orientation": "none",
+      "placed_cell_name": "nwt_mok2p__nwt_mok2p",
       "abuts": []
     },
     {
@@ -418,18 +453,40 @@
       "generator": "guard_ring",
       "cell_name": "nwt_mo1p",
       "source_path": "gen/nwt_mo1p.gds",
-      "source_digest": "sha256:157918ec9a5740e8fe68cc28fe9c3ed10b206d515a42b5eeb53f6f8fab5a18e0",
+      "source_digest": "sha256:6574a66f1e30648e5f6a599c863c16e3af45d2beccec9c2b3a43b5784520ea49",
       "offset_um": {
-        "x": 33.96,
-        "y": 14.2
+        "x": 72.96,
+        "y": 22.2
       },
       "bbox_um": {
-        "x0": 33.76,
-        "y0": 14.0,
-        "x1": 36.0,
-        "y1": 16.24
+        "x0": 72.75999999999999,
+        "y0": 22.0,
+        "x1": 75.0,
+        "y1": 24.24
       },
       "orientation": "none",
+      "placed_cell_name": "nwt_mo1p__nwt_mo1p",
+      "abuts": []
+    },
+    {
+      "id": "nwt_mokh",
+      "source": "generator_report",
+      "generator": "guard_ring",
+      "cell_name": "nwt_mokh",
+      "source_path": "gen/nwt_mokh.gds",
+      "source_digest": "sha256:2d40f4c46050e8513859be8956c031a068b989d837d63053024ffe0da47b7cf3",
+      "offset_um": {
+        "x": 66.01,
+        "y": 25.17
+      },
+      "bbox_um": {
+        "x0": 65.81,
+        "y0": 24.970000000000002,
+        "x1": 68.05000000000001,
+        "y1": 27.21
+      },
+      "orientation": "none",
+      "placed_cell_name": "nwt_mokh__nwt_mokh",
       "abuts": []
     },
     {
@@ -438,18 +495,19 @@
       "generator": "guard_ring",
       "cell_name": "pst1",
       "source_path": "gen/pst1.gds",
-      "source_digest": "sha256:1a25615057e66e40f4bdb2ed139001d1c7faf52b150f8b4b0954a03f8c9c842f",
+      "source_digest": "sha256:6fc74992dc700fcea3817a322118d7bf15adc6d3cd5716b7369160aef42ad292",
       "offset_um": {
-        "x": 10.0,
+        "x": 14.0,
         "y": -3.5
       },
       "bbox_um": {
-        "x0": 9.875,
+        "x0": 13.875,
         "y0": -3.625,
-        "x1": 11.965,
+        "x1": 15.965,
         "y1": -1.535
       },
       "orientation": "none",
+      "placed_cell_name": "pst1__pst1",
       "abuts": []
     },
     {
@@ -458,18 +516,19 @@
       "generator": "guard_ring",
       "cell_name": "pst2",
       "source_path": "gen/pst2.gds",
-      "source_digest": "sha256:5d3cb5b6d22a80cb803520b96e1f9e3ad44e73e8fe3c196e3b69f486687430bd",
+      "source_digest": "sha256:88cafe88b2b8174cd279c5884e7d9b1ead20b87593b501e014638b1d2ab699df",
       "offset_um": {
-        "x": 30.0,
+        "x": 55.0,
         "y": -3.5
       },
       "bbox_um": {
-        "x0": 29.875,
+        "x0": 54.875,
         "y0": -3.625,
-        "x1": 31.965,
+        "x1": 56.965,
         "y1": -1.535
       },
       "orientation": "none",
+      "placed_cell_name": "pst2__pst2",
       "abuts": []
     },
     {
@@ -481,15 +540,16 @@
       "source_digest": "sha256:902ff80454f309f31943b44b8a7f942a6d96817455a784cbefd7f85d019f84ab",
       "offset_um": {
         "x": -4.0,
-        "y": 26.5
+        "y": 43.0
       },
       "bbox_um": {
         "x0": -4.0,
-        "y0": 26.5,
+        "y0": 43.0,
         "x1": -2.5,
-        "y1": 26.67
+        "y1": 43.17
       },
       "orientation": "none",
+      "placed_cell_name": "stub_vdd__promo_stub",
       "abuts": []
     },
     {
@@ -510,6 +570,7 @@
         "y1": -5.83
       },
       "orientation": "none",
+      "placed_cell_name": "stub_vss__promo_stub",
       "abuts": []
     },
     {
@@ -530,6 +591,7 @@
         "y1": 11.67
       },
       "orientation": "none",
+      "placed_cell_name": "stub_pb__promo_stub",
       "abuts": []
     },
     {
@@ -550,6 +612,7 @@
         "y1": 8.17
       },
       "orientation": "none",
+      "placed_cell_name": "stub_nokx__promo_stub",
       "abuts": []
     },
     {
@@ -570,6 +633,7 @@
         "y1": 7.17
       },
       "orientation": "none",
+      "placed_cell_name": "stub_nkg__promo_stub",
       "abuts": []
     },
     {
@@ -581,15 +645,16 @@
       "source_digest": "sha256:d424bed4ea0c150c3b587f778629b56bbddafe6074de3201ed45fcc12436409c",
       "offset_um": {
         "x": -6.5,
-        "y": 19.5
+        "y": 30.0
       },
       "bbox_um": {
         "x0": -6.5,
-        "y0": 19.5,
+        "y0": 30.0,
         "x1": -6.33,
-        "y1": 21.0
+        "y1": 31.5
       },
       "orientation": "none",
+      "placed_cell_name": "stub_bias_ok__promo_stub_v",
       "abuts": []
     }
   ],
@@ -622,6 +687,14 @@
           "port": "U0_S"
         },
         {
+          "block": "nwt_mokh",
+          "port": "TAP_N"
+        },
+        {
+          "block": "mokh",
+          "port": "U0_S"
+        },
+        {
           "block": "nwt_mo1p",
           "port": "TAP_N"
         },
@@ -635,7 +708,7 @@
         }
       ],
       "routed": true,
-      "route_length_um": 182.705,
+      "route_length_um": 404.505,
       "status": "routed",
       "landed_on_block": true,
       "legs": [
@@ -651,7 +724,7 @@
             }
           ],
           "routed": true,
-          "route_length_um": 23.03,
+          "route_length_um": 40.03,
           "reason": null,
           "channel_track": 0,
           "landed_on_block": true
@@ -668,7 +741,7 @@
             }
           ],
           "routed": true,
-          "route_length_um": 29.37,
+          "route_length_um": 46.370000000000005,
           "reason": null,
           "channel_track": 0,
           "landed_on_block": true
@@ -685,7 +758,7 @@
             }
           ],
           "routed": true,
-          "route_length_um": 24.42,
+          "route_length_um": 60.419999999999995,
           "reason": null,
           "channel_track": 0,
           "landed_on_block": true
@@ -702,7 +775,7 @@
             }
           ],
           "routed": true,
-          "route_length_um": 18.320000000000004,
+          "route_length_um": 27.32,
           "reason": null,
           "channel_track": 0,
           "landed_on_block": true
@@ -719,7 +792,7 @@
             }
           ],
           "routed": true,
-          "route_length_um": 23.03000000000001,
+          "route_length_um": 40.28,
           "reason": null,
           "channel_track": 0,
           "landed_on_block": true
@@ -731,12 +804,46 @@
               "port": "U0_S"
             },
             {
+              "block": "nwt_mokh",
+              "port": "TAP_N"
+            }
+          ],
+          "routed": true,
+          "route_length_um": 48.7,
+          "reason": null,
+          "channel_track": 0,
+          "landed_on_block": true
+        },
+        {
+          "pins": [
+            {
+              "block": "nwt_mokh",
+              "port": "TAP_N"
+            },
+            {
+              "block": "mokh",
+              "port": "U0_S"
+            }
+          ],
+          "routed": true,
+          "route_length_um": 38.43000000000001,
+          "reason": null,
+          "channel_track": 0,
+          "landed_on_block": true
+        },
+        {
+          "pins": [
+            {
+              "block": "mokh",
+              "port": "U0_S"
+            },
+            {
               "block": "nwt_mo1p",
               "port": "TAP_N"
             }
           ],
           "routed": true,
-          "route_length_um": 29.370000000000005,
+          "route_length_um": 42.28999999999999,
           "reason": null,
           "channel_track": 0,
           "landed_on_block": true
@@ -753,7 +860,7 @@
             }
           ],
           "routed": true,
-          "route_length_um": 23.03,
+          "route_length_um": 40.03,
           "reason": null,
           "channel_track": 0,
           "landed_on_block": true
@@ -770,7 +877,7 @@
             }
           ],
           "routed": true,
-          "route_length_um": 12.135000000000003,
+          "route_length_um": 20.635000000000005,
           "reason": null,
           "channel_track": 0,
           "landed_on_block": true
@@ -814,7 +921,7 @@
         }
       ],
       "routed": true,
-      "route_length_um": 113.635,
+      "route_length_um": 162.635,
       "status": "routed",
       "landed_on_block": true,
       "legs": [
@@ -830,7 +937,7 @@
             }
           ],
           "routed": true,
-          "route_length_um": 12.419999999999998,
+          "route_length_um": 17.419999999999998,
           "reason": null,
           "channel_track": 0,
           "landed_on_block": true
@@ -847,7 +954,7 @@
             }
           ],
           "routed": true,
-          "route_length_um": 14.500000000000002,
+          "route_length_um": 24.0,
           "reason": null,
           "channel_track": 0,
           "landed_on_block": true
@@ -864,7 +971,7 @@
             }
           ],
           "routed": true,
-          "route_length_um": 21.5,
+          "route_length_um": 35.0,
           "reason": null,
           "channel_track": 0,
           "landed_on_block": true
@@ -881,7 +988,7 @@
             }
           ],
           "routed": true,
-          "route_length_um": 19.0,
+          "route_length_um": 22.0,
           "reason": null,
           "channel_track": 0,
           "landed_on_block": true
@@ -898,7 +1005,7 @@
             }
           ],
           "routed": true,
-          "route_length_um": 12.420000000000002,
+          "route_length_um": 15.420000000000002,
           "reason": null,
           "channel_track": 0,
           "landed_on_block": true
@@ -915,7 +1022,7 @@
             }
           ],
           "routed": true,
-          "route_length_um": 16.0,
+          "route_length_um": 29.999999999999993,
           "reason": null,
           "channel_track": 0,
           "landed_on_block": true
@@ -932,7 +1039,7 @@
             }
           ],
           "routed": true,
-          "route_length_um": 17.795,
+          "route_length_um": 18.795,
           "reason": null,
           "channel_track": 0,
           "landed_on_block": true
@@ -956,7 +1063,7 @@
         }
       ],
       "routed": true,
-      "route_length_um": 41.56,
+      "route_length_um": 81.56000000000002,
       "status": "routed",
       "landed_on_block": true,
       "legs": [
@@ -972,7 +1079,7 @@
             }
           ],
           "routed": true,
-          "route_length_um": 8.079999999999998,
+          "route_length_um": 12.08,
           "reason": null,
           "channel_track": 0,
           "landed_on_block": true
@@ -989,7 +1096,7 @@
             }
           ],
           "routed": true,
-          "route_length_um": 33.480000000000004,
+          "route_length_um": 69.48000000000002,
           "reason": null,
           "channel_track": 0,
           "landed_on_block": true
@@ -1013,7 +1120,7 @@
         }
       ],
       "routed": true,
-      "route_length_um": 40.135000000000005,
+      "route_length_um": 91.135,
       "status": "routed",
       "landed_on_block": true,
       "legs": [
@@ -1029,7 +1136,7 @@
             }
           ],
           "routed": true,
-          "route_length_um": 32.42,
+          "route_length_um": 75.42,
           "reason": null,
           "channel_track": 0,
           "landed_on_block": true
@@ -1046,7 +1153,7 @@
             }
           ],
           "routed": true,
-          "route_length_um": 7.715000000000002,
+          "route_length_um": 15.715000000000002,
           "reason": null,
           "channel_track": 0,
           "landed_on_block": true
@@ -1074,7 +1181,7 @@
         }
       ],
       "routed": true,
-      "route_length_um": 38.67,
+      "route_length_um": 86.07,
       "status": "routed",
       "landed_on_block": true,
       "legs": [
@@ -1090,7 +1197,7 @@
             }
           ],
           "routed": true,
-          "route_length_um": 20.5,
+          "route_length_um": 45.00000000000001,
           "reason": null,
           "channel_track": 0,
           "landed_on_block": true
@@ -1107,7 +1214,7 @@
             }
           ],
           "routed": true,
-          "route_length_um": 9.980000000000002,
+          "route_length_um": 23.479999999999997,
           "reason": null,
           "channel_track": 0,
           "landed_on_block": true
@@ -1124,7 +1231,7 @@
             }
           ],
           "routed": true,
-          "route_length_um": 8.190000000000001,
+          "route_length_um": 17.589999999999993,
           "reason": null,
           "channel_track": 0,
           "landed_on_block": true
@@ -1152,7 +1259,7 @@
         }
       ],
       "routed": true,
-      "route_length_um": 55.879999999999995,
+      "route_length_um": 72.47999999999999,
       "status": "routed",
       "landed_on_block": true,
       "legs": [
@@ -1168,7 +1275,7 @@
             }
           ],
           "routed": true,
-          "route_length_um": 23.809999999999995,
+          "route_length_um": 37.71,
           "reason": null,
           "channel_track": 0,
           "landed_on_block": true
@@ -1185,7 +1292,7 @@
             }
           ],
           "routed": true,
-          "route_length_um": 18.04,
+          "route_length_um": 17.739999999999995,
           "reason": null,
           "channel_track": 0,
           "landed_on_block": true
@@ -1202,7 +1309,7 @@
             }
           ],
           "routed": true,
-          "route_length_um": 14.030000000000003,
+          "route_length_um": 17.029999999999998,
           "reason": null,
           "channel_track": 0,
           "landed_on_block": true
@@ -1229,12 +1336,16 @@
           "port": "U0_G"
         },
         {
+          "block": "mokh",
+          "port": "U0_D"
+        },
+        {
           "block": "stub_nokx",
           "port": "CONN"
         }
       ],
       "routed": true,
-      "route_length_um": 85.185,
+      "route_length_um": 159.42499999999998,
       "status": "routed",
       "landed_on_block": true,
       "legs": [
@@ -1250,7 +1361,24 @@
             }
           ],
           "routed": true,
-          "route_length_um": 17.21,
+          "route_length_um": 25.959999999999994,
+          "reason": null,
+          "channel_track": 0,
+          "landed_on_block": true
+        },
+        {
+          "pins": [
+            {
+              "block": "mok2p",
+              "port": "U0_D"
+            },
+            {
+              "block": "mokh",
+              "port": "U0_D"
+            }
+          ],
+          "routed": true,
+          "route_length_um": 7.490000000000002,
           "reason": null,
           "channel_track": 0,
           "landed_on_block": true
@@ -1267,7 +1395,7 @@
             }
           ],
           "routed": true,
-          "route_length_um": 14.279999999999998,
+          "route_length_um": 25.279999999999998,
           "reason": null,
           "channel_track": 0,
           "landed_on_block": true
@@ -1284,7 +1412,7 @@
             }
           ],
           "routed": true,
-          "route_length_um": 11.2,
+          "route_length_um": 19.2,
           "reason": null,
           "channel_track": 0,
           "landed_on_block": true
@@ -1301,7 +1429,7 @@
             }
           ],
           "routed": true,
-          "route_length_um": 42.495000000000005,
+          "route_length_um": 81.49499999999999,
           "reason": null,
           "channel_track": 0,
           "landed_on_block": true
@@ -1320,12 +1448,16 @@
           "port": "U0_D"
         },
         {
+          "block": "mokh",
+          "port": "U0_G"
+        },
+        {
           "block": "stub_bias_ok",
           "port": "CONN"
         }
       ],
       "routed": true,
-      "route_length_um": 89.02499999999999,
+      "route_length_um": 177.99500000000003,
       "status": "routed",
       "landed_on_block": true,
       "legs": [
@@ -1341,7 +1473,24 @@
             }
           ],
           "routed": true,
-          "route_length_um": 19.709999999999994,
+          "route_length_um": 28.710000000000008,
+          "reason": null,
+          "channel_track": 0,
+          "landed_on_block": true
+        },
+        {
+          "pins": [
+            {
+              "block": "mo1p",
+              "port": "U0_D"
+            },
+            {
+              "block": "mokh",
+              "port": "U0_G"
+            }
+          ],
+          "routed": true,
+          "route_length_um": 23.470000000000006,
           "reason": null,
           "channel_track": 0,
           "landed_on_block": true
@@ -1358,7 +1507,7 @@
             }
           ],
           "routed": true,
-          "route_length_um": 69.315,
+          "route_length_um": 125.81500000000001,
           "reason": null,
           "channel_track": 0,
           "landed_on_block": true
@@ -1378,7 +1527,7 @@
         }
       ],
       "routed": true,
-      "route_length_um": 30.745000000000005,
+      "route_length_um": 55.745000000000005,
       "status": "routed",
       "landed_on_block": true,
       "legs": [
@@ -1394,7 +1543,7 @@
             }
           ],
           "routed": true,
-          "route_length_um": 30.745000000000005,
+          "route_length_um": 55.745000000000005,
           "reason": null,
           "channel_track": 0,
           "landed_on_block": true
@@ -1468,7 +1617,8 @@
           "mol2",
           "mokc",
           "mok2",
-          "mo1n"
+          "mo1n",
+          "mokh"
         ],
         "placement_symmetric": null
       }
@@ -1481,22 +1631,23 @@
     "block 'nwt_moka' is placed 0.00um from block 'moka' (strategy: explicit), closer than moka's own declared drc_hints.min_spacing_um of 0.40um",
     "block 'nwt_mok2p' is placed 0.00um from block 'mok2p' (strategy: explicit), closer than mok2p's own declared drc_hints.min_spacing_um of 0.40um",
     "block 'nwt_mo1p' is placed 0.00um from block 'mo1p' (strategy: explicit), closer than mo1p's own declared drc_hints.min_spacing_um of 0.40um",
+    "block 'nwt_mokh' is placed 0.00um from block 'mokh' (strategy: explicit), closer than mokh's own declared drc_hints.min_spacing_um of 0.40um",
     "block 'mpok' is placed 0.00um from block 'nwt_mpok' (strategy: explicit), closer than nwt_mpok's own declared drc_hints.min_spacing_um of 0.40um",
     "block 'mokb' is placed 0.00um from block 'nwt_mokb' (strategy: explicit), closer than nwt_mokb's own declared drc_hints.min_spacing_um of 0.40um",
     "block 'moka' is placed 0.00um from block 'nwt_moka' (strategy: explicit), closer than nwt_moka's own declared drc_hints.min_spacing_um of 0.40um",
     "block 'mok2p' is placed 0.00um from block 'nwt_mok2p' (strategy: explicit), closer than nwt_mok2p's own declared drc_hints.min_spacing_um of 0.40um",
-    "block 'mo1p' is placed 0.00um from block 'nwt_mo1p' (strategy: explicit), closer than nwt_mo1p's own declared drc_hints.min_spacing_um of 0.40um"
+    "block 'mo1p' is placed 0.00um from block 'nwt_mo1p' (strategy: explicit), closer than nwt_mo1p's own declared drc_hints.min_spacing_um of 0.40um",
+    "block 'mokh' is placed 0.00um from block 'nwt_mokh' (strategy: explicit), closer than nwt_mokh's own declared drc_hints.min_spacing_um of 0.40um"
   ],
   "provenance": {
-    "klt_version": "0.7.1.dev1610+g758c6e224053",
-    "klayout_version": "0.30.12",
+    "klt_version": "0.9.2",
+    "klt_git_commit": "046ba74652fc096bd97071fc3237f7159dd40183",
+    "klt_reinstall_spec": "klayout-tools==0.9.2",
+    "klayout_version": "0.30.14",
     "pdk": {
       "name": "sky130A",
       "source": "search root: ~/.ciel",
-      "version": "open_pdks f6eeac7dad085ffcc829ccfd721f7b4ce39edcf7",
-      "ambiguous_sources": [
-        "search root: ~/.volare"
-      ]
+      "version": "open_pdks f6eeac7dad085ffcc829ccfd721f7b4ce39edcf7"
     },
     "deck": null,
     "input": null

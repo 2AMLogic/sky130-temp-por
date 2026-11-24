@@ -160,8 +160,8 @@
     "engine": "klayout",
     "engine_version": "0.30.14",
     "netgen_binary": null,
-    "layout_sha256": "fa5b991470ca314385984044858ca3444b2a502b22a58eb59f23efdd3791e8d5",
-    "reference_sha256": "6eeecac9536192ad6c6d3bbe870aa8dd904daafb4bc990de8993552bf44e91a9",
+    "layout_sha256": "8ae2cce065780cc9189fbc8c8b6877fd410bbe61a364412c86fddfa6fa36e8f8",
+    "reference_sha256": "97b7cdee05d7e81262c50d8aeafb80c7233d5d189259fe17f80d67bce279cfdb",
     "extracted_netlist": null
   },
   "provenance": {
@@ -176,7 +176,7 @@
       "released": true
     },
     "input": {
-      "content_hash": "sha256:fa5b991470ca314385984044858ca3444b2a502b22a58eb59f23efdd3791e8d5",
+      "content_hash": "sha256:8ae2cce065780cc9189fbc8c8b6877fd410bbe61a364412c86fddfa6fa36e8f8",
       "role": "netlist"
     },
     "klayout_version_mismatch": true
@@ -239,7 +239,7 @@
     {
       "category": "device.placeholder_value",
       "severity": "warning",
-      "description": "reference device class 'RES_XHIGH_PO' was converted from a subcircuit call (request.reference.form: \"subckt-call\"), so its 'R' value is the literal 0 placeholder on all 4 reference instance(s) -- klt lvs has no PDK sheet-resistance/capacitance-per-area data to compute a real one. 'R' was therefore excluded from this compare on both sides (layout: 4 instance(s), R 17500..4104000) and the two sides were paired on topology alone -- that dimension of the compare is not independently verified. Supply a reference in the plain-element form carrying real 'R' values to compare it (see docs/cli/lvs.md, 'device.placeholder_value')",
+      "description": "reference device class 'RES_XHIGH_PO' was converted from a subcircuit call (request.reference.form: \"subckt-call\"), so its 'R' value is the literal 0 placeholder on all 4 reference instance(s) -- klt lvs has no PDK sheet-resistance/capacitance-per-area data to compute a real one. 'R' was therefore excluded from this compare on both sides (layout: 4 instance(s), R 350000..4104000) and the two sides were paired on topology alone -- that dimension of the compare is not independently verified. Supply a reference in the plain-element form carrying real 'R' values to compare it (see docs/cli/lvs.md, 'device.placeholder_value')",
       "side": "reference",
       "net": null,
       "device": {
@@ -254,7 +254,6 @@
         "reference_devices": 4,
         "layout_devices": 4,
         "layout_values": [
-          17500.0,
           350000.0,
           1016000.0,
           4104000.0

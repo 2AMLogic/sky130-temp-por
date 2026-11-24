@@ -1,12 +1,15 @@
 {
-  "schema_version": 3,
-  "file": "bias_core_passives.gds",
+  "schema_version": 4,
+  "file": {
+    "path": "layout/bias_core_passives/bias_core_passives.gds",
+    "scope": "repo"
+  },
   "deck": "sky130",
   "top": "bias_core_passives",
   "dbu_um": 0.001,
   "netlist_path": "bias_core_passives.spice",
-  "netlist_sha256": "fa5b991470ca314385984044858ca3444b2a502b22a58eb59f23efdd3791e8d5",
-  "netlist_normalized_sha256": "b66221af150014e48e78eeaea087107cdef0aaba317cf0e7afe1f08befb87e86",
+  "netlist_sha256": "8ae2cce065780cc9189fbc8c8b6877fd410bbe61a364412c86fddfa6fa36e8f8",
+  "netlist_normalized_sha256": "d652ea013034a070281c0e73019a9a493cfb48d610ecbbfa5ca211c8e7517d00",
   "status": "extracted",
   "device_count": 6,
   "net_count": 11,
@@ -51,7 +54,15 @@
     "pnp",
     "sky130_fd_pr__model__cap_mim",
     "sky130_fd_pr__model__cap_mim_m4",
-    "resistor"
+    "resistor",
+    "diode_pw2nd_05v5",
+    "diode_pw2nd_05v5_lvt",
+    "diode_pw2nd_05v5_nvt",
+    "diode_pw2nd_11v0",
+    "diode_pd2nw_05v5",
+    "diode_pd2nw_05v5_lvt",
+    "diode_pd2nw_05v5_hvt",
+    "diode_pd2nw_11v0"
   ],
   "devices": [
     {
@@ -72,7 +83,7 @@
           "array_index": null
         },
         {
-          "cell": "cap_array",
+          "cell": "cap_cc__core",
           "array_index": null
         }
       ]
@@ -95,7 +106,7 @@
           "array_index": null
         },
         {
-          "cell": "cap_array$1",
+          "cell": "cap_cok__core",
           "array_index": null
         }
       ]
@@ -109,11 +120,11 @@
         "w": "vsubs"
       },
       "params": {
-        "r_ohm": 17500.0,
-        "l_um": 17.5,
+        "r_ohm": 350000.0,
+        "l_um": 350.0,
         "w_um": 2.0,
-        "area_um2": 35.0,
-        "perimeter_um": 39.0
+        "area_um2": 700.0,
+        "perimeter_um": 704.0
       },
       "instance_path": [
         {
@@ -121,7 +132,7 @@
           "array_index": null
         },
         {
-          "cell": "res_array",
+          "cell": "res_rt__core",
           "array_index": null
         }
       ]
@@ -147,7 +158,7 @@
           "array_index": null
         },
         {
-          "cell": "res_array$1",
+          "cell": "res_r1__core",
           "array_index": null
         }
       ]
@@ -173,7 +184,7 @@
           "array_index": null
         },
         {
-          "cell": "res_array$2",
+          "cell": "res_rz__core",
           "array_index": null
         }
       ]
@@ -199,7 +210,7 @@
           "array_index": null
         },
         {
-          "cell": "res_array$3",
+          "cell": "res_r2__core",
           "array_index": null
         }
       ]
@@ -215,7 +226,7 @@
       "label_positions_um": [
         {
           "text": "ec",
-          "x_um": 372.365,
+          "x_um": 704.865,
           "y_um": 1.0
         }
       ]
@@ -229,7 +240,7 @@
       "label_positions_um": [
         {
           "text": "er",
-          "x_um": 5524.925,
+          "x_um": 5857.425,
           "y_um": 1.0
         }
       ]
@@ -243,7 +254,7 @@
       "label_positions_um": [
         {
           "text": "n2",
-          "x_um": 376.255,
+          "x_um": 708.755,
           "y_um": 1.0
         }
       ]
@@ -257,7 +268,7 @@
       "label_positions_um": [
         {
           "text": "nb",
-          "x_um": 20.03,
+          "x_um": 352.53,
           "y_um": 1.0
         }
       ]
@@ -285,7 +296,7 @@
       "label_positions_um": [
         {
           "text": "nokx",
-          "x_um": 5531.87,
+          "x_um": 5864.37,
           "y_um": 7.71
         }
       ]
@@ -299,7 +310,7 @@
       "label_positions_um": [
         {
           "text": "nz",
-          "x_um": 1394.365,
+          "x_um": 1726.865,
           "y_um": 5.753
         }
       ]
@@ -313,7 +324,7 @@
       "label_positions_um": [
         {
           "text": "pg",
-          "x_um": 1406.59,
+          "x_um": 1739.09,
           "y_um": 21.71
         }
       ]
@@ -327,7 +338,7 @@
       "label_positions_um": [
         {
           "text": "vdd",
-          "x_um": 5528.37,
+          "x_um": 5860.87,
           "y_um": 3.5
         }
       ]
@@ -341,7 +352,7 @@
       "label_positions_um": [
         {
           "text": "vref",
-          "x_um": 1420.535,
+          "x_um": 1753.035,
           "y_um": 1.0
         }
       ]
@@ -363,6 +374,7 @@
   "abstracted_cells": [],
   "unmodelled_poly": [],
   "merged_net_labels": [],
+  "split_net_labels": [],
   "voltage_domain_warnings": [],
   "missing_flavour_markers": [],
   "unsupported_devices": [],
@@ -376,19 +388,22 @@
   "declared_pins": null,
   "def_pins": null,
   "label_layers": null,
+  "device_models": null,
   "probes": [],
   "pdk": null,
   "provenance": {
-    "klt_version": "0.7.1.dev1610+g758c6e224053",
-    "klayout_version": "0.30.12",
+    "klt_version": "0.9.2",
+    "klt_git_commit": "046ba74652fc096bd97071fc3237f7159dd40183",
+    "klt_reinstall_spec": "klayout-tools==0.9.2",
+    "klayout_version": "0.30.14",
     "pdk": null,
     "deck": {
       "name": "sky130",
-      "content_hash": "sha256:773f73886500d88310f3c3ebe671aad84de425473e9eb6b7ae5a22902416e973",
-      "released": false
+      "content_hash": "sha256:36027b82e3b16075e72b8e21775cde47ba7d08b7636efa4b73e9c34732a28efd",
+      "released": true
     },
     "input": {
-      "content_hash": "sha256:3d3d695d429e95ffcdf05931a9583a1ab55a991fae0146e8cf2c9ed4dc4ae55b",
+      "content_hash": "sha256:d159df54d1986be67d054a811f35616cbc3fef417425d9db7c5a299c7c4d1e95",
       "role": "layout"
     }
   },
@@ -403,13 +418,13 @@
   "timing": {
     "stages": {
       "read_layout": 0.001,
-      "device_extraction": 0.005,
+      "device_extraction": 0.006,
       "diagnostics": 0.0,
-      "netlist_write": 0.001,
+      "netlist_write": 0.0,
       "netlist_hash": 0.0,
       "netlist_normalized_hash": 0.0
     },
-    "total_seconds": 0.099,
-    "unattributed_seconds": 0.092
+    "total_seconds": 0.012,
+    "unattributed_seconds": 0.005
   }
 }

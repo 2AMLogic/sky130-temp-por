@@ -322,3 +322,24 @@ remain the layout work tracked from
 verification of the passives (resistor and MiM values) needs a reference
 form that carries real `R`/`C`, or a PEX run (T1 item 7). The match above
 does not cover it.
+
+## Re-render after the #455 OK-detector change (issue #473)
+
+`bias_core_settle_flag` and `bias_core_passives` were re-rendered for the landed
+`design/netlist/bias_core.spice` @ `f93433ad` (new `XMOKH`, resized `XMOL*`/`XMOK*`,
+`XRT` `L=350`). Re-composed with `klt 0.9.2`: **DRC clean; 51 devices, 27 nets; LVS `match`
+51/51 devices, 27/27 nets**; `klt erc` clean (0 findings); pad-island census `ok`. The numbers
+above (50 devices, pre-#455) are the earlier record.
+
+Assembly changes: `passives` is now placed at `x=-332.5` so that every passives port except
+`nbtop` keeps its previous assembly coordinate (the longer `XRT` shifts the rest of the row by
+332.5 um). `nbtop` now leaves the west end of `XRT` and runs on metal4 below the passives
+(`y=-60`) to the existing `x=-12` riser. The `settle_flag` port waypoints for `VDD`
+(`y=143.085`), `nbtop` and `na` were re-derived, and `BIAS_OK` is now at `(5443.585, 130.0)`.
+LVS does not check resistor geometry; the extracted `XRT` is `L=350 W=2` (R = 350 kohm), equal
+to the landed card. `temp_por_top` follows (154/154 devices, 71/71 nets).
+
+**Not done:** re-running the post-layout `por-comparator-thresholds` campaign with the extracted
+`bias_core`. Both existing post-layout variants extract only `por_comparator`, so they cannot
+show the bias-core parasitic effect; a new extracted-bias_core variant is tracked in a follow-up
+issue. No threshold claim is made for the re-rendered layout.

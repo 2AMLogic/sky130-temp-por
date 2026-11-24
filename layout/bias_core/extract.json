@@ -1,19 +1,22 @@
 {
-  "schema_version": 3,
-  "file": "bias_core.gds",
+  "schema_version": 4,
+  "file": {
+    "path": "layout/bias_core/bias_core.gds",
+    "scope": "repo"
+  },
   "deck": "sky130",
   "top": "bias_core",
   "dbu_um": 0.001,
   "netlist_path": "bias_core.spice",
-  "netlist_sha256": "e4a8ba053136c8f6fee964486b2a91d56c1a2e390ef396522c2f568d21850246",
-  "netlist_normalized_sha256": "8ae300aecfa580856a23cdac2659ca3cf14c91bc5e5698d3694aa7f21aab2f08",
+  "netlist_sha256": "cee35f023175b3c0cd88f69cfe137c63fbc3b48a62fa8496588be16b8fd93256",
+  "netlist_normalized_sha256": "16187cda06d4f6ee2d2ed4efc1cb7e148d93889629a09501e175006942006cd5",
   "status": "extracted",
-  "device_count": 50,
+  "device_count": 51,
   "net_count": 27,
   "pin_count": 27,
   "device_counts": {
     "nfet": 18,
-    "pfet": 16,
+    "pfet": 17,
     "pnp": 10,
     "res_xhigh_po": 4,
     "sky130_fd_pr__model__cap_mim": 2
@@ -21,14 +24,9 @@
   "dummy_devices_dropped": 0,
   "ignored_layers": [
     {
-      "layer": 93,
-      "datatype": 44,
-      "shapes": 44
-    },
-    {
       "layer": 95,
       "datatype": 20,
-      "shapes": 38
+      "shapes": 39
     }
   ],
   "device_recognition_only_layers": [
@@ -53,9 +51,14 @@
       "shapes": 2
     },
     {
+      "layer": 93,
+      "datatype": 44,
+      "shapes": 45
+    },
+    {
       "layer": 94,
       "datatype": 20,
-      "shapes": 36
+      "shapes": 37
     }
   ],
   "device_classes": [
@@ -64,7 +67,15 @@
     "pnp",
     "sky130_fd_pr__model__cap_mim",
     "sky130_fd_pr__model__cap_mim_m4",
-    "resistor"
+    "resistor",
+    "diode_pw2nd_05v5",
+    "diode_pw2nd_05v5_lvt",
+    "diode_pw2nd_05v5_nvt",
+    "diode_pw2nd_11v0",
+    "diode_pd2nw_05v5",
+    "diode_pd2nw_05v5_lvt",
+    "diode_pd2nw_05v5_hvt",
+    "diode_pd2nw_11v0"
   ],
   "devices": [
     {
@@ -103,38 +114,6 @@
       "name": "$10",
       "class": "nfet",
       "nets": {
-        "s": "pg",
-        "g": "nkg",
-        "d": "VSS|vss",
-        "b": "VSS|vss"
-      },
-      "params": {
-        "l_um": 4.0,
-        "w_um": 1.0,
-        "as_um2": 0.42,
-        "ad_um2": 0.42,
-        "ps_um": 2.84,
-        "pd_um": 2.84
-      },
-      "instance_path": [
-        {
-          "cell": "startup__bias_core_startup",
-          "array_index": null
-        },
-        {
-          "cell": "kick__kick",
-          "array_index": null
-        },
-        {
-          "cell": "mos_array$6$1",
-          "array_index": null
-        }
-      ]
-    },
-    {
-      "name": "$11",
-      "class": "nfet",
-      "nets": {
         "s": "nkg",
         "g": "ks4",
         "d": "ks4",
@@ -164,7 +143,7 @@
       ]
     },
     {
-      "name": "$12",
+      "name": "$11",
       "class": "nfet",
       "nets": {
         "s": "ks4",
@@ -196,7 +175,7 @@
       ]
     },
     {
-      "name": "$13",
+      "name": "$12",
       "class": "nfet",
       "nets": {
         "s": "ks3",
@@ -228,7 +207,7 @@
       ]
     },
     {
-      "name": "$14",
+      "name": "$13",
       "class": "nfet",
       "nets": {
         "s": "ks2",
@@ -260,7 +239,7 @@
       ]
     },
     {
-      "name": "$15",
+      "name": "$14",
       "class": "nfet",
       "nets": {
         "s": "ks1",
@@ -292,7 +271,7 @@
       ]
     },
     {
-      "name": "$16",
+      "name": "$15",
       "class": "nfet",
       "nets": {
         "s": "nkm",
@@ -324,7 +303,7 @@
       ]
     },
     {
-      "name": "$17",
+      "name": "$16",
       "class": "nfet",
       "nets": {
         "s": "VSS|vss",
@@ -356,7 +335,7 @@
       ]
     },
     {
-      "name": "$18",
+      "name": "$17",
       "class": "nfet",
       "nets": {
         "s": "VSS|vss",
@@ -383,6 +362,38 @@
         },
         {
           "cell": "mos_array$15",
+          "array_index": null
+        }
+      ]
+    },
+    {
+      "name": "$18",
+      "class": "nfet",
+      "nets": {
+        "s": "VSS|vss",
+        "g": "noko",
+        "d": "nokx",
+        "b": "VSS|vss"
+      },
+      "params": {
+        "l_um": 4.0,
+        "w_um": 8.0,
+        "as_um2": 3.36,
+        "ad_um2": 3.36,
+        "ps_um": 16.84,
+        "pd_um": 16.84
+      },
+      "instance_path": [
+        {
+          "cell": "settle_flag__bias_core_settle_flag",
+          "array_index": null
+        },
+        {
+          "cell": "mok2__mok2_nfet",
+          "array_index": null
+        },
+        {
+          "cell": "mok2_nfet__core",
           "array_index": null
         }
       ]
@@ -457,6 +468,38 @@
       "nets": {
         "s": "VDD|vdd",
         "g": "pb",
+        "d": "nokx",
+        "b": "VDD|vdd"
+      },
+      "params": {
+        "l_um": 4.0,
+        "w_um": 0.5,
+        "as_um2": 0.21,
+        "ad_um2": 0.21,
+        "ps_um": 1.84,
+        "pd_um": 1.84
+      },
+      "instance_path": [
+        {
+          "cell": "settle_flag__bias_core_settle_flag",
+          "array_index": null
+        },
+        {
+          "cell": "mok2p__mok2p_pfet",
+          "array_index": null
+        },
+        {
+          "cell": "mok2p_pfet__core",
+          "array_index": null
+        }
+      ]
+    },
+    {
+      "name": "$21",
+      "class": "pfet",
+      "nets": {
+        "s": "VDD|vdd",
+        "g": "pb",
         "d": "tok",
         "b": "VDD|vdd"
       },
@@ -478,39 +521,7 @@
           "array_index": null
         },
         {
-          "cell": "mos_array$16",
-          "array_index": null
-        }
-      ]
-    },
-    {
-      "name": "$21",
-      "class": "pfet",
-      "nets": {
-        "s": "VDD|vdd",
-        "g": "pb",
-        "d": "nokx",
-        "b": "VDD|vdd"
-      },
-      "params": {
-        "l_um": 4.0,
-        "w_um": 1.0,
-        "as_um2": 0.42,
-        "ad_um2": 0.42,
-        "ps_um": 2.84,
-        "pd_um": 2.84
-      },
-      "instance_path": [
-        {
-          "cell": "settle_flag__bias_core_settle_flag",
-          "array_index": null
-        },
-        {
-          "cell": "mok2p__mok2p_pfet",
-          "array_index": null
-        },
-        {
-          "cell": "mos_array$3$2",
+          "cell": "mpok_pfet__core",
           "array_index": null
         }
       ]
@@ -542,77 +553,13 @@
           "array_index": null
         },
         {
-          "cell": "mos_array$4$2",
+          "cell": "mo1p_pfet__core",
           "array_index": null
         }
       ]
     },
     {
       "name": "$23",
-      "class": "pfet",
-      "nets": {
-        "s": "tok",
-        "g": "nbtop",
-        "d": "nokl",
-        "b": "VDD|vdd"
-      },
-      "params": {
-        "l_um": 4.0,
-        "w_um": 8.0,
-        "as_um2": 3.36,
-        "ad_um2": 3.36,
-        "ps_um": 16.84,
-        "pd_um": 16.84
-      },
-      "instance_path": [
-        {
-          "cell": "settle_flag__bias_core_settle_flag",
-          "array_index": null
-        },
-        {
-          "cell": "mokb__mokb_pfet",
-          "array_index": null
-        },
-        {
-          "cell": "mos_array$1$2",
-          "array_index": null
-        }
-      ]
-    },
-    {
-      "name": "$24",
-      "class": "pfet",
-      "nets": {
-        "s": "noko",
-        "g": "na",
-        "d": "tok",
-        "b": "VDD|vdd"
-      },
-      "params": {
-        "l_um": 4.0,
-        "w_um": 8.0,
-        "as_um2": 3.36,
-        "ad_um2": 3.36,
-        "ps_um": 16.84,
-        "pd_um": 16.84
-      },
-      "instance_path": [
-        {
-          "cell": "settle_flag__bias_core_settle_flag",
-          "array_index": null
-        },
-        {
-          "cell": "moka__moka_pfet",
-          "array_index": null
-        },
-        {
-          "cell": "mos_array$2$2",
-          "array_index": null
-        }
-      ]
-    },
-    {
-      "name": "$25",
       "class": "pfet",
       "nets": {
         "s": "VDD|vdd",
@@ -644,7 +591,7 @@
       ]
     },
     {
-      "name": "$26",
+      "name": "$24",
       "class": "pfet",
       "nets": {
         "s": "VDD|vdd",
@@ -676,7 +623,7 @@
       ]
     },
     {
-      "name": "$27",
+      "name": "$25",
       "class": "pfet",
       "nets": {
         "s": "VDD|vdd",
@@ -708,7 +655,7 @@
       ]
     },
     {
-      "name": "$28",
+      "name": "$26",
       "class": "pfet",
       "nets": {
         "s": "VDD|vdd",
@@ -740,7 +687,39 @@
       ]
     },
     {
-      "name": "$29",
+      "name": "$27",
+      "class": "pfet",
+      "nets": {
+        "s": "nokx",
+        "g": "BIAS_OK|bias_ok",
+        "d": "VDD|vdd",
+        "b": "VDD|vdd"
+      },
+      "params": {
+        "l_um": 4.0,
+        "w_um": 2.0,
+        "as_um2": 0.84,
+        "ad_um2": 0.84,
+        "ps_um": 4.84,
+        "pd_um": 4.84
+      },
+      "instance_path": [
+        {
+          "cell": "settle_flag__bias_core_settle_flag",
+          "array_index": null
+        },
+        {
+          "cell": "mokh__mokh_pfet",
+          "array_index": null
+        },
+        {
+          "cell": "mokh_pfet__core",
+          "array_index": null
+        }
+      ]
+    },
+    {
+      "name": "$28",
       "class": "pfet",
       "nets": {
         "s": "VDD|vdd",
@@ -772,39 +751,7 @@
       ]
     },
     {
-      "name": "$3",
-      "class": "nfet",
-      "nets": {
-        "s": "VSS|vss",
-        "g": "nokl",
-        "d": "nokl",
-        "b": "VSS|vss"
-      },
-      "params": {
-        "l_um": 4.0,
-        "w_um": 2.0,
-        "as_um2": 0.84,
-        "ad_um2": 0.84,
-        "ps_um": 4.84,
-        "pd_um": 4.84
-      },
-      "instance_path": [
-        {
-          "cell": "settle_flag__bias_core_settle_flag",
-          "array_index": null
-        },
-        {
-          "cell": "mol1__mol1_nfet",
-          "array_index": null
-        },
-        {
-          "cell": "mos_array$5$2",
-          "array_index": null
-        }
-      ]
-    },
-    {
-      "name": "$30",
+      "name": "$29",
       "class": "pfet",
       "nets": {
         "s": "VDD|vdd",
@@ -836,7 +783,39 @@
       ]
     },
     {
-      "name": "$31",
+      "name": "$3",
+      "class": "nfet",
+      "nets": {
+        "s": "VSS|vss",
+        "g": "nkg",
+        "d": "noko",
+        "b": "VSS|vss"
+      },
+      "params": {
+        "l_um": 1.0,
+        "w_um": 2.0,
+        "as_um2": 0.84,
+        "ad_um2": 0.84,
+        "ps_um": 4.84,
+        "pd_um": 4.84
+      },
+      "instance_path": [
+        {
+          "cell": "settle_flag__bias_core_settle_flag",
+          "array_index": null
+        },
+        {
+          "cell": "mokc__mokc_nfet",
+          "array_index": null
+        },
+        {
+          "cell": "mokc_nfet__core",
+          "array_index": null
+        }
+      ]
+    },
+    {
+      "name": "$30",
       "class": "pfet",
       "nets": {
         "s": "VDD|vdd",
@@ -868,7 +847,7 @@
       ]
     },
     {
-      "name": "$32",
+      "name": "$31",
       "class": "pfet",
       "nets": {
         "s": "nt",
@@ -900,7 +879,7 @@
       ]
     },
     {
-      "name": "$33",
+      "name": "$32",
       "class": "pfet",
       "nets": {
         "s": "nt",
@@ -932,7 +911,71 @@
       ]
     },
     {
+      "name": "$33",
+      "class": "pfet",
+      "nets": {
+        "s": "tok",
+        "g": "nbtop",
+        "d": "nokl",
+        "b": "VDD|vdd"
+      },
+      "params": {
+        "l_um": 8.0,
+        "w_um": 16.0,
+        "as_um2": 6.72,
+        "ad_um2": 6.72,
+        "ps_um": 32.84,
+        "pd_um": 32.84
+      },
+      "instance_path": [
+        {
+          "cell": "settle_flag__bias_core_settle_flag",
+          "array_index": null
+        },
+        {
+          "cell": "mokb__mokb_pfet",
+          "array_index": null
+        },
+        {
+          "cell": "mokb_pfet__core",
+          "array_index": null
+        }
+      ]
+    },
+    {
       "name": "$34",
+      "class": "pfet",
+      "nets": {
+        "s": "noko",
+        "g": "na",
+        "d": "tok",
+        "b": "VDD|vdd"
+      },
+      "params": {
+        "l_um": 8.0,
+        "w_um": 16.0,
+        "as_um2": 6.72,
+        "ad_um2": 6.72,
+        "ps_um": 32.84,
+        "pd_um": 32.84
+      },
+      "instance_path": [
+        {
+          "cell": "settle_flag__bias_core_settle_flag",
+          "array_index": null
+        },
+        {
+          "cell": "moka__moka_pfet",
+          "array_index": null
+        },
+        {
+          "cell": "moka_pfet__core",
+          "array_index": null
+        }
+      ]
+    },
+    {
+      "name": "$35",
       "class": "pfet",
       "nets": {
         "s": "VDD|vdd",
@@ -964,7 +1007,7 @@
       ]
     },
     {
-      "name": "$35",
+      "name": "$36",
       "class": "pnp",
       "nets": {
         "c": "VSS|vss",
@@ -988,7 +1031,7 @@
       ]
     },
     {
-      "name": "$36",
+      "name": "$37",
       "class": "pnp",
       "nets": {
         "c": "VSS|vss",
@@ -1007,30 +1050,6 @@
         },
         {
           "cell": "bjt_array",
-          "array_index": null
-        }
-      ]
-    },
-    {
-      "name": "$37",
-      "class": "pnp",
-      "nets": {
-        "c": "VSS|vss",
-        "b": "VSS|vss",
-        "e": "ec"
-      },
-      "params": {},
-      "instance_path": [
-        {
-          "cell": "pnp8_leg__bias_core_pnp8_leg",
-          "array_index": null
-        },
-        {
-          "cell": "array__pnp8",
-          "array_index": null
-        },
-        {
-          "cell": "bjt_array$1",
           "array_index": null
         }
       ]
@@ -1088,29 +1107,29 @@
       "class": "nfet",
       "nets": {
         "s": "VSS|vss",
-        "g": "nokl",
-        "d": "noko",
+        "g": "n1",
+        "d": "n1",
         "b": "VSS|vss"
       },
       "params": {
-        "l_um": 4.0,
-        "w_um": 2.0,
-        "as_um2": 0.84,
-        "ad_um2": 0.84,
-        "ps_um": 4.84,
-        "pd_um": 4.84
+        "l_um": 8.0,
+        "w_um": 4.0,
+        "as_um2": 1.68,
+        "ad_um2": 1.68,
+        "ps_um": 8.84,
+        "pd_um": 8.84
       },
       "instance_path": [
         {
-          "cell": "settle_flag__bias_core_settle_flag",
+          "cell": "mirror_amp__bias_core_mirror_amp",
           "array_index": null
         },
         {
-          "cell": "mol2__mol2_nfet",
+          "cell": "ml1__ml1_nfet",
           "array_index": null
         },
         {
-          "cell": "mos_array$6$2",
+          "cell": "mos_array$13",
           "array_index": null
         }
       ]
@@ -1237,6 +1256,30 @@
     },
     {
       "name": "$45",
+      "class": "pnp",
+      "nets": {
+        "c": "VSS|vss",
+        "b": "VSS|vss",
+        "e": "ec"
+      },
+      "params": {},
+      "instance_path": [
+        {
+          "cell": "pnp8_leg__bias_core_pnp8_leg",
+          "array_index": null
+        },
+        {
+          "cell": "array__pnp8",
+          "array_index": null
+        },
+        {
+          "cell": "bjt_array$1",
+          "array_index": null
+        }
+      ]
+    },
+    {
+      "name": "$46",
       "class": "sky130_fd_pr__model__cap_mim",
       "nets": {
         "a": "VDD|vdd",
@@ -1257,13 +1300,13 @@
           "array_index": null
         },
         {
-          "cell": "cap_array$1",
+          "cell": "cap_cok__core",
           "array_index": null
         }
       ]
     },
     {
-      "name": "$46",
+      "name": "$47",
       "class": "sky130_fd_pr__model__cap_mim",
       "nets": {
         "a": "nz",
@@ -1284,13 +1327,13 @@
           "array_index": null
         },
         {
-          "cell": "cap_array",
+          "cell": "cap_cc__core",
           "array_index": null
         }
       ]
     },
     {
-      "name": "$47",
+      "name": "$48",
       "class": "res_xhigh_po",
       "nets": {
         "a": "nbtop",
@@ -1298,11 +1341,11 @@
         "w": "VSS|vss"
       },
       "params": {
-        "r_ohm": 17500.0,
-        "l_um": 17.5,
+        "r_ohm": 350000.0,
+        "l_um": 350.0,
         "w_um": 2.0,
-        "area_um2": 35.0,
-        "perimeter_um": 39.0
+        "area_um2": 700.0,
+        "perimeter_um": 704.0
       },
       "instance_path": [
         {
@@ -1314,13 +1357,13 @@
           "array_index": null
         },
         {
-          "cell": "res_array",
+          "cell": "res_rt__core",
           "array_index": null
         }
       ]
     },
     {
-      "name": "$48",
+      "name": "$49",
       "class": "res_xhigh_po",
       "nets": {
         "a": "nb",
@@ -1344,169 +1387,13 @@
           "array_index": null
         },
         {
-          "cell": "res_array$1",
-          "array_index": null
-        }
-      ]
-    },
-    {
-      "name": "$49",
-      "class": "res_xhigh_po",
-      "nets": {
-        "a": "n2",
-        "b": "nz",
-        "w": "VSS|vss"
-      },
-      "params": {
-        "r_ohm": 1016000.0,
-        "l_um": 1016.0,
-        "w_um": 2.0,
-        "area_um2": 2032.0,
-        "perimeter_um": 2036.0
-      },
-      "instance_path": [
-        {
-          "cell": "passives__bias_core_passives",
-          "array_index": null
-        },
-        {
-          "cell": "rz__res_rz",
-          "array_index": null
-        },
-        {
-          "cell": "res_array$2",
+          "cell": "res_r1__core",
           "array_index": null
         }
       ]
     },
     {
       "name": "$5",
-      "class": "nfet",
-      "nets": {
-        "s": "VSS|vss",
-        "g": "nkg",
-        "d": "noko",
-        "b": "VSS|vss"
-      },
-      "params": {
-        "l_um": 1.0,
-        "w_um": 2.0,
-        "as_um2": 0.84,
-        "ad_um2": 0.84,
-        "ps_um": 4.84,
-        "pd_um": 4.84
-      },
-      "instance_path": [
-        {
-          "cell": "settle_flag__bias_core_settle_flag",
-          "array_index": null
-        },
-        {
-          "cell": "mokc__mokc_nfet",
-          "array_index": null
-        },
-        {
-          "cell": "mos_array$7$2",
-          "array_index": null
-        }
-      ]
-    },
-    {
-      "name": "$50",
-      "class": "res_xhigh_po",
-      "nets": {
-        "a": "VREF|vref",
-        "b": "er",
-        "w": "VSS|vss"
-      },
-      "params": {
-        "r_ohm": 4104000.0,
-        "l_um": 4104.0,
-        "w_um": 2.0,
-        "area_um2": 8208.0,
-        "perimeter_um": 8212.0
-      },
-      "instance_path": [
-        {
-          "cell": "passives__bias_core_passives",
-          "array_index": null
-        },
-        {
-          "cell": "r2__res_r2",
-          "array_index": null
-        },
-        {
-          "cell": "res_array$3",
-          "array_index": null
-        }
-      ]
-    },
-    {
-      "name": "$6",
-      "class": "nfet",
-      "nets": {
-        "s": "VSS|vss",
-        "g": "noko",
-        "d": "nokx",
-        "b": "VSS|vss"
-      },
-      "params": {
-        "l_um": 4.0,
-        "w_um": 2.0,
-        "as_um2": 0.84,
-        "ad_um2": 0.84,
-        "ps_um": 4.84,
-        "pd_um": 4.84
-      },
-      "instance_path": [
-        {
-          "cell": "settle_flag__bias_core_settle_flag",
-          "array_index": null
-        },
-        {
-          "cell": "mok2__mok2_nfet",
-          "array_index": null
-        },
-        {
-          "cell": "mos_array$8$2",
-          "array_index": null
-        }
-      ]
-    },
-    {
-      "name": "$7",
-      "class": "nfet",
-      "nets": {
-        "s": "VSS|vss",
-        "g": "n1",
-        "d": "n1",
-        "b": "VSS|vss"
-      },
-      "params": {
-        "l_um": 8.0,
-        "w_um": 4.0,
-        "as_um2": 1.68,
-        "ad_um2": 1.68,
-        "ps_um": 8.84,
-        "pd_um": 8.84
-      },
-      "instance_path": [
-        {
-          "cell": "mirror_amp__bias_core_mirror_amp",
-          "array_index": null
-        },
-        {
-          "cell": "ml1__ml1_nfet",
-          "array_index": null
-        },
-        {
-          "cell": "mos_array$13",
-          "array_index": null
-        }
-      ]
-    },
-    {
-      "name": "$8",
       "class": "nfet",
       "nets": {
         "s": "VSS|vss",
@@ -1538,7 +1425,131 @@
       ]
     },
     {
-      "name": "$9",
+      "name": "$50",
+      "class": "res_xhigh_po",
+      "nets": {
+        "a": "n2",
+        "b": "nz",
+        "w": "VSS|vss"
+      },
+      "params": {
+        "r_ohm": 1016000.0,
+        "l_um": 1016.0,
+        "w_um": 2.0,
+        "area_um2": 2032.0,
+        "perimeter_um": 2036.0
+      },
+      "instance_path": [
+        {
+          "cell": "passives__bias_core_passives",
+          "array_index": null
+        },
+        {
+          "cell": "rz__res_rz",
+          "array_index": null
+        },
+        {
+          "cell": "res_rz__core",
+          "array_index": null
+        }
+      ]
+    },
+    {
+      "name": "$51",
+      "class": "res_xhigh_po",
+      "nets": {
+        "a": "VREF|vref",
+        "b": "er",
+        "w": "VSS|vss"
+      },
+      "params": {
+        "r_ohm": 4104000.0,
+        "l_um": 4104.0,
+        "w_um": 2.0,
+        "area_um2": 8208.0,
+        "perimeter_um": 8212.0
+      },
+      "instance_path": [
+        {
+          "cell": "passives__bias_core_passives",
+          "array_index": null
+        },
+        {
+          "cell": "r2__res_r2",
+          "array_index": null
+        },
+        {
+          "cell": "res_r2__core",
+          "array_index": null
+        }
+      ]
+    },
+    {
+      "name": "$6",
+      "class": "nfet",
+      "nets": {
+        "s": "VSS|vss",
+        "g": "nokl",
+        "d": "nokl",
+        "b": "VSS|vss"
+      },
+      "params": {
+        "l_um": 16.0,
+        "w_um": 4.0,
+        "as_um2": 1.68,
+        "ad_um2": 1.68,
+        "ps_um": 8.84,
+        "pd_um": 8.84
+      },
+      "instance_path": [
+        {
+          "cell": "settle_flag__bias_core_settle_flag",
+          "array_index": null
+        },
+        {
+          "cell": "mol1__mol1_nfet",
+          "array_index": null
+        },
+        {
+          "cell": "mol1_nfet__core",
+          "array_index": null
+        }
+      ]
+    },
+    {
+      "name": "$7",
+      "class": "nfet",
+      "nets": {
+        "s": "VSS|vss",
+        "g": "nokl",
+        "d": "noko",
+        "b": "VSS|vss"
+      },
+      "params": {
+        "l_um": 16.0,
+        "w_um": 4.0,
+        "as_um2": 1.68,
+        "ad_um2": 1.68,
+        "ps_um": 8.84,
+        "pd_um": 8.84
+      },
+      "instance_path": [
+        {
+          "cell": "settle_flag__bias_core_settle_flag",
+          "array_index": null
+        },
+        {
+          "cell": "mol2__mol2_nfet",
+          "array_index": null
+        },
+        {
+          "cell": "mol2_nfet__core",
+          "array_index": null
+        }
+      ]
+    },
+    {
+      "name": "$8",
       "class": "nfet",
       "nets": {
         "s": "VSS|vss",
@@ -1564,7 +1575,39 @@
           "array_index": null
         },
         {
-          "cell": "mos_array$9$1",
+          "cell": "mo1n_nfet__core",
+          "array_index": null
+        }
+      ]
+    },
+    {
+      "name": "$9",
+      "class": "nfet",
+      "nets": {
+        "s": "pg",
+        "g": "nkg",
+        "d": "VSS|vss",
+        "b": "VSS|vss"
+      },
+      "params": {
+        "l_um": 4.0,
+        "w_um": 1.0,
+        "as_um2": 0.42,
+        "ad_um2": 0.42,
+        "ps_um": 2.84,
+        "pd_um": 2.84
+      },
+      "instance_path": [
+        {
+          "cell": "startup__bias_core_startup",
+          "array_index": null
+        },
+        {
+          "cell": "kick__kick",
+          "array_index": null
+        },
+        {
+          "cell": "mos_array$6$1",
           "array_index": null
         }
       ]
@@ -1574,24 +1617,24 @@
     {
       "name": "BIAS_OK|bias_ok",
       "pin": true,
-      "device_count": 2,
-      "net_id": 18,
+      "device_count": 3,
+      "net_id": 23,
       "pin_index": 0,
       "label_positions_um": [
         {
           "text": "BIAS_OK",
           "x_um": 5443.585,
-          "y_um": 119.5
+          "y_um": 130.0
         },
         {
           "text": "bias_ok",
           "x_um": 5443.585,
-          "y_um": 119.5
+          "y_um": 130.0
         },
         {
           "text": "bias_ok",
-          "x_um": 5492.0,
-          "y_um": 106.985
+          "x_um": 5531.5,
+          "y_um": 110.985
         }
       ]
     },
@@ -1599,7 +1642,7 @@
       "name": "IBIAS|ibias",
       "pin": true,
       "device_count": 1,
-      "net_id": 27,
+      "net_id": 26,
       "pin_index": 1,
       "label_positions_um": [
         {
@@ -1617,8 +1660,8 @@
     {
       "name": "VDD|vdd",
       "pin": true,
-      "device_count": 31,
-      "net_id": 7,
+      "device_count": 33,
+      "net_id": 6,
       "pin_index": 2,
       "label_positions_um": [
         {
@@ -1654,12 +1697,12 @@
         {
           "text": "vdd",
           "x_um": 5446.0,
-          "y_um": 126.585
+          "y_um": 143.085
         },
         {
           "text": "vdd",
           "x_um": 5449.725,
-          "y_um": 126.5
+          "y_um": 143.0
         },
         {
           "text": "vdd",
@@ -1672,7 +1715,7 @@
       "name": "VREF|vref",
       "pin": true,
       "device_count": 2,
-      "net_id": 26,
+      "net_id": 25,
       "pin_index": 3,
       "label_positions_um": [
         {
@@ -1756,8 +1799,8 @@
         },
         {
           "text": "vss",
-          "x_um": 5458.21,
-          "y_um": 94.79
+          "x_um": 5458.92,
+          "y_um": 94.0
         }
       ]
     },
@@ -1765,7 +1808,7 @@
       "name": "ec",
       "pin": true,
       "device_count": 9,
-      "net_id": 9,
+      "net_id": 11,
       "pin_index": 5,
       "label_positions_um": [
         {
@@ -1794,7 +1837,7 @@
       "name": "er",
       "pin": true,
       "device_count": 2,
-      "net_id": 1,
+      "net_id": 2,
       "pin_index": 6,
       "label_positions_um": [
         {
@@ -1874,7 +1917,7 @@
       "name": "n1",
       "pin": true,
       "device_count": 4,
-      "net_id": 19,
+      "net_id": 18,
       "pin_index": 11,
       "label_positions_um": [
         {
@@ -1888,7 +1931,7 @@
       "name": "n2",
       "pin": true,
       "device_count": 4,
-      "net_id": 4,
+      "net_id": 5,
       "pin_index": 12,
       "label_positions_um": [
         {
@@ -1917,7 +1960,7 @@
       "name": "na",
       "pin": true,
       "device_count": 4,
-      "net_id": 8,
+      "net_id": 10,
       "pin_index": 13,
       "label_positions_um": [
         {
@@ -1942,8 +1985,8 @@
         },
         {
           "text": "na",
-          "x_um": 5470.58,
-          "y_um": 114.21
+          "x_um": 5495.58,
+          "y_um": 122.21
         }
       ]
     },
@@ -1951,7 +1994,7 @@
       "name": "nb",
       "pin": true,
       "device_count": 3,
-      "net_id": 3,
+      "net_id": 4,
       "pin_index": 14,
       "label_positions_um": [
         {
@@ -1975,7 +2018,7 @@
       "name": "nbg",
       "pin": true,
       "device_count": 4,
-      "net_id": 11,
+      "net_id": 8,
       "pin_index": 15,
       "label_positions_um": [
         {
@@ -1989,18 +2032,18 @@
       "name": "nbtop",
       "pin": true,
       "device_count": 3,
-      "net_id": 2,
+      "net_id": 1,
       "pin_index": 16,
       "label_positions_um": [
         {
           "text": "nbtop",
-          "x_um": -12.0,
-          "y_um": 41.202
+          "x_um": -332.305,
+          "y_um": -49.0
         },
         {
           "text": "nbtop",
-          "x_um": 0.195,
-          "y_um": -49.0
+          "x_um": -83.548,
+          "y_um": -60.0
         },
         {
           "text": "nbtop",
@@ -2009,8 +2052,8 @@
         },
         {
           "text": "nbtop",
-          "x_um": 5461.42,
-          "y_um": 114.21
+          "x_um": 5463.42,
+          "y_um": 122.21
         }
       ]
     },
@@ -2018,7 +2061,7 @@
       "name": "nkg",
       "pin": true,
       "device_count": 4,
-      "net_id": 21,
+      "net_id": 20,
       "pin_index": 17,
       "label_positions_um": [
         {
@@ -2043,7 +2086,7 @@
         },
         {
           "text": "nkg",
-          "x_um": 5462.788,
+          "x_um": 5475.288,
           "y_um": 107.0
         }
       ]
@@ -2066,13 +2109,13 @@
       "name": "nokl",
       "pin": true,
       "device_count": 4,
-      "net_id": 17,
+      "net_id": 9,
       "pin_index": 19,
       "label_positions_um": [
         {
           "text": "nokl",
-          "x_um": 5464.5,
-          "y_um": 109.59
+          "x_um": 5469.0,
+          "y_um": 109.84
         }
       ]
     },
@@ -2080,21 +2123,21 @@
       "name": "noko",
       "pin": true,
       "device_count": 4,
-      "net_id": 10,
+      "net_id": 17,
       "pin_index": 20,
       "label_positions_um": [
         {
           "text": "noko",
-          "x_um": 5467.6,
-          "y_um": 107.835
+          "x_um": 5490.0,
+          "y_um": 113.485
         }
       ]
     },
     {
       "name": "nokx",
       "pin": true,
-      "device_count": 5,
-      "net_id": 20,
+      "device_count": 6,
+      "net_id": 19,
       "pin_index": 21,
       "label_positions_um": [
         {
@@ -2104,8 +2147,8 @@
         },
         {
           "text": "nokx",
-          "x_um": 5483.5,
-          "y_um": 108.735
+          "x_um": 5511.5,
+          "y_um": 113.11
         },
         {
           "text": "nokx",
@@ -2123,7 +2166,7 @@
       "name": "nt",
       "pin": true,
       "device_count": 3,
-      "net_id": 25,
+      "net_id": 27,
       "pin_index": 22,
       "label_positions_um": [
         {
@@ -2137,7 +2180,7 @@
       "name": "nz",
       "pin": true,
       "device_count": 2,
-      "net_id": 5,
+      "net_id": 3,
       "pin_index": 23,
       "label_positions_um": [
         {
@@ -2151,7 +2194,7 @@
       "name": "pb",
       "pin": true,
       "device_count": 9,
-      "net_id": 24,
+      "net_id": 22,
       "pin_index": 24,
       "label_positions_um": [
         {
@@ -2181,7 +2224,7 @@
         },
         {
           "text": "pb",
-          "x_um": 5465.92,
+          "x_um": 5479.42,
           "y_um": 111.5
         }
       ]
@@ -2190,7 +2233,7 @@
       "name": "pg",
       "pin": true,
       "device_count": 8,
-      "net_id": 22,
+      "net_id": 21,
       "pin_index": 25,
       "label_positions_um": [
         {
@@ -2224,13 +2267,13 @@
       "name": "tok",
       "pin": true,
       "device_count": 3,
-      "net_id": 23,
+      "net_id": 24,
       "pin_index": 26,
       "label_positions_um": [
         {
           "text": "tok",
           "x_um": 5455.9,
-          "y_um": 118.24
+          "y_um": 128.24
         }
       ]
     }
@@ -2243,7 +2286,7 @@
     "net 'VREF|vref' merges 2 distinct labels (VREF, vref) onto one net -- KLayout joins multiple labels found on the same electrical net (as '|' here and in the written netlist, matching NetlistSpiceWriter's own node-name escaping); this usually means two differently-named nets were shorted together in the layout -- see docs/cli/extract.md's 'Merged net labels' section.",
     "net 'VSS|vss' merges 2 distinct labels (VSS, vss) onto one net -- KLayout joins multiple labels found on the same electrical net (as '|' here and in the written netlist, matching NetlistSpiceWriter's own node-name escaping); this usually means two differently-named nets were shorted together in the layout -- see docs/cli/extract.md's 'Merged net labels' section.",
     "2 drawn capacitors ('sky130_fd_pr__model__cap_mim') written as a fixed-value 'C' card (the deck's nominal area+perimeter value) -- PDK process corners (e.g. mimcap_ff/mimcap_ss) do not apply to it, so schematic-vs-extracted deltas at non-typical corners include a capacitor-corner term; pass --pdk to bind the PDK capacitor subcircuit instead. See docs/cli/extract.md's 'SPICE model binding' section.",
-    "2 layers (93/44, 95/20) carrying 82 shapes are outside 'sky130' deck's connectivity graph -- this geometry is invisible to extraction, so a net routed only through it extracts as multiple disconnected nets instead of one, which will silently mismatch a downstream `klt lvs` reference netlist -- see ignored_layers[] for the full per-layer shape counts. See docs/cli/extract.md's 'ignored_layers' field documentation."
+    "1 layer (95/20) carrying 39 shapes is outside 'sky130' deck's connectivity graph -- this geometry is invisible to extraction, so a net routed only through it extracts as multiple disconnected nets instead of one, which will silently mismatch a downstream `klt lvs` reference netlist -- see ignored_layers[] for the full per-layer shape counts. See docs/cli/extract.md's 'ignored_layers' field documentation."
   ],
   "black_box_regions": [],
   "abstracted_cells": [],
@@ -2285,6 +2328,7 @@
       ]
     }
   ],
+  "split_net_labels": [],
   "voltage_domain_warnings": [],
   "missing_flavour_markers": [],
   "unsupported_devices": [],
@@ -2298,19 +2342,22 @@
   "declared_pins": null,
   "def_pins": null,
   "label_layers": null,
+  "device_models": null,
   "probes": [],
   "pdk": null,
   "provenance": {
-    "klt_version": "0.7.1.dev1610+g758c6e224053",
-    "klayout_version": "0.30.12",
+    "klt_version": "0.9.2",
+    "klt_git_commit": "046ba74652fc096bd97071fc3237f7159dd40183",
+    "klt_reinstall_spec": "klayout-tools==0.9.2",
+    "klayout_version": "0.30.14",
     "pdk": null,
     "deck": {
       "name": "sky130",
-      "content_hash": "sha256:773f73886500d88310f3c3ebe671aad84de425473e9eb6b7ae5a22902416e973",
-      "released": false
+      "content_hash": "sha256:36027b82e3b16075e72b8e21775cde47ba7d08b7636efa4b73e9c34732a28efd",
+      "released": true
     },
     "input": {
-      "content_hash": "sha256:a044bcd3ce64e0f4a290c261de9962c25f003dc63f9bb2be98b9368601e6dae3",
+      "content_hash": "sha256:0e0575392067fd708b4d5d75770ca56561a1ed673e8ea5b3dc72b461c85816fd",
       "role": "layout"
     }
   },
@@ -2318,20 +2365,20 @@
   "spef_path": null,
   "subcircuit": null,
   "metrics": {
-    "extract__device__count": 50,
+    "extract__device__count": 51,
     "extract__net__count": 27,
     "extract__pin__count": 27
   },
   "timing": {
     "stages": {
       "read_layout": 0.001,
-      "device_extraction": 0.049,
+      "device_extraction": 0.055,
       "diagnostics": 0.0,
       "netlist_write": 0.001,
       "netlist_hash": 0.0,
       "netlist_normalized_hash": 0.001
     },
-    "total_seconds": 0.149,
-    "unattributed_seconds": 0.096
+    "total_seconds": 0.073,
+    "unattributed_seconds": 0.015
   }
 }

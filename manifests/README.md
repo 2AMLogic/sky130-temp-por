@@ -154,7 +154,7 @@ part of the claim and travel with it):
   (or to a leaf stream the top embeds) turns the row `stale_evidence`.
   **What it does not claim:** presence and reproducibility only. The top's
   recorded checks are *not* cited — DRC is clean (0 violations), ERC clean
-  (0 findings), and an LVS `match` (153/153 devices, 71/71 nets) with the
+  (0 findings), and an LVS `match` (154/154 devices, 71/71 nets) with the
   native-Vt `XMASSIST` included and no exclusion (#453 re-rendered the top
   from the current leaf streams at klt `0.9.2`; the compare stays
   flavour-blind, see item 4 below). See
@@ -176,7 +176,7 @@ part of the claim and travel with it):
   acceptable — it asserts the run was clean inside the coverage it had, and
   this README is where the gaps are disclosed.
 - **Item 4 — LVS clean: `met`** via `layout/temp_por_top/lvs.json`. The
-  block-level `temp_por_top` LVS reports `status: match`, **153/153
+  block-level `temp_por_top` LVS reports `status: match`, **154/154
   devices and 71/71 nets**, with the native-Vt `XMASSIST`
   (`sky130_fd_pr__nfet_05v0_nvt`) included on both sides — the #453
   re-render recomposed the top from the current leaf streams and retired the
@@ -196,7 +196,7 @@ part of the claim and travel with it):
   reference is flattened. The match is a topology match. The envelope
   carries no `power_connectivity` verdict, because that sub-check does not
   arise for an analog SPICE-reference compare. The `bias_core` sub-block
-  LVS (50/50 devices, 27/27 nets) is sub-block evidence and is no longer
+  LVS (51/51 devices, 27/27 nets) is sub-block evidence and is no longer
   cited.
 - **Items 5, 6, 7, 8 — `unmet` (`no_evidence`)**, each for a real reason:
   the target spec is only **partially ratified** (DR-003 is `ratified`, scoped,
@@ -259,7 +259,7 @@ part of the claim and travel with it):
   the build needs to decide substrate isolation for `erc.supply_short`
   (without the deck the check reports `substrate_isolation_undecidable` and
   this row goes `unmet`). VDD and VSS are each one island at the top. The LVS
-  half is item 4's full-block match (153/153, no exclusion). Until #259 this row
+  half is item 4's full-block match (154/154, no exclusion). Until #259 this row
   cited `layout/bias_core/`, which overclaimed: T1 is block-scoped, and the
   `bias_core` evidence (`layout/bias_core/erc.json`,
   `pad-island-census.json`) is sub-block evidence only and is not cited.

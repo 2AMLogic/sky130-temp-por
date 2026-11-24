@@ -135,9 +135,9 @@
       "matched": 71
     },
     "devices": {
-      "layout": 153,
-      "reference": 153,
-      "matched": 153
+      "layout": 154,
+      "reference": 154,
+      "matched": 154
     },
     "pins": {
       "layout": 11,
@@ -165,8 +165,8 @@
     "engine": "klayout",
     "engine_version": "0.30.14",
     "netgen_binary": null,
-    "layout_sha256": "7943002dba1f6c4d8d9532bf38a3c7f8074783fdba70ebd9915b469dc33d0fcb",
-    "reference_sha256": "bf7d068d59f4ec8c668fe94676014a761016c954d2e8b97f08aa9cb51e671e5e",
+    "layout_sha256": "f24ec09b1df7a8e51d4d0a5a0aa4647f94da6e1d197f1e80c17b36f8f749ecff",
+    "reference_sha256": "c6249c56777378ef1c4ac46533f299b97e40df88e1927f51faa6292223dbcbd9",
     "extracted_netlist": null
   },
   "provenance": {
@@ -181,7 +181,7 @@
       "released": true
     },
     "input": {
-      "content_hash": "sha256:7943002dba1f6c4d8d9532bf38a3c7f8074783fdba70ebd9915b469dc33d0fcb",
+      "content_hash": "sha256:f24ec09b1df7a8e51d4d0a5a0aa4647f94da6e1d197f1e80c17b36f8f749ecff",
       "role": "netlist"
     },
     "klayout_version_mismatch": true
@@ -290,7 +290,7 @@
     {
       "category": "device.placeholder_value",
       "severity": "warning",
-      "description": "reference device class 'RES_XHIGH_PO' was converted from a subcircuit call (request.reference.form: \"subckt-call\"), so its 'R' value is the literal 0 placeholder on all 12 reference instance(s) -- klt lvs has no PDK sheet-resistance/capacitance-per-area data to compute a real one. 'R' was therefore excluded from this compare on both sides (layout: 12 instance(s), R 17500..7897440) and the two sides were paired on topology alone -- that dimension of the compare is not independently verified. Supply a reference in the plain-element form carrying real 'R' values to compare it (see docs/cli/lvs.md, 'device.placeholder_value')",
+      "description": "reference device class 'RES_XHIGH_PO' was converted from a subcircuit call (request.reference.form: \"subckt-call\"), so its 'R' value is the literal 0 placeholder on all 12 reference instance(s) -- klt lvs has no PDK sheet-resistance/capacitance-per-area data to compute a real one. 'R' was therefore excluded from this compare on both sides (layout: 12 instance(s), R 111050..7897440) and the two sides were paired on topology alone -- that dimension of the compare is not independently verified. Supply a reference in the plain-element form carrying real 'R' values to compare it (see docs/cli/lvs.md, 'device.placeholder_value')",
       "side": "reference",
       "net": null,
       "device": {
@@ -305,7 +305,6 @@
         "reference_devices": 12,
         "layout_devices": 12,
         "layout_values": [
-          17500.0,
           111050.0,
           119470.0,
           350000.0,

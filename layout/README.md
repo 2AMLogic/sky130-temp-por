@@ -155,9 +155,9 @@ topology only (see that cell's README).
 
 [`layout/bias_core_settle_flag/`](bias_core_settle_flag/README.md) lays out
 `design/netlist/bias_core.spice`'s `XMPOK`/`XMOKA`/`XMOKB`/`XMOL1`/`XMOL2`/
-`XMOKC`/`XMOK2`/`XMOK2P`/`XMO1P`/`XMO1N` device group — the settle-flag
-comparator/driver chain that produces `bias_core`'s own `BIAS_OK` output, 10
-devices (5x `sky130_fd_pr__pfet_g5v0d10v5` + 5x
+`XMOKC`/`XMOK2`/`XMOK2P`/`XMO1P`/`XMO1N`/`XMOKH` device group — the settle-flag
+comparator/driver chain that produces `bias_core`'s own `BIAS_OK` output, 11
+devices (6x `sky130_fd_pr__pfet_g5v0d10v5` + 5x
 `sky130_fd_pr__nfet_g5v0d10v5`, no two of them the same size) — as a fourth
 standalone proof cell: a two-row CMOS floorplan (NMOS row, signal channel,
 PMOS row) with per-device `guard_ring` body-tie islands abutted at a 0.10um
@@ -165,9 +165,9 @@ nwell overlap, and all eight routed nets split across three metal planes by
 `connectivity[].layer_role` so the whole cell composes in a single
 `klt gen-compose` pass.
 
-**`klt drc`: clean, 0 violations.** **`klt extract`: 10 devices, 11 nets, 11
+**`klt drc`: clean, 0 violations.** **`klt extract`: 11 devices, 11 nets, 11
 pins.** **`klt lvs` against `design/netlist/bias_core.spice`'s own device
-cards: `match` — 10/10 devices, 11/11 nets, 11/11 pins, 0 mismatches.** This
+cards: `match` — 11/11 devices, 11/11 nets, 11/11 pins, 0 mismatches.** This
 is **the first sub-block in this repo to reach a full LVS match**: none of
 the three gaps blocking the sibling cells touches a MOS device, so this group
 was free to go the whole way.
@@ -448,10 +448,11 @@ device-group sub-blocks below into one cell against
 BIAS_OK`, each placed as an opaque `blocks[].cell` sibling (no fresh `klt
 gen` calls in this cell.json at all).
 
-**`klt drc`: clean, 0 violations.** **`klt extract`: 50 devices, 27 nets,
+**`klt drc`: clean, 0 violations.** **`klt extract`: 51 devices, 27 nets,
 27 pins.** The device count matches `design/netlist/bias_core.spice`
-exactly. **`klt lvs`: `match`, 50/50 devices and 27/27 nets** (issue #81;
-up from 21/50 devices and 14/27 nets). Every cross-block net is wired:
+exactly. **`klt lvs`: `match`, 51/51 devices and 27/27 nets** (issue #81;
+up from 21/50 devices, when the cell had 50 devices pre-#455, and 14/27
+nets). Every cross-block net is wired:
 `VDD`/`VSS`/`nkg` on li1/met1/met2 as before, and the remaining ten nets
 on the met3/met4/met5 routing roles klayout-tools#2738 added, by a
 hand-made layer plan (that cell's README, "Layer plan"). Five disclosed

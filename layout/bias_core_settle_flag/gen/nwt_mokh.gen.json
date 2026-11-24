@@ -1,0 +1,97 @@
+{
+  "schema_version": 1,
+  "generator": "guard_ring",
+  "cell_name": "nwt_mokh",
+  "gds_path": "gen/nwt_mokh.gds",
+  "pdk": {
+    "name": "sky130A",
+    "variant": "sky130A",
+    "version": "open_pdks f6eeac7dad085ffcc829ccfd721f7b4ce39edcf7"
+  },
+  "dbu_um": 0.001,
+  "bbox_um": {
+    "x0": -0.2,
+    "y0": -0.2,
+    "x1": 2.04,
+    "y1": 2.04
+  },
+  "device_count": 8,
+  "ports": [
+    {
+      "name": "TAP_N",
+      "net": null,
+      "layer": {
+        "layer": 67,
+        "datatype": 20,
+        "name": null
+      },
+      "x_um": 0.9199999999999999,
+      "y_um": 1.63,
+      "width_um": 0.42,
+      "direction_deg": 90
+    },
+    {
+      "name": "TAP_S",
+      "net": null,
+      "layer": {
+        "layer": 67,
+        "datatype": 20,
+        "name": null
+      },
+      "x_um": 0.9199999999999999,
+      "y_um": 0.21,
+      "width_um": 0.42,
+      "direction_deg": 270
+    },
+    {
+      "name": "TAP_E",
+      "net": null,
+      "layer": {
+        "layer": 67,
+        "datatype": 20,
+        "name": null
+      },
+      "x_um": 1.63,
+      "y_um": 0.9199999999999999,
+      "width_um": 0.42,
+      "direction_deg": 0
+    },
+    {
+      "name": "TAP_W",
+      "net": null,
+      "layer": {
+        "layer": 67,
+        "datatype": 20,
+        "name": null
+      },
+      "x_um": 0.21,
+      "y_um": 0.9199999999999999,
+      "width_um": 0.42,
+      "direction_deg": 180
+    }
+  ],
+  "navigable_regions": [],
+  "drc_hints": {
+    "min_spacing_um": 0.4,
+    "matched_group_id": null,
+    "snapped_to_grid": false,
+    "notes": [
+      "the resolved contact count (2) leaves less than 0.3um between adjacent contacts along inner_width_um -- may violate the target PDK's minimum contact spacing rule",
+      "the resolved contact count (2) leaves less than 0.3um between adjacent contacts along inner_height_um -- may violate the target PDK's minimum contact spacing rule"
+    ]
+  },
+  "warnings": [],
+  "provenance": {
+    "klt_version": "0.9.2",
+    "klt_git_commit": "046ba74652fc096bd97071fc3237f7159dd40183",
+    "klt_reinstall_spec": "klayout-tools==0.9.2",
+    "klayout_version": "0.30.14",
+    "pdk": {
+      "name": "sky130A",
+      "source": "search root: ~/.ciel",
+      "version": "open_pdks f6eeac7dad085ffcc829ccfd721f7b4ce39edcf7"
+    },
+    "deck": null,
+    "input": null
+  }
+}

@@ -20,7 +20,7 @@ The signoff report grades `layout/temp_por_top/` at **7 of 11 T1 items met**.
 | 1 Design sources | met | `design/` (four leaf cells and `temp_por_top`), attested in `manifests/attestations/` |
 | 2 Layout | met | `layout/temp_por_top/temp_por_top.gds` (#240) |
 | 3 DRC clean | met | `layout/temp_por_top/drc.json` |
-| 4 LVS clean | met | `layout/temp_por_top/lvs.json`: `match` 153/153 devices, 71/71 nets, native-Vt `XMASSIST` included — no exclusion (re-rendered at klt `0.9.2`, #453). The compare is flavour-blind until the 5 V devices' `hvi` marker can be drawn (klayout-tools#6025) |
+| 4 LVS clean | met | `layout/temp_por_top/lvs.json`: `match` 154/154 devices, 71/71 nets, native-Vt `XMASSIST` included — no exclusion (re-rendered at klt `0.9.2`, #453). The compare is flavour-blind until the 5 V devices' `hvi` marker can be drawn (klayout-tools#6025) |
 | 5 Corner verification vs a ratified spec | unmet | only two of eight spec rows are ratified (DR-003) |
 | 6 Monte Carlo for statistical claims | unmet | MC records exist under `sim/` as harness records, not as envelopes the report accepts, and back no ratified row |
 | 7 Post-layout verification | unmet | cell-level `klt pex` report for `por_comparator` passes at the klt `0.9.2` pin (single tt/27C point, `layout/por_comparator/pex/klt-pex.rerun.report.json`, #454); the block-level `temp_por_top` report now exists but is `status: error` — the extracted leg cannot start because nine composed-sibling net labels differ only by case, which no case-insensitive simulator can load (klayout-tools#7091, closed upstream as a clean refusal with no automatic renaming, so the netlist stays unsimulatable as generated; `layout/temp_por_top/pex/`, #454). Item 7 needs a passing block-level report, which needs the repo-side net-label fix (#501) |
@@ -93,7 +93,9 @@ Unblocked by a named item above or by a ruling listed under "Blocked and waiting
 - **Block-level post-layout verification (item 7).** *The pin-order limit is
   retired — the `klt pex` re-run at the `0.9.2` pin passes on `por_comparator`
   (#454). The block-level pilot ran (#454, `layout/temp_por_top/pex/`):
-  extraction matches LVS (153 devices / 71 nets, declared pin order) and both
+  extraction (of the pre-#473 stream `746e20de…`, 153 devices / 71 nets, declared
+  pin order; the record predates the #473 re-render, after which LVS matches
+  154/154) matched LVS at that time and both
   schematic legs pass, but the extracted leg cannot start — nine net-label
   pairs differ only by case and produce duplicate parasitic cards plus
   case-folded node shorts. klayout-tools#7091 is closed upstream as a clean
@@ -102,7 +104,7 @@ Unblocked by a named item above or by a ruling listed under "Blocked and waiting
   extracted block runs within the fleet's job limits (#153 may recur).*
 - **Full-block LVS.** Answered and delivered — klt draws and compares the
   native-Vt NMOS at the klt `0.9.2` pin (#97, closed), and the `temp_por_top`
-  re-render (#453) matches 153/153 devices with no exclusion. What remains
+  re-render (#453) matches 154/154 devices with no exclusion. What remains
   open is the flavour-aware compare, tracked under "Blocked and waiting".
 - **Remaining ladder rungs** from the README: post-layout re-verification,
   shuttle seat, measured silicon (`measurements/` is empty by design).
@@ -113,7 +115,7 @@ Unblocked by a named item above or by a ruling listed under "Blocked and waiting
   (triage note of 2026-10-15). DR-006 and DR-007 have no ratification issue.
   This gates items 5 and 6.
 - **#97 follow-on, flavour-aware LVS**: the `temp_por_top` re-render is done
-  (#453 — the top embeds the current leaf stream, its LVS matches 153/153
+  (#453 — the top embeds the current leaf stream, its LVS matches 154/154
   with no exclusion, and the block-level `lvs.drop_prefixes` entry is
   retired). What remains is the flavour-blind compare limit: drawing the 5V
   devices' own `hvi` marker was blocked by

@@ -12,7 +12,7 @@
   "bbox_um": {
     "x0": -0.25,
     "y0": -0.3,
-    "x1": 5535.37,
+    "x1": 5867.87,
     "y1": 21.92
   },
   "ports": [
@@ -39,7 +39,7 @@
         "datatype": 20,
         "name": null
       },
-      "x_um": 372.365,
+      "x_um": 704.865,
       "y_um": 1.0,
       "width_um": 2.2,
       "direction_deg": 0,
@@ -54,7 +54,7 @@
         "datatype": 20,
         "name": null
       },
-      "x_um": 376.25500000000005,
+      "x_um": 708.7550000000001,
       "y_um": 1.0,
       "width_um": 2.2,
       "direction_deg": 180,
@@ -69,7 +69,7 @@
         "datatype": 20,
         "name": null
       },
-      "x_um": 1406.5900000000001,
+      "x_um": 1739.0900000000001,
       "y_um": 21.71,
       "width_um": 0.42000000000000004,
       "direction_deg": 90,
@@ -84,7 +84,7 @@
         "datatype": 20,
         "name": null
       },
-      "x_um": 1420.535,
+      "x_um": 1753.035,
       "y_um": 1.0,
       "width_um": 2.2,
       "direction_deg": 180,
@@ -99,7 +99,7 @@
         "datatype": 20,
         "name": null
       },
-      "x_um": 5524.924999999999,
+      "x_um": 5857.424999999999,
       "y_um": 1.0,
       "width_um": 2.2,
       "direction_deg": 0,
@@ -114,7 +114,7 @@
         "datatype": 20,
         "name": null
       },
-      "x_um": 5528.37,
+      "x_um": 5860.87,
       "y_um": 3.5,
       "width_um": 7.0,
       "direction_deg": 180,
@@ -129,7 +129,7 @@
         "datatype": 20,
         "name": null
       },
-      "x_um": 5531.87,
+      "x_um": 5864.37,
       "y_um": 7.71,
       "width_um": 0.42000000000000004,
       "direction_deg": 90,
@@ -144,7 +144,7 @@
       "generator": "res_array",
       "cell_name": "res_rt",
       "source_path": "gen/rt.gds",
-      "source_digest": "sha256:d0feab710ee38103ec02953d24972c2a57a1da64fd35d37ea3db27caf93d1064",
+      "source_digest": "sha256:c826a27e6e4207d2b3f8f1fed11ad3c61b14cf06ede5f315ce17e766d04ecf83",
       "offset_um": {
         "x": 0.0,
         "y": 0.0
@@ -152,10 +152,11 @@
       "bbox_um": {
         "x0": -0.25,
         "y0": -0.3,
-        "x1": 18.53,
+        "x1": 351.03000000000003,
         "y1": 2.3000000000000003
       },
       "orientation": "none",
+      "placed_cell_name": "rt__res_rt",
       "abuts": []
     },
     {
@@ -164,18 +165,19 @@
       "generator": "res_array",
       "cell_name": "res_r1",
       "source_path": "gen/r1.gds",
-      "source_digest": "sha256:56f024bc416f56916dc5159e9f04fb0c939010983f912df0a65b8d8a47a07a27",
+      "source_digest": "sha256:c5b3cffff0fe8a378782cdb40aacbfdc9e9deca2385b4cf1ae69044cd7ac2650",
       "offset_um": {
-        "x": 21.78,
+        "x": 354.28000000000003,
         "y": 0.0
       },
       "bbox_um": {
-        "x0": 21.53,
+        "x0": 354.03000000000003,
         "y0": -0.3,
-        "x1": 372.81000000000006,
+        "x1": 705.3100000000001,
         "y1": 2.3000000000000003
       },
       "orientation": "none",
+      "placed_cell_name": "r1__res_r1",
       "abuts": []
     },
     {
@@ -184,18 +186,19 @@
       "generator": "res_array",
       "cell_name": "res_rz",
       "source_path": "gen/rz.gds",
-      "source_digest": "sha256:754d0b16ba89ad2958207a9184e1fded7acdce24780efb21ebb675a915e17f19",
+      "source_digest": "sha256:cd7903528436f08dde634fdeb994041fd83bd941e9176d6e4f63671b71894da6",
       "offset_um": {
-        "x": 376.06000000000006,
+        "x": 708.5600000000001,
         "y": 0.0
       },
       "bbox_um": {
-        "x0": 375.81000000000006,
+        "x0": 708.3100000000001,
         "y0": -0.3,
-        "x1": 1393.0900000000001,
+        "x1": 1725.5900000000001,
         "y1": 2.3000000000000003
       },
       "orientation": "none",
+      "placed_cell_name": "rz__res_rz",
       "abuts": []
     },
     {
@@ -204,18 +207,19 @@
       "generator": "cap_array",
       "cell_name": "cap_cc",
       "source_path": "gen/cc.gds",
-      "source_digest": "sha256:8bf23bb4ccd4faf80a5514eba88eeee71f5738151bb86afab037447089aeee4f",
+      "source_digest": "sha256:0aec2d33ec30404a0f10e982cbdd7f392047343fb5b9929b517115df32fb9415",
       "offset_um": {
-        "x": 1396.0900000000001,
+        "x": 1728.5900000000001,
         "y": 0.0
       },
       "bbox_um": {
-        "x0": 1396.0900000000001,
+        "x0": 1728.5900000000001,
         "y0": 0.0,
-        "x1": 1417.0900000000001,
+        "x1": 1749.5900000000001,
         "y1": 21.92
       },
       "orientation": "none",
+      "placed_cell_name": "cc__cap_cc",
       "abuts": []
     },
     {
@@ -224,18 +228,19 @@
       "generator": "res_array",
       "cell_name": "res_r2",
       "source_path": "gen/r2.gds",
-      "source_digest": "sha256:e942817a9ce71bc6566bfd85b6618d2ef03e87781acd6ce8791b4c685b4efd90",
+      "source_digest": "sha256:39847feb5168e662b0fc05656280d681c666e3f616c05dab777dce4c8c474207",
       "offset_um": {
-        "x": 1420.3400000000001,
+        "x": 1752.8400000000001,
         "y": 0.0
       },
       "bbox_um": {
-        "x0": 1420.0900000000001,
+        "x0": 1752.5900000000001,
         "y0": -0.3,
-        "x1": 5525.37,
+        "x1": 5857.87,
         "y1": 2.3000000000000003
       },
       "orientation": "none",
+      "placed_cell_name": "r2__res_r2",
       "abuts": []
     },
     {
@@ -244,18 +249,19 @@
       "generator": "cap_array",
       "cell_name": "cap_cok",
       "source_path": "gen/cok.gds",
-      "source_digest": "sha256:a382e150417f04cecd876170740b5cf71d5a7ee9155f0b66a140c5867a930515",
+      "source_digest": "sha256:42c3560acaea976109eb3a048e19acd44a4c7721ff1da4b7383ed6afc552b5c8",
       "offset_um": {
-        "x": 5528.37,
+        "x": 5860.87,
         "y": 0.0
       },
       "bbox_um": {
-        "x0": 5528.37,
+        "x0": 5860.87,
         "y0": 0.0,
-        "x1": 5535.37,
+        "x1": 5867.87,
         "y1": 7.92
       },
       "orientation": "none",
+      "placed_cell_name": "cok__cap_cok",
       "abuts": []
     }
   ],
@@ -273,7 +279,7 @@
         }
       ],
       "routed": true,
-      "route_length_um": 3.8900000000000006,
+      "route_length_um": 3.890000000000043,
       "status": "routed",
       "landed_on_block": true,
       "legs": [
@@ -289,7 +295,7 @@
             }
           ],
           "routed": true,
-          "route_length_um": 3.8900000000000006,
+          "route_length_um": 3.890000000000043,
           "reason": null,
           "channel_track": 0,
           "landed_on_block": true
@@ -410,15 +416,14 @@
   },
   "warnings": [],
   "provenance": {
-    "klt_version": "0.7.1.dev1610+g758c6e224053",
-    "klayout_version": "0.30.12",
+    "klt_version": "0.9.2",
+    "klt_git_commit": "046ba74652fc096bd97071fc3237f7159dd40183",
+    "klt_reinstall_spec": "klayout-tools==0.9.2",
+    "klayout_version": "0.30.14",
     "pdk": {
       "name": "sky130A",
       "source": "search root: ~/.ciel",
-      "version": "open_pdks f6eeac7dad085ffcc829ccfd721f7b4ce39edcf7",
-      "ambiguous_sources": [
-        "search root: ~/.volare"
-      ]
+      "version": "open_pdks f6eeac7dad085ffcc829ccfd721f7b4ce39edcf7"
     },
     "deck": null,
     "input": null
