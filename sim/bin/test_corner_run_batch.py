@@ -205,9 +205,10 @@ class RequestConstruction(unittest.TestCase):
         self.assertNotIn(".lib", cards)
         self.assertNotIn(".temp", cards)
         self.assertTrue(text.rstrip().endswith(".end"))
-        # neither klt backend honors options.ngspice_init and neither stages
-        # sim/spiceinit, so the netlist itself carries a `set ng_nomodcheck`
-        # control block or native-device decks abort on the BSIM parameter check
+        # the fleet runner ignores options.ngspice_init (sim_common.FLEET_NOTE) and
+        # neither backend stages sim/spiceinit, so the netlist itself carries a
+        # `set ng_nomodcheck` control block or native-device decks abort on the
+        # BSIM parameter check
         self.assertIn("set ng_nomodcheck", text)
 
 
