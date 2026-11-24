@@ -158,7 +158,7 @@ cell's own LVS run.
      Read back by `NetlistSpiceReader` (as `klt lvs` does for both sides), a
      `C` card with no model name becomes the generic `CAP` class rather than
      the specific `sky130_fd_pr__model__cap_mim` a reference declares — so
-     capacitor in any composed cell using `cap_array` can ever be paired
+     no capacitor in any composed cell using `cap_array` can ever be paired
      against a class-carrying reference, independent of gap 1 above.
 
   Both are generic, design-independent `klayout-tools` gaps, filed per this
