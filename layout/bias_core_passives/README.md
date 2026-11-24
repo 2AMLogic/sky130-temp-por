@@ -90,7 +90,7 @@ cell's own LVS run.
   section above). `device_counts` reads `{"res_xhigh_po": 4,
   "sky130_fd_pr__model__cap_mim": 2}`, and every resistor's own `r_ohm`
   matches `L / W * 2000` (sky130's `res_xhigh_po` sheet rho) exactly —
-  `17500`/`350000`/`1016000`/`4104000` Ω for `L=17.5`/`350.0`/`1016.0`/
+  `350000`/`350000`/`1016000`/`4104000` Ω for `L=350.0`/`350.0`/`1016.0`/
   `4104.0` respectively.
 - **Update (issue #81): `klt lvs` now reads `match`, with 6/6 devices,
   11/11 nets and 0 errors** (`lvs.json` at the `0ce8c64842d9` pin). The

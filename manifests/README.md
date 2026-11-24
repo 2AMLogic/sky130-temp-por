@@ -196,7 +196,7 @@ part of the claim and travel with it):
   reference is flattened. The match is a topology match. The envelope
   carries no `power_connectivity` verdict, because that sub-check does not
   arise for an analog SPICE-reference compare. The `bias_core` sub-block
-  LVS (50/50 devices, 27/27 nets) is sub-block evidence and is no longer
+  LVS (51/51 devices, 27/27 nets) is sub-block evidence and is no longer
   cited.
 - **Items 5, 6, 7, 8 — `unmet` (`no_evidence`)**, each for a real reason:
   the target spec is only **partially ratified** (DR-003 is `ratified`, scoped,
