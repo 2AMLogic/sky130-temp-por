@@ -60,7 +60,17 @@ All artifacts below were produced by this re-render (#453) at one klt build:
   `erc_coverage.checked_by_well_assertion`; neither was skipped as degenerate.
   The declaration is falsifiable: pointing `nwell_nt` at `VDD` in a scratch
   copy returns the two `erc.missing_tie` findings. VDD and VSS are each one
-  island at the top. Run as `klt erc <gds> <spec> --deck sky130`: klt `0.9.2`
+  island at the top. The `nets[]` entry for `NT` declares `"islands": 2`
+  (#501): since the `bias_core` family's labels were upper-cased to match their
+  reference netlists, the label text `NT` legitimately names two distinct nets
+  at the top — `temp_core`'s `XMI1`/`XMI2` source-tie net (the one
+  `nwell_nt` grades, scoped by its well boxes) and `bias_core`'s mirror-amp
+  `NT` — two disconnected conductor groups by design, the same
+  flat-name-space sharing `temp_core` and `por_comparator` already had for
+  `NA`/`N1`/`NBG` before the rename. That declaration is falsifiable too:
+  a scratch copy declaring `"islands": 3` returns the
+  `erc.unconnected_net` NT finding (and the undeclared spec returns it for
+  the implicit `1`). Run as `klt erc <gds> <spec> --deck sky130`: klt `0.9.2`
   needs the deck (or hand-asserted `ties[].isolation_boxes`) to decide
   substrate isolation for `erc.supply_short` — without it the check reports
   `substrate_isolation_undecidable` and signoff item 11 goes `unmet`. Antenna

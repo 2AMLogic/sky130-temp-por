@@ -84,8 +84,8 @@ cell's own LVS run.
 ## Verification
 
 - **`klt drc --deck sky130`: clean, 0 violations.**
-- **`klt extract --deck sky130`: 6 devices, 11 nets** (`ec`, `er`, `n2`,
-  `nb`, `nbtop`, `nokx`, `nz`, `pg`, `vdd`, `vref`, `vsubs` — exactly the
+- **`klt extract --deck sky130`: 6 devices, 11 nets** (`ec`, `er`, `N2`,
+  `NB`, `nbtop`, `nokx`, `NZ`, `PG`, `vdd`, `vref`, `vsubs` — exactly the
   Test Plan's named net list, `VSS` recovered as `vsubs` per the "Routing"
   section above). `device_counts` reads `{"res_xhigh_po": 4,
   "sky130_fd_pr__model__cap_mim": 2}`, and every resistor's own `r_ohm`
@@ -152,8 +152,8 @@ cell's own LVS run.
   2. **`klt extract`'s SPICE netlist writer drops a MiM capacitor's
      device-class/model-name token from its `C` card entirely.** Every
      resistor `R` card correctly carries a trailing model name
-     (`R$3 nbtop nb vsubs 17500 res_xhigh_po`), but every capacitor `C` card
-     does not (`C$1 nz pg 8.152e-13` — no fifth token at all, confirmed in
+     (`R$3 nbtop NB vsubs 17500 res_xhigh_po`), but every capacitor `C` card
+     does not (`C$1 NZ PG 8.152e-13` — no fifth token at all, confirmed in
      this cell's own committed `bias_core_passives.spice`). Read back by
      `NetlistSpiceReader` (as `klt lvs` does for both sides), a `C` card
      with no model name becomes the generic `CAP` class rather than the

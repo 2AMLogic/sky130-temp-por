@@ -10,7 +10,7 @@
 * pin M3D
 * pin N1
 * pin N2
-* pin NA,na
+* pin NA
 * pin NB
 * pin NBG
 * pin NC,ec
@@ -25,8 +25,8 @@
 * pin PTAT_TRIM
 * pin VDD
 * pin VSS,vss
-.SUBCKT temp_core CTAT EN ENB IBIAS M1D M2D M3D N1 N2 NA|na NB NBG NC|ec ND NR
-+ NT NZ PB PCAS PG PTAT PTAT_TRIM VDD VSS|vss
+.SUBCKT temp_core CTAT EN ENB IBIAS M1D M2D M3D N1 N2 NA NB NBG NC|ec ND NR NT
++ NZ PB PCAS PG PTAT PTAT_TRIM VDD VSS|vss
 * device instance $1 r0 *1 0.67,0.5 nfet
 M$1 ENB EN VSS|vss VSS|vss nfet L=0.5U W=1U AS=0.42P AD=0.42P PS=2.84U PD=2.84U
 * device instance $2 r0 *1 85.52,0.5 nfet
@@ -75,7 +75,7 @@ M$22 PG EN VDD VDD pfet L=0.5U W=4U AS=1.68P AD=1.68P PS=8.84U PD=8.84U
 * device instance $23 r0 *1 95.76,30.23 pfet
 M$23 M1D PG VDD VDD pfet L=4U W=8U AS=3.36P AD=3.36P PS=16.84U PD=16.84U
 * device instance $24 r0 *1 102.89,30.23 pfet
-M$24 NA|na PCAS M1D VDD pfet L=1U W=8U AS=3.36P AD=3.36P PS=16.84U PD=16.84U
+M$24 NA PCAS M1D VDD pfet L=1U W=8U AS=3.36P AD=3.36P PS=16.84U PD=16.84U
 * device instance $25 r0 *1 110.02,30.23 pfet
 M$25 M2D PG VDD VDD pfet L=4U W=8U AS=3.36P AD=3.36P PS=16.84U PD=16.84U
 * device instance $26 r0 *1 117.15,30.23 pfet
@@ -91,7 +91,7 @@ M$30 PG PB VDD VDD pfet L=4U W=10U AS=4.2P AD=4.2P PS=20.84U PD=20.84U
 * device instance $31 r0 *1 65.87,36.23 pfet
 M$31 NT PB VDD VDD pfet L=4U W=20U AS=8.4P AD=8.4P PS=40.84U PD=40.84U
 * device instance $32 r0 *1 76.5,42.23 pfet
-M$32 N1 NA|na NT NT pfet L=4U W=32U AS=13.44P AD=13.44P PS=64.84U PD=64.84U
+M$32 N1 NA NT NT pfet L=4U W=32U AS=13.44P AD=13.44P PS=64.84U PD=64.84U
 * device instance $33 r0 *1 85.13,42.23 pfet
 M$33 N2 NB NT NT pfet L=4U W=32U AS=13.44P AD=13.44P PS=64.84U PD=64.84U
 * device instance $34 r0 *1 278.08,-2.33 pnp
@@ -107,7 +107,7 @@ Q$36 VSS|vss VSS|vss NC|ec pnp AE=11.56P PE=13.6U AB=12.96P PB=14.4U AC=12.96P
 Q$37 VSS|vss VSS|vss NC|ec pnp AE=11.56P PE=13.6U AB=12.96P PB=14.4U AC=12.96P
 + PC=14.4U NE=1
 * device instance $38 r0 *1 308.08,-0.3 pnp
-Q$38 VSS|vss VSS|vss NA|na pnp AE=11.56P PE=13.6U AB=12.96P PB=14.4U AC=12.96P
+Q$38 VSS|vss VSS|vss NA pnp AE=11.56P PE=13.6U AB=12.96P PB=14.4U AC=12.96P
 + PC=14.4U NE=1
 * device instance $39 r0 *1 278.08,1.47 pnp
 Q$39 VSS|vss VSS|vss NC|ec pnp AE=11.56P PE=13.6U AB=12.96P PB=14.4U AC=12.96P
@@ -132,5 +132,5 @@ X$46 N2 NZ VSS|vss res_xhigh_po r=1000000 L=1000U W=2U
 * device instance $47 r0 *1 206.605,-2.5 res_xhigh_po
 X$47 NB NC|ec VSS|vss res_xhigh_po r=119470 L=119.47U W=2U
 * device instance $48 r0 *1 205.395,2 res_xhigh_po
-X$48 NA|na CTAT VSS|vss res_xhigh_po r=111050 L=111.05U W=2U
+X$48 NA CTAT VSS|vss res_xhigh_po r=111050 L=111.05U W=2U
 .ENDS temp_core

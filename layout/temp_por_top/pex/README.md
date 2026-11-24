@@ -18,6 +18,17 @@ relaxed; nothing here edits existing records.
 > already `status: error` from klayout-tools#7091, the repo-side fix is #501,
 > and item 7 belongs to #454.
 
+> **Fix landed (#501): the extracted leg now loads.** The composed siblings'
+> net labels are case-consistent (the `bias_core` family re-labelled uppercase,
+> matching its own reference netlists), and the block-level re-run lives in
+> **`records/20261124-092216-9307a231/`** as new appended evidence: the
+> single-corner pilot is **`status: pass`** on all four legs (extracted netlist
+> loads in ngspice, no `device already exists`), and the 5x3x3 grid ran on the
+> batch fleet (84/135 delta rows pass, 51 error -- singular-matrix and
+> release-out-of-interval findings, taxonomy in the record). Roadmap item 7
+> stays `unmet` until #454's signoff has a passing block-level report. The
+> `status: error` files below stay verbatim as the historical record.
+
 ## What is here
 
 | file | what |
@@ -25,6 +36,7 @@ relaxed; nothing here edits existing records.
 | `temp_por_top.pex.spice` | the raw `klt pex` extraction of `../temp_por_top.gds` (153 devices, 71 nets, 566 R + 210 C parasitic cards), verbatim |
 | `klt-pex.report.json` | the `klt pex` report -- **status `error`**: both schematic legs `pass`, both extracted legs `error` (`ngspice_fatal`, `analysis_started: false`), 3/3 delta rows `error` |
 | `pextb/` | the two `klt sim` testbench requests + netlists (the spec suite, below) |
+| `records/` | append-only re-runs; `records/20261124-092216-9307a231/` is the post-#501 fix record (pilot `pass` + the 5x3x3 fleet grid) |
 
 ## The spec suite (whole-block testbenches, per #454 step 3)
 

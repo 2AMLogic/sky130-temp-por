@@ -8,8 +8,8 @@
   "top": "bias_core_xq1_xqr",
   "dbu_um": 0.001,
   "netlist_path": "bias_core_xq1_xqr.spice",
-  "netlist_sha256": "219d1d5aa29dca115791d22f99dafbf4e00734dfc2d160ce50b84ab41f79c637",
-  "netlist_normalized_sha256": "ce14ab57ba783d5c6f0d6c4534efff4fcc4bb60a35e549d2830c2c408e97ddbc",
+  "netlist_sha256": "7c2ab0a05a8c458513ed6b0fd8801d51595cfcb79e69bd9b7cd828c2a9117c78",
+  "netlist_normalized_sha256": "4a0558e8d4b4b93017290046f96661f5494dd7c0591eda53667709ad0e8a1c3b",
   "status": "extracted",
   "device_count": 2,
   "net_count": 3,
@@ -59,7 +59,7 @@
       "nets": {
         "c": "vss",
         "b": "vss",
-        "e": "na"
+        "e": "NA"
       },
       "params": {},
       "instance_path": [
@@ -68,7 +68,7 @@
           "array_index": null
         },
         {
-          "cell": "bjt_array",
+          "cell": "xq1_xqr__core",
           "array_index": null
         }
       ]
@@ -88,7 +88,7 @@
           "array_index": null
         },
         {
-          "cell": "bjt_array",
+          "cell": "xq1_xqr__core",
           "array_index": null
         }
       ]
@@ -96,29 +96,29 @@
   ],
   "nets": [
     {
-      "name": "er",
+      "name": "NA",
       "pin": true,
       "device_count": 1,
-      "net_id": 2,
+      "net_id": 1,
       "pin_index": 0,
       "label_positions_um": [
         {
-          "text": "er",
-          "x_um": 6.32,
+          "text": "NA",
+          "x_um": 1.7,
           "y_um": 1.7
         }
       ]
     },
     {
-      "name": "na",
+      "name": "er",
       "pin": true,
       "device_count": 1,
-      "net_id": 1,
+      "net_id": 2,
       "pin_index": 1,
       "label_positions_um": [
         {
-          "text": "na",
-          "x_um": 1.7,
+          "text": "er",
+          "x_um": 6.32,
           "y_um": 1.7
         }
       ]
@@ -177,7 +177,7 @@
       "released": true
     },
     "input": {
-      "content_hash": "sha256:5890d064523ad452ac9c5e1f828c7d4098bd6f769a6fdd93090780ecd394d248",
+      "content_hash": "sha256:b11648648d73ba7c72e4ed68747a9527ec11df73a5ffa1c21438887744de02e8",
       "role": "layout"
     }
   },
@@ -191,14 +191,14 @@
   },
   "timing": {
     "stages": {
-      "read_layout": 0.0,
-      "device_extraction": 0.004,
+      "read_layout": 0.001,
+      "device_extraction": 0.005,
       "diagnostics": 0.0,
       "netlist_write": 0.0,
       "netlist_hash": 0.0,
       "netlist_normalized_hash": 0.0
     },
-    "total_seconds": 0.008,
-    "unattributed_seconds": 0.003
+    "total_seconds": 0.011,
+    "unattributed_seconds": 0.004
   }
 }

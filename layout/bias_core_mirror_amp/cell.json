@@ -50,23 +50,23 @@
     "is enough: an NMOS body is a globally synthesized net regardless of any",
     "drawn contact (see bias_core_startup/README.md's own empirical check).",
     "",
-    "ROUTING (three planes, assigned per net -- and for 'n2' per LEG -- via",
+    "ROUTING (three planes, assigned per net -- and for 'N2' per LEG -- via",
     "connectivity[].layer_role / connectivity[].legs[].layer_role,",
     "klayout-tools#1655, so no two nets sharing a plane ever cross):",
-    "  metal  (li1)  nbg / nt / n1 -- three local nets in disjoint x ranges;",
+    "  metal  (li1)  NBG / NT / N1 -- three local nets in disjoint x ranges;",
     "  metal2 (met1) vdd (one bus at y=65.0, ABOVE every PMOS top, with a",
     "                riser down each tap/source column), vss (one bus at",
-    "                y=-6.0 below the NMOS row), pb (one channel lane at",
-    "                y=18.0), and n2's ml2.D->ms2n.G leg (channel lane at",
+    "                y=-6.0 below the NMOS row), PB (one channel lane at",
+    "                y=18.0), and N2's ml2.D->ms2n.G leg (channel lane at",
     "                y=12.0) -- four disjoint y bands;",
-    "  metal3 (met2) pg (channel lane at y=14.0), na (an 'attic' run at",
-    "                y=66.0 over the whole PMOS row -- pg's own lane already",
-    "                owns the channel between mp1 and mi1), and n2's",
+    "  metal3 (met2) PG (channel lane at y=14.0), NA (an 'attic' run at",
+    "                y=66.0 over the whole PMOS row -- PG's own lane already",
+    "                owns the channel between mp1 and mi1), and N2's",
     "                mi2.D->ml2.D leg (a column at x=88.9, east of every",
     "                block).",
-    "n2's two legs live on two different planes and stitch at their shared",
+    "N2's two legs live on two different planes and stitch at their shared",
     "ml2.U0_D pin through the existing via-drop: routing the whole net on one",
-    "plane is not possible here (ms2n's gate sits directly under pg's own",
+    "plane is not possible here (ms2n's gate sits directly under PG's own",
     "channel lane, and the mi2 end sits east of everything), which is exactly",
     "the non-planar case per-leg layer_role exists for.",
     "",
@@ -75,7 +75,7 @@
     "compose.response.json records routed: true for every net AND every named",
     "leg.",
     "",
-    "nbtop / vref / ibias / nb touch exactly one port in this device group, so",
+    "nbtop / vref / ibias / NB touch exactly one port in this device group, so",
     "each is a pins[] declare-only top-level pin (a label on the pad's own",
     "already-drawn li1, no metal routed) rather than a connectivity[] net."
   ],
@@ -1412,7 +1412,7 @@
       ]
     },
     {
-      "net": "pg",
+      "net": "PG",
       "layer_role": "metal3",
       "pins": [
         {
@@ -1576,7 +1576,7 @@
       ]
     },
     {
-      "net": "pb",
+      "net": "PB",
       "layer_role": "metal2",
       "pins": [
         {
@@ -1744,7 +1744,7 @@
       ]
     },
     {
-      "net": "nbg",
+      "net": "NBG",
       "pins": [
         {
           "block": "mpbn",
@@ -1835,7 +1835,7 @@
       ]
     },
     {
-      "net": "na",
+      "net": "NA",
       "layer_role": "metal3",
       "pins": [
         {
@@ -1907,7 +1907,7 @@
       ]
     },
     {
-      "net": "nt",
+      "net": "NT",
       "pins": [
         {
           "block": "mpt",
@@ -1974,7 +1974,7 @@
       ]
     },
     {
-      "net": "n1",
+      "net": "N1",
       "pins": [
         {
           "block": "mi1",
@@ -2061,7 +2061,7 @@
       ]
     },
     {
-      "net": "n2",
+      "net": "N2",
       "pins": [
         {
           "block": "mi2",
@@ -2168,7 +2168,7 @@
       "port": "U0_D"
     },
     {
-      "net": "nb",
+      "net": "NB",
       "block": "mi2",
       "port": "U0_G"
     },
@@ -2183,22 +2183,22 @@
       "port": "PAD"
     },
     {
-      "net": "pg",
+      "net": "PG",
       "block": "stub_pg",
       "port": "PAD"
     },
     {
-      "net": "pb",
+      "net": "PB",
       "block": "stub_pb",
       "port": "PAD"
     },
     {
-      "net": "n2",
+      "net": "N2",
       "block": "stub_n2",
       "port": "PAD"
     },
     {
-      "net": "na",
+      "net": "NA",
       "block": "stub_na",
       "port": "PAD"
     }

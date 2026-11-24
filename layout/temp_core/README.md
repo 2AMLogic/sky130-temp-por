@@ -45,7 +45,7 @@ python3 layout/bin/check-promotion.py layout/temp_core/cell.json
 
 1. **`xq1`** calls `klt gen bjt_array` once (`rows=1 cols=1 dummy=0`,
    `emitter_um=3.4`, closed collector ring). It wires the base `Q0_B` to the
-   ring's own tap `COLL_E` and promotes the emitter as `na`. Outputs:
+   ring's own tap `COLL_E` and promotes the emitter as `NA`. Outputs:
    `xq1.compose.request.json`, `xq1.compose.response.json`, `xq1.gds`.
 2. **Final stage** (154 blocks). It places 33 `mos_array` 1x1 blocks, 16
    n-well `guard_ring` tap islands, 10 p-tap `guard_ring` islands, 5
@@ -139,7 +139,7 @@ Coordinates are in um.
   have the same card as in `bias_core` (`VSS VSS <emitter>`), so only the
   emitter net name differs (`NC` here, `ec` there). That block's existing
   `ec` and `vss` escape stubs are declared as its ports. `XQ1` is the `xq1`
-  stage at (306.38, -2.0). Its `na` port is the emitter pad, and its `vss`
+  stage at (306.38, -2.0). Its `NA` port is the emitter pad, and its `vss`
   port is the collector ring's own li1 at `COLL_E`.
 - **Ports** are declare-only li1 stubs on the west edge: `VDD`/`VSS` at
   x=-6, and `IBIAS`, `EN`, `PTAT`, `CTAT` at x=-10 on their own track's y.
@@ -231,8 +231,8 @@ well-to-tap-distance rule, so none of those is claimed. The deck is
 **Extract.** `klt extract --deck sky130`: `extracted`, 48 devices, 24 nets,
 24 pin labels, `dummy_devices_dropped: 0`, and empty `single_terminal_nets`,
 `dead_metal`, `unbiased_pmos_body_nets` and `missing_flavour_markers`.
-`merged_net_labels` holds only the three intended joins with the reused
-blocks' own labels: `NA|na` (`xq1` stage), `NC|ec` and `VSS|vss`
+`merged_net_labels` holds only the two intended joins with the reused
+blocks' own labels: `NC|ec` and `VSS|vss`
 (`bias_core_pnp8_leg`, `xq1`). As drawn, independently of LVS:
 
 | Device | Netlist `L`, `W` (um) | Extracted `l_um`, `w_um` | `r_ohm` (deck value) |

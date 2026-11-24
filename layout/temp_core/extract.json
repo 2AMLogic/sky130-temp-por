@@ -8,8 +8,8 @@
   "top": "temp_core",
   "dbu_um": 0.001,
   "netlist_path": "temp_core.spice",
-  "netlist_sha256": "6947fa080e68e526a961e0e41f949fd9a6f6de2dba95c17192ed1e73872ab42f",
-  "netlist_normalized_sha256": "a2fa3905a5090ed9fbf9a94366b58d333adf59bb5ac5fd533b716afe43f91d80",
+  "netlist_sha256": "67d188ea9f4ba4ea8307755d0965292d38f1471564088a6495d9b935651da45a",
+  "netlist_normalized_sha256": "856fd6497bbe4b13866375a6abb3c03d533b20682226fef117fb638fe138fc26",
   "status": "extracted",
   "device_count": 48,
   "net_count": 24,
@@ -101,7 +101,7 @@
           "array_index": null
         },
         {
-          "cell": "mos_array",
+          "cell": "minvn__core",
           "array_index": null
         }
       ]
@@ -129,7 +129,7 @@
           "array_index": null
         },
         {
-          "cell": "mos_array$14",
+          "cell": "mdn2__core",
           "array_index": null
         }
       ]
@@ -157,7 +157,7 @@
           "array_index": null
         },
         {
-          "cell": "mos_array$2",
+          "cell": "mbd__core",
           "array_index": null
         }
       ]
@@ -185,7 +185,7 @@
           "array_index": null
         },
         {
-          "cell": "mos_array$4",
+          "cell": "mbn1__core",
           "array_index": null
         }
       ]
@@ -213,7 +213,7 @@
           "array_index": null
         },
         {
-          "cell": "mos_array$5",
+          "cell": "mbn2__core",
           "array_index": null
         }
       ]
@@ -241,7 +241,7 @@
           "array_index": null
         },
         {
-          "cell": "mos_array$9",
+          "cell": "msu3__core",
           "array_index": null
         }
       ]
@@ -269,7 +269,7 @@
           "array_index": null
         },
         {
-          "cell": "mos_array$11",
+          "cell": "ml1__core",
           "array_index": null
         }
       ]
@@ -297,7 +297,7 @@
           "array_index": null
         },
         {
-          "cell": "mos_array$12",
+          "cell": "ml2__core",
           "array_index": null
         }
       ]
@@ -325,7 +325,7 @@
           "array_index": null
         },
         {
-          "cell": "mos_array$13",
+          "cell": "ms2n__core",
           "array_index": null
         }
       ]
@@ -353,7 +353,7 @@
           "array_index": null
         },
         {
-          "cell": "mos_array$20",
+          "cell": "mcb__core",
           "array_index": null
         }
       ]
@@ -381,7 +381,7 @@
           "array_index": null
         },
         {
-          "cell": "mos_array$21",
+          "cell": "msu1__core",
           "array_index": null
         }
       ]
@@ -409,7 +409,7 @@
           "array_index": null
         },
         {
-          "cell": "mos_array$15",
+          "cell": "menpt__core",
           "array_index": null
         }
       ]
@@ -437,7 +437,7 @@
           "array_index": null
         },
         {
-          "cell": "mos_array$22",
+          "cell": "msu4__core",
           "array_index": null
         }
       ]
@@ -465,7 +465,7 @@
           "array_index": null
         },
         {
-          "cell": "mos_array$17",
+          "cell": "minvp__core",
           "array_index": null
         }
       ]
@@ -493,7 +493,7 @@
           "array_index": null
         },
         {
-          "cell": "mos_array$18",
+          "cell": "menpg__core",
           "array_index": null
         }
       ]
@@ -521,7 +521,7 @@
           "array_index": null
         },
         {
-          "cell": "mos_array$27",
+          "cell": "mp1__core",
           "array_index": null
         }
       ]
@@ -532,7 +532,7 @@
       "nets": {
         "s": "M1D",
         "g": "PCAS",
-        "d": "NA|na",
+        "d": "NA",
         "b": "VDD"
       },
       "params": {
@@ -549,7 +549,7 @@
           "array_index": null
         },
         {
-          "cell": "mos_array$28",
+          "cell": "mpc1__core",
           "array_index": null
         }
       ]
@@ -577,7 +577,7 @@
           "array_index": null
         },
         {
-          "cell": "mos_array$29",
+          "cell": "mp2__core",
           "array_index": null
         }
       ]
@@ -605,7 +605,7 @@
           "array_index": null
         },
         {
-          "cell": "mos_array$30",
+          "cell": "mpc2__core",
           "array_index": null
         }
       ]
@@ -633,7 +633,7 @@
           "array_index": null
         },
         {
-          "cell": "mos_array$31",
+          "cell": "mp3__core",
           "array_index": null
         }
       ]
@@ -661,7 +661,7 @@
           "array_index": null
         },
         {
-          "cell": "mos_array$32",
+          "cell": "mpc3__core",
           "array_index": null
         }
       ]
@@ -689,7 +689,7 @@
           "array_index": null
         },
         {
-          "cell": "mos_array$19",
+          "cell": "mbp__core",
           "array_index": null
         }
       ]
@@ -717,7 +717,7 @@
           "array_index": null
         },
         {
-          "cell": "mos_array$16",
+          "cell": "menct__core",
           "array_index": null
         }
       ]
@@ -745,7 +745,7 @@
           "array_index": null
         },
         {
-          "cell": "mos_array$23",
+          "cell": "ms2p__core",
           "array_index": null
         }
       ]
@@ -773,7 +773,7 @@
           "array_index": null
         },
         {
-          "cell": "mos_array$24",
+          "cell": "mt__core",
           "array_index": null
         }
       ]
@@ -783,7 +783,7 @@
       "class": "pfet",
       "nets": {
         "s": "NT",
-        "g": "NA|na",
+        "g": "NA",
         "d": "N1",
         "b": "NT"
       },
@@ -801,7 +801,7 @@
           "array_index": null
         },
         {
-          "cell": "mos_array$25",
+          "cell": "mi1__core",
           "array_index": null
         }
       ]
@@ -829,7 +829,7 @@
           "array_index": null
         },
         {
-          "cell": "mos_array$26",
+          "cell": "mi2__core",
           "array_index": null
         }
       ]
@@ -936,7 +936,7 @@
       "nets": {
         "c": "VSS|vss",
         "b": "VSS|vss",
-        "e": "NA|na"
+        "e": "NA"
       },
       "params": {},
       "instance_path": [
@@ -949,7 +949,7 @@
           "array_index": null
         },
         {
-          "cell": "bjt_array$1",
+          "cell": "xq1_array__core",
           "array_index": null
         }
       ]
@@ -1001,7 +1001,7 @@
           "array_index": null
         },
         {
-          "cell": "mos_array$1",
+          "cell": "mpass__core",
           "array_index": null
         }
       ]
@@ -1096,7 +1096,7 @@
           "array_index": null
         },
         {
-          "cell": "cap_array",
+          "cell": "cc__core",
           "array_index": null
         }
       ]
@@ -1122,7 +1122,7 @@
           "array_index": null
         },
         {
-          "cell": "res_array$4",
+          "cell": "r2trim__core",
           "array_index": null
         }
       ]
@@ -1148,7 +1148,7 @@
           "array_index": null
         },
         {
-          "cell": "res_array$3",
+          "cell": "r2__core",
           "array_index": null
         }
       ]
@@ -1174,7 +1174,7 @@
           "array_index": null
         },
         {
-          "cell": "res_array$2",
+          "cell": "rz__core",
           "array_index": null
         }
       ]
@@ -1200,7 +1200,7 @@
           "array_index": null
         },
         {
-          "cell": "res_array$1",
+          "cell": "r1__core",
           "array_index": null
         }
       ]
@@ -1209,7 +1209,7 @@
       "name": "$48",
       "class": "res_xhigh_po",
       "nets": {
-        "a": "NA|na",
+        "a": "NA",
         "b": "CTAT",
         "w": "VSS|vss"
       },
@@ -1226,7 +1226,7 @@
           "array_index": null
         },
         {
-          "cell": "res_array",
+          "cell": "riso__core",
           "array_index": null
         }
       ]
@@ -1254,7 +1254,7 @@
           "array_index": null
         },
         {
-          "cell": "mos_array$3",
+          "cell": "mdnb__core",
           "array_index": null
         }
       ]
@@ -1282,7 +1282,7 @@
           "array_index": null
         },
         {
-          "cell": "mos_array$6",
+          "cell": "msu5__core",
           "array_index": null
         }
       ]
@@ -1310,7 +1310,7 @@
           "array_index": null
         },
         {
-          "cell": "mos_array$7",
+          "cell": "msu2__core",
           "array_index": null
         }
       ]
@@ -1338,7 +1338,7 @@
           "array_index": null
         },
         {
-          "cell": "mos_array$8",
+          "cell": "mdnd__core",
           "array_index": null
         }
       ]
@@ -1366,7 +1366,7 @@
           "array_index": null
         },
         {
-          "cell": "mos_array$10",
+          "cell": "mdnt__core",
           "array_index": null
         }
       ]
@@ -1515,7 +1515,7 @@
       ]
     },
     {
-      "name": "NA|na",
+      "name": "NA",
       "pin": true,
       "device_count": 4,
       "net_id": 20,
@@ -1527,7 +1527,7 @@
           "y_um": 22.095
         },
         {
-          "text": "na",
+          "text": "NA",
           "x_um": 308.08,
           "y_um": -0.3
         }
@@ -1771,7 +1771,6 @@
     }
   ],
   "warnings": [
-    "net 'NA|na' merges 2 distinct labels (NA, na) onto one net -- KLayout joins multiple labels found on the same electrical net (as '|' here and in the written netlist, matching NetlistSpiceWriter's own node-name escaping); this usually means two differently-named nets were shorted together in the layout -- see docs/cli/extract.md's 'Merged net labels' section.",
     "net 'NC|ec' merges 2 distinct labels (NC, ec) onto one net -- KLayout joins multiple labels found on the same electrical net (as '|' here and in the written netlist, matching NetlistSpiceWriter's own node-name escaping); this usually means two differently-named nets were shorted together in the layout -- see docs/cli/extract.md's 'Merged net labels' section.",
     "net 'VSS|vss' merges 2 distinct labels (VSS, vss) onto one net -- KLayout joins multiple labels found on the same electrical net (as '|' here and in the written netlist, matching NetlistSpiceWriter's own node-name escaping); this usually means two differently-named nets were shorted together in the layout -- see docs/cli/extract.md's 'Merged net labels' section.",
     "1 drawn capacitor ('sky130_fd_pr__model__cap_mim') written as a fixed-value 'C' card (the deck's nominal area+perimeter value) -- PDK process corners (e.g. mimcap_ff/mimcap_ss) do not apply to it, so schematic-vs-extracted deltas at non-typical corners include a capacitor-corner term; pass --pdk to bind the PDK capacitor subcircuit instead. See docs/cli/extract.md's 'SPICE model binding' section.",
@@ -1781,13 +1780,6 @@
   "abstracted_cells": [],
   "unmodelled_poly": [],
   "merged_net_labels": [
-    {
-      "net": "NA|na",
-      "labels": [
-        "NA",
-        "na"
-      ]
-    },
     {
       "net": "NC|ec",
       "labels": [
@@ -1832,7 +1824,7 @@
       "released": true
     },
     "input": {
-      "content_hash": "sha256:4bb46c257d1346513510c41e7bb6d3eb12629ea2d8b63dab804ee9a394ac4f06",
+      "content_hash": "sha256:8ade1140a09e0644d254b9104ec2e22f73e4fb53e382f699ab43413b2ce675cc",
       "role": "layout"
     }
   },
@@ -1847,13 +1839,13 @@
   "timing": {
     "stages": {
       "read_layout": 0.002,
-      "device_extraction": 0.05,
+      "device_extraction": 0.064,
       "diagnostics": 0.0,
-      "netlist_write": 0.003,
+      "netlist_write": 0.001,
       "netlist_hash": 0.0,
       "netlist_normalized_hash": 0.001
     },
-    "total_seconds": 0.084,
-    "unattributed_seconds": 0.028
+    "total_seconds": 0.097,
+    "unattributed_seconds": 0.03
   }
 }

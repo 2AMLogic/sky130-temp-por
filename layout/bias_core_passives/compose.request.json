@@ -46,7 +46,7 @@
   },
   "connectivity": [
     {
-      "net": "nb",
+      "net": "NB",
       "pins": [
         {
           "block": "rt",
@@ -59,7 +59,7 @@
       ]
     },
     {
-      "net": "nz",
+      "net": "NZ",
       "pins": [
         {
           "block": "rz",
@@ -84,12 +84,12 @@
       "port": "R0_B"
     },
     {
-      "net": "n2",
+      "net": "N2",
       "block": "rz",
       "port": "R0_A"
     },
     {
-      "net": "pg",
+      "net": "PG",
       "block": "cc",
       "port": "C0_TOP"
     },

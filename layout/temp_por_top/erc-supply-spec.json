@@ -23,7 +23,7 @@
   "nets": [
     { "name": "VDD", "kind": "supply" },
     { "name": "VSS", "kind": "supply" },
-    { "name": "NT", "kind": "signal" }
+    { "name": "NT", "kind": "signal", "islands": 2 }
   ],
   "ties": [
     {

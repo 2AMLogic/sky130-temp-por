@@ -8,8 +8,8 @@
   "top": "bias_core_settle_flag",
   "dbu_um": 0.001,
   "netlist_path": "bias_core_settle_flag.spice",
-  "netlist_sha256": "4aead78f8276eded672d1f6734ec303c8e8dd08875692993f94048cc095e0c2e",
-  "netlist_normalized_sha256": "a5a37fd2fbebbb01cf50e5afa03336c5520794a696e2e85774182ae861a1abc0",
+  "netlist_sha256": "34e333843ea8b904b753d7c9bd6f8d3206295e3d5ed41fee42441128a6554f26",
+  "netlist_normalized_sha256": "5b996a761a793ea258358df21e1f30f5ed12f3a6f09c0ef3992af8427f1989f9",
   "status": "extracted",
   "device_count": 11,
   "net_count": 11,
@@ -116,7 +116,7 @@
       "class": "pfet",
       "nets": {
         "s": "noko",
-        "g": "na",
+        "g": "NA",
         "d": "tok",
         "b": "vdd"
       },
@@ -256,7 +256,7 @@
       "class": "pfet",
       "nets": {
         "s": "vdd",
-        "g": "pb",
+        "g": "PB",
         "d": "nokx",
         "b": "vdd"
       },
@@ -284,7 +284,7 @@
       "class": "pfet",
       "nets": {
         "s": "vdd",
-        "g": "pb",
+        "g": "PB",
         "d": "tok",
         "b": "vdd"
       },
@@ -366,11 +366,44 @@
   ],
   "nets": [
     {
+      "name": "NA",
+      "pin": true,
+      "device_count": 1,
+      "net_id": 9,
+      "pin_index": 0,
+      "label_positions_um": [
+        {
+          "text": "NA",
+          "x_um": 45.58,
+          "y_um": 22.21
+        }
+      ]
+    },
+    {
+      "name": "PB",
+      "pin": true,
+      "device_count": 2,
+      "net_id": 6,
+      "pin_index": 1,
+      "label_positions_um": [
+        {
+          "text": "PB",
+          "x_um": -4.0,
+          "y_um": 11.585
+        },
+        {
+          "text": "PB",
+          "x_um": 29.42,
+          "y_um": 11.5
+        }
+      ]
+    },
+    {
       "name": "bias_ok",
       "pin": true,
       "device_count": 3,
       "net_id": 11,
-      "pin_index": 0,
+      "pin_index": 2,
       "label_positions_um": [
         {
           "text": "bias_ok",
@@ -385,25 +418,11 @@
       ]
     },
     {
-      "name": "na",
-      "pin": true,
-      "device_count": 1,
-      "net_id": 9,
-      "pin_index": 1,
-      "label_positions_um": [
-        {
-          "text": "na",
-          "x_um": 45.58,
-          "y_um": 22.21
-        }
-      ]
-    },
-    {
       "name": "nbtop",
       "pin": true,
       "device_count": 1,
       "net_id": 8,
-      "pin_index": 2,
+      "pin_index": 3,
       "label_positions_um": [
         {
           "text": "nbtop",
@@ -417,7 +436,7 @@
       "pin": true,
       "device_count": 1,
       "net_id": 2,
-      "pin_index": 3,
+      "pin_index": 4,
       "label_positions_um": [
         {
           "text": "nkg",
@@ -436,7 +455,7 @@
       "pin": true,
       "device_count": 4,
       "net_id": 5,
-      "pin_index": 4,
+      "pin_index": 5,
       "label_positions_um": [
         {
           "text": "nokl",
@@ -450,7 +469,7 @@
       "pin": true,
       "device_count": 4,
       "net_id": 4,
-      "pin_index": 5,
+      "pin_index": 6,
       "label_positions_um": [
         {
           "text": "noko",
@@ -464,7 +483,7 @@
       "pin": true,
       "device_count": 5,
       "net_id": 3,
-      "pin_index": 6,
+      "pin_index": 7,
       "label_positions_um": [
         {
           "text": "nokx",
@@ -475,25 +494,6 @@
           "text": "nokx",
           "x_um": 61.5,
           "y_um": 13.11
-        }
-      ]
-    },
-    {
-      "name": "pb",
-      "pin": true,
-      "device_count": 2,
-      "net_id": 6,
-      "pin_index": 7,
-      "label_positions_um": [
-        {
-          "text": "pb",
-          "x_um": -4.0,
-          "y_um": 11.585
-        },
-        {
-          "text": "pb",
-          "x_um": 29.42,
-          "y_um": 11.5
         }
       ]
     },
@@ -586,7 +586,7 @@
       "released": true
     },
     "input": {
-      "content_hash": "sha256:4510ddc4831f411ae7d3284f87b41874836a575a0bfdb18955e235daa838739f",
+      "content_hash": "sha256:6aeb9d1f69a9b723bcd922b0d5ac143e51030bdd95e92c1efa71c80c8d316a47",
       "role": "layout"
     }
   },
@@ -601,13 +601,13 @@
   "timing": {
     "stages": {
       "read_layout": 0.001,
-      "device_extraction": 0.019,
+      "device_extraction": 0.018,
       "diagnostics": 0.0,
       "netlist_write": 0.0,
       "netlist_hash": 0.0,
       "netlist_normalized_hash": 0.0
     },
-    "total_seconds": 0.027,
-    "unattributed_seconds": 0.007
+    "total_seconds": 0.026,
+    "unattributed_seconds": 0.006
   }
 }

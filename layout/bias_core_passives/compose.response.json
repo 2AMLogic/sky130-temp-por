@@ -47,8 +47,8 @@
       "port": "R0_B"
     },
     {
-      "name": "n2",
-      "net": "n2",
+      "name": "N2",
+      "net": "N2",
       "layer": {
         "layer": 67,
         "datatype": 20,
@@ -62,8 +62,8 @@
       "port": "R0_A"
     },
     {
-      "name": "pg",
-      "net": "pg",
+      "name": "PG",
+      "net": "PG",
       "layer": {
         "layer": 71,
         "datatype": 20,
@@ -267,7 +267,7 @@
   ],
   "nets": [
     {
-      "net": "nb",
+      "net": "NB",
       "pins": [
         {
           "block": "rt",
@@ -303,7 +303,7 @@
       ]
     },
     {
-      "net": "nz",
+      "net": "NZ",
       "pins": [
         {
           "block": "rz",
@@ -353,13 +353,13 @@
       "labelled": true
     },
     {
-      "net": "n2",
+      "net": "N2",
       "block": "rz",
       "port": "R0_A",
       "labelled": true
     },
     {
-      "net": "pg",
+      "net": "PG",
       "block": "cc",
       "port": "C0_TOP",
       "labelled": true
@@ -423,7 +423,10 @@
     "pdk": {
       "name": "sky130A",
       "source": "search root: ~/.ciel",
-      "version": "open_pdks f6eeac7dad085ffcc829ccfd721f7b4ce39edcf7"
+      "version": "open_pdks f6eeac7dad085ffcc829ccfd721f7b4ce39edcf7",
+      "ambiguous_sources": [
+        "search root: ~/.volare"
+      ]
     },
     "deck": null,
     "input": null

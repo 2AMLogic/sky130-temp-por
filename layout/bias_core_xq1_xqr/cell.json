@@ -29,7 +29,7 @@
     "cell.json's connectivity[]/pins[] (as pnp8_leg does) avoids that",
     "failure mode and leaves 'vss' (both base pins, wired together -- see",
     "below) and each device's own emitter (declare-only top-level pins",
-    "'na'/'er', never bussed to anything) DRC-clean, correctly separate,",
+    "'NA'/'er', never bussed to anything) DRC-clean, correctly separate,",
     "and individually LVS-matchable against the design's own device cards",
     "-- only the collector-to-VSS strap this cell's own LVS run against the",
     "*unmodified* design/netlist/bias_core.spice reference still (honestly)",
@@ -39,7 +39,7 @@
     "(met1) for the one same-block self-net ('vss' bussing Q0_B and Q1_B),",
     "which otherwise jogs directly over Q1_E's own drawn pad -- the same",
     "cross-block bus routing example layout/bias_core_pnp8_leg/ used, just",
-    "with one same-block net here instead of two ('na'/'er' are each a",
+    "with one same-block net here instead of two ('NA'/'er' are each a",
     "single-pin declare-only top-level pin, not a connectivity[] net, so",
     "neither needs its own routing pass).",
     "",
@@ -163,7 +163,7 @@
     }
   ],
   "pins": [
-    { "net": "na", "block": "array", "port": "Q0_E" },
+    { "net": "NA", "block": "array", "port": "Q0_E" },
     { "net": "er", "block": "array", "port": "Q1_E" },
     { "net": "vss", "block": "stub_vss", "port": "PAD" }
   ],

@@ -78,29 +78,29 @@ layout/bias_core/cell.json` exits 0, with the result committed as
 connectivity/pin nets at 39 declared pads, and each net is exactly one
 island. The census uses the ERC spec's graph, including the `devices[]`
 cuts, so each island name also shows that the nets stay apart: `VDD,vdd`,
-`VSS,vss`, `VREF,vref`, `ec`, `er`, `n2`, `na`, `nb`, `nbtop`, `nkg`,
-`nokx`, `pb`, `pg`, `IBIAS,ibias` and `BIAS_OK,bias_ok`. One probe has a
-weaker guarantee: `passives.nb` is a net that `bias_core_passives` wires
+`VSS,vss`, `VREF,vref`, `ec`, `er`, `N2`, `NA`, `NB`, `nbtop`, `nkg`,
+`nokx`, `PB`, `PG`, `IBIAS,ibias` and `BIAS_OK,bias_ok`. One probe has a
+weaker guarantee: `passives.NB` is a net that `bias_core_passives` wires
 internally but cannot promote, because `klt gen-compose` refuses `pins[]`
 on a port that its `connectivity[]` already wires. That block's
-`compose.response.json` therefore reports no `nb` port. The probe is
+`compose.response.json` therefore reports no `NB` port. The probe is
 recorded as `assembly_declaration_unpromoted_sibling_port`, and the #69
 frame check cannot run for it. The landing is still independently
 confirmed by the LVS match on `NB`. The census proves same-net
 connectivity and, since #92, that no two declared nets share an
 extracted cluster (a cross-net merge exits 1; checked on cluster ids,
 case-folding label aliases such as `VDD`/`vdd`). Running with a spec that
-drops `devices[]` demonstrably fails this check (`n2`/`pg`, `VREF`/`er`,
-`VDD`/`nokx` and `ec`/`nb`/`nbtop` merge). Extract/LVS (27 separate nets
+drops `devices[]` demonstrably fails this check (`N2`/`PG`, `VREF`/`er`,
+`VDD`/`nokx` and `ec`/`NB`/`nbtop` merge). Extract/LVS (27 separate nets
 matched one-to-one) remains the independent check on cross-net shorts.
 
-The `passives.nb` fallback is an explicit, census-owned opt-in in
+The `passives.NB` fallback is an explicit, census-owned opt-in in
 `pad-island-census-spec.json` (keyed by block and port; `cell.json` cannot
 carry it because klt rejects unknown keys). Any other sibling port missing
 from its `compose.response.json` fails the census. Group
 `declared_frame_matches_source` is `true` only when every pad's frame was
 verified, `false` if any mismatches, and `null` when unverified: in the
-committed evidence `nb` and the declare-only `VDD`/`VSS` stub groups are
+committed evidence `NB` and the declare-only `VDD`/`VSS` stub groups are
 `null` (listed in `summary.frame_unverified_nets`).
 
 ## Placement
@@ -170,16 +170,16 @@ met3, `metal5` = met4, `metal6` = met5.
 | `VDD` | li1 (`metal`) | default | `mirror_amp` / `startup` / `settle_flag` / `passives` `vdd` + west `stub_VDD` |
 | `VSS` | met1 (`metal2`) | default | `mirror_amp` / `startup` / `settle_flag` `vss` + west `stub_VSS` |
 | `nkg` | met2 (`metal3`) | default | `startup` ↔ `settle_flag` |
-| `n2` | met3 (`metal4`) | 0.4 | `passives` ↔ `mirror_amp` |
-| `nb` | met3 (`metal4`) | 0.4 | `passives` (XRT/XR1 strap) ↔ `mirror_amp` |
+| `N2` | met3 (`metal4`) | 0.4 | `passives` ↔ `mirror_amp` |
+| `NB` | met3 (`metal4`) | 0.4 | `passives` (XRT/XR1 strap) ↔ `mirror_amp` |
 | `ec` | met3 (`metal4`) | 0.4 | `passives` ↔ `pnp8_leg` |
 | `VREF` | met3 (`metal4`) | 0.4 | `passives` ↔ `mirror_amp` (top-level pin) |
 | `er` | met3 (`metal4`) | 0.4 | `passives` ↔ `xq1_xqr` |
 | `nbtop` | met3 (`metal4`) | 0.4 | `passives` / `settle_flag` → `mirror_amp` |
 | `nokx` | met4 (`metal5`) | 0.4 | `passives` (XCOK top plate) ↔ `settle_flag` |
-| `pg` | met4 (`metal5`) | 0.4 | `passives` (XCC top plate) / `startup` → `mirror_amp` |
-| `na` | met4 (`metal5`) | 0.4 | `xq1_xqr` / `settle_flag` → `mirror_amp` |
-| `pb` | met5 (`metal6`) | 1.6 | `startup` / `settle_flag` → `mirror_amp` |
+| `PG` | met4 (`metal5`) | 0.4 | `passives` (XCC top plate) / `startup` → `mirror_amp` |
+| `NA` | met4 (`metal5`) | 0.4 | `xq1_xqr` / `settle_flag` → `mirror_amp` |
+| `PB` | met5 (`metal6`) | 1.6 | `startup` / `settle_flag` → `mirror_amp` |
 
 `IBIAS` and `BIAS_OK` are declare-only top-level pins on the one sub-block
 pad each touches (`mirror_amp.ibias`, `settle_flag.bias_ok`). `VREF` used
@@ -187,8 +187,8 @@ to be declare-only too, but is now a real `connectivity[]` net named
 `VREF`. A port may be promoted by `pins[]` or wired by `connectivity[]`,
 not both, and the net has to reach `passives.vref` (XR2's node).
 
-`nb` is a tenth net beyond the nine the issue named. The `mirror_amp` side
-of `nb` (promoted by #56) has to meet XRT/XR1's shared strap inside
+`NB` is a tenth net beyond the nine the issue named. The `mirror_amp` side
+of `NB` (promoted by #56) has to meet XRT/XR1's shared strap inside
 `bias_core_passives`. That strap is not a promoted port of that block (see
 the census note above), so the assembly declares it at the strap's
 midpoint (19.84, 1.0), read from the block's own GDS.
@@ -220,33 +220,33 @@ and `VDD` (li1), `VSS` (met1) and `nkg` (met2) used all three across the
 shared corridor between the upper transistor row (y ≈ 94–165) and
 `passives` (y = -50…-28). Every further net crossed one of them (#64).
 klayout-tools#2738 added met3/met4/met5 as routing roles, so the nine
-remaining nets (ten with `nb`) go on those three new planes and never
+remaining nets (ten with `NB`) go on those three new planes and never
 touch the lower three. `VDD`, `VSS` and `nkg` keep their existing routes
 unchanged.
 
 **Assignment rule.** No two nets on one plane may cross. Each plane
 therefore gets a family of nets whose routes nest or sit side by side.
 
-- **met3 (`metal4`): the vertical risers out of `passives`.** `n2`, `nb`,
+- **met3 (`metal4`): the vertical risers out of `passives`.** `N2`, `NB`,
   `ec`, `VREF`, `er` and `nbtop` all start on `passives`' li1 pads along
-  y ≈ -49. Each rises on its own x column (`nbtop` x=-12, `nb` x=-10, `ec`
-  x=378, `er` x=380, `VREF` x=1424), with `n2` running west along y=-30 to
-  `mirror_amp`. Each then turns along its own y lane: `n2` -30, `nb`
+  y ≈ -49. Each rises on its own x column (`nbtop` x=-12, `NB` x=-10, `ec`
+  x=378, `er` x=380, `VREF` x=1424), with `N2` running west along y=-30 to
+  `mirror_amp`. Each then turns along its own y lane: `N2` -30, `NB`
   -38→122, `ec` 110, `er` -54→112, `VREF` 126, `nbtop` 126/130. Lanes are
   nested so that a net that rises further west turns at a higher or lower
   y than its neighbour and never crosses it. `er` runs under the passives
   row at y=-54, below every other riser's start, to reach x=380.
 - **met4 (`metal5`): the nets whose `passives` end already sits on met4,
-  plus `na`.** `pg` and `nokx` land on MiM top-plate contacts, which are
-  met4 by construction (`passives`' `pg`/`nokx` ports are 71/20). Keeping
+  plus `NA`.** `PG` and `nokx` land on MiM top-plate contacts, which are
+  met4 by construction (`passives`' `PG`/`nokx` ports are 71/20). Keeping
   them on met4 avoids a via ladder through the met3 bottom-plate level
-  next to the caps. `pg` rises at x=1342 and runs west along y=116, `nokx`
-  rises at x=5530 and runs west along y=88, and `na` runs along y=106/108
+  next to the caps. `PG` rises at x=1342 and runs west along y=116, `nokx`
+  rises at x=5530 and runs west along y=88, and `NA` runs along y=106/108
   (from `xq1_xqr`) and y=120 (from `settle_flag`). None of these lanes
   cross.
-- **met5 (`metal6`): `pb` alone.** It spans the full upper row
+- **met5 (`metal6`): `PB` alone.** It spans the full upper row
   (`settle_flag` x≈5446 → `mirror_amp` x=16) along y=118, crossing the
-  `pg` and `na` met4 lanes, so it takes the top plane by itself. Width is
+  `PG` and `NA` met4 lanes, so it takes the top plane by itself. Width is
   1.6 µm, sky130 `m5.1`'s minimum met5 width (the deck's own rule). The
   lower-plane 0.4 µm width is **not** reused on met5. The via4 landings
   are drawn by `klt gen-compose`'s `via5` role (physical via4, 71/44) and
@@ -269,7 +269,7 @@ checks crossings and own-geometry collisions, followed by `klt drc`
 `XCOK` (`VDD`–`NOKX`, 6×6 µm, capm at (5527.36, -49.5)–(5533.36, -43.5)).
 Both have their bottom plate on met3 and their top plate (capm, 89/44)
 contacted by via3 up to met4. The only routes that touch them are the
-intended ones: `pg` and `nokx` land on the met4 top-plate contacts, and
+intended ones: `PG` and `nokx` land on the met4 top-plate contacts, and
 `VDD` lands on `XCOK`'s met3 bottom plate (`passives.vdd`). The
 clearances below were measured on the committed GDS, with each
 unrelated net checked against the plates:
@@ -281,7 +281,7 @@ unrelated net checked against the plates:
 | unrelated met4 → capm | > 20 µm (none within the search radius) | — |
 | unrelated met4 → top-plate contact met4 | 1.562 µm | `m4.2` 0.3 µm |
 | met4 overlapping capm that is not the plate's own net | 0 shapes | — |
-| met5 (`pb`) → capm | > 20 µm | — |
+| met5 (`PB`) → capm | > 20 µm | — |
 
 The routing kept at least 2.7 µm (met3) and 1.5 µm (met4) clear of
 each cap's plates and plate contacts, well above the 0.3 µm minimum
@@ -304,7 +304,7 @@ spacing. `klt drc` over the deck's `capm.*` rules (`capm.1`, `capm.2a`,
   filed for #81: `klt gen-compose` refuses `pins[]` on a port its own
   `connectivity[]` already wires. A composed cell therefore cannot expose an internally
   wired net as a port without adding a stub branch, which is why
-  `passives.nb` is assembly-declared (see the census note above).
+  `passives.NB` is assembly-declared (see the census note above).
 - [`2AMLogic/klayout-tools#2822`](https://github.com/2AMLogic/klayout-tools/issues/2822) —
   already tracked: `klt erc`'s spec rejects unknown top-level keys at this
   pin, so a spec can no longer carry inline rationale (`_comment`). It now lives in
@@ -335,7 +335,7 @@ Assembly changes: `passives` is now placed at `x=-332.5` so that every passives 
 `nbtop` keeps its previous assembly coordinate (the longer `XRT` shifts the rest of the row by
 332.5 um). `nbtop` now leaves the west end of `XRT` and runs on metal4 below the passives
 (`y=-60`) to the existing `x=-12` riser. The `settle_flag` port waypoints for `VDD`
-(`y=143.085`), `nbtop` and `na` were re-derived, and `BIAS_OK` is now at `(5443.585, 130.0)`.
+(`y=143.085`), `nbtop` and `NA` were re-derived, and `BIAS_OK` is now at `(5443.585, 130.0)`.
 LVS does not check resistor geometry; the extracted `XRT` is `L=350 W=2` (R = 350 kohm), equal
 to the landed card. `temp_por_top` follows (154/154 devices, 71/71 nets).
 

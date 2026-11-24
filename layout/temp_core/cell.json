@@ -48,7 +48,7 @@
     }
    ],
    "pins": [
-    {"net": "na", "block": "array", "port": "Q0_E"}
+    {"net": "NA", "block": "array", "port": "Q0_E"}
    ]
   },
   {
@@ -540,7 +540,7 @@
       "from_stage": "xq1",
       "ports": [
        {
-        "name": "na",
+        "name": "NA",
         "x_um": 1.7,
         "y_um": 1.7,
         "layer": {"layer": 67, "datatype": 20},
@@ -5002,7 +5002,7 @@
       {"block": "j_na_mpc1_u0_d", "port": "N"},
       {"block": "riso", "port": "R0_A"},
       {"block": "j_na_riso_r0_a", "port": "S"},
-      {"block": "xq1", "port": "na"},
+      {"block": "xq1", "port": "NA"},
       {"block": "j_na_xq1_na", "port": "S"},
       {"block": "j_na_mi1_u0_g", "port": "E"},
       {"block": "j_na_mpc1_u0_d", "port": "W"},
@@ -5028,7 +5028,7 @@
        "waypoints_um": [[149.69, 18.72]]
       },
       {
-       "from_pin": {"block": "xq1", "port": "na"},
+       "from_pin": {"block": "xq1", "port": "NA"},
        "to_pin": {"block": "j_na_xq1_na", "port": "S"},
        "waypoints_um": [[308.08, 18.72]]
       },

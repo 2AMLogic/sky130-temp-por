@@ -70,7 +70,7 @@ bias_core` is the whole cell, not this group alone.
 `placement.strategy: "explicit"`. Drawn extent 91.18 x 72.17 um
 (`x0=-2.19 y0=-6.085 x1=88.985 y1=66.085`); the placed-block bbox
 `compose.response.json` reports is `x0=-2.19 y0=0.0 x1=87.84 y1=63.12`, the
-difference being the `vss` bus below the NMOS row and the `vdd`/`na` runs
+difference being the `vss` bus below the NMOS row and the `vdd`/`NA` runs
 above the PMOS row.
 
 - **NMOS row along `y=0`**, `orientation: "none"`, so every NFET gate faces
@@ -110,16 +110,16 @@ behind that claim.
 
 ## Routing
 
-Three planes, assigned per net — and, for `n2`, per **leg** — through
+Three planes, assigned per net — and, for `N2`, per **leg** — through
 `connectivity[].layer_role` / `connectivity[].legs[].layer_role`
 ([`klayout-tools#1655`](https://github.com/2AMLogic/klayout-tools/issues/1655)),
 so no two nets sharing a plane ever cross:
 
 | Plane | Nets | Where |
 |---|---|---|
-| `metal` (li1) | `nbg`, `nt`, `n1` | three local nets in disjoint x ranges (26.4–33.4, 67.6–81.2, 72.4–83.4; `nt` stays at `y >= 23.97`, above `n1`'s channel lane) |
-| `metal2` (met1) | `vdd`, `vss`, `pb`, `n2`'s `ml2.D -> ms2n.G` leg | four disjoint y bands: the `vdd` bus at `y=65.0` (above every PMOS top) with a riser down each tap/source column, the `vss` bus at `y=-6.0` below the NMOS row, `pb`'s channel lane at `y=18.0`, and `n2`'s channel lane at `y=12.0` |
-| `metal3` (met2) | `pg`, `na`, `n2`'s `mi2.D -> ml2.D` leg | `pg`'s channel lane at `y=14.0`; `na`'s "attic" run at `y=66.0` straight over the PMOS row; `n2`'s column at `x=88.9`, east of every block |
+| `metal` (li1) | `NBG`, `NT`, `N1` | three local nets in disjoint x ranges (26.4–33.4, 67.6–81.2, 72.4–83.4; `NT` stays at `y >= 23.97`, above `N1`'s channel lane) |
+| `metal2` (met1) | `vdd`, `vss`, `PB`, `N2`'s `ml2.D -> ms2n.G` leg | four disjoint y bands: the `vdd` bus at `y=65.0` (above every PMOS top) with a riser down each tap/source column, the `vss` bus at `y=-6.0` below the NMOS row, `PB`'s channel lane at `y=18.0`, and `N2`'s channel lane at `y=12.0` |
+| `metal3` (met2) | `PG`, `NA`, `N2`'s `mi2.D -> ml2.D` leg | `PG`'s channel lane at `y=14.0`; `NA`'s "attic" run at `y=66.0` straight over the PMOS row; `N2`'s column at `x=88.9`, east of every block |
 
 Every leg is steered explicitly through `connectivity[].legs[]`
 ([`klayout-tools#1529`](https://github.com/2AMLogic/klayout-tools/issues/1529))
@@ -129,33 +129,33 @@ every named leg.
 
 Three of those choices are worth the words:
 
-**`na` goes over the roof, not through the channel.** `NA` runs from
+**`NA` goes over the roof, not through the channel.** `NA` runs from
 `XMP1`'s drain (left half) to `XMI1`'s gate (right half), i.e. across the
-whole cell — but `pg`'s own lane already owns the channel on met2 and `pb`'s
+whole cell — but `PG`'s own lane already owns the channel on met2 and `PB`'s
 owns it on met1 across exactly that x range. Since `gen-compose` *does*
 allow a route to plunge into its **own** endpoint's block (just not an
-unrelated one), `na` leaves `XMP1`'s drain eastward into the 1.82um gap at
+unrelated one), `NA` leaves `XMP1`'s drain eastward into the 1.82um gap at
 `x=23.5`, climbs to `y=66.0` — clear of `mpib`'s `y=63.12` top, the tallest
 block in the cell — runs the width of the PMOS row, and drops back down the
 `x=74.42` column straight through `mi1`'s own body onto its south-facing
 gate pad.
 
-**`n2` is the one net that needs two planes.** `XMS2N`'s gate sits directly
-*under* `pg`'s own channel lane, and the `XMI2` end sits east of every
+**`N2` is the one net that needs two planes.** `XMS2N`'s gate sits directly
+*under* `PG`'s own channel lane, and the `XMI2` end sits east of every
 block, so no single plane can carry `mi2.D`, `ml2.D` and `ms2n.G` at once
-without crossing `pg`. The two legs live on met2 and met1 respectively and
+without crossing `PG`. The two legs live on met2 and met1 respectively and
 stitch at their shared `ml2.U0_D` pin through the existing via-drop — which
 is exactly the non-planar case per-leg `layer_role` exists for.
 
 **The `vdd` bus runs above the PMOS row, not below it.** Below the row would
-put the bus in the channel, where it would have to cross `pb`'s and `n2`'s
+put the bus in the channel, where it would have to cross `PB`'s and `N2`'s
 met1 lanes; above it, each source/tap riser drops down a column that is
 empty except for its own endpoint's block, and the whole `y < 22` half of
 met1 stays free for signal routing.
 
 ### One routability lesson worth recording
 
-The first draft routed `nt`'s `mi1.U0_S -> mi2.U0_S` leg by climbing over
+The first draft routed `NT`'s `mi1.U0_S -> mi2.U0_S` leg by climbing over
 `mi1`, running east at `y=40.0`, and dropping *straight down the
 `x=81.21` column* onto `mi2`'s west-facing source pad — 8.4um through
 `mi2`'s own interior. `gen-compose` rejected it:
@@ -185,7 +185,7 @@ fields) at the `klt` build `layout/pdk.json` pins.
   `XMP1`/`XMP2`/`XMP3`/`XMPBN`/`XMBP`/`XMPIB`/`XMPT`/`XMI1`/`XMI2`/`XMS2P`
   PFETs and the five `XMBN`/`XMBN2`/`XML1`/`XML2`/`XMS2N` NFETs. The
   thirteen nets are exactly the thirteen boundary nodes — `vdd`, `vss`,
-  `pg`, `na`, `nbtop`, `vref`, `nbg`, `pb`, `nt`, `n1`, `n2`, `ibias`, `nb`.
+  `PG`, `NA`, `nbtop`, `vref`, `NBG`, `PB`, `NT`, `N1`, `N2`, `ibias`, `NB`.
 - **`klt lvs` against `reference.spice`: `match`** — 15/15 devices, 13/13
   nets, 13/13 pins, `mismatch_count: 0`, `error_count: 0`, and every one of
   the thirteen nets appears in `net_correspondence` as a pin.
@@ -219,16 +219,16 @@ Filed as a repo-hygiene follow-up, not a tool gap.
 ## Full-cell assembly pins (issue #56)
 
 This cell's own isolated LVS reference only needed `nbtop`/`vref`/`ibias`/
-`nb` exposed — the four nets that touch exactly one port in this device
+`NB` exposed — the four nets that touch exactly one port in this device
 group. Full-cell `bias_core` assembly (#40) needs every net that crosses
 this group's own boundary reachable from outside, and the #40 Builder's own
-assembly attempt found the other six (`na`/`pg`/`pb`/`vdd`/`vss`/`n2`) had
+assembly attempt found the other six (`NA`/`PG`/`PB`/`vdd`/`vss`/`N2`) had
 no external pad at all, plus `nbtop`/`vref`'s *existing* pads sat too deep
 inside this cell's own interior for `klt gen-compose`'s router to escape
 without a same-block self-collision (issue #1527) — see #56 for the full
 writeup.
 
-`pins[]` now also promotes `na`/`pg`/`pb`/`vdd`/`vss`/`n2`, each via a small
+`pins[]` now also promotes `NA`/`PG`/`PB`/`vdd`/`vss`/`N2`, each via a small
 declare-only metal stub (`klt draw`, no PDK awareness needed since it draws
 plain, DRC-legal-width `li1`) placed in the one genuinely obstruction-free
 column this floorplan has — the far west edge, past `nwt_mp2`'s own guard
@@ -238,14 +238,14 @@ ring, which nothing else in this cell ever reaches:
 |---|---|---|
 | `vdd` | new leg extending the existing `vdd` bus (already at `y=65.0`) west from `nwt_mp2.TAP_N` | `stub_vdd.PAD`, `x=-4.0, y=65.085` |
 | `vss` | new leg extending the existing `vss` bus (already at `y=-6.0`) west from `mbn.U0_S` | `stub_vss.PAD`, `x=-4.0, y=-5.915` |
-| `pg` | new leg branching west from `mp2.U0_G`, reusing `pg`'s own native `y=14.0` channel lane | `stub_pg.PAD`, `x=-4.0, y=14.085` |
-| `pb` | new leg branching west from `mbn2.U0_D`, reusing `pb`'s own native `y=18.0` channel lane | `stub_pb.PAD`, `x=-4.0, y=18.085` |
-| `n2` | new leg branching west from `ms2n.U0_G` on `metal3` (avoids `pb`'s own `metal2` riser at `x=36.9`) | `stub_n2.PAD`, `x=-4.0, y=12.085` |
-| `na` | new leg branching from `mp1.U0_D`'s own existing attic launch point, over the roof at `y=68.0` (one plane above the existing `na` route's own `y=66.0`, so the two never share a lane), down a dedicated west column | `stub_na.PAD`, `x=-6.415, y=9.0` |
+| `PG` | new leg branching west from `mp2.U0_G`, reusing `PG`'s own native `y=14.0` channel lane | `stub_pg.PAD`, `x=-4.0, y=14.085` |
+| `PB` | new leg branching west from `mbn2.U0_D`, reusing `PB`'s own native `y=18.0` channel lane | `stub_pb.PAD`, `x=-4.0, y=18.085` |
+| `N2` | new leg branching west from `ms2n.U0_G` on `metal3` (avoids `PB`'s own `metal2` riser at `x=36.9`) | `stub_n2.PAD`, `x=-4.0, y=12.085` |
+| `NA` | new leg branching from `mp1.U0_D`'s own existing attic launch point, over the roof at `y=68.0` (one plane above the existing `NA` route's own `y=66.0`, so the two never share a lane), down a dedicated west column | `stub_na.PAD`, `x=-6.415, y=9.0` |
 
 Every new leg is an *additional* branch off an already-connected pin (the
-existing routing for `nbtop`/`vref`/`ibias`/`nb`/`na`/`pg`/`pb`/`vdd`/`vss`/
-`n2` is byte-for-byte unchanged) — a declare-only `pins[]` entry draws no
+existing routing for `nbtop`/`vref`/`ibias`/`NB`/`NA`/`PG`/`PB`/`vdd`/`vss`/
+`N2` is byte-for-byte unchanged) — a declare-only `pins[]` entry draws no
 new geometry beyond the small stub itself, so `klt drc`/`klt extract`/`klt
 lvs` all stay exactly as they were: 15/15 devices, 13/13 nets, `match`. The
 `ports[]`/`pins[]` diff in `compose.response.json`/`extract.json` is purely
@@ -266,7 +266,7 @@ Evidence: `downstream-check.request.json`/`.response.json`/`.drc.json`/
 python3 layout/bin/check-promotion.py layout/bias_core_mirror_amp/cell.json
 ```
 
-`nbtop`/`vref`/`ibias`/`nb` are unchanged by this issue — `ibias`/`nb`
+`nbtop`/`vref`/`ibias`/`NB` are unchanged by this issue — `ibias`/`NB`
 already composed cleanly in #40's own assembly attempt, but `nbtop`/`vref`
 were two of the nets that hit the same-block self-collision there. #56's
 own Acceptance Criteria did not ask for a `nbtop`/`vref` re-tap on this

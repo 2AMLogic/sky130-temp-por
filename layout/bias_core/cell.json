@@ -35,7 +35,7 @@
     "bias_core_startup / bias_core_settle_flag, VDD additionally reaching",
     "bias_core_passives), nkg (bias_core_startup <-> bias_core_settle_flag),",
     "and -- issue #81, on the met3/met4/met5 planes klayout-tools#2738 added --",
-    "the ten cross-block nets pg, pb, n2, na, nbtop, vref, nokx, ec, er and nb.",
+    "the ten cross-block nets PG, PB, N2, NA, nbtop, vref, nokx, ec, er and NB.",
     "IBIAS/BIAS_OK are declare-only top-level pins pointing directly at the one",
     "sub-block that touches each (bias_core_mirror_amp for IBIAS,",
     "bias_core_settle_flag for BIAS_OK); VREF is a real connectivity net named",
@@ -51,7 +51,7 @@
     "",
     "Two block declarations changed for #81: bias_core_pnp8_leg now declares its",
     "`ec` escape stub (-5, 10) and the composed cell's real bbox, and",
-    "bias_core_passives declares an `nb` landing at (19.84, 1.0) -- the middle",
+    "bias_core_passives declares an `NB` landing at (19.84, 1.0) -- the middle",
     "of the 3.84um li1 strap XRT/XR1 already share (rt.R0_B / r1.R0_A), read",
     "from that block's own GDS; unlike every other declared port it is not in",
     "the block's compose.response.json (it is not a promoted pin), so the pad",
@@ -102,7 +102,7 @@
             "direction_deg": 0
           },
           {
-            "name": "nb",
+            "name": "NB",
             "x_um": 83.42,
             "y_um": 22.21,
             "layer": {
@@ -135,7 +135,7 @@
             "direction_deg": 180
           },
           {
-            "name": "pg",
+            "name": "PG",
             "x_um": -4.0,
             "y_um": 14.085,
             "layer": {
@@ -146,7 +146,7 @@
             "direction_deg": 180
           },
           {
-            "name": "pb",
+            "name": "PB",
             "x_um": -4.0,
             "y_um": 18.085,
             "layer": {
@@ -157,7 +157,7 @@
             "direction_deg": 180
           },
           {
-            "name": "n2",
+            "name": "N2",
             "x_um": -4.0,
             "y_um": 12.085,
             "layer": {
@@ -168,7 +168,7 @@
             "direction_deg": 180
           },
           {
-            "name": "na",
+            "name": "NA",
             "x_um": -6.415,
             "y_um": 9.0,
             "layer": {
@@ -194,7 +194,7 @@
         "cell_name": "bias_core_xq1_xqr",
         "ports": [
           {
-            "name": "na",
+            "name": "NA",
             "x_um": 1.7,
             "y_um": 1.7,
             "layer": {
@@ -257,7 +257,7 @@
         "cell_name": "bias_core_startup",
         "ports": [
           {
-            "name": "pb",
+            "name": "PB",
             "x_um": -24.58,
             "y_um": 5.26,
             "layer": {
@@ -268,7 +268,7 @@
             "direction_deg": 90
           },
           {
-            "name": "pg",
+            "name": "PG",
             "x_um": -5.63,
             "y_um": 4.0,
             "layer": {
@@ -327,7 +327,7 @@
         "cell_name": "bias_core_settle_flag",
         "ports": [
           {
-            "name": "na",
+            "name": "NA",
             "x_um": 45.58,
             "y_um": 22.21,
             "layer": {
@@ -373,7 +373,7 @@
             "direction_deg": 180
           },
           {
-            "name": "pb",
+            "name": "PB",
             "x_um": -4.0,
             "y_um": 11.585,
             "layer": {
@@ -456,7 +456,7 @@
             "direction_deg": 0
           },
           {
-            "name": "n2",
+            "name": "N2",
             "x_um": 708.7550000000001,
             "y_um": 1.0,
             "layer": {
@@ -468,7 +468,7 @@
             "direction_deg": 180
           },
           {
-            "name": "pg",
+            "name": "PG",
             "x_um": 1739.0900000000001,
             "y_um": 21.71,
             "layer": {
@@ -528,7 +528,7 @@
             "direction_deg": 90
           },
           {
-            "name": "nb",
+            "name": "NB",
             "x_um": 352.34,
             "y_um": 1.0,
             "layer": {
@@ -934,18 +934,18 @@
       ]
     },
     {
-      "net": "n2",
+      "net": "N2",
       "layer_role": "metal4",
       "width_um": 0.4,
       "legs": [
         {
           "from_pin": {
             "block": "passives",
-            "port": "n2"
+            "port": "N2"
           },
           "to_pin": {
             "block": "mirror_amp",
-            "port": "n2"
+            "port": "N2"
           },
           "waypoints_um": [
             [
@@ -962,27 +962,27 @@
       "pins": [
         {
           "block": "passives",
-          "port": "n2"
+          "port": "N2"
         },
         {
           "block": "mirror_amp",
-          "port": "n2"
+          "port": "N2"
         }
       ]
     },
     {
-      "net": "nb",
+      "net": "NB",
       "layer_role": "metal4",
       "width_um": 0.4,
       "legs": [
         {
           "from_pin": {
             "block": "passives",
-            "port": "nb"
+            "port": "NB"
           },
           "to_pin": {
             "block": "mirror_amp",
-            "port": "nb"
+            "port": "NB"
           },
           "waypoints_um": [
             [
@@ -1011,11 +1011,11 @@
       "pins": [
         {
           "block": "passives",
-          "port": "nb"
+          "port": "NB"
         },
         {
           "block": "mirror_amp",
-          "port": "nb"
+          "port": "NB"
         }
       ]
     },
@@ -1151,18 +1151,18 @@
       ]
     },
     {
-      "net": "pg",
+      "net": "PG",
       "layer_role": "metal5",
       "width_um": 0.4,
       "legs": [
         {
           "from_pin": {
             "block": "startup",
-            "port": "pg"
+            "port": "PG"
           },
           "to_pin": {
             "block": "mirror_amp",
-            "port": "pg"
+            "port": "PG"
           },
           "waypoints_um": [
             [
@@ -1182,11 +1182,11 @@
         {
           "from_pin": {
             "block": "passives",
-            "port": "pg"
+            "port": "PG"
           },
           "to_pin": {
             "block": "mirror_amp",
-            "port": "pg"
+            "port": "PG"
           },
           "waypoints_um": [
             [
@@ -1215,15 +1215,15 @@
       "pins": [
         {
           "block": "startup",
-          "port": "pg"
+          "port": "PG"
         },
         {
           "block": "mirror_amp",
-          "port": "pg"
+          "port": "PG"
         },
         {
           "block": "passives",
-          "port": "pg"
+          "port": "PG"
         }
       ]
     },
@@ -1370,18 +1370,18 @@
       ]
     },
     {
-      "net": "na",
+      "net": "NA",
       "layer_role": "metal5",
       "width_um": 0.4,
       "legs": [
         {
           "from_pin": {
             "block": "xq1_xqr",
-            "port": "na"
+            "port": "NA"
           },
           "to_pin": {
             "block": "mirror_amp",
-            "port": "na"
+            "port": "NA"
           },
           "waypoints_um": [
             [
@@ -1401,11 +1401,11 @@
         {
           "from_pin": {
             "block": "settle_flag",
-            "port": "na"
+            "port": "NA"
           },
           "to_pin": {
             "block": "mirror_amp",
-            "port": "na"
+            "port": "NA"
           },
           "waypoints_um": [
             [
@@ -1434,31 +1434,31 @@
       "pins": [
         {
           "block": "xq1_xqr",
-          "port": "na"
+          "port": "NA"
         },
         {
           "block": "mirror_amp",
-          "port": "na"
+          "port": "NA"
         },
         {
           "block": "settle_flag",
-          "port": "na"
+          "port": "NA"
         }
       ]
     },
     {
-      "net": "pb",
+      "net": "PB",
       "layer_role": "metal6",
       "width_um": 1.6,
       "legs": [
         {
           "from_pin": {
             "block": "startup",
-            "port": "pb"
+            "port": "PB"
           },
           "to_pin": {
             "block": "mirror_amp",
-            "port": "pb"
+            "port": "PB"
           },
           "waypoints_um": [
             [
@@ -1478,11 +1478,11 @@
         {
           "from_pin": {
             "block": "settle_flag",
-            "port": "pb"
+            "port": "PB"
           },
           "to_pin": {
             "block": "mirror_amp",
-            "port": "pb"
+            "port": "PB"
           },
           "waypoints_um": [
             [
@@ -1503,15 +1503,15 @@
       "pins": [
         {
           "block": "startup",
-          "port": "pb"
+          "port": "PB"
         },
         {
           "block": "mirror_amp",
-          "port": "pb"
+          "port": "PB"
         },
         {
           "block": "settle_flag",
-          "port": "pb"
+          "port": "PB"
         }
       ]
     }

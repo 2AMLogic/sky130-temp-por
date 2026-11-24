@@ -94,7 +94,7 @@
       "generator": null,
       "cell_name": "bias_core",
       "source_path": "../bias_core/bias_core.gds",
-      "source_digest": "sha256:3c4733acd0610089145094d6d3a38450f4d1c9a7102d8f9aeef32df762cabd39",
+      "source_digest": "sha256:8045076f7dd9588e489260b62a1c2d6902a652c941128f7d14d137b6f4d45bee",
       "offset_um": {
         "x": 0.0,
         "y": 0.0
@@ -186,7 +186,7 @@
       "generator": null,
       "cell_name": "temp_core",
       "source_path": "../temp_core/temp_core.gds",
-      "source_digest": "sha256:f23a4f8e851d2a97e498857bf51e03a04812ef789193029adb831a986bb86d59",
+      "source_digest": "sha256:29c28c352d4e22ea3cac7fd6bd81c792f4927588037fbb8b6e25f0db3ee5638e",
       "offset_um": {
         "x": 0.0,
         "y": 700.0
@@ -633,7 +633,10 @@
     "pdk": {
       "name": "sky130A",
       "source": "search root: ~/.ciel",
-      "version": "open_pdks f6eeac7dad085ffcc829ccfd721f7b4ce39edcf7"
+      "version": "open_pdks f6eeac7dad085ffcc829ccfd721f7b4ce39edcf7",
+      "ambiguous_sources": [
+        "search root: ~/.volare"
+      ]
     },
     "deck": null,
     "input": null
