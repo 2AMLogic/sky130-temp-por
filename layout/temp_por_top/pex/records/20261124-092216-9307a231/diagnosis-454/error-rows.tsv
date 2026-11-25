@@ -1,0 +1,52 @@
+group	testbench	measurement	corner	failing_side	delta_error_code	side_diagnostic_codes	schematic_value
+A no 2.64 V crossing in 30 ms	ramp	t_release_v_ih	ff/3.300V/125C	extracted	measurement	measurement+measurement	0.00261544
+A no 2.64 V crossing in 30 ms	ramp	t_release_v_ih	ff/3.300V/27C	extracted	singular_matrix	singular_matrix+measurement+measurement	0.00256066
+A no 2.64 V crossing in 30 ms	ramp	t_release_v_ih	fs/2.970V/125C	extracted	measurement	measurement+measurement	0.00322876
+A no 2.64 V crossing in 30 ms	ramp	t_release_v_ih	fs/2.970V/27C	extracted	measurement	measurement+measurement	0.00335782
+A no 2.64 V crossing in 30 ms	ramp	t_release_v_ih	fs/3.300V/125C	extracted	measurement	measurement+measurement	0.00352731
+A no 2.64 V crossing in 30 ms	ramp	t_release_v_ih	fs/3.300V/27C	extracted	measurement	measurement+measurement	0.00368529
+A no 2.64 V crossing in 30 ms	ramp	t_release_v_ih	fs/3.630V/-40C	extracted	singular_matrix	singular_matrix+measurement+measurement	0.00430683
+A no 2.64 V crossing in 30 ms	ramp	t_release_v_ih	fs/3.630V/27C	extracted	measurement	measurement+measurement	0.00400573
+A no 2.64 V crossing in 30 ms	ramp	t_release_v_ih	sf/2.970V/-40C	schematic	measurement	measurement+measurement	
+A no 2.64 V crossing in 30 ms	ramp	t_release_v_ih	sf/3.630V/27C	extracted	measurement	measurement+measurement	0.00225165
+A no 2.64 V crossing in 30 ms	ramp	t_release_v_ih	tt/2.970V/-40C	extracted	measurement	measurement+measurement	0.00248795
+A no 2.64 V crossing in 30 ms	ramp	t_release_v_ih	tt/3.300V/-40C	extracted	measurement	measurement+measurement	0.00275744
+A no 2.64 V crossing in 30 ms	ramp	vdd_at_release	ff/3.300V/125C	extracted	measurement	measurement+measurement	3.3
+A no 2.64 V crossing in 30 ms	ramp	vdd_at_release	ff/3.300V/27C	extracted	singular_matrix	singular_matrix+measurement+measurement	3.3
+A no 2.64 V crossing in 30 ms	ramp	vdd_at_release	fs/2.970V/125C	extracted	measurement	measurement+measurement	2.97
+A no 2.64 V crossing in 30 ms	ramp	vdd_at_release	fs/2.970V/27C	extracted	measurement	measurement+measurement	2.97
+A no 2.64 V crossing in 30 ms	ramp	vdd_at_release	fs/3.300V/125C	extracted	measurement	measurement+measurement	3.3
+A no 2.64 V crossing in 30 ms	ramp	vdd_at_release	fs/3.300V/27C	extracted	measurement	measurement+measurement	3.3
+A no 2.64 V crossing in 30 ms	ramp	vdd_at_release	fs/3.630V/-40C	extracted	singular_matrix	singular_matrix+measurement+measurement	3.63
+A no 2.64 V crossing in 30 ms	ramp	vdd_at_release	fs/3.630V/27C	extracted	measurement	measurement+measurement	3.63
+A no 2.64 V crossing in 30 ms	ramp	vdd_at_release	sf/2.970V/-40C	schematic	measurement	measurement+measurement	
+A no 2.64 V crossing in 30 ms	ramp	vdd_at_release	sf/3.630V/27C	extracted	measurement	measurement+measurement	3.63
+A no 2.64 V crossing in 30 ms	ramp	vdd_at_release	tt/2.970V/-40C	extracted	measurement	measurement+measurement	2.97
+A no 2.64 V crossing in 30 ms	ramp	vdd_at_release	tt/3.300V/-40C	extracted	measurement	measurement+measurement	3.3
+B ss op/transient abort (extracted only)	iq-por	iq_por_settled	ss/2.970V/-40C	extracted	singular_matrix	singular_matrix+timestep_too_small+nonconvergence+measurement+analysis_aborted	-0.00597815
+B ss op/transient abort (extracted only)	iq-por	iq_por_settled	ss/2.970V/125C	extracted	singular_matrix	singular_matrix+timestep_too_small+nonconvergence+measurement+analysis_aborted	-5.08193e-05
+B ss op/transient abort (extracted only)	iq-por	iq_por_settled	ss/2.970V/27C	extracted	singular_matrix	singular_matrix+timestep_too_small+nonconvergence+measurement+analysis_aborted	-5.70116e-05
+B ss op/transient abort (extracted only)	iq-por	iq_por_settled	ss/3.300V/-40C	extracted	singular_matrix	singular_matrix+timestep_too_small+nonconvergence+measurement+analysis_aborted	-0.00599706
+B ss op/transient abort (extracted only)	iq-por	iq_por_settled	ss/3.300V/125C	extracted	singular_matrix	singular_matrix+timestep_too_small+nonconvergence+measurement+analysis_aborted	-6.40595e-05
+B ss op/transient abort (extracted only)	iq-por	iq_por_settled	ss/3.300V/27C	extracted	singular_matrix	singular_matrix+timestep_too_small+nonconvergence+measurement+analysis_aborted	-7.29743e-05
+B ss op/transient abort (extracted only)	iq-por	iq_por_settled	ss/3.630V/-40C	extracted	singular_matrix	singular_matrix+timestep_too_small+nonconvergence+measurement+analysis_aborted	-0.00601733
+B ss op/transient abort (extracted only)	iq-por	iq_por_settled	ss/3.630V/125C	extracted	singular_matrix	singular_matrix+timestep_too_small+nonconvergence+measurement+analysis_aborted	-7.84676e-05
+B ss op/transient abort (extracted only)	iq-por	iq_por_settled	ss/3.630V/27C	extracted	singular_matrix	singular_matrix+timestep_too_small+nonconvergence+measurement+analysis_aborted	-9.02224e-05
+B ss op/transient abort (extracted only)	ramp	t_release_v_ih	ss/2.970V/-40C	extracted	singular_matrix	singular_matrix+timestep_too_small+nonconvergence+measurement+measurement+analysis_aborted	0.00265222
+B ss op/transient abort (extracted only)	ramp	t_release_v_ih	ss/2.970V/125C	extracted	singular_matrix	singular_matrix+timestep_too_small+nonconvergence+measurement+measurement+analysis_aborted	0.00262809
+B ss op/transient abort (extracted only)	ramp	t_release_v_ih	ss/2.970V/27C	extracted	singular_matrix	singular_matrix+timestep_too_small+nonconvergence+measurement+measurement+analysis_aborted	0.00260021
+B ss op/transient abort (extracted only)	ramp	t_release_v_ih	ss/3.300V/-40C	extracted	singular_matrix	singular_matrix+timestep_too_small+nonconvergence+measurement+measurement+analysis_aborted	0.00292684
+B ss op/transient abort (extracted only)	ramp	t_release_v_ih	ss/3.300V/125C	extracted	singular_matrix	singular_matrix+timestep_too_small+nonconvergence+measurement+measurement+analysis_aborted	0.00287067
+B ss op/transient abort (extracted only)	ramp	t_release_v_ih	ss/3.300V/27C	extracted	singular_matrix	singular_matrix+timestep_too_small+nonconvergence+measurement+measurement+analysis_aborted	0.00286202
+B ss op/transient abort (extracted only)	ramp	t_release_v_ih	ss/3.630V/-40C	extracted	singular_matrix	singular_matrix+timestep_too_small+nonconvergence+measurement+measurement+analysis_aborted	0.00317642
+B ss op/transient abort (extracted only)	ramp	t_release_v_ih	ss/3.630V/125C	extracted	singular_matrix	singular_matrix+timestep_too_small+nonconvergence+measurement+measurement+analysis_aborted	0.00309228
+B ss op/transient abort (extracted only)	ramp	t_release_v_ih	ss/3.630V/27C	extracted	singular_matrix	singular_matrix+timestep_too_small+nonconvergence+measurement+measurement+analysis_aborted	0.0030961
+B ss op/transient abort (extracted only)	ramp	vdd_at_release	ss/2.970V/-40C	extracted	singular_matrix	singular_matrix+timestep_too_small+nonconvergence+measurement+measurement+analysis_aborted	2.97
+B ss op/transient abort (extracted only)	ramp	vdd_at_release	ss/2.970V/125C	extracted	singular_matrix	singular_matrix+timestep_too_small+nonconvergence+measurement+measurement+analysis_aborted	2.97
+B ss op/transient abort (extracted only)	ramp	vdd_at_release	ss/2.970V/27C	extracted	singular_matrix	singular_matrix+timestep_too_small+nonconvergence+measurement+measurement+analysis_aborted	2.97
+B ss op/transient abort (extracted only)	ramp	vdd_at_release	ss/3.300V/-40C	extracted	singular_matrix	singular_matrix+timestep_too_small+nonconvergence+measurement+measurement+analysis_aborted	3.3
+B ss op/transient abort (extracted only)	ramp	vdd_at_release	ss/3.300V/125C	extracted	singular_matrix	singular_matrix+timestep_too_small+nonconvergence+measurement+measurement+analysis_aborted	3.3
+B ss op/transient abort (extracted only)	ramp	vdd_at_release	ss/3.300V/27C	extracted	singular_matrix	singular_matrix+timestep_too_small+nonconvergence+measurement+measurement+analysis_aborted	3.3
+B ss op/transient abort (extracted only)	ramp	vdd_at_release	ss/3.630V/-40C	extracted	singular_matrix	singular_matrix+timestep_too_small+nonconvergence+measurement+measurement+analysis_aborted	3.63
+B ss op/transient abort (extracted only)	ramp	vdd_at_release	ss/3.630V/125C	extracted	singular_matrix	singular_matrix+timestep_too_small+nonconvergence+measurement+measurement+analysis_aborted	3.63
+B ss op/transient abort (extracted only)	ramp	vdd_at_release	ss/3.630V/27C	extracted	singular_matrix	singular_matrix+timestep_too_small+nonconvergence+measurement+measurement+analysis_aborted	3.63
