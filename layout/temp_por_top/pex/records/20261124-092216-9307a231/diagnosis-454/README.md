@@ -8,7 +8,7 @@ reproductions. No grid was run. Item 7 stays `unmet`.
 | file | what |
 |---|---|
 | `error-rows.tsv` | all 51 error rows: group, testbench, measurement, corner, failing side, `delta[].error.code`, the side's full diagnostic code list, schematic value |
-| `inputs/` | the decks of the local reproductions (`deck.cir` tt/-40C extracted, `deck_ss.cir` ss/27C extracted, `deck_sch.cir` tt/-40C schematic), the testbench copy, and the ss run log. Paths are written `<repo>` / `~`; point them at a checkout and a PDK root to rerun |
+| `inputs/` | the decks of the local reproductions (`deck.cir` tt/-40C extracted, `deck_ss.cir` ss/27C extracted, `deck_sch.cir` tt/-40C schematic), the testbench copy, and the two ngspice run logs (`inputs/ss-run.txt`, `inputs/tt-n40-run.txt`). The logs carry a `.txt` name because `.gitignore` excludes `*.log` outside `sim/*/corners/`. They are **re-runs** of the decks beside them (ngspice-47, one `ngspice -b` each, 2026-11-25, in the #519 review cycle): the first-run output was never committed and the numbers quoted below were reproduced exactly. Paths are written `<repo>` / `~`; point them at a checkout and a PDK root to rerun |
 
 ## Accounting (51 = 24 + 27, by corner, testbench, side)
 
@@ -70,9 +70,15 @@ schematic side too (a schematic-only behavior, not a pex effect).
   `analysis_aborted`.
 - Local single run, extracted, `ss/3.30V/27C` (3.3 s): the failure is at the
   **initial operating point**, before any transient step. Dynamic and true gmin
-  stepping both fail; `Error: Transient op failed, timestep too small`; trouble
-  reported at `xdut.x$116`, a `sky130_fd_pr__pnp_05v5_w0p68l0p68par5x` BJT
-  instance. Singular warnings at `xdut.ptat_trim__t0` and `xdut.nz$1`.
+  stepping both fail (`inputs/ss-run.txt` lines 12-15; the fleet diagnostics carry
+  only the dynamic-gmin warning); source stepping fails; `Error: Transient op
+  failed, timestep too small`; trouble reported at instance `xdut.x$116`
+  (`X$116` in `../grid/temp_por_top.pex.spice`, a `sky130_fd_pr__pnp_05v5_W3p40L3p40`
+  BJT, the only PNP flavour in the netlist: 19 instances). ngspice's message names
+  the PDK's inner model `sky130_fd_pr__pnp_05v5_w0p68l0p68par5x_model-instance`
+  and the instance `q.xdut.x$116.qsky130_fd_pr__pnp_05v5_w3p40l3p40`; the
+  `w0p68l0p68par5x` string is that inner model card name, not a device in the
+  netlist. Singular warnings at `xdut.ptat_trim__t0` and `xdut.nz$1`.
 - The schematic leg of the same corners passes, so the extracted netlist (with its
   parasitic `R`/`C` cards and the BJT substrate wiring) is what the solver cannot
   start from at the slow process corner.
@@ -89,17 +95,23 @@ group A, and the two may share the `PTAT` branch).
 ## klt gaps demonstrated
 
 Two gaps were found while attributing the rows, filed generically at
-`2AMLogic/klayout-tools`:
+`2AMLogic/klayout-tools`; the second turned out to be half a klt gap and half
+this repo's own `.gitignore`:
 
 - [#7904](https://github.com/2AMLogic/klayout-tools/issues/7904) -- `delta[].error`
   reports a warning-severity `singular_matrix` instead of the measurement failure
   (4 of the 51 rows; mis-sorts the taxonomy above).
 - [#7905](https://github.com/2AMLogic/klayout-tools/issues/7905) -- batch
-  `keep_artifacts` returns no per-corner ngspice log (0 `*.log` files in
-  `../grid/artifacts/`, although `../README.md` lists `ngspice.log` there) and a
-  `corner.cir` whose `.include` points at a non-retained job path, so the failed
-  corners could not be re-run from the artifacts. The two local reproductions
-  above had to be rebuilt by hand from the testbench and the extraction.
+  `corner.cir` has a `.include` pointing at a non-retained job path
+  (`/var/tmp/eda-job-klt-sim-<id>/inputs/netlist.cir`), so the failed corners
+  could not be re-run from the artifacts. The two local reproductions above had to
+  be rebuilt by hand from the testbench and the extraction. **Not a klt gap:** the
+  absence of per-corner `ngspice.log` files in `../grid/artifacts/`. Upstream
+  measured that all 180 engine logs were present in the fleet outputs and were
+  restored by klt `0.9.2`; this repo's `.gitignore` rule `*.log` (negated only for
+  `sim/*/corners/`) kept them out of the committed tree. That is this repo's
+  friction (a `*.log` rule hiding record evidence), recorded here, not a tool
+  defect.
 
 The design/solver findings (groups A and B) are not klt defects as demonstrated and
 are recorded here as evidence only. Whether group B is a klt extraction defect
@@ -107,6 +119,10 @@ are recorded here as evidence only. Whether group B is a klt extraction defect
 exposed as a pin gave a singular DC solve) is not shown by these runs.
 
 ## Disclosure for the cited reports
+
+The three repro decks add `set ng_nomodcheck` and extra `.meas` probes relative to the
+grid's `corner.cir`; the `tran 1u 0.03 0 1e-05` window and the 2.64 V `RISE=1`
+crossing are the original.
 
 Both `../klt-pex.report.json` (pilot, `status: pass`) and `../grid/klt-pex.report.json`
 (grid, `status: error`):
