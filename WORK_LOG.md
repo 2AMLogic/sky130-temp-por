@@ -7,8 +7,14 @@ Chronological record of recently merged pull requests and closed issues. This fi
 - [2026-09](work_log/WORK_LOG_2026-09.md)
 - [2026-08](work_log/WORK_LOG_2026-08.md)
 
+### 2026-11-25
+
+- **PR #518**: docs: record post-#501 block-level pex grid result in roadmap item 7
+
 ### 2026-11-24
 
+- **PR #476**: docs: state klayout-tools#6025 as closed in bias-core and output-chain READMEs
+- **Issue #470** (closed): Three cell READMEs still call klayout-tools#6025 open (outside #454's AC-6 scope)
 - **PR #516**: docs: re-quote stale extract cards in two bias_core leaf READMEs
 - **PR #512**: fix(layout): upper-case the bias_core family's net labels so the flat pex netlist loads
 - **PR #511**: fix(sim): re-scope spiceinit provenance, group helper inlining, name sparse-grid cross product
