@@ -110,3 +110,19 @@ Pilot (as recorded above):
 
 Grid: same command shape with this record's `pextb-grid/` requests and
 `--backend batch --max-units-per-job 9 --wait-for-capacity 600`.
+
+## Correction (2026-11-25)
+
+Appended, not an edit: the "Error taxonomy" above miscounts. Re-derived with `jq`
+from `grid/klt-pex.report.json` (51 error rows in total, unchanged):
+
+- Extracted `t_release_v_ih` `out of interval` is **12** corners (24 rows), not 18.
+  18 is the number of corners with an extracted-side `singular_matrix`.
+- `singular_matrix` diagnostics are 21x `xdut.ptat_trim__t0` (not 25), 3x
+  `xdut.nz$1`, 3x `xdut.sns` on the extracted side (27, not 31), plus 6x
+  `xdut.x.xtemp.xr2.t2` on the schematic side.
+- The schematic-side ramp error is at `sf/2.970V/-40C`, not an `ss` corner.
+- `unavailable_comparison` appears on all 51 error rows, not 18.
+- Omitted above: all 9 `ss` corners abort the transient (`timestep_too_small`,
+  `nonconvergence`, `analysis_aborted`) on both testbenches, 27 of the 51 rows;
+  the #153 signature.
