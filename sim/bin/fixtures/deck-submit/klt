@@ -1,0 +1,56 @@
+#!/usr/bin/env python3
+"""Stub `klt` for the deck-transport submit tests (sim/bin/test_deck_transport.py).
+
+Answers `--version`, and `sim` only as a deck-list submit: appends its argv to
+$STUB_KLT_LOG, writes each deck's unit directory under the request's `-o` output
+directory with $STUB_KLT_STDOUT as its stdout (`@SOLVER@` becomes the solver the
+unit's own shipped .spiceinit selects), and prints a passing deck report.  Refuses
+with `batch_no_capacity` on stderr when $STUB_KLT_FAIL is set.  Any other argv fails
+an assertion.
+
+Tracked and executable on purpose (issue #539): the suite puts this directory first
+on PATH and checks that `klt` resolves here before the first call.  A stub written
+into the temporary directory is skipped by PATH lookup when TMPDIR is mounted noexec,
+and a real `klt` installed later on PATH is invoked instead.
+"""
+import json, os, shutil, sys
+args = sys.argv[1:]
+if args[:1] == ["--version"]:
+    print("klt 9.9.9-stub")
+    sys.exit(0)
+assert args[0] == "sim"
+open(os.environ["STUB_KLT_LOG"], "a").write(json.dumps(args) + "\n")
+if os.environ.get("STUB_KLT_FAIL"):
+    sys.stderr.write('{"error": {"code": "batch_no_capacity", "message": "fleet refused the job"}}\n')
+    sys.exit(2)
+req = json.loads(open(args[1]).read())
+outdir = args[args.index("-o") + 1]
+units = []
+for deck in req["decks"]:
+    d = os.path.join(outdir, deck["id"])
+    os.makedirs(d, exist_ok=True)
+    # Replay the deck and its shipped .spiceinit into the unit's stdout, so a test can
+    # assert the engine saw what the request declared.
+    init = ""
+    for inp in deck.get("inputs", []):
+        src = os.path.join(os.path.dirname(args[1]), inp["path"])
+        if os.path.isfile(src):
+            init = open(src).read()
+    solver = "SPARSE 1.3" if "\n* option klu" in init else "KLU"
+    body = os.environ.get("STUB_KLT_STDOUT", "").replace("@SOLVER@", solver)
+    open(os.path.join(d, "stdout.bin"), "w").write(body)
+    open(os.path.join(d, "stderr.bin"), "w").write("")
+    units.append({"id": deck["id"], "status": "pass", "exit_code": 0, "timed_out": False,
+                  "stdout": deck["id"] + "/stdout.bin", "stderr": deck["id"] + "/stderr.bin",
+                  "engine_version": "47", "diagnostics": []})
+json.dump({"schema_version": 3, "mode": "decks", "status": "pass", "unit_count": len(units),
+           "passed": len(units), "errored": 0, "timed_out": 0, "units": units,
+           "outdir": os.path.abspath(outdir),
+           "environment": {"engine": "ngspice", "engine_version": "47", "klt_version": "9.9.9-stub",
+                           "engine_host": "worker",
+                           "remote": {"provider": "aws-batch-fleet", "job_id": "job-deck-1",
+                                      "region": "us-east-1", "instance_type": "c7i.8xlarge",
+                                      "state": "done", "runner_klt_version": "0.9.0-runner",
+                                      "runner_request_features": {"required": ["decks"],
+                                                                  "missing": [], "status": "supported"}}}},
+          sys.stdout)

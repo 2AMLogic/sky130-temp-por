@@ -1,0 +1,33 @@
+#!/usr/bin/env python3
+"""Stub `klt` for the corner-run batch submit tests (sim/bin/test_corner_run_batch.py).
+
+Answers `--version`, and `sim` only as a `--backend batch` grid submit: appends its
+argv to $STUB_KLT_LOG and replays $STUB_KLT_REPORT as the fleet's report.  Refuses
+instead when $STUB_KLT_FAIL is set (with $STUB_KLT_FAIL_STDOUT on stdout), or for the
+first $STUB_KLT_CAPFAIL_TIMES runs counted in the $STUB_KLT_CAPFAIL file.  Any other
+argv fails an assertion.
+
+Tracked and executable on purpose (issue #539): the suite puts this directory first
+on PATH and checks that `klt` resolves here before the first call.  A stub written
+into the temporary directory is skipped by PATH lookup when TMPDIR is mounted noexec,
+and a real `klt` installed later on PATH is invoked instead.
+"""
+import json, os, sys
+args = sys.argv[1:]
+if args[:1] == ["--version"]:
+    print("klt 9.9.9-stub")
+    sys.exit(0)
+assert args[0] == "sim" and "--backend" in args and args[args.index("--backend") + 1] == "batch"
+open(os.environ["STUB_KLT_LOG"], "a").write(json.dumps(args) + "\n")
+if os.environ.get("STUB_KLT_FAIL"):
+    sys.stdout.write(os.environ.get("STUB_KLT_FAIL_STDOUT", ""))
+    sys.stderr.write("batch_no_capacity: fleet refused the job\n")
+    sys.exit(2)
+capfail = os.environ.get("STUB_KLT_CAPFAIL")
+if capfail:
+    n = int(open(capfail).read().strip() or "0")
+    if n < int(os.environ.get("STUB_KLT_CAPFAIL_TIMES", "1")):
+        open(capfail, "w").write(str(n + 1))
+        sys.stderr.write(json.dumps({"error": {"message": "launch refused: BATCH_MAX_CONCURRENT_INSTANCES cap reached"}}) + "\n")
+        sys.exit(2)
+sys.stdout.write(open(os.environ["STUB_KLT_REPORT"]).read())
