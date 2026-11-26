@@ -57,13 +57,13 @@ Schematic leg, same point:
 
 ## What the tt/3.300V/-40C runs establish (AC 1)
 
-1. **The 12.79 V PTAT state is a numerical solution branch, not a physical
-   extraction result.** A passive RC extraction cannot hold a node at 3.9x
-   the 3.30 V rail (the only drivers of PTAT are pfet drains, a nfet drain to
-   VSS and megohm trim resistors); the `1.47691e+236 ^ 2 out of range` error
-   in `b.xdut.x$153.brbody` (base log, the PDK `res_xhigh_po` nonlinear body
-   resistor evaluating that voltage) is the symptom. Tightening `reltol`
-   from 1e-3 to 1e-4 reduces the 5 ms PTAT peak from 14.96 V to 2.91 V.
+1. **The 12.79 V PTAT state is a non-physical transient solution.** ngspice
+   reports `1.47691e+236, 2 out of range for ^` in `b.xdut.x$153.brbody`
+   (the `res_xhigh_po` body resistor)
+   during the initial operating-point solve. Gmin stepping completes with PTAT
+   at −9.86e−153 V. At 30 ms, PTAT is 3.9 times the 3.30 V supply voltage. [Base log](runs/tt-n40-base-run.txt)
+   Tightening `reltol` from 1e-3 to 1e-4 reduces the 5 ms PTAT peak
+   from 14.96 V to 2.91 V.
    The 30 ms run at 1e-4 measures PTAT at −47 µV at the end and gives the
    first 2.64 V crossing at **1.2139 ms**, 0.44x the schematic's 2.757 ms.
 2. **The excursion develops during the transient and depends on the operating-point
@@ -86,14 +86,21 @@ Schematic leg, same point:
 4. **The 300 ms run crosses on a non-physical trajectory.** At default
    tolerance RESETn crosses at 55.30 ms, and PTAT peaks at 16.05 V at
    55.31 ms. RESETn subsequently stays high while PTAT settles near 3.29 V.
-5. **The systematic early release of the extracted leg is the #467 model
-   mismatch, not the parasitics.** The grid schematic with nothing but the
-   extractor's model substitution (`01v8` for 114 `g5v0d10v5` MOS) releases
-   at **1.1817 ms** -- matching the tight-tolerance extracted run (1.2139 ms)
-   and the fleet's early-release band (20 passing corners at 0.32-0.88x the
-   schematic; 4 late at 6.2-10.0x). The `nor` variant (star-R short) shows
-   a completed operating-point solve, but the partial transient ends at
-   0.116 ms. Its release time remains unknown.
+5. **The #467 model swap advances schematic release at this cold tt point.**
+   Changing only the 114 schematic MOS models from `g5v0d10v5` to `01v8`
+   moves the 2.64 V crossing from 2.75744 ms to **1.18170 ms**. The extracted
+   run at `reltol=1e-4` crosses at 1.2139 ms. [Original schematic](runs/sch-tt-run.txt) · [Model-swapped schematic](runs/sch-tt-01v8swap-run.txt)
+
+   In the fleet grid, 20 passing
+   `request-ramp.t_release_v_ih` rows release at 0.32–0.88 times their
+   schematic crossing time. The cold tt result (0.43 times the original)
+   makes the model mismatch a plausible explanation for those early releases.
+   The other four passing rows release at 6.17–10.04 times their schematic
+   crossing time. Their cause remains open. [Fleet grid report](../grid/klt-pex.report.json)
+
+   The `nor` variant (star-R short)
+   completes its operating-point solve, but its transient log ends at 0.116 ms,
+   before a release time could be measured.
 6. **Tighter tolerance increases the number of transient samples.** Over the
    same 30 ms, ngspice reports 3,072 rows at default tolerance and 2,247,983
    at 1e-4. The schematic logs at 1e-4 and 1e-5 end at 12.6 and 6.1 ms
@@ -131,8 +138,8 @@ Schematic leg, same point:
 - **22 extracted-only rows cover 11 corners with two ramp measurements each.**
   The schematic crosses at all 11. The extracted `tt/3.300V/-40C` run
   demonstrates a non-physical branch sensitive to tolerance, the PTAT nodeset
-  and coupling capacitance, alongside the #467 model-mismatch early release.
-  This mechanism is the inferred cause at the other ten corners.
+  and coupling capacitance. A similar branch is the inferred cause of the
+  missed crossings at the other ten corners.
 - **The remaining two rows cover `sf/2.970V/-40C`, where both legs miss.**
   The report attributes the rows to the schematic side. Its 2.6383 V logic
   high falls below the harness's fixed 2.64 V threshold (**#521**).
@@ -168,9 +175,10 @@ The cited reports are unchanged from the #519 increment
   modelled.
 - **`model_mismatch`** (114 MOS: `nfet/pfet_g5v0d10v5` in the reference vs
   `nfet/pfet_01v8` in the extracted) is unchanged -- #467 (open, blocked on
-  the klt pin bump). This record shows that mismatch also dominates the
-  release-time delta of every passing ramp row, not just the comparator
-  accuracy it was filed for.
+  the klt pin bump). The schematic model-swap controls cover only
+  `tt/3.300V/-40C` and `sf/2.970V/-40C`. Both are error rows for
+  `request-ramp.t_release_v_ih` in the fleet grid. The contribution of the
+  mismatch to release timing at the 24 passing corners remains unmeasured.
 
 Neither report is cited as item 7 in the manifest: the pilot is a single
 point and the grid reports `error`. A passing block-level grid remains the
