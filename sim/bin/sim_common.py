@@ -1523,8 +1523,16 @@ def deck_list_batch_clause(b: dict, fleet_ngspice: str) -> list[str]:
 
 
 def deck_units(report: dict | None) -> dict[str, dict]:
-    """`{unit id: unit}` of a `decks[]` report; empty for anything that is not one."""
-    return {u["id"]: u for u in (report or {}).get("units", []) if isinstance(u, dict) and u.get("id")}
+    """`{unit id: unit}` of a `decks[]` report; empty for anything that is not one.
+
+    Only a unit whose `id` is a nonempty string is indexed: a list/object id is unhashable and
+    a number/bool id is not a unit name, so each is dropped here, never indexed (issue #528).
+    """
+    return {
+        u["id"]: u
+        for u in (report or {}).get("units", [])
+        if isinstance(u, dict) and isinstance(u.get("id"), str) and u["id"]
+    }
 
 
 DECK_STDERR_CAP = 1200
@@ -1545,7 +1553,7 @@ def require_deck_report(d: Path, outcome: dict, cap: int = DECK_STDERR_CAP) -> t
     malformed stdout raised `JSONDecodeError` there and took the stderr with it, and only
     an empty stdout reached the refusal that reports it (issue #528).  Covered: a stdout
     that is not JSON, is empty, or is JSON that is not an object; a report whose `units`
-    is missing, empty, not a list, or holds no entry with an `id`; no `report.json` at all.
+    is missing, empty, not a list, or holds no entry with a nonempty string `id`; no `report.json` at all.
 
     The bytes `submit_prepared()` wrote are left as written -- `report.json` is what klt
     printed, and that is what an operator needs to see what the fleet said.  A report that

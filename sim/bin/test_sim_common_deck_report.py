@@ -140,6 +140,16 @@ class RequireDeckReportTest(unittest.TestCase):
     def test_units_without_an_id_are_refused(self):
         self.refusal(json.dumps({"status": "pass", "units": [1, None, {"status": "pass"}, {"id": ""}]}))
 
+    def test_units_with_unusable_ids_are_refused_not_indexed(self):
+        for bad in (["p0"], {"k": "v"}, 42, True, 1.5, ""):
+            with self.subTest(id=bad):
+                self.refusal(json.dumps({"status": "pass", "units": [{"id": bad}]}))
+
+    def test_valid_units_pass_through_beside_malformed_ids(self):
+        mixed = json.dumps({"status": "pass", "units": [{"id": ["p0"]}, {"id": 42}, unit("ok"), {"id": {}}]})
+        _, units = self.require(mixed)
+        self.assertEqual(list(units), ["ok"])
+
     def test_missing_report_is_refused_not_a_file_error(self):
         with tempfile.TemporaryDirectory() as td:
             with self.assertRaises(cr.HarnessError):
@@ -349,6 +359,10 @@ class RunnersStopAtTheSharedRefusal(unittest.TestCase):
         "malformed nonempty stdout": ("runner unavailable", "NO-JSON"),
         "empty stdout": ("", "NO-JSON"),
         "empty unit list": (deck_report(), "pass"),
+        "list unit id": (json.dumps({"status": "error", "units": [{"id": ["p0"]}]}), "error"),
+        "object unit id": (json.dumps({"status": "error", "units": [{"id": {"k": "p0"}}]}), "error"),
+        "numeric unit id": (json.dumps({"status": "error", "units": [{"id": 42}]}), "error"),
+        "boolean unit id": (json.dumps({"status": "error", "units": [{"id": True}]}), "error"),
         "klt error envelope": (json.dumps({"error": {"code": "batch_no_capacity", "message": "fleet refused"}}), "?"),
     }
 
