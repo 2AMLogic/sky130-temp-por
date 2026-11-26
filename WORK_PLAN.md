@@ -35,6 +35,10 @@ Human-approved issues ready for implementation (`loom:issue`).
 Issues currently being built (`loom:building`).
 
 - **#454**: T1 item 7: diagnose missing RESETn crossings in the temp_por_top post-layout grid
+- **#523**: gitignore: daemon-written .loom/account-ranking.* state makes check-main-clean.sh exit 3 spuriously
+- **#528**: Consolidate the three deck-list report checks so malformed output preserves fleet diagnostics
+- **#529**: Enforce append-only CI checks for layout PEX records
+- **#530**: submit_prepared and load_request_report crash on klt stdout that is JSON but not an object
 
 ## PRs Awaiting Review
 
@@ -46,7 +50,8 @@ _None._
 
 PRs that passed review and are queued for Champion auto-merge (`loom:pr`).
 
-_None._
+- **#524**: docs: attribute the block-level pex ramp no-crossing rows (solver branch, model swap, threshold)
+- **#525**: chore: ignore daemon-written .loom/account-ranking.codex state
 
 ## Proposed
 
@@ -59,6 +64,10 @@ Issues carrying `loom:curated`.
 - **#376**: Self-check: assert every spec/decision-records/DR-*.md is indexed in spec/README.md with its own status *(curated)*
 - **#454**: T1 item 7: diagnose missing RESETn crossings in the temp_por_top post-layout grid *(curated)*
 - **#461**: temp_core: build DR-007 chopped-amplifier + degenerated-mirror sim variant and measure chopper residual offset (part a of #456) *(curated)*
+- **#521**: Measure the 45-corner PEX ramp grid with per-rail RESETn thresholds and compare group-A recovery *(curated)*
+- **#523**: gitignore: daemon-written .loom/account-ranking.* state makes check-main-clean.sh exit 3 spuriously *(curated)*
+- **#529**: Enforce append-only CI checks for layout PEX records *(curated)*
+- **#530**: submit_prepared and load_request_report crash on klt stdout that is JSON but not an object *(curated)*
 
 ## Proposed (Architect / Hermit)
 
@@ -78,10 +87,10 @@ Issues carrying `loom:curated`.
 | Very important | 0 |
 | Important | 2 |
 | Ready (`loom:issue`) | 3 |
-| In Progress (`loom:building`) | 1 |
+| In Progress (`loom:building`) | 5 |
 | PRs awaiting review | 0 |
-| Approved PRs awaiting merge | 0 |
-| Curated | 7 |
+| Approved PRs awaiting merge | 2 |
+| Curated | 11 |
 | Architect / Hermit proposals | 3 |
 | Active epics | 1 |
 <!-- guide:plan-body:end -->

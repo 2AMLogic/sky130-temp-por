@@ -9,6 +9,8 @@ Chronological record of recently merged pull requests and closed issues. This fi
 
 ### 2026-11-26
 
+- **PR #527**: docs: record per-rail PEX ramp grid fleet run vs baseline
+- **PR #526**: fix: measure PEX reset release at 80% of each final supply
 - **PR #519**: docs: attribute the 51 block-level pex grid error rows with single-corner repros
 
 ### 2026-11-25
