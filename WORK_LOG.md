@@ -7,6 +7,10 @@ Chronological record of recently merged pull requests and closed issues. This fi
 - [2026-09](work_log/WORK_LOG_2026-09.md)
 - [2026-08](work_log/WORK_LOG_2026-08.md)
 
+### 2026-11-26
+
+- **PR #519**: docs: attribute the 51 block-level pex grid error rows with single-corner repros
+
 ### 2026-11-25
 
 - **PR #518**: docs: record post-#501 block-level pex grid result in roadmap item 7
