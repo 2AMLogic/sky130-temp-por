@@ -15,9 +15,19 @@ rules; the fleet grid stays the graded authority). Item 7 stays `unmet`.
 | `runs/` | the ngspice-47 run logs (`.txt` because the repo `.gitignore` excludes `*.log` outside `sim/*/corners/`) |
 
 Every deck adds `set ng_nomodcheck` and extra `.meas` probes relative to the
-grid's `corner.cir`; the `tran 1u 0.03 0 1e-05` window and the 2.64 V
-`RISE=1` crossing are the original, except where the run's name says
-`long` (300 ms), `5ms` or `reltol`.
+grid's `corner.cir`. The decks retain the 2.64 V `RISE=1` crossing and
+the original 30 ms window except for `long` (300 ms) and `5ms` runs.
+
+Run names below map to `inputs/deck-<run>.cir` and `runs/<run>-run.txt`.
+The following logs have different names from their decks.
+
+| Deck in `inputs/` | Log in `runs/` |
+|---|---|
+| `deck-tt-n40-trace.cir` | `tt-n40-trace-repeat-run.txt` (unseeded control repeated alongside the corrected nodeset) |
+| `deck-tt-n40-reltol-1e-4-full.cir` | `tt-n40-reltol-1e-4-30ms-run.txt` and `tt-n40-reltol-1e-4-30ms-partial-run.txt` (earlier partial run) |
+| `deck-sch-tt-reltol-1e-4.cir` | `sch-tt-reltol-1e-4-partial-run.txt` |
+| `deck-sch-tt-reltol-1e-5.cir` | `sch-tt-reltol-1e-5-partial-run.txt` |
+| Deck unavailable | `tt-n40-reltol-1e-5-30ms-partial-run.txt` (exploratory run, last logged timestep 7.05 ms) |
 
 ## Runs at tt/3.300V/-40C (extracted leg unless stated)
 
@@ -25,23 +35,24 @@ grid's `corner.cir`; the `tran 1u 0.03 0 1e-05` window and the 2.64 V
 |---|---|---|---|---|
 | `tt-n40-base` | none (reproduction of `../diagnosis-454`) | 14.96 V @ 1.208 ms / **12.789 V** | max 52.7 mV @ 10.2 us; -6.9 mV @ 30 ms | none |
 | `tt-n40-trace` | time probes only | 14.96 V @ 1.208 ms / 12.79 V | -3.2 mV @ 2 ms ... -7.6 mV @ 29 ms | none |
-| `tt-n40-nodeset` | `.nodeset v(xdut.ptat)=0.283` | identical to base, every printed digit | identical | none |
+| `tt-n40-nodeset` | ngspice ignored the nonexistent `xdut.ptat` node (warning on line 1 of the log) | invalid control | | |
+| `tt-n40-nodeset-ptat` | 0.283 V nodeset on the `ptat` hub and all three split terminals, same deck as `tt-n40-trace` otherwise | 0.543 mV @ 5.12 us / **−3.446 V** | 3.041 V @ 2 ms, −33.7 mV @ 30 ms | **1.20544 ms** |
 | `tt-n40-long` | window 300 ms | 16.05 V @ 55.3 ms / 12.79 V @ 30 ms, 3.291 V @ 100-200 ms | 3.040 V from ~55.3 ms | **55.30 ms** (on the garbage trajectory) |
 | `tt-n40-reltol-1e-3-5ms` | window 5 ms (control) | 14.96 V @ 1.208 ms / 12.81 V @ 4 ms | -13.1 mV @ 5 ms | none |
 | `tt-n40-reltol-1e-4-5ms` | + `reltol=1e-4` | **2.907 V** @ 1.216 ms / -11.9 mV @ 2 ms | 3.041 V @ 1.23 ms, -12.4 mV @ 5 ms | **1.2139 ms** |
 | `tt-n40-reltol-1e-5-5ms` | + `reltol=1e-5` | **3.058 V** @ 1.219 ms / 1.380 V @ 4 ms | 3.041 V @ 1.22 ms, 3.041 V @ 5 ms | **1.2161 ms** |
-| `tt-n40-reltol-1e-4-30ms` | `reltol=1e-4`, original 30 ms window (~46 min wall) | -47 uV @ 30 ms (in rails) | crossing at 1.2139 ms, but the tail cycles (max 3.055 V @ 16.2 ms, ~0 V at 10/20/30 ms) | **1.2139 ms** |
+| `tt-n40-reltol-1e-4-30ms` | `reltol=1e-4`, original 30 ms window | -47 uV @ 30 ms | crossing at 1.2139 ms, but the tail cycles (max 3.055 V @ 16.2 ms, ~0 V at 10/20/30 ms) | **1.2139 ms** |
 | `tt-n40-nocc` | 131 `Ccc_*` coupling caps removed | 1.57 mV @ 80 us / **0.40 mV** | max 52.7 mV @ 10.2 us, 1.07 mV @ 30 ms | none |
 | `tt-n40-nocc-long` | + window 300 ms | 0.40 mV decaying to 0.39 mV @ 290 ms | ~1.04-1.07 mV throughout | none |
-| `tt-n40-nor` | 569 star resistors shorted (1 u-ohm) | transient op solves (after gmin/source-stepping failures); run crawls, killed at 300 s | -- | not completable |
+| `tt-n40-nor` | 569 star resistors shorted (1 u-ohm) | transient op solves after gmin/source-stepping failures, last logged timestep 0.116 ms | -- | incomplete |
 
 Schematic leg, same point:
 
 | run | netlist / change | PTAT | RESETn | crossing |
 |---|---|---|---|---|
 | `sch-tt` | grid schematic (`g5v0d10v5` MOS) | ~1e-8 V until ~2.7 ms (dead), then 0.2830 V; max 1.616 V @ 2.759 ms | 2.9698 V | **2.7574 ms** |
-| `sch-tt-reltol-1e-4(-partial)` | + `reltol=1e-4` | crawl: 12.6 ms of the 30 ms in 240 s | | not completable |
-| `sch-tt-reltol-1e-5(-partial)` | + `reltol=1e-5` | crawl: 6.1 ms of the 30 ms in 240 s | | not completable |
+| `sch-tt-reltol-1e-4-partial` | + `reltol=1e-4` | last logged timestep 12.6 ms of 30 ms | | incomplete |
+| `sch-tt-reltol-1e-5-partial` | + `reltol=1e-5` | last logged timestep 6.1 ms of 30 ms | | incomplete |
 | `sch-tt-01v8swap` | schematic with the extractor's model swap (`g5v0d10v5` -> `01v8`, 114 MOS, no parasitics) | 0.2683 V; max 3.678 V @ 0.21 ms (brief, recovers) | 3.1089 V | **1.1817 ms** |
 
 ## What the tt/3.300V/-40C runs establish (AC 1)
@@ -52,38 +63,44 @@ Schematic leg, same point:
    VSS and megohm trim resistors); the `1.47691e+236 ^ 2 out of range` error
    in `b.xdut.x$153.brbody` (base log, the PDK `res_xhigh_po` nonlinear body
    resistor evaluating that voltage) is the symptom. Tightening `reltol`
-   1e-3 -> 1e-4 pulls PTAT back within the rails (max 2.91 V vs 14.96 V) and
-   produces the 2.64 V crossing at 1.2139 ms -- **inside the original 30 ms
-   window** (`tt-n40-reltol-1e-4-30ms`), at 0.44x the schematic's 2.757 ms.
-2. **The branch is selected during the transient, not at the DC operating
-   point**: `.nodeset v(xdut.ptat)=0.283` changes nothing (bit-identical
-   output), and the trace shows PTAT at -3.44 V at 1 ms before snapping to
-   +12.83 V at 2 ms (peak 14.96 V at 1.208 ms).
-3. **The entry path is the aF-scale coupling capacitors**: with the 131
-   `Ccc_*` cards removed, no excursion occurs at all (PTAT ~0.4 mV) -- but the
-   block then sits on its zero-current branch and never starts in 300 ms,
-   while the same transient on the grid schematic starts at 2.76 ms. The
-   coupling values (7.7e-18 F .. 1.2e-17 F) are 4-5 orders below the
-   net-to-vsubs caps (fF) and cannot matter physically; they matter only as
-   the numerical path off the dead branch.
-4. **A longer window does not rescue the row and its "release" is not
-   physical**: at 300 ms the default-tolerance run crosses at 55.30 ms only
-   after PTAT peaks at 16.05 V, and RESETn thereafter sits high while PTAT
-   rests at 3.29 V -- a garbage trajectory, not a slow timer.
+   from 1e-3 to 1e-4 reduces the 5 ms PTAT peak from 14.96 V to 2.91 V.
+   The 30 ms run at 1e-4 measures PTAT at −47 µV at the end and gives the
+   first 2.64 V crossing at **1.2139 ms**, 0.44x the schematic's 2.757 ms.
+2. **The excursion develops during the transient and depends on the operating-point
+   starting guess.** In `tt-n40-trace-repeat`, unseeded PTAT starts at
+   −9.86e−153 V, reaches −3.44 V at 1 ms, peaks at +14.96 V at 1.208 ms
+   and is +12.83 V at 2 ms. RESETn misses 2.64 V. In `tt-n40-nodeset-ptat`,
+   ngspice accepts the 0.283 V guess on `ptat` and `xdut.ptat__t0` through
+   `xdut.ptat__t2`. PTAT converges to 2.96e−15 V initially, falls to −3.511 V
+   at 2 ms and ends at −3.446 V. RESETn crosses at 1.20544 ms and returns low
+   by 10 ms. The valid nodeset changes which non-physical trajectory is reached.
+3. **Removing all coupling capacitors suppresses the excursion in this run.**
+   With the 131 `Ccc_*` cards removed, PTAT stays near 0.4 mV and the block
+   stays on the zero-current branch through 300 ms. The grid schematic starts
+   at 2.76 ms. In `../grid/temp_por_top.pex.spice`, the 131 couplings range
+   from 3.869e−18 to 2.2846e−16 F. The 16 with a PTAT endpoint range from
+   3.869e−18 to 3.0948e−17 F. The 71 net-to-substrate caps range from
+   1.7277e−15 to 1.7074e−12 F. The smallest substrate cap is 7.6 times the
+   largest coupling cap. The removal experiment shows the extracted simulation
+   is sensitive to these cards. Their physical contribution remains unmeasured.
+4. **The 300 ms run crosses on a non-physical trajectory.** At default
+   tolerance RESETn crosses at 55.30 ms, and PTAT peaks at 16.05 V at
+   55.31 ms. RESETn subsequently stays high while PTAT settles near 3.29 V.
 5. **The systematic early release of the extracted leg is the #467 model
    mismatch, not the parasitics.** The grid schematic with nothing but the
    extractor's model substitution (`01v8` for 114 `g5v0d10v5` MOS) releases
    at **1.1817 ms** -- matching the tight-tolerance extracted run (1.2139 ms)
    and the fleet's early-release band (20 passing corners at 0.32-0.88x the
    schematic; 4 late at 6.2-10.0x). The `nor` variant (star-R short) shows
-   the series resistors are not freely removable (the netlist becomes
-   unsolvable-slow), so the R-card bisection stops there.
-6. **Tolerance tightening is not a fleet remedy**: at `reltol<=1e-4` BOTH
-   legs crawl (~50-100x slower; the 30 ms extracted run needs ~46 min, the
-   schematic run does not finish in 240 s), against the ramp request's
-   `timeout_s: 3000`. The grid's default-tolerance configuration is the only
-   viable one; within it the extracted leg is exposed to the non-physical
-   branch at the 12 group-A corners.
+   a completed operating-point solve, but the partial transient ends at
+   0.116 ms. Its release time remains unknown.
+6. **Tighter tolerance increases the number of transient samples.** Over the
+   same 30 ms, ngspice reports 3,072 rows at default tolerance and 2,247,983
+   at 1e-4. The schematic logs at 1e-4 and 1e-5 end at 12.6 and 6.1 ms
+   respectively. The operator reported about 46 minutes for the extracted
+   1e-4 run, 240 s for each partial schematic run and 300 s for `nor`.
+   Those wall times are unrecorded operator observations. Performance against
+   the fleet request's 3,000 s timeout remains unverified. [Ramp request](../pextb-grid/request-ramp.json)
 
 ## What the sf/2.970V/-40C runs establish (AC 2)
 
@@ -98,6 +115,7 @@ Schematic leg, same point:
   crossing" although the block released; filed as **#521** (spec decision,
   out of #454's scope). 4 of the 12 group-A corners are 2.970 V corners where
   both legs' RESETn-high is threshold-critical.
+  [30 ms schematic log](runs/sch-sf-run.txt) · [300 ms schematic log](runs/sch-sf-long-run.txt)
 - **Extracted leg at the same corner: the non-physical branch, opposite
   polarity.** PTAT parks at **-3.44 V** (below ground) with RESETn low
   (max 42.5 mV at 10.2 us); removing the coupling caps collapses it to the
@@ -106,17 +124,18 @@ Schematic leg, same point:
   own PTAT rides a 4.557 V excursion -- so the non-physical PTAT branch is a
   property of the `01v8` leg + default tolerance, appearing with or without
   parasitics, in either polarity, at both tested corners.
+  [Extracted log](runs/ext-sf-run.txt) · [Coupling removed](runs/ext-sf-nocc-run.txt) · [Model-swapped schematic](runs/sch-sf-01v8swap-run.txt)
 
 ## Attribution of the 24 group-A rows (supersedes "design vs solver unresolved")
 
-- **22 extracted-side rows (12 corners, 11 real misses + `sf/2.970V/-40C`
-  both-sides)**: a tolerance-selected non-physical ngspice branch on the
-  `01v8` extracted leg, entering through the aF coupling caps -- a **solver
-  cause**, amplified by the extraction, on top of the model-mismatch-driven
-  early release. Not a physical release beyond the window, not a slow timer.
-- **2 schematic-side rows (`sf/2.970V/-40C`)**: the fixed 2.64 V threshold vs
-  the 2.638 V logic-high on the 2.970 V rail (**#521**), a harness
-  definition artifact, not a circuit failure.
+- **22 extracted-only rows cover 11 corners with two ramp measurements each.**
+  The schematic crosses at all 11. The extracted `tt/3.300V/-40C` run
+  demonstrates a non-physical branch sensitive to tolerance, the PTAT nodeset
+  and coupling capacitance, alongside the #467 model-mismatch early release.
+  This mechanism is the inferred cause at the other ten corners.
+- **The remaining two rows cover `sf/2.970V/-40C`, where both legs miss.**
+  The report attributes the rows to the schematic side. Its 2.6383 V logic
+  high falls below the harness's fixed 2.64 V threshold (**#521**).
 - The evidence runs out at: only `tt/3.300V/-40C` and `sf/2.970V/-40C` were
   re-run locally (single-point, per the issue); the other 10 group-A corners'
   branch states are inferred, not measured. Group B (27 `ss` abort rows) is
