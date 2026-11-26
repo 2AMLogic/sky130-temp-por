@@ -1160,11 +1160,15 @@ def refuse_unrecordable(gi: dict, drift: list[str] | None, allow_dirty: bool, al
 
 
 def report_usable(report_path: Path) -> bool:
-    """True when a klt report.json exists and carries per-corner results (the retry-failed predicate)."""
+    """True when a klt report.json exists, is a JSON object and carries per-corner
+    results (the retry-failed predicate)."""
+    if not report_path.is_file():
+        return False
     try:
-        return report_path.is_file() and "corners" in json.loads(report_path.read_text())
+        rep = json.loads(report_path.read_text())
     except json.JSONDecodeError:
         return False
+    return isinstance(rep, dict) and "corners" in rep
 
 
 TRIAGE_CAP = 600
@@ -1183,14 +1187,18 @@ FLEET_JOB_KEYS = ("job_id", "instance_type", "lifecycle", "runner_klt_version",
 def load_request_report(d: Path, run_dir: Path, repo_root: Path, cap: int = TRIAGE_CAP) -> tuple[dict | None, str | None]:
     """One fleet request's gradeable klt report, or the scrubbed reason it cannot be graded.
 
-    Exactly one of the two is None: `(report, None)` when `d/report.json` parses and
-    carries per-corner results -- the same predicate `report_usable()` applies on the
-    retry path -- and `(None, why)` for each of the three ways a request yields nothing
-    to grade:
+    Exactly one of the two is None: `(report, None)` when `d/report.json` parses to a
+    JSON object and carries per-corner results -- the same predicate `report_usable()`
+    applies on the retry path -- and `(None, why)` for each of the three ways a request
+    yields nothing to grade:
 
         no report.json       "NOT SUBMITTED / no report"
         unparseable          "NO JSON (klt failed before a report existed): <klt.stderr tail>"
         report without corners "klt error (no corners reported): <report error message>"
+
+    "Unparseable" covers a document that is JSON but not an object (`[]`, `null`, a
+    string): `klt sim --format json` prints an object, so anything else is klt failing
+    ahead of its report, and the stderr tail is the diagnostic (issue #530).
 
     Every campaign grader used to carry its own copy of this block.  The copies had
     drifted into three wordings for a missing report, two for a report without
@@ -1205,6 +1213,8 @@ def load_request_report(d: Path, run_dir: Path, repo_root: Path, cap: int = TRIA
     try:
         rep = json.loads(rep_path.read_text())
     except json.JSONDecodeError:
+        rep = None
+    if not isinstance(rep, dict):
         err = d / "klt.stderr"
         tail = err.read_text()[-cap:] if err.is_file() else ""
         return None, "NO JSON (klt failed before a report existed): " + scrub(tail, run_dir, repo_root)
@@ -1284,6 +1294,10 @@ def submit_prepared(d: Path, netlist: str | None, request: dict, submit_msg: str
     per-unit decks and inputs are passed as `files`, a map of d-relative paths to their
     text, written before the submit so each `decks[].deck`/`inputs[].path` resolves
     against the request file's own directory (see `deck_request()`).
+
+    Returns `{"exit", "status"}`: klt's own exit code, and the report's `status` --
+    `?` when the object carries none, `NO-JSON` when stdout is not a JSON object
+    (klt failed ahead of its report; the diagnostic is the saved `klt.stderr`).
     """
     d.mkdir(parents=True, exist_ok=True)
     if (d / "report.json").is_file():  # archive an earlier attempt, never overwrite
@@ -1307,9 +1321,10 @@ def submit_prepared(d: Path, netlist: str | None, request: dict, submit_msg: str
     (d / "report.json").write_text(p.stdout)
     (d / "klt.stderr").write_text(p.stderr)
     try:
-        status = json.loads(p.stdout).get("status", "?")
+        body = json.loads(p.stdout)
     except json.JSONDecodeError:
-        status = "NO-JSON"
+        body = None
+    status = body.get("status", "?") if isinstance(body, dict) else "NO-JSON"
     say(f"[done]   {done_label}: exit {p.returncode}, report status {status}")
     return {"exit": p.returncode, "status": status}
 
