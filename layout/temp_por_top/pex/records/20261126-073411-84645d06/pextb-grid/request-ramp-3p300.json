@@ -1,0 +1,47 @@
+{
+  "netlist": "tb-ramp.spice",
+  "backend": "batch",
+  "models": {
+    "pdk": "sky130A",
+    "lib": "libs.tech/combined/sky130.lib.spice"
+  },
+  "corners": {
+    "process": [
+      "tt",
+      "ss",
+      "ff",
+      "sf",
+      "fs"
+    ],
+    "supply_v": {
+      "vset": [
+        3.3
+      ]
+    },
+    "temperature_c": [
+      -40,
+      27,
+      125
+    ]
+  },
+  "analysis": {
+    "kind": "tran",
+    "args": "1u 0.03 0 1e-05"
+  },
+  "measurements": [
+    {
+      "name": "t_release_v_ih",
+      "spice": ".meas tran t_release_v_ih WHEN v(resetn)=2.64 RISE=1",
+      "unit": "s"
+    },
+    {
+      "name": "vdd_at_release",
+      "spice": ".meas tran vdd_at_release FIND v(vdd) WHEN v(resetn)=2.64 RISE=1",
+      "unit": "V"
+    }
+  ],
+  "options": {
+    "timeout_s": 3000,
+    "keep_artifacts": true
+  }
+}

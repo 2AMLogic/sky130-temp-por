@@ -41,7 +41,7 @@ relaxed; nothing here edits existing records.
 ## The spec suite (whole-block testbenches, per #454 step 3)
 
 Both requests re-use the existing whole-block campaigns' stimulus exactly:
-physical 0 V start, `V(VDD) = min(3.30, rate*t)` at rate 10000 V/s (the
+physical 0 V start, `V(VDD) = min(vf, rate*t)` at rate 10000 V/s (the
 `sim/iq-top` rate), held to tstop 30 ms, `.options method=gear trtol=50`,
 `set ng_nomodcheck` carried in the netlist (the fleet runner ignores
 `options.ngspice_init`). Measurements reference **top-level nodes only**
@@ -51,7 +51,11 @@ physical 0 V start, `V(VDD) = min(3.30, rate*t)` at rate 10000 V/s (the
 - `request-ramp.json` / `tb-ramp.spice` -- the supply-ramp **release
   measurement** (`sim/supply-ramp-top`): first rising V_IH = 0.8*vf crossing
   of RESETn (the campaign's release definition; 3.30 V -> 2.64 V literal).
+  The bench adds no threshold element to the circuit. For other rails the
+  threshold is a literal per rail (2.97 V -> 2.376 V, 3.63 V -> 2.904 V), so
+  the 45-corner grid is split into one request per rail.
   Rows: `t_release_v_ih`, `vdd_at_release`.
+  [Per-rail requests, nominal pilot and rail checks](records/20261126-073411-84645d06/README.md)
 - `request-iq-por.json` / `tb-iq-por.spice` -- **Iq** (`sim/iq-top`), in the
   `por-iq` state (RESETn forced low by a 0 V `VRST`, disabling `temp_core`):
   trailing-window mean of i(BVDD) over [25, 30] ms, the same window
