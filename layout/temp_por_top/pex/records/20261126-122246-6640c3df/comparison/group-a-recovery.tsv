@@ -1,0 +1,25 @@
+corner	measurement	rail	baseline_status	baseline_schematic_status	baseline_extracted_status	baseline_schematic_value	baseline_extracted_value	new_status	new_schematic_status	new_extracted_status	new_schematic_value	new_extracted_value	new_schematic_codes	new_extracted_codes	new_error_side	new_error_code	change	schematic_leg	extracted_leg
+tt/2.970V/-40C	t_release_v_ih	2p970	error	pass	error	0.00248795		error	pass	error	0.00248718		singular_matrix	measurement+measurement	extracted	measurement	unchanged	unchanged	unchanged
+tt/2.970V/-40C	vdd_at_release	2p970	error	pass	error	2.97		error	pass	error	2.97		singular_matrix	measurement+measurement	extracted	measurement	unchanged	unchanged	unchanged
+sf/2.970V/-40C	t_release_v_ih	2p970	error	error	error			error	pass	error	0.00180093			measurement+measurement	extracted	measurement	unchanged	recovered	unchanged
+sf/2.970V/-40C	vdd_at_release	2p970	error	error	error			error	pass	error	2.97			measurement+measurement	extracted	measurement	unchanged	recovered	unchanged
+fs/2.970V/27C	t_release_v_ih	2p970	error	pass	error	0.00335782		error	pass	error	0.0033577			measurement+measurement	extracted	measurement	unchanged	unchanged	unchanged
+fs/2.970V/27C	vdd_at_release	2p970	error	pass	error	2.97		error	pass	error	2.97			measurement+measurement	extracted	measurement	unchanged	unchanged	unchanged
+fs/2.970V/125C	t_release_v_ih	2p970	error	pass	error	0.00322876		error	pass	error	0.00322872			measurement+measurement	extracted	measurement	unchanged	unchanged	unchanged
+fs/2.970V/125C	vdd_at_release	2p970	error	pass	error	2.97		error	pass	error	2.97			measurement+measurement	extracted	measurement	unchanged	unchanged	unchanged
+tt/3.300V/-40C	t_release_v_ih	3p300	error	pass	error	0.00275744		error	pass	error	0.00275744		singular_matrix	measurement+measurement	extracted	measurement	unchanged	unchanged	unchanged
+tt/3.300V/-40C	vdd_at_release	3p300	error	pass	error	3.3		error	pass	error	3.3		singular_matrix	measurement+measurement	extracted	measurement	unchanged	unchanged	unchanged
+ff/3.300V/27C	t_release_v_ih	3p300	error	pass	error	0.00256066		error	pass	error	0.00256066			singular_matrix+measurement+measurement	extracted	measurement	unchanged	unchanged	unchanged
+ff/3.300V/27C	vdd_at_release	3p300	error	pass	error	3.3		error	pass	error	3.3			singular_matrix+measurement+measurement	extracted	measurement	unchanged	unchanged	unchanged
+ff/3.300V/125C	t_release_v_ih	3p300	error	pass	error	0.00261544		error	pass	error	0.00261544			measurement+measurement	extracted	measurement	unchanged	unchanged	unchanged
+ff/3.300V/125C	vdd_at_release	3p300	error	pass	error	3.3		error	pass	error	3.3			measurement+measurement	extracted	measurement	unchanged	unchanged	unchanged
+fs/3.300V/27C	t_release_v_ih	3p300	error	pass	error	0.00368529		error	pass	error	0.00368529			measurement+measurement	extracted	measurement	unchanged	unchanged	unchanged
+fs/3.300V/27C	vdd_at_release	3p300	error	pass	error	3.3		error	pass	error	3.3			measurement+measurement	extracted	measurement	unchanged	unchanged	unchanged
+fs/3.300V/125C	t_release_v_ih	3p300	error	pass	error	0.00352731		error	pass	error	0.00352731			measurement+measurement	extracted	measurement	unchanged	unchanged	unchanged
+fs/3.300V/125C	vdd_at_release	3p300	error	pass	error	3.3		error	pass	error	3.3			measurement+measurement	extracted	measurement	unchanged	unchanged	unchanged
+sf/3.630V/27C	t_release_v_ih	3p630	error	pass	error	0.00225165		error	pass	error	0.00225169			measurement+measurement	extracted	measurement	unchanged	unchanged	unchanged
+sf/3.630V/27C	vdd_at_release	3p630	error	pass	error	3.63		error	pass	error	3.63			measurement+measurement	extracted	measurement	unchanged	unchanged	unchanged
+fs/3.630V/-40C	t_release_v_ih	3p630	error	pass	error	0.00430683		error	pass	error	0.00430692			singular_matrix+measurement+measurement	extracted	measurement	unchanged	unchanged	unchanged
+fs/3.630V/-40C	vdd_at_release	3p630	error	pass	error	3.63		error	pass	error	3.63			singular_matrix+measurement+measurement	extracted	measurement	unchanged	unchanged	unchanged
+fs/3.630V/27C	t_release_v_ih	3p630	error	pass	error	0.00400573		error	pass	error	0.00400776			measurement+measurement	extracted	measurement	unchanged	unchanged	unchanged
+fs/3.630V/27C	vdd_at_release	3p630	error	pass	error	3.63		error	pass	error	3.63			measurement+measurement	extracted	measurement	unchanged	unchanged	unchanged

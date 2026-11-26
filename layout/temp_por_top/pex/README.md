@@ -36,7 +36,7 @@ relaxed; nothing here edits existing records.
 | `temp_por_top.pex.spice` | the raw `klt pex` extraction of `../temp_por_top.gds` (153 devices, 71 nets, 566 R + 210 C parasitic cards), verbatim |
 | `klt-pex.report.json` | the `klt pex` report -- **status `error`**: both schematic legs `pass`, both extracted legs `error` (`ngspice_fatal`, `analysis_started: false`), 3/3 delta rows `error` |
 | `pextb/` | the two `klt sim` testbench requests + netlists (the spec suite, below) |
-| `records/` | append-only re-runs; `records/20261124-092216-9307a231/` is the post-#501 fix record (pilot `pass` + the 5x3x3 fleet grid) |
+| `records/` | append-only re-runs; `records/20261124-092216-9307a231/` is the post-#501 fix record (pilot `pass` + the 5x3x3 fleet grid); `records/20261126-122246-6640c3df/` is the 45-corner ramp grid re-run with the per-rail release thresholds |
 
 ## The spec suite (whole-block testbenches, per #454 step 3)
 
@@ -56,6 +56,7 @@ physical 0 V start, `V(VDD) = min(vf, rate*t)` at rate 10000 V/s (the
   the 45-corner grid is split into one request per rail.
   Rows: `t_release_v_ih`, `vdd_at_release`.
   [Per-rail requests, nominal pilot and rail checks](records/20261126-073411-84645d06/README.md)
+  [45-corner fleet run with the per-rail thresholds, compared with the 2.64 V baseline](records/20261126-122246-6640c3df/README.md)
 - `request-iq-por.json` / `tb-iq-por.spice` -- **Iq** (`sim/iq-top`), in the
   `por-iq` state (RESETn forced low by a 0 V `VRST`, disabling `temp_core`):
   trailing-window mean of i(BVDD) over [25, 30] ms, the same window
