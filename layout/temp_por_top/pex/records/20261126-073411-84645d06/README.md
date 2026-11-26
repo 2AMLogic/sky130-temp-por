@@ -18,11 +18,11 @@ card, one literal per supply rail:
 | 3.630 | 2.904 | [`request-ramp-3p630.json`](pextb-grid/request-ramp-3p630.json) |
 
 Each request keeps the 5 process × 3 temperature corners of the original
-grid, so the three requests together cover the same 45 corners. Both cards
-(`t_release_v_ih`, `vdd_at_release`) use `WHEN v(resetn)=<literal> RISE=1`,
-so each reports the crossing time and VDD at that event. `klt` cannot yet
-derive a supply-relative level for a `.meas` card (ngspice needs a literal
-there), which is why the grid is split by rail.
+grid, so the three requests together cover the same 45 corners. KLT uses the
+same file-scope `.meas` cards for every corner in a request. Grouping by rail
+lets both cards use `WHEN v(resetn)=<literal> RISE=1`. `t_release_v_ih`
+reports the first rising crossing time, and `vdd_at_release` samples VDD
+at that crossing.
 
 ## Local measurements
 
@@ -40,13 +40,27 @@ Single-corner local runs of `klt pex` (schematic and extracted legs, KLT
   post-#501 bench. The extracted leg reproduces the post-#501 pilot value
   (16.6871 ms, 3.300 V) and the schematic leg reproduces 2.70377 ms.
   Nothing about the circuit differs from that pilot.
-- **Low-rail check.** The schematic releases at 2.970 V against the 2.376 V
-  threshold. The extracted leg never reaches 2.376 V inside the 30 ms window,
-  so `klt pex` reports an `out of interval` error for both measurements on
-  that corner. This is a physical extracted-leg result at this corner, not a
-  bench artifact, and it is recorded as an open finding for #521.
 - **High-rail check.** Both legs release at 3.630 V against 2.904 V; the
   extracted leg is slow (27.4 ms, close to the 30 ms window end).
+
+### Low-rail crossing at sf / 2.970 V / −40 °C
+
+In an ngspice 47 replay of the generated schematic deck, these were the first
+consecutive samples to bracket a rising RESETn crossing of 2.376 V.
+
+| Time (ms) | RESETn (V) | VDD (V) |
+|---:|---:|---:|
+| 1.800335161 | 0.012592986 | 2.970 |
+| 1.800992147 | 2.624656773 | 2.970 |
+
+Linear interpolation gives **1.800929605 ms** and **2.970 V**, matching
+`t_release_v_ih` (1.80093 ms) and `vdd_at_release` (2.970 V) at the
+precision of the [low-rail report](low-rail/klt-pex.report.json).
+On the same 30 ms trace, `WHEN v(resetn)=2.640 RISE=1` returned
+`out of interval`. Peak RESETn was 2.63833 V.
+
+On the extracted leg, both measurements reported `out of interval` at
+2.376 V during the 30 ms transient.
 
 ## Batch status
 
@@ -75,11 +89,14 @@ klt pex layout/temp_por_top/temp_por_top.gds "$pex/pextb/request-ramp.json" \
   "${common[@]}" --backend local -o "$scratch/pilot.pex.spice" \
   --outdir "$scratch/pilot" > "$scratch/pilot.json"
 
-# one rail of the grid (repeat for 2p970 and 3p630), needs the fleet submit profile
-klt pex layout/temp_por_top/temp_por_top.gds \
-  "$record/pextb-grid/request-ramp-3p300.json" "${common[@]}" --backend batch \
-  --max-units-per-job 9 --wait-for-capacity 600 \
-  -o "$scratch/grid.pex.spice" --outdir "$scratch/grid" > "$scratch/grid.json"
+# All three rails of the grid (requires the fleet submit profile)
+for rail in 2p970 3p300 3p630; do
+  klt pex layout/temp_por_top/temp_por_top.gds \
+    "$record/pextb-grid/request-ramp-$rail.json" "${common[@]}" --backend batch \
+    --max-units-per-job 9 --wait-for-capacity 600 \
+    -o "$scratch/grid-$rail.pex.spice" --outdir "$scratch/grid-$rail" \
+    > "$scratch/grid-$rail.json"
+done
 ```
 
 The low- and high-rail rows were single corners: the nominal request with
