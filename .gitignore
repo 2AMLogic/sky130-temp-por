@@ -97,6 +97,12 @@ flow/build/
 /.loom-local/
 # <<< loom-managed <<<
 
+# loom-daemon account-ranking state (token-pool --ranking): daemon-owned,
+# rewritten in place, must not dirty the main checkout. Deliberately outside
+# the loom-managed block so resync does not drop it, and scoped to the exact
+# filename so sibling files (e.g. account-ranking-notes.md) stay visible (#523).
+/.loom/account-ranking.codex
+
 # Staged evidence scratch: raw outputs of new runs go to the fleet artifact
 # store (sim/bin/evidence_store.py); only manifests/artifacts/ is committed.
 # The corners/**/*.log exception above covers already-committed history only:
