@@ -9,6 +9,10 @@ Chronological record of recently merged pull requests and closed issues. This fi
 
 ### 2026-11-26
 
+- **PR #534**: fix: report klt stdout that is not a JSON object as NO-JSON
+- **PR #525**: chore: ignore daemon-written .loom/account-ranking.codex state
+- **Issue #530** (closed): submit_prepared and load_request_report crash on klt stdout that is JSON but not an object
+- **Issue #523** (closed): gitignore: daemon-written .loom/account-ranking.* state makes check-main-clean.sh exit 3 spuriously
 - **PR #527**: docs: record per-rail PEX ramp grid fleet run vs baseline
 - **PR #526**: fix: measure PEX reset release at 80% of each final supply
 - **PR #519**: docs: attribute the 51 block-level pex grid error rows with single-corner repros
