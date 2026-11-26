@@ -46,6 +46,7 @@ if args[:1] == ["--version"]:
 assert args[0] == "sim" and "--backend" in args and args[args.index("--backend") + 1] == "batch"
 open(os.environ["STUB_KLT_LOG"], "a").write(json.dumps(args) + "\\n")
 if os.environ.get("STUB_KLT_FAIL"):
+    sys.stdout.write(os.environ.get("STUB_KLT_FAIL_STDOUT", ""))
     sys.stderr.write("batch_no_capacity: fleet refused the job\\n")
     sys.exit(2)
 capfail = os.environ.get("STUB_KLT_CAPFAIL")
@@ -291,6 +292,20 @@ class SubmitWithStubbedKlt(unittest.TestCase):
             )
         self.assertIn("batch_no_capacity: fleet refused the job", str(ctx.exception))
         self.assertIn("not falling back to a local grid", str(ctx.exception))
+        self.assertEqual(len(self.log.read_text().splitlines()), 1)  # no retry via another path
+
+    def test_stdout_that_is_json_but_not_an_object_surfaces_the_fleet_diagnostic(self):
+        """A refused submit whose stdout is `[]` reaches this check instead of raising
+        from the submit helper (issue #530): the diagnostic is quoted, not lost."""
+        os.environ["STUB_KLT_FAIL"] = "1"
+        os.environ["STUB_KLT_FAIL_STDOUT"] = "[]"
+        with self.assertRaises(cr.HarnessError) as ctx:
+            cr.submit_batch(
+                self.exp, self.matrix, "* netlist\n.end\n", self.request(), self.tmp / "run"
+            )
+        self.assertIn("status NO-JSON", str(ctx.exception))
+        self.assertIn("klt stdout (verbatim): []", str(ctx.exception))
+        self.assertIn("batch_no_capacity: fleet refused the job", str(ctx.exception))
         self.assertEqual(len(self.log.read_text().splitlines()), 1)  # no retry via another path
 
     def test_request_carries_capacity_wait_and_zero_disables_it(self):
