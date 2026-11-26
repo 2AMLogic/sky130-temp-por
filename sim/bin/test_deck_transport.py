@@ -32,7 +32,6 @@ import json
 import os
 import re
 import shutil
-import stat
 import subprocess
 import sys
 import tempfile
@@ -51,49 +50,7 @@ PINNED = PIN["open_pdks_commit"]
 
 # The stub writes its argv to STUB_KLT_LOG and replays a canned report, so a test can
 # assert BOTH what was submitted (one request, never one per point) and what came back.
-STUB_KLT = """#!/usr/bin/env python3
-import json, os, shutil, sys
-args = sys.argv[1:]
-if args[:1] == ["--version"]:
-    print("klt 9.9.9-stub")
-    sys.exit(0)
-assert args[0] == "sim"
-open(os.environ["STUB_KLT_LOG"], "a").write(json.dumps(args) + "\\n")
-if os.environ.get("STUB_KLT_FAIL"):
-    sys.stderr.write('{"error": {"code": "batch_no_capacity", "message": "fleet refused the job"}}\\n')
-    sys.exit(2)
-req = json.loads(open(args[1]).read())
-outdir = args[args.index("-o") + 1]
-units = []
-for deck in req["decks"]:
-    d = os.path.join(outdir, deck["id"])
-    os.makedirs(d, exist_ok=True)
-    # Replay the deck and its shipped .spiceinit into the unit's stdout, so a test can
-    # assert the engine saw what the request declared.
-    init = ""
-    for inp in deck.get("inputs", []):
-        src = os.path.join(os.path.dirname(args[1]), inp["path"])
-        if os.path.isfile(src):
-            init = open(src).read()
-    solver = "SPARSE 1.3" if "\\n* option klu" in init else "KLU"
-    body = os.environ.get("STUB_KLT_STDOUT", "").replace("@SOLVER@", solver)
-    open(os.path.join(d, "stdout.bin"), "w").write(body)
-    open(os.path.join(d, "stderr.bin"), "w").write("")
-    units.append({"id": deck["id"], "status": "pass", "exit_code": 0, "timed_out": False,
-                  "stdout": deck["id"] + "/stdout.bin", "stderr": deck["id"] + "/stderr.bin",
-                  "engine_version": "47", "diagnostics": []})
-json.dump({"schema_version": 3, "mode": "decks", "status": "pass", "unit_count": len(units),
-           "passed": len(units), "errored": 0, "timed_out": 0, "units": units,
-           "outdir": os.path.abspath(outdir),
-           "environment": {"engine": "ngspice", "engine_version": "47", "klt_version": "9.9.9-stub",
-                           "engine_host": "worker",
-                           "remote": {"provider": "aws-batch-fleet", "job_id": "job-deck-1",
-                                      "region": "us-east-1", "instance_type": "c7i.8xlarge",
-                                      "state": "done", "runner_klt_version": "0.9.0-runner",
-                                      "runner_request_features": {"required": ["decks"],
-                                                                  "missing": [], "status": "supported"}}}},
-          sys.stdout)
-"""
+STUB_KLT = BIN / "fixtures" / "deck-submit" / "klt"
 
 # The per-runner probe class runs its subprocesses behind this *tripwire* `klt` instead
 # of the real tool.  The only verb that can submit a campaign (`sim`) is recorded in
@@ -107,17 +64,39 @@ json.dump({"schema_version": 3, "mode": "decks", "status": "pass", "unit_count":
 # runs inside the subcommand handlers, which no probe ever reaches.  Refusing every
 # verb keeps the containment absolute: no probe can execute the real, credentialed
 # `klt` on this host.
-TRIPWIRE_KLT = """#!/usr/bin/env python3
-import os, sys
-args = sys.argv[1:]
-if args[:1] == ["--version"]:
-    print("klt 9.9.9-stub")
-    sys.exit(0)
-open(os.environ["TRIPWIRE_LOG"], "a").write(" ".join(args) + "\\n")
-sys.stderr.write("klt tripwire: `klt %s` refused -- probes get `--version` only\\n"
-                 % (args[0] if args else "<no args>"))
-sys.exit(3)
-"""
+TRIPWIRE_KLT = BIN / "fixtures" / "deck-tripwire" / "klt"
+
+# The stand-in for the real tool that the non-delegation test puts behind the
+# tripwire on PATH: `delegated <argv>` on stdout is the signal that it was reached.
+BEHIND_KLT = BIN / "fixtures" / "deck-tripwire-behind" / "klt"
+
+KLT_VERSION = "klt 9.9.9-stub"
+
+
+def klt_first(fixture: Path, path: str) -> str:
+    """`path` with the fixture's directory first on it, for a caller that runs `klt` by
+    bare name on that PATH -- provided `klt` resolves to the fixture there and the
+    fixture executes.  Otherwise raise, naming the expected and the resolved path, so
+    the caller stops before its first call instead of reaching a later `klt`.
+
+    Resolving is not enough.  Which entry answers is decided by `execve`, and a
+    `noexec` mount refuses the fixture whatever its permission bits say, so lookup
+    then goes on to the next entry.  Hence the probe, which starts the fixture itself
+    by its own path and nothing else."""
+    path = f"{fixture.parent}{os.pathsep}{path}"
+    resolved = shutil.which("klt", path=path)
+    if resolved != str(fixture):
+        raise RuntimeError(f"`klt` on PATH is not the test fixture: expected {fixture}, resolved {resolved}")
+    try:
+        probe = subprocess.run([str(fixture), "--version"], capture_output=True, text=True)
+    except OSError as exc:
+        probe = argparse.Namespace(returncode=None, stdout="", stderr=str(exc))
+    if (probe.returncode, probe.stdout.strip()) != (0, KLT_VERSION):
+        raise RuntimeError(
+            f"`klt` on PATH resolves to the test fixture but it does not execute here: "
+            f"expected {fixture} to answer `{KLT_VERSION}` to --version, resolved {resolved}, "
+            f"got exit {probe.returncode}, stdout {probe.stdout.strip()!r}, stderr {probe.stderr.strip()!r}")
+    return path
 
 
 def load(path: Path, name: str):
@@ -339,15 +318,11 @@ class SolverCrossCheck(unittest.TestCase):
 
 class SubmitWithStubbedKlt(unittest.TestCase):
     def setUp(self):
+        path = klt_first(STUB_KLT, os.environ["PATH"])
         self.tmp = Path(tempfile.mkdtemp(prefix="deck-submit-"))
-        bindir = self.tmp / "bin"
-        bindir.mkdir()
-        klt = bindir / "klt"
-        klt.write_text(STUB_KLT)
-        klt.chmod(klt.stat().st_mode | stat.S_IXUSR)
         self.log = self.tmp / "klt.log"
         self.saved_env = dict(os.environ)
-        os.environ["PATH"] = f"{bindir}{os.pathsep}{os.environ['PATH']}"
+        os.environ["PATH"] = path
         os.environ["STUB_KLT_LOG"] = str(self.log)
         os.environ["STUB_KLT_STDOUT"] = (
             "Using @SOLVER@ as Direct Linear Solver\nvref = 1.25\n-i(v1) = 1e-06\nngspice-47 done\n"
@@ -607,15 +582,13 @@ class CapacityWaitFlagReachesEveryRunnersParser(unittest.TestCase):
     appears."""
 
     def setUp(self):
+        path = klt_first(TRIPWIRE_KLT, os.environ["PATH"])
         self.tmp = tempfile.TemporaryDirectory(prefix="klt-tripwire-")
         self.addCleanup(self.tmp.cleanup)
-        bindir = Path(self.tmp.name) / "bin"
-        bindir.mkdir()
-        self.klt = bindir / "klt"
-        self.klt.write_text(TRIPWIRE_KLT)
-        self.klt.chmod(self.klt.stat().st_mode | stat.S_IXUSR)
+        self.klt = TRIPWIRE_KLT
         self.tripwire_log = Path(self.tmp.name) / "tripwire.log"
         self.tripwire_log.touch()
+        self.probe_path = path
 
     def cli(self, rel: str, *argv: str, expect: str):
         """Drive one runner's real CLI behind the tripwire, asserting the argparse
@@ -634,7 +607,7 @@ class CapacityWaitFlagReachesEveryRunnersParser(unittest.TestCase):
              *CAPACITY_WAIT_RUNNERS[rel], *argv],
             cwd=REPO, capture_output=True, text=True,
             env={**os.environ,
-                 "PATH": f"{Path(self.klt).parent}{os.pathsep}{os.environ['PATH']}",
+                 "PATH": self.probe_path,
                  "TRIPWIRE_LOG": str(self.tripwire_log)})
         tripped = self.tripwire_log.read_text()
         self.assertEqual(
@@ -674,22 +647,30 @@ class CapacityWaitFlagReachesEveryRunnersParser(unittest.TestCase):
         """Containment is absolute: no probe may execute the real, credentialed `klt`.
         Nothing on the probe path invokes `klt` before argparse (measured across all
         11 runners -- see TRIPWIRE_KLT's comment), so refusing every non-`--version`
-        verb breaks nothing; a fake `klt` behind the tripwire proves it is never
+        verb breaks nothing; a stand-in `klt` behind the tripwire proves it is never
         reached."""
-        behind = tempfile.TemporaryDirectory(prefix="klt-behind-")
-        self.addCleanup(behind.cleanup)
-        real = Path(behind.name) / "klt"
-        real.write_text("#!/bin/sh\necho \"delegated $*\"\n")
-        real.chmod(real.stat().st_mode | stat.S_IXUSR)
         p = subprocess.run(
             [sys.executable, str(self.klt), "artifact", "put", "--help"],
             capture_output=True, text=True,
-            env={**os.environ, "PATH": f"{self.klt.parent}{os.pathsep}{behind.name}",
+            env={**os.environ, "PATH": f"{self.klt.parent}{os.pathsep}{BEHIND_KLT.parent}",
                  "TRIPWIRE_LOG": str(self.tripwire_log)})
         self.assertNotEqual(p.returncode, 0, p.stdout)
         self.assertIn("tripwire", p.stderr)
         self.assertNotIn("delegated", p.stdout)
         self.assertIn("artifact put --help", self.tripwire_log.read_text())
+
+    def test_the_stand_in_behind_the_tripwire_answers_when_it_is_reached(self):
+        """What keeps the test above honest on either mount type.  Reached through PATH
+        lookup alone, with nothing in front to refuse on its behalf, the stand-in
+        answers -- so its silence behind the tripwire is the tripwire's doing, not a
+        lookup that could not have reached it (issue #539: a stand-in written into the
+        temporary directory is unreachable where TMPDIR is mounted noexec)."""
+        p = subprocess.run(["klt", "artifact", "put", "--help"], capture_output=True, text=True,
+                           env={**os.environ, "PATH": str(BEHIND_KLT.parent),
+                                "TRIPWIRE_LOG": str(self.tripwire_log)})
+        self.assertEqual(p.returncode, 0, p.stderr)
+        self.assertEqual(p.stdout, "delegated artifact put --help\n")
+        self.assertEqual(self.tripwire_log.read_text(), "")
 
     def test_a_valid_float_value_alone_is_refused_before_any_subprocess(self):
         """PR #359's original regression: `--wait-for-capacity 0.5` parses and submits,
@@ -796,6 +777,73 @@ class CapacityWaitFlagReachesEveryRunnersParser(unittest.TestCase):
         self.assertNotIn("invalid float value", p.stderr)
         self.assertIn("unrecognized arguments", p.stderr)
         self.assertIn(UNRECOGNISED_PROBE, p.stderr)
+
+
+# ---------------------------------------------------------------------------
+# fixture selection (issue #539)
+# ---------------------------------------------------------------------------
+
+
+class FixtureSelection(unittest.TestCase):
+    """Every `setUp` that puts a `klt` fixture on PATH selects it, or stops.
+
+    A fixture that is merely first on PATH is not enough.  Where it cannot be executed,
+    PATH lookup goes on to the next entry and whatever `klt` is there answers -- on a
+    dispatch worker, the installed client.  So each `setUp` checks what `klt` resolves
+    to -- on the PATH its own subprocesses will get: the submit class changes the
+    parent's PATH, the probe class builds a child PATH from it -- and that the fixture
+    executes, before the first call.  When either fails it stops, naming the expected
+    and the resolved path."""
+
+    SUBMITS = (SubmitWithStubbedKlt, "test_one_submit_for_the_whole_grid_not_one_per_point")
+    PROBES = (CapacityWaitFlagReachesEveryRunnersParser, "test_the_tripwire_refuses_sim_and_records_the_attempt")
+    TARGETS = ((SUBMITS, STUB_KLT), (PROBES, TRIPWIRE_KLT))
+
+    def stopped_setup(self, target, resolved, probe):
+        """Run `target`'s `setUp()` with `klt` resolving to `resolved` and the fixture's
+        `--version` probe answering `probe`; return the message it stopped with and the
+        two mocks, after checking that it stopped *in setup*: no subprocess started,
+        and the environment is exactly as it was."""
+        case, name = target
+        with unittest.mock.patch.dict(os.environ), \
+             unittest.mock.patch.object(subprocess, "Popen") as popen, \
+             unittest.mock.patch.object(shutil, "which", return_value=resolved) as which, \
+             unittest.mock.patch.object(subprocess, "run", **probe) as run:
+            before = dict(os.environ)
+            with self.assertRaises(RuntimeError) as caught:
+                case(name).setUp()
+            self.assertEqual(dict(os.environ), before)
+            popen.assert_not_called()
+        return str(caught.exception), which, run
+
+    def test_setup_stops_when_klt_is_missing_or_resolves_elsewhere(self):
+        """The two ways lookup fails: nothing on PATH answers to `klt`, or something
+        other than the fixture does.  The check is made on the PATH the class's own
+        subprocesses will use; the message names both paths, and nothing is started."""
+        for target, fixture in self.TARGETS:
+            for resolved in (None, "/elsewhere/on/PATH/klt"):
+                with self.subTest(case=target[0].__name__, resolved=resolved):
+                    msg, which, run = self.stopped_setup(target, resolved, {})
+                    which.assert_called_once_with(
+                        "klt", path=f"{fixture.parent}{os.pathsep}{os.environ['PATH']}")
+                    run.assert_not_called()
+                    self.assertIn(f"expected {fixture}", msg)
+                    self.assertIn(f"resolved {resolved}", msg)
+
+    def test_setup_stops_when_the_fixture_does_not_execute_here(self):
+        """Resolved to the fixture, which still cannot run: a `noexec` mount refuses
+        `execve` while the file is exactly where lookup found it.  Only the fixture
+        itself, by its own path, may be started to find that out."""
+        for target, fixture in self.TARGETS:
+            outcomes = {
+                "execve refused": {"side_effect": PermissionError(13, "Permission denied", str(fixture))},
+                "answers something else": {"return_value": argparse.Namespace(returncode=1, stdout="", stderr="")},
+            }
+            for name, outcome in outcomes.items():
+                with self.subTest(case=target[0].__name__, name=name):
+                    msg, _, run = self.stopped_setup(target, str(fixture), outcome)
+                    run.assert_called_once_with([str(fixture), "--version"], capture_output=True, text=True)
+                    self.assertIn(str(fixture), msg)
 
 
 if __name__ == "__main__":

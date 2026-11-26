@@ -1,7 +1,8 @@
 #!/usr/bin/env python3
 """Batch-backend tests for corner-run.py (issue #219). Stdlib only, no SPICE, no PDK.
 
-`klt` is a stub executable on PATH: it answers `--version` and `sim` the way the
+`klt` is a stub executable on PATH (the tracked fixture
+`sim/bin/fixtures/corner-batch/klt`): it answers `--version` and `sim` the way the
 real verb's outputs are shaped, so request construction, report-to-result
 mapping, record rendering and the no-local-fallback failure path are all
 exercised without a fleet.
@@ -14,7 +15,7 @@ from __future__ import annotations
 import argparse
 import json
 import os
-import stat
+import shutil
 import subprocess
 import sys
 import tempfile
@@ -37,27 +38,34 @@ PINNED = PIN["open_pdks_commit"]
 LOCAL_COMMIT = "e" * 40          # this host's own install, parked on a batch record
 EXPERIMENT = REPO / "sim" / "bias-core-smoke"
 
-STUB_KLT = """#!/usr/bin/env python3
-import json, os, sys
-args = sys.argv[1:]
-if args[:1] == ["--version"]:
-    print("klt 9.9.9-stub")
-    sys.exit(0)
-assert args[0] == "sim" and "--backend" in args and args[args.index("--backend") + 1] == "batch"
-open(os.environ["STUB_KLT_LOG"], "a").write(json.dumps(args) + "\\n")
-if os.environ.get("STUB_KLT_FAIL"):
-    sys.stdout.write(os.environ.get("STUB_KLT_FAIL_STDOUT", ""))
-    sys.stderr.write("batch_no_capacity: fleet refused the job\\n")
-    sys.exit(2)
-capfail = os.environ.get("STUB_KLT_CAPFAIL")
-if capfail:
-    n = int(open(capfail).read().strip() or "0")
-    if n < int(os.environ.get("STUB_KLT_CAPFAIL_TIMES", "1")):
-        open(capfail, "w").write(str(n + 1))
-        sys.stderr.write(json.dumps({"error": {"message": "launch refused: BATCH_MAX_CONCURRENT_INSTANCES cap reached"}}) + "\\n")
-        sys.exit(2)
-sys.stdout.write(open(os.environ["STUB_KLT_REPORT"]).read())
-"""
+STUB_KLT = BIN / "fixtures" / "corner-batch" / "klt"
+KLT_VERSION = "klt 9.9.9-stub"
+
+
+def klt_first(fixture: Path, path: str) -> str:
+    """`path` with the fixture's directory first on it, for a caller that runs `klt` by
+    bare name on that PATH -- provided `klt` resolves to the fixture there and the
+    fixture executes.  Otherwise raise, naming the expected and the resolved path, so
+    the caller stops before its first call instead of reaching a later `klt`.
+
+    Resolving is not enough.  Which entry answers is decided by `execve`, and a
+    `noexec` mount refuses the fixture whatever its permission bits say, so lookup
+    then goes on to the next entry.  Hence the probe, which starts the fixture itself
+    by its own path and nothing else."""
+    path = f"{fixture.parent}{os.pathsep}{path}"
+    resolved = shutil.which("klt", path=path)
+    if resolved != str(fixture):
+        raise RuntimeError(f"`klt` on PATH is not the test fixture: expected {fixture}, resolved {resolved}")
+    try:
+        probe = subprocess.run([str(fixture), "--version"], capture_output=True, text=True)
+    except OSError as exc:
+        probe = argparse.Namespace(returncode=None, stdout="", stderr=str(exc))
+    if (probe.returncode, probe.stdout.strip()) != (0, KLT_VERSION):
+        raise RuntimeError(
+            f"`klt` on PATH resolves to the test fixture but it does not execute here: "
+            f"expected {fixture} to answer `{KLT_VERSION}` to --version, resolved {resolved}, "
+            f"got exit {probe.returncode}, stdout {probe.stdout.strip()!r}, stderr {probe.stderr.strip()!r}")
+    return path
 
 
 def make_pdk() -> "cr.Pdk":
@@ -249,17 +257,13 @@ class ReportMapping(unittest.TestCase):
 
 class SubmitWithStubbedKlt(unittest.TestCase):
     def setUp(self):
+        path = klt_first(STUB_KLT, os.environ["PATH"])
         self.tmp = Path(tempfile.mkdtemp(prefix="corner-run-batch-"))
-        bindir = self.tmp / "bin"
-        bindir.mkdir()
-        klt = bindir / "klt"
-        klt.write_text(STUB_KLT)
-        klt.chmod(klt.stat().st_mode | stat.S_IXUSR)
         self.log = self.tmp / "klt.log"
         self.exp = cr.load_experiment(EXPERIMENT)
         self.matrix = full_matrix(self.exp)
         self.saved_env = dict(os.environ)
-        os.environ["PATH"] = f"{bindir}{os.pathsep}{os.environ['PATH']}"
+        os.environ["PATH"] = path
         os.environ["STUB_KLT_LOG"] = str(self.log)
         report = self.tmp / "report.json"
         report.write_text(json.dumps(fake_report(self.matrix)))
@@ -517,6 +521,62 @@ class SubmitWithStubbedKlt(unittest.TestCase):
             "backend": "batch",
             "batch": fleet["batch"],
         }
+
+
+class StubSelection(unittest.TestCase):
+    """Issue #539: the submit tests run the tracked stub or do not run at all.
+
+    A stub that is merely first on PATH is not enough.  Where it cannot be executed,
+    PATH lookup goes on to the next entry and whatever `klt` is there answers -- on a
+    dispatch worker, the installed client.  `setUp` therefore checks what `klt`
+    resolves to, on the PATH the submit itself will use, and that the stub executes,
+    before the first call; when either fails it stops, naming the expected and the
+    resolved path."""
+
+    SUBMIT = (SubmitWithStubbedKlt, "test_submit_records_fleet_provenance")
+
+    def stopped_setup(self, resolved, probe):
+        """Run the submit class's `setUp()` with `klt` resolving to `resolved` and the
+        fixture's `--version` probe answering `probe`; return the message it stopped
+        with and the two mocks, after checking that it stopped *in setup*: no subprocess
+        started, and the environment is exactly as it was."""
+        case, name = self.SUBMIT
+        with mock.patch.dict(os.environ), mock.patch.object(subprocess, "Popen") as popen, \
+             mock.patch.object(shutil, "which", return_value=resolved) as which, \
+             mock.patch.object(subprocess, "run", **probe) as run:
+            before = dict(os.environ)
+            with self.assertRaises(RuntimeError) as caught:
+                case(name).setUp()
+            self.assertEqual(dict(os.environ), before)
+            popen.assert_not_called()
+        return str(caught.exception), which, run
+
+    def test_setup_stops_when_klt_is_missing_or_resolves_elsewhere(self):
+        """The two ways lookup fails: nothing on PATH answers to `klt`, or something
+        other than the stub does.  The check is made on the PATH the submit itself
+        will use; the message names both paths, and not even the stub is started."""
+        for resolved in (None, "/elsewhere/on/PATH/klt"):
+            with self.subTest(resolved=resolved):
+                msg, which, run = self.stopped_setup(resolved, {})
+                which.assert_called_once_with(
+                    "klt", path=f"{STUB_KLT.parent}{os.pathsep}{os.environ['PATH']}")
+                run.assert_not_called()
+                self.assertIn(f"expected {STUB_KLT}", msg)
+                self.assertIn(f"resolved {resolved}", msg)
+
+    def test_setup_stops_when_the_stub_does_not_execute_here(self):
+        """Resolved to the stub, which still cannot run: a `noexec` mount refuses
+        `execve` while the file is exactly where lookup found it.  Only the stub
+        itself, by its own path, may be started to find that out."""
+        outcomes = {
+            "execve refused": {"side_effect": PermissionError(13, "Permission denied", str(STUB_KLT))},
+            "answers something else": {"return_value": argparse.Namespace(returncode=1, stdout="", stderr="")},
+        }
+        for name, outcome in outcomes.items():
+            with self.subTest(name):
+                msg, _, run = self.stopped_setup(str(STUB_KLT), outcome)
+                run.assert_called_once_with([str(STUB_KLT), "--version"], capture_output=True, text=True)
+                self.assertIn(str(STUB_KLT), msg)
 
 
 class RefuseExistingHelper(unittest.TestCase):

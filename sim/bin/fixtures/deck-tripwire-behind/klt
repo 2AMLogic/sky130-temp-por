@@ -1,0 +1,9 @@
+#!/bin/sh
+# Stand-in for the real `klt` in the deck-transport tripwire tests
+# (sim/bin/test_deck_transport.py).  It answers any argv with `delegated <argv>` --
+# the signal the suite asserts is ABSENT when this sits behind the tripwire on PATH.
+#
+# Tracked and executable on purpose (issue #539): a stand-in written into the
+# temporary directory cannot be reached where TMPDIR is mounted noexec, which would
+# let that assertion pass without the tripwire having refused anything.
+echo "delegated $*"

@@ -1,0 +1,22 @@
+#!/usr/bin/env python3
+"""Tripwire `klt` for the deck-transport runner probes (sim/bin/test_deck_transport.py).
+
+Answers `--version` and nothing else: every other argv is appended to $TRIPWIRE_LOG
+and refused with exit 3, never delegated, so a probe whose argv a runner accepts
+cannot reach the real tool.  What that keeps in, and what was measured across the
+runners, is in the comment above TRIPWIRE_KLT in that file.
+
+Tracked and executable on purpose (issue #539): the suite puts this directory first
+on the probes' PATH and checks that `klt` resolves here before the first call.  A
+tripwire written into the temporary directory is skipped by PATH lookup when TMPDIR is
+mounted noexec, and a real `klt` installed later on PATH is invoked instead.
+"""
+import os, sys
+args = sys.argv[1:]
+if args[:1] == ["--version"]:
+    print("klt 9.9.9-stub")
+    sys.exit(0)
+open(os.environ["TRIPWIRE_LOG"], "a").write(" ".join(args) + "\n")
+sys.stderr.write("klt tripwire: `klt %s` refused -- probes get `--version` only\n"
+                 % (args[0] if args else "<no args>"))
+sys.exit(3)
