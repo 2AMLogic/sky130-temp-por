@@ -1055,17 +1055,7 @@ def main(argv: list[str]) -> int:
         SLUG,
         files=files,
     )
-    report = json.loads((submit_dir / "report.json").read_text() or "{}")
-    units = sim_common.deck_units(report)
-    if not units:
-        # No local-grid fallback, ever (host rules): a refusal is reported verbatim and
-        # the run ends without a record, so nothing claims evidence the fleet never made.
-        raise cr.HarnessError(
-            f"batch submit produced no usable deck report (klt exit {outcome['exit']}, "
-            f"report status {outcome['status']}); NOT falling back to a local grid.\n"
-            f"  klt stderr: {(submit_dir / 'klt.stderr').read_text().strip()[:1200]}\n"
-            f"  request:    {submit_dir / 'request.json'}"
-        )
+    report, units = sim_common.require_deck_report(submit_dir, outcome)
 
     results: list[dict] = []
     stamp = datetime.now(timezone.utc)

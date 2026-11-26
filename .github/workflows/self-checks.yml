@@ -93,6 +93,9 @@ jobs:
       - name: sim_common deck-list record batch-block tests (committed records are the oracle for its keys and prose)
         run: python3 -I sim/bin/test_sim_common_deck_batch.py
 
+      - name: sim_common deck-list report check tests (malformed, empty and unit-less fleet output refuses with klt's own stderr after one submit; a partial report reaches each campaign's grader)
+        run: python3 -I sim/bin/test_sim_common_deck_report.py
+
       - name: Every fleet runner records the PDK its runners reported, never the client's (one contract, all seven runners)
         run: python3 -I sim/bin/test_runner_fleet_pdk.py
 
