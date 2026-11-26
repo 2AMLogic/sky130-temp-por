@@ -1,0 +1,91 @@
+corner	measurement	rail	baseline_group	baseline_status	baseline_schematic_status	baseline_extracted_status	baseline_schematic_value	baseline_extracted_value	new_status	new_schematic_status	new_extracted_status	new_schematic_value	new_extracted_value	new_schematic_codes	new_extracted_codes	new_error_side	new_error_code	change	schematic_leg	extracted_leg
+tt/2.970V/-40C	t_release_v_ih	2p970	A	error	pass	error	0.00248795		error	pass	error	0.00248718		singular_matrix	measurement+measurement	extracted	measurement	unchanged	unchanged	unchanged
+tt/2.970V/-40C	vdd_at_release	2p970	A	error	pass	error	2.97		error	pass	error	2.97		singular_matrix	measurement+measurement	extracted	measurement	unchanged	unchanged	unchanged
+tt/2.970V/27C	t_release_v_ih	2p970	pass	pass	pass	pass	0.00246432	0.00148672	pass	pass	pass	0.00246334	0.0014867					unchanged	unchanged	unchanged
+tt/2.970V/27C	vdd_at_release	2p970	pass	pass	pass	pass	2.97	2.97	pass	pass	pass	2.97	2.97					unchanged	unchanged	unchanged
+tt/2.970V/125C	t_release_v_ih	2p970	pass	pass	pass	pass	0.00251009	0.0018943	pass	pass	pass	0.00251003	0.00189427					unchanged	unchanged	unchanged
+tt/2.970V/125C	vdd_at_release	2p970	pass	pass	pass	pass	2.97	2.97	pass	pass	pass	2.97	2.97					unchanged	unchanged	unchanged
+ss/2.970V/-40C	t_release_v_ih	2p970	B	error	pass	error	0.00265222		error	pass	error	0.00265089			singular_matrix+timestep_too_small+nonconvergence+measurement+measurement+analysis_aborted	extracted	singular_matrix	unchanged	unchanged	unchanged
+ss/2.970V/-40C	vdd_at_release	2p970	B	error	pass	error	2.97		error	pass	error	2.97			singular_matrix+timestep_too_small+nonconvergence+measurement+measurement+analysis_aborted	extracted	singular_matrix	unchanged	unchanged	unchanged
+ss/2.970V/27C	t_release_v_ih	2p970	B	error	pass	error	0.00260021		error	pass	error	0.00260014			singular_matrix+timestep_too_small+nonconvergence+measurement+measurement+analysis_aborted	extracted	singular_matrix	unchanged	unchanged	unchanged
+ss/2.970V/27C	vdd_at_release	2p970	B	error	pass	error	2.97		error	pass	error	2.97			singular_matrix+timestep_too_small+nonconvergence+measurement+measurement+analysis_aborted	extracted	singular_matrix	unchanged	unchanged	unchanged
+ss/2.970V/125C	t_release_v_ih	2p970	B	error	pass	error	0.00262809		error	pass	error	0.00262713			singular_matrix+timestep_too_small+nonconvergence+measurement+measurement+analysis_aborted	extracted	singular_matrix	unchanged	unchanged	unchanged
+ss/2.970V/125C	vdd_at_release	2p970	B	error	pass	error	2.97		error	pass	error	2.97			singular_matrix+timestep_too_small+nonconvergence+measurement+measurement+analysis_aborted	extracted	singular_matrix	unchanged	unchanged	unchanged
+ff/2.970V/-40C	t_release_v_ih	2p970	pass	pass	pass	pass	0.00232196	0.00122881	pass	pass	pass	0.00232176	0.00122869		singular_matrix			unchanged	unchanged	unchanged
+ff/2.970V/-40C	vdd_at_release	2p970	pass	pass	pass	pass	2.97	2.97	pass	pass	pass	2.97	2.97		singular_matrix			unchanged	unchanged	unchanged
+ff/2.970V/27C	t_release_v_ih	2p970	pass	pass	pass	pass	0.00232391	0.00139189	pass	pass	pass	0.00232387	0.00139176		singular_matrix			unchanged	unchanged	unchanged
+ff/2.970V/27C	vdd_at_release	2p970	pass	pass	pass	pass	2.97	2.97	pass	pass	pass	2.97	2.97		singular_matrix			unchanged	unchanged	unchanged
+ff/2.970V/125C	t_release_v_ih	2p970	pass	pass	pass	pass	0.00238686	0.00150697	pass	pass	pass	0.00238671	0.00150696					unchanged	unchanged	unchanged
+ff/2.970V/125C	vdd_at_release	2p970	pass	pass	pass	pass	2.97	2.97	pass	pass	pass	2.97	2.97					unchanged	unchanged	unchanged
+sf/2.970V/-40C	t_release_v_ih	2p970	A	error	error	error			error	pass	error	0.00180093			measurement+measurement	extracted	measurement	unchanged	recovered	unchanged
+sf/2.970V/-40C	vdd_at_release	2p970	A	error	error	error			error	pass	error	2.97			measurement+measurement	extracted	measurement	unchanged	recovered	unchanged
+sf/2.970V/27C	t_release_v_ih	2p970	pass	pass	pass	pass	0.00186392	0.00138744	pass	pass	pass	0.00186365	0.00138743					unchanged	unchanged	unchanged
+sf/2.970V/27C	vdd_at_release	2p970	pass	pass	pass	pass	2.97	2.97	pass	pass	pass	2.97	2.97					unchanged	unchanged	unchanged
+sf/2.970V/125C	t_release_v_ih	2p970	pass	pass	pass	pass	0.00200086	0.00176484	pass	pass	pass	0.00200078	0.00176481					unchanged	unchanged	unchanged
+sf/2.970V/125C	vdd_at_release	2p970	pass	pass	pass	pass	2.97	2.97	pass	pass	pass	2.97	2.97					unchanged	unchanged	unchanged
+fs/2.970V/-40C	t_release_v_ih	2p970	pass	pass	pass	pass	0.00360729	0.0011892	pass	pass	pass	0.0036071	0.00118917		singular_matrix			unchanged	unchanged	unchanged
+fs/2.970V/-40C	vdd_at_release	2p970	pass	pass	pass	pass	2.97	2.97	pass	pass	pass	2.97	2.97		singular_matrix			unchanged	unchanged	unchanged
+fs/2.970V/27C	t_release_v_ih	2p970	A	error	pass	error	0.00335782		error	pass	error	0.0033577			measurement+measurement	extracted	measurement	unchanged	unchanged	unchanged
+fs/2.970V/27C	vdd_at_release	2p970	A	error	pass	error	2.97		error	pass	error	2.97			measurement+measurement	extracted	measurement	unchanged	unchanged	unchanged
+fs/2.970V/125C	t_release_v_ih	2p970	A	error	pass	error	0.00322876		error	pass	error	0.00322872			measurement+measurement	extracted	measurement	unchanged	unchanged	unchanged
+fs/2.970V/125C	vdd_at_release	2p970	A	error	pass	error	2.97		error	pass	error	2.97			measurement+measurement	extracted	measurement	unchanged	unchanged	unchanged
+tt/3.300V/-40C	t_release_v_ih	3p300	A	error	pass	error	0.00275744		error	pass	error	0.00275744		singular_matrix	measurement+measurement	extracted	measurement	unchanged	unchanged	unchanged
+tt/3.300V/-40C	vdd_at_release	3p300	A	error	pass	error	3.3		error	pass	error	3.3		singular_matrix	measurement+measurement	extracted	measurement	unchanged	unchanged	unchanged
+tt/3.300V/27C	t_release_v_ih	3p300	pass	pass	pass	pass	0.00270377	0.0166871	pass	pass	pass	0.00270377	0.0166871					unchanged	unchanged	unchanged
+tt/3.300V/27C	vdd_at_release	3p300	pass	pass	pass	pass	3.3	3.3	pass	pass	pass	3.3	3.3					unchanged	unchanged	unchanged
+tt/3.300V/125C	t_release_v_ih	3p300	pass	pass	pass	pass	0.00275149	0.00204364	pass	pass	pass	0.00275149	0.00204364					unchanged	unchanged	unchanged
+tt/3.300V/125C	vdd_at_release	3p300	pass	pass	pass	pass	3.3	3.3	pass	pass	pass	3.3	3.3					unchanged	unchanged	unchanged
+ss/3.300V/-40C	t_release_v_ih	3p300	B	error	pass	error	0.00292684		error	pass	error	0.00292684			singular_matrix+timestep_too_small+nonconvergence+measurement+measurement+analysis_aborted	extracted	singular_matrix	unchanged	unchanged	unchanged
+ss/3.300V/-40C	vdd_at_release	3p300	B	error	pass	error	3.3		error	pass	error	3.3			singular_matrix+timestep_too_small+nonconvergence+measurement+measurement+analysis_aborted	extracted	singular_matrix	unchanged	unchanged	unchanged
+ss/3.300V/27C	t_release_v_ih	3p300	B	error	pass	error	0.00286202		error	pass	error	0.00286202			singular_matrix+timestep_too_small+nonconvergence+measurement+measurement+analysis_aborted	extracted	singular_matrix	unchanged	unchanged	unchanged
+ss/3.300V/27C	vdd_at_release	3p300	B	error	pass	error	3.3		error	pass	error	3.3			singular_matrix+timestep_too_small+nonconvergence+measurement+measurement+analysis_aborted	extracted	singular_matrix	unchanged	unchanged	unchanged
+ss/3.300V/125C	t_release_v_ih	3p300	B	error	pass	error	0.00287067		error	pass	error	0.00287067			singular_matrix+timestep_too_small+nonconvergence+measurement+measurement+analysis_aborted	extracted	singular_matrix	unchanged	unchanged	unchanged
+ss/3.300V/125C	vdd_at_release	3p300	B	error	pass	error	3.3		error	pass	error	3.3			singular_matrix+timestep_too_small+nonconvergence+measurement+measurement+analysis_aborted	extracted	singular_matrix	unchanged	unchanged	unchanged
+ff/3.300V/-40C	t_release_v_ih	3p300	pass	pass	pass	pass	0.00258132	0.00132011	pass	pass	pass	0.00258132	0.00132011		singular_matrix			unchanged	unchanged	unchanged
+ff/3.300V/-40C	vdd_at_release	3p300	pass	pass	pass	pass	3.3	3.3	pass	pass	pass	3.3	3.3		singular_matrix			unchanged	unchanged	unchanged
+ff/3.300V/27C	t_release_v_ih	3p300	A	error	pass	error	0.00256066		error	pass	error	0.00256066			singular_matrix+measurement+measurement	extracted	measurement	unchanged	unchanged	unchanged
+ff/3.300V/27C	vdd_at_release	3p300	A	error	pass	error	3.3		error	pass	error	3.3			singular_matrix+measurement+measurement	extracted	measurement	unchanged	unchanged	unchanged
+ff/3.300V/125C	t_release_v_ih	3p300	A	error	pass	error	0.00261544		error	pass	error	0.00261544			measurement+measurement	extracted	measurement	unchanged	unchanged	unchanged
+ff/3.300V/125C	vdd_at_release	3p300	A	error	pass	error	3.3		error	pass	error	3.3			measurement+measurement	extracted	measurement	unchanged	unchanged	unchanged
+sf/3.300V/-40C	t_release_v_ih	3p300	pass	pass	pass	pass	0.00200984	0.0201734	pass	pass	pass	0.00200984	0.0201734					unchanged	unchanged	unchanged
+sf/3.300V/-40C	vdd_at_release	3p300	pass	pass	pass	pass	3.3	3.3	pass	pass	pass	3.3	3.3					unchanged	unchanged	unchanged
+sf/3.300V/27C	t_release_v_ih	3p300	pass	pass	pass	pass	0.00206245	0.00151532	pass	pass	pass	0.00206245	0.00151532					unchanged	unchanged	unchanged
+sf/3.300V/27C	vdd_at_release	3p300	pass	pass	pass	pass	3.3	3.3	pass	pass	pass	3.3	3.3					unchanged	unchanged	unchanged
+sf/3.300V/125C	t_release_v_ih	3p300	pass	pass	pass	pass	0.00219935	0.00192568	pass	pass	pass	0.00219935	0.00192568					unchanged	unchanged	unchanged
+sf/3.300V/125C	vdd_at_release	3p300	pass	pass	pass	pass	3.3	3.3	pass	pass	pass	3.3	3.3					unchanged	unchanged	unchanged
+fs/3.300V/-40C	t_release_v_ih	3p300	pass	pass	pass	pass	0.00397133	0.00128947	pass	pass	pass	0.00397133	0.00128947		singular_matrix			unchanged	unchanged	unchanged
+fs/3.300V/-40C	vdd_at_release	3p300	pass	pass	pass	pass	3.3	3.3	pass	pass	pass	3.3	3.3		singular_matrix			unchanged	unchanged	unchanged
+fs/3.300V/27C	t_release_v_ih	3p300	A	error	pass	error	0.00368529		error	pass	error	0.00368529			measurement+measurement	extracted	measurement	unchanged	unchanged	unchanged
+fs/3.300V/27C	vdd_at_release	3p300	A	error	pass	error	3.3		error	pass	error	3.3			measurement+measurement	extracted	measurement	unchanged	unchanged	unchanged
+fs/3.300V/125C	t_release_v_ih	3p300	A	error	pass	error	0.00352731		error	pass	error	0.00352731			measurement+measurement	extracted	measurement	unchanged	unchanged	unchanged
+fs/3.300V/125C	vdd_at_release	3p300	A	error	pass	error	3.3		error	pass	error	3.3			measurement+measurement	extracted	measurement	unchanged	unchanged	unchanged
+tt/3.630V/-40C	t_release_v_ih	3p630	pass	pass	pass	pass	0.00300971	0.0012906	pass	pass	pass	0.00300974	0.00129071	singular_matrix				unchanged	unchanged	unchanged
+tt/3.630V/-40C	vdd_at_release	3p630	pass	pass	pass	pass	3.63	3.63	pass	pass	pass	3.63	3.63	singular_matrix				unchanged	unchanged	unchanged
+tt/3.630V/27C	t_release_v_ih	3p630	pass	pass	pass	pass	0.002943	0.0274468	pass	pass	pass	0.0029438	0.027447					unchanged	unchanged	unchanged
+tt/3.630V/27C	vdd_at_release	3p630	pass	pass	pass	pass	3.63	3.63	pass	pass	pass	3.63	3.63					unchanged	unchanged	unchanged
+tt/3.630V/125C	t_release_v_ih	3p630	pass	pass	pass	pass	0.00298178	0.00217144	pass	pass	pass	0.00298181	0.00217152					unchanged	unchanged	unchanged
+tt/3.630V/125C	vdd_at_release	3p630	pass	pass	pass	pass	3.63	3.63	pass	pass	pass	3.63	3.63					unchanged	unchanged	unchanged
+ss/3.630V/-40C	t_release_v_ih	3p630	B	error	pass	error	0.00317642		error	pass	error	0.0031765			singular_matrix+timestep_too_small+nonconvergence+measurement+measurement+analysis_aborted	extracted	singular_matrix	unchanged	unchanged	unchanged
+ss/3.630V/-40C	vdd_at_release	3p630	B	error	pass	error	3.63		error	pass	error	3.63			singular_matrix+timestep_too_small+nonconvergence+measurement+measurement+analysis_aborted	extracted	singular_matrix	unchanged	unchanged	unchanged
+ss/3.630V/27C	t_release_v_ih	3p630	B	error	pass	error	0.0030961		error	pass	error	0.00309612			singular_matrix+timestep_too_small+nonconvergence+measurement+measurement+analysis_aborted	extracted	singular_matrix	unchanged	unchanged	unchanged
+ss/3.630V/27C	vdd_at_release	3p630	B	error	pass	error	3.63		error	pass	error	3.63			singular_matrix+timestep_too_small+nonconvergence+measurement+measurement+analysis_aborted	extracted	singular_matrix	unchanged	unchanged	unchanged
+ss/3.630V/125C	t_release_v_ih	3p630	B	error	pass	error	0.00309228		error	pass	error	0.00309231			singular_matrix+timestep_too_small+nonconvergence+measurement+measurement+analysis_aborted	extracted	singular_matrix	unchanged	unchanged	unchanged
+ss/3.630V/125C	vdd_at_release	3p630	B	error	pass	error	3.63		error	pass	error	3.63			singular_matrix+timestep_too_small+nonconvergence+measurement+measurement+analysis_aborted	extracted	singular_matrix	unchanged	unchanged	unchanged
+ff/3.630V/-40C	t_release_v_ih	3p630	pass	pass	pass	pass	0.00280719	0.00141498	pass	pass	pass	0.00280724	0.00141501		singular_matrix			unchanged	unchanged	unchanged
+ff/3.630V/-40C	vdd_at_release	3p630	pass	pass	pass	pass	3.63	3.63	pass	pass	pass	3.63	3.63		singular_matrix			unchanged	unchanged	unchanged
+ff/3.630V/27C	t_release_v_ih	3p630	pass	pass	pass	pass	0.00278591	0.00158781	pass	pass	pass	0.00278599	0.00158792		singular_matrix			unchanged	unchanged	unchanged
+ff/3.630V/27C	vdd_at_release	3p630	pass	pass	pass	pass	3.63	3.63	pass	pass	pass	3.63	3.63		singular_matrix			unchanged	unchanged	unchanged
+ff/3.630V/125C	t_release_v_ih	3p630	pass	pass	pass	pass	0.00283437	0.00172468	pass	pass	pass	0.00283442	0.00172471					unchanged	unchanged	unchanged
+ff/3.630V/125C	vdd_at_release	3p630	pass	pass	pass	pass	3.63	3.63	pass	pass	pass	3.63	3.63					unchanged	unchanged	unchanged
+sf/3.630V/-40C	t_release_v_ih	3p630	pass	pass	pass	pass	0.00219851	0.021396	pass	pass	pass	0.00219854	0.0213968					unchanged	unchanged	unchanged
+sf/3.630V/-40C	vdd_at_release	3p630	pass	pass	pass	pass	3.63	3.63	pass	pass	pass	3.63	3.63					unchanged	unchanged	unchanged
+sf/3.630V/27C	t_release_v_ih	3p630	A	error	pass	error	0.00225165		error	pass	error	0.00225169			measurement+measurement	extracted	measurement	unchanged	unchanged	unchanged
+sf/3.630V/27C	vdd_at_release	3p630	A	error	pass	error	3.63		error	pass	error	3.63			measurement+measurement	extracted	measurement	unchanged	unchanged	unchanged
+sf/3.630V/125C	t_release_v_ih	3p630	pass	pass	pass	pass	0.00239038	0.00205377	pass	pass	pass	0.00239042	0.00205385					unchanged	unchanged	unchanged
+sf/3.630V/125C	vdd_at_release	3p630	pass	pass	pass	pass	3.63	3.63	pass	pass	pass	3.63	3.63					unchanged	unchanged	unchanged
+fs/3.630V/-40C	t_release_v_ih	3p630	A	error	pass	error	0.00430683		error	pass	error	0.00430692			singular_matrix+measurement+measurement	extracted	measurement	unchanged	unchanged	unchanged
+fs/3.630V/-40C	vdd_at_release	3p630	A	error	pass	error	3.63		error	pass	error	3.63			singular_matrix+measurement+measurement	extracted	measurement	unchanged	unchanged	unchanged
+fs/3.630V/27C	t_release_v_ih	3p630	A	error	pass	error	0.00400573		error	pass	error	0.00400776			measurement+measurement	extracted	measurement	unchanged	unchanged	unchanged
+fs/3.630V/27C	vdd_at_release	3p630	A	error	pass	error	3.63		error	pass	error	3.63			measurement+measurement	extracted	measurement	unchanged	unchanged	unchanged
+fs/3.630V/125C	t_release_v_ih	3p630	pass	pass	pass	pass	0.00380935	0.00230577	pass	pass	pass	0.0038094	0.00230579					unchanged	unchanged	unchanged
+fs/3.630V/125C	vdd_at_release	3p630	pass	pass	pass	pass	3.63	3.63	pass	pass	pass	3.63	3.63					unchanged	unchanged	unchanged
