@@ -1,0 +1,155 @@
+{
+  "schema_version": 1,
+  "inputs": {
+    "baseline_report": "../../20261124-092216-9307a231/grid/klt-pex.report.json",
+    "baseline_groups": "../../20261124-092216-9307a231/diagnosis-454/error-rows.tsv",
+    "new_reports": {
+      "2p970": "../grid-2p970/klt-pex.report.json",
+      "3p300": "../grid-3p300/klt-pex.report.json",
+      "3p630": "../grid-3p630/klt-pex.report.json"
+    }
+  },
+  "coverage": {
+    "baseline_ramp_rows": 90,
+    "new_rows": 90,
+    "new_unique_pairs": 90,
+    "keys_equal": true,
+    "per_rail": {
+      "2p970": {
+        "volt": "2.970V",
+        "rows": 30,
+        "passed": 16,
+        "failed": 0,
+        "errored": 14,
+        "job_ids": {
+          "schematic": [
+            "klt-sim-754aa92deba0",
+            "klt-sim-1344e775267b"
+          ],
+          "extracted": [
+            "klt-sim-9f95f710de2c",
+            "klt-sim-c6a366d607ea"
+          ]
+        }
+      },
+      "3p300": {
+        "volt": "3.300V",
+        "rows": 30,
+        "passed": 14,
+        "failed": 0,
+        "errored": 16,
+        "job_ids": {
+          "schematic": [
+            "klt-sim-eb3de377f771",
+            "klt-sim-2a9d9bac34b0"
+          ],
+          "extracted": [
+            "klt-sim-915c63d0fa20",
+            "klt-sim-a53c45c0015c"
+          ]
+        }
+      },
+      "3p630": {
+        "volt": "3.630V",
+        "rows": 30,
+        "passed": 18,
+        "failed": 0,
+        "errored": 12,
+        "job_ids": {
+          "schematic": [
+            "klt-sim-d079c27714dd",
+            "klt-sim-d927fb569ffc"
+          ],
+          "extracted": [
+            "klt-sim-96a85048763a",
+            "klt-sim-a43b94e9e3c7"
+          ]
+        }
+      }
+    }
+  },
+  "group_a": {
+    "rows": 24,
+    "corners": 12,
+    "recovered": 0,
+    "non_pass": 24,
+    "non_pass_new_schematic_status": {
+      "pass": 24
+    },
+    "non_pass_new_extracted_status": {
+      "error": 24
+    },
+    "non_pass_new_extracted_codes": {
+      "measurement+measurement": 20,
+      "singular_matrix+measurement+measurement": 4
+    },
+    "legs_recovered": [
+      [
+        "sf/2.970V/-40C",
+        "t_release_v_ih",
+        "schematic"
+      ],
+      [
+        "sf/2.970V/-40C",
+        "vdd_at_release",
+        "schematic"
+      ]
+    ],
+    "legs_regressed": []
+  },
+  "regressions": {
+    "baseline_pass_rows": 48,
+    "regressed": 0,
+    "rows": []
+  },
+  "row_status": {
+    "baseline": {
+      "error": 42,
+      "pass": 48
+    },
+    "new": {
+      "error": 42,
+      "pass": 48
+    }
+  },
+  "corner_leg_status": {
+    "baseline_schematic": {
+      "error": 1,
+      "pass": 44
+    },
+    "new_schematic": {
+      "pass": 45
+    },
+    "baseline_extracted": {
+      "error": 21,
+      "pass": 24
+    },
+    "new_extracted": {
+      "error": 21,
+      "pass": 24
+    }
+  },
+  "value_shift": {
+    "2p970": {
+      "rows_pass_in_both_runs": 16,
+      "legs_identical": 16,
+      "legs_new_lower": 16,
+      "legs_new_higher": 0
+    },
+    "3p300": {
+      "rows_pass_in_both_runs": 14,
+      "legs_identical": 28,
+      "legs_new_lower": 0,
+      "legs_new_higher": 0
+    },
+    "3p630": {
+      "rows_pass_in_both_runs": 18,
+      "legs_identical": 18,
+      "legs_new_lower": 0,
+      "legs_new_higher": 18
+    }
+  },
+  "changes": {
+    "unchanged": 90
+  }
+}
