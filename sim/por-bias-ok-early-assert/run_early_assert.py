@@ -274,11 +274,7 @@ def main(argv) -> int:
     sim_common.refuse_existing((rec_md, rec_json, snap, stage, evidence_store.manifest_path(SLUG, record_id)))
     sub = run_dir / "batch"
     outcome = sim_common.submit_prepared(sub, None, request, f"{SLUG}: {len(points)} decks -> batch fleet", SLUG, files=files)
-    report = json.loads((sub / "report.json").read_text() or "{}")
-    units = sim_common.deck_units(report)
-    if not units:
-        raise cr.HarnessError(f"batch submit produced no usable deck report (exit {outcome['exit']}, status {outcome['status']}); "
-                              f"NOT falling back to a local grid.\n  stderr: {(sub / 'klt.stderr').read_text().strip()[:1200]}")
+    report, units = sim_common.require_deck_report(sub, outcome)
     stage.mkdir(parents=True, exist_ok=True)
     results = []
     for pt in points:

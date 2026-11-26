@@ -109,6 +109,12 @@ and/or `corner-run.py` itself):
                           `batch` dict's own 15-key shape (a unit tally, not
                           `fleet_job_fields()`' corner one), and the
                           `Backend`/`Fleet engine` sentences that render it
+    require_deck_report()  the deck-list runners' post-submit report check
+                          (issue #528): the `(report, units)` a finished
+                          `submit_prepared()` left behind, or the one refusal
+                          that keeps klt's exit code, report status, stderr
+                          and request path for a stdout that was not a
+                          usable report
 """
 
 from __future__ import annotations
@@ -1519,6 +1525,48 @@ def deck_list_batch_clause(b: dict, fleet_ngspice: str) -> list[str]:
 def deck_units(report: dict | None) -> dict[str, dict]:
     """`{unit id: unit}` of a `decks[]` report; empty for anything that is not one."""
     return {u["id"]: u for u in (report or {}).get("units", []) if isinstance(u, dict) and u.get("id")}
+
+
+DECK_STDERR_CAP = 1200
+
+
+def require_deck_report(d: Path, outcome: dict, cap: int = DECK_STDERR_CAP) -> tuple[dict, dict[str, dict]]:
+    """The `decks[]` report a finished `submit_prepared()` left in `d`, and `deck_units()` of it.
+
+    Returns `(report, units)` when `report.json` is a JSON object that indexes at least one
+    unit.  Anything else raises the runners' `HarnessError`, so the run ends after ONE
+    submission, before any evidence is recorded, with what the fleet said in hand: klt's
+    exit code and the report status from `outcome` -- `submit_prepared()`'s own summary,
+    read here and never reshaped -- the head of `klt.stderr`, and the request's path.
+    No local-grid fallback, ever (host rules).
+
+    "Anything else" is deliberately every way a report can be unusable, because the three
+    deck-list runners each used to decide it with an unguarded `json.loads`: a NONEMPTY
+    malformed stdout raised `JSONDecodeError` there and took the stderr with it, and only
+    an empty stdout reached the refusal that reports it (issue #528).  Covered: a stdout
+    that is not JSON, is empty, or is JSON that is not an object; a report whose `units`
+    is missing, empty, not a list, or holds no entry with an `id`; no `report.json` at all.
+
+    The bytes `submit_prepared()` wrote are left as written -- `report.json` is what klt
+    printed, and that is what an operator needs to see what the fleet said.  A report that
+    indexes units but not every id requested is NOT refused here: each campaign grades its
+    own missing units (`run_pnp_mismatch.py` fails the run, `run_op_branch.py` fails the
+    point, `run_early_assert.py` logs it).
+    """
+    try:
+        report = json.loads((d / "report.json").read_text())
+    except (OSError, ValueError):
+        report = None
+    units = deck_units(report) if isinstance(report, dict) and isinstance(report.get("units"), list) else {}
+    if units:
+        return report, units
+    err = d / "klt.stderr"
+    raise load_corner_run().HarnessError(
+        f"batch submit produced no usable deck report (klt exit {outcome['exit']}, "
+        f"report status {outcome['status']}); NOT falling back to a local grid.\n"
+        f"  klt stderr: {err.read_text().strip()[:cap] if err.is_file() else ''}\n"
+        f"  request:    {d / 'request.json'}"
+    )
 
 
 def deck_streams(report: dict, unit: dict) -> str:
