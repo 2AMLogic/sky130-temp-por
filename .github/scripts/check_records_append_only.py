@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""CI: committed sim/ evidence is append-only against Git.
+"""CI: committed sim/ and layout PEX evidence is append-only against Git.
 
 Protected evidence (Git pathspecs; Git's * crosses '/', so flat and nested
 layouts are both covered):
@@ -7,6 +7,9 @@ layouts are both covered):
   sim/*/netlist-snapshots/*  frozen decks and batch request files
   sim/*/corners/*            raw per-corner logs, summaries, waveforms (.gz)
   manifests/artifacts/*      artifact-store manifests and summaries of new runs
+  layout/*/pex/records/*     block-level PEX re-run records (nested run
+                             directories: klt-pex.report.json files, batch
+                             request files, decks, READMEs)
 
 sim/README.md's "Append-only rule" says this evidence is never edited,
 deleted or moved after creation -- corrections preserve the old bytes and
@@ -18,6 +21,16 @@ type change of an existing evidence blob fails, even when the edited file is
 still well-formed; the affected paths are listed. Added paths are allowed.
 Live testbenches, campaign drivers, experiment manifests and READMEs are not
 protected and stay editable.
+
+layout/<block>/pex/README.md describes its records/ as append-only re-runs, and
+the same file-level rule applies (issue #529): each run directory is cited
+evidence (README prose, issue comments and comparison tooling that resolves
+committed request files by sha256), so a later change that rewrote or deleted
+a committed klt-pex.report.json or request would silently change what a merged
+record is understood to have measured. A new run directory is an allowed
+addition -- records/ is not closed, the closed rule below is specific to
+sim/*/corners/. The sibling pextb*/, grid/ and top-level report files beside
+records/ under layout/*/pex/ are not protected and stay editable.
 
 Closed directory (added paths also fail):
   sim/*/corners/*            historical raw bytes only
@@ -59,7 +72,10 @@ Usage:
                                             (modify, delete, move), additions
                                             under the closed corners/ (flat
                                             and nested), fresh store-era run,
-                                            live-file edits, and baseline
+                                            live-file edits, layout PEX records
+                                            (nested modify, delete, move out,
+                                            rename, type change; fresh run;
+                                            sibling README), and baseline
                                             resolution (missing, initial push,
                                             push before-commit, PR merge base,
                                             merge-group base: absent,
@@ -80,6 +96,7 @@ PROTECTED = (
     "sim/*/netlist-snapshots/*",
     "sim/*/corners/*",
     "manifests/artifacts/*",
+    "layout/*/pex/records/*",
 )
 
 # Closed to additions as well: raw bytes of a new run belong in the artifact
@@ -261,11 +278,22 @@ def main(argv):
         verbs = {"D": "deleted", "M": "modified", "T": "type-changed"}
         for status, path in bad:
             verb = verbs.get(status, f"changed ({status})")
+            if path.startswith("layout/"):
+                rule = (
+                    "committed layout PEX records are never edited, deleted or "
+                    "moved; preserve the record and append a new run directory "
+                    '(layout/<block>/pex/README.md: records/ are "append-only '
+                    're-runs")'
+                )
+            else:
+                rule = (
+                    "committed sim evidence is never edited, deleted or moved; "
+                    "preserve it and append a new run ID with a Supersedes link "
+                    '(sim/README.md "Append-only rule")'
+                )
             print(
                 f"::error file={path}::append-only violation: evidence {verb} (a move counts "
-                f"as a deletion) — committed sim evidence is never edited, "
-                f"deleted or moved; preserve it and append a new run ID with a "
-                f'Supersedes link (sim/README.md "Append-only rule")',
+                f"as a deletion) — {rule}",
                 file=sys.stderr,
             )
         print(
@@ -681,10 +709,86 @@ def selftest():
         p = ev()
         check("editing testbench/driver/manifest/README passes", p.returncode == 0, p.stderr)
 
+        # layout PEX records (issue #529): layout/*/pex/records/ is cited
+        # evidence, append-only at file level like sim records -- a move out of
+        # records/ counts as a deletion and a type change is a change -- while a
+        # new run directory is an allowed addition (the closed-to-additions
+        # rule stays specific to sim/*/corners/) and the sibling pextb/ and
+        # README beside records/ stay editable
+        pex = repo / "layout" / "block" / "pex"
+        prec = pex / "records" / "r0"
+        (prec / "grid").mkdir(parents=True)
+        (prec / "grid" / "klt-pex.report.json").write_text('{"status": "pass"}\n')
+        (prec / "pextb-grid").mkdir()
+        (prec / "pextb-grid" / "request-ramp.json").write_text('{"vdd": "3.3"}\n')
+        (prec / "README.md").write_text("# pex record r0\n")
+        (pex / "pextb").mkdir()
+        (pex / "pextb" / "tb-ramp.spice").write_text("* live deck\n")
+        (pex / "README.md").write_text("pex readme\n")
+        commit_all("add layout PEX record")
+        ev_base = commit_sha(repo, "HEAD")
+
+        report = "layout/block/pex/records/r0/grid/klt-pex.report.json"
+        request = "layout/block/pex/records/r0/pextb-grid/request-ramp.json"
+        readme = "layout/block/pex/records/r0/README.md"
+
+        (prec / "grid" / "klt-pex.report.json").write_text('{"status": "error"}\n')
+        commit_all("edit a nested PEX report")
+        expect_fail("modifying a nested PEX report fails", report)
+
+        (prec / "grid" / "klt-pex.report.json").unlink()
+        commit_all("delete a nested PEX report")
+        expect_fail("deleting a nested PEX report fails", report)
+
+        (pex / "archive").mkdir()
+        git(repo, "mv", report, "layout/block/pex/archive/klt-pex.report.json")
+        commit_all("move a PEX report out of records/")
+        expect_fail("moving a PEX record outside records/ fails", report)
+
+        git(repo, "mv", request, "layout/block/pex/records/r0/pextb-grid/request-renamed.json")
+        commit_all("rename a PEX request")
+        expect_fail("renaming a PEX record file fails", request)
+
+        (prec / "README.md").unlink()
+        (prec / "README.md").symlink_to("../../README.md")
+        commit_all("replace a PEX record file with a symlink")
+        expect_fail("type-changing a PEX record file fails", readme)
+
+        # a fresh PEX run (a whole new run directory) is an allowed addition
+        (prec.parent / "r1" / "grid").mkdir(parents=True)
+        (prec.parent / "r1" / "grid" / "klt-pex.report.json").write_text("{}\n")
+        (prec.parent / "r1" / "pextb-grid").mkdir()
+        (prec.parent / "r1" / "pextb-grid" / "request-ramp.json").write_text("{}\n")
+        (prec.parent / "r1" / "README.md").write_text("# pex record r1\n")
+        commit_all("fresh PEX run")
+        p = ev()
+        check(
+            "adding a fresh PEX run passes and is counted among allowed additions",
+            p.returncode == 0 and "3 new path(s) allowed" in p.stdout,
+            f"rc={p.returncode} {p.stdout}{p.stderr}",
+        )
+        check(
+            "a fresh PEX run is not a closed-directory addition",
+            "::error" not in p.stderr,
+            p.stderr,
+        )
+        git(repo, "reset", "-q", "--hard", ev_base)
+
+        # the sibling pex README and the live pextb/ deck stay editable
+        (pex / "README.md").write_text("pex readme v2\n")
+        (pex / "pextb" / "tb-ramp.spice").write_text("* live deck v2\n")
+        commit_all("edit the sibling pex README and a live deck")
+        p = ev()
+        check(
+            "editing the sibling pex README and a live deck passes",
+            p.returncode == 0,
+            f"rc={p.returncode} {p.stderr}",
+        )
+
     if failures:
         print(f"selftest FAILED: {len(failures)} case(s): {', '.join(failures)}", file=sys.stderr)
         return 1
-    print("selftest ok: record and evidence (flat/nested) add/modify/delete/move, live-file, baseline (push, pull_request, merge_group) fixtures all behave")
+    print("selftest ok: record, evidence (flat/nested) and layout PEX record add/modify/delete/move, live-file, baseline (push, pull_request, merge_group) fixtures all behave")
     return 0
 
 
