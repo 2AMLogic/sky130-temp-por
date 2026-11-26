@@ -9,6 +9,8 @@ Chronological record of recently merged pull requests and closed issues. This fi
 
 ### 2026-11-26
 
+- **PR #531**: fix(sim): keep klt's stderr for an unusable deck-list report
+- **Issue #528** (closed): Consolidate the three deck-list report checks so malformed output preserves fleet diagnostics
 - **PR #534**: fix: report klt stdout that is not a JSON object as NO-JSON
 - **PR #525**: chore: ignore daemon-written .loom/account-ranking.codex state
 - **Issue #530** (closed): submit_prepared and load_request_report crash on klt stdout that is JSON but not an object
