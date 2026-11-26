@@ -15,9 +15,7 @@
     ],
     "supply_v": {
       "vset": [
-        2.97,
-        3.3,
-        3.63
+        3.3
       ]
     },
     "temperature_c": [
@@ -33,12 +31,12 @@
   "measurements": [
     {
       "name": "t_release_v_ih",
-      "spice": ".meas tran t_release_v_ih WHEN v(resetn)=v(vth) RISE=1",
+      "spice": ".meas tran t_release_v_ih WHEN v(resetn)=2.64 RISE=1",
       "unit": "s"
     },
     {
       "name": "vdd_at_release",
-      "spice": ".meas tran vdd_at_release FIND v(vdd) WHEN v(resetn)=v(vth) RISE=1",
+      "spice": ".meas tran vdd_at_release FIND v(vdd) WHEN v(resetn)=2.64 RISE=1",
       "unit": "V"
     }
   ],

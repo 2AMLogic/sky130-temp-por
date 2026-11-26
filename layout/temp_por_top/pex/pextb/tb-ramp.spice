@@ -2,10 +2,10 @@
 * Stimulus = sim/supply-ramp-top tb_temp_por_ramp.sch: physical 0 V start,
 * V(VDD) = min(vf, rate*t), rate 10000 V/s (the sim/iq-top rate), held to tstop 30 ms.
 * Measurements (.meas cards come from request-ramp.json) reference top-level
-* nodes only (VDD, RESETn, VTH): the extracted leg is flat, so DUT-internal nets
+* nodes only (VDD, RESETn): the extracted leg is flat, so DUT-internal nets
 * (POR_RAW, IBIAS, ...) do not exist there.
 * Release definition = sim/supply-ramp-top grading: first rising V_IH = 0.8*vf
-* crossing of RESETn (Schmitt output, starts LOW). VSETN is the final supply at this corner.
+* crossing of RESETn (Schmitt output, starts LOW). vf = 3.30 V -> V_IH = 2.64 V.
 .param rate=10000
 * ng_nomodcheck: same setting as sim/spiceinit; carried in the netlist because the
 * fleet runner ignores options.ngspice_init (see sim/supply-ramp-top experiment.json)
@@ -17,12 +17,10 @@ set ng_nomodcheck
 VSET VSETN 0 3.3
 BVDD VDD 0 V = min(v(VSETN), {rate}*time)
 XDUT VDD 0 PTAT CTAT RESETn temp_por_top
-* Constant V_IH for the release measurements, sensed from the final setpoint.
-ETH VTH 0 VSETN 0 0.8
 **** begin user architecture code
 
 
-.save v(vdd) v(resetn) v(vth) i(bvdd) v(ptat) v(ctat)
+.save v(vdd) v(resetn) i(bvdd) v(ptat) v(ctat)
 .options method=gear trtol=50
 
 

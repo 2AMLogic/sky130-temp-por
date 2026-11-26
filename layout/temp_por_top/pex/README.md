@@ -45,16 +45,17 @@ physical 0 V start, `V(VDD) = min(vf, rate*t)` at rate 10000 V/s (the
 `sim/iq-top` rate), held to tstop 30 ms, `.options method=gear trtol=50`,
 `set ng_nomodcheck` carried in the netlist (the fleet runner ignores
 `options.ngspice_init`). Measurements reference **top-level nodes only**
-(VDD, RESETn, VTH, i(BVDD)) because the extracted leg is flat -- DUT-internal nets
+(VDD, RESETn, i(BVDD)) because the extracted leg is flat -- DUT-internal nets
 (POR_RAW, IBIAS, ...) do not exist there.
 
 - `request-ramp.json` / `tb-ramp.spice` -- the supply-ramp **release
   measurement** (`sim/supply-ramp-top`): first rising V_IH = 0.8*vf crossing
-  of RESETn. The bench derives a constant VTH from the corner’s final supply
-  (VSETN). The 2.970, 3.300 (nominal) and 3.630 V rails use 2.376, 2.640
-  and 2.904 V respectively. Both legs report the crossing time
-  (`t_release_v_ih`) and sample VDD at that event (`vdd_at_release`).
-  [Per-rail waveforms, nominal pilot and batch submission record](records/20261126-073411-84645d06/README.md)
+  of RESETn (the campaign's release definition; 3.30 V -> 2.64 V literal).
+  The bench adds no threshold element to the circuit. For other rails the
+  threshold is a literal per rail (2.97 V -> 2.376 V, 3.63 V -> 2.904 V), so
+  the 45-corner grid is split into one request per rail.
+  Rows: `t_release_v_ih`, `vdd_at_release`.
+  [Per-rail requests, nominal pilot and rail checks](records/20261126-073411-84645d06/README.md)
 - `request-iq-por.json` / `tb-iq-por.spice` -- **Iq** (`sim/iq-top`), in the
   `por-iq` state (RESETn forced low by a 0 V `VRST`, disabling `temp_core`):
   trailing-window mean of i(BVDD) over [25, 30] ms, the same window
