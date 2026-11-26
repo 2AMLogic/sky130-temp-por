@@ -22,6 +22,7 @@ from __future__ import annotations
 
 import json
 import os
+import shutil
 import subprocess
 import sys
 import tempfile
@@ -155,29 +156,7 @@ def store_or_exit(bench: str, run_id: str, stage_dir: Path) -> tuple[Path, Path]
 # self-test (fake klt)
 # --------------------------------------------------------------------------
 
-_FAKE_KLT = r'''#!/usr/bin/env python3
-import hashlib, json, os, sys
-a = sys.argv[1:]
-mode = os.environ.get("FAKE_KLT_MODE", "ok")
-if a[:2] == ["artifact", "put"] and "--help" in a:
-    sys.exit(1 if mode == "no-put" else 0)
-if a[:2] == ["artifact", "verify"] and "--help" in a:
-    sys.exit(0)
-if a[:2] == ["artifact", "put"]:
-    if mode == "put-fails":
-        print("broker unreachable", file=sys.stderr); sys.exit(1)
-    m = a[a.index("--manifest") + 1]
-    files = a[a.index("--manifest") + 2:]
-    ents = []
-    for f in files:
-        b = open(f, "rb").read(); h = hashlib.sha256(b).hexdigest()
-        ents.append({"sha256": h, "size": len(b), "kind": "evidence",
-                     "producer": {"tool": "klt", "version": "0", "loom.repo": "o/n", "commit": None},
-                     "uri": ("s3://x/" if mode == "bad-uri" else "artifact:evidence/o__n/") + h, "name": f})
-    open(m, "w").write(json.dumps({"schema_version": 1, "entries": ents}))
-    sys.exit(0)
-sys.exit(2)
-'''
+FAKE_KLT = REPO_ROOT / "sim" / "bin" / "fixtures" / "klt"
 
 
 # Every `sim/*/run_*.py`, and the argv that must fail closed when the broker is unset.
@@ -228,17 +207,20 @@ def selftest() -> int:
 
     with tempfile.TemporaryDirectory() as tmp:
         tmpd = Path(tmp)
-        binp = tmpd / "bin"
-        binp.mkdir()
-        (binp / "klt").write_text(_FAKE_KLT.replace("#!/usr/bin/env python3", f"#!{sys.executable}"))
-        (binp / "klt").chmod(0o755)
         saved = (MANIFEST_DIR, STAGE_ROOT, dict(os.environ))
         MANIFEST_DIR = tmpd / "manifests" / "artifacts"
         STAGE_ROOT = tmpd / "stage"
-        os.environ["PATH"] = f"{binp}{os.pathsep}{os.environ['PATH']}"
+        os.environ["PATH"] = f"{FAKE_KLT.parent}{os.pathsep}{os.environ['PATH']}"
         try:
             os.environ[BROKER_ENV] = "http://broker.invalid"
             os.environ["FAKE_KLT_MODE"] = "ok"
+            fake = str(FAKE_KLT)
+            resolved = shutil.which("klt")
+            check("klt on PATH resolves to the tracked fake fixture", resolved == fake,
+                  f"resolved to {resolved!r}, expected {fake!r}")
+            if resolved != fake:
+                print(f"selftest FAILED: {', '.join(failures)}", file=sys.stderr)
+                return 1
             check("preflight passes with broker and verbs", raises(preflight) is None)
 
             del os.environ[BROKER_ENV]

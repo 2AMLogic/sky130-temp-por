@@ -1,0 +1,33 @@
+#!/usr/bin/env python3
+"""Fake `klt` for the evidence-store self-test (`sim/bin/evidence_store.py --selftest`).
+
+Answers `artifact put --help`, `artifact verify --help` and `artifact put`
+only; anything else exits 2. $FAKE_KLT_MODE picks the behaviour: ok (default),
+no-put, put-fails, bad-uri.
+
+Tracked and executable on purpose (issue #538): the self-test puts this
+directory first on PATH. A fake written into the temporary directory is
+skipped by PATH lookup when TMPDIR is mounted noexec, and a real `klt`
+installed later on PATH is invoked instead.
+"""
+import hashlib, json, os, sys
+a = sys.argv[1:]
+mode = os.environ.get("FAKE_KLT_MODE", "ok")
+if a[:2] == ["artifact", "put"] and "--help" in a:
+    sys.exit(1 if mode == "no-put" else 0)
+if a[:2] == ["artifact", "verify"] and "--help" in a:
+    sys.exit(0)
+if a[:2] == ["artifact", "put"]:
+    if mode == "put-fails":
+        print("broker unreachable", file=sys.stderr); sys.exit(1)
+    m = a[a.index("--manifest") + 1]
+    files = a[a.index("--manifest") + 2:]
+    ents = []
+    for f in files:
+        b = open(f, "rb").read(); h = hashlib.sha256(b).hexdigest()
+        ents.append({"sha256": h, "size": len(b), "kind": "evidence",
+                     "producer": {"tool": "klt", "version": "0", "loom.repo": "o/n", "commit": None},
+                     "uri": ("s3://x/" if mode == "bad-uri" else "artifact:evidence/o__n/") + h, "name": f})
+    open(m, "w").write(json.dumps({"schema_version": 1, "entries": ents}))
+    sys.exit(0)
+sys.exit(2)
