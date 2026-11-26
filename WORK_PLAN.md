@@ -35,21 +35,21 @@ Human-approved issues ready for implementation (`loom:issue`).
 Issues currently being built (`loom:building`).
 
 - **#454**: T1 item 7: diagnose missing RESETn crossings in the temp_por_top post-layout grid
-- **#528**: Consolidate the three deck-list report checks so malformed output preserves fleet diagnostics
 - **#529**: Enforce append-only CI checks for layout PEX records
+- **#538**: Stop generating a klt executable in the evidence-store self-test’s temporary directory
 
 ## PRs Awaiting Review
 
 PRs waiting on Judge (`loom:review-requested`).
 
 - **#533**: fix: extend the append-only CI check to layout PEX records
+- **#540**: test(sim): move the evidence-store fake klt into a tracked fixture
 
 ## Approved (Awaiting Merge)
 
 PRs that passed review and are queued for Champion auto-merge (`loom:pr`).
 
 - **#524**: docs: attribute the block-level pex ramp no-crossing rows (solver branch, model swap, threshold)
-- **#531**: fix(sim): keep klt's stderr for an unusable deck-list report
 
 ## Proposed
 
@@ -85,8 +85,8 @@ Issues carrying `loom:curated`.
 | Important | 2 |
 | Ready (`loom:issue`) | 3 |
 | In Progress (`loom:building`) | 3 |
-| PRs awaiting review | 1 |
-| Approved PRs awaiting merge | 2 |
+| PRs awaiting review | 2 |
+| Approved PRs awaiting merge | 1 |
 | Curated | 9 |
 | Architect / Hermit proposals | 4 |
 | Active epics | 1 |
