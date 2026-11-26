@@ -1,0 +1,140 @@
+Warning: singular matrix:  check node xdut.x.xtemp.xr2.t2
+
+Note: Starting dynamic gmin stepping
+Note: Dynamic gmin stepping completed
+
+Note: No compatibility mode selected!
+
+
+Circuit: *lib ~/.ciel/sky130A/libs.tech/combined/sky130.lib.spice tt
+
+Doing analysis at TEMP = -40.000000 and TNOM = 27.000000
+
+Using SPARSE 1.3 as Direct Linear Solver
+
+Initial Transient Solution
+--------------------------
+
+Node                                   Voltage
+----                                   -------
+vsetn                                      3.3
+vdd                                          0
+xdut.xbias.na                    -2.95748e-146
+xdut.xbias.pg                     -5.16512e-20
+xdut.xbias.nbtop                 -1.26009e-129
+xdut.vref                         1.16921e-143
+xdut.xbias.nbg                     1.9606e-126
+xdut.x.xbias.xrt.t1              -1.26009e-129
+xdut.x.xbias.xrt.t2              -1.26009e-129
+xdut.xbias.nb                    -1.26009e-129
+xdut.x.xbias.xr1.t1              -1.26009e-129
+xdut.x.xbias.xr1.t2              -1.26009e-129
+xdut.xbias.ec                    -1.26009e-129
+xdut.x.xbias.xr2.t1               1.16921e-143
+xdut.x.xbias.xr2.t2               1.16921e-143
+xdut.xbias.er                     1.16921e-143
+xdut.xbias.pb                     1.49808e-126
+xdut.ibias                       -4.34583e-123
+xdut.xbias.nt                     6.69677e-133
+xdut.xbias.n1                    -1.22529e-124
+xdut.xbias.n2                     3.65364e-127
+xdut.xbias.nz                     3.65364e-127
+xdut.x.xbias.xrz.t1               3.65364e-127
+xdut.x.xbias.xrz.t2               3.65364e-127
+xdut.xbias.ks1                   -1.73124e-120
+xdut.xbias.ks2                    1.32666e-119
+xdut.xbias.ks3                   -9.98761e-119
+xdut.xbias.ks4                     7.5157e-118
+xdut.xbias.nkg                   -5.65542e-117
+xdut.xbias.nkm                    2.03708e-126
+xdut.xbias.tok                    1.98921e-135
+xdut.xbias.noko                  -5.97309e-127
+xdut.xbias.nokl                  -4.06195e-128
+xdut.xbias.nokx                  -1.22313e-118
+xdut.bias_ok                      4.73502e-121
+xdut.xcmp.bias_okb               -6.11456e-124
+xdut.xcmp.nbg                    -8.27458e-124
+xdut.xcmp.sns                     1.27989e-144
+xdut.x.xcmp.xrtop.t1              1.27988e-144
+xdut.x.xcmp.xrtop.t2              8.60064e-150
+xdut.xcmp.snsb                    2.37694e-144
+xdut.x.xcmp.xrbot.t1              2.37693e-144
+xdut.x.xcmp.xrbot.t2               1.2799e-144
+xdut.x.xcmp.xrhys.t1              1.62756e-148
+xdut.x.xcmp.xrhys.t2              2.37678e-144
+xdut.xcmp.n1                     -1.76225e-124
+xdut.xcmp.tn                       2.7631e-119
+xdut.xcmp.na                     -2.17747e-119
+xdut.xcmp.cmpo                   -2.14342e-119
+xdut.xcmp.vdda                    1.61534e-126
+xdut.por_raw                      2.60764e-124
+xdut.xpor.pdn                    -2.09811e-143
+xdut.xpor.ndl                    -5.23883e-130
+xdut.xpor.ndgp                   -1.53898e-122
+xdut.xpor.ndg                      2.2476e-116
+xdut.xpor.ndgn                   -8.09284e-116
+xdut.xpor.pgdg                    6.29606e-131
+xdut.xpor.pgdgb                  -4.17039e-126
+xdut.xpor.nts                      2.98529e-27
+xdut.xpor.tim                      7.54031e-37
+xdut.xpor.nd1                    -3.49665e-141
+xdut.xpor.trip                      2.9837e-27
+resetn                             -1.1594e-67
+xdut.xpor.rstb                    -1.48699e-27
+xdut.xpor.nnand                    -1.1224e-29
+xdut.xtemp.nbg                   -2.63009e-125
+xdut.xtemp.enb                    1.26449e-219
+xdut.xtemp.pb                     3.44581e-121
+xdut.xtemp.pcas                  -1.80467e-121
+xdut.xtemp.nt                     -8.07897e-21
+xdut.xtemp.n1                     -8.12573e-20
+xdut.xtemp.na                     4.07577e-117
+xdut.xtemp.n2                      4.88931e-20
+xdut.xtemp.nb                     2.21353e-128
+xdut.xtemp.pg                     -3.87289e-20
+xdut.xtemp.nz                      4.88931e-20
+xdut.x.xtemp.xrz.t1                4.88931e-20
+xdut.x.xtemp.xrz.t2                4.88931e-20
+xdut.xtemp.m1d                   -3.32729e-123
+xdut.xtemp.m2d                   -2.72852e-132
+xdut.xtemp.m3d                    5.04779e-158
+ptat                               -7.905e-164
+xdut.xtemp.nd                     5.60535e-130
+xdut.xtemp.nr                      1.1726e-126
+ctat                              4.07577e-117
+xdut.xtemp.nc                     2.21353e-128
+xdut.x.xtemp.xr1.t1               2.21353e-128
+xdut.x.xtemp.xr1.t2               2.21353e-128
+xdut.x.xtemp.xr2.t1              -7.90487e-164
+xdut.x.xtemp.xr2.t2              -1.14868e-164
+xdut.xtemp.ptat_trim             -1.14854e-164
+xdut.x.xtemp.xr2trim.t1           -1.1484e-164
+xdut.x.xtemp.xr2trim.t2          -1.35172e-168
+xdut.x.xtemp.xriso.t1             4.07577e-117
+xdut.x.xtemp.xriso.t2             4.07577e-117
+bvdd#branch                       -1.37188e-31
+vset#branch                                  0
+
+ Reference value :  0.00000e+00 Reference value :  1.90240e-04 Reference value :  2.24391e-04 Reference value :  3.10925e-04 Reference value :  1.07268e-03 Reference value :  1.18113e-03 Reference value :  1.18280e-03 Reference value :  1.58126e-03 Reference value :  2.62126e-03 Reference value :  3.70126e-03 Reference value :  4.65126e-03 Reference value :  5.55126e-03 Reference value :  6.54126e-03 Reference value :  7.46126e-03 Reference value :  8.48126e-03 Reference value :  9.21126e-03 Reference value :  9.97126e-03 Reference value :  1.06513e-02 Reference value :  1.13813e-02 Reference value :  1.21413e-02 Reference value :  1.31713e-02 Reference value :  1.41413e-02 Reference value :  1.49413e-02 Reference value :  1.57913e-02 Reference value :  1.66413e-02 Reference value :  1.75313e-02 Reference value :  1.84713e-02 Reference value :  1.94513e-02 Reference value :  2.04213e-02 Reference value :  2.13813e-02 Reference value :  2.23513e-02 Reference value :  2.33213e-02 Reference value :  2.42813e-02 Reference value :  2.52413e-02 Reference value :  2.62013e-02 Reference value :  2.71513e-02 Reference value :  2.81113e-02 Reference value :  2.90813e-02
+No. of Data Rows : 3062
+
+  Measurements for Transient Analysis
+
+t_release_v_ih      =   1.18170e-03
+
+ptat_1m             =  2.98654e-07
+ptat_2m             =  2.68284e-01
+ptat_3m             =  2.68284e-01
+ptat_5m             =  2.68284e-01
+ptat_10m            =  2.68284e-01
+ptat_20m            =  2.68284e-01
+ptat_29m            =  2.68284e-01
+vdd30               =  3.30000e+00
+ptatmax             =  3.67757e+00 at=  2.10240e-04
+ptat30              =  2.68284e-01
+ctat30              =  7.53739e-01
+r_end               =  3.10890e+00
+r_10m               =  3.10890e+00
+r_20m               =  3.10890e+00
+vmax                =  3.10891e+00 at=  1.18300e-03
+ngspice-47 done

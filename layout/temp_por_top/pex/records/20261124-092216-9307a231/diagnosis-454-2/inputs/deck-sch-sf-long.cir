@@ -1,0 +1,45 @@
+.lib ~/.ciel/sky130A/libs.tech/combined/sky130.lib.spice sf
+.include ./tb.spice
+.include <repo>/layout/temp_por_top/pex/records/20261124-092216-9307a231/grid/artifacts/schematic-dut.flat.spice
+.temp -40
+.meas tran t_release_v_ih WHEN v(resetn)=2.64 RISE=1
+.control
+set ng_nomodcheck
+save all
+alter vset=2.97
+tran 1u 0.3 0 1e-05
+meas tran ptat_1m FIND v(ptat) AT=1e-3
+meas tran ctat_1m FIND v(ctat) AT=1e-3
+meas tran resetn_1m FIND v(resetn) AT=1e-3
+meas tran ptat_3m FIND v(ptat) AT=3e-3
+meas tran ctat_3m FIND v(ctat) AT=3e-3
+meas tran resetn_3m FIND v(resetn) AT=3e-3
+meas tran ptat_5m FIND v(ptat) AT=5e-3
+meas tran ctat_5m FIND v(ctat) AT=5e-3
+meas tran resetn_5m FIND v(resetn) AT=5e-3
+meas tran ptat_10m FIND v(ptat) AT=10e-3
+meas tran ctat_10m FIND v(ctat) AT=10e-3
+meas tran resetn_10m FIND v(resetn) AT=10e-3
+meas tran ptat_29m FIND v(ptat) AT=29e-3
+meas tran ctat_29m FIND v(ctat) AT=29e-3
+meas tran resetn_29m FIND v(resetn) AT=29e-3
+meas tran ptat_50m FIND v(ptat) AT=50e-3
+meas tran resetn_50m FIND v(resetn) AT=50e-3
+meas tran ptat_100m FIND v(ptat) AT=100e-3
+meas tran resetn_100m FIND v(resetn) AT=100e-3
+meas tran ptat_200m FIND v(ptat) AT=200e-3
+meas tran resetn_200m FIND v(resetn) AT=200e-3
+meas tran ptat_290m FIND v(ptat) AT=290e-3
+meas tran resetn_290m FIND v(resetn) AT=290e-3
+meas tran vdd30 FIND v(vdd) AT=0.3
+meas tran ptatmax MAX v(ptat)
+meas tran resetnmax MAX v(resetn)
+meas tran ptat30 FIND v(ptat) AT=0.3
+meas tran ctat30 FIND v(ctat) AT=0.3
+meas tran r_end FIND v(resetn) AT=0.3
+meas tran r_10m FIND v(resetn) AT=0.01
+meas tran r_20m FIND v(resetn) AT=0.02
+meas tran vmax MAX v(resetn)
+quit
+.endc
+.end
