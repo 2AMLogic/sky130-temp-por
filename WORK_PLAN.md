@@ -35,15 +35,12 @@ Human-approved issues ready for implementation (`loom:issue`).
 Issues currently being built (`loom:building`).
 
 - **#454**: T1 item 7: diagnose missing RESETn crossings in the temp_por_top post-layout grid
-- **#529**: Enforce append-only CI checks for layout PEX records
-- **#538**: Stop generating a klt executable in the evidence-store self-test’s temporary directory
 
 ## PRs Awaiting Review
 
 PRs waiting on Judge (`loom:review-requested`).
 
-- **#533**: fix: extend the append-only CI check to layout PEX records
-- **#540**: test(sim): move the evidence-store fake klt into a tracked fixture
+_None._
 
 ## Approved (Awaiting Merge)
 
@@ -63,7 +60,6 @@ Issues carrying `loom:curated`.
 - **#454**: T1 item 7: diagnose missing RESETn crossings in the temp_por_top post-layout grid *(curated)*
 - **#461**: temp_core: build DR-007 chopped-amplifier + degenerated-mirror sim variant and measure chopper residual offset (part a of #456) *(curated)*
 - **#521**: Measure the 45-corner PEX ramp grid with per-rail RESETn thresholds and compare group-A recovery *(curated)*
-- **#529**: Enforce append-only CI checks for layout PEX records *(curated)*
 
 ## Proposed (Architect / Hermit)
 
@@ -84,10 +80,10 @@ Issues carrying `loom:curated`.
 | Very important | 0 |
 | Important | 2 |
 | Ready (`loom:issue`) | 3 |
-| In Progress (`loom:building`) | 3 |
-| PRs awaiting review | 2 |
+| In Progress (`loom:building`) | 1 |
+| PRs awaiting review | 0 |
 | Approved PRs awaiting merge | 1 |
-| Curated | 9 |
+| Curated | 8 |
 | Architect / Hermit proposals | 4 |
 | Active epics | 1 |
 <!-- guide:plan-body:end -->
