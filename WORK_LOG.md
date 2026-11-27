@@ -9,6 +9,12 @@ Chronological record of recently merged pull requests and closed issues. This fi
 
 ### 2026-11-26
 
+- **Issue #529** (closed): Enforce append-only CI checks for layout PEX records
+- **PR #533**: fix: extend the append-only CI check to layout PEX records
+- **Issue #539** (closed): Make the corner-run batch and deck-transport klt fixtures work with a noexec TMPDIR
+- **PR #542**: test(sim): move the corner-run and deck-transport klt stubs into tracked fixtures
+- **Issue #538** (closed): Stop generating a klt executable in the evidence-store self-test’s temporary directory
+- **PR #540**: test(sim): move the evidence-store fake klt into a tracked fixture
 - **PR #531**: fix(sim): keep klt's stderr for an unusable deck-list report
 - **Issue #528** (closed): Consolidate the three deck-list report checks so malformed output preserves fleet diagnostics
 - **PR #534**: fix: report klt stdout that is not a JSON object as NO-JSON
