@@ -120,6 +120,9 @@ jobs:
       - name: PNP-mismatch grader signal-vs-sigma check records a zero-mean failure instead of crashing (issue #446)
         run: python3 -I sim/pnp-mismatch/test_pnp_mismatch.py
 
+      - name: bias-core op-branch verdict defers branch movement to the solver comparison under identical and differing off-branch sets (issue #544)
+        run: python3 -I sim/bias-core-op-branch/test_op_branch.py
+
       - name: Pad-island census unit tests
         run: python3 -m unittest layout/bin/test_pad_island_census.py
 
