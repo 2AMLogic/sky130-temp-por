@@ -1,0 +1,23 @@
+.lib ~/.ciel/sky130A/libs.tech/combined/sky130.lib.spice sf
+.include ./tb.spice
+.include <repo>/layout/temp_por_top/pex/records/20261124-092216-9307a231/diagnosis-454-2/inputs/schematic-dut.flat.01v8swap.spice
+.temp -40
+.meas tran t_release_v_ih WHEN v(resetn)=2.64 RISE=1
+.control
+set ng_nomodcheck
+save all
+alter vset=2.97
+tran 1u 0.03 0 1e-05
+meas tran vdd30 FIND v(vdd) AT=0.03
+meas tran resetnmax MAX v(resetn)
+meas tran resetn_3m FIND v(resetn) AT=0.003
+meas tran ptat_3m FIND v(ptat) AT=0.003
+meas tran ptat30 FIND v(ptat) AT=0.03
+meas tran ctat30 FIND v(ctat) AT=0.03
+meas tran r_end FIND v(resetn) AT=0.03
+meas tran r_10m FIND v(resetn) AT=0.01
+meas tran r_20m FIND v(resetn) AT=0.02
+meas tran vmax MAX v(resetn)
+quit
+.endc
+.end

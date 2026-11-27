@@ -23,7 +23,7 @@ The signoff report grades `layout/temp_por_top/` at **7 of 11 T1 items met**.
 | 4 LVS clean | met | `layout/temp_por_top/lvs.json`: `match` 154/154 devices, 71/71 nets, native-Vt `XMASSIST` included — no exclusion (re-rendered at klt `0.9.2`, #453). The compare is flavour-blind until the 5 V devices' `hvi` marker can be drawn (klayout-tools#6025) |
 | 5 Corner verification vs a ratified spec | unmet | only two of eight spec rows are ratified (DR-003) |
 | 6 Monte Carlo for statistical claims | unmet | MC records exist under `sim/` as harness records, not as envelopes the report accepts, and back no ratified row |
-| 7 Post-layout verification | unmet | cell-level `klt pex` report for `por_comparator` passes at the klt `0.9.2` pin (single tt/27C point, `layout/por_comparator/pex/klt-pex.rerun.report.json`, #454); the block-level `temp_por_top` report now exists, post-#501: the single tt/27C/3.30V pilot is `status: pass` and the 5x3x3 batch-fleet grid is `status: error` (84/135 delta rows pass, 51 error: 24 rows from 12 corners where the extracted release finds no 2.64 V crossing in the 30 ms window, 27 rows from the 9 `ss` corners where ngspice aborts the transient on both testbenches (`timestep_too_small` / `nonconvergence`, the #153 signature); `singular_matrix` is reported at 18 extracted-side corners and 6 schematic-side corners; `layout/temp_por_top/pex/records/20261124-092216-9307a231/`, #454). Item 7 needs a passing block-level report, so it stays `unmet`; the 51 errors are attributed in `layout/temp_por_top/pex/records/20261124-092216-9307a231/diagnosis-454/` (#454): 27 rows are an extracted-only DC operating-point failure at `ss` (solver limitation), 24 rows are an extracted RESETn that never rises (design vs solver unresolved); two klt reporting gaps filed (klayout-tools#7904 mis-sorted `delta[].error`, #7905 non-retained `.include` path in `corner.cir`; the missing per-corner logs were this repo's `*.log` gitignore rule, not klt) |
+| 7 Post-layout verification | unmet | cell-level `klt pex` report for `por_comparator` passes at the klt `0.9.2` pin (single tt/27C point, `layout/por_comparator/pex/klt-pex.rerun.report.json`, #454); the block-level `temp_por_top` report now exists, post-#501: the single tt/27C/3.30V pilot is `status: pass` and the 5x3x3 batch-fleet grid is `status: error` (84/135 delta rows pass, 51 error: 24 rows from 12 corners where the extracted release finds no 2.64 V crossing in the 30 ms window, 27 rows from the 9 `ss` corners where ngspice aborts the transient on both testbenches (`timestep_too_small` / `nonconvergence`, the #153 signature); `singular_matrix` is reported at 18 extracted-side corners and 6 schematic-side corners; `layout/temp_por_top/pex/records/20261124-092216-9307a231/`, #454). Item 7 needs a passing block-level report, so it stays `unmet`; the 51 errors are attributed in `layout/temp_por_top/pex/records/20261124-092216-9307a231/diagnosis-454/` (#454): 27 rows are an extracted-only DC operating-point failure at `ss` (solver limitation), the 24 ramp rows miss the 2.64 V crossing. In `diagnosis-454-2/` (#454), single-point controls show that the non-physical PTAT trajectory at `tt/3.300V/-40C` depends on tolerance, the PTAT operating-point guess and coupling capacitance. At that corner, the #467 `01v8` model swap advances the schematic crossing from 2.76 ms to 1.18 ms. At `sf/2.970V/-40C` the schematic high falls below the fixed 2.64 V threshold (#521); two klt reporting gaps filed (klayout-tools#7904 mis-sorted `delta[].error`, #7905 non-retained `.include` path in `corner.cir`; the missing per-corner logs were this repo's `*.log` gitignore rule, not klt) |
 | 8 Characterization report | unmet | `docs/characterization-report.md` exists but records FAILs and gaps, so it is not a passing check |
 | 9 Testbenches shipped | met | `manifests/attestations/`, item 9 |
 | 10 Repo hygiene | met | `manifests/attestations/`, item 10 |
@@ -104,11 +104,22 @@ Unblocked by a named item above or by a ruling listed under "Blocked and waiting
   3x `xdut.sns`) and at 6 schematic-side corners (`xdut.x.xtemp.xr2.t2`).
   Attribution (#454, `diagnosis-454/`): the 27 `ss` rows fail at the extracted
   netlist's initial operating point (gmin stepping fails; schematic legs pass), a
-  solver limitation not shown to share a cause with #153; the 24 no-crossing rows
-  are a RESETn that stays low (a local repro has PTAT at 12.8 V on a 3.3 V rail),
-  design-vs-solver unresolved. klt gaps filed: klayout-tools#7904, #7905 (include path only). What
-  remains: the evidence listed in `diagnosis-454/README.md` to separate those
-  causes, and the `hvi` marker re-render (klt pin bump, #467). Item 7 stays
+  solver limitation not shown to share a cause with #153. Follow-up single-point
+  runs (`diagnosis-454-2/`) examine the 24 ramp rows. At `tt/3.300V/-40C`
+  the unseeded extracted PTAT reaches +12.79 V at 30 ms and RESETn misses
+  2.64 V. A 0.283 V nodeset on PTAT and its three terminals gives a crossing
+  at 1.205 ms but leaves PTAT at −3.446 V at 30 ms. Tightening `reltol` to
+  1e-4 lowers the 5 ms peak from 14.96 V to 2.91 V and gives a crossing at
+  1.214 ms. Removing the coupling caps suppresses the excursion. The schematic
+  with only the #467 `01v8` model swap releases at 1.18 ms, consistent with
+  the early extracted releases (0.3-0.9x the schematic at 20 passing corners).
+  At `sf/2.970V/-40C` the schematic
+  RESETn-high (2.6383 V) misses the pinned 2.64 V (0.8x3.30 V) threshold by
+  1.7 mV on a 2.97 V rail where the defined V_IH is 2.376 V (#521). klt gaps
+  filed: klayout-tools#7904, #7905 (include path only). What
+  remains: the `ss` attribution (#153 relation untested), the harness
+  threshold decision (#521), and the `hvi` marker re-render (klt pin bump,
+  #467) whose post-swap grid is the item-7 path. Item 7 stays
   `unmet`.*
 - **Full-block LVS.** Answered and delivered — klt draws and compares the
   native-Vt NMOS at the klt `0.9.2` pin (#97, closed), and the `temp_por_top`
