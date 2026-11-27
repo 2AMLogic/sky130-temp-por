@@ -874,7 +874,13 @@ def render_record(r: dict) -> str:
     return "\n".join(L)
 
 
-def verdict_text(results: list[dict], checks: list[dict]) -> str:
+def verdict_text(results: list[dict]) -> str:
+    """The record's verdict, decided by the per-point physicality checks alone.
+
+    Branch movement is deliberately not stated here: it is the `solver_dependence`
+    check's finding. Physicality and solver dependence are independent -- a non-physical
+    solution can appear under both solvers at the same supply -- so this only refers the
+    reader to that check by name (issue #544)."""
     off = [p for p in results if p["branch"] == "off"]
     physical_off = [
         p
@@ -906,8 +912,11 @@ def verdict_text(results: list[dict], checks: list[dict]) -> str:
         "the wrong way) or parks at least one node outside the rails by more than "
         f"{RAIL_MARGIN_V:g} V, so none of them can be a state bias_core is able to "
         "occupy. They are false "
-        "convergences of the cold `.op`'s continuation path, and the branch reported "
-        "moves when only the numerics change (see `solver_dependence`). Cold `.op` is "
+        "convergences of the cold `.op`'s continuation path. That rests on physicality "
+        "alone, which is independent of the solver comparison: a non-physical solution "
+        "can appear under both solvers at the same supply voltage. Whether the off-branch "
+        "set depends on the solver, and at which supply points, is the "
+        "`solver_dependence` check's finding, not this verdict's. Cold `.op` is "
         "therefore not a sound branch-selection characterization for this cell; the "
         "transient-from-0 V startup testbench (`sim/bias-core-startup/`) is the method "
         "that can make a branch claim. Note the weaker `.op`-side mitigations are only "
@@ -1160,7 +1169,7 @@ def main(argv: list[str]) -> int:
         "points": results,
         "checks": checks,
         "overall_pass": overall,
-        "verdict": verdict_text(results, checks),
+        "verdict": verdict_text(results),
         "links": {
             "testbench": str(TESTBENCH.relative_to(REPO_ROOT)),
             "runner": str(Path(__file__).resolve().relative_to(REPO_ROOT)),
